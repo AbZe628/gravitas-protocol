@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Gravitas Protocol — Atomic Liquidity Migration for DEXs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Gravitas Protocol is invisible infrastructure for atomic liquidity migration between DEXs with micro-fees that generate sustainable protocol revenue." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
+
+  <!-- Open Graph / Twitter -->
+  <meta property="og:title" content="Gravitas Protocol — Atomic Liquidity Migration for DEXs">
+  <meta property="og:description" content="Invisible infrastructure for atomic liquidity migration with protocol-level micro-fees.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://abze628.github.io/gravitas-protocol/">
+  <meta property="og:image" content="https://abze628.github.io/gravitas-protocol/og-cover.png">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <!-- Tailwind via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Minimal CSS tweaks -->
+  <style>
+    .glass { backdrop-filter: blur(10px); background: rgba(255,255,255,0.08); }
+    .gradient { background: radial-gradient(1200px 600px at 50% -10%, rgba(99,102,241,.25), rgba(0,0,0,0)); }
+    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;}
+  </style>
+
+  <!-- JSON-LD (structured data) -->
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"SoftwareApplication",
+    "name":"Gravitas Protocol",
+    "applicationCategory":"DeFi Infrastructure",
+    "operatingSystem":"Blockchain",
+    "url":"https://abze628.github.io/gravitas-protocol/",
+    "description":"Invisible infrastructure for atomic liquidity migration between DEXs.",
+    "creator": [
+      {"@type":"Person","name":"Abdusamed Zelić"},
+      {"@type":"Person","name":"Abdulah Zelić"}
+    ],
+    "offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}
+  }
+  </script>
+</head>
+<body class="bg-black text-white selection:bg-indigo-600 selection:text-white">
+  <!-- Nav -->
+  <header class="sticky top-0 z-40 border-b border-white/10 bg-black/70 backdrop-blur">
+    <div class="mx-auto max-w-7xl px-4 py-3 flex items-center justify-between">
+      <a href="#" class="flex items-center gap-3">
+        <span class="text-2xl">🛰️</span>
+        <span class="text-lg font-semibold">Gravitas Protocol</span>
+      </a>
+      <nav class="hidden md:flex items-center gap-6 text-sm">
+        <a href="#problem" class="hover:text-indigo-300">Problem</a>
+        <a href="#solution" class="hover:text-indigo-300">Solution</a>
+        <a href="#architecture" class="hover:text-indigo-300">Architecture</a>
+        <a href="#security" class="hover:text-indigo-300">Security</a>
+        <a href="#roadmap" class="hover:text-indigo-300">Roadmap</a>
+        <a href="#team" class="hover:text-indigo-300">Team</a>
+      </nav>
+      <div class="flex items-center gap-2">
+        <a href="https://github.com/AbZe628/gravitas-protocol" class="px-4 py-2 rounded-xl border border-white/15 hover:bg-white/10">GitHub</a>
+        <a href="./whitepaper.md" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500">Whitepaper</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="relative gradient">
+    <div class="mx-auto max-w-7xl px-4 py-20 grid md:grid-cols-2 gap-10 items-center">
+      <div>
+        <h1 class="text-4xl md:text-5xl font-extrabold leading-tight">
+          Atomic Liquidity Migration<br class="hidden md:block"/> Between DEXs
+        </h1>
+        <p class="mt-5 text-white/80 text-lg">
+          Gravitas is invisible infrastructure that moves LP positions across Uniswap, SushiSwap, Curve, and Balancer—safely, instantly, and with protocol-level micro-fees.
+        </p>
+        <div class="mt-8 flex flex-wrap gap-3">
+          <a href="./whitepaper.md" class="px-5 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500">Read Blueprint</a>
+          <a href="mailto:abdusamedzelic98@gmail.com" class="px-5 py-3 rounded-xl border border-white/15 hover:bg-white/10">Contact</a>
+          <a href="tel:+385915668133" class="px-5 py-3 rounded-xl border border-white/15 hover:bg-white/10">Call</a>
+        </div>
+        <div class="mt-6 flex items-center gap-3 text-xs text-white/60">
+          <span class="px-2 py-1 rounded bg-white/5 border border-white/10">MVP Ready</span>
+          <span class="px-2 py-1 rounded bg-white/5 border border-white/10">Audit Planned</span>
+          <span class="px-2 py-1 rounded bg-white/5 border border-white/10">SDK Incoming</span>
+        </div>
+      </div>
+      <div class="glass rounded-2xl border border-white/10 p-6">
+        <div class="text-sm text-white/70">Flow Overview</div>
+        <div class="mt-3 bg-black/40 rounded-xl p-6 border border-white/10">
+          <pre class="code text-sm leading-6 whitespace-pre-wrap">
+[User Wallet] → <Teleport.sol> → [Adapters] → [DEX Pools] → <Treasury.sol>
+
+Teleport.sol      Atomic execution & fee capture
+Adapters          UniV2 / UniV3 safe wrappers (try/catch)
+DEX Pools         Uniswap, SushiSwap, Curve, Balancer
+Treasury.sol      Multisig fee vault (3/5) with timelock</pre>
+        </div>
+        <div class="mt-4 text-xs text-white/60">
+          Full spec: <a class="underline hover:text-indigo-300" href="./whitepaper.md">docs/whitepaper.md</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Problem -->
+  <section id="problem" class="mx-auto max-w-7xl px-4 py-16 border-t border-white/10">
+    <h2 class="text-2xl md:text-3xl font-bold">Problem</h2>
+    <p class="mt-4 text-white/80">
+      DeFi liquidity is fragmented across chains and pools. Users waste time and fees on manual LP migrations. Protocols miss out on passive income from their own liquidity.
+    </p>
+    <ul class="mt-6 grid md:grid-cols-3 gap-4 text-white/80">
+      <li class="glass p-4 rounded-xl border border-white/10">Manual, error-prone LP moves</li>
+      <li class="glass p-4 rounded-xl border border-white/10">Slippage & failed transactions</li>
+      <li class="glass p-4 rounded-xl border border-white/10">No protocol-level revenue</li>
+    </ul>
+  </section>
+
+  <!-- Solution / Value -->
+  <section id="solution" class="mx-auto max-w-7xl px-4 py-16 border-t border-white/10">
+    <h2 class="text-2xl md:text-3xl font-bold">Solution & Value</h2>
+    <div class="mt-6 grid md:grid-cols-3 gap-6">
+      <div class="glass p-6 rounded-2xl border border-white/10">
+        <h3 class="font-semibold">Atomic Migration</h3>
+        <p class="mt-2 text-white/80">One-click, fail-safe LP transfers between V2/V3 pools with strict slippage control.</p>
+      </div>
+      <div class="glass p-6 rounded-2xl border border-white/10">
+        <h3 class="font-semibold">Micro-Fee Revenue</h3>
+        <p class="mt-2 text-white/80">5–10 bps captured at protocol layer. 100% flows to the Treasury multisig.</p>
+      </div>
+      <div class="glass p-6 rounded-2xl border border-white/10">
+        <h3 class="font-semibold">Partner SDK</h3>
+        <p class="mt-2 text-white/80">DEX front-ends integrate SDK for native migration UX and shared revenue.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Architecture -->
+  <section id="architecture" class="mx-auto max-w-7xl px-4 py-16 border-t border-white/10">
+    <h2 class="text-2xl md:text-3xl font-bold">Architecture</h2>
+    <div class="mt-6 grid md:grid-cols-2 gap-6">
+      <div class="glass p-6 rounded-2xl border border-white/10">
+        <h3 class="font-semibold">Core Contracts</h3>
+        <ul class="mt-3 list-disc pl-5 text-white/80">
+          <li><span class="code">Teleport.sol</span> — atomic execution, fee routing</li>
+          <li><span class="code">Treasury.sol</span> — fee accumulation, multisig control</li>
+          <li>Adapters — <span class="code">UniV2Adapter</span>, <span class="code">UniV3Adapter</span> (safe wrappers)</li>
+          <li>Libraries — <span class="code">SafeERC20</span>, <span class="code">TokenValidation</span></li>
+        </ul>
+      </div>
+      <div class="glass p-6 rounded-2xl border border-white/10">
+        <h3 class="font-semibold">SDK Modules</h3>
+        <ul class="mt-3 list-disc pl-5 text-white/80">
+          <li>Initialize & simulate migration</li>
+          <li>Build unsigned transactions</li>
+          <li>Discover migratable positions</li>
+          <li>Permit2 handler & error mapper</li>
+        </ul>
+      </div>
+    </div>
+    <p class="mt-6 text-white/70 text-sm">
+      Full architecture and process diagrams are described in the <a class="underline hover:text-indigo-300" href="./whitepaper.md">Blueprint</a>.
+    </p>
+  </section>
+
+  <!-- Security -->
+  <section id="security" class="mx-auto max-w-7xl px-4 py-16 border-t border-white/10">
+    <h2 class="text-2xl md:text-3xl font-bold">Security & Governance</h2>
+    <div class="mt-6 grid md:grid-cols-3 gap-6">
+      <div class="glass p-6 rounded-2xl border border-white/10">
+        <h3 class="font-semibold">Defense-in-Depth</h3>
+        <p class="mt-2 text-white/80">Guardian pause, timelock (48h), circuit breakers, invariant tests, Slither & MythX.</p>
+      </div>
+      <div class="glass p-6 rounded-2xl border border-white/10">
+        <h3 class="font-semibold">Treasury Multisig</h3>
+        <p class="mt-2 text-white/80">3/5 signers (founders, advisors, community). Transparent revenue handling.</p>
+      </div>
+      <div class="glass p-6 rounded-2xl border border-white/10">
+        <h3 class="font-semibold">Audit Plan</h3>
+        <p class="mt-2 text-white/80">Code4rena contest + Tier-1 audit firm pre-mainnet. Bug bounty post-launch.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Roadmap -->
+  <section id="roadmap" class="mx-auto max-w-7xl px-4 py-16 border-t border-white/10">
+    <h2 class="text-2xl md:text-3xl font-bold">Roadmap</h2>
+    <div class="mt-6 overflow-x-auto">
+      <table class="w-full text-left text-white/90">
+        <thead class="text-white/60 text-sm border-b border-white/10">
+          <tr><th class="py-2 pr-4">Phase</th><th class="py-2 pr-4">Description</th><th class="py-2">Status</th></tr>
+        </thead>
+        <tbody class="text-sm">
+          <tr class="border-b border-white/10"><td class="py-2 pr-4">1</td><td class="py-2 pr-4">Smart Contracts Core (Teleport, Treasury)</td><td class="py-2">80% Complete</td></tr>
+          <tr class="border-b border-white/10"><td class="py-2 pr-4">2</td><td class="py-2 pr-4">SDK Development & Infrastructure Setup</td><td class="py-2">In Progress</td></tr>
+          <tr class="border-b border-white/10"><td class="py-2 pr-4">3</td><td class="py-2 pr-4">Audit & Testnet Deployment</td><td class="py-2">Planned</td></tr>
+          <tr><td class="py-2 pr-4">4</td><td class="py-2 pr-4">Mainnet Launch with Partners</td><td class="py-2">Q2 2025 Target</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Team -->
+  <section id="team" class="mx-auto max-w-7xl px-4 py-16 border-t border-white/10">
+    <h2 class="text-2xl md:text-3xl font-bold">Team & Contact</h2>
+    <p class="mt-4 text-white/80">
+      Architects: <b>Abdusamed Zelić</b> & <b>Abdulah Zelić</b>
+    </p>
+    <p class="text-white/80">Email: <a class="underline hover:text-indigo-300" href="mailto:abdusamedzelic98@gmail.com">abdusamedzelic98@gmail.com</a> &nbsp;·&nbsp; Phone: <a class="underline hover:text-indigo-300" href="tel:+385915668133">+385 91 566 8133</a></p>
+
+    <div class="mt-6 flex flex-wrap gap-3">
+      <a href="mailto:abdusamedzelic98@gmail.com" class="px-5 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500">Book Intro Call</a>
+      <a href="https://github.com/AbZe628/gravitas-protocol" class="px-5 py-3 rounded-xl border border-white/15 hover:bg-white/10">View GitHub</a>
+      <a href="./whitepaper.md" class="px-5 py-3 rounded-xl border border-white/15 hover:bg-white/10">Download Blueprint</a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="border-t border-white/10">
+    <div class="mx-auto max-w-7xl px-4 py-6 text-sm text-white/50">
+      © <span id="year"></span> Gravitas Protocol — “Code is law. Funds are safe. The protocol is gravity.”
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
