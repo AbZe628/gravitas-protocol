@@ -205,6 +205,8 @@ npx hardhat run scripts\migrate.ts  --network localhost
 - Prepare documentation for Code4rena audit  
 
 ---
+📘 [Read the full Gravitas Protocol Blueprint](./docs/whitepaper.md)
+
 
 ## License
 
