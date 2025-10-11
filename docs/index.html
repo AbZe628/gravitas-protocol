@@ -1,232 +1,810 @@
-<!doctype html>
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>Gravitas Protocol — Atomic Liquidity Migration for DEXs</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Gravitas Protocol is invisible infrastructure for atomic liquidity migration between DEXs with micro-fees that generate sustainable protocol revenue." />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛰️</text></svg>">
+  <link rel="canonical" href="https://abze628.github.io/gravitas-protocol/">
 
-  <!-- Open Graph / Twitter -->
-  <meta property="og:title" content="Gravitas Protocol — Atomic Liquidity Migration for DEXs">
-  <meta property="og:description" content="Invisible infrastructure for atomic liquidity migration with protocol-level micro-fees.">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://abze628.github.io/gravitas-protocol/">
-  <meta property="og:image" content="https://abze628.github.io/gravitas-protocol/og-cover.png">
-  <meta name="twitter:card" content="summary_large_image">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gravitas Protocol - The Invisible Engine of DeFi Liquidity</title>
+    <meta name="description" content="Atomic liquidity migration between DEXs — one click, zero friction, continuous revenue.">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="Gravitas Protocol - DeFi Liquidity Infrastructure">
+    <meta property="og:description" content="Atomic liquidity migration between DEXs — one click, zero friction, continuous revenue.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="./og-cover.png">
+<meta name="twitter:card" content="summary_large_image">
 
-  <!-- Tailwind via CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Minimal CSS tweaks -->
-  <style>
-    .glass { backdrop-filter: blur(10px); background: rgba(255,255,255,0.08); }
-    .gradient { background: radial-gradient(1200px 600px at 50% -10%, rgba(99,102,241,.25), rgba(0,0,0,0)); }
-    .code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;}
-  </style>
-
-  <!-- JSON-LD (structured data) -->
-  <script type="application/ld+json">
-  {
-    "@context":"https://schema.org",
-    "@type":"SoftwareApplication",
-    "name":"Gravitas Protocol",
-    "applicationCategory":"DeFi Infrastructure",
-    "operatingSystem":"Blockchain",
-    "url":"https://abze628.github.io/gravitas-protocol/",
-    "description":"Invisible infrastructure for atomic liquidity migration between DEXs.",
-    "creator": [
-      {"@type":"Person","name":"Abdusamed Zelić"},
-      {"@type":"Person","name":"Abdulah Zelić"}
-    ],
-    "offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}
-  }
-  </script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6366f1',
+                        'primary-dark': '#4338ca',
+                        secondary: '#10b981',
+                        dark: '#0f172a',
+                        darker: '#020617',
+                        light: '#f8fafc',
+                        gray: '#64748b'
+                    },
+                    animation: {
+                        'gradient': 'gradient 8s linear infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        gradient: {
+                            '0%, 100%': {
+                                'background-size': '200% 200%',
+                                'background-position': 'left center'
+                            },
+                            '50%': {
+                                'background-size': '200% 200%',
+                                'background-position': 'right center'
+                            }
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-20px)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #6366f1 0%, #10b981 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero-gradient {
+            background: linear-gradient(-45deg, #020617, #0f172a, #4338ca, #10b981);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+        
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease-out;
+        }
+        
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
 </head>
-<body class="bg-black text-white selection:bg-indigo-600 selection:text-white">
-  <!-- Nav -->
-  <header class="sticky top-0 z-40 border-b border-white/10 bg-black/70 backdrop-blur">
-    <div class="mx-auto max-w-7xl px-4 py-3 flex items-center justify-between">
-      <a href="#" class="flex items-center gap-3">
-        <span class="text-2xl">🛰️</span>
-        <span class="text-lg font-semibold">Gravitas Protocol</span>
-      </a>
-      <nav class="hidden md:flex items-center gap-6 text-sm">
-        <a href="#problem" class="hover:text-indigo-300">Problem</a>
-        <a href="#solution" class="hover:text-indigo-300">Solution</a>
-        <a href="#architecture" class="hover:text-indigo-300">Architecture</a>
-        <a href="#security" class="hover:text-indigo-300">Security</a>
-        <a href="#roadmap" class="hover:text-indigo-300">Roadmap</a>
-        <a href="#team" class="hover:text-indigo-300">Team</a>
-      </nav>
-      <div class="flex items-center gap-2">
-        <a href="https://github.com/AbZe628/gravitas-protocol" class="px-4 py-2 rounded-xl border border-white/15 hover:bg-white/10">GitHub</a>
-        <a href="./whitepaper.md" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500">Whitepaper</a>
-      </div>
-    </div>
-  </header>
-
-  <!-- Hero -->
-  <section class="relative gradient">
-    <div class="mx-auto max-w-7xl px-4 py-20 grid md:grid-cols-2 gap-10 items-center">
-      <div>
-        <h1 class="text-4xl md:text-5xl font-extrabold leading-tight">
-          Atomic Liquidity Migration<br class="hidden md:block"/> Between DEXs
-        </h1>
-        <p class="mt-5 text-white/80 text-lg">
-          Gravitas is invisible infrastructure that moves LP positions across Uniswap, SushiSwap, Curve, and Balancer—safely, instantly, and with protocol-level micro-fees.
-        </p>
-        <div class="mt-8 flex flex-wrap gap-3">
-          <a href="./whitepaper.md" class="px-5 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500">Read Blueprint</a>
-          <a href="mailto:abdusamedzelic98@gmail.com" class="px-5 py-3 rounded-xl border border-white/15 hover:bg-white/10">Contact</a>
-          <a href="tel:+385915668133" class="px-5 py-3 rounded-xl border border-white/15 hover:bg-white/10">Call</a>
+<body class="bg-darker text-light font-sans antialiased">
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 glass py-4">
+        <div class="container mx-auto px-6">
+            <div class="flex justify-between items-center">
+                <div class="text-2xl font-bold gradient-text">GRAVITAS</div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#problem" class="hover:text-primary transition-colors">Problem</a>
+                    <a href="#solution" class="hover:text-primary transition-colors">Solution</a>
+                    <a href="#architecture" class="hover:text-primary transition-colors">Architecture</a>
+                    <a href="#security" class="hover:text-primary transition-colors">Security</a>
+                    <a href="#revenue" class="hover:text-primary transition-colors">Revenue</a>
+                    <a href="#investment" class="hover:text-primary transition-colors">Invest</a>
+                </div>
+                <div class="flex space-x-4">
+                    <a href="#contact" class="bg-primary hover:bg-primary-dark px-6 py-2 rounded-full transition-colors">Contact</a>
+                    <button class="md:hidden">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
         </div>
-        <div class="mt-6 flex items-center gap-3 text-xs text-white/60">
-          <span class="px-2 py-1 rounded bg-white/5 border border-white/10">MVP Ready</span>
-          <span class="px-2 py-1 rounded bg-white/5 border border-white/10">Audit Planned</span>
-          <span class="px-2 py-1 rounded bg-white/5 border border-white/10">SDK Incoming</span>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero min-h-screen hero-gradient flex items-center pt-20">
+        <div class="container mx-auto px-6 py-20">
+            <div class="max-w-4xl mx-auto text-center">
+                <h1 class="text-5xl md:text-7xl font-bold mb-6">
+                    The Invisible Engine of <span class="gradient-text">DeFi Liquidity</span>
+                </h1>
+                <p class="text-xl md:text-2xl text-gray-300 mb-12 max-w-3xl mx-auto">
+                    Atomic liquidity migration between DEXs — one click, zero friction, continuous revenue.
+                </p>
+                
+                <div class="flex flex-col sm:flex-row gap-4 justify-center mb-16">
+                    <a href="#architecture" class="bg-primary hover:bg-primary-dark px-8 py-4 rounded-full font-semibold transition-all transform hover:scale-105">
+                        Read Technical Blueprint
+                    </a>
+                    <a href="#investment" class="glass hover:bg-white/10 px-8 py-4 rounded-full font-semibold transition-all transform hover:scale-105">
+                        Invest / Contact
+                    </a>
+                    <a href="https://github.com/AbZe628/gravitas-protocol" class="glass hover:bg-white/10 px-8 py-4 rounded-full font-semibold transition-all transform hover:scale-105">
+                        <i class="fab fa-github mr-2"></i>View GitHub
+                    </a>
+                </div>
+
+                <!-- Metrics -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-2xl mx-auto">
+                    <div class="text-center">
+                        <div class="text-2xl md:text-3xl font-bold gradient-text">$100M+</div>
+                        <div class="text-gray-400 text-sm">Target Monthly Volume</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl md:text-3xl font-bold gradient-text">5-10 bps</div>
+                        <div class="text-gray-400 text-sm">Protocol Fee</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl md:text-3xl font-bold gradient-text">99.9%</div>
+                        <div class="text-gray-400 text-sm">Uptime SLA</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-2xl md:text-3xl font-bold gradient-text">1-Click</div>
+                        <div class="text-gray-400 text-sm">Migration</div>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-      <div class="glass rounded-2xl border border-white/10 p-6">
-        <div class="text-sm text-white/70">Flow Overview</div>
-        <div class="mt-3 bg-black/40 rounded-xl p-6 border border-white/10">
-          <pre class="code text-sm leading-6 whitespace-pre-wrap">
-[User Wallet] → &lt;Teleport.sol&gt; → [Adapters] → [DEX Pools] → &lt;Treasury.sol&gt;
+    </section>
 
+    <!-- Problem Section -->
+    <section id="problem" class="py-20 bg-dark">
+        <div class="container mx-auto px-6">
+            <div class="max-w-4xl mx-auto text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6">The DeFi Liquidity Problem</h2>
+                <p class="text-xl text-gray-300">
+                    DeFi liquidity is fragmented. Users waste time and gas. Projects earn nothing from their own liquidity.
+                </p>
+            </div>
 
-Teleport.sol      Atomic execution & fee capture
-Adapters          UniV2 / UniV3 safe wrappers (try/catch)
-DEX Pools         Uniswap, SushiSwap, Curve, Balancer
-Treasury.sol      Multisig fee vault (3/5) with timelock</pre>
+            <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                <div class="glass p-8 rounded-2xl hover:transform hover:scale-105 transition-all duration-300">
+                    <div class="w-16 h-16 bg-primary/20 rounded-2xl flex items-center justify-center mb-6">
+                        <i class="fas fa-exchange-alt text-2xl text-primary"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4">Fragmentation</h3>
+                    <p class="text-gray-300">
+                        Liquidity scattered across multiple DEXs and layers. No unified infrastructure for seamless movement.
+                    </p>
+                </div>
+
+                <div class="glass p-8 rounded-2xl hover:transform hover:scale-105 transition-all duration-300">
+                    <div class="w-16 h-16 bg-primary/20 rounded-2xl flex items-center justify-center mb-6">
+                        <i class="fas fa-gas-pump text-2xl text-primary"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4">Inefficiency</h3>
+                    <p class="text-gray-300">
+                        5-10 transactions required for manual migrations. High gas costs and slippage exposure.
+                    </p>
+                </div>
+
+                <div class="glass p-8 rounded-2xl hover:transform hover:scale-105 transition-all duration-300">
+                    <div class="w-16 h-16 bg-primary/20 rounded-2xl flex items-center justify-center mb-6">
+                        <i class="fas fa-money-bill-wave text-2xl text-primary"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4">Lost Revenue</h3>
+                    <p class="text-gray-300">
+                        Protocols capture zero value from liquidity movements. Missed opportunity for sustainable revenue.
+                    </p>
+                </div>
+            </div>
         </div>
-        <div class="mt-4 text-xs text-white/60">
-          Full spec: <a class="underline hover:text-indigo-300" href="./whitepaper.md">docs/whitepaper.md</a>
+    </section>
+
+    <!-- Solution Section -->
+    <section id="solution" class="py-20 bg-darker">
+        <div class="container mx-auto px-6">
+            <div class="max-w-6xl mx-auto">
+                <div class="grid lg:grid-cols-2 gap-16 items-center">
+                    <div>
+                        <h2 class="text-4xl md:text-5xl font-bold mb-6">Atomic Liquidity Migration</h2>
+                        <p class="text-xl text-gray-300 mb-8">
+                            One transaction executes the complete migration: withdraw, remove liquidity, take fee, add liquidity, stake.
+                        </p>
+                        
+                        <div class="space-y-4 mb-8">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center mr-4">
+                                    <i class="fas fa-check text-white"></i>
+                                </div>
+                                <span>5-10 bps micro-fee on all migrations</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center mr-4">
+                                    <i class="fas fa-check text-white"></i>
+                                </div>
+                                <span>100% fees go to protocol treasury</span>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center mr-4">
+                                    <i class="fas fa-check text-white"></i>
+                                </div>
+                                <span>Built for safety, speed, and sustainable income</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass p-8 rounded-2xl">
+                        <div class="text-center mb-8">
+                            <h3 class="text-2xl font-bold mb-2">Migration Flow</h3>
+                            <p class="text-gray-300">Single transaction execution</p>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between p-4 bg-white/5 rounded-xl">
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center mr-4">
+                                        <i class="fas fa-wallet text-primary"></i>
+                                    </div>
+                                    <span>User Wallet</span>
+                                </div>
+                                <i class="fas fa-arrow-right text-gray-400"></i>
+                            </div>
+
+                            <div class="flex items-center justify-between p-4 bg-white/5 rounded-xl">
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center mr-4">
+                                        <i class="fas fa-rocket text-primary"></i>
+                                    </div>
+                                    <span>Teleport.sol</span>
+                                </div>
+                                <i class="fas fa-arrow-right text-gray-400"></i>
+                            </div>
+
+                            <div class="flex items-center justify-between p-4 bg-white/5 rounded-xl">
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center mr-4">
+                                        <i class="fas fa-plug text-primary"></i>
+                                    </div>
+                                    <span>Adapters</span>
+                                </div>
+                                <i class="fas fa-arrow-right text-gray-400"></i>
+                            </div>
+
+                            <div class="flex items-center justify-between p-4 bg-white/5 rounded-xl">
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center mr-4">
+                                        <i class="fas fa-exchange-alt text-primary"></i>
+                                    </div>
+                                    <span>DEX Protocols</span>
+                                </div>
+                                <i class="fas fa-arrow-right text-gray-400"></i>
+                            </div>
+
+                            <div class="flex items-center p-4 bg-white/5 rounded-xl">
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center mr-4">
+                                        <i class="fas fa-landmark text-primary"></i>
+                                    </div>
+                                    <span>Treasury.sol</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- Problem -->
-  <section id="problem" class="mx-auto max-w-7xl px-4 py-16 border-t border-white/10">
-    <h2 class="text-2xl md:text-3xl font-bold">Problem</h2>
-    <p class="mt-4 text-white/80">
-      DeFi liquidity is fragmented across chains and pools. Users waste time and fees on manual LP migrations. Protocols miss out on passive income from their own liquidity.
-    </p>
-    <ul class="mt-6 grid md:grid-cols-3 gap-4 text-white/80">
-      <li class="glass p-4 rounded-xl border border-white/10">Manual, error-prone LP moves</li>
-      <li class="glass p-4 rounded-xl border border-white/10">Slippage & failed transactions</li>
-      <li class="glass p-4 rounded-xl border border-white/10">No protocol-level revenue</li>
-    </ul>
-  </section>
+    <!-- Architecture Section -->
+    <section id="architecture" class="py-20 bg-dark">
+        <div class="container mx-auto px-6">
+            <div class="max-w-4xl mx-auto text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6">Technical Architecture</h2>
+                <p class="text-xl text-gray-300">Enterprise-grade infrastructure built for scale and security</p>
+            </div>
 
-  <!-- Solution / Value -->
-  <section id="solution" class="mx-auto max-w-7xl px-4 py-16 border-t border-white/10">
-    <h2 class="text-2xl md:text-3xl font-bold">Solution & Value</h2>
-    <div class="mt-6 grid md:grid-cols-3 gap-6">
-      <div class="glass p-6 rounded-2xl border border-white/10">
-        <h3 class="font-semibold">Atomic Migration</h3>
-        <p class="mt-2 text-white/80">One-click, fail-safe LP transfers between V2/V3 pools with strict slippage control.</p>
-      </div>
-      <div class="glass p-6 rounded-2xl border border-white/10">
-        <h3 class="font-semibold">Micro-Fee Revenue</h3>
-        <p class="mt-2 text-white/80">5–10 bps captured at protocol layer. 100% flows to the Treasury multisig.</p>
-      </div>
-      <div class="glass p-6 rounded-2xl border border-white/10">
-        <h3 class="font-semibold">Partner SDK</h3>
-        <p class="mt-2 text-white/80">DEX front-ends integrate SDK for native migration UX and shared revenue.</p>
-      </div>
-    </div>
-  </section>
+            <div class="grid lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
+                <!-- Smart Contracts -->
+                <div class="glass p-8 rounded-2xl">
+                    <h3 class="text-2xl font-bold mb-6 gradient-text">Smart Contracts</h3>
+                    <div class="space-y-4">
+                        <div class="p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-colors cursor-pointer">
+                            <h4 class="font-bold mb-2">Teleport.sol</h4>
+                            <p class="text-gray-300 text-sm">Atomic migration engine with reentrancy protection</p>
+                        </div>
+                        <div class="p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-colors cursor-pointer">
+                            <h4 class="font-bold mb-2">Treasury.sol</h4>
+                            <p class="text-gray-300 text-sm">Gnosis Safe-based treasury with multi-sig governance</p>
+                        </div>
+                        <div class="p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-colors cursor-pointer">
+                            <h4 class="font-bold mb-2">UniV2/V3 Adapters</h4>
+                            <p class="text-gray-300 text-sm">Protocol-specific integration adapters</p>
+                        </div>
+                        <div class="p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-colors cursor-pointer">
+                            <h4 class="font-bold mb-2">SafeERC20 & TokenValidation</h4>
+                            <p class="text-gray-300 text-sm">Secure token handling and validation libraries</p>
+                        </div>
+                    </div>
+                </div>
 
-  <!-- Architecture -->
-  <section id="architecture" class="mx-auto max-w-7xl px-4 py-16 border-t border-white/10">
-    <h2 class="text-2xl md:text-3xl font-bold">Architecture</h2>
-    <div class="mt-6 grid md:grid-cols-2 gap-6">
-      <div class="glass p-6 rounded-2xl border border-white/10">
-        <h3 class="font-semibold">Core Contracts</h3>
-        <ul class="mt-3 list-disc pl-5 text-white/80">
-          <li><span class="code">Teleport.sol</span> — atomic execution, fee routing</li>
-          <li><span class="code">Treasury.sol</span> — fee accumulation, multisig control</li>
-          <li>Adapters — <span class="code">UniV2Adapter</span>, <span class="code">UniV3Adapter</span> (safe wrappers)</li>
-          <li>Libraries — <span class="code">SafeERC20</span>, <span class="code">TokenValidation</span></li>
-        </ul>
-      </div>
-      <div class="glass p-6 rounded-2xl border border-white/10">
-        <h3 class="font-semibold">SDK Modules</h3>
-        <ul class="mt-3 list-disc pl-5 text-white/80">
-          <li>Initialize & simulate migration</li>
-          <li>Build unsigned transactions</li>
-          <li>Discover migratable positions</li>
-          <li>Permit2 handler & error mapper</li>
-        </ul>
-      </div>
-    </div>
-    <p class="mt-6 text-white/70 text-sm">
-      Full architecture and process diagrams are described in the <a class="underline hover:text-indigo-300" href="./whitepaper.md">Blueprint</a>.
-    </p>
-  </section>
+                <!-- SDK Structure -->
+                <div class="glass p-8 rounded-2xl">
+                    <h3 class="text-2xl font-bold mb-6 gradient-text">Integration SDK</h3>
+                    <div class="space-y-4">
+                        <div class="p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-colors cursor-pointer">
+                            <h4 class="font-bold mb-2">Migration Simulator</h4>
+                            <p class="text-gray-300 text-sm">Dry-run simulations with precise output estimation</p>
+                        </div>
+                        <div class="p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-colors cursor-pointer">
+                            <h4 class="font-bold mb-2">Permit2Handler</h4>
+                            <p class="text-gray-300 text-sm">Gasless approval management with ERC-2612</p>
+                        </div>
+                        <div class="p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-colors cursor-pointer">
+                            <h4 class="font-bold mb-2">ErrorMapper</h4>
+                            <p class="text-gray-300 text-sm">User-friendly error translation and handling</p>
+                        </div>
+                        <div class="p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-colors cursor-pointer">
+                            <h4 class="font-bold mb-2">RateLimiter</h4>
+                            <p class="text-gray-300 text-sm">API abuse protection and request throttling</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-  <!-- Security -->
-  <section id="security" class="mx-auto max-w-7xl px-4 py-16 border-t border-white/10">
-    <h2 class="text-2xl md:text-3xl font-bold">Security & Governance</h2>
-    <div class="mt-6 grid md:grid-cols-3 gap-6">
-      <div class="glass p-6 rounded-2xl border border-white/10">
-        <h3 class="font-semibold">Defense-in-Depth</h3>
-        <p class="mt-2 text-white/80">Guardian pause, timelock (48h), circuit breakers, invariant tests, Slither & MythX.</p>
-      </div>
-      <div class="glass p-6 rounded-2xl border border-white/10">
-        <h3 class="font-semibold">Treasury Multisig</h3>
-        <p class="mt-2 text-white/80">3/5 signers (founders, advisors, community). Transparent revenue handling.</p>
-      </div>
-      <div class="glass p-6 rounded-2xl border border-white/10">
-        <h3 class="font-semibold">Audit Plan</h3>
-        <p class="mt-2 text-white/80">Code4rena contest + Tier-1 audit firm pre-mainnet. Bug bounty post-launch.</p>
-      </div>
-    </div>
-  </section>
+            <!-- Code Example -->
+            <div class="max-w-4xl mx-auto mt-12">
+                <div class="glass p-6 rounded-2xl">
+                    <h4 class="font-bold mb-4">3-Line Integration Example</h4>
+                    <pre class="bg-black/50 p-4 rounded-lg overflow-x-auto text-sm">
+<code class="text-green-400">// Partner Integration
+const sdk = new TeleportSDK(provider, chainId);
+const migration = await sdk.initializeMigration(userAddress);
+const tx = await migration.buildTransaction();</code></pre>
+                </div>
+            </div>
+        </div>
+    </section>
 
-  <!-- Roadmap -->
-  <section id="roadmap" class="mx-auto max-w-7xl px-4 py-16 border-t border-white/10">
-    <h2 class="text-2xl md:text-3xl font-bold">Roadmap</h2>
-    <div class="mt-6 overflow-x-auto">
-      <table class="w-full text-left text-white/90">
-        <thead class="text-white/60 text-sm border-b border-white/10">
-          <tr><th class="py-2 pr-4">Phase</th><th class="py-2 pr-4">Description</th><th class="py-2">Status</th></tr>
-        </thead>
-        <tbody class="text-sm">
-          <tr class="border-b border-white/10"><td class="py-2 pr-4">1</td><td class="py-2 pr-4">Smart Contracts Core (Teleport, Treasury)</td><td class="py-2">80% Complete</td></tr>
-          <tr class="border-b border-white/10"><td class="py-2 pr-4">2</td><td class="py-2 pr-4">SDK Development & Infrastructure Setup</td><td class="py-2">In Progress</td></tr>
-          <tr class="border-b border-white/10"><td class="py-2 pr-4">3</td><td class="py-2 pr-4">Audit & Testnet Deployment</td><td class="py-2">Planned</td></tr>
-          <tr><td class="py-2 pr-4">4</td><td class="py-2 pr-4">Mainnet Launch with Partners</td><td class="py-2">Q2 2025 Target</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
+    <!-- Security Section -->
+    <section id="security" class="py-20 bg-darker">
+        <div class="container mx-auto px-6">
+            <div class="max-w-4xl mx-auto text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6">Security & Governance</h2>
+                <p class="text-xl text-gray-300">No token minting, no upgradeable proxies, immutable core</p>
+            </div>
 
-  <!-- Team -->
-  <section id="team" class="mx-auto max-w-7xl px-4 py-16 border-t border-white/10">
-    <h2 class="text-2xl md:text-3xl font-bold">Team & Contact</h2>
-    <p class="mt-4 text-white/80">
-      Architects: <b>Abdusamed Zelić</b> & <b>Abdulah Zelić</b>
-    </p>
-    <p class="text-white/80">Email: <a class="underline hover:text-indigo-300" href="mailto:abdusamedzelic98@gmail.com">abdusamedzelic98@gmail.com</a> &nbsp;·&nbsp; Phone: <a class="underline hover:text-indigo-300" href="tel:+385915668133">+385 91 566 8133</a></p>
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto mb-16">
+                <div class="glass p-6 text-center rounded-2xl">
+                    <i class="fas fa-users text-3xl text-primary mb-4"></i>
+                    <h4 class="font-bold mb-2">Multi-Sig (3/5)</h4>
+                    <p class="text-gray-300 text-sm">Treasury and governance control</p>
+                </div>
+                <div class="glass p-6 text-center rounded-2xl">
+                    <i class="fas fa-clock text-3xl text-primary mb-4"></i>
+                    <h4 class="font-bold mb-2">48h Timelock</h4>
+                    <p class="text-gray-300 text-sm">All administrative changes</p>
+                </div>
+                <div class="glass p-6 text-center rounded-2xl">
+                    <i class="fas fa-shield-alt text-3xl text-primary mb-4"></i>
+                    <h4 class="font-bold mb-2">Guardian Wallet</h4>
+                    <p class="text-gray-300 text-sm">Emergency pause capability</p>
+                </div>
+                <div class="glass p-6 text-center rounded-2xl">
+                    <i class="fas fa-bolt text-3xl text-primary mb-4"></i>
+                    <h4 class="font-bold mb-2">Circuit Breaker</h4>
+                    <p class="text-gray-300 text-sm">Instant protocol suspension</p>
+                </div>
+            </div>
 
-    <div class="mt-6 flex flex-wrap gap-3">
-      <a href="mailto:abdusamedzelic98@gmail.com" class="px-5 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500">Book Intro Call</a>
-      <a href="https://github.com/AbZe628/gravitas-protocol" class="px-5 py-3 rounded-xl border border-white/15 hover:bg-white/10">View GitHub</a>
-      <a href="./whitepaper.md" class="px-5 py-3 rounded-xl border border-white/15 hover:bg-white/10">Download Blueprint</a>
-    </div>
-  </section>
+            <!-- Incident Response -->
+            <div class="max-w-4xl mx-auto">
+                <div class="glass p-8 rounded-2xl">
+                    <h3 class="text-2xl font-bold mb-6 gradient-text text-center">Incident Response Protocol</h3>
+                    <div class="grid md:grid-cols-5 gap-4 text-center">
+                        <div class="p-4">
+                            <div class="w-12 h-12 bg-primary rounded-full flex items-center justify-center mx-auto mb-2">
+                                <span class="font-bold">1</span>
+                            </div>
+                            <p class="text-sm">Detection<br><span class="text-gray-400">30s alerts</span></p>
+                        </div>
+                        <div class="p-4">
+                            <div class="w-12 h-12 bg-primary rounded-full flex items-center justify-center mx-auto mb-2">
+                                <span class="font-bold">2</span>
+                            </div>
+                            <p class="text-sm">Assessment<br><span class="text-gray-400">5min analysis</span></p>
+                        </div>
+                        <div class="p-4">
+                            <div class="w-12 h-12 bg-primary rounded-full flex items-center justify-center mx-auto mb-2">
+                                <span class="font-bold">3</span>
+                            </div>
+                            <p class="text-sm">Containment<br><span class="text-gray-400">Circuit breaker</span></p>
+                        </div>
+                        <div class="p-4">
+                            <div class="w-12 h-12 bg-primary rounded-full flex items-center justify-center mx-auto mb-2">
+                                <span class="font-bold">4</span>
+                            </div>
+                            <p class="text-sm">Communication<br><span class="text-gray-400">15min update</span></p>
+                        </div>
+                        <div class="p-4">
+                            <div class="w-12 h-12 bg-primary rounded-full flex items-center justify-center mx-auto mb-2">
+                                <span class="font-bold">5</span>
+                            </div>
+                            <p class="text-sm">Resolution<br><span class="text-gray-400">24h post-mortem</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-  <!-- Footer -->
-  <footer class="border-t border-white/10">
-    <div class="mx-auto max-w-7xl px-4 py-6 text-sm text-white/50">
-      © <span id="year"></span> Gravitas Protocol — “Code is law. Funds are safe. The protocol is gravity.”
-    </div>
-  </footer>
+    <!-- Revenue Section -->
+    <section id="revenue" class="py-20 bg-dark">
+        <div class="container mx-auto px-6">
+            <div class="max-w-4xl mx-auto text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6">Revenue Model</h2>
+                <p class="text-xl text-gray-300">Sustainable protocol-owned revenue through micro-fees</p>
+            </div>
 
-  <script>
-    document.getElementById('year').textContent = new Date().getFullYear();
-  </script>
+            <div class="grid lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
+                <div class="glass p-8 rounded-2xl">
+                    <h3 class="text-2xl font-bold mb-6 gradient-text">Fee Structure</h3>
+                    <div class="space-y-6">
+                        <div>
+                            <h4 class="font-bold mb-2">5-10 bps per migration</h4>
+                            <p class="text-gray-300">Micro-fee applied to all migrated volume</p>
+                        </div>
+                        <div>
+                            <h4 class="font-bold mb-2">100% to Treasury</h4>
+                            <p class="text-gray-300">All fees directed to protocol-owned treasury</p>
+                        </div>
+                        <div>
+                            <h4 class="font-bold mb-2">Target: $100M monthly volume</h4>
+                            <p class="text-gray-300">$50k-$100k monthly revenue at scale</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass p-8 rounded-2xl">
+                    <h3 class="text-2xl font-bold mb-6 gradient-text">Revenue Projections</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center p-3 bg-white/5 rounded">
+                            <span>Volume</span>
+                            <span>Fee</span>
+                            <span>Monthly Revenue</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-white/5 rounded">
+                            <span>$10M</span>
+                            <span>10 bps</span>
+                            <span class="text-green-400">$10,000</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-white/5 rounded">
+                            <span>$50M</span>
+                            <span>8 bps</span>
+                            <span class="text-green-400">$40,000</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-white/5 rounded">
+                            <span>$100M</span>
+                            <span>5 bps</span>
+                            <span class="text-green-400">$50,000</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tokenomics -->
+            <div class="max-w-2xl mx-auto mt-12">
+                <div class="glass p-8 rounded-2xl">
+                    <h3 class="text-2xl font-bold mb-6 gradient-text text-center">Future Tokenomics (Optional)</h3>
+                    <div class="grid grid-cols-2 gap-4 text-center">
+                        <div class="p-4">
+                            <div class="text-2xl font-bold text-primary">20%</div>
+                            <div class="text-gray-300">Team</div>
+                        </div>
+                        <div class="p-4">
+                            <div class="text-2xl font-bold text-primary">15%</div>
+                            <div class="text-gray-300">Investors</div>
+                        </div>
+                        <div class="p-4">
+                            <div class="text-2xl font-bold text-primary">30%</div>
+                            <div class="text-gray-300">Treasury</div>
+                        </div>
+                        <div class="p-4">
+                            <div class="text-2xl font-bold text-primary">35%</div>
+                            <div class="text-gray-300">Community</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Roadmap Section -->
+    <section class="py-20 bg-darker">
+        <div class="container mx-auto px-6">
+            <div class="max-w-4xl mx-auto text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6">Development Roadmap</h2>
+                <p class="text-xl text-gray-300">16-week timeline from development to mainnet launch</p>
+            </div>
+
+            <div class="max-w-6xl mx-auto">
+                <div class="grid md:grid-cols-4 gap-8">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-code text-2xl text-white"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">Phase 1</h3>
+                        <p class="text-gray-300 mb-2">Weeks 1-4</p>
+                        <p class="text-sm">Smart Contracts</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-shield-alt text-2xl text-white"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">Phase 2</h3>
+                        <p class="text-gray-300 mb-2">Weeks 5-8</p>
+                        <p class="text-sm">Testing & Security</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-tools text-2xl text-white"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">Phase 3</h3>
+                        <p class="text-gray-300 mb-2">Weeks 9-12</p>
+                        <p class="text-sm">SDK & Infrastructure</p>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-secondary rounded-2xl flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-rocket text-2xl text-white"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">Phase 4</h3>
+                        <p class="text-gray-300 mb-2">Weeks 13-16</p>
+                        <p class="text-sm">Mainnet Launch</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section class="py-20 bg-dark">
+        <div class="container mx-auto px-6">
+            <div class="max-w-4xl mx-auto text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6">Team</h2>
+                <p class="text-xl text-gray-300">Building the future of DeFi infrastructure</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                <div class="glass p-8 rounded-2xl text-center">
+                    <div class="w-32 h-32 bg-gradient-to-br from-primary to-secondary rounded-full mx-auto mb-6 flex items-center justify-center">
+                        <span class="text-3xl font-bold text-white">AZ</span>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-2">Abdusamed Zelić</h3>
+                    <p class="text-gray-300 mb-4">Lead Smart Contract Architect</p>
+                    <div class="flex justify-center space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-primary transition-colors">
+                            <i class="fab fa-linkedin text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-primary transition-colors">
+                            <i class="fab fa-github text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="glass p-8 rounded-2xl text-center">
+                    <div class="w-32 h-32 bg-gradient-to-br from-primary to-secondary rounded-full mx-auto mb-6 flex items-center justify-center">
+                        <span class="text-3xl font-bold text-white">AZ</span>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-2">Abdulah Zelić</h3>
+                    <p class="text-gray-300 mb-4">Infrastructure Engineer</p>
+                    <div class="flex justify-center space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-primary transition-colors">
+                            <i class="fab fa-linkedin text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-primary transition-colors">
+                            <i class="fab fa-github text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Investment Section -->
+    <section id="investment" class="py-20 bg-darker">
+        <div class="container mx-auto px-6">
+            <div class="max-w-4xl mx-auto text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6">Investment Opportunity</h2>
+                <p class="text-xl text-gray-300">Join the foundation of DeFi liquidity infrastructure</p>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
+                <div class="glass p-8 rounded-2xl">
+                    <h3 class="text-2xl font-bold mb-6 gradient-text">Financial Overview</h3>
+                    <div class="space-y-6">
+                        <div class="flex justify-between items-center p-4 bg-white/5 rounded">
+                            <span>Initial Investment</span>
+                            <span class="text-2xl font-bold">$930,000</span>
+                        </div>
+                        <div class="flex justify-between items-center p-4 bg-white/5 rounded">
+                            <span>Year 1 Operating Cost</span>
+                            <span class="text-2xl font-bold">$500,000</span>
+                        </div>
+                        <div class="flex justify-between items-center p-4 bg-white/5 rounded">
+                            <span>Break-even Volume</span>
+                            <span class="text-2xl font-bold">$83M/month</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-8">
+                        <h4 class="font-bold mb-4">Use of Funds</h4>
+                        <div class="space-y-3">
+                            <div class="flex justify-between">
+                                <span>Development (5 seniors, 4 months)</span>
+                                <span class="text-primary">$480,000</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Security Audits</span>
+                                <span class="text-primary">$250,000</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Infrastructure & Tools</span>
+                                <span class="text-primary">$50,000</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Legal & Compliance</span>
+                                <span class="text-primary">$50,000</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Marketing & Partnerships</span>
+                                <span class="text-primary">$100,000</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass p-8 rounded-2xl">
+                    <h3 class="text-2xl font-bold mb-6 gradient-text">Investment Details</h3>
+                    <div class="space-y-6">
+                        <div>
+                            <h4 class="font-bold mb-2">Seed Round</h4>
+                            <p class="text-gray-300">Currently raising $930,000 for 15% equity</p>
+                        </div>
+                        <div>
+                            <h4 class="font-bold mb-2">Valuation</h4>
+                            <p class="text-gray-300">Pre-money valuation: $5.3M</p>
+                        </div>
+                        <div>
+                            <h4 class="font-bold mb-2">Minimum Investment</h4>
+                            <p class="text-gray-300">$50,000</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 space-y-4">
+                        <a href="#contact" class="w-full bg-primary hover:bg-primary-dark py-4 rounded-full font-semibold transition-colors block text-center">
+                            Request Investor Deck
+                        </a>
+                        <a href="#contact" class="w-full glass hover:bg-white/10 py-4 rounded-full font-semibold transition-colors block text-center">
+                            Join Seed Round
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 bg-dark">
+        <div class="container mx-auto px-6">
+            <div class="max-w-4xl mx-auto text-center">
+                <h2 class="text-4xl md:text-5xl font-bold mb-6">Ready to Build the Future?</h2>
+                <p class="text-xl text-gray-300 mb-12">Let's discuss the future of DeFi liquidity infrastructure</p>
+
+                <div class="glass p-8 rounded-2xl max-w-2xl mx-auto">
+                    <div class="text-center mb-8">
+                        <div class="w-20 h-20 bg-gradient-to-br from-primary to-secondary rounded-full mx-auto mb-4 flex items-center justify-center">
+                            <i class="fas fa-paper-plane text-2xl text-white"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-2">Contact Information</h3>
+                    </div>
+
+                    <div class="space-y-4 text-center">
+                        <div>
+                            <i class="fas fa-envelope text-primary mr-2"></i>
+                            <a href="mailto:abdusamedzelic98@gmail.com" class="hover:text-primary transition-colors">
+                                abdusamedzelic98@gmail.com
+                            </a>
+                        </div>
+                        <div>
+                            <i class="fas fa-phone text-primary mr-2"></i>
+                            <a href="tel:+385915668133" class="hover:text-primary transition-colors">
+                                +385 91 566 8133
+                            </a>
+                        </div>
+                        <div>
+                            <i class="fas fa-map-marker-alt text-primary mr-2"></i>
+                            <span>Rijeka, Croatia</span>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-center space-x-6 mt-8">
+                        <a href="#" class="text-gray-400 hover:text-primary transition-colors">
+                            <i class="fab fa-github text-2xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-primary transition-colors">
+                            <i class="fab fa-twitter text-2xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-primary transition-colors">
+                            <i class="fab fa-linkedin text-2xl"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-8 bg-darker border-t border-white/10">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="text-2xl font-bold gradient-text mb-4 md:mb-0">GRAVITAS</div>
+                <div class="text-gray-400 text-center md:text-right">
+                    <p class="italic mb-2">"Code is law. Funds are safe. The protocol is gravity."</p>
+                    <p>&copy; <span id="currentYear"></span> Gravitas Protocol. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Set current year
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        // Fade in animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        // Observe all sections
+        document.querySelectorAll('section').forEach(section => {
+            section.classList.add('fade-in');
+            observer.observe(section);
+        });
+
+        // Simple mobile menu toggle (can be enhanced)
+        document.querySelector('button.md\\:hidden').addEventListener('click', function() {
+            const nav = document.querySelector('.hidden.md\\:flex');
+            nav.classList.toggle('hidden');
+            nav.classList.toggle('flex');
+            nav.classList.toggle('flex-col');
+            nav.classList.toggle('absolute');
+            nav.classList.toggle('top-16');
+            nav.classList.toggle('left-0');
+            nav.classList.toggle('right-0');
+            nav.classList.toggle('bg-darker');
+            nav.classList.toggle('p-4');
+            nav.classList.toggle('space-y-4');
+        });
+
+        // Add visible class to hero immediately
+        document.querySelector('.hero').classList.add('visible');
+    </script>
 </body>
 </html>
