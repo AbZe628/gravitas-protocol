@@ -177,6 +177,33 @@ npx hardhat run scripts\migrate.ts  --network localhost
 
 > This proves the full pipeline exists: contracts, scripts, and observable on-chain state transitions (even if local).
 
+## 🧩 MVP Status & Roadmap
+
+**Current Progress**
+
+✅ Project structure and contract templates complete  
+⚙️ Core logic (Teleport.sol) in active development  
+🔒 Security audit scheduled (Code4rena + MythX)  
+🧠 SDK and analytics dashboard under construction  
+
+---
+
+**Development Roadmap**
+
+| Phase | Description | Status |
+|-------|--------------|--------|
+| 1 | Smart Contracts Core (Teleport, Treasury) | ✅ 80% Complete |
+| 2 | SDK Development & Infrastructure Setup | 🛠 In Progress |
+| 3 | Audit & Testnet Deployment | 🔜 Planned |
+| 4 | Mainnet Launch with Partners | ⏳ Q2 2025 Target |
+
+---
+
+**Next Milestones**
+- Implement fee routing logic in Teleport.sol  
+- Finalize adapter safety wrappers (UniV2 & UniV3)  
+- Prepare documentation for Code4rena audit  
+
 ---
 
 ## License
