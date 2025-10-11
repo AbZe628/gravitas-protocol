@@ -1,0 +1,28 @@
+{
+  "name": "gravitas",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "compile": "hardhat compile",
+    "deploy:bsctest": "hardhat run scripts/deploy.ts --network bsctest",
+    "seed:bsctest": "hardhat run scripts/seed.ts --network bsctest",
+    "migrate:bsctest": "hardhat run scripts/migrate.ts --network bsctest"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-chai-matchers": "2.0.7",
+    "@nomicfoundation/hardhat-ethers": "3.0.6",
+    "@nomicfoundation/hardhat-network-helpers": "1.0.11",
+    "@types/chai": "4.3.11",
+    "@types/node": "20.11.28",
+    "chai": "4.3.10",
+    "dotenv": "16.4.5",
+    "ethers": "6.13.2",
+    "hardhat": "2.22.6",
+    "ts-node": "10.9.1",
+    "typescript": "5.2.2"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.4.0",
+    "forge-std": "^1.1.2"
+  }
+}
