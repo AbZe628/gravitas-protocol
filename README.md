@@ -12,6 +12,23 @@ Gravitas solves this by providing a *seamless, invisible bridge* for liquidity m
 - Micro-fees (5–10 bps) generate continuous protocol revenue  
 - Partners can integrate via SDK and share in revenue  
 
+## ⚙️ Architecture
+
+Gravitas Protocol is built around modular smart contracts that enable atomic, safe, and flexible liquidity transfers.
+
+**Core Components:**
+
+- **Teleport.sol** — the main contract that executes atomic liquidity migrations  
+- **Treasury.sol** — collects protocol fees and manages multi-sig treasury  
+- **Adapters (UniV2Adapter.sol / UniV3Adapter.sol)** — interface with Uniswap and other DEX routers  
+- **Libraries (SafeERC20.sol / TokenValidation.sol)** — security and validation helpers  
+
+```
+[User Wallet] → [Teleport.sol] → [Adapters] → [DEX Pools] → [Treasury.sol]
+```
+
+➡ This flow ensures that every liquidity migration is executed atomically, with protocol-level fee collection and full safety guarantees.
+
 
 **Status:** MVP | **Scope:** Uniswap V2 liquidity migration (same-chain) via adapter + demo tokens | **Stack:** Solidity 0.8.24, Hardhat, TypeScript, OpenZeppelin
 
