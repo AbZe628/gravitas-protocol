@@ -1,77 +1,131 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/Pausable.sol";
-import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+/*
+  Minimal Teleport contract for MVP demo.
+  - Sadrži minimalne interface-e inline kako ne bi morao dirati node_modules ili druge fajlove.
+  - Manual migration: burn LP on factoryA pair, mint on factoryB pair.
+  - Simple owner pattern (no OZ imports) so deployment / calling je straightforward.
+*/
 
-import "./interfaces/IUniswapV2Pair.sol";
-import "./UniV2Adapter.sol";
+interface IERC20 {
+    function totalSupply() external view returns (uint256);
+    function balanceOf(address owner) external view returns (uint256);
+    function transfer(address to, uint256 value) external returns (bool);
+    function approve(address spender, uint256 value) external returns (bool);
+    function allowance(address owner, address spender) external view returns (uint256);
+    function transferFrom(address from, address to, uint256 value) external returns (bool);
+    event Transfer(address indexed from, address indexed to, uint256 value);
+    event Approval(address indexed owner, address indexed spender, uint256 value);
+}
 
-contract Teleport is Ownable, Pausable, ReentrancyGuard {
-    using SafeERC20 for IERC20;
+interface IUniswapV2Factory {
+    function getPair(address tokenA, address tokenB) external view returns (address pair);
+    function createPair(address tokenA, address tokenB) external returns (address pair);
+}
 
-    UniV2Adapter public adapter;
+interface IUniswapV2PairLite {
+    // minimal we need: burn and mint (pair is also ERC20 but we use IERC20 for transfer)
+    function burn(address to) external returns (uint amount0, uint amount1);
+    function mint(address to) external returns (uint liquidity);
+}
 
+contract Teleport {
+    // --- owner ---
+    address public owner;
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Teleport: caller is not owner");
+        _;
+    }
+
+    constructor() {
+        owner = msg.sender;
+        emit OwnershipTransferred(address(0), msg.sender);
+    }
+
+    function transferOwnership(address newOwner) external onlyOwner {
+        require(newOwner != address(0), "Teleport: zero addr");
+        emit OwnershipTransferred(owner, newOwner);
+        owner = newOwner;
+    }
+
+    // --- Events ---
     event LiquidityMigratedV2(
-        address indexed user,
-        address indexed routerFrom,
-        address indexed routerTo,
+        address indexed caller,
+        address indexed factoryFrom,
+        address indexed factoryTo,
         address tokenA,
         address tokenB,
-        uint256 amountAOut,
-        uint256 amountBOut,
-        uint256 liquidityMinted
+        uint amountA,
+        uint amountB,
+        uint liquidityMinted
     );
 
-    // OZ v5: Ownable traži inicijalnog vlasnika
-    constructor(address _adapter) Ownable(msg.sender) {
-        adapter = UniV2Adapter(_adapter);
+    // --- Helpers (admin) ---
+    // Allow Teleport to set approve on LP pair (if needed)
+    function approveLP(address pair, address spender, uint256 amount) external onlyOwner {
+        IERC20(pair).approve(spender, 0);
+        IERC20(pair).approve(spender, amount);
     }
 
-    function pause() external onlyOwner { _pause(); }
-    function unpause() external onlyOwner { _unpause(); }
+    // Approve tokenA/tokenB allowance to a spender (e.g., routerB) from Teleport
+    function approveTokens(address tokenA, address tokenB, address spender, uint256 amount) external onlyOwner {
+        IERC20(tokenA).approve(spender, 0);
+        IERC20(tokenA).approve(spender, amount);
+        IERC20(tokenB).approve(spender, 0);
+        IERC20(tokenB).approve(spender, amount);
+    }
 
-    /// @notice MVP: migrira LP sa V2 routera na V2 router (može biti isti router i za demo)
-    function migrateLiquidityV2(
-        address routerFrom,
-        address routerTo,
+    // --------------------------
+    // Manual migration A -> B
+    // --------------------------
+    // Steps:
+    // 1) Find pairFrom via factoryFrom.getPair(tokenA, tokenB)
+    // 2) Transfer LP (Teleport -> pairFrom) and call burn(to=Teleport) to get amountA/amountB
+    // 3) Ensure pairTo exists on factoryTo (create if not)
+    // 4) Transfer tokens (Teleport -> pairTo) and call mint(to=Teleport)
+    // 5) Emit event
+    //
+    // All calls are performed by Teleport itself. No router used — deterministic.
+    function migrateLiquidityV2Manual(
+        address factoryFrom,
+        address factoryTo,
         address tokenA,
         address tokenB,
-        uint256 liquidity,
-        uint256 removeAMin,
-        uint256 removeBMin,
-        uint256 addAMin,
-        uint256 addBMin,
-        uint256 deadline
-    ) external nonReentrant whenNotPaused {
-        // 1) Dohvati LP adresu za routerFrom
-        address lp = adapter.getPair(routerFrom, tokenA, tokenB);
-        require(lp != address(0), "Pair not found");
+        uint256 liquidity
+    ) external onlyOwner {
+        require(factoryFrom != address(0) && factoryTo != address(0), "Teleport: zero factory");
+        require(tokenA != address(0) && tokenB != address(0), "Teleport: zero token");
+        require(liquidity > 0, "Teleport: zero liquidity");
 
-        // 2) Povuci LP od korisnika u ADAPTER (on ce obaviti removeLiquidity)
-        IUniswapV2Pair(lp).transferFrom(msg.sender, address(adapter), liquidity);
+        // 1) Source pair
+        address pairFrom = IUniswapV2Factory(factoryFrom).getPair(tokenA, tokenB);
+        require(pairFrom != address(0), "Teleport: pairFrom not found");
 
-        // 3) Ukloni likvidnost preko adaptera (tokeni A/B ostaju u adapteru)
-        (uint256 amtA, uint256 amtB) = adapter.removeLiquidityAll(
-            routerFrom, tokenA, tokenB, liquidity, removeAMin, removeBMin, deadline
-        );
+        // 2) Move LP into pairFrom and burn to Teleport
+        //   Note: pair is an ERC20 LP token so transfer works
+        require(IERC20(pairFrom).transfer(pairFrom, liquidity), "Teleport: transfer LP -> pairFrom failed");
 
-        // 4) Prebaci tokene iz adaptera u ovaj contract (Teleport)
-        IERC20(tokenA).safeTransferFrom(address(adapter), address(this), amtA);
-        IERC20(tokenB).safeTransferFrom(address(adapter), address(this), amtB);
+        (uint amountA, uint amountB) = IUniswapV2PairLite(pairFrom).burn(address(this));
+        // amountA/amountB now belong to Teleport contract
 
-        // 5) Odobri adapteru pa dodaj likvidnost na routerTo, LP ide korisniku
-        IERC20(tokenA).forceApprove(address(adapter), 0);
-        IERC20(tokenA).forceApprove(address(adapter), amtA);
-        IERC20(tokenB).forceApprove(address(adapter), 0);
-        IERC20(tokenB).forceApprove(address(adapter), amtB);
+        // 3) Ensure target pair exists (create if not)
+        address pairTo = IUniswapV2Factory(factoryTo).getPair(tokenA, tokenB);
+        if (pairTo == address(0)) {
+            pairTo = IUniswapV2Factory(factoryTo).createPair(tokenA, tokenB);
+            require(pairTo != address(0), "Teleport: createPair failed");
+        }
 
-        (uint256 a2, uint256 b2, uint256 liq) = adapter.addLiquidityAll(
-            routerTo, tokenA, tokenB, amtA, amtB, addAMin, addBMin, msg.sender, deadline
-        );
+        // 4) Transfer tokens to pairTo and mint LP to Teleport
+        require(IERC20(tokenA).transfer(pairTo, amountA), "Teleport: transfer tokenA -> pairTo failed");
+        require(IERC20(tokenB).transfer(pairTo, amountB), "Teleport: transfer tokenB -> pairTo failed");
 
-        emit LiquidityMigratedV2(msg.sender, routerFrom, routerTo, tokenA, tokenB, a2, b2, liq);
+        uint liquidityMinted = IUniswapV2PairLite(pairTo).mint(address(this));
+
+        // 5) Emit event
+        emit LiquidityMigratedV2(msg.sender, factoryFrom, factoryTo, tokenA, tokenB, amountA, amountB, liquidityMinted);
     }
+
 }

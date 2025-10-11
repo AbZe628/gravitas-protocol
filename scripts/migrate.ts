@@ -1,39 +1,51 @@
 import { ethers } from "hardhat";
-import * as fs from "fs";
+import fs from "fs";
 
 async function main() {
-  const [user] = await ethers.getSigners();
-  const deployed = JSON.parse(fs.readFileSync("deployed.json", "utf8"));
-  const seed = JSON.parse(fs.readFileSync("pair.json", "utf8"));
+  const [caller] = await ethers.getSigners();
+  const data = JSON.parse(fs.readFileSync("addresses.json", "utf-8"));
 
-  const teleport = await ethers.getContractAt("Teleport", deployed.teleport);
-  const deadline = Math.floor(Date.now() / 1000) + 3600;
+  const pair = await ethers.getContractAt(
+    "@uniswap/v2-core/contracts/interfaces/IUniswapV2Pair.sol:IUniswapV2Pair",
+    data.pairA
+  );
 
-  // koristimo isti router za demo (from == to)
-  const routerFrom = seed.router;
-  const routerTo = seed.router;
+  // 1) LP JE U TVOM EOA — očitaj ga
+  const lpBalance = await pair.balanceOf(caller.address);
+  if (lpBalance === 0n) throw new Error("EOA has 0 LP — redeploy or check pair.");
 
-  // remove min i add min postavljamo 0 za test (bez slippage zaštite u MVP-u)
-  const removeMin = 0;
-  const addMin = 0;
+  // 2) Odobri Teleportu da povuče LP
+  await (await pair.approve(data.teleport, lpBalance)).wait();
 
-  // LP količina iz seed-a
-  const lpStr = seed.lp;
+  // 3) Pozovi migraciju
+  const tp = await ethers.getContractAt("Teleport", data.teleport);
 
-  const tx = await teleport.connect(user).migrateLiquidityV2(
+  const routerFrom = data.routerA;
+  const routerTo   = data.routerB;
+  const tokenA     = data.tka;
+  const tokenB     = data.tkb;
+
+  const removeAMin = 0;
+  const removeBMin = 0;
+  const addAMin    = 0;
+  const addBMin    = 0;
+  const deadline   = Math.floor(Date.now() / 1000) + 3600;
+
+  console.log("Teleport LP (EOA) balance:", lpBalance.toString());
+  const tx = await (tp as any).migrateLiquidityV2(
     routerFrom,
     routerTo,
-    deployed.tka,
-    deployed.tkb,
-    lpStr,        // cijeli LP balans
-    removeMin,
-    removeMin,
-    addMin,
-    addMin,
+    tokenA,
+    tokenB,
+    lpBalance,
+    removeAMin,
+    removeBMin,
+    addAMin,
+    addBMin,
     deadline
   );
-  const rc = await tx.wait();
-  console.log("Migrated! TX:", rc?.hash);
+  const rcpt = await tx.wait();
+  console.log("Migrated. TX:", rcpt?.hash);
 }
 
 main().catch((e) => { console.error(e); process.exit(1); });
