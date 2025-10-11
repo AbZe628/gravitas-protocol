@@ -1,4 +1,17 @@
 # Gravitas Protocol — MVP (Liquidity Teleport & Fee Harvesting)
+**Invisible infrastructure for atomic liquidity migration between decentralized exchanges (DEXs).**
+
+Gravitas Protocol is an automated liquidity migration layer that allows users and DeFi projects to move their LP tokens between DEXs like Uniswap, SushiSwap, Curve, and Balancer — instantly, safely, and with micro-fees that generate passive income for the protocol.
+
+## 🌌 Vision
+
+DeFi liquidity today is fragmented across multiple pools and chains.  
+Gravitas solves this by providing a *seamless, invisible bridge* for liquidity migration.
+
+- One-click atomic transfers between DEX pools  
+- Micro-fees (5–10 bps) generate continuous protocol revenue  
+- Partners can integrate via SDK and share in revenue  
+
 
 **Status:** MVP | **Scope:** Uniswap V2 liquidity migration (same-chain) via adapter + demo tokens | **Stack:** Solidity 0.8.24, Hardhat, TypeScript, OpenZeppelin
 
