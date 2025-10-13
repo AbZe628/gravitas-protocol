@@ -12,24 +12,21 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <!-- Three.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r152/three.min.js"></script>
+
   <style>
     :root{
       --primary:#8A1538;        /* Qatar maroon */
-      --primary-600:#6C102B;
       --gold:#D4AF37;           /* Gold accent */
       --paper:#0B0C10;          /* Deep charcoal */
       --paper-grad:
         radial-gradient(1200px 600px at 50% -10%, rgba(212,175,55,.12), transparent 60%),
         radial-gradient(1400px 700px at 50% 120%, rgba(138,21,56,.16), transparent 55%);
-      --panel:#15161C;
-      --ink:#F6F6F8;
-      --muted:#A9ADBB;
       --line:rgba(255,255,255,.08);
+      --muted:#A9ADBB;
+      --ink:#F6F6F8;
       --grad:linear-gradient(135deg,var(--gold),#B8860B);
-      --ok:#22c55e; --warn:#f59e0b; --bad:#ef4444;
       --glass-bg: rgba(255,255,255,.06);
       --glass-stroke: rgba(255,255,255,.18);
-      --glass-shadow: 0 10px 30px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.08);
     }
     *{box-sizing:border-box;margin:0;padding:0}
     html{scroll-behavior:smooth}
@@ -40,13 +37,16 @@
       color:var(--ink); line-height:1.78; overflow-x:hidden;
     }
     a{color:inherit;text-decoration:none}
-    /* Background 3D layer (under everything) */
-    #bg3d{position:fixed; inset:0; z-index:-2}
+
+    /* Layers */
+    #bg3d{position:fixed; inset:0; z-index:-3}
+    #shaderCanvas{position:fixed; inset:0; z-index:-2; pointer-events:none}
     #vignette{position:fixed; inset:0; z-index:-1; pointer-events:none;
       background:
         radial-gradient(1000px 700px at 50% 30%, rgba(255,255,255,.06), transparent 60%),
         linear-gradient(to bottom, rgba(0,0,0,.0), rgba(0,0,0,.35))
     }
+
     /* Topbar */
     .topbar{
       position:fixed; top:0; left:0; right:0; height:68px; z-index:1000;
@@ -72,6 +72,7 @@
     .cta-row{display:flex; gap:.6rem; align-items:center}
     .burger{display:none; background:transparent; border:1px solid var(--line); border-radius:10px; width:40px; height:40px; color:#fff; align-items:center; justify-content:center}
     @media (max-width:1180px){.nav-links{display:none}.burger{display:flex}}
+
     /* Drawer */
     .drawer-backdrop{position:fixed; inset:0; background:rgba(0,0,0,.55); backdrop-filter:blur(2px); z-index:999; display:none}
     .drawer{position:fixed; top:0; left:0; height:100vh; width:332px; background:rgba(16,18,23,.8); border-right:1px solid var(--line);
@@ -81,6 +82,7 @@
     .drawer nav{display:flex; flex-direction:column; padding:1rem}
     .drawer nav a{padding:.95rem 1rem; border-radius:12px; color:var(--muted); font-weight:900}
     .drawer nav a:hover{background:rgba(255,255,255,.06); color:#fff}
+
     /* Layout */
     .container{width:92%; max-width:1240px; margin:0 auto; padding:7.6rem 0}
     .section-title{font-size:3rem; font-weight:900; text-align:center; margin-bottom:1rem;
@@ -89,30 +91,39 @@
     .grid-2{display:grid; grid-template-columns:1fr 1fr; gap:2rem}
     .grid-3{display:grid; grid-template-columns:repeat(3,1fr); gap:2rem}
     @media (max-width:1100px){.grid-2,.grid-3{grid-template-columns:1fr}}
-    /* Glassmorphism */
-    .glass{
-      background: var(--glass-bg);
-      border: 1px solid var(--glass-stroke);
-      border-radius: 18px;
-      box-shadow: var(--glass-shadow);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-    }
+
+    /* Glass */
+    .glass{background:var(--glass-bg); border:1px solid var(--glass-stroke); border-radius:18px; backdrop-filter: blur(14px)}
     .card{padding:2rem; transition:transform .25s, border-color .2s, box-shadow .25s}
     .card:hover{transform:translateY(-6px); border-color:rgba(212,175,55,.22); box-shadow:0 28px 70px rgba(0,0,0,.35)}
     .card h3{font-size:1.45rem; margin-bottom:.65rem}
     ul.clean{list-style:none}
     ul.clean li{padding-left:1.25rem; position:relative; margin:.55rem 0; color:var(--muted)}
     ul.clean li::before{content:""; position:absolute; left:0; top:.78rem; width:8px; height:8px; border-radius:50%; background:var(--gold)}
+
     /* Tables */
     .table-wrap{overflow:auto; border-radius:14px}
     table{width:100%; border-collapse:collapse; font-size:.98rem; background:rgba(21,22,28,.7); border:1px solid var(--line)}
     thead th{position:sticky; top:0; background:rgba(16,18,23,.9); border-bottom:1px solid var(--line); text-align:left; padding:12px; font-weight:900}
     tbody td{border-top:1px solid var(--line); padding:12px; color:#dee}
     tbody tr:nth-child(odd){background:rgba(20,22,26,.5)}
-    .note{color:var(--muted); font-size:.95rem; margin-top:.7rem}
-    /* Doc embed */
-    .doc-embed{width:100%; height:80vh; border:1px solid var(--line); border-radius:16px; background:#0b0c10}
+
+    /* Hero */
+    .hero{min-height:100vh; display:flex; align-items:center}
+    .hero-inner{max-width:1060px; margin:0 auto; padding-top:6rem; text-align:center}
+    .eyebrow{display:inline-flex; gap:.5rem; align-items:center; border:1px solid var(--line); padding:.42rem .78rem; border-radius:999px; color:#EAEAF1; margin-bottom:1rem; backdrop-filter:blur(10px)}
+    .eyebrow i{color:var(--gold)}
+    .hero h1{font-size:4.1rem; line-height:1.05; font-weight:900; margin:.6rem 0 1rem;
+      background:linear-gradient(135deg,#fff,#c7c7d1); -webkit-background-clip:text; background-clip:text; color:transparent}
+    .hero p{color:var(--muted); font-size:1.22rem; margin:0 auto 1.6rem; max-width:920px}
+    .hero-ctas{display:flex; justify-content:center; gap:.8rem; flex-wrap:wrap}
+
+    /* KPI band */
+    .kpi-band{margin-top:2.1rem; display:grid; grid-template-columns:repeat(4,1fr); gap:1rem}
+    .kpi{border:1px solid var(--line); border-radius:16px; background:rgba(21,22,28,.6); padding:1.1rem; text-align:center; backdrop-filter: blur(10px)}
+    .kpi .v{font-weight:900; font-size:1.9rem; background:var(--grad); -webkit-background-clip:text; background-clip:text; color:transparent}
+    .kpi .l{color:var(--muted); font-weight:700}
+
     /* Timeline */
     .timeline{position:relative; margin:1rem auto}
     .timeline::before{content:""; position:absolute; left:calc(50% - 2px); top:0; bottom:0; width:4px; background:var(--grad); border-radius:2px; opacity:.45}
@@ -127,11 +138,7 @@
       .t-item.left,.t-item.right{text-align:left; left:0}
       .t-item .dot{left:12px}
     }
-    /* KPI band */
-    .kpi-band{margin-top:2.1rem; display:grid; grid-template-columns:repeat(4,1fr); gap:1rem}
-    .kpi{border:1px solid var(--line); border-radius:16px; background:rgba(21,22,28,.6); padding:1.1rem; text-align:center; backdrop-filter: blur(10px)}
-    .kpi .v{font-weight:900; font-size:1.9rem; background:var(--grad); -webkit-background-clip:text; background-clip:text; color:transparent}
-    .kpi .l{color:var(--muted); font-weight:700}
+
     /* CTA band + Footer */
     .cta-band{background:rgba(15,17,22,.6); border-top:1px solid var(--line); border-bottom:1px solid var(--line); backdrop-filter: blur(10px)}
     .cta-band .inner{text-align:center}
@@ -139,9 +146,10 @@
     footer{padding:3.5rem 5% 2.2rem; border-top:1px solid var(--line); text-align:center; backdrop-filter: blur(6px)}
     .foot-brand{display:flex; gap:.6rem; align-items:center; justify-content:center; margin-bottom:.6rem}
     .foot-social{display:flex; gap:1rem; justify-content:center; margin:1rem 0}
-    .foot-social a{color:var(--muted); font-size:1.3rem}
+    .foot-social a{color:#9aa1b3; font-size:1.3rem}
     .foot-social a:hover{color:var(--gold)}
     .foot-cta{margin-top:1rem}
+
     /* Back to top */
     .to-top{position:fixed; right:18px; bottom:18px; z-index:800; border:none; border-radius:999px; width:46px; height:46px;
       background:var(--grad); color:#111; display:flex; align-items:center; justify-content:center; cursor:pointer;
@@ -149,23 +157,19 @@
     .to-top.show{opacity:1; pointer-events:auto}
     .to-top:hover{transform:translateY(-3px)}
     .sr-only{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0; padding:0; margin:-1px}
-    /* Tick styles for competitor table */
-    .t{color:var(--ok); font-weight:900}
-    .x{color:var(--bad); font-weight:900}
-    .p{color:var(--warn); font-weight:900}
-    /* Hero */
-    .hero{min-height:100vh; display:flex; align-items:center}
-    .hero-inner{max-width:1060px; margin:0 auto; padding-top:6rem; text-align:center}
-    .eyebrow{display:inline-flex; gap:.5rem; align-items:center; border:1px solid var(--line); padding:.42rem .78rem; border-radius:999px; color:#EAEAF1; margin-bottom:1rem; backdrop-filter:blur(10px)}
-    .eyebrow i{color:var(--gold)}
-    .hero h1{font-size:4.1rem; line-height:1.05; font-weight:900; margin:.6rem 0 1rem;
-      background:linear-gradient(135deg,#fff,#c7c7d1); -webkit-background-clip:text; background-clip:text; color:transparent}
-    .hero p{color:var(--muted); font-size:1.22rem; margin:0 auto 1.6rem; max-width:920px}
-    .hero-ctas{display:flex; justify-content:center; gap:.8rem; flex-wrap:wrap}
+
+    /* Parallax helpers */
+    .parallax{will-change:transform}
+    [data-parallax]{transform:translateY(var(--pY,0))}
+
+    /* Doc embed */
+    .doc-embed{width:100%; height:70vh; border:1px solid var(--line); border-radius:16px}
   </style>
 </head>
 <body>
+  <!-- Layers -->
   <div id="bg3d" aria-hidden="true"></div>
+  <canvas id="shaderCanvas" aria-hidden="true"></canvas>
   <div id="vignette" aria-hidden="true"></div>
 
   <a class="sr-only" href="#main">Skip to content</a>
@@ -181,9 +185,12 @@
       <a href="#security">Security</a>
       <a href="#adapters">Adapters</a>
       <a href="#sdk">SDK/API</a>
+      <a href="#competition">Competition</a>
+      <a href="#cases">Case Studies</a>
+      <a href="#gtm">GTM</a>
       <a href="#audit">Audit</a>
       <a href="#risks">Risks</a>
-      <a href="#gtm">GTM</a>
+      <a href="#preseed">Pre-Seed</a>
       <a href="#faq">FAQ</a>
       <a href="#whitepaper">Whitepaper</a>
       <a href="#contact">Contact</a>
@@ -214,9 +221,12 @@
       <a href="#security">Security</a>
       <a href="#adapters">Adapters</a>
       <a href="#sdk">SDK/API</a>
+      <a href="#competition">Competition</a>
+      <a href="#cases">Case Studies</a>
+      <a href="#gtm">GTM</a>
       <a href="#audit">Audit</a>
       <a href="#risks">Risks</a>
-      <a href="#gtm">GTM</a>
+      <a href="#preseed">Pre-Seed</a>
       <a href="#faq">FAQ</a>
       <a href="#whitepaper">Whitepaper</a>
       <a href="https://github.com/AbZe628/gravitas-protocol/tree/main" target="_blank" rel="noopener">Explore MVP</a>
@@ -227,16 +237,17 @@
   <main id="main">
     <!-- HERO -->
     <section class="hero" id="hero">
-      <div class="container hero-inner">
+      <div class="container hero-inner parallax" data-parallax data-speed="0.18">
         <span class="eyebrow glass"><i class="fa-solid fa-shield"></i> MVP Complete • Policy-Driven • Non-Custodial</span>
-        <h1>Liquidity that <span style="background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent">moves like light</span> — secure, instant, auditable.</h1>
-        <p>Gravitas is a neutral orchestration layer for treasuries, DAOs and L2 foundations. We turn fragmented liquidity into a reliable, revenue-generating engine — with explicit on-chain policies, guardian safeguards and atomic migrations across venues.</p>
-        <div class="hero-ctas">
+        <h1 class="parallax" data-parallax data-speed="0.1">Liquidity that <span style="background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent">moves like light</span> — secure, instant, auditable.</h1>
+        <p class="parallax" data-parallax data-speed="0.14">Gravitas is a neutral orchestration layer for treasuries, DAOs and L2 foundations. We turn fragmented liquidity into a reliable, revenue-generating engine — with explicit on-chain policies, guardian safeguards and atomic migrations across venues.</p>
+        <div class="hero-ctas parallax" data-parallax data-speed="0.2">
           <a class="btn btn-primary" id="btn-request" href="mailto:abdusamedzelic98@gmail.com?subject=Gravitas%20Protocol%20—%20Investor%20Docs%20Request&body=Hi%20Gravitas%20team%2C%0A%0APlease%20send%20the%20latest%20investor%20deck%20and%20materials.%20Here%20are%20my%20details%3A%0A-%20Name%3A%0A-%20Fund%2FOrg%3A%0A-%20Check%20size%3A%0A-%20Focus%3A%0A%0AThank%20you!">Request Investor Docs</a>
           <a class="btn btn-ghost" id="btn-schedule" href="mailto:abdusamedzelic98@gmail.com?subject=Gravitas%20—%20Intro%20Call&body=Hi%2C%20I'd%20like%20to%20book%20a%2030-minute%20intro%20call.%20My%20availability%3A%0A-%20Option%201%3A%0A-%20Option%202%3A%0A-%20Timezone%3A%0A%0AThank%20you!"><i class="fa-solid fa-calendar-days"></i> Schedule a Meeting</a>
           <a class="btn btn-ghost" href="https://github.com/AbZe628/gravitas-protocol/tree/main" target="_blank" rel="noopener"><i class="fab fa-github"></i> Explore MVP</a>
         </div>
-        <div class="kpi-band">
+
+        <div class="kpi-band parallax" data-parallax data-speed="0.22">
           <div class="kpi glass"><div class="v">&lt;30s</div><div class="l">Avg Migration</div></div>
           <div class="kpi glass"><div class="v">99.9%</div><div class="l">Uptime Target</div></div>
           <div class="kpi glass"><div class="v">0</div><div class="l">Critical Incidents</div></div>
@@ -247,10 +258,10 @@
 
     <!-- VISION -->
     <section id="vision" class="container">
-      <h2 class="section-title">Vision — The Liquidity Operating System</h2>
-      <p class="section-sub">Capital should flow to its best use instantly, safely, and predictably. DeFi has the venues; Gravitas provides the operating system that routes liquidity with policy guarantees and institutional discipline.</p>
+      <h2 class="section-title parallax" data-parallax data-speed="0.08">Vision — The Liquidity Operating System</h2>
+      <p class="section-sub parallax" data-parallax data-speed="0.12">Capital should flow to its best use instantly, safely, and predictably. DeFi has the venues; Gravitas provides the operating system that routes liquidity with policy guarantees and institutional discipline.</p>
       <div class="grid-3">
-        <div class="card glass">
+        <div class="card glass parallax" data-parallax data-speed="0.18">
           <h3>Neutral by Design</h3>
           <ul class="clean">
             <li>No product conflicts. We don’t launch yield strategies; we power them.</li>
@@ -258,7 +269,7 @@
             <li>Transparent fees accrue credibility, not complexity.</li>
           </ul>
         </div>
-        <div class="card glass">
+        <div class="card glass parallax" data-parallax data-speed="0.22">
           <h3>Trust via Operations</h3>
           <ul class="clean">
             <li>Guardian + timelock, auditable change-management, public telemetry.</li>
@@ -266,7 +277,7 @@
             <li>“Boring to depend on” is our product philosophy.</li>
           </ul>
         </div>
-        <div class="card glass">
+        <div class="card glass parallax" data-parallax data-speed="0.26">
           <h3>Network Effects</h3>
           <ul class="clean">
             <li>Each adapter compounds strategy surface area for everyone.</li>
@@ -279,24 +290,25 @@
 
     <!-- OPPORTUNITY -->
     <section id="opportunity" class="container">
-      <h2 class="section-title">The Fragmentation Tax</h2>
-      <p class="section-sub">Liquidity lives across DEXs, fee tiers and L2s. Treasuries burn basis points daily on slippage, latency and manual ops. The winner abstracts venues behind policy-safe, atomic execution and precise telemetry.</p>
+      <h2 class="section-title parallax" data-parallax data-speed="0.1">Opportunity — Liquidity Fragmentation is a Tax on Growth</h2>
+      <p class="section-sub parallax" data-parallax data-speed="0.14">DEX volumes exceed tens of billions monthly, yet treasuries remain under-optimized: assets idle, migrations manual, risk controls ad-hoc. Consolidating this into a policy-first engine unlocks durable revenue and systemic reliability.</p>
       <div class="grid-2">
-        <div class="card glass">
-          <h3>Problem Narrative</h3>
+        <div class="card glass parallax" data-parallax data-speed="0.18">
+          <h3>Market Pain</h3>
           <ul class="clean">
-            <li>Manual rebalances → governance drag, timing risk, coordination failure.</li>
-            <li>Venue heterogeneity → inconsistent security and UX guarantees.</li>
-            <li>Telemetry gaps → blind spots during volatility spikes.</li>
-            <li>Outcome: persistent capital inefficiency and revenue leakage.</li>
+            <li>Fragmented capital: shallow pools, poor depth.</li>
+            <li>Operational overhead: governance + ops latency.</li>
+            <li>Inconsistent risk controls across venues.</li>
+            <li>No neutral, auditable orchestration standard.</li>
           </ul>
         </div>
-        <div class="card glass">
-          <h3>Why Now</h3>
+        <div class="card glass parallax" data-parallax data-speed="0.22">
+          <h3>Investment Case</h3>
           <ul class="clean">
-            <li>Institutional flows demand policy guarantees and auditability.</li>
-            <li>L2 maturity enables low-friction automation at scale.</li>
-            <li>Post-cycle sobriety favors durable micro-fee businesses.</li>
+            <li>B2B rails for on-chain capital operations.</li>
+            <li>Recurring, volume-linked revenues (bps).</li>
+            <li>Defensibility via integrations and reliability.</li>
+            <li>Aligned with the professionalization of DeFi.</li>
           </ul>
         </div>
       </div>
@@ -304,394 +316,384 @@
 
     <!-- SOLUTION -->
     <section id="solution" class="container">
-      <h2 class="section-title">Solution — Policy Engine + Adapters</h2>
-      <p class="section-sub">Users/DAO → <strong>Policy Engine</strong> (rules, limits, oracles) → <strong>Adapters</strong> (venue connectors) → venues. Guardian pause and timelock guard critical changes. Telemetry makes the system reviewable in real time and governable with confidence.</p>
+      <h2 class="section-title parallax" data-parallax data-speed="0.1">Solution — Policy-Driven Orchestration Engine</h2>
+      <p class="section-sub parallax" data-parallax data-speed="0.14">One API, one policy, any venue: Gravitas executes migrations and rebalances under strict guardrails. Institutions define tolerance; we enforce it.</p>
       <div class="grid-3">
-        <div class="card glass">
+        <div class="card glass parallax" data-parallax data-speed="0.16">
           <h3>Policy Engine</h3>
           <ul class="clean">
-            <li>Allowlists, exposure caps, cooldowns.</li>
-            <li>Oracle staleness (&lt;60s), volatility-aware slippage bands.</li>
-            <li>Velocity limits per asset and per policy.</li>
+            <li>Whitelisted assets, venues, and concentration limits.</li>
+            <li>Max slippage, velocity caps, oracle freshness.</li>
+            <li>Programmatic approvals; no discretionary ops.</li>
           </ul>
         </div>
-        <div class="card glass">
-          <h3>Adapter Layer</h3>
+        <div class="card glass parallax" data-parallax data-speed="0.2">
+          <h3>Atomic Migrations</h3>
           <ul class="clean">
-            <li>Isolated connectors (Uniswap v2/v3, Curve, Balancer, lending).</li>
-            <li>Registry-controlled, hot-swappable with timelock review.</li>
-            <li>Revert reason mapping → actionable on-chain events.</li>
+            <li>One-click reallocation across pools/DEXs.</li>
+            <li>Batching and netting reduce gas by design.</li>
+            <li>Transparent events for auditability.</li>
           </ul>
         </div>
-        <div class="card glass">
-          <h3>Ops & Governance</h3>
+        <div class="card glass parallax" data-parallax data-speed="0.24">
+          <h3>Adapters Network</h3>
           <ul class="clean">
-            <li>3/5 multisig, 48h timelock, guardian pause (no withdrawals).</li>
-            <li>Public dashboards, signed announcements, SIEM webhooks.</li>
-            <li>SLAs and incident runbooks like mission-critical infra.</li>
+            <li>Modular adapters (Aave, Morpho, Uni, Balancer...).</li>
+            <li>Risk-isolated integration surface.</li>
+            <li>Each new adapter increases strategy space.</li>
           </ul>
         </div>
       </div>
     </section>
 
-    <!-- ECONOMICS -->
+    <!-- ECONOMICS with SVG charts -->
     <section id="economics" class="container">
-      <h2 class="section-title">Unit Economics</h2>
-      <p class="section-sub">High margins, linear scale with volume. Micro-fees align our success with partners. Reliability is the moat.</p>
-      <div class="grid-2" style="align-items:start">
-        <div class="card glass">
-          <h3>Revenue Sensitivity</h3>
-          <div class="table-wrap">
+      <h2 class="section-title parallax" data-parallax data-speed="0.1">Economics — Simple, Transparent, Aligned</h2>
+      <p class="section-sub parallax" data-parallax data-speed="0.14">We charge a micro-fee (5–10 bps) on routed volume. High gross margins; costs are mainly security, infra, and ops.</p>
+
+      <div class="grid-2">
+        <div class="card glass parallax" data-parallax data-speed="0.18">
+          <h3>Unit Economics</h3>
+          <div class="table-wrap" style="margin-top:.6rem">
             <table>
-              <thead><tr><th>Monthly Volume</th><th>5 bps</th><th>6 bps</th><th>10 bps</th></tr></thead>
+              <thead><tr><th>Monthly Volume</th><th>5 bps</th><th>8 bps</th><th>10 bps</th></tr></thead>
               <tbody>
-                <tr><td>$50M</td><td>$25,000</td><td>$30,000</td><td>$50,000</td></tr>
-                <tr><td>$83M (breakeven)</td><td>$41,500</td><td><strong>$49,800</strong></td><td>$83,000</td></tr>
-                <tr><td>$100M (Y1 target)</td><td>$50,000</td><td>$60,000</td><td>$100,000</td></tr>
-                <tr><td>$250M</td><td>$125,000</td><td>$150,000</td><td>$250,000</td></tr>
+                <tr><td>$50M</td><td>$25k</td><td>$40k</td><td>$50k</td></tr>
+                <tr><td>$100M</td><td>$50k</td><td>$80k</td><td>$100k</td></tr>
+                <tr><td>$250M</td><td>$125k</td><td>$200k</td><td>$250k</td></tr>
+                <tr><td>$500M</td><td>$250k</td><td>$400k</td><td>$500k</td></tr>
               </tbody>
             </table>
           </div>
-          <p class="note">Primary costs are fixed (security, advisors, infra). L2 automation lowers execution friction for routine rebalances.</p>
+          <p style="margin-top:.6rem;color:var(--muted)">Break-even achievable sub-$100M monthly volume at ~6–8 bps blended.</p>
         </div>
-        <div class="card glass">
-          <h3>Moat & Defensibility</h3>
-          <ul class="clean">
-            <li>Operational trust (SLA discipline) is hard to copy quickly.</li>
-            <li>Adapter network effects: each integration increases value.</li>
-            <li>Policy semantics + audits become the de-facto standard.</li>
-          </ul>
+
+        <div class="card glass parallax" data-parallax data-speed="0.22">
+          <h3>Revenue Sensitivity (SVG)</h3>
+          <svg viewBox="0 0 520 240" width="100%" height="240" role="img" aria-label="Revenue sensitivity chart">
+            <defs>
+              <linearGradient id="g" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0" stop-color="#D4AF37"/>
+                <stop offset="1" stop-color="#B8860B"/>
+              </linearGradient>
+            </defs>
+            <!-- axes -->
+            <line x1="40" y1="200" x2="500" y2="200" stroke="rgba(255,255,255,.25)" stroke-width="1"/>
+            <line x1="40" y1="20" x2="40" y2="200" stroke="rgba(255,255,255,.25)" stroke-width="1"/>
+            <!-- x labels -->
+            <text x="80" y="215" fill="#A9ADBB" font-size="12">$50M</text>
+            <text x="180" y="215" fill="#A9ADBB" font-size="12">$100M</text>
+            <text x="300" y="215" fill="#A9ADBB" font-size="12">$250M</text>
+            <text x="430" y="215" fill="#A9ADBB" font-size="12">$500M</text>
+            <!-- y labels -->
+            <text x="5" y="200" fill="#A9ADBB" font-size="12">$0</text>
+            <text x="5" y="150" fill="#A9ADBB" font-size="12">$200k</text>
+            <text x="5" y="100" fill="#A9ADBB" font-size="12">$400k</text>
+            <text x="5" y="50" fill="#A9ADBB" font-size="12">$600k</text>
+            <!-- 10 bps line -->
+            <polyline fill="none" stroke="url(#g)" stroke-width="3"
+              points="80,175 180,150 300,100 430,50"/>
+            <!-- 8 bps ghost -->
+            <polyline fill="none" stroke="rgba(212,175,55,.55)" stroke-width="2" stroke-dasharray="4 6"
+              points="80,185 180,170 300,120 430,70"/>
+            <!-- 5 bps ghost -->
+            <polyline fill="none" stroke="rgba(212,175,55,.35)" stroke-width="2" stroke-dasharray="2 6"
+              points="80,195 180,185 300,150 430,100"/>
+            <!-- legend -->
+            <rect x="55" y="26" width="180" height="52" rx="10" ry="10" fill="rgba(255,255,255,.06)" stroke="rgba(255,255,255,.12)"/>
+            <line x1="65" y1="42" x2="95" y2="42" stroke="url(#g)" stroke-width="3"/>
+            <text x="105" y="46" fill="#EDEFF7" font-size="12">10 bps</text>
+            <line x1="65" y1="58" x2="95" y2="58" stroke="rgba(212,175,55,.55)" stroke-width="2" stroke-dasharray="4 6"/>
+            <text x="105" y="62" fill="#EDEFF7" font-size="12">8 bps</text>
+          </svg>
+          <p style="margin-top:.6rem;color:var(--muted)">Illustrative only; exact slope depends on venue mix, gas, and batching efficiency.</p>
         </div>
       </div>
     </section>
 
     <!-- SECURITY -->
     <section id="security" class="container">
-      <h2 class="section-title">Security & Assurance</h2>
-      <p class="section-sub">Security is the product. Static guardrails prevent misuse; dynamic checks adapt in flight; ops rigor keeps incidents boring and brief.</p>
+      <h2 class="section-title parallax" data-parallax data-speed="0.1">Security — Defense in Depth</h2>
+      <p class="section-sub parallax" data-parallax data-speed="0.14">Security is not a feature; it’s the product. All flows are constrained by immutable checks and executable policies, with change-management visible on-chain.</p>
       <div class="grid-3">
-        <div class="card glass">
+        <div class="card glass parallax" data-parallax data-speed="0.18">
           <h3>Static Guards</h3>
           <ul class="clean">
-            <li>Reentrancy protection, bounded inputs, allowlists.</li>
-            <li>Deterministic fee accounting; rounding-safe math.</li>
-            <li>Adapter isolation; restricted external call surface.</li>
+            <li>Reentrancy, rate-limits, allowance minimization.</li>
+            <li>Asset & venue whitelists enforced at entry.</li>
+            <li>Invariant checks + revert on policy breach.</li>
           </ul>
         </div>
-        <div class="card glass">
+        <div class="card glass parallax" data-parallax data-speed="0.22">
           <h3>Dynamic Guards</h3>
           <ul class="clean">
-            <li>Oracle freshness & volatility-aware slippage bands.</li>
-            <li>Per-asset velocity caps; venue circuit breakers.</li>
-            <li>Fail-shut with explicit on-chain event signaling.</li>
+            <li>Oracle freshness & deviation bounds.</li>
+            <li>Adaptive slippage by volatility regime.</li>
+            <li>Velocity caps; circuit breaker events.</li>
           </ul>
         </div>
-        <div class="card glass">
-          <h3>Testing & Monitoring</h3>
+        <div class="card glass parallax" data-parallax data-speed="0.26">
+          <h3>Governance-Safe</h3>
           <ul class="clean">
-            <li>Foundry invariants, fuzzing, mainnet-fork sims; &gt;95% coverage target.</li>
-            <li>Historical exploit replays to validate failure paths.</li>
-            <li>Events: <code>FAILED_TX</code>, <code>CIRCUIT_BREAKER_TRIPPED</code>, <code>POLICY_BREACH_ATTEMPT</code>, <code>FEE_CHANGE_PROPOSED</code>.</li>
+            <li>3/5 multisig with 48h timelock on critical changes.</li>
+            <li>Guardian pause (no withdraw authority).</li>
+            <li>Public telemetry & incident runbooks.</li>
           </ul>
         </div>
       </div>
     </section>
 
-    <!-- NEW: ADAPTER CATALOG -->
+    <!-- ADAPTERS -->
     <section id="adapters" class="container">
-      <h2 class="section-title">Adapter Catalog</h2>
-      <p class="section-sub">Isolated connectors translate policy intents into venue-specific calls. Each adapter increases the strategy surface area without expanding blast radius.</p>
+      <h2 class="section-title parallax" data-parallax data-speed="0.1">Adapters — Modular, Risk-Isolated</h2>
+      <p class="section-sub parallax" data-parallax data-speed="0.14">Each adapter speaks a venue’s language. Policy Engine remains lean; integration risk stays contained.</p>
       <div class="grid-3">
-        <div class="card glass">
+        <div class="card glass parallax" data-parallax data-speed="0.18">
           <h3>DEX Adapters</h3>
           <ul class="clean">
-            <li>Uniswap v2/v3: add/remove liquidity, swap within slippage bands, fee tier selection.</li>
-            <li>Curve: pool join/exit with gauge awareness (read-only), metapool constraints.</li>
-            <li>Balancer: weighted pool joins with max price impact control.</li>
+            <li>Uniswap v3/v4, Balancer, Curve.</li>
+            <li>Concentrated liquidity & fee tier awareness.</li>
+            <li>Batch swaps; MEV-aware routing.</li>
           </ul>
         </div>
-        <div class="card glass">
+        <div class="card glass parallax" data-parallax data-speed="0.22">
           <h3>Lending Adapters</h3>
           <ul class="clean">
-            <li>Aave v3: supply/withdraw, E-mode checks, oracle staleness enforcement.</li>
-            <li>Compound v2: mint/redeem with collateral caps per policy.</li>
-            <li>Morpho (readiness): peer-matched supply/withdraw hooks.</li>
+            <li>Aave/Morpho, Compound.</li>
+            <li>Collateral & LTV guardrails.</li>
+            <li>Safe unwind paths & rate bands.</li>
           </ul>
         </div>
-        <div class="card glass">
-          <h3>Registry & Upgrades</h3>
+        <div class="card glass parallax" data-parallax data-speed="0.26">
+          <h3>Bridges & L2</h3>
           <ul class="clean">
-            <li>On-chain registry approves adapter addresses and versions.</li>
-            <li>Timelock-gated upgrades; diff announcements with commit hash.</li>
-            <li>Canary deploys under stricter policy before generalization.</li>
+            <li>Canonical bridges, risk-scored alternatives.</li>
+            <li>Timeouts & caps per route.</li>
+            <li>Async settlement tracking.</li>
           </ul>
         </div>
       </div>
     </section>
 
-    <!-- NEW: SDK / API -->
+    <!-- SDK / API -->
     <section id="sdk" class="container">
-      <h2 class="section-title">SDK / API</h2>
-      <p class="section-sub">Two lines to migrate liquidity inside your own dashboard. Intent goes in; policy-safe transactions come out.</p>
+      <h2 class="section-title parallax" data-parallax data-speed="0.1">Developer SDK & API</h2>
+      <p class="section-sub parallax" data-parallax data-speed="0.14">Integrate Gravitas in minutes. Policies configure behavior; the SDK handles execution and receipts.</p>
       <div class="grid-2">
-        <div class="card glass">
-          <h3>TypeScript Example</h3>
-          <pre style="white-space:pre-wrap; font-size:.92rem; background:rgba(0,0,0,.25); border:1px solid var(--line); border-radius:12px; padding:1rem; overflow:auto">
+        <div class="card glass parallax" data-parallax data-speed="0.18">
+<pre style="white-space:pre-wrap;overflow:auto"><code>// TypeScript example
 import { GravitasClient } from '@gravitas/sdk';
 
-const client = new GravitasClient({ signer });
+const client = new GravitasClient(signer);
 
-// Migrate $1M USDC under 'treasury-mod' policy
+// Migrate $1M USDC under the 'moderate' policy
 const tx = await client.migrate({
   asset: 'USDC',
   amount: 1_000_000,
-  fromVenue: { type: 'UniswapV3', feeTier: 500 },
-  toVenue:   { type: 'Curve', pool: '3pool' },
-  policyId: 'treasury-mod'
+  policyId: 'moderate',
+  fromVenue: 'UniV3-0.05%',
+  toVenue: 'Balancer-80/20',
 });
 
-await tx.wait(); // &lt;30s on L2
-          </pre>
-          <p class="note">SDK enforces policy locally before calldata is built. Violations never reach chain.</p>
+await tx.wait(); // &lt;30s typical</code></pre>
         </div>
-        <div class="card glass">
-          <h3>Policy Template (YAML)</h3>
-          <pre style="white-space:pre-wrap; font-size:.92rem; background:rgba(0,0,0,.25); border:1px solid var(--line); border-radius:12px; padding:1rem; overflow:auto">
-id: treasury-mod
-assets:
-  allow: [USDC, DAI, WETH]
-  max_concentration_bps: 4500
-oracles:
-  freshness_s: 60
-execution:
-  max_slippage_bps: 12..22   # adaptive band
-  velocity_bps_per_hr: 800
-venues:
-  allow: [UniswapV3, Curve, Balancer, AaveV3]
-governance:
-  timelock_h: 48
-  guardian_pause: true
-          </pre>
-          <p class="note">Templates compile to on-chain policy structs; diffs are signed and announced before activation.</p>
+        <div class="card glass parallax" data-parallax data-speed="0.22">
+          <h3>SDK Guarantees</h3>
+          <ul class="clean">
+            <li>Typed policies; compile-time safety.</li>
+            <li>Receipts with full event trail.</li>
+            <li>Retry semantics for transient failures.</li>
+            <li>Telemetry hooks out-of-the-box.</li>
+          </ul>
+          <div style="margin-top:.6rem">
+            <a class="btn btn-ghost" href="https://github.com/AbZe628/gravitas-protocol/tree/main" target="_blank" rel="noopener"><i class="fab fa-github"></i> Explore MVP</a>
+          </div>
         </div>
       </div>
     </section>
 
     <!-- COMPETITION -->
     <section id="competition" class="container">
-      <h2 class="section-title">Competitive Landscape</h2>
-      <p class="section-sub">We’re not another vault front-end. We’re the neutral engine that vaults and treasuries plug into.</p>
-      <div class="card glass">
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Capability</th>
-                <th>Gravitas Protocol</th>
-                <th>Yield Aggregators</th>
-                <th>Treasury Platforms</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr><td>Neutral Infrastructure</td><td class="t">✓</td><td class="x">✗</td><td class="p">○</td></tr>
-              <tr><td>Policy-Driven Automation</td><td class="t">✓</td><td class="p">○</td><td class="x">✗</td></tr>
-              <tr><td>Custom Risk Guardrails</td><td class="t">✓</td><td class="x">✗</td><td class="p">○</td></tr>
-              <tr><td>B2B SDK (Infra-first)</td><td class="t">✓</td><td class="p">○</td><td class="x">✗</td></tr>
-              <tr><td>Non-Custodial</td><td class="t">✓</td><td class="t">✓</td><td class="t">✓</td></tr>
-              <tr><td>Ops Transparency (SLA/Telemetry)</td><td class="t">✓</td><td class="p">○</td><td class="p">○</td></tr>
-            </tbody>
-          </table>
-        </div>
-        <p class="note">Legend: <span class="t">✓</span> strong, <span class="p">○</span> partial, <span class="x">✗</span> limited.</p>
+      <h2 class="section-title parallax" data-parallax data-speed="0.1">Competitive Landscape</h2>
+      <p class="section-sub parallax" data-parallax data-speed="0.14">We don’t sell vaults. We power safe, policy-bound liquidity operations for those who do.</p>
+      <div class="table-wrap card glass parallax" data-parallax data-speed="0.18">
+        <table>
+          <thead><tr><th>Feature</th><th>Gravitas</th><th>Yield Vaults</th><th>Treasury Tools</th></tr></thead>
+          <tbody>
+            <tr><td>Neutral Infrastructure</td><td>✓</td><td>✗</td><td>○</td></tr>
+            <tr><td>Policy-Driven Automation</td><td>✓</td><td>○</td><td>✗</td></tr>
+            <tr><td>Adapters Network Effects</td><td>✓</td><td>○</td><td>✗</td></tr>
+            <tr><td>Governance-Safe Guardrails</td><td>✓</td><td>✗</td><td>○</td></tr>
+            <tr><td>Non-Custodial</td><td>✓</td><td>✓</td><td>✓</td></tr>
+          </tbody>
+        </table>
       </div>
     </section>
 
-    <!-- CASE STUDY -->
-    <section id="case" class="container">
-      <h2 class="section-title">Case Study — Treasury Migration</h2>
-      <p class="section-sub">A DAO with $40M in POL needed to rotate liquidity across venues during regime shifts. Manual ops leaked basis points; governance delays hurt execution. Gravitas enforced policy-safe, single-transaction migrations.</p>
-      <div class="grid-2" style="align-items:start">
-        <div class="card glass">
-          <h3>Before → After</h3>
+    <!-- CASE STUDIES -->
+    <section id="cases" class="container">
+      <h2 class="section-title parallax" data-parallax data-speed="0.1">Illustrative Case Studies</h2>
+      <p class="section-sub parallax" data-parallax data-speed="0.14">Examples show how policy-first orchestration compounds benefits over time.</p>
+      <div class="grid-3">
+        <div class="card glass parallax" data-parallax data-speed="0.18">
+          <h3>DAO Treasury</h3>
           <ul class="clean">
-            <li><strong>Execution time:</strong> days → <em>&lt;30s</em> atomic migration.</li>
-            <li><strong>Slippage + fees:</strong> 25–40 bps → <em>≤10 bps</em> effective (venue-aware routing).</li>
-            <li><strong>Governance risk:</strong> ad-hoc approvals → <em>codified policy</em>, timelock, guardian.</li>
-            <li><strong>Observability:</strong> spreadsheet ops → <em>on-chain telemetry</em> + alerts.</li>
+            <li>Rebalance between stable pools on shock days.</li>
+            <li>Cap exposure per venue to &lt;25%.</li>
+            <li>Net effect: reduced drawdowns; smoother revenue.</li>
           </ul>
-          <p class="note">Outcome: +$1.1M annualized delta at $40M POL assuming 35→10 bps average friction reduction over monthly rotations.</p>
         </div>
-        <div class="card glass">
-          <h3>Friction Delta (bps)</h3>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>State</th><th>bps</th></tr></thead>
-              <tbody>
-                <tr><td>Before</td><td>~35</td></tr>
-                <tr><td>After</td><td>≤10</td></tr>
-              </tbody>
-            </table>
-          </div>
-          <p class="note">Assumes volatile conditions; policy bands tighten slippage during stress to preserve capital.</p>
+        <div class="card glass parallax" data-parallax data-speed="0.22">
+          <h3>AMM Program</h3>
+          <ul class="clean">
+            <li>Automated range updates on Uni v3.</li>
+            <li>Policy ensures min depth & fee tier constraints.</li>
+            <li>Higher realized fee APR without manual ops.</li>
+          </ul>
+        </div>
+        <div class="card glass parallax" data-parallax data-speed="0.26">
+          <h3>L2 Foundation</h3>
+          <ul class="clean">
+            <li>Cross-venue liquidity bootstrapping at launch.</li>
+            <li>Guarded ramps; slippage & MEV controls.</li>
+            <li>Faster ecosystem growth with predictable risk.</li>
+          </ul>
         </div>
       </div>
     </section>
 
     <!-- GTM -->
     <section id="gtm" class="container">
-      <h2 class="section-title">Go-To-Market — 12 Months</h2>
-      <p class="section-sub">Design partners first. Ship reliability. Turn adapters into network effects. Align incentives via predictable micro-fees.</p>
-      <div class="grid-2">
-        <div class="card glass">
-          <h3>Quarterly Plan</h3>
-          <ul class="clean">
-            <li><strong>Q1 — Audit & Hardening:</strong> External audit, formal verification of policy constraints; bug bounty live; incident runbooks published.</li>
-            <li><strong>Q2 — Design Partners:</strong> 3–5 partners (L2s/DAOs); SDK beta; public telemetry dashboard; canary deployments with SLAs.</li>
-            <li><strong>Q3 — Expansion:</strong> +6 adapters (DEX/Lending); cross-venue routing; DAO tooling for self-service policy templates.</li>
-            <li><strong>Q4 — Scale & Governance:</strong> $100M/mo routed; governance committees bootstrap; fee schedule review with partners.</li>
-          </ul>
-        </div>
-        <div class="card glass">
-          <h3>Operational Targets</h3>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>Metric</th><th>Q2</th><th>Q3</th><th>Q4</th></tr></thead>
-              <tbody>
-                <tr><td>Active partners</td><td>3–5</td><td>8–10</td><td>12+</td></tr>
-                <tr><td>Adapters live</td><td>5</td><td>11</td><td>15+</td></tr>
-                <tr><td>Monthly volume</td><td>$40–60M</td><td>$70–100M</td><td>$100M+</td></tr>
-                <tr><td>SLA uptime</td><td>99.9%</td><td>99.95%</td><td>99.95%</td></tr>
-              </tbody>
-            </table>
+      <h2 class="section-title parallax" data-parallax data-speed="0.1">Go-To-Market — Design Partners First</h2>
+      <p class="section-sub parallax" data-parallax data-speed="0.14">We build trust with a small set of high-quality partners, then scale horizontally with adapters and tooling.</p>
+
+      <div class="timeline parallax" data-parallax data-speed="0.18">
+        <div class="t-item left">
+          <span class="dot"></span>
+          <div class="t-card glass card">
+            <h3>M0–M3: Design Partners</h3>
+            <p>Deep integrations with 3–5 DAOs/L2s, finalize audits, mainnet launch with essential adapters.</p>
           </div>
-          <p class="note">Volume sensitivity makes revenue transparent: 5–10 bps at target scale funds security-first operations.</p>
+        </div>
+        <div class="t-item right">
+          <span class="dot"></span>
+          <div class="t-card glass card">
+            <h3>M4–M9: L2 Expansion</h3>
+            <p>Expand to 3+ L2s, roll out advanced policy modules, 10+ total partners.</p>
+          </div>
+        </div>
+        <div class="t-item left">
+          <span class="dot"></span>
+          <div class="t-card glass card">
+            <h3>M10–M12: Tooling</h3>
+            <p>Self-service policy tooling; community telemetry; clear path to decentralized governance.</p>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- NEW: AUDIT & BOUNTY -->
+    <!-- AUDIT & MONITORING -->
     <section id="audit" class="container">
-      <h2 class="section-title">Audit Plan & Bug Bounty</h2>
-      <p class="section-sub">Security spending is non-negotiable. We publish timelines, scopes, and reports. Incidents are handled with transparency.</p>
+      <h2 class="section-title parallax" data-parallax data-speed="0.1">Audit & Monitoring</h2>
+      <p class="section-sub parallax" data-parallax data-speed="0.14">Independent reviews, formal verification of core logic, and real-time alerting close the loop.</p>
       <div class="grid-3">
-        <div class="card glass">
-          <h3>External Audit</h3>
+        <div class="card glass parallax" data-parallax data-speed="0.18">
+          <h3>External Audits</h3>
           <ul class="clean">
-            <li>Top-tier firm for core: PolicyEngine, Registry, AdapterBase.</li>
-            <li>Spec-driven review of policy semantics; formal verification on caps and velocity.</li>
-            <li>Public report with remediation diff and retest sign-off.</li>
+            <li>Top-tier firm engagement post-MVP.</li>
+            <li>Remediation windows enforced by timelock.</li>
+            <li>Public reports and diff reviews.</li>
           </ul>
         </div>
-        <div class="card glass">
-          <h3>Bug Bounty</h3>
+        <div class="card glass parallax" data-parallax data-speed="0.22">
+          <h3>Formal Methods</h3>
           <ul class="clean">
-            <li>Tiered rewards up to $100k for criticals.</li>
-            <li>Scope includes on-chain contracts and SDK transaction builder.</li>
-            <li>Coordinated disclosure with signed advisories.</li>
+            <li>Policy invariants as specs.</li>
+            <li>SMT-backed proofs for guardrails.</li>
+            <li>Fuzz + invariant testing &gt;95% coverage.</li>
           </ul>
         </div>
-        <div class="card glass">
-          <h3>Ops Discipline</h3>
+        <div class="card glass parallax" data-parallax data-speed="0.26">
+          <h3>Monitoring</h3>
           <ul class="clean">
-            <li>Runbooks (pause, rollback, comms), quarterly game-days.</li>
-            <li>Signed, timestamped change logs; timelock enforced.</li>
-            <li>SIEM hooks on <code>FAILED_TX</code>, <code>CB_TRIPPED</code>, policy breaches.</li>
+            <li>FAILED_TX_THRESHOLD, POLICY_BREACH_ATTEMPT.</li>
+            <li>CIRCUIT_BREAKER_TRIPPED alerts to SIEM.</li>
+            <li>Public dashboards for partners.</li>
           </ul>
         </div>
       </div>
     </section>
 
-    <!-- NEW: RISK REGISTER -->
+    <!-- RISKS -->
     <section id="risks" class="container">
-      <h2 class="section-title">Risk Register & Mitigations</h2>
-      <p class="section-sub">We catalogue risks, rate them, and assign explicit controls — so governance can evaluate posture in the open.</p>
-      <div class="card glass">
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Risk</th><th>Category</th><th>Likelihood</th><th>Impact</th><th>Mitigations</th></tr></thead>
-            <tbody>
-              <tr>
-                <td>Adapter exploit</td><td>Security</td><td>Low</td><td>High</td>
-                <td>Isolation, allowlists, circuit breakers, external audit, canary deploys</td>
-              </tr>
-              <tr>
-                <td>Oracle stale/compromised</td><td>Market</td><td>Med</td><td>Med</td>
-                <td>Freshness checks, cross-source sanity, auto-tighten slippage, fail-shut</td>
-              </tr>
-              <tr>
-                <td>Governance capture</td><td>Org</td><td>Low</td><td>High</td>
-                <td>3/5 multisig, timelock, signed announcements, guardian (pause-only)</td>
-              </tr>
-              <tr>
-                <td>Partner adoption drag</td><td>GTM</td><td>Med</td><td>Med</td>
-                <td>Design partners, SDK ease-of-use, SLAs, transparent economics</td>
-              </tr>
-            </tbody>
-          </table>
+      <h2 class="section-title parallax" data-parallax data-speed="0.1">Risks & Mitigations</h2>
+      <p class="section-sub parallax" data-parallax data-speed="0.14">We name risks early and instrument mitigations at design-time.</p>
+      <div class="grid-2">
+        <div class="card glass parallax" data-parallax data-speed="0.18">
+          <h3>Market/Adoption</h3>
+          <ul class="clean">
+            <li>Mitigation: founder-led teams & L2s first; short cycles.</li>
+            <li>Simplified adapters to cut partner eng overhead.</li>
+            <li>Transparent SLAs & shared telemetry build trust.</li>
+          </ul>
+        </div>
+        <div class="card glass parallax" data-parallax data-speed="0.22">
+          <h3>Security/Execution</h3>
+          <ul class="clean">
+            <li>Mitigation: audits/formal verification.</li>
+            <li>Timelocks + guardian pause w/o withdrawal power.</li>
+            <li>Strict release process and rollback plans.</li>
+          </ul>
         </div>
       </div>
     </section>
 
-    <!-- PRE-SEED -->
+    <!-- PRESEED -->
     <section id="preseed" class="container">
-      <h2 class="section-title">Pre-Seed (Revised) — $450k</h2>
-      <p class="section-sub">Lean capital for audit, legal formalization, and Qatar relocation to operate from a crypto-forward jurisdiction.</p>
-      <div class="grid-2">
-        <div class="card glass">
-          <h3>Allocation</h3>
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>Category</th><th>Amount</th><th>Purpose</th></tr></thead>
-              <tbody>
-                <tr><td>Security audits & formal verification</td><td>$150k</td><td>Top-tier external audit + spec verification</td></tr>
-                <tr><td>Relocation & Qatar corporate setup</td><td>$100k</td><td>Entity, compliance, on-site operations</td></tr>
-                <tr><td>Legal & regulatory</td><td>$80k</td><td>Digital asset counsel, agreements, policy</td></tr>
-                <tr><td>Runway (advisors, infra, BD)</td><td>$120k</td><td>Infrastructure, advisor stipends, GTM</td></tr>
-                <tr><td><strong>Total</strong></td><td><strong>$450k</strong></td><td>18 months, 10+ partners</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <div class="card glass">
-          <h3>Governance Path (No Token Now)</h3>
-          <ul class="clean">
-            <li>No token required for revenue or security. Considered post-PMF strictly for governance alignment.</li>
-            <li>Advisory committees (risk, integration) form before any decentralization steps.</li>
-            <li>Any token plan must not weaken neutrality or fee clarity.</li>
-          </ul>
-        </div>
+      <h2 class="section-title parallax" data-parallax data-speed="0.1">Pre-Seed Plan — $450k Lean Ask</h2>
+      <p class="section-sub parallax" data-parallax data-speed="0.14">MVP is complete; funds focus on audits, legal formalization, and establishing a base in Qatar for a crypto-forward environment.</p>
+      <div class="table-wrap card glass parallax" data-parallax data-speed="0.18">
+        <table>
+          <thead><tr><th>Category</th><th>Amount</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td>Security Audits & Formal Verification</td><td>$150k</td><td>Top-tier external + internal reviews</td></tr>
+            <tr><td>Relocation & Qatar Corporate Setup</td><td>$100k</td><td>Entity & operations setup; Visa/relocation</td></tr>
+            <tr><td>Legal & Regulatory</td><td>$80k</td><td>Opinions, agreements, compliance</td></tr>
+            <tr><td>Runway (Advisors, Infra, BD)</td><td>$120k</td><td>Infra, stipends, early GTM</td></tr>
+            <tr><td><strong>Total</strong></td><td><strong>$450k</strong></td><td>18-month lean runway</td></tr>
+          </tbody>
+        </table>
       </div>
     </section>
 
     <!-- FAQ -->
     <section id="faq" class="container">
-      <h2 class="section-title">Investor FAQ</h2>
-      <p class="section-sub">Straight answers to common diligence questions.</p>
+      <h2 class="section-title parallax" data-parallax data-speed="0.1">Investor FAQ</h2>
       <div class="grid-2">
-        <div class="card glass">
-          <h3>How do protocol fees accrue?</h3>
-          <p>Fees (5–10 bps) are swept to a protocol treasury controlled by multisig. Initially, funds cover operations and security; future governance can direct surplus toward partner incentives or buybacks.</p>
-          <h3 style="margin-top:1.2rem">Is custody of funds ever taken?</h3>
-          <p>No. Partners retain custody. Gravitas manages allowances and executes policy-safe calls into underlying venues via adapters.</p>
-          <h3 style="margin-top:1.2rem">Why not build in-house?</h3>
-          <p>Security, audits, adapter maintenance, and ops discipline are expensive to sustain. We specialize so protocols can focus on their core roadmap.</p>
+        <div class="card glass parallax" data-parallax data-speed="0.16">
+          <h3>How do fees accrue?</h3>
+          <p>Micro-fees accrue to a protocol treasury multisig. Early stage: ops & audits. Governance may expand use post-PMF.</p>
         </div>
-        <div class="card glass">
-          <h3>What are the security guarantees?</h3>
-          <p>Static guards (reentrancy, allowlists), dynamic controls (oracle freshness, velocity limits), multisig+timelock, guardian pause (no withdrawals), public telemetry, and external audit before scale.</p>
-          <h3 style="margin-top:1.2rem">Token?</h3>
-          <p>Not required for revenue. Considered post-PMF only for governance decentralization and alignment — if and when it adds real value.</p>
-          <h3 style="margin-top:1.2rem">What’s the fastest path to value?</h3>
-          <p>Design-partner integration with pre-agreed policy templates, SLAs, and dashboards. We target revenue within 90 days of launch via volume-linked micro-fees.</p>
+        <div class="card glass parallax" data-parallax data-speed="0.2">
+          <h3>Do you take custody?</h3>
+          <p>No. Funds remain in partner-owned contracts or underlying protocols. We operate via allowances within policy bounds.</p>
+        </div>
+        <div class="card glass parallax" data-parallax data-speed="0.22">
+          <h3>Token?</h3>
+          <p>Not required. Considered post-PMF for decentralizing governance and aligning long-term incentives.</p>
+        </div>
+        <div class="card glass parallax" data-parallax data-speed="0.26">
+          <h3>Why not build in-house?</h3>
+          <p>Security + operations are their own business. Gravitas delivers audited, neutral infra with faster iteration and lower risk.</p>
         </div>
       </div>
     </section>
 
-    <!-- WHITEPAPER / RESOURCES -->
+    <!-- WHITEPAPER -->
     <section id="whitepaper" class="container">
-      <h2 class="section-title">Technical Whitepaper & Resources</h2>
-      <p class="section-sub">Full architecture, policy semantics, and security model. Open the Markdown version on GitHub.</p>
-      <p style="text-align:center;margin-bottom:1rem">
+      <h2 class="section-title parallax" data-parallax data-speed="0.1">Technical Whitepaper & Resources</h2>
+      <p class="section-sub parallax" data-parallax data-speed="0.14">Full architecture, policy semantics, and security model. Open the Markdown version on GitHub.</p>
+      <p style="text-align:center;margin-bottom:1rem" class="parallax" data-parallax data-speed="0.16">
         <a class="btn btn-primary" href="https://github.com/AbZe628/gravitas-protocol/blob/main/docs/whitepaper.md" target="_blank" rel="noopener">
           <i class="fa-solid fa-file-lines"></i>&nbsp;Open Whitepaper (.md)
         </a>
@@ -699,36 +701,27 @@ governance:
           <i class="fab fa-github"></i>&nbsp;Explore MVP
         </a>
       </p>
-      <iframe class="doc-embed glass" src="https://github.com/AbZe628/gravitas-protocol/blob/main/docs/whitepaper.md" title="Gravitas Whitepaper (.md)" loading="lazy"></iframe>
-      <div class="card glass" style="margin-top:1.4rem">
-        <h3>Press & Resources</h3>
-        <ul class="clean">
-          <li>Public announcements are PGP-signed; change logs are timestamped and mirrored.</li>
-          <li>Security advisories and audit reports are published with remediation diffs.</li>
-          <li>Adapter specs and SDK docs live alongside the code in the repository.</li>
-        </ul>
-      </div>
+      <iframe class="doc-embed glass parallax" data-parallax data-speed="0.18" src="https://github.com/AbZe628/gravitas-protocol/blob/main/docs/whitepaper.md" title="Gravitas Whitepaper (.md)" loading="lazy"></iframe>
     </section>
 
     <!-- CTA BAND -->
     <section class="cta-band">
-      <div class="container inner">
-        <h2>Join the neutrality standard for DeFi liquidity.</h2>
-        <p class="section-sub">If you run a treasury or DAO and optimize for durability and policy safety, we’d like to work with you.</p>
-        <div class="hero-ctas">
-          <a class="btn btn-primary" href="mailto:abdusamedzelic98@gmail.com?subject=Gravitas%20—%20Intro%20Call">Book a Call</a>
+      <div class="container inner parallax" data-parallax data-speed="0.12">
+        <h2>Join the policy-driven liquidity standard.</h2>
+        <p class="section-sub">Design partners and investors are welcome — let’s make reliability the default.</p>
+        <p>
+          <a class="btn btn-primary" href="mailto:abdusamedzelic98@gmail.com?subject=Gravitas%20—%20Deck%20Request">Request Investor Docs</a>
           <a class="btn btn-ghost" href="https://github.com/AbZe628/gravitas-protocol/tree/main" target="_blank" rel="noopener"><i class="fab fa-github"></i> Explore MVP</a>
-          <a class="btn btn-ghost" href="mailto:abdusamedzelic98@gmail.com?subject=Gravitas%20Protocol%20—%20Investor%20Docs%20Request">Request Investor Docs</a>
-        </div>
+        </p>
       </div>
     </section>
 
     <!-- CONTACT -->
     <section id="contact" class="container">
-      <h2 class="section-title">Contact & Partnerships</h2>
-      <p class="section-sub">We’re onboarding design partners and investors who want reliability and policy-first automation to become the norm.</p>
+      <h2 class="section-title parallax" data-parallax data-speed="0.1">Contact & Partnerships</h2>
+      <p class="section-sub parallax" data-parallax data-speed="0.12">We’re onboarding design partners and investors who want policy-first automation to become the norm.</p>
       <div class="grid-2">
-        <div class="card glass">
+        <div class="card glass parallax" data-parallax data-speed="0.16">
           <h3>Reach Us</h3>
           <ul class="clean">
             <li><strong>Email:</strong> <a href="mailto:abdusamedzelic98@gmail.com">abdusamedzelic98@gmail.com</a></li>
@@ -741,7 +734,7 @@ governance:
             <a class="btn btn-ghost" href="https://github.com/AbZe628/gravitas-protocol/blob/main/docs/whitepaper.md" target="_blank" rel="noopener"><i class="fa-solid fa-file-lines"></i> Whitepaper</a>
           </div>
         </div>
-        <div class="card glass">
+        <div class="card glass parallax" data-parallax data-speed="0.2">
           <h3>Why Partners Choose Gravitas</h3>
           <ul class="clean">
             <li>Non-custodial, policy-driven automation with explicit guardrails.</li>
@@ -756,8 +749,8 @@ governance:
 
   <!-- FOOTER -->
   <footer>
-    <div class="foot-brand"><i class="fas fa-atom" style="color:var(--gold)"></i><strong>Gravitas Protocol</strong></div>
-    <p style="color:var(--muted)">Liquidity orchestration for institutions — secure, instant, auditable.</p>
+    <div class="foot-brand"><i class="fas fa-atom" style="color:var(--gold)"></i><strong>&nbsp;Gravitas Protocol</strong></div>
+    <p style="color:#9aa1b3">Liquidity orchestration for institutions — secure, instant, auditable.</p>
     <div class="foot-social">
       <a href="https://www.linkedin.com/in/abdusamed-zeli%C4%87-5b5526183/" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
       <a href="https://github.com/AbZe628/gravitas-protocol/tree/main" target="_blank" rel="noopener" aria-label="GitHub"><i class="fab fa-github"></i></a>
@@ -765,14 +758,14 @@ governance:
     <div class="foot-cta">
       <a class="btn btn-ghost" href="https://github.com/AbZe628/gravitas-protocol/tree/main" target="_blank" rel="noopener"><i class="fab fa-github"></i> Explore MVP</a>
     </div>
-    <p style="margin-top:1rem;color:var(--muted)">© 2025 Gravitas Protocol. All rights reserved.</p>
+    <p style="margin-top:1rem;color:#9aa1b3">© 2025 Gravitas Protocol. All rights reserved.</p>
   </footer>
 
   <!-- BACK TO TOP -->
   <button class="to-top" id="toTop" aria-label="Back to top"><i class="fa-solid fa-arrow-up"></i></button>
 
   <script>
-    // === Sci-Fi “Blockchain Desert” background ===
+    // === Sci-Fi “Blockchain Desert” (Three.js) ===
     (function(){
       const container = document.getElementById('bg3d');
       const scene = new THREE.Scene();
@@ -852,7 +845,120 @@ governance:
       });
     })();
 
-    // === Drawer & back-to-top ===
+    // === HEX-GRID SHADER OVERLAY (pure WebGL2) ===
+    (function(){
+      const canvas = document.getElementById('shaderCanvas');
+      const gl = canvas.getContext('webgl2', { premultipliedAlpha: true });
+      if(!gl) return;
+
+      const DPR = Math.min(window.devicePixelRatio || 1, 2);
+      function resize(){
+        const w = Math.floor(window.innerWidth * DPR);
+        const h = Math.floor(window.innerHeight * DPR);
+        if(canvas.width !== w || canvas.height !== h){
+          canvas.width = w; canvas.height = h;
+        }
+        gl.viewport(0,0,gl.drawingBufferWidth, gl.drawingBufferHeight);
+      }
+      resize(); window.addEventListener('resize', resize);
+
+      const vs = `#version 300 es
+      in vec2 p; out vec2 vUv;
+      void main(){ vUv = (p+1.0)*0.5; gl_Position = vec4(p,0.0,1.0); }`;
+
+      const fs = `#version 300 es
+      precision highp float;
+      in vec2 vUv; out vec4 frag;
+
+      uniform vec2 uRes;
+      uniform float uTime;
+
+      mat2 rot(float a){ float c=cos(a), s=sin(a); return mat2(c,-s,s,c); }
+
+      vec3 hex(vec2 p){
+        const vec2 k = vec2(1.0, 1.7320508);
+        p = abs(p);
+        vec2 a = mod(p, k) - 0.5*k;
+        vec2 b = mod(p - 0.5*k, k) - 0.5*k;
+        vec2 g = (length(a) < length(b)) ? a : b;
+        float d = length(g);
+        return vec3(g, d);
+      }
+
+      void main(){
+        vec2 uv = vUv;
+        vec2 p = (uv*2.0 - 1.0);
+        p.x *= uRes.x/uRes.y;
+
+        float t = uTime*0.2;
+        p *= rot(0.05*sin(t*0.9));
+        p.y += 0.03*sin(p.x*2.0 + t*1.3);
+        p.x += 0.03*cos(p.y*2.0 - t*1.1);
+
+        float scale = 3.2;
+        vec3 h = hex(p*scale);
+
+        float line = smoothstep(0.01, 0.002, h.z);
+        float glow = smoothstep(0.06, 0.0, h.z)*0.25;
+
+        vec3 gold = vec3(212.0/255.0, 175.0/255.0, 55.0/255.0);
+        float shimmer = 0.45 + 0.25*sin(10.0*h.x + t*2.0) * cos(10.0*h.y - t*1.6);
+
+        float vig = smoothstep(1.2, 0.2, length(p));
+        float alpha = (line*0.35 + glow*0.25) * vig;
+
+        frag = vec4(gold * shimmer, alpha);
+      }`;
+
+      function compile(src, type){
+        const sh = gl.createShader(type);
+        gl.shaderSource(sh, src); gl.compileShader(sh);
+        if(!gl.getShaderParameter(sh, gl.COMPILE_STATUS)){
+          console.error(gl.getShaderInfoLog(sh));
+          gl.deleteShader(sh); return null;
+        }
+        return sh;
+      }
+      const prog = gl.createProgram();
+      const v = compile(vs, gl.VERTEX_SHADER);
+      const f = compile(fs, gl.FRAGMENT_SHADER);
+      gl.attachShader(prog, v); gl.attachShader(prog, f);
+      gl.linkProgram(prog);
+      if(!gl.getProgramParameter(prog, gl.LINK_STATUS)){
+        console.error(gl.getProgramInfoLog(prog)); return;
+      }
+
+      const buf = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+        -1,-1,  1,-1,  -1, 1,
+         1,-1,  1, 1,  -1, 1
+      ]), gl.STATIC_DRAW);
+
+      const locPos = gl.getAttribLocation(prog, 'p');
+      const uRes = gl.getUniformLocation(prog, 'uRes');
+      const uTime = gl.getUniformLocation(prog, 'uTime');
+
+      gl.useProgram(prog);
+      gl.enableVertexAttribArray(locPos);
+      gl.vertexAttribPointer(locPos, 2, gl.FLOAT, false, 0, 0);
+
+      let start = performance.now();
+      function render(){
+        const t = (performance.now()-start)/1000;
+        gl.viewport(0,0,gl.drawingBufferWidth, gl.drawingBufferHeight);
+        gl.enable(gl.BLEND);
+        gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+        gl.useProgram(prog);
+        gl.uniform2f(uRes, gl.drawingBufferWidth, gl.drawingBufferHeight);
+        gl.uniform1f(uTime, t);
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+        requestAnimationFrame(render);
+      }
+      render();
+    })();
+
+    // === Drawer, back-to-top ===
     (function(){
       const burger = document.getElementById('burger');
       const drawer = document.getElementById('drawer');
@@ -889,7 +995,7 @@ governance:
       });
     })();
 
-    // === Smooth anchor scrolling ===
+    // === Smooth anchors ===
     (function(){
       const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       document.querySelectorAll('a[href^="#"]').forEach(a=>{
@@ -902,6 +1008,35 @@ governance:
           el.scrollIntoView({ behavior: reduced?'auto':'smooth', block:'start' });
         });
       });
+    })();
+
+    // === PARALLAX ENGINE (scroll-linked, cheap) ===
+    (function(){
+      const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if(prefersReduced) return;
+      const items = Array.from(document.querySelectorAll('[data-parallax]'));
+      const speeds = new WeakMap();
+      items.forEach(el => speeds.set(el, parseFloat(el.getAttribute('data-speed') || '0.15')));
+      let ticking = false;
+
+      const update = ()=>{
+        const vh = window.innerHeight;
+        for(const el of items){
+          const r = el.getBoundingClientRect();
+          const visible = r.top<vh && r.bottom>0;
+          if(!visible) continue;
+          const s = speeds.get(el);
+          const offset = (r.top - vh*0.5) * s * -0.12;
+          el.style.setProperty('--pY', offset.toFixed(2) + 'px');
+        }
+        ticking = false;
+      };
+      const onScroll = ()=>{
+        if(!ticking){ ticking = true; requestAnimationFrame(update); }
+      };
+      window.addEventListener('scroll', onScroll, {passive:true});
+      window.addEventListener('resize', onScroll);
+      update();
     })();
   </script>
 </body>
