@@ -1,351 +1,255 @@
 <!DOCTYPE html>
-<html lang="hr">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Gravitas Protocol — Nevidljivi motor DeFi likvidnosti</title>
-  <meta name="description" content="Gravitas Protocol je neutralni, audit-friendly sloj za atomske migracije likvidnosti između DEX-ova s mikro-naknadama koje stvaraju održiv prihod protokola." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Urbanist:wght@400;600;800&display=swap" rel="stylesheet" />
+  <title>Gravitas Protocol — The Invisible Engine of DeFi Liquidity</title>
+  <meta name="description" content="Gravitas Protocol is a neutral, audit-ready transport layer for atomic liquidity migrations across DEXs and L2s. Micro-fees on volume = sustainable protocol revenue." />
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..800&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet"/>
   <style>
+    /* ======== Design System (Apple-ish, 2025) ======== */
     :root{
-      /* Light, airy, Apple-ish */
-      --bg: #f7f8fb;
-      --surface: #ffffff;
-      --surface-2: #fafbff;
-      --text: #0b0f19;
-      --muted: #5b6475;
-      --line: rgba(10,12,20,0.08);
+      --bg: #f7f9fc;
+      --bg-2:#ffffff;
+      --ink:#0b0f19;
+      --muted:#5c6475;
+      --line: rgba(11,15,25,0.08);
+      --glow: 0 40px 120px rgba(108,122,255,0.28);
 
-      /* Premium gradient */
-      --accent-1:#6e7cff;
+      --accent-1:#6c7aff;
       --accent-2:#b46ef7;
       --accent-3:#7ed0ff;
-      --grad: linear-gradient(135deg, var(--accent-1), var(--accent-2) 55%, var(--accent-3));
+      --grad: linear-gradient(135deg,var(--accent-1),var(--accent-2) 55%,var(--accent-3));
 
-      --radius-xl: 20px;
-      --radius-lg: 16px;
-      --radius-md: 12px;
-
-      --shadow-1: 0 10px 30px rgba(14,22,53,0.06);
-      --shadow-2: 0 30px 80px rgba(14,22,53,0.10);
-
-      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      --font-display: 'Urbanist', var(--font-sans);
-      --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
-
-      --maxw: 1200px;
+      --r-xl: 22px; --r-lg:16px; --r:12px; --r-sm:10px;
+      --shadow-1: 0 10px 30px rgba(14,22,53,.06);
+      --shadow-2: 0 30px 80px rgba(14,22,53,.10);
+      --maxw: 1240px;
+    }
+    [data-theme="dark"]{
+      --bg:#0b0f19; --bg-2:#0f1422; --ink:#eef2ff; --muted:#a7b0c6; --line:rgba(255,255,255,0.08);
+      --shadow-1: 0 10px 30px rgba(0,0,0,.45);
+      --shadow-2: 0 30px 80px rgba(0,0,0,.55);
     }
 
-    *{ box-sizing:border-box; }
-    html{ scroll-behavior:smooth; }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
     body{
-      margin:0;
-      color:var(--text);
-      background:
-        radial-gradient(1400px 700px at 100% -10%, rgba(110,124,255,0.08), transparent 40%),
-        radial-gradient(1200px 800px at -10% 10%, rgba(180,110,247,0.08), transparent 45%),
+      margin:0; color:var(--ink); background:
+        radial-gradient(1200px 700px at 100% -10%, rgba(110,122,255,0.10), transparent 50%),
+        radial-gradient(1000px 700px at -10% 10%, rgba(180,110,247,0.10), transparent 55%),
         var(--bg);
-      font-family:var(--font-sans);
-      line-height:1.55;
-      -webkit-font-smoothing:antialiased;
-      text-rendering:optimizeLegibility;
+      font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      line-height:1.6; -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
     }
 
-    /* --- Navigation --- */
-    .nav-wrap{
-      position:sticky; top:0; z-index:50;
-      backdrop-filter:saturate(180%) blur(18px);
-      background:rgba(255,255,255,0.7);
-      border-bottom:1px solid var(--line);
-    }
-    .nav{
-      max-width:var(--maxw); margin:0 auto; padding:14px 20px;
-      display:flex; align-items:center; gap:18px;
-    }
-    .brand{
-      display:flex; align-items:center; gap:12px; text-decoration:none; color:var(--text);
-      font-weight:800; letter-spacing:0.2px;
-    }
-    .logo{
-      width:42px; height:42px; border-radius:14px; position:relative; overflow:hidden;
-      background:var(--grad); color:#fff; display:grid; place-items:center; font-weight:800;
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.25);
-    }
-    .logo::after{
-      content:""; position:absolute; inset:-60% -60% auto auto;
-      width:200%; height:200%; transform:rotate(35deg);
-      background:linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
-      animation:shine 3.5s linear infinite;
-    }
-    @keyframes shine{ 0%{transform:translateX(-60%) rotate(35deg);} 100%{transform:translateX(60%) rotate(35deg);} }
+    .container{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+    section{padding:96px 0; position:relative}
+    h1,h2{font-family:"Plus Jakarta Sans", Inter, system-ui, sans-serif; line-height:1.08; letter-spacing:-0.02em}
+    h1{font-size:clamp(2.6rem,5.2vw,4.4rem); margin:16px 0 10px; font-weight:800}
+    h2{font-size:clamp(1.8rem,3.2vw,2.4rem); margin:0 0 8px; font-weight:800}
+    h3{font-weight:700; font-size:1.15rem; margin:0 0 8px}
+    p.lead{font-size:clamp(1.05rem,1.2vw,1.2rem); color:var(--muted); max-width:900px}
 
-    .spacer{ flex:1; }
-    .menu{
-      display:flex; gap:18px; align-items:center; flex-wrap:wrap;
-    }
-    .menu a{
-      text-decoration:none; color:#1b2130; font-weight:600; font-size:0.95rem; padding:10px 12px;
-      border-radius:10px; position:relative;
-    }
-    .menu a.active, .menu a:hover{
-      background:var(--surface-2); box-shadow:inset 0 0 0 1px var(--line);
-    }
-    .cta{
-      display:inline-flex; align-items:center; gap:10px;
-      padding:12px 16px; border-radius:14px; background:var(--grad); color:#fff; font-weight:700;
-      text-decoration:none; box-shadow:var(--shadow-1);
-    }
+    /* ======== NAV ======== */
+    .nav-wrap{position:sticky; top:0; z-index:50; backdrop-filter:saturate(180%) blur(20px);
+      background:color-mix(in oklab, var(--bg-2) 70%, transparent);
+      border-bottom:1px solid var(--line)}
+    .nav{display:flex;align-items:center;gap:16px;padding:14px 24px}
+    .brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink);font-weight:800}
+    .logo{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;color:#fff;background:var(--grad);position:relative;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(255,255,255,.35)}
+    .logo:after{content:"";position:absolute;inset:-60% auto auto -60%;width:220%;height:220%;transform:rotate(35deg);
+      background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);animation:shine 3.6s linear infinite}
+    @keyframes shine{0%{transform:translateX(-60%) rotate(35deg)}100%{transform:translateX(60%) rotate(35deg)}}
+    .spacer{flex:1}
+    .menu{display:flex;gap:8px; align-items:center}
+    .menu a{padding:10px 12px;border-radius:10px;text-decoration:none;color:var(--ink);font-weight:600;font-size:.96rem}
+    .menu a:hover,.menu a.active{background:var(--bg-2); box-shadow:inset 0 0 0 1px var(--line)}
+    .btn{display:inline-flex;align-items:center;gap:10px;padding:12px 16px;border-radius:14px;text-decoration:none;font-weight:800}
+    .btn.grad{background:var(--grad);color:#fff; box-shadow:var(--shadow-1)}
+    .btn.ghost{border:1px solid var(--line); background:var(--bg-2); color:var(--ink)}
 
-    /* --- Container / sections --- */
-    .container{ max-width:var(--maxw); margin:0 auto; padding:0 20px; }
-    section{ padding:84px 0; position:relative; }
-    .section-head{ margin-bottom:26px; }
-    h1,h2,h3{ line-height:1.1; letter-spacing:-0.02em; }
-    h1{
-      font-family:var(--font-display);
-      font-size: clamp(2.4rem, 5vw, 4.2rem);
-      font-weight:800;
-      margin:16px 0 14px;
-      background:linear-gradient(180deg,#0b0f19, #3a4763 70%);
-      -webkit-background-clip:text; background-clip:text; color:transparent;
-    }
-    h2{
-      font-family:var(--font-display);
-      font-size: clamp(1.8rem, 3.2vw, 2.4rem);
-      font-weight:800;
-      margin:0 0 8px;
-    }
-    h3{ font-size:1.2rem; margin:0 0 8px; font-weight:700; }
-    p.lead{
-      font-size: clamp(1.05rem, 1.2vw, 1.2rem);
-      color:var(--muted);
-      max-width:820px;
-    }
-    .pill{
-      display:inline-flex; gap:10px; align-items:center;
-      padding:10px 14px; border-radius:999px; background:var(--surface); box-shadow:var(--shadow-1);
-      border:1px solid var(--line); color:#1f2634; font-weight:600; font-size:0.92rem;
-    }
-    .chips{ display:flex; gap:10px; flex-wrap:wrap; margin-top:18px; }
+    .theme{border:none;background:var(--bg-2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-weight:700;cursor:pointer}
 
-    /* --- Hero --- */
-    .hero{
-      padding:120px 0 80px;
-      background:
-        radial-gradient(900px 480px at 80% -10%, rgba(110,124,255,0.14), transparent 60%),
-        radial-gradient(800px 480px at 10% 0%, rgba(180,110,247,0.13), transparent 55%);
-      position:relative; overflow:hidden;
-    }
-    .hero .glass{
-      background:rgba(255,255,255,0.65);
-      border:1px solid var(--line);
-      border-radius:var(--radius-xl);
-      padding:26px;
-      display:inline-flex; align-items:center; gap:10px;
-      box-shadow:var(--shadow-1);
-      font-weight:700; color:#1a2030;
-    }
-    .hero-grid{
-      display:grid; grid-template-columns:1.1fr 0.9fr; gap:28px; align-items:center; margin-top:26px;
-    }
-    .hero-card{
-      background:var(--surface);
-      border:1px solid var(--line);
-      border-radius:var(--radius-xl);
-      padding:22px;
-      box-shadow:var(--shadow-2);
-    }
-    .hero-visual{
-      position:relative; aspect-ratio:4/3; border-radius:24px; overflow:hidden;
-      background:
-        radial-gradient(60% 120% at 110% -10%, rgba(110,124,255,0.3), transparent 60%),
-        radial-gradient(80% 120% at -10% 110%, rgba(180,110,247,0.26), transparent 50%),
-        linear-gradient(180deg, #ffffff, #f3f6ff);
-      border:1px solid var(--line);
-      box-shadow:var(--shadow-2);
-    }
-    /* Zaha Hadid organic ribbons */
-    .ribbon{
-      position:absolute; filter:blur(0.2px); opacity:0.8; mix-blend-mode:multiply;
-      background:var(--grad);
-      animation:morph 18s ease-in-out infinite;
-      transform-origin:50% 50%;
-      border-radius: 50% 40% 60% 40% / 40% 60% 40% 60%;
-    }
-    .r1{ width:520px; height:220px; top:10%; left:-10%; transform:rotate(-8deg); }
-    .r2{ width:440px; height:180px; bottom:-10%; right:-6%; animation-delay:-6s; }
-    .r3{ width:260px; height:260px; top:40%; left:30%; animation-delay:-12s; }
+    .burger{display:none; border:none; background:transparent; font-size:26px; cursor:pointer}
+    @media (max-width: 1040px){ .menu{display:none} .burger{display:block} }
+
+    .drawer{position:fixed; inset:0 0 0 auto; width:min(86vw,380px); background:var(--bg-2);
+      border-left:1px solid var(--line); box-shadow:var(--shadow-2); transform:translateX(100%);
+      transition:transform .35s ease; z-index:70; padding:20px}
+    .drawer.open{transform:translateX(0)}
+    .drawer a{display:block; padding:12px 10px; text-decoration:none; color:var(--ink); font-weight:700; border-radius:10px}
+    .drawer a:hover{background:var(--bg)}
+
+    /* ======== HERO ======== */
+    header.hero{padding:120px 0 80px; overflow:hidden}
+    .badge{display:inline-flex;gap:10px;align-items:center;padding:10px 14px;border:1px solid var(--line);
+      border-radius:999px;background:var(--bg-2);box-shadow:var(--shadow-1);font-weight:700}
+    .chips{display:flex; gap:10px; flex-wrap:wrap; margin-top:16px}
+    .chip{padding:10px 12px; border-radius:999px; border:1px solid var(--line); background:var(--bg-2); font-weight:600}
+
+    .hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:28px;align-items:center;margin-top:22px}
+    @media (max-width: 980px){ .hero-grid{grid-template-columns:1fr} }
+
+    .panel{background:var(--bg-2); border:1px solid var(--line); border-radius:var(--r-xl); padding:22px; box-shadow:var(--shadow-2)}
+    .visual{position:relative; aspect-ratio:4/3; border-radius:24px; overflow:hidden; border:1px solid var(--line);
+      background:linear-gradient(180deg,#fff, #eef2ff); box-shadow:var(--glow)}
+
+    /* Zaha Hadid ribbons */
+    .ribbon{position:absolute; background:var(--grad); mix-blend-mode:multiply; filter:saturate(110%); opacity:.85;
+      border-radius:60% 40% 30% 70% / 60% 30% 70% 40%; animation:morph 18s ease-in-out infinite}
+    .r1{width:560px;height:220px; top:6%; left:-12%; transform:rotate(-6deg)}
+    .r2{width:480px;height:180px; bottom:-8%; right:-6%; animation-delay:-6s}
+    .r3{width:260px;height:260px; top:42%; left:32%; animation-delay:-12s}
     @keyframes morph{
-      0%,100%{ border-radius: 50% 40% 60% 40% / 40% 60% 40% 60%; transform:rotate(0deg) scale(1);}
-      25%{ border-radius: 40% 60% 35% 65% / 65% 35% 60% 40%; transform:rotate(4deg) scale(1.03);}
-      50%{ border-radius: 60% 40% 55% 45% / 45% 55% 40% 60%; transform:rotate(-3deg) scale(1.02);}
-      75%{ border-radius: 35% 65% 40% 60% / 60% 40% 65% 35%; transform:rotate(2deg) scale(1.04);}
+      0%,100%{ border-radius:60% 40% 30% 70% / 60% 30% 70% 40%; transform:rotate(0) scale(1)}
+      25%{ border-radius:40% 60% 70% 30% / 50% 60% 30% 60%; transform:rotate(3deg) scale(1.03)}
+      50%{ border-radius:50% 60% 30% 60% / 60% 30% 70% 40%; transform:rotate(-3deg) scale(1.02)}
+      75%{ border-radius:35% 65% 40% 60% / 60% 40% 65% 35%; transform:rotate(2deg) scale(1.04)}
     }
 
-    /* --- Cards / grids --- */
-    .grid{ display:grid; gap:20px; }
-    .grid-3{ grid-template-columns: repeat(3, minmax(0,1fr)); }
-    .grid-2{ grid-template-columns: repeat(2, minmax(0,1fr)); }
-    @media (max-width: 980px){
-      .hero-grid{ grid-template-columns:1fr; }
-      .grid-3{ grid-template-columns:1fr; }
-      .grid-2{ grid-template-columns:1fr; }
-    }
-    .card{
-      background:var(--surface);
-      border:1px solid var(--line);
-      border-radius:var(--radius-lg);
-      padding:20px;
-      box-shadow:var(--shadow-1);
-      transition:transform .35s ease, box-shadow .35s ease, background .35s ease;
-    }
-    .card:hover{ transform:translateY(-4px); box-shadow:var(--shadow-2); }
+    /* ======== Cards / Grids ======== */
+    .grid{display:grid; gap:20px}
+    .g-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .g-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .g-auto{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+    @media (max-width: 980px){ .g-2,.g-3{grid-template-columns:1fr} }
 
-    /* --- Code block --- */
-    .code{
-      position:relative; border:1px solid var(--line); border-radius:14px; overflow:hidden;
-      background: #fbfcff;
-    }
-    .code pre{
-      margin:0; padding:16px; font: 13px/1.6 var(--mono); color:#111827;
-      overflow:auto; white-space:pre;
-    }
-    .copy{
-      position:absolute; right:10px; top:10px; font-size:12px; padding:6px 10px; border-radius:10px;
-      background:#fff; border:1px solid var(--line); cursor:pointer; font-weight:700;
-    }
-    .copy:hover{ background:var(--surface-2); }
+    .card{background:var(--bg-2); border:1px solid var(--line); border-radius:var(--r-lg); padding:20px; box-shadow:var(--shadow-1);
+      transition:transform .35s ease, box-shadow .35s ease}
+    .card:hover{transform:translateY(-4px); box-shadow:var(--shadow-2)}
 
-    /* --- Details / accordion --- */
-    details{
-      border:1px solid var(--line); border-radius:14px; background:var(--surface);
-      box-shadow:var(--shadow-1);
-    }
-    summary{
-      list-style:none; padding:18px 20px; cursor:pointer; font-weight:700; letter-spacing:0.2px;
-    }
-    summary::-webkit-details-marker{ display:none; }
-    details[open] summary{ border-bottom:1px solid var(--line); }
-    .details-body{ padding:16px 20px 20px; }
+    /* Code block */
+    .code{position:relative; border:1px solid var(--line); border-radius:14px; overflow:hidden; background:color-mix(in oklab, var(--bg) 60%, #fff)}
+    .code pre{margin:0; padding:16px; font:13px/1.6 ui-monospace,SFMono-Regular,Consolas,Menlo,monospace; color:var(--ink); overflow:auto}
+    .copy{position:absolute; right:10px; top:10px; font-size:12px; padding:6px 10px; border-radius:10px; background:var(--bg-2);
+      border:1px solid var(--line); cursor:pointer; font-weight:800}
 
-    /* --- KPI tiles --- */
-    .kpi{
-      border:1px solid var(--line); border-radius:16px; padding:18px; background:var(--surface);
-    }
-    .kpi h4{ margin:0; font-size:0.95rem; color:#2b3347; }
-    .kpi .v{ font-family:var(--font-display); font-size:1.8rem; font-weight:800; margin-top:6px; background:var(--grad); -webkit-background-clip:text; background-clip:text; color:transparent; }
+    /* Details / Accordion */
+    details{border:1px solid var(--line); border-radius:14px; background:var(--bg-2); box-shadow:var(--shadow-1)}
+    summary{list-style:none; padding:18px 20px; cursor:pointer; font-weight:800}
+    summary::-webkit-details-marker{display:none}
+    details[open] summary{border-bottom:1px solid var(--line)}
+    .details-body{padding:16px 20px 20px}
 
-    /* --- Footer & back-to-top --- */
-    footer{
-      border-top:1px solid var(--line);
-      background:linear-gradient(180deg, rgba(255,255,255,0.7), #fff);
-      padding:36px 0;
-    }
-    .top{
-      position:fixed; right:18px; bottom:18px; display:none; z-index:60;
-      border:none; padding:12px 14px; border-radius:14px; background:var(--grad); color:#fff; font-weight:800; cursor:pointer; box-shadow:var(--shadow-2);
-    }
+    /* KPI */
+    .kpi{border:1px solid var(--line); border-radius:16px; padding:18px; background:var(--bg-2)}
+    .kpi .v{font-family:"Plus Jakarta Sans", Inter, system-ui; font-size:1.7rem; font-weight:800; background:var(--grad); -webkit-background-clip:text; background-clip:text; color:transparent}
 
-    /* --- Waves between sections (soft Zaha curve) --- */
-    .wave{
-      position:absolute; left:0; right:0; bottom:100%; height:120px; pointer-events:none;
-    }
+    /* PDF Embed */
+    .pdf-wrap{border:1px solid var(--line); border-radius:16px; overflow:hidden; background:var(--bg-2); box-shadow:var(--shadow-1)}
+    .pdf{width:100%; height:70vh; border:0; background:#fff}
 
-    /* Reduce motion */
+    /* Footer & top */
+    footer{border-top:1px solid var(--line); background:linear-gradient(180deg, color-mix(in oklab,var(--bg-2) 75%, transparent), var(--bg-2)); padding:36px 0}
+    .top{position:fixed; right:18px; bottom:18px; display:none; z-index:60; border:none; padding:12px 14px; border-radius:14px;
+      background:var(--grad); color:#fff; font-weight:800; cursor:pointer; box-shadow:var(--shadow-2)}
+
+    /* Reduced motion */
     @media (prefers-reduced-motion: reduce){
-      html{ scroll-behavior:auto; }
-      *{ animation:none !important; transition:none !important; }
+      html{scroll-behavior:auto}
+      *{animation:none !important; transition:none !important}
     }
   </style>
 </head>
 <body>
   <!-- NAV -->
   <div class="nav-wrap">
-    <nav class="nav" aria-label="Glavna navigacija">
-      <a href="#home" class="brand">
-        <span class="logo">G</span>
-        <span>Gravitas Protocol</span>
-      </a>
+    <nav class="nav" aria-label="Primary">
+      <a class="brand" href="#home"><span class="logo">G</span><span>Gravitas Protocol</span></a>
       <div class="spacer"></div>
       <div class="menu" id="menu">
-        <a href="#summary">Sažetak</a>
-        <a href="#market">Tržište</a>
-        <a href="#tech">Tehnologija</a>
-        <a href="#security">Sigurnost</a>
-        <a href="#sdk">SDK/API</a>
-        <a href="#governance">Upravljanje</a>
-        <a href="#invest">Investicije</a>
+        <a href="#overview">Overview</a>
+        <a href="#market">Market</a>
+        <a href="#technology">Technology</a>
+        <a href="#security">Security</a>
+        <a href="#sdk">SDK</a>
+        <a href="#governance">Governance</a>
+        <a href="#investment">Investment</a>
         <a href="#kpis">KPIs</a>
         <a href="#roadmap">Roadmap</a>
-        <a href="#contact">Kontakt</a>
+        <a href="#cases">Case Studies</a>
+        <a href="#threat">Threat Model</a>
+        <a href="#playbook">Partner Playbook</a>
+        <a href="#audit">Audit Plan</a>
+        <a href="#whitepaper">Whitepaper</a>
+        <a href="#faq">FAQ</a>
+        <a href="#contact">Contact</a>
       </div>
-      <a class="cta" href="#contact" aria-label="Kontaktiraj nas">Započni razgovor</a>
+      <button class="theme" id="themeToggle" aria-label="Toggle theme">☀︎ / ☾</button>
+      <button class="burger" id="burger" aria-label="Open menu">☰</button>
     </nav>
   </div>
+
+  <!-- Drawer (mobile) -->
+  <aside class="drawer" id="drawer" aria-label="Mobile menu">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <strong style="font-size:1.1rem">Menu</strong>
+      <button class="theme" id="drawerClose" aria-label="Close menu">✕</button>
+    </div>
+    <div style="display:grid;gap:6px">
+      <a href="#overview">Overview</a><a href="#market">Market</a><a href="#technology">Technology</a>
+      <a href="#security">Security</a><a href="#sdk">SDK</a><a href="#governance">Governance</a>
+      <a href="#investment">Investment</a><a href="#kpis">KPIs</a><a href="#roadmap">Roadmap</a>
+      <a href="#cases">Case Studies</a><a href="#threat">Threat Model</a><a href="#playbook">Partner Playbook</a>
+      <a href="#audit">Audit Plan</a><a href="#whitepaper">Whitepaper</a><a href="#faq">FAQ</a><a href="#contact">Contact</a>
+    </div>
+  </aside>
 
   <!-- HERO -->
   <header id="home" class="hero">
     <div class="container">
-      <div class="glass">Status: <span style="margin-left:8px">READY • Enterprise build</span></div>
-      <h1>Nevidljivi motor <span style="background:var(--grad); -webkit-background-clip:text; background-clip:text; color:transparent;">DeFi likvidnosti</span></h1>
+      <span class="badge">Status: READY • Enterprise build</span>
+      <h1>The Invisible Engine of <span style="background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent">DeFi Liquidity</span></h1>
       <p class="lead">
-        Gravitas Protocol je neutralni transportni sloj za <strong>atomske migracije likvidnosti</strong> između DEX-ova (V2/V3) i L2 mreža.
-        Mikro-naknade → održiv prihod. Arhitektura prilagođena revizijama, institucijama i partnerstvima na razini burzi.
+        Gravitas Protocol is a neutral transport layer for <strong>atomic liquidity migrations</strong> between DEXs (V2/V3) and L2s.
+        Micro-fees on flow create <strong>sustainable protocol revenue</strong>. Audit-ready, institution-friendly, partner-first.
       </p>
-      <div class="chips" aria-label="Glavne značajke">
-        <span class="pill">Atomske migracije</span>
-        <span class="pill">Adapter pattern (UniV2/V3)</span>
-        <span class="pill">Multisig + timelock</span>
-        <span class="pill">SDK, nadzor, SLA</span>
-        <span class="pill">Fork testovi & fuzz</span>
+      <div class="chips" aria-label="Key capabilities">
+        <span class="chip">Atomic migrations</span><span class="chip">Adapter pattern (UniV2/V3)</span>
+        <span class="chip">Multisig + Timelock</span><span class="chip">SDK & Observability</span><span class="chip">Fork & Fuzz tests</span>
       </div>
 
       <div class="hero-grid">
-        <div class="hero-card">
-          <h3>Zašto sada?</h3>
-          <p class="lead" style="font-size:1rem;">
-            Fragmentacija likvidnosti, cross-chain strategije i sezonske rotacije yield-a traže <em>automatizirane</em>, sigurnosno-dokazane migracije.
-            Gravitas uklanja ručni rad, smanjuje slippage i stvara <strong>pasivni prihod</strong> kroz volumen.
-          </p>
-          <div class="grid grid-3" style="margin-top:10px;">
-            <div class="kpi"><h4>Vrijeme migracije</h4><div class="v">&lt; 30 s</div></div>
-            <div class="kpi"><h4>Fail tx rate</h4><div class="v">&lt; 1%</div></div>
-            <div class="kpi"><h4>Uptime</h4><div class="v">99.9%</div></div>
+        <div class="panel">
+          <h3>Why this matters</h3>
+          <p style="margin:6px 0 14px;color:var(--muted)">Liquidity is fragmented across venues and chains. Strategies rotate weekly.
+            Gravitas automates migrations with determinism, near-zero operational drag, and verifiable guardrails.</p>
+          <div class="grid g-3">
+            <div class="kpi"><div class="v">&lt;30s</div><div style="color:var(--muted);font-size:.95rem">Typical migration time</div></div>
+            <div class="kpi"><div class="v">&lt;1%</div><div style="color:var(--muted);font-size:.95rem">Failed transaction rate</div></div>
+            <div class="kpi"><div class="v">99.9%</div><div style="color:var(--muted);font-size:.95rem">Availability SLO</div></div>
           </div>
         </div>
-        <div class="hero-visual" aria-hidden="true">
-          <div class="ribbon r1"></div>
-          <div class="ribbon r2"></div>
-          <div class="ribbon r3"></div>
+        <div class="visual" aria-hidden="true">
+          <div class="ribbon r1"></div><div class="ribbon r2"></div><div class="ribbon r3"></div>
         </div>
       </div>
     </div>
   </header>
 
-  <!-- EXECUTIVE SUMMARY -->
-  <section id="summary">
+  <!-- OVERVIEW -->
+  <section id="overview">
     <div class="container">
-      <div class="section-head">
-        <h2>Executive Sažetak</h2>
-        <p class="lead">Problem → Rješenje → Vrijednost za kreatore, LP-eve i protokol.</p>
-      </div>
-      <div class="grid grid-3">
+      <h2>Executive Overview</h2>
+      <p class="lead">Problem → Solution → Value across creators, users, and the protocol.</p>
+      <div class="grid g-3" style="margin-top:10px">
         <div class="card">
           <h3>Problem</h3>
-          <p>Likvidnost je raspršena kroz više DEX-ova i lanaca. Ručne migracije troše vrijeme, povećavaju rizik greške i gubitke od slippage-a.</p>
+          <p>DeFi liquidity lives in silos; manual moves burn time, slippage, and gas. Projects lack a predictable, recurring revenue stream from their own liquidity motion.</p>
         </div>
         <div class="card">
-          <h3>Rješenje</h3>
-          <p>Gravitas nudi <strong>atomske</strong> migracije preko adaptera (UniV2/V3), uz precizno upravljanje naknadama, rokovima i graničnim uvjetima.</p>
+          <h3>Solution</h3>
+          <p><strong>Atomic migrations</strong> across DEXs using audited adapters and strict guards (slippage, deadlines, whitelists), with transparent micro-fees that scale with volume.</p>
         </div>
         <div class="card">
-          <h3>Vrijednost</h3>
+          <h3>Value</h3>
           <ul>
-            <li><strong>Kreatori:</strong> bolji prinosi, manje operativnog trenja.</li>
-            <li><strong>Korisnici:</strong> 1-klik migracije bez skrivenih rizika.</li>
-            <li><strong>Protokol:</strong> mikro-naknade na volumen = održiv prihod.</li>
+            <li><strong>Creators:</strong> higher net yields, less operational drag.</li>
+            <li><strong>Users:</strong> 1-click migrations, deterministic outcomes.</li>
+            <li><strong>Protocol:</strong> usage-based, non-extractive revenue.</li>
           </ul>
         </div>
       </div>
@@ -354,106 +258,85 @@
 
   <!-- MARKET -->
   <section id="market">
-    <div class="wave">
-      <svg width="100%" height="100%" viewBox="0 0 1440 120" preserveAspectRatio="none">
-        <path d="M0,80 C240,120 480,40 720,70 C960,100 1200,60 1440,90 L1440,0 L0,0 Z" fill="url(#g1)"></path>
-        <defs><linearGradient id="g1" x1="0" x2="1" y1="0" y2="0"><stop stop-color="#ffffff" offset="0"/><stop stop-color="#f7f8fb" offset="1"/></linearGradient></defs>
-      </svg>
-    </div>
     <div class="container">
-      <div class="section-head">
-        <h2>Tržišni Kontekst</h2>
-        <p class="lead">Rotacije likvidnosti postaju standard. Potreban je sloj koji to radi sigurno, brzo i predvidivo.</p>
-      </div>
-      <div class="grid grid-2">
+      <h2>Market & Positioning</h2>
+      <p class="lead">Agnostic migration infrastructure for a multi-venue, multi-chain reality.</p>
+      <div class="grid g-2" style="margin-top:10px">
         <div class="card">
-          <h3>Segmenti potražnje</h3>
+          <h3>Demand segments</h3>
           <ul>
-            <li><strong>DEX partneri:</strong> žele plug-in za ulaz/izlaz likvidnosti bez trenja.</li>
-            <li><strong>Treasure/DAO-i:</strong> upravljanje tvornim kapitalom preko više mreža.</li>
-            <li><strong>Market makeri:</strong> brz i siguran rebalans.</li>
+            <li><strong>DEX partners:</strong> seamless in/out flows; reduce user churn.</li>
+            <li><strong>DAOs/Treasuries:</strong> programmatic treasury rebalancing.</li>
+            <li><strong>MMs & funds:</strong> deterministic timing for rotations.</li>
           </ul>
         </div>
         <div class="card">
-          <h3>Diferencijacija</h3>
-          <p>Neutralan, audit-friendly sloj koji ne preuzima custody, već orkestrira migracije uz <em>determinističke</em> ishode i prenosivu evidenciju.</p>
+          <h3>Differentiation</h3>
+          <p>Neutral, <em>audit-first</em> transport with signature-stable APIs. No custody; <strong>deterministic</strong> execution with verifiable logs and rollbacks under timelock.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- TECH -->
-  <section id="tech">
+  <!-- TECHNOLOGY -->
+  <section id="technology">
     <div class="container">
-      <div class="section-head">
-        <h2>Tehnički Blueprint</h2>
-        <p class="lead">Faze, strukture i testovi za enterprise razinu – od pametnih ugovora do nadzora.</p>
-      </div>
+      <h2>Technology Blueprint</h2>
+      <p class="lead">Phased build-out; contracts → adapters → SDK → observability.</p>
 
       <details open class="card">
-        <summary>Faza 1: Smart contract jezgra (tjedni 1–4)</summary>
+        <summary>Phase 1: Smart contracts (Weeks 1–4)</summary>
         <div class="details-body">
           <div class="code">
-            <button class="copy" aria-label="Kopiraj">Kopiraj</button>
-<pre><code>// Struktura
-/contracts/
-  /interfaces/
-    IUniswapV2Router.sol
-    IUniswapV3Pool.sol
-    INonfungiblePositionManager.sol
-  /adapters/
-    UniV2Adapter.sol
-    UniV3Adapter.sol
-  /libraries/
-    SafeERC20.sol
-    TokenValidation.sol
-  Teleport.sol
-  Treasury.sol
+            <button class="copy">Copy</button>
+<pre><code>/contracts/
+  /interfaces/ IUniswapV2Router.sol, IUniswapV3Pool.sol, INonfungiblePositionManager.sol
+  /adapters/   UniV2Adapter.sol, UniV3Adapter.sol
+  /libraries/  SafeERC20.sol, TokenValidation.sol
+  Teleport.sol, Treasury.sol
 
-// Inicijalizacija
 npm init -y
-npm install @openzeppelin/contracts @uniswap/v3-core @uniswap/v3-periphery
+npm i @openzeppelin/contracts @uniswap/v3-core @uniswap/v3-periphery
 npx hardhat init</code></pre>
           </div>
-
-          <div class="grid grid-2" style="margin-top:16px;">
+          <div class="grid g-2" style="margin-top:14px">
             <div class="card">
-              <h3>Teleport.sol (kritične funkcije)</h3>
+              <h3>Teleport.sol</h3>
               <ul>
-                <li><code>migrateLiquidity</code> (entry)</li>
-                <li><code>_executeMigration</code> (core logika)</li>
-                <li><code>_takeProtocolFee</code> (točne bps, rounding guard)</li>
-                <li><code>pause/unpause</code> (guardian)</li>
+                <li><code>migrateLiquidity</code> → main entry</li>
+                <li><code>_executeMigration</code> → core orchestration</li>
+                <li><code>_takeProtocolFee</code> → exact bps; rounding guards</li>
+                <li><code>pause/unpause</code> via guardian</li>
               </ul>
             </div>
             <div class="card">
               <h3>Adapter pattern</h3>
               <ul>
-                <li>V2: remove/add LP, deadline &amp; slippage guard</li>
-                <li>V3: mint/increase uz tick validaciju</li>
-                <li>try/catch za eksterne pozive</li>
+                <li>V2: remove/add LP with slippage + deadline guards</li>
+                <li>V3: mint/increase with tick validation</li>
+                <li>All external calls wrapped in try/catch</li>
               </ul>
             </div>
           </div>
         </div>
       </details>
 
-      <details class="card" style="margin-top:14px;">
-        <summary>Faza 2: Testiranje & sigurnost (tjedni 5–8)</summary>
+      <details class="card" style="margin-top:14px">
+        <summary>Phase 2: Testing & security (Weeks 5–8)</summary>
         <div class="details-body">
           <div class="code">
-            <button class="copy">Kopiraj</button>
+            <button class="copy">Copy</button>
 <pre><code>/test/
-  /unit/ Teleport.test.ts, Adapters.test.ts, Fees.test.ts
+  /unit/        Teleport.test.ts, Adapters.test.ts, Fees.test.ts
   /integration/ V2ToV2.test.ts, V2ToV3.test.ts, V3ToV3.test.ts
-  /fuzz/ MigrationFuzz.test.ts, FeeFuzz.test.ts
-  /fork/ MainnetFork.test.ts, HistoricalHacks.test.ts
+  /fuzz/        MigrationFuzz.test.ts, FeeFuzz.test.ts
+  /fork/        MainnetFork.test.ts, HistoricalHacks.test.ts
 
-Ciljevi:
-- ~100% pokrivenost
-- Fuzz za sve aritmetike
-- Fork s realnim stanjima
-- Rekonstrukcija poznatih incidenata</code></pre>
+Targets:
+- ~100% coverage
+- Full math fuzzing
+- Mainnet fork states
+- Historic incident replays</code></pre>
           </div>
         </div>
       </details>
@@ -463,85 +346,62 @@ Ciljevi:
   <!-- SECURITY -->
   <section id="security">
     <div class="container">
-      <div class="section-head">
-        <h2>Sigurnosni Protokoli</h2>
-        <p class="lead">Dokaziva sigurnost uz višeslojnu kontrolu i nadzor u realnom vremenu.</p>
-      </div>
-      <div class="grid grid-2">
+      <h2>Security Protocols</h2>
+      <p class="lead">Defense-in-depth with verifiable governance and live alerts.</p>
+      <div class="grid g-2" style="margin-top:10px">
         <div class="card">
-          <h3>Upravljanje pravima</h3>
-          <div class="code">
-            <button class="copy">Kopiraj</button>
-<pre><code>Treasury Multisig: 3/5
- - 2 osnivača
- - 2 savjetnika
- - 1 community rep
-
-Timelock: 48h
- - admin promjene, naknade, whitelist
-
-Guardian (hot): samo emergency pause
-</code></pre>
-          </div>
+          <h3>Access & governance</h3>
+          <div class="code"><button class="copy">Copy</button>
+<pre><code>Treasury Multisig: 3/5 (2 founders, 2 advisors, 1 community)
+Timelock: 48h (admin changes, fees, whitelist)
+Guardian (hot): emergency pause only</code></pre></div>
         </div>
         <div class="card">
-          <h3>Monitoring & alarmi</h3>
-          <div class="code">
-            <button class="copy">Kopiraj</button>
+          <h3>Monitoring & alerts</h3>
+          <div class="code"><button class="copy">Copy</button>
 <pre><code>const CRITICAL_ALERTS = {
-  LARGE_MIGRATION: { threshold: 100000, priority: 'HIGH' },
-  FAILED_TX:       { threshold: 10000,  priority: 'MEDIUM' },
-  CIRCUIT_BREAKER: { threshold: 1,      priority: 'CRITICAL' },
-  FEE_CHANGE:      { threshold: 1,      priority: 'HIGH' }
-};</code></pre>
-          </div>
-          <ul style="margin-top:8px;">
-            <li>SIEM export + podpisani audit logovi</li>
-            <li>Automatski rollback uz timelock ograničenja</li>
-            <li>24/7 pager duty s runbookovima</li>
+  LARGE_MIGRATION: { threshold: 100000, priority:'HIGH' },
+  FAILED_TX:       { threshold: 10000,  priority:'MEDIUM' },
+  CIRCUIT_BREAKER: { threshold: 1,      priority:'CRITICAL' },
+  FEE_CHANGE:      { threshold: 1,      priority:'HIGH' }
+};</code></pre></div>
+          <ul>
+            <li>Signed audit logs + SIEM export</li>
+            <li>Rollback runbooks under timelock rules</li>
+            <li>24/7 on-call with automated escalation</li>
           </ul>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- SDK / API -->
+  <!-- SDK -->
   <section id="sdk">
     <div class="container">
-      <div class="section-head">
-        <h2>SDK & API za integracije</h2>
-        <p class="lead">Jednostavno za partnere: tipizirani adapteri, idempotentni pozivi i deterministički rezultati.</p>
-      </div>
-      <div class="grid grid-2">
+      <h2>SDK & APIs</h2>
+      <p class="lead">Typed adapters, idempotent calls, deterministic results.</p>
+      <div class="grid g-2" style="margin-top:10px">
         <div class="card">
-          <h3>Struktura paketa</h3>
-          <div class="code">
-            <button class="copy">Kopiraj</button>
+          <h3>Package structure</h3>
+          <div class="code"><button class="copy">Copy</button>
 <pre><code>/sdk/
   /core/ client.ts, signer.ts
   /dex/  univ2.ts, univ3.ts
   /types/ index.d.ts
-  /utils/ math.ts, slippage.ts, deadlines.ts</code></pre>
-          </div>
-          <p><strong>SLA:</strong> SemVer, LTS branch, sigurnosna ažuriranja 24h od otkrivanja.</p>
+  /utils/ math.ts, slippage.ts, deadlines.ts</code></pre></div>
+          <p><strong>Reliability:</strong> SemVer, LTS branch, 24h targeted security patches.</p>
         </div>
         <div class="card">
-          <h3>Primjer (TypeScript)</h3>
-          <div class="code">
-            <button class="copy">Kopiraj</button>
+          <h3>TypeScript example</h3>
+          <div class="code"><button class="copy">Copy</button>
 <pre><code>import { GravitasClient } from '@gravitas/sdk';
-
 const client = new GravitasClient({ rpc: process.env.RPC_URL });
 await client.connect(wallet);
-
 await client.migrate({
-  from: { dex: 'univ2', pair: 'WETH/USDC' },
-  to:   { dex: 'univ3', pool: 'WETH/USDC', feeTier: 500 },
-  amountLP: '100.0',
-  slippageBps: 30,
-  deadlineSec: 120
-});</code></pre>
-          </div>
+  from:{ dex:'univ2', pair:'WETH/USDC' },
+  to:{ dex:'univ3', pool:'WETH/USDC', feeTier:500 },
+  amountLP:'100.0', slippageBps:30, deadlineSec:120
+});</code></pre></div>
         </div>
       </div>
     </div>
@@ -550,78 +410,68 @@ await client.migrate({
   <!-- GOVERNANCE -->
   <section id="governance">
     <div class="container">
-      <div class="section-head">
-        <h2>Upravljanje & usklađenost</h2>
-        <p class="lead">Minimalni rizik, maksimalna provjerljivost. Token nije potreban u prvoj fazi.</p>
-      </div>
-      <div class="grid grid-2">
+      <h2>Governance & Compliance</h2>
+      <p class="lead">Minimize risk, maximize verifiability. Token optional later.</p>
+      <div class="grid g-2" style="margin-top:10px">
         <div class="card">
           <h3>Model</h3>
           <ul>
-            <li>Faza 0–1: centralizirano multisig + timelock</li>
-            <li>Faza 2: DAO nadzor parametara (naknade, whitelist adaptera)</li>
-            <li>Usklađenost: bez custody funkcije; infrastrukturni sloj</li>
+            <li>Phase 0–1: multisig + timelock</li>
+            <li>Phase 2: DAO oversight on parameters (fees, adapter whitelist)</li>
+            <li>Compliance: infrastructure only, no custody</li>
           </ul>
         </div>
         <div class="card">
-          <h3>Token (opcionalno kasnije)</h3>
-          <p>Utility: governance, fee-sharing, staking bondovi za sigurnost adaptera. Striktnim rasporedom otključavanja i naglaskom na trezor protokola.</p>
+          <h3>Token (optional)</h3>
+          <p>Utility: governance, fee-sharing, staking bonds for adapter security with disciplined unlocks and protocol-owned liquidity.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- INVEST -->
-  <section id="invest">
+  <!-- INVESTMENT -->
+  <section id="investment">
     <div class="container">
-      <div class="section-head">
-        <h2>Investicijski Blueprint</h2>
-        <p class="lead">Transparentna ekonomija i jasna putanja do prihoda na volumenu.</p>
-      </div>
-      <div class="grid grid-2">
+      <h2>Investment Blueprint</h2>
+      <p class="lead">Transparent economics, credible path to revenue on volume.</p>
+      <div class="grid g-2" style="margin-top:10px">
         <div class="card">
-          <h3>Prihod & metrika</h3>
-          <div class="code">
-            <button class="copy">Kopiraj</button>
+          <h3>Revenue & metrics</h3>
+          <div class="code"><button class="copy">Copy</button>
 <pre><code>Fee: 5–10 bps (0.05–0.1%)
-Cilj volumena Y1: $100M / mj
-Projekcija prihoda: $50k–$100k / mj
-Break-even (6 bps): ~$83M / mj</code></pre>
-          </div>
-          <p>Prihod 100% u Treasury → razvoj, sigurnost, partnerstva. Kasnije dio se može dijeliti kroz fee-sharing module (uz DAO konsenzus).</p>
+Year-1 Volume Target: $100M / month
+Projected Revenue: $50k–$100k / month
+Break-even (6 bps): ~ $83M / month</code></pre></div>
+          <p>100% of fees accrue to Treasury → development, security, partnerships; later fee-sharing modules via DAO votes.</p>
         </div>
         <div class="card">
-          <h3>Troškovi & runway</h3>
-          <div class="code">
-            <button class="copy">Kopiraj</button>
-<pre><code>Senior dev (5×, 4 mj): ~$480k
-Auditi (2×): ~$250k
-Infra & alati: ~$50k
-Pravo & usklađenost: ~$50k
-BD & partnerstva: ~$100k
-----------------------------
-Inicijalno: ~$930k</code></pre>
-          </div>
-          <p>Runway Y1 OPEX ~ $500k. Fokus na rane strateške DEX partnere da se brže dosegne break-even.</p>
+          <h3>Costs & runway</h3>
+          <div class="code"><button class="copy">Copy</button>
+<pre><code>Senior Devs (5×, 4 mo) : ~$480k
+Audits (2×)            : ~$250k
+Infra & Tools          : ~$50k
+Legal & Compliance     : ~$50k
+BD & Partnerships      : ~$100k
+-----------------------------
+Initial Capex          : ~$930k</code></pre></div>
+          <p>Year-1 OPEX ≈ $500k. Focus on early strategic DEX partners for faster break-even.</p>
         </div>
       </div>
 
-      <div class="card" style="margin-top:16px;">
-        <h3>Go-to-Market (12 mjeseci)</h3>
-        <div class="code">
-          <button class="copy">Kopiraj</button>
-<pre><code>Faza 1 (1–3 mj): Early Adopters
-- 3–5 DEX partnera na Eth mainnetu
-- $10M/mj cilj
+      <div class="card" style="margin-top:14px">
+        <h3>Go-to-Market (12 months)</h3>
+        <div class="code"><button class="copy">Copy</button>
+<pre><code>Phase 1 (1–3 mo): Early Adopters
+- 3–5 DEX partners on Ethereum mainnet
+- $10M/month volume target
 
-Faza 2 (4–6 mj): Skaliranje
-- 10+ partnera, dodati L2 (Arbitrum/Optimism)
-- $50M/mj cilj
+Phase 2 (4–6 mo): Scale
+- 10+ partners, add L2 (Arbitrum/Optimism)
+- $50M/month
 
-Faza 3 (7–12 mj): Rast
-- Cross-chain ekspanzija
-- $100M+/mj cilj</code></pre>
-        </div>
+Phase 3 (7–12 mo): Growth
+- Cross-chain expansion
+- $100M+/month</code></pre></div>
       </div>
     </div>
   </section>
@@ -629,22 +479,15 @@ Faza 3 (7–12 mj): Rast
   <!-- KPIs -->
   <section id="kpis">
     <div class="container">
-      <div class="section-head">
-        <h2>KPIs (Godina 1)</h2>
-        <p class="lead">Tehnički → Biznis → Korisnički učinak.</p>
-      </div>
-      <div class="grid grid-3">
-        <div class="kpi"><h4>Tehnički</h4><div class="v">99.9% uptime</div><p style="margin:6px 0 0;color:var(--muted);">0 kritičnih incidenata; &lt;1% fail tx</p></div>
-        <div class="kpi"><h4>Biznis</h4><div class="v">$100M+/mj</div><p style="margin:6px 0 0;color:var(--muted);">10+ integriranih partnera</p></div>
-        <div class="kpi"><h4>Korisnik</h4><div class="v">1,000+ MAU</div><p style="margin:6px 0 0;color:var(--muted);">&lt;30s prosječna migracija</p></div>
-      </div>
-
-      <div class="card" style="margin-top:16px;">
-        <h3>Izlazna strategija (opcionalno)</h3>
-        <ul>
-          <li>Protocol-owned liquidity, DAO upravljanje</li>
-          <li>Temelj za dugoročnu održivost — bez kratkoročnih M&A ciljeva</li>
-        </ul>
+      <h2>Success Metrics (Year 1)</h2>
+      <p class="lead">Technical → Business → User outcomes.</p>
+      <div class="grid g-3" style="margin-top:10px">
+        <div class="kpi"><div class="v">99.9%</div><div style="color:var(--muted);font-size:.95rem">Uptime</div></div>
+        <div class="kpi"><div class="v">0</div><div style="color:var(--muted);font-size:.95rem">Critical incidents</div></div>
+        <div class="kpi"><div class="v">&lt;1%</div><div style="color:var(--muted);font-size:.95rem">Failed tx rate</div></div>
+        <div class="kpi"><div class="v">$100M+</div><div style="color:var(--muted);font-size:.95rem">Monthly migration volume</div></div>
+        <div class="kpi"><div class="v">10+</div><div style="color:var(--muted);font-size:.95rem">Integrated partners</div></div>
+        <div class="kpi"><div class="v">1,000+</div><div style="color:var(--muted);font-size:.95rem">Monthly active migrators</div></div>
       </div>
     </div>
   </section>
@@ -652,34 +495,161 @@ Faza 3 (7–12 mj): Rast
   <!-- ROADMAP -->
   <section id="roadmap">
     <div class="container">
-      <div class="section-head">
-        <h2>Roadmap (Q1–Q4)</h2>
-        <p class="lead">Konkretnim koracima do mainneta i rasta.</p>
-      </div>
-      <div class="grid grid-2">
+      <h2>Roadmap</h2>
+      <p class="lead">From testnet to mainnet to scale.</p>
+      <div class="grid g-2" style="margin-top:10px">
         <div class="card">
-          <h3>Sljedeća 24 h</h3>
+          <h3>Next 24h</h3>
           <ul>
-            <li>Hardhat/Foundry setup, init repo</li>
-            <li>TimelockController na testnetu</li>
-            <li>CI/CD + sigurnosne politike</li>
+            <li>Hardhat/Foundry setup, repo init</li>
+            <li>Deploy TimelockController (testnet)</li>
+            <li>CI/CD + security baselines</li>
           </ul>
-          <h3 style="margin-top:12px;">Sljedećih 7 dana</h3>
+          <h3 style="margin-top:12px">Next 7 days</h3>
           <ul>
-            <li>Skeleton <code>Teleport.sol</code> + unit testovi</li>
-            <li>Osnovni monitoring i alarmi</li>
-            <li>Identifikacija 3 launch partnera</li>
+            <li>Teleport.sol skeleton + unit tests</li>
+            <li>Alerts + observability</li>
+            <li>Identify 3 launch partners</li>
           </ul>
         </div>
         <div class="card">
           <h3>Milestones</h3>
           <ul>
-            <li><strong>T+30</strong>: Faza 1 gotova</li>
-            <li><strong>T+60</strong>: Sigurnosni audit #1</li>
-            <li><strong>T+90</strong>: Testnet deploy</li>
-            <li><strong>T+120</strong>: Mainnet (3 partnera)</li>
+            <li><strong>T+30</strong>: Phase 1 complete</li>
+            <li><strong>T+60</strong>: Security audit #1</li>
+            <li><strong>T+90</strong>: Public testnet</li>
+            <li><strong>T+120</strong>: Mainnet (3 partners)</li>
           </ul>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CASE STUDIES -->
+  <section id="cases">
+    <div class="container">
+      <h2>Case Studies (Simulated)</h2>
+      <p class="lead">Before/after snapshots with slippage and timing impact.</p>
+      <div class="grid g-auto" style="margin-top:10px">
+        <div class="card">
+          <h3>V2 → V3 Rebalancing (WETH/USDC)</h3>
+          <ul>
+            <li><strong>Before:</strong> Manual removal → swap → mint; ~6 tx; ~0.45% slippage</li>
+            <li><strong>After:</strong> Single migration call; ≤2 tx; ≤0.08% slippage</li>
+            <li><strong>Time saved:</strong> ~12 minutes per move</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>L2 Expansion (Arbitrum)</h3>
+          <ul>
+            <li><strong>Before:</strong> Ad-hoc bridging + re-minting; inconsistent fees</li>
+            <li><strong>After:</strong> Pre-quoted path with guardrails; deterministic fee bands</li>
+            <li><strong>Outcome:</strong> Predictable treasury rotations</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>DAO Treasury Rotation</h3>
+          <ul>
+            <li><strong>Before:</strong> Governance overhead per venue</li>
+            <li><strong>After:</strong> Policy templates + timelock; signed audit trail</li>
+            <li><strong>Impact:</strong> Fewer governance cycles; safer execution</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- THREAT MODEL -->
+  <section id="threat">
+    <div class="container">
+      <h2>Threat Model (STRIDE)</h2>
+      <p class="lead">Systemic view of plausible risks and concrete mitigations.</p>
+      <div class="grid g-auto" style="margin-top:10px">
+        <div class="card"><h3>Spoofing</h3><p>Signer spoofing, adapter address spoofing.</p><p><strong>Mitigation:</strong> EIP-712 typed data; whitelisted adapters; on-chain registry.</p></div>
+        <div class="card"><h3>Tampering</h3><p>Parameter tampering in flight.</p><p><strong>Mitigation:</strong> Timelock for admin changes; immutables; Merkle-proofed configs.</p></div>
+        <div class="card"><h3>Repudiation</h3><p>Dispute over who approved what.</p><p><strong>Mitigation:</strong> Signed audit logs, append-only store, SIEM ingestion.</p></div>
+        <div class="card"><h3>Information Disclosure</h3><p>Leak of migration intents.</p><p><strong>Mitigation:</strong> Commit-reveal for large moves; batching; optional MEV-protected relays.</p></div>
+        <div class="card"><h3>Denial of Service</h3><p>Griefing adapters, gas grief.</p><p><strong>Mitigation:</strong> Circuit breakers; rate-limits per address; back-pressure queues.</p></div>
+        <div class="card"><h3>Elevation of Privilege</h3><p>Admin takeover, guardian abuse.</p><p><strong>Mitigation:</strong> Multisig + hardware keys; scoped roles; emergency council with quorum.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PARTNER PLAYBOOK -->
+  <section id="playbook">
+    <div class="container">
+      <h2>Partner Integration Playbook</h2>
+      <p class="lead">From sandbox to production with SLAs and observability.</p>
+      <div class="grid g-2" style="margin-top:10px">
+        <div class="card">
+          <h3>Steps</h3>
+          <ol>
+            <li>Sandbox keys & adapter registry access</li>
+            <li>SDK install + sample flows (V2↔V3)</li>
+            <li>Staging fork tests on target pools</li>
+            <li>Alerting hooks + dashboards</li>
+            <li>Production rollout gate with small caps</li>
+          </ol>
+        </div>
+        <div class="card">
+          <h3>SLAs</h3>
+          <ul>
+            <li>Latency: &lt; 2s orchestration</li>
+            <li>Availability: 99.9% monthly</li>
+            <li>Support: 24h P1 response</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AUDIT PLAN -->
+  <section id="audit">
+    <div class="container">
+      <h2>Audit Plan</h2>
+      <p class="lead">Scope, timelines, and community incentives.</p>
+      <div class="grid g-2" style="margin-top:10px">
+        <div class="card">
+          <h3>Scope</h3>
+          <ul>
+            <li>Contracts: Teleport, Treasury, Adapters, Registry</li>
+            <li>Economic analysis: fee precision, rounding, griefing</li>
+            <li>Threat replay: historical exploits on forks</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Timeline & incentives</h3>
+          <ul>
+            <li>Audit #1 (4 weeks), remediations (2 weeks)</li>
+            <li>Audit #2 (3 weeks) + public contest (Code4rena-style)</li>
+            <li>Bug bounty live at launch</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHITEPAPER (PDF EMBED) -->
+  <section id="whitepaper">
+    <div class="container">
+      <h2>Technical Whitepaper</h2>
+      <p class="lead">Inline PDF for investor & engineer review. Replace the file at <code>docs/whitepaper.pdf</code>.</p>
+      <div class="pdf-wrap" style="margin-top:10px">
+        <iframe class="pdf" src="docs/whitepaper.pdf" title="Gravitas Protocol Whitepaper" loading="lazy"></iframe>
+      </div>
+      <p style="margin-top:10px;color:var(--muted)">If the PDF doesn’t render in your browser, <a href="docs/whitepaper.pdf" target="_blank" rel="noopener">open it in a new tab</a>.</p>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq">
+    <div class="container">
+      <h2>Investor & Technical FAQ</h2>
+      <div class="grid g-auto" style="margin-top:10px">
+        <details class="card"><summary>How do fees accrue?</summary><div class="details-body">Micro-fees (bps) are deducted during migrations and routed to Treasury. Transparent, auditable accounting.</div></details>
+        <details class="card"><summary>Is custody involved?</summary><div class="details-body">No. Gravitas orchestrates migrations via adapters with whitelisted routers; funds move through users’ authorized flows.</div></details>
+        <details class="card"><summary>What’s the token plan?</summary><div class="details-body">Optional. Only after product-market fit: governance, fee-sharing, and staking bonds for security.</div></details>
+        <details class="card"><summary>How are large moves protected?</summary><div class="details-body">Commit-reveal, batching windows, slippage caps, and optional MEV-protected relays.</div></details>
       </div>
     </div>
   </section>
@@ -687,52 +657,63 @@ Faza 3 (7–12 mj): Rast
   <!-- CONTACT -->
   <section id="contact">
     <div class="container">
-      <div class="section-head">
-        <h2>Kontakt & Partnerstva</h2>
-        <p class="lead">Spreman za tehnički due-diligence i investitorske razgovore.</p>
-      </div>
-      <div class="grid grid-2">
-        <a class="card" href="mailto:abdusamedzelic98@gmail.com" style="text-decoration:none; color:inherit;">
-          <h3>E-mail</h3>
-          <p style="color:var(--muted);">abdusamedzelic98@gmail.com</p>
+      <h2>Contact & Partnerships</h2>
+      <p class="lead">Ready for diligence, partnerships, and integration pilots.</p>
+      <div class="grid g-2" style="margin-top:10px">
+        <a class="card" style="text-decoration:none;color:inherit" href="mailto:abdusamedzelic98@gmail.com">
+          <h3>Email</h3><p style="color:var(--muted)">abdusamedzelic98@gmail.com</p>
         </a>
-        <a class="card" href="tel:+385915668133" style="text-decoration:none; color:inherit;">
-          <h3>Telefon</h3>
-          <p style="color:var(--muted);">+385 91 566 8133</p>
+        <a class="card" style="text-decoration:none;color:inherit" href="tel:+385915668133">
+          <h3>Phone</h3><p style="color:var(--muted)">+385 91 566 8133</p>
         </a>
-      </div>
-      <div class="card" style="margin-top:16px;">
-        <h3>Pitch & Materijali</h3>
-        <p>Na zahtjev: tehničke specifikacije, threat model, test izvještaji, plan audita i partnerski SDK pristup.</p>
       </div>
     </div>
   </section>
 
   <!-- FOOTER -->
   <footer role="contentinfo">
-    <div class="container" style="display:flex; gap:16px; align-items:center; justify-content:space-between; flex-wrap:wrap;">
-      <p style="margin:0; color:var(--muted);">© <span id="y"></span> Gravitas Protocol • All rights reserved</p>
-      <div style="display:flex; gap:14px;">
-        <a href="#summary" style="text-decoration:none; color:var(--muted);">Blueprint</a>
-        <a href="#contact" style="text-decoration:none; color:var(--muted);">Kontakt</a>
+    <div class="container" style="display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap">
+      <p style="margin:0;color:var(--muted)">© <span id="y"></span> Gravitas Protocol • All rights reserved</p>
+      <div style="display:flex;gap:14px">
+        <a href="#whitepaper" style="text-decoration:none;color:var(--muted)">Whitepaper</a>
+        <a href="#contact" style="text-decoration:none;color:var(--muted)">Contact</a>
       </div>
     </div>
   </footer>
 
   <!-- Back to top -->
-  <button class="top" id="topBtn" aria-label="Natrag na vrh">↑</button>
+  <button class="top" id="topBtn" aria-label="Back to top">↑</button>
 
   <script>
     // Year
     document.getElementById('y').textContent = new Date().getFullYear();
 
+    // Theme toggle (persist)
+    const root = document.documentElement;
+    const key = 'gravitas_theme';
+    const saved = localStorage.getItem(key);
+    if(saved) document.documentElement.setAttribute('data-theme', saved);
+    document.getElementById('themeToggle').addEventListener('click', ()=>{
+      const cur = document.documentElement.getAttribute('data-theme') || 'light';
+      const nxt = cur === 'light' ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', nxt);
+      localStorage.setItem(key, nxt);
+    });
+
+    // Burger / Drawer
+    const burger = document.getElementById('burger');
+    const drawer = document.getElementById('drawer');
+    const drawerClose = document.getElementById('drawerClose');
+    const toggleDrawer = (open)=> drawer.classList.toggle('open', open);
+    burger.addEventListener('click', ()=> toggleDrawer(true));
+    drawerClose.addEventListener('click', ()=> toggleDrawer(false));
+    drawer.querySelectorAll('a').forEach(a=>a.addEventListener('click', ()=>toggleDrawer(false)));
+
     // Back to top
     const topBtn = document.getElementById('topBtn');
-    const onScroll = () => {
-      topBtn.style.display = (window.scrollY > 500) ? 'inline-flex' : 'none';
-    };
+    const onScroll = ()=>{ topBtn.style.display = (window.scrollY > 600) ? 'inline-flex' : 'none'; };
     window.addEventListener('scroll', onScroll, { passive:true });
-    topBtn.addEventListener('click', () => window.scrollTo({ top:0, behavior:'smooth' }));
+    topBtn.addEventListener('click', ()=> window.scrollTo({ top:0, behavior:'smooth' }));
 
     // Copy buttons
     document.querySelectorAll('.copy').forEach(btn=>{
@@ -740,22 +721,20 @@ Faza 3 (7–12 mj): Rast
         const code = btn.parentElement.querySelector('pre').textContent;
         try{
           await navigator.clipboard.writeText(code);
-          const t = btn.textContent; btn.textContent='Kopirano ✓';
+          const t = btn.textContent; btn.textContent='Copied ✓';
           setTimeout(()=>btn.textContent=t, 1600);
-        }catch(e){ alert('Kopiranje nije uspjelo. Označi i kopiraj ručno.'); }
+        }catch(e){ alert('Copy failed. Select text and copy manually.'); }
       });
     });
 
-    // Scroll spy for menu
+    // Scroll spy
     const menuLinks = [...document.querySelectorAll('.menu a')];
     const sections = menuLinks.map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
-
-    const spy = () => {
-      let activeId = '';
-      const offset = 120;
+    const spy = ()=>{
+      let activeId = ''; const offset = 120;
       sections.forEach(sec=>{
-        const rect = sec.getBoundingClientRect();
-        if(rect.top <= offset && rect.bottom > offset){ activeId = '#' + sec.id; }
+        const r = sec.getBoundingClientRect();
+        if(r.top <= offset && r.bottom > offset){ activeId = '#' + sec.id; }
       });
       menuLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href')===activeId));
     };
@@ -763,16 +742,12 @@ Faza 3 (7–12 mj): Rast
     window.addEventListener('resize', spy);
     document.addEventListener('DOMContentLoaded', spy);
 
-    // Smooth anchor scroll override to respect sticky nav
+    // Smooth anchor accounting for sticky nav
     document.querySelectorAll('a[href^="#"]').forEach(a=>{
       a.addEventListener('click', e=>{
-        const id = a.getAttribute('href');
-        const target = document.querySelector(id);
-        if(target){
-          e.preventDefault();
-          const top = target.getBoundingClientRect().top + window.scrollY - 84;
-          window.scrollTo({ top, behavior:'smooth' });
-        }
+        const id = a.getAttribute('href'); const el = document.querySelector(id);
+        if(el){ e.preventDefault(); const top = el.getBoundingClientRect().top + window.scrollY - 86;
+          window.scrollTo({ top, behavior:'smooth' }); }
       });
     });
 
