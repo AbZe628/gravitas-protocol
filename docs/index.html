@@ -12,35 +12,32 @@
 
     <style>
         /* ========================================
-        0. CSS VARIABLES & BASE SETUP (ULTRA REDESIGN)
+        0. CSS VARIABLES & BASE SETUP (RADICAL REDESIGN)
         ======================================== */
         :root {
-            /* Palette */
             --color-paper-light: #FCFCFA;
             --color-ink-light: #0E1116;
             --color-muted-light: #6B7280;
-            --color-lines-light: rgba(14, 17, 22, 0.08);
+            --color-lines-light: rgba(14, 17, 22, 0.07);
             --color-accent: #8A1538;
             --color-accent-hover: #6C102B;
 
             --color-paper-dark: #0A0C10;
             --color-ink-dark: #f0eef3;
             --color-muted-dark: #8892B0;
-            --color-lines-dark: rgba(240, 238, 243, 0.1);
+            --color-lines-dark: rgba(240, 238, 243, 0.08);
             
-            /* Typography */
             --font-heading: 'IBM Plex Serif', serif;
             --font-body: 'Inter', sans-serif;
             --font-mono: 'Space Mono', monospace;
 
-            /* Layout & Motion */
-            --header-height: 72px;
-            --sidebar-width: 280px;
-            --container-width: 820px;
+            --header-height: 80px;
+            --sidebar-width: 260px;
+            --container-width: 780px;
             --spacing-unit: 24px;
-            --border-radius: 8px;
+            --border-radius: 12px;
             --transition-curve: cubic-bezier(.2,.8,.2,1);
-            --transition-duration: 200ms;
+            --transition-duration: 300ms;
         }
 
         [data-theme="light"] {
@@ -65,11 +62,11 @@
             font-family: var(--font-body);
             background-color: var(--bg-paper);
             color: var(--text-ink);
-            line-height: 1.7;
-            font-size: 17px;
+            line-height: 1.8;
+            font-size: 18px;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
-            transition: background-color var(--transition-duration) ease-in-out, color var(--transition-duration) ease-in-out;
+            transition: background-color var(--transition-duration), color var(--transition-duration);
             overflow-x: hidden;
             position: relative;
         }
@@ -82,209 +79,191 @@
         body.drawer-open { overflow: hidden; }
 
         /* ========================================
-        1. BACKGROUND & 3D ELEMENTS
+        1. BACKGROUND & LAYOUT
         ======================================== */
         .particle-canvas {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: -2;
-            opacity: 0.5;
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%; z-index: -2; opacity: 0.6;
         }
         
-        .flow-contour {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1;
-            opacity: 0.04;
-            pointer-events: none;
-            overflow: hidden;
+        .page-wrapper { display: flex; }
+        .main-content { flex-grow: 1; padding: var(--header-height) 0 0 0; }
+        .container {
+            max-width: var(--container-width);
+            margin: 0 auto;
+            padding: calc(var(--spacing-unit) * 2) var(--spacing-unit);
         }
-        [data-theme="dark"] .flow-contour { opacity: 0.03; }
-        .flow-contour svg {
-            position: absolute;
-            width: 200%; height: auto;
-            left: 50%; top: 50%;
-            transform: translate(-50%, -50%);
-            min-width: 1400px;
+        section { position: relative; padding: calc(var(--spacing-unit) * 4) 0; }
+        
+        .section-divider {
+            position: absolute; left: 0; width: 100%;
+            z-index: -1; line-height: 0;
+        }
+        .section-divider svg { width: 100%; height: auto; }
+        .divider-top { top: 0; transform: translateY(-99%); }
+        .divider-bottom { bottom: 0; transform: translateY(99%); }
+        .divider-fill { fill: var(--border-lines); }
+        [data-theme="dark"] .divider-fill { opacity: 0.5; }
+
+        @media (min-width: 1100px) {
+            .main-content { padding-left: var(--sidebar-width); }
         }
 
         /* ========================================
-        2. TYPOGRAPHY & COMMON ELEMENTS
+        2. TYPOGRAPHY
         ======================================== */
         .skip-link {
-            position: absolute; top: -100px; left: 0;
-            background: var(--color-accent); color: white;
-            padding: 12px 16px; z-index: 9999;
-            transition: top var(--transition-duration) ease-in-out;
+            position: absolute; top: -100px; left: 0; background: var(--color-accent);
+            color: white; padding: 12px 16px; z-index: 9999;
+            transition: top var(--transition-duration);
         }
         .skip-link:focus { top: 0; }
 
         h1, h2, h3, h4 {
-            font-family: var(--font-heading);
-            font-weight: 700; line-height: 1.2;
-            color: var(--text-ink); letter-spacing: -0.02em;
+            font-family: var(--font-heading); font-weight: 700;
+            line-height: 1.1; color: var(--text-ink); letter-spacing: -0.03em;
         }
+        h1 { font-size: clamp(3rem, 10vw, 5.5rem); margin-bottom: var(--spacing-unit); }
+        h2 { font-size: clamp(2rem, 7vw, 3rem); margin-bottom: calc(var(--spacing-unit) * 2); text-align: center; max-width: 20ch; margin-left: auto; margin-right: auto;}
+        h3 { font-size: 1.75rem; margin-top: calc(var(--spacing-unit) * 2); margin-bottom: var(--spacing-unit); }
+        h4 { font-size: 1rem; font-family: var(--font-body); text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); font-weight: 500; }
 
-        h1 { font-size: 3.5rem; margin-bottom: var(--spacing-unit); }
-        h2 { font-size: 2.25rem; margin-top: calc(var(--spacing-unit) * 4); border-bottom: 1px solid var(--border-lines); padding-bottom: calc(var(--spacing-unit) / 2); margin-bottom: calc(var(--spacing-unit) * 1.5); }
-        h3 { font-size: 1.75rem; margin-top: calc(var(--spacing-unit) * 2.5); font-weight: 600; margin-bottom: var(--spacing-unit); }
-        h4 { font-size: 1rem; margin-top: var(--spacing-unit); font-family: var(--font-body); text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); font-weight: 500; }
-
-        p, ul, ol, table { margin-bottom: var(--spacing-unit); color: var(--text-muted); max-width: 75ch; }
+        p, ul, ol, table { margin-bottom: var(--spacing-unit); color: var(--text-muted); max-width: 65ch; }
         ul, ol { padding-left: var(--spacing-unit); }
-        li { margin-bottom: calc(var(--spacing-unit) / 3); }
+        li { margin-bottom: calc(var(--spacing-unit) / 2); }
         
         strong { font-weight: 600; color: var(--text-ink); }
-        a { color: var(--color-accent); text-decoration: none; transition: color var(--transition-duration) var(--transition-curve); }
-        a:hover { color: var(--color-accent-hover); text-decoration: underline; }
-
+        a { color: var(--color-accent); text-decoration: none; transition: color var(--transition-duration); }
+        a:hover { color: var(--color-accent-hover); text-decoration: none; }
+        
         .kpi-number {
             font-family: var(--font-mono); font-weight: 700;
             color: var(--text-ink); font-variant-numeric: tabular-nums;
         }
 
-        hr { border: none; border-top: 1px solid var(--border-lines); margin: calc(var(--spacing-unit) * 4) 0; }
-
         /* ========================================
-        3. LAYOUT & NAVIGATION
+        3. NAVIGATION
         ======================================== */
-        .page-wrapper { display: flex; }
-        .main-content { flex-grow: 1; padding: var(--header-height) var(--spacing-unit) 0; }
-        .container { max-width: var(--container-width); margin: 0 auto; padding: calc(var(--spacing-unit) * 3) 0; }
-        section { position: relative; }
-        @media (min-width: 1024px) { .main-content { padding-left: calc(var(--sidebar-width) + var(--spacing-unit)); } }
-        
         .topbar {
             position: fixed; top: 0; left: 0; right: 0; height: var(--header-height);
             display: flex; align-items: center; justify-content: space-between;
-            padding: 0 var(--spacing-unit);
-            background-color: hsla(from var(--bg-paper) h s l / 0.8);
+            padding: 0 var(--spacing-unit); z-index: 1000;
+            background-color: transparent; border-bottom: 1px solid transparent;
+            transition: background-color var(--transition-duration), border-color var(--transition-duration);
+        }
+        body.scrolled .topbar {
+             background-color: hsla(from var(--bg-paper) h s l / 0.8);
             backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border-lines); z-index: 1000;
+            border-bottom: 1px solid var(--border-lines);
         }
-        .brand { font-family: var(--font-heading); font-weight: 600; font-size: 1.25rem; }
+        .brand { font-family: var(--font-heading); font-weight: 600; font-size: 1.5rem; }
         .topbar-nav { display: flex; align-items: center; gap: calc(var(--spacing-unit) * 0.5); }
-        
-        .cta-button {
-            display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px;
-            font-size: 0.9rem; font-weight: 500; border-radius: var(--border-radius);
-            transition: all var(--transition-duration) var(--transition-curve);
-        }
-        .cta-button.primary { background-color: var(--color-accent); color: white; border: 1px solid var(--color-accent); }
-        .cta-button.primary:hover { background-color: var(--color-accent-hover); border-color: var(--color-accent-hover); transform: translateY(-2px); text-decoration: none; box-shadow: 0 8px 16px -8px var(--color-accent); }
-        .cta-button.secondary { background-color: transparent; color: var(--text-ink); border: 1px solid var(--border-lines); }
-        .cta-button.secondary:hover { background-color: var(--border-lines); border-color: var(--text-muted); text-decoration: none; transform: translateY(-2px); }
-
-        .theme-toggle, .burger-menu {
-            background: none; border: none; cursor: pointer; width: 44px; height: 44px;
-            display: flex; align-items: center; justify-content: center; color: var(--text-muted);
-        }
-        .theme-toggle:hover, .burger-menu:hover { color: var(--text-ink); }
         .desktop-nav { display: none; }
         @media (min-width: 1024px) { .desktop-nav { display: flex; align-items: center; gap: var(--spacing-unit); } }
         .burger-menu { display: flex; }
         @media (min-width: 1024px) { .burger-menu { display: none; } }
         
         .toc-sidebar { display: none; }
-        @media (min-width: 1024px) {
+        @media (min-width: 1100px) {
             .toc-sidebar {
-                display: block; position: fixed; top: var(--header-height); left: 0;
-                width: var(--sidebar-width); height: calc(100vh - var(--header-height));
-                padding: calc(var(--spacing-unit) * 2) var(--spacing-unit);
+                display: block; position: fixed; top: 0; left: 0;
+                width: var(--sidebar-width); height: 100vh;
+                padding: var(--header-height) var(--spacing-unit) var(--spacing-unit);
                 border-right: 1px solid var(--border-lines); overflow-y: auto;
             }
-            .toc-sidebar h4 { margin-top: 0; margin-bottom: var(--spacing-unit); font-size: 0.8rem; letter-spacing: 0.1em; }
+            .toc-sidebar h4 { margin-top: 0; margin-bottom: var(--spacing-unit); }
             .toc-sidebar ul { list-style: none; padding: 0; }
             .toc-sidebar li a {
-                display: block; padding: 8px 12px; border-radius: 6px; font-size: 0.9rem; color: var(--text-muted);
-                border-left: 2px solid transparent; transition: all var(--transition-duration) var(--transition-curve);
+                display: block; padding: 10px 14px; border-radius: 6px; font-size: 0.9rem; color: var(--text-muted);
+                transition: all var(--transition-duration) var(--transition-curve);
             }
             .toc-sidebar li a:hover { background-color: var(--border-lines); text-decoration: none; color: var(--text-ink); }
-            .toc-sidebar li a.active { color: var(--color-accent); font-weight: 500; border-left-color: var(--color-accent); }
+            .toc-sidebar li a.active { color: var(--color-accent); font-weight: 500; background-color: hsla(from var(--color-accent) h s l / 0.1);}
         }
 
         .drawer-backdrop {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(10, 15, 26, 0.5);
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(10, 15, 26, 0.7);
             z-index: 1999; opacity: 0; visibility: hidden; transition: opacity 0.3s ease;
         }
         .drawer {
-            position: fixed; top: 0; left: 0; width: 300px; height: 100%; background-color: var(--bg-paper);
-            z-index: 2000; transform: translateX(-100%); transition: transform 0.3s var(--transition-curve); display: flex; flex-direction: column;
+            position: fixed; top: 0; right: 0; width: 320px; height: 100%; background-color: var(--bg-paper);
+            z-index: 2000; transform: translateX(100%); transition: transform 0.4s var(--transition-curve);
+            display: flex; flex-direction: column; box-shadow: -10px 0 30px rgba(0,0,0,0.1);
         }
         .drawer.is-open { transform: translateX(0); }
         .drawer-backdrop.is-open { opacity: 1; visibility: visible; }
         .drawer-header {
-            display: flex; justify-content: space-between; align-items: center; padding: 0 var(--spacing-unit);
-            height: var(--header-height); border-bottom: 1px solid var(--border-lines); flex-shrink: 0;
+            display: flex; justify-content: flex-end; align-items: center; padding: 0 calc(var(--spacing-unit)/2);
+            height: var(--header-height); flex-shrink: 0;
         }
         .drawer-nav { padding: var(--spacing-unit); overflow-y: auto; flex-grow: 1; }
         .drawer-nav ul { list-style: none; padding: 0; }
-        .drawer-nav li a { display: block; padding: 12px; border-radius: 6px; font-size: 1rem; color: var(--text-muted); }
+        .drawer-nav li a { display: block; padding: 16px; border-radius: 6px; font-size: 1.1rem; color: var(--text-muted); font-weight: 500;}
         .drawer-nav li a:hover { background-color: var(--border-lines); color: var(--text-ink); text-decoration: none; }
-        .drawer-nav li a.active { color: var(--color-accent); font-weight: 500; }
-        
+        .drawer-nav li a.active { color: var(--color-accent); }
+
         /* ========================================
         4. COMPONENTS
         ======================================== */
+        .cta-button {
+            display: inline-flex; align-items: center; gap: 10px; padding: 12px 22px;
+            font-size: 1rem; font-weight: 500; border-radius: var(--border-radius);
+            transition: all var(--transition-duration) var(--transition-curve);
+            border: 1px solid transparent;
+        }
+        .cta-button.primary { background-color: var(--color-accent); color: white; border-color: var(--color-accent); }
+        .cta-button.primary:hover { background-color: var(--color-accent-hover); border-color: var(--color-accent-hover); transform: scale(1.05); text-decoration: none; box-shadow: 0 10px 20px -10px var(--color-accent); }
+        .cta-button.secondary { background-color: hsla(from var(--text-ink) h s l / 0.05); color: var(--text-ink); border-color: var(--border-lines); }
+        .cta-button.secondary:hover { background-color: hsla(from var(--text-ink) h s l / 0.1); border-color: var(--text-muted); text-decoration: none; transform: scale(1.05); }
+
         .status-badge {
             display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px;
-            border-radius: 20px; border: 1px solid var(--border-lines);
+            border-radius: 20px; border: 1px solid var(--border-lines); backdrop-filter: blur(5px);
             font-size: 0.9rem; margin-bottom: var(--spacing-unit);
         }
-        .status-badge::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background-color: var(--color-accent); }
-        
+        .status-badge::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background-color: var(--color-accent); animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 hsla(from var(--color-accent) h s l / 0.7); } 70% { box-shadow: 0 0 0 10px hsla(from var(--color-accent) h s l / 0); } 100% { box-shadow: 0 0 0 0 hsla(from var(--color-accent) h s l / 0); } }
+
         .executive-highlights {
-            display: flex; flex-wrap: wrap; gap: var(--spacing-unit);
-            background: var(--border-lines);
-            padding: var(--spacing-unit);
-            border-radius: var(--border-radius);
-            margin: calc(var(--spacing-unit) * 2.5) 0;
-            justify-content: space-around;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2px; background: var(--border-lines);
+            border: 1px solid var(--border-lines); border-radius: var(--border-radius);
+            margin: calc(var(--spacing-unit) * 3) 0; overflow: hidden;
         }
-        .highlight-item { text-align: center; flex: 1; min-width: 150px; }
-        .highlight-item .kpi-number { font-size: 1.25rem; display: block; }
-        .highlight-item p { font-size: 0.8rem; color: var(--text-muted); margin: 0; text-transform: uppercase; letter-spacing: 0.05em; }
+        .highlight-item { background-color: var(--bg-paper); padding: var(--spacing-unit); }
+        .highlight-item .kpi-number { font-size: 2rem; display: block; color: var(--color-accent); }
+        .highlight-item p { font-size: 0.9rem; color: var(--text-muted); margin: 0; }
 
         .card {
             border: 1px solid var(--border-lines); border-radius: var(--border-radius);
-            padding: var(--spacing-unit); background-color: var(--bg-paper);
+            padding: calc(var(--spacing-unit) * 1.5);
+            background: hsla(from var(--bg-paper) h s l / 0.7);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
             transition: all var(--transition-duration) var(--transition-curve);
             transform-style: preserve-3d;
         }
         @media (hover: hover) and (prefers-reduced-motion: no-preference) {
             .card:hover {
-                border-color: rgba(14,17,22,.2);
-                box-shadow: 0 8px 16px -4px rgba(14,17,22,.04), 0 16px 32px -8px rgba(14,17,22,.08);
-                transform: perspective(1000px) rotateY(1deg) rotateX(2deg) translateY(-4px);
+                transform: perspective(1200px) rotateY(2deg) rotateX(4deg) scale(1.02);
+                box-shadow: 0 20px 40px -15px rgba(14,17,22,.1);
+                border-color: var(--text-muted);
             }
         }
         
-        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-        .table-wrapper { overflow-x: auto; }
-        th, td { text-align: left; padding: 14px; border-bottom: 1px solid var(--border-lines); }
-        thead th { font-weight: 600; color: var(--text-ink); border-bottom-width: 2px; position: sticky; top: 0; background: var(--bg-paper); }
-        tbody tr:nth-of-type(even) { background-color: hsla(from var(--border-lines) h s l / 0.3); }
-
         .g-pdf {
             width: 100%; height: 80vh; border: 1px solid var(--border-lines);
             border-radius: var(--border-radius); background-color: var(--border-lines);
         }
 
-        .code-block-wrapper { position: relative; margin: var(--spacing-unit) 0; }
-        pre { background-color: var(--border-lines); padding: var(--spacing-unit); border-radius: var(--border-radius); overflow-x: auto; font-family: var(--font-mono); font-size: 0.85rem; line-height: 1.5; }
-        .copy-button { position: absolute; top: 12px; right: 12px; background-color: var(--bg-paper); border: 1px solid var(--border-lines); color: var(--text-muted); padding: 6px 10px; font-size: 0.8rem; border-radius: 6px; cursor: pointer; opacity: 0.6; transition: opacity var(--transition-duration); }
-        .code-block-wrapper:hover .copy-button { opacity: 1; }
-        
         .back-to-top {
             position: fixed; bottom: var(--spacing-unit); right: var(--spacing-unit);
-            width: 48px; height: 48px; background-color: var(--color-accent); color: white;
+            width: 52px; height: 52px; background-color: var(--color-accent); color: white;
             border: none; border-radius: 50%; display: flex; align-items: center; justify-content: center;
             cursor: pointer; z-index: 999; opacity: 0; visibility: hidden;
             transform: translateY(20px); transition: all var(--transition-duration) var(--transition-curve);
         }
         .back-to-top.visible { opacity: 1; visibility: visible; transform: translateY(0); }
-        .back-to-top:hover { background-color: var(--color-accent-hover); transform: scale(1.1); }
+        .back-to-top:hover { background-color: var(--color-accent-hover); transform: scale(1.1); box-shadow: 0 5px 15px -5px var(--color-accent); }
         
         /* ========================================
         5. NEW SVG CHARTS
@@ -292,29 +271,17 @@
         .svg-chart-container {
             border: 1px solid var(--border-lines); border-radius: var(--border-radius);
             padding: var(--spacing-unit); margin: calc(var(--spacing-unit) * 1.5) 0;
+            background: hsla(from var(--bg-paper) h s l / 0.5);
+            backdrop-filter: blur(5px);
         }
-        .svg-chart {
-            display: block;
-            font-family: var(--font-body);
-            font-size: 12px;
-        }
+        .svg-chart { display: block; font-family: var(--font-body); font-size: 12px; }
         .svg-chart .grid-line { stroke: var(--border-lines); stroke-width: 1; }
         .svg-chart .axis-label { fill: var(--text-muted); }
-        .svg-chart .data-line { stroke-width: 2.5; fill: none; }
+        .svg-chart .data-line { stroke-width: 3; fill: none; stroke-linecap: round; }
         .svg-chart .data-bar { transition: all var(--transition-duration) var(--transition-curve); }
         .svg-chart .bar-label { fill: var(--text-ink); font-family: var(--font-mono); font-size: 14px; }
-        
-        /* ========================================
-        6. PRINT STYLES
-        ======================================== */
-        @media print {
-            .topbar, .toc-sidebar, .drawer-backdrop, .drawer, .back-to-top, .cta-button, .theme-toggle, .burger-menu, .flow-contour, .particle-canvas { display: none !important; }
-            body { background-color: #fff; color: #000; }
-            .main-content, .container { padding: 0; margin: 0; max-width: 100%; }
-            h2 { margin-top: 40px; border: none; page-break-after: avoid; }
-            table, .card, .svg-chart-container { page-break-inside: avoid; }
-            a { color: #000; text-decoration: underline; }
-        }
+        .svg-chart .marker { stroke: var(--bg-paper); stroke-width: 2; animation: fade-in 1s forwards; }
+        @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
@@ -322,20 +289,17 @@
     <canvas class="particle-canvas" id="particle-canvas"></canvas>
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
-    <header class="topbar">
-        <a href="#cover" class="brand">Gravitas Protocol</a>
+    <header class="topbar" id="topbar">
+        <a href="#cover" class="brand">Gravitas</a>
         <div class="topbar-nav">
             <nav class="desktop-nav" aria-label="Main navigation">
-                <a href="https://github.com/AbZe628/gravitas-protocol/tree/main" target="_blank" rel="noopener noreferrer" class="cta-button secondary">View MVP on GitHub</a>
+                <a href="https://github.com/AbZe628/gravitas-protocol/tree/main" target="_blank" rel="noopener noreferrer" class="cta-button secondary">View MVP</a>
                 <a href="#whitepaper" class="cta-button secondary">Whitepaper</a>
                 <a href="#contact" class="cta-button primary">Book a Call</a>
             </nav>
-            <button class="theme-toggle" aria-label="Toggle dark mode">
-                <svg class="sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.25a.75.75 0 01.75.75v2.25a.75.75 0 01-1.5 0V3a.75.75 0 01.75-.75zM7.5 12a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM18.894 6.106a.75.75 0 010 1.06l-1.591 1.59a.75.75 0 11-1.06-1.06l1.59-1.59a.75.75 0 011.06 0zM21.75 12a.75.75 0 01-.75.75h-2.25a.75.75 0 010-1.5H21a.75.75 0 01.75.75zM17.803 17.803a.75.75 0 01-1.06 0l-1.59-1.591a.75.75 0 111.06-1.06l1.59 1.59a.75.75 0 010 1.06zM12 21a.75.75 0 01-.75-.75v-2.25a.75.75 0 011.5 0V20.25a.75.75 0 01-.75-.75zM5.197 17.803a.75.75 0 010-1.06l1.59-1.59a.75.75 0 111.06 1.06l-1.59 1.59a.75.75 0 01-1.06 0zM3 12a.75.75 0 01.75-.75h2.25a.75.75 0 010 1.5H3.75A.75.75 0 013 12zM6.106 5.197a.75.75 0 011.06 0l1.59 1.591a.75.75 0 11-1.06 1.06l-1.59-1.59a.75.75 0 010-1.06z"/></svg>
-                <svg class="moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M9.528 1.718a.75.75 0 01.162.819A8.97 8.97 0 009 6a9 9 0 009 9 8.97 8.97 0 003.463-.69.75.75 0 01.981.98 10.503 10.503 0 01-9.694 6.46c-5.799 0-10.5-4.701-10.5-10.5 0-3.51 1.713-6.635 4.362-8.528a.75.75 0 01.818.162z" clip-rule="evenodd"/></svg>
-            </button>
+            <button class="theme-toggle" aria-label="Toggle dark mode"></button>
             <button class="burger-menu" aria-label="Open navigation menu" aria-haspopup="true" aria-expanded="false" aria-controls="mobile-drawer">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" /></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
             </button>
         </div>
     </header>
@@ -343,77 +307,94 @@
     <div class="page-wrapper">
         <aside class="toc-sidebar">
             <h4>Table of Contents</h4>
-            <nav>
-                <ul id="desktop-toc-list"></ul>
-            </nav>
+            <nav><ul id="desktop-toc-list"></ul></nav>
         </aside>
 
         <main class="main-content" id="main-content">
-            <div class="container">
-                <section id="cover">
-                    <div class="flow-contour" aria-hidden="true">
-                        <svg viewBox="0 0 1440 800" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M-200 800C-42.5 538.5 289.5 448 481.5 464C729.5 484.5 829 782 1085 711C1341 640 1640 200 1640 200V800H-200Z" fill="var(--color-accent)"/></svg>
-                    </div>
-                    <div style="min-height: 70vh; display: flex; flex-direction: column; justify-content: center;">
+            <section id="cover" style="min-height: 100vh; display: flex; flex-direction: column; justify-content: center; padding-bottom: 15vh;">
+                <div class="container">
+                    <div style="max-width: 600px; position: relative; z-index: 1;">
                         <div class="status-badge">MVP Complete & Auditable</div>
                         <h1>The Invisible Engine of DeFi Liquidity.</h1>
-                        <p style="font-size: 1.3rem; color: var(--text-muted); max-width: 65ch;">Gravitas Protocol provides institutional-grade, policy-driven liquidity management for DeFi treasuries, L2s, and DAOs.</p>
-                        
+                        <p style="font-size: 1.3rem; color: var(--text-muted);">Gravitas Protocol provides institutional-grade, policy-driven liquidity management for DeFi treasuries, L2s, and DAOs.</p>
                         <div style="margin: calc(var(--spacing-unit) * 2) 0; display: flex; flex-wrap: wrap; gap: var(--spacing-unit);">
                             <a href="https://github.com/AbZe628/gravitas-protocol/tree/main" target="_blank" rel="noopener noreferrer" class="cta-button secondary">View MVP on GitHub</a>
                             <a href="#whitepaper" class="cta-button primary">View Whitepaper</a>
                         </div>
                     </div>
+                </div>
+            </section>
+            
+            <section id="executive-summary" style="padding-top: 0;">
+                <div class="section-divider divider-top">
+                    <svg viewBox="0 0 1440 100" preserveAspectRatio="none"><path d="M0,50 Q720,100 1440,50 V100 H0 Z" class="divider-fill"></path></svg>
+                </div>
+                <div class="container">
                     <div class="executive-highlights">
-                        <div class="highlight-item"><span class="kpi-number">&lt;30s</span><p>Avg. Migration</p></div>
+                        <div class="highlight-item"><span class="kpi-number">&lt;30s</span><p>Average Migration</p></div>
                         <div class="highlight-item"><span class="kpi-number">99.9%</span><p>Uptime Target</p></div>
                         <div class="highlight-item"><span class="kpi-number">0</span><p>Critical Incidents</p></div>
                         <div class="highlight-item"><span class="kpi-number">$100M/mo</span><p>Target Volume</p></div>
                     </div>
-                </section>
-                
-                <hr>
+                </div>
+            </section>
 
-                <section id="thesis">
+            <section id="thesis" style="background-color: var(--border-lines);">
+                 <div class="section-divider divider-top">
+                    <svg viewBox="0 0 1440 100" preserveAspectRatio="none"><path d="M0,50 Q720,0 1440,50 V100 H0 Z" class="divider-fill"></path></svg>
+                </div>
+                <div class="container">
                     <h2>Investment Thesis</h2>
                     <p>The maturation of DeFi requires a shift from retail-driven, high-risk yield farming to professional, risk-managed treasury operations. Currently, protocol treasuries, L2 foundations, and DAOs collectively manage billions in assets, yet lack the tooling to deploy this capital efficiently and safely. This creates a significant drag on capital efficiency and exposes ecosystems to systemic risks.</p>
-                    <p>Our thesis is that a neutral, non-custodial infrastructure layer that provides operational trust and policy-based automation for on-chain capital management will unlock the next wave of DeFi growth and institutional adoption.</p>
-                </section>
-                
-                <hr>
-                
-                <section id="market">
-                    <h2>Market, Model & Unit Economics</h2>
+                    <p><strong>Our thesis is that a neutral, non-custodial infrastructure layer that provides operational trust and policy-based automation for on-chain capital management will unlock the next wave of DeFi growth and institutional adoption.</strong></p>
+                </div>
+                <div class="section-divider divider-bottom">
+                    <svg viewBox="0 0 1440 100" preserveAspectRatio="none"><path d="M0,50 Q720,100 1440,50 V0 H0 Z" class="divider-fill"></path></svg>
+                </div>
+            </section>
+
+            <section id="market">
+                <div class="container">
+                    <h2>Market & Model</h2>
                     <p>The addressable market is the vast and growing pool of on-chain capital requiring professional management. Our business model is a simple, volume-based fee (5-10 bps), ensuring our incentives are aligned with our partners' success.</p>
-                    
-                    <div class="svg-chart-container">
+                    <div class="svg-chart-container card">
                         <h4>Illustrative Revenue vs. Volume</h4>
                         <svg class="svg-chart" viewBox="0 0 400 200">
-                            <line x1="40" y1="20" x2="40" y2="170" class="grid-line"/>
-                            <line x1="40" y1="170" x2="380" y2="170" class="grid-line"/>
-                            <line x1="40" y1="95" x2="380" y2="95" class="grid-line" stroke-dasharray="2,3"/>
-                            <text x="35" y="25" class="axis-label" text-anchor="end">$200k</text>
-                            <text x="35" y="170" class="axis-label" text-anchor="end">$0</text>
-                            <text x="380" y="185" class="axis-label" text-anchor="end">$200M Volume</text>
-                            <path d="M 40 170 C 150 120, 250 60, 380 20" class="data-line" style="stroke: var(--color-accent);"/>
-                            <path d="M 40 170 C 150 140, 250 100, 380 70" class="data-line" style="stroke: var(--text-ink); opacity: 0.7;"/>
-                            <path d="M 40 170 C 150 150, 250 130, 380 110" class="data-line" style="stroke: var(--text-muted);"/>
-                            <text x="375" y="30" class="axis-label" text-anchor="end">10 bps</text>
-                            <text x="375" y="80" class="axis-label" text-anchor="end">6 bps</text>
-                            <text x="375" y="120" class="axis-label" text-anchor="end">5 bps</text>
+                            <defs>
+                                <linearGradient id="line-grad-1" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" style="stop-color: var(--color-accent); stop-opacity: 0.5"/>
+                                    <stop offset="100%" style="stop-color: var(--color-accent); stop-opacity: 1"/>
+                                </linearGradient>
+                                <linearGradient id="line-grad-2" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" style="stop-color: var(--text-ink); stop-opacity: 0.2"/>
+                                    <stop offset="100%" style="stop-color: var(--text-ink); stop-opacity: 0.7"/>
+                                </linearGradient>
+                            </defs>
+                            <g class="grid">
+                                <line x1="40" y1="20" x2="40" y2="170" class="grid-line"/>
+                                <line x1="40" y1="170" x2="380" y2="170" class="grid-line"/>
+                                <line x1="40" y1="95" x2="380" y2="95" class="grid-line" stroke-dasharray="2,3"/>
+                            </g>
+                            <g class="labels">
+                                <text x="35" y="25" class="axis-label" text-anchor="end">$200k</text>
+                                <text x="35" y="170" class="axis-label" text-anchor="end">$0</text>
+                                <text x="380" y="185" class="axis-label" text-anchor="end">$200M Volume</text>
+                            </g>
+                            <path d="M 40 170 C 150 120, 250 60, 380 20" class="data-line" style="stroke: url(#line-grad-1);"/>
+                            <path d="M 40 170 C 150 140, 250 100, 380 70" class="data-line" style="stroke: url(#line-grad-2);"/>
+                            <circle cx="380" cy="20" r="4" fill="var(--color-accent)" class="marker"/>
+                            <circle cx="380" cy="70" r="4" fill="var(--text-ink)" class="marker"/>
                         </svg>
                     </div>
                 </section>
-
-                <hr>
-
-                <section id="architecture-deep-dive">
-                    <div class="flow-contour" aria-hidden="true">
-                        <svg viewBox="0 0 1440 800" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1640 0C1442.5 261.5 1111.5 352 919.5 336C671.5 315.5 572 18 316 89C60 160 -200 600 -200 600V0H1640Z" fill="var(--color-accent)"/></svg>
-                    </div>
+            
+            <section id="architecture-deep-dive" style="background-color: var(--border-lines);">
+                 <div class="section-divider divider-top">
+                    <svg viewBox="0 0 1440 100" preserveAspectRatio="none"><path d="M0,50 Q720,0 1440,50 V100 H0 Z" class="divider-fill"></path></svg>
+                </div>
+                <div class="container">
                     <h2>Architecture Deep Dive</h2>
                     <p>Gravitas is a modular, multi-layered system designed for security and extensibility. The core logic is separated from external integrations, allowing for rapid development and isolated risk.</p>
-                    
                     <h4>Sequence of Operations</h4>
                     <ol>
                         <li><strong>Policy Validation:</strong> A transaction is initiated and verified against the treasury's registered policy constraints (allowlists, caps, etc.).</li>
@@ -426,265 +407,236 @@
                         <li><strong>Oracle Freshness & Volatility-Aware Slippage:</strong> Reverts if price data is older than 60s and adjusts slippage based on market conditions.</li>
                         <li><strong>Cooldowns & Velocity Limits:</strong> Time-based restrictions and limits on value moved per epoch.</li>
                     </ul>
-                </section>
-
-                <hr>
-
-                <section id="security-assurance">
+                </div>
+                 <div class="section-divider divider-bottom">
+                    <svg viewBox="0 0 1440 100" preserveAspectRatio="none"><path d="M0,50 Q720,100 1440,50 V0 H0 Z" class="divider-fill"></path></svg>
+                </div>
+            </section>
+            
+            <section id="security-assurance">
+                <div class="container">
                     <h2>Security & Assurance</h2>
                     <p>Our security posture is built on a defense-in-depth model, assuming adversarial conditions at every layer. The protocol is designed to be failsafe, prioritizing the preservation of capital above all else.</p>
-                    
-                    <h4>Static & Dynamic Guards</h4>
-                    <p>Static guards like reentrancy protection and adapter isolation are built-in. Dynamic guards include real-time circuit-breakers, oracle staleness checks, and velocity caps to respond to market anomalies.</p>
-                    
-                    <h4>Governance & Testing</h4>
-                    <p>A <strong>3/5 multisig</strong> with a <strong>48h timelock</strong> governs protocol parameters, overseen by a pause-only Guardian. Our testing regimen includes <strong>Foundry-based fuzzing and invariant testing</strong>, >95% code coverage, and mainnet-fork simulations.</p>
-                    
-                    <h4>Monitoring & Audit Plan</h4>
-                    <p>We monitor for critical on-chain events (`FAILED_TX`, `CIRCUIT_BREAKER_TRIPPED`, `POLICY_BREACH_ATTEMPT`) and have a multi-stage audit plan including internal reviews, a top-tier external audit, and formal verification of core logic.</p>
-                </section>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--spacing-unit);">
+                        <div class="card">
+                            <h4>Static & Dynamic Guards</h4>
+                            <p>Static guards like reentrancy protection and adapter isolation are built-in. Dynamic guards include real-time circuit-breakers, oracle staleness checks, and velocity caps to respond to market anomalies.</p>
+                        </div>
+                        <div class="card">
+                            <h4>Governance & Testing</h4>
+                            <p>A <strong>3/5 multisig</strong> with a <strong>48h timelock</strong> governs protocol parameters, overseen by a pause-only Guardian. Our testing regimen includes <strong>Foundry-based fuzzing and invariant testing</strong>, >95% code coverage, and mainnet-fork simulations.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-                <hr>
-
-                <section id="use-of-funds">
+            <section id="use-of-funds">
+                <div class="container">
                     <h2>Pre-Seed Revised ($450k Ask)</h2>
-                    <p>With the MVP technically complete, this revised funding request is focused exclusively on security, legal formalization, and establishing an operational base. This lean ask provides an 18-month runway for audits, compliance, and initial business development.</p>
-                    
-                    <div class="svg-chart-container">
-                        <h4>Cost Allocation</h4>
+                    <p>With the MVP technically complete, this revised funding request is focused exclusively on security, legal formalization, and establishing an operational base.</p>
+                    <div class="svg-chart-container card">
+                        <h4>Cost Allocation ($450k)</h4>
                         <svg class="svg-chart" viewBox="0 0 400 120">
-                            <g class="bar-group" transform="translate(0, 20)">
-                                <rect x="150" y="0" width="83.3" height="20" rx="4" style="fill: var(--text-muted)"/>
-                                <text x="140" y="15" text-anchor="end" class="axis-label">Relocation ($100k)</text>
-                                <text x="240" y="15" class="bar-label kpi-number">22.2%</text>
-                            </g>
-                            <g class="bar-group" transform="translate(0, 50)">
-                                <rect x="150" y="0" width="66.6" height="20" rx="4" style="fill: var(--border-lines); stroke: var(--text-muted); stroke-width: 1px;"/>
-                                <text x="140" y="15" text-anchor="end" class="axis-label">Legal ($80k)</text>
-                                <text x="223" y="15" class="bar-label kpi-number">17.8%</text>
-                            </g>
-                             <g class="bar-group" transform="translate(0, 80)">
-                                <rect x="150" y="0" width="100" height="20" rx="4" style="fill: var(--text-ink)"/>
-                                <text x="140" y="15" text-anchor="end" class="axis-label">Runway ($120k)</text>
-                                <text x="257" y="15" class="bar-label kpi-number" style="fill: var(--bg-paper);">26.7%</text>
-                            </g>
-                             <g class="bar-group" transform="translate(0, -10)">
-                                <rect x="150" y="0" width="125" height="20" rx="4" style="fill: var(--color-accent)"/>
-                                <text x="140" y="15" text-anchor="end" class="axis-label">Security ($150k)</text>
-                                <text x="282" y="15" class="bar-label kpi-number" style="fill: var(--bg-paper);">33.3%</text>
-                            </g>
+                           <g class="axis-label" style="font-size: 11px;">
+                                <text x="0" y="20">Security ($150k)</text>
+                                <text x="0" y="45">Relocation ($100k)</text>
+                                <text x="0" y="70">Legal ($80k)</text>
+                                <text x="0" y="95">Runway ($120k)</text>
+                           </g>
+                           <rect x="130" y="10" width="166.5" height="15" rx="4" style="fill: var(--color-accent)"/>
+                           <rect x="130" y="35" width="111" height="15" rx="4" style="fill: var(--text-muted)"/>
+                           <rect x="130" y="60" width="88.8" height="15" rx="4" style="fill: var(--border-lines); stroke: var(--text-muted); stroke-width: 0.5px;"/>
+                           <rect x="130" y="85" width="133.2" height="15" rx="4" style="fill: var(--text-ink)"/>
                         </svg>
                     </div>
                 </section>
                 
-                <hr>
-                
-                <section id="whitepaper">
-                    <h2>Technical Whitepaper</h2>
-                    <p>For a complete exploration of the protocol architecture, mathematical models, and the full policy engine specification, please review the complete whitepaper.</p>
-                    <div style="height: 80vh; position: relative;" id="pdf-container">
-                        <iframe class="g-pdf" src="https://markup.su/viewer/?url=https://raw.githubusercontent.com/AbZe628/gravitas-protocol/main/docs/whitepaper.md" title="Gravitas Protocol Whitepaper" loading="lazy"></iframe>
+                <section id="whitepaper" style="background: var(--border-lines);">
+                     <div class="section-divider divider-top">
+                        <svg viewBox="0 0 1440 100" preserveAspectRatio="none"><path d="M0,50 Q720,0 1440,50 V100 H0 Z" class="divider-fill"></path></svg>
                     </div>
-                    <p>If the PDF doesn’t render, <a href="https://github.com/AbZe628/gravitas-protocol/blob/main/docs/whitepaper.md" target="_blank" rel="noopener">open it in a new tab</a>.</p>
+                    <div class="container">
+                        <h2>Technical Whitepaper</h2>
+                        <p>For a complete exploration of the protocol architecture, mathematical models, and the full policy engine specification, please review the complete whitepaper.</p>
+                        <div style="height: 80vh; position: relative; border-radius: var(--border-radius); overflow: hidden;" id="pdf-container">
+                            <iframe class="g-pdf" src="https://markup.su/viewer/?url=https://raw.githubusercontent.com/AbZe628/gravitas-protocol/main/docs/whitepaper.md" title="Gravitas Protocol Whitepaper" loading="lazy"></iframe>
+                        </div>
+                        <p style="text-align: center; margin-top: var(--spacing-unit);">If the PDF doesn’t render, <a href="https://github.com/AbZe628/gravitas-protocol/blob/main/docs/whitepaper.md" target="_blank" rel="noopener">open it in a new tab</a>.</p>
+                    </div>
                 </section>
-                
-                <hr>
 
                 <section id="contact">
-                    <h2>Contact & Partnerships</h2>
-                    <p>We are actively seeking design partners and investors who share our vision for a more stable and efficient DeFi ecosystem. To learn more, please get in touch.</p>
-                    <div style="font-size: 1.1rem; line-height: 1.8;">
-                        <p><strong>Email:</strong> <a href="mailto:abdusamedzelic98@gmail.com">abdusamedzelic98@gmail.com</a></p>
-                        <p><strong>Phone:</strong> <a href="tel:+385915668133">+385 91 566 8133</a></p>
-                    </div>
-                    <div style="margin-top: calc(var(--spacing-unit) * 1.5);">
-                        <a href="https://github.com/AbZe628/gravitas-protocol/tree/main" target="_blank" rel="noopener noreferrer" class="cta-button secondary">View MVP on GitHub</a>
+                    <div class="container" style="text-align: center;">
+                        <h2>Contact & Partnerships</h2>
+                        <p style="margin-left: auto; margin-right: auto;">We are actively seeking design partners and investors who share our vision. To learn more, please get in touch.</p>
+                        <div style="font-size: 1.25rem; line-height: 1.8; margin-bottom: var(--spacing-unit);">
+                            <p><strong><a href="mailto:abdusamedzelic98@gmail.com">abdusamedzelic98@gmail.com</a></strong></p>
+                            <p><a href="tel:+385915668133">+385 91 566 8133</a></p>
+                        </div>
+                        <a href="https://github.com/AbZe628/gravitas-protocol/tree/main" target="_blank" rel="noopener noreferrer" class="cta-button secondary" style="margin: 0 auto;">View MVP on GitHub</a>
                     </div>
                 </section>
-            </div>
         </main>
     </div>
 
     <div class="drawer-backdrop" id="drawer-backdrop" aria-hidden="true"></div>
     <nav class="drawer" id="mobile-drawer" aria-labelledby="drawer-title" aria-hidden="true">
         <div class="drawer-header">
-            <span id="drawer-title" class="brand">Navigation</span>
             <button class="burger-menu" id="close-drawer-btn" aria-label="Close navigation menu">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         </div>
         <div class="drawer-nav"><ul id="mobile-toc-list"></ul></div>
     </nav>
 
     <button class="back-to-top" aria-label="Back to top">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" /></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
     </button>
     
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+    // Wrapped in a try...catch to prevent script-breaking errors
+    try {
+        const tocSections = document.querySelectorAll('main section[id]');
+        const desktopTocList = document.getElementById('desktop-toc-list');
+        const mobileTocList = document.getElementById('mobile-toc-list');
+        const themeToggleButton = document.querySelector('.theme-toggle');
+        const burgerMenuButton = document.querySelector('.burger-menu');
+        const closeDrawerButton = document.getElementById('close-drawer-btn');
+        const drawer = document.getElementById('mobile-drawer');
+        const drawerBackdrop = document.getElementById('drawer-backdrop');
+        const backToTopButton = document.querySelector('.back-to-top');
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const topbar = document.getElementById('topbar');
 
-    const sections = document.querySelectorAll('main section[id]');
-    const desktopTocList = document.getElementById('desktop-toc-list');
-    const mobileTocList = document.getElementById('mobile-toc-list');
-    const themeToggleButton = document.querySelector('.theme-toggle');
-    const sunIcon = document.querySelector('.theme-toggle .sun');
-    const moonIcon = document.querySelector('.theme-toggle .moon');
-    const burgerMenuButton = document.querySelector('.burger-menu');
-    const closeDrawerButton = document.getElementById('close-drawer-btn');
-    const drawer = document.getElementById('mobile-drawer');
-    const drawerBackdrop = document.getElementById('drawer-backdrop');
-    const backToTopButton = document.querySelector('.back-to-top');
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    // 1. Table of Contents & Scroll-Spy
-    const tocItems = Array.from(sections).map(section => {
-        const titleEl = section.querySelector('h2');
-        return titleEl ? { id: section.id, title: titleEl.textContent } : null;
-    }).filter(Boolean);
-    
-    const createTocLinks = (listElement) => {
-        if (!listElement) return;
-        listElement.innerHTML = tocItems.map(item => `<li><a href="#${item.id}" data-target-id="${item.id}">${item.title}</a></li>`).join('');
-    };
-    createTocLinks(desktopTocList);
-    createTocLinks(mobileTocList);
-    
-    const tocLinks = document.querySelectorAll('.toc-sidebar a, .drawer-nav a');
-    const observer = new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-            const id = entry.target.getAttribute('id');
-            const correspondingLinks = document.querySelectorAll(`a[data-target-id="${id}"]`);
-            if (entry.isIntersecting && entry.intersectionRatio > 0.1) {
-                tocLinks.forEach(link => link.classList.remove('active'));
-                correspondingLinks.forEach(link => link.classList.add('active'));
-            }
-        });
-    }, { rootMargin: `-${document.querySelector('.topbar').offsetHeight}px 0px -40% 0px`, threshold: 0.1 });
-    sections.forEach(section => observer.observe(section));
-
-    // 2. Dark Mode Toggle
-    const applyTheme = (theme) => {
-        document.documentElement.setAttribute('data-theme', theme);
-        if (sunIcon && moonIcon) {
-            sunIcon.style.display = theme === 'dark' ? 'none' : 'block';
-            moonIcon.style.display = theme === 'dark' ? 'block' : 'none';
-        }
-    };
-    const toggleTheme = () => {
-        const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-        localStorage.setItem('gravitas_theme', newTheme);
-        applyTheme(newTheme);
-    };
-    const persistedTheme = localStorage.getItem('gravitas_theme');
-    const preferredTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    applyTheme(persistedTheme || preferredTheme);
-    themeToggleButton.addEventListener('click', toggleTheme);
-
-    // 3. Mobile Drawer Logic
-    const openDrawer = () => {
-        drawer.classList.add('is-open');
-        drawerBackdrop.classList.add('is-open');
-        drawer.setAttribute('aria-hidden', 'false');
-        burgerMenuButton.setAttribute('aria-expanded', 'true');
-        document.body.classList.add('drawer-open');
-    };
-    const closeDrawer = () => {
-        drawer.classList.remove('is-open');
-        drawerBackdrop.classList.remove('is-open');
-        drawer.setAttribute('aria-hidden', 'true');
-        burgerMenuButton.setAttribute('aria-expanded', 'false');
-        document.body.classList.remove('drawer-open');
-        burgerMenuButton.focus();
-    };
-    burgerMenuButton.addEventListener('click', openDrawer);
-    closeDrawerButton.addEventListener('click', closeDrawer);
-    drawerBackdrop.addEventListener('click', closeDrawer);
-    document.querySelectorAll('.drawer-nav a').forEach(link => link.addEventListener('click', closeDrawer));
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && drawer.classList.contains('is-open')) closeDrawer();
-    });
-
-    // 4. Smooth Scrolling & Back to Top
-    const scrollOptions = { behavior: prefersReducedMotion ? 'auto' : 'smooth' };
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function(e) {
-            e.preventDefault();
-            const targetElement = document.querySelector(this.getAttribute('href'));
-            if(targetElement) targetElement.scrollIntoView(scrollOptions);
-        });
-    });
-    backToTopButton.addEventListener('click', () => window.scrollTo({ top: 0, ...scrollOptions }));
-
-    // 5. Back-to-Top visibility
-    window.addEventListener('scroll', () => {
-        backToTopButton.classList.toggle('visible', window.scrollY > 600);
-    }, { passive: true });
-
-    // 6. Particle Canvas Background
-    if (!prefersReducedMotion) {
-        const canvas = document.getElementById('particle-canvas');
-        const ctx = canvas.getContext('2d');
-        let particles = [];
+        // 1. Table of Contents & Scroll-Spy
+        const tocItems = Array.from(tocSections).map(section => {
+            const titleEl = section.querySelector('h2');
+            return titleEl ? { id: section.id, title: titleEl.textContent } : null;
+        }).filter(Boolean);
         
-        const resizeCanvas = () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
+        const createTocLinks = (listElement) => {
+            if (!listElement) return;
+            listElement.innerHTML = tocItems.map(item => `<li><a href="#${item.id}" data-target-id="${item.id}">${item.title}</a></li>`).join('');
         };
+        createTocLinks(desktopTocList);
+        createTocLinks(mobileTocList);
         
-        class Particle {
-            constructor() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 1.5 + 0.5;
-                this.speedX = Math.random() * 0.4 - 0.2;
-                this.speedY = Math.random() * 0.4 - 0.2;
-            }
-            update() {
-                this.x += this.speedX;
-                this.y += this.speedY;
-                if (this.size > 0.1) this.size -= 0.01;
-            }
-            draw() {
-                ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-muted');
-                ctx.globalAlpha = 0.5;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
-            }
-        }
-        
-        const initParticles = () => {
-            particles = [];
-            let numberOfParticles = (canvas.width * canvas.height) / 9000;
-            for (let i = 0; i < numberOfParticles; i++) {
-                particles.push(new Particle());
-            }
-        };
-
-        const animate = () => {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            for (let i = 0; i < particles.length; i++) {
-                particles[i].update();
-                particles[i].draw();
-                if (particles[i].size <= 0.1) {
-                    particles.splice(i, 1);
-                    i--;
-                    particles.push(new Particle());
+        const tocLinks = document.querySelectorAll('.toc-sidebar a, .drawer-nav a');
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                const id = entry.target.getAttribute('id');
+                const correspondingLinks = document.querySelectorAll(`a[data-target-id="${id}"]`);
+                if (entry.isIntersecting && entry.intersectionRatio > 0.1) {
+                    tocLinks.forEach(link => link.classList.remove('active'));
+                    correspondingLinks.forEach(link => link.classList.add('active'));
                 }
-            }
-            requestAnimationFrame(animate);
-        };
-        
-        resizeCanvas();
-        initParticles();
-        animate();
-        
-        window.addEventListener('resize', () => {
-            resizeCanvas();
-            initParticles();
-        });
-    }
+            });
+        }, { rootMargin: `-100px 0px -50% 0px`, threshold: 0.1 });
+        tocSections.forEach(section => observer.observe(section));
 
+        // 2. Dark Mode Toggle
+        const applyTheme = (theme) => document.documentElement.setAttribute('data-theme', theme);
+        const toggleTheme = () => {
+            const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('gravitas_theme', newTheme);
+            applyTheme(newTheme);
+        };
+        const persistedTheme = localStorage.getItem('gravitas_theme');
+        const preferredTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        applyTheme(persistedTheme || preferredTheme);
+        themeToggleButton.addEventListener('click', toggleTheme);
+
+        // 3. Mobile Drawer Logic
+        const openDrawer = () => {
+            drawer.classList.add('is-open');
+            drawerBackdrop.classList.add('is-open');
+            drawer.setAttribute('aria-hidden', 'false');
+            burgerMenuButton.setAttribute('aria-expanded', 'true');
+            document.body.classList.add('drawer-open');
+        };
+        const closeDrawer = () => {
+            drawer.classList.remove('is-open');
+            drawerBackdrop.classList.remove('is-open');
+            drawer.setAttribute('aria-hidden', 'true');
+            burgerMenuButton.setAttribute('aria-expanded', 'false');
+            document.body.classList.remove('drawer-open');
+        };
+        burgerMenuButton.addEventListener('click', openDrawer);
+        closeDrawerButton.addEventListener('click', closeDrawer);
+        drawerBackdrop.addEventListener('click', closeDrawer);
+        document.querySelectorAll('.drawer-nav a').forEach(link => link.addEventListener('click', closeDrawer));
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && drawer.classList.contains('is-open')) closeDrawer();
+        });
+
+        // 4. Smooth Scrolling & Back to Top
+        const scrollOptions = { behavior: prefersReducedMotion ? 'auto' : 'smooth' };
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetElement = document.querySelector(this.getAttribute('href'));
+                if(targetElement) targetElement.scrollIntoView(scrollOptions);
+            });
+        });
+        backToTopButton.addEventListener('click', () => window.scrollTo({ top: 0, ...scrollOptions }));
+
+        // 5. Scroll-based UI changes
+        window.addEventListener('scroll', () => {
+            backToTopButton.classList.toggle('visible', window.scrollY > 600);
+            if (topbar) topbar.parentElement.classList.toggle('scrolled', window.scrollY > 50);
+        }, { passive: true });
+
+        // 6. Particle Canvas Background
+        if (!prefersReducedMotion) {
+            const canvas = document.getElementById('particle-canvas');
+            if(canvas) {
+                const ctx = canvas.getContext('2d');
+                let particles = [];
+                const resizeCanvas = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
+                
+                class Particle {
+                    constructor() {
+                        this.x = Math.random() * canvas.width;
+                        this.y = Math.random() * canvas.height;
+                        this.size = Math.random() * 1.5 + 0.5;
+                        this.speedX = Math.random() * 0.4 - 0.2;
+                        this.speedY = Math.random() * 0.4 - 0.2;
+                        this.opacity = Math.random() * 0.5 + 0.2;
+                    }
+                    update() {
+                        this.x += this.speedX; this.y += this.speedY;
+                        if (this.x > canvas.width || this.x < 0) this.speedX *= -1;
+                        if (this.y > canvas.height || this.y < 0) this.speedY *= -1;
+                    }
+                    draw(context) {
+                        context.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-muted');
+                        context.globalAlpha = this.opacity;
+                        context.beginPath();
+                        context.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                        context.fill();
+                    }
+                }
+                
+                const initParticles = () => {
+                    particles = [];
+                    let numberOfParticles = (canvas.width * canvas.height) / 12000;
+                    for (let i = 0; i < numberOfParticles; i++) particles.push(new Particle());
+                };
+
+                const animate = () => {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    for (let p of particles) { p.update(); p.draw(ctx); }
+                    requestAnimationFrame(animate);
+                };
+                
+                resizeCanvas(); initParticles(); animate();
+                window.addEventListener('resize', () => { resizeCanvas(); initParticles(); });
+            }
+        }
+    } catch(error) {
+        console.error("An error occurred during site initialization:", error);
+    }
 });
 </script>
 
