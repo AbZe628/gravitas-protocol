@@ -4,101 +4,92 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Gravitas Protocol — The Invisible Engine of DeFi Liquidity</title>
-  <meta name="description" content="Gravitas Protocol is a neutral, audit-ready transport layer for atomic liquidity migrations across DEXs and L2s. Micro-fees on volume = sustainable protocol revenue." />
+  <meta name="description" content="Gravitas Protocol is a neutral, audit-first transport layer for atomic liquidity migrations across DEXs and L2s. Micro-fees on flow create sustainable protocol revenue." />
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..800&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..800&family=Plus+Jakarta+Sans:wght@600;800&display=swap" rel="stylesheet"/>
   <style>
-    /* ======== Design System (Apple-ish, 2025) ======== */
+    /* ==================== DESIGN SYSTEM ==================== */
     :root{
-      --bg: #f7f9fc;
-      --bg-2:#ffffff;
-      --ink:#0b0f19;
-      --muted:#5c6475;
-      --line: rgba(11,15,25,0.08);
-      --glow: 0 40px 120px rgba(108,122,255,0.28);
-
-      --accent-1:#6c7aff;
-      --accent-2:#b46ef7;
-      --accent-3:#7ed0ff;
-      --grad: linear-gradient(135deg,var(--accent-1),var(--accent-2) 55%,var(--accent-3));
-
-      --r-xl: 22px; --r-lg:16px; --r:12px; --r-sm:10px;
-      --shadow-1: 0 10px 30px rgba(14,22,53,.06);
-      --shadow-2: 0 30px 80px rgba(14,22,53,.10);
-      --maxw: 1240px;
+      --bg:#f6f8fb; --surface:#ffffff; --ink:#0b1220; --muted:#5f687a; --line:rgba(11,18,32,0.10);
+      --accent1:#6c7aff; --accent2:#b46ef7; --accent3:#79d2ff;
+      --grad:linear-gradient(135deg,var(--accent1),var(--accent2) 55%,var(--accent3));
+      --r-xl:22px; --r-lg:16px; --r:12px; --r-sm:10px;
+      --shadow-1:0 10px 28px rgba(15,23,42,.08);
+      --shadow-2:0 30px 80px rgba(15,23,42,.14);
+      --maxw:1240px;
     }
     [data-theme="dark"]{
-      --bg:#0b0f19; --bg-2:#0f1422; --ink:#eef2ff; --muted:#a7b0c6; --line:rgba(255,255,255,0.08);
-      --shadow-1: 0 10px 30px rgba(0,0,0,.45);
-      --shadow-2: 0 30px 80px rgba(0,0,0,.55);
+      --bg:#0b1220; --surface:#0f172a; --ink:#ecf1ff; --muted:#a6b0c6; --line:rgba(255,255,255,0.10);
+      --shadow-1:0 10px 28px rgba(0,0,0,.45);
+      --shadow-2:0 30px 80px rgba(0,0,0,.60);
     }
 
     *{box-sizing:border-box}
     html{scroll-behavior:smooth}
     body{
-      margin:0; color:var(--ink); background:
-        radial-gradient(1200px 700px at 100% -10%, rgba(110,122,255,0.10), transparent 50%),
-        radial-gradient(1000px 700px at -10% 10%, rgba(180,110,247,0.10), transparent 55%),
+      margin:0; color:var(--ink);
+      background:
+        radial-gradient(1200px 700px at 110% -10%, rgba(108,122,255,.09), transparent 55%),
+        radial-gradient(1000px 600px at -10% 0%, rgba(180,110,247,.09), transparent 55%),
         var(--bg);
       font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
       line-height:1.6; -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
     }
-
-    .container{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+    .container{max-width:var(--maxw); margin:0 auto; padding:0 24px}
     section{padding:96px 0; position:relative}
-    h1,h2{font-family:"Plus Jakarta Sans", Inter, system-ui, sans-serif; line-height:1.08; letter-spacing:-0.02em}
-    h1{font-size:clamp(2.6rem,5.2vw,4.4rem); margin:16px 0 10px; font-weight:800}
-    h2{font-size:clamp(1.8rem,3.2vw,2.4rem); margin:0 0 8px; font-weight:800}
-    h3{font-weight:700; font-size:1.15rem; margin:0 0 8px}
-    p.lead{font-size:clamp(1.05rem,1.2vw,1.2rem); color:var(--muted); max-width:900px}
+    h1,h2{font-family:"Plus Jakarta Sans", Inter, system-ui; letter-spacing:-.02em; line-height:1.075}
+    h1{font-size:clamp(2.6rem,5vw,4.3rem); margin:16px 0 10px; font-weight:800}
+    h2{font-size:clamp(1.9rem,3vw,2.6rem); margin:0 0 10px; font-weight:800}
+    h3{font-size:1.12rem; margin:0 0 8px; font-weight:700}
+    p.lead{font-size:clamp(1.05rem,1.2vw,1.2rem); color:var(--muted); max-width:920px}
 
-    /* ======== NAV ======== */
-    .nav-wrap{position:sticky; top:0; z-index:50; backdrop-filter:saturate(180%) blur(20px);
-      background:color-mix(in oklab, var(--bg-2) 70%, transparent);
+    /* ==================== NAV ==================== */
+    .nav-wrap{position:sticky; top:0; z-index:50; backdrop-filter:saturate(180%) blur(18px);
+      background:color-mix(in oklab, var(--surface) 75%, transparent);
       border-bottom:1px solid var(--line)}
-    .nav{display:flex;align-items:center;gap:16px;padding:14px 24px}
-    .brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink);font-weight:800}
-    .logo{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;color:#fff;background:var(--grad);position:relative;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(255,255,255,.35)}
+    .nav{display:flex; align-items:center; gap:14px; padding:14px 24px}
+    .brand{display:flex; align-items:center; gap:12px; text-decoration:none; color:var(--ink); font-weight:800}
+    .logo{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;color:#fff;background:var(--grad);
+      position:relative;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(255,255,255,.35)}
     .logo:after{content:"";position:absolute;inset:-60% auto auto -60%;width:220%;height:220%;transform:rotate(35deg);
       background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);animation:shine 3.6s linear infinite}
     @keyframes shine{0%{transform:translateX(-60%) rotate(35deg)}100%{transform:translateX(60%) rotate(35deg)}}
     .spacer{flex:1}
-    .menu{display:flex;gap:8px; align-items:center}
-    .menu a{padding:10px 12px;border-radius:10px;text-decoration:none;color:var(--ink);font-weight:600;font-size:.96rem}
-    .menu a:hover,.menu a.active{background:var(--bg-2); box-shadow:inset 0 0 0 1px var(--line)}
-    .btn{display:inline-flex;align-items:center;gap:10px;padding:12px 16px;border-radius:14px;text-decoration:none;font-weight:800}
-    .btn.grad{background:var(--grad);color:#fff; box-shadow:var(--shadow-1)}
-    .btn.ghost{border:1px solid var(--line); background:var(--bg-2); color:var(--ink)}
-
-    .theme{border:none;background:var(--bg-2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-weight:700;cursor:pointer}
+    .menu{display:flex; gap:8px; align-items:center}
+    .menu a{padding:10px 12px; border-radius:10px; text-decoration:none; color:var(--ink); font-weight:600; font-size:.96rem}
+    .menu a:hover,.menu a.active{background:var(--surface); box-shadow:inset 0 0 0 1px var(--line)}
+    .btn{display:inline-flex; align-items:center; gap:10px; padding:10px 14px; border-radius:12px; text-decoration:none; font-weight:800}
+    .btn.grad{background:var(--grad); color:#fff; box-shadow:var(--shadow-1)}
+    .btn.ghost{border:1px solid var(--line); background:var(--surface); color:var(--ink)}
+    .theme{border:1px solid var(--line); background:var(--surface); border-radius:12px; padding:10px 12px; font-weight:800; cursor:pointer}
 
     .burger{display:none; border:none; background:transparent; font-size:26px; cursor:pointer}
-    @media (max-width: 1040px){ .menu{display:none} .burger{display:block} }
+    @media (max-width: 1100px){ .menu{display:none} .burger{display:block} }
 
-    .drawer{position:fixed; inset:0 0 0 auto; width:min(86vw,380px); background:var(--bg-2);
+    .drawer{position:fixed; inset:0 0 0 auto; width:min(86vw,380px); background:var(--surface);
       border-left:1px solid var(--line); box-shadow:var(--shadow-2); transform:translateX(100%);
-      transition:transform .35s ease; z-index:70; padding:20px}
+      transition:transform .35s ease; z-index:70; padding:22px 18px}
     .drawer.open{transform:translateX(0)}
     .drawer a{display:block; padding:12px 10px; text-decoration:none; color:var(--ink); font-weight:700; border-radius:10px}
     .drawer a:hover{background:var(--bg)}
+    .backdrop{position:fixed; inset:0; background:rgba(0,0,0,.35); opacity:0; pointer-events:none; transition:opacity .25s ease; z-index:60}
+    .backdrop.show{opacity:1; pointer-events:auto}
 
-    /* ======== HERO ======== */
+    /* ==================== HERO ==================== */
     header.hero{padding:120px 0 80px; overflow:hidden}
-    .badge{display:inline-flex;gap:10px;align-items:center;padding:10px 14px;border:1px solid var(--line);
-      border-radius:999px;background:var(--bg-2);box-shadow:var(--shadow-1);font-weight:700}
+    .badge{display:inline-flex; gap:10px; align-items:center; padding:10px 14px; border:1px solid var(--line);
+      border-radius:999px; background:var(--surface); box-shadow:var(--shadow-1); font-weight:800}
     .chips{display:flex; gap:10px; flex-wrap:wrap; margin-top:16px}
-    .chip{padding:10px 12px; border-radius:999px; border:1px solid var(--line); background:var(--bg-2); font-weight:600}
+    .chip{padding:10px 12px; border-radius:999px; border:1px solid var(--line); background:var(--surface); font-weight:600}
 
-    .hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:28px;align-items:center;margin-top:22px}
+    .hero-grid{display:grid; grid-template-columns:1.06fr .94fr; gap:28px; align-items:center; margin-top:24px}
     @media (max-width: 980px){ .hero-grid{grid-template-columns:1fr} }
-
-    .panel{background:var(--bg-2); border:1px solid var(--line); border-radius:var(--r-xl); padding:22px; box-shadow:var(--shadow-2)}
+    .panel{background:var(--surface); border:1px solid var(--line); border-radius:var(--r-xl); padding:22px; box-shadow:var(--shadow-2)}
     .visual{position:relative; aspect-ratio:4/3; border-radius:24px; overflow:hidden; border:1px solid var(--line);
-      background:linear-gradient(180deg,#fff, #eef2ff); box-shadow:var(--glow)}
-
-    /* Zaha Hadid ribbons */
-    .ribbon{position:absolute; background:var(--grad); mix-blend-mode:multiply; filter:saturate(110%); opacity:.85;
+      background:linear-gradient(180deg,#fff,#eef3ff)}
+    /* Zaha ribbons (organic, subtle) */
+    .ribbon{position:absolute; background:var(--grad); mix-blend-mode:multiply; opacity:.85;
       border-radius:60% 40% 30% 70% / 60% 30% 70% 40%; animation:morph 18s ease-in-out infinite}
     .r1{width:560px;height:220px; top:6%; left:-12%; transform:rotate(-6deg)}
     .r2{width:480px;height:180px; bottom:-8%; right:-6%; animation-delay:-6s}
@@ -110,44 +101,39 @@
       75%{ border-radius:35% 65% 40% 60% / 60% 40% 65% 35%; transform:rotate(2deg) scale(1.04)}
     }
 
-    /* ======== Cards / Grids ======== */
+    /* ==================== LAYOUT UTILITIES ==================== */
     .grid{display:grid; gap:20px}
     .g-2{grid-template-columns:repeat(2,minmax(0,1fr))}
     .g-3{grid-template-columns:repeat(3,minmax(0,1fr))}
     .g-auto{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
-    @media (max-width: 980px){ .g-2,.g-3{grid-template-columns:1fr} }
+    @media (max-width:980px){ .g-2,.g-3{grid-template-columns:1fr} }
 
-    .card{background:var(--bg-2); border:1px solid var(--line); border-radius:var(--r-lg); padding:20px; box-shadow:var(--shadow-1);
+    .card{background:var(--surface); border:1px solid var(--line); border-radius:var(--r-lg); padding:20px; box-shadow:var(--shadow-1);
       transition:transform .35s ease, box-shadow .35s ease}
-    .card:hover{transform:translateY(-4px); box-shadow:var(--shadow-2)}
+    .card:hover{transform:translateY(-3px); box-shadow:var(--shadow-2)}
 
-    /* Code block */
-    .code{position:relative; border:1px solid var(--line); border-radius:14px; overflow:hidden; background:color-mix(in oklab, var(--bg) 60%, #fff)}
+    .code{position:relative; border:1px solid var(--line); border-radius:14px; overflow:hidden; background:color-mix(in oklab, var(--bg) 65%, #fff)}
     .code pre{margin:0; padding:16px; font:13px/1.6 ui-monospace,SFMono-Regular,Consolas,Menlo,monospace; color:var(--ink); overflow:auto}
-    .copy{position:absolute; right:10px; top:10px; font-size:12px; padding:6px 10px; border-radius:10px; background:var(--bg-2);
+    .copy{position:absolute; right:10px; top:10px; font-size:12px; padding:6px 10px; border-radius:10px; background:var(--surface);
       border:1px solid var(--line); cursor:pointer; font-weight:800}
 
-    /* Details / Accordion */
-    details{border:1px solid var(--line); border-radius:14px; background:var(--bg-2); box-shadow:var(--shadow-1)}
+    details{border:1px solid var(--line); border-radius:14px; background:var(--surface); box-shadow:var(--shadow-1)}
     summary{list-style:none; padding:18px 20px; cursor:pointer; font-weight:800}
     summary::-webkit-details-marker{display:none}
     details[open] summary{border-bottom:1px solid var(--line)}
     .details-body{padding:16px 20px 20px}
 
-    /* KPI */
-    .kpi{border:1px solid var(--line); border-radius:16px; padding:18px; background:var(--bg-2)}
-    .kpi .v{font-family:"Plus Jakarta Sans", Inter, system-ui; font-size:1.7rem; font-weight:800; background:var(--grad); -webkit-background-clip:text; background-clip:text; color:transparent}
+    .kpi{border:1px solid var(--line); border-radius:16px; padding:18px; background:var(--surface)}
+    .kpi .v{font-family:"Plus Jakarta Sans", Inter; font-size:1.7rem; font-weight:800; background:var(--grad);
+      -webkit-background-clip:text; background-clip:text; color:transparent}
 
-    /* PDF Embed */
-    .pdf-wrap{border:1px solid var(--line); border-radius:16px; overflow:hidden; background:var(--bg-2); box-shadow:var(--shadow-1)}
-    .pdf{width:100%; height:70vh; border:0; background:#fff}
+    .pdf{width:100%; height:70vh; border:0; background:#fff; border-radius:16px; box-shadow:var(--shadow-1)}
 
-    /* Footer & top */
-    footer{border-top:1px solid var(--line); background:linear-gradient(180deg, color-mix(in oklab,var(--bg-2) 75%, transparent), var(--bg-2)); padding:36px 0}
+    footer{border-top:1px solid var(--line); background:linear-gradient(180deg, color-mix(in oklab,var(--surface) 82%, transparent), var(--surface)); padding:36px 0}
     .top{position:fixed; right:18px; bottom:18px; display:none; z-index:60; border:none; padding:12px 14px; border-radius:14px;
       background:var(--grad); color:#fff; font-weight:800; cursor:pointer; box-shadow:var(--shadow-2)}
 
-    /* Reduced motion */
+    /* Accessibility / reduced motion */
     @media (prefers-reduced-motion: reduce){
       html{scroll-behavior:auto}
       *{animation:none !important; transition:none !important}
@@ -172,7 +158,7 @@
         <a href="#roadmap">Roadmap</a>
         <a href="#cases">Case Studies</a>
         <a href="#threat">Threat Model</a>
-        <a href="#playbook">Partner Playbook</a>
+        <a href="#playbook">Playbook</a>
         <a href="#audit">Audit Plan</a>
         <a href="#whitepaper">Whitepaper</a>
         <a href="#faq">FAQ</a>
@@ -183,19 +169,19 @@
     </nav>
   </div>
 
-  <!-- Drawer (mobile) -->
+  <!-- Drawer & Backdrop -->
+  <div class="backdrop" id="backdrop" aria-hidden="true"></div>
   <aside class="drawer" id="drawer" aria-label="Mobile menu">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
       <strong style="font-size:1.1rem">Menu</strong>
       <button class="theme" id="drawerClose" aria-label="Close menu">✕</button>
     </div>
-    <div style="display:grid;gap:6px">
-      <a href="#overview">Overview</a><a href="#market">Market</a><a href="#technology">Technology</a>
-      <a href="#security">Security</a><a href="#sdk">SDK</a><a href="#governance">Governance</a>
-      <a href="#investment">Investment</a><a href="#kpis">KPIs</a><a href="#roadmap">Roadmap</a>
-      <a href="#cases">Case Studies</a><a href="#threat">Threat Model</a><a href="#playbook">Partner Playbook</a>
+    <nav style="display:grid;gap:6px">
+      <a href="#overview">Overview</a><a href="#market">Market</a><a href="#technology">Technology</a><a href="#security">Security</a>
+      <a href="#sdk">SDK</a><a href="#governance">Governance</a><a href="#investment">Investment</a><a href="#kpis">KPIs</a>
+      <a href="#roadmap">Roadmap</a><a href="#cases">Case Studies</a><a href="#threat">Threat Model</a><a href="#playbook">Playbook</a>
       <a href="#audit">Audit Plan</a><a href="#whitepaper">Whitepaper</a><a href="#faq">FAQ</a><a href="#contact">Contact</a>
-    </div>
+    </nav>
   </aside>
 
   <!-- HERO -->
@@ -205,22 +191,24 @@
       <h1>The Invisible Engine of <span style="background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent">DeFi Liquidity</span></h1>
       <p class="lead">
         Gravitas Protocol is a neutral transport layer for <strong>atomic liquidity migrations</strong> between DEXs (V2/V3) and L2s.
-        Micro-fees on flow create <strong>sustainable protocol revenue</strong>. Audit-ready, institution-friendly, partner-first.
+        Micro-fees on flow create <strong>sustainable protocol revenue</strong>. Audit-first, institution-ready, partner-friendly.
       </p>
       <div class="chips" aria-label="Key capabilities">
-        <span class="chip">Atomic migrations</span><span class="chip">Adapter pattern (UniV2/V3)</span>
-        <span class="chip">Multisig + Timelock</span><span class="chip">SDK & Observability</span><span class="chip">Fork & Fuzz tests</span>
+        <span class="chip">Atomic migrations</span><span class="chip">UniV2/V3 adapters</span>
+        <span class="chip">Multisig + Timelock</span><span class="chip">SDK & Observability</span><span class="chip">Fork & Fuzz Tests</span>
       </div>
-
       <div class="hero-grid">
         <div class="panel">
           <h3>Why this matters</h3>
-          <p style="margin:6px 0 14px;color:var(--muted)">Liquidity is fragmented across venues and chains. Strategies rotate weekly.
-            Gravitas automates migrations with determinism, near-zero operational drag, and verifiable guardrails.</p>
+          <p style="margin:6px 0 14px;color:var(--muted)">Liquidity is fragmented. Strategies rotate quickly. Gravitas executes migrations with deterministic guardrails, near-zero operational drag, and verifiable audit logs.</p>
           <div class="grid g-3">
             <div class="kpi"><div class="v">&lt;30s</div><div style="color:var(--muted);font-size:.95rem">Typical migration time</div></div>
             <div class="kpi"><div class="v">&lt;1%</div><div style="color:var(--muted);font-size:.95rem">Failed transaction rate</div></div>
             <div class="kpi"><div class="v">99.9%</div><div style="color:var(--muted);font-size:.95rem">Availability SLO</div></div>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">
+            <a class="btn grad" href="#contact">Start a Conversation</a>
+            <a class="btn ghost" href="#whitepaper">View Whitepaper</a>
           </div>
         </div>
         <div class="visual" aria-hidden="true">
@@ -234,23 +222,12 @@
   <section id="overview">
     <div class="container">
       <h2>Executive Overview</h2>
-      <p class="lead">Problem → Solution → Value across creators, users, and the protocol.</p>
+      <p class="lead">Problem → Solution → Value for creators, users, and the protocol.</p>
       <div class="grid g-3" style="margin-top:10px">
-        <div class="card">
-          <h3>Problem</h3>
-          <p>DeFi liquidity lives in silos; manual moves burn time, slippage, and gas. Projects lack a predictable, recurring revenue stream from their own liquidity motion.</p>
-        </div>
-        <div class="card">
-          <h3>Solution</h3>
-          <p><strong>Atomic migrations</strong> across DEXs using audited adapters and strict guards (slippage, deadlines, whitelists), with transparent micro-fees that scale with volume.</p>
-        </div>
-        <div class="card">
-          <h3>Value</h3>
-          <ul>
-            <li><strong>Creators:</strong> higher net yields, less operational drag.</li>
-            <li><strong>Users:</strong> 1-click migrations, deterministic outcomes.</li>
-            <li><strong>Protocol:</strong> usage-based, non-extractive revenue.</li>
-          </ul>
+        <div class="card"><h3>Problem</h3><p>DeFi liquidity sits in silos; manual moves waste time, create slippage, and add risk. Projects lack a predictable, recurring revenue stream from liquidity motion.</p></div>
+        <div class="card"><h3>Solution</h3><p><strong>Atomic migrations</strong> with audited adapters and strict guards (slippage, deadlines, whitelists). Transparent micro-fees scale with volume.</p></div>
+        <div class="card"><h3>Value</h3>
+          <ul><li><strong>Creators:</strong> higher net yields, less ops drag</li><li><strong>Users:</strong> 1-click moves, deterministic outcomes</li><li><strong>Protocol:</strong> usage-based, non-extractive revenue</li></ul>
         </div>
       </div>
     </div>
@@ -262,18 +239,10 @@
       <h2>Market & Positioning</h2>
       <p class="lead">Agnostic migration infrastructure for a multi-venue, multi-chain reality.</p>
       <div class="grid g-2" style="margin-top:10px">
-        <div class="card">
-          <h3>Demand segments</h3>
-          <ul>
-            <li><strong>DEX partners:</strong> seamless in/out flows; reduce user churn.</li>
-            <li><strong>DAOs/Treasuries:</strong> programmatic treasury rebalancing.</li>
-            <li><strong>MMs & funds:</strong> deterministic timing for rotations.</li>
-          </ul>
+        <div class="card"><h3>Demand segments</h3>
+          <ul><li><strong>DEX partners:</strong> seamless in/out flows; reduce user churn</li><li><strong>DAOs/Treasuries:</strong> programmatic rebalancing</li><li><strong>MMs & funds:</strong> deterministic rotations</li></ul>
         </div>
-        <div class="card">
-          <h3>Differentiation</h3>
-          <p>Neutral, <em>audit-first</em> transport with signature-stable APIs. No custody; <strong>deterministic</strong> execution with verifiable logs and rollbacks under timelock.</p>
-        </div>
+        <div class="card"><h3>Differentiation</h3><p>Neutral, <em>audit-first</em> transport with signature-stable APIs. No custody; <strong>deterministic</strong> execution; timelocked rollbacks; verifiable logs.</p></div>
       </div>
     </div>
   </section>
@@ -287,8 +256,7 @@
       <details open class="card">
         <summary>Phase 1: Smart contracts (Weeks 1–4)</summary>
         <div class="details-body">
-          <div class="code">
-            <button class="copy">Copy</button>
+          <div class="code"><button class="copy">Copy</button>
 <pre><code>/contracts/
   /interfaces/ IUniswapV2Router.sol, IUniswapV3Pool.sol, INonfungiblePositionManager.sol
   /adapters/   UniV2Adapter.sol, UniV3Adapter.sol
@@ -297,35 +265,22 @@
 
 npm init -y
 npm i @openzeppelin/contracts @uniswap/v3-core @uniswap/v3-periphery
-npx hardhat init</code></pre>
-          </div>
+npx hardhat init</code></pre></div>
           <div class="grid g-2" style="margin-top:14px">
-            <div class="card">
-              <h3>Teleport.sol</h3>
-              <ul>
-                <li><code>migrateLiquidity</code> → main entry</li>
-                <li><code>_executeMigration</code> → core orchestration</li>
-                <li><code>_takeProtocolFee</code> → exact bps; rounding guards</li>
-                <li><code>pause/unpause</code> via guardian</li>
-              </ul>
+            <div class="card"><h3>Teleport.sol</h3>
+              <ul><li><code>migrateLiquidity</code> → main entry</li><li><code>_executeMigration</code> → orchestration</li><li><code>_takeProtocolFee</code> → exact bps; rounding guards</li><li><code>pause/unpause</code> via guardian</li></ul>
             </div>
-            <div class="card">
-              <h3>Adapter pattern</h3>
-              <ul>
-                <li>V2: remove/add LP with slippage + deadline guards</li>
-                <li>V3: mint/increase with tick validation</li>
-                <li>All external calls wrapped in try/catch</li>
-              </ul>
+            <div class="card"><h3>Adapter pattern</h3>
+              <ul><li>V2: remove/add LP with slippage + deadlines</li><li>V3: mint/increase with tick validation</li><li>External calls wrapped in try/catch</li></ul>
             </div>
           </div>
         </div>
       </details>
 
       <details class="card" style="margin-top:14px">
-        <summary>Phase 2: Testing & security (Weeks 5–8)</summary>
+        <summary>Phase 2: Testing & Security (Weeks 5–8)</summary>
         <div class="details-body">
-          <div class="code">
-            <button class="copy">Copy</button>
+          <div class="code"><button class="copy">Copy</button>
 <pre><code>/test/
   /unit/        Teleport.test.ts, Adapters.test.ts, Fees.test.ts
   /integration/ V2ToV2.test.ts, V2ToV3.test.ts, V3ToV3.test.ts
@@ -336,8 +291,7 @@ Targets:
 - ~100% coverage
 - Full math fuzzing
 - Mainnet fork states
-- Historic incident replays</code></pre>
-          </div>
+- Historic incident replays</code></pre></div>
         </div>
       </details>
     </div>
@@ -349,15 +303,13 @@ Targets:
       <h2>Security Protocols</h2>
       <p class="lead">Defense-in-depth with verifiable governance and live alerts.</p>
       <div class="grid g-2" style="margin-top:10px">
-        <div class="card">
-          <h3>Access & governance</h3>
+        <div class="card"><h3>Access & governance</h3>
           <div class="code"><button class="copy">Copy</button>
 <pre><code>Treasury Multisig: 3/5 (2 founders, 2 advisors, 1 community)
 Timelock: 48h (admin changes, fees, whitelist)
 Guardian (hot): emergency pause only</code></pre></div>
         </div>
-        <div class="card">
-          <h3>Monitoring & alerts</h3>
+        <div class="card"><h3>Monitoring & alerts</h3>
           <div class="code"><button class="copy">Copy</button>
 <pre><code>const CRITICAL_ALERTS = {
   LARGE_MIGRATION: { threshold: 100000, priority:'HIGH' },
@@ -365,11 +317,7 @@ Guardian (hot): emergency pause only</code></pre></div>
   CIRCUIT_BREAKER: { threshold: 1,      priority:'CRITICAL' },
   FEE_CHANGE:      { threshold: 1,      priority:'HIGH' }
 };</code></pre></div>
-          <ul>
-            <li>Signed audit logs + SIEM export</li>
-            <li>Rollback runbooks under timelock rules</li>
-            <li>24/7 on-call with automated escalation</li>
-          </ul>
+          <ul><li>Signed audit logs + SIEM export</li><li>Rollback runbooks under timelock</li><li>24/7 on-call with automated escalation</li></ul>
         </div>
       </div>
     </div>
@@ -381,18 +329,16 @@ Guardian (hot): emergency pause only</code></pre></div>
       <h2>SDK & APIs</h2>
       <p class="lead">Typed adapters, idempotent calls, deterministic results.</p>
       <div class="grid g-2" style="margin-top:10px">
-        <div class="card">
-          <h3>Package structure</h3>
+        <div class="card"><h3>Package structure</h3>
           <div class="code"><button class="copy">Copy</button>
 <pre><code>/sdk/
   /core/ client.ts, signer.ts
   /dex/  univ2.ts, univ3.ts
   /types/ index.d.ts
   /utils/ math.ts, slippage.ts, deadlines.ts</code></pre></div>
-          <p><strong>Reliability:</strong> SemVer, LTS branch, 24h targeted security patches.</p>
+          <p><strong>Reliability:</strong> SemVer, LTS branch, 24h security fixes.</p>
         </div>
-        <div class="card">
-          <h3>TypeScript example</h3>
+        <div class="card"><h3>TypeScript example</h3>
           <div class="code"><button class="copy">Copy</button>
 <pre><code>import { GravitasClient } from '@gravitas/sdk';
 const client = new GravitasClient({ rpc: process.env.RPC_URL });
@@ -413,18 +359,10 @@ await client.migrate({
       <h2>Governance & Compliance</h2>
       <p class="lead">Minimize risk, maximize verifiability. Token optional later.</p>
       <div class="grid g-2" style="margin-top:10px">
-        <div class="card">
-          <h3>Model</h3>
-          <ul>
-            <li>Phase 0–1: multisig + timelock</li>
-            <li>Phase 2: DAO oversight on parameters (fees, adapter whitelist)</li>
-            <li>Compliance: infrastructure only, no custody</li>
-          </ul>
+        <div class="card"><h3>Model</h3>
+          <ul><li>Phase 0–1: multisig + timelock</li><li>Phase 2: DAO parameter oversight (fees, adapter whitelist)</li><li>Compliance: infrastructure only; no custody</li></ul>
         </div>
-        <div class="card">
-          <h3>Token (optional)</h3>
-          <p>Utility: governance, fee-sharing, staking bonds for adapter security with disciplined unlocks and protocol-owned liquidity.</p>
-        </div>
+        <div class="card"><h3>Token (optional)</h3><p>Utility: governance, fee-sharing, staking bonds for adapter security with disciplined unlocks and protocol-owned liquidity.</p></div>
       </div>
     </div>
   </section>
@@ -433,19 +371,17 @@ await client.migrate({
   <section id="investment">
     <div class="container">
       <h2>Investment Blueprint</h2>
-      <p class="lead">Transparent economics, credible path to revenue on volume.</p>
+      <p class="lead">Transparent economics with a credible path to revenue on volume.</p>
       <div class="grid g-2" style="margin-top:10px">
-        <div class="card">
-          <h3>Revenue & metrics</h3>
+        <div class="card"><h3>Revenue & metrics</h3>
           <div class="code"><button class="copy">Copy</button>
 <pre><code>Fee: 5–10 bps (0.05–0.1%)
 Year-1 Volume Target: $100M / month
 Projected Revenue: $50k–$100k / month
 Break-even (6 bps): ~ $83M / month</code></pre></div>
-          <p>100% of fees accrue to Treasury → development, security, partnerships; later fee-sharing modules via DAO votes.</p>
+          <p>100% of fees accrue to Treasury → development, security, partnerships; later fee-sharing via DAO votes.</p>
         </div>
-        <div class="card">
-          <h3>Costs & runway</h3>
+        <div class="card"><h3>Costs & runway</h3>
           <div class="code"><button class="copy">Copy</button>
 <pre><code>Senior Devs (5×, 4 mo) : ~$480k
 Audits (2×)            : ~$250k
@@ -500,26 +436,13 @@ Phase 3 (7–12 mo): Growth
       <div class="grid g-2" style="margin-top:10px">
         <div class="card">
           <h3>Next 24h</h3>
-          <ul>
-            <li>Hardhat/Foundry setup, repo init</li>
-            <li>Deploy TimelockController (testnet)</li>
-            <li>CI/CD + security baselines</li>
-          </ul>
+          <ul><li>Hardhat/Foundry setup, repo init</li><li>Deploy TimelockController (testnet)</li><li>CI/CD + security baselines</li></ul>
           <h3 style="margin-top:12px">Next 7 days</h3>
-          <ul>
-            <li>Teleport.sol skeleton + unit tests</li>
-            <li>Alerts + observability</li>
-            <li>Identify 3 launch partners</li>
-          </ul>
+          <ul><li>Teleport.sol skeleton + unit tests</li><li>Alerts + observability</li><li>Identify 3 launch partners</li></ul>
         </div>
         <div class="card">
           <h3>Milestones</h3>
-          <ul>
-            <li><strong>T+30</strong>: Phase 1 complete</li>
-            <li><strong>T+60</strong>: Security audit #1</li>
-            <li><strong>T+90</strong>: Public testnet</li>
-            <li><strong>T+120</strong>: Mainnet (3 partners)</li>
-          </ul>
+          <ul><li><strong>T+30</strong>: Phase 1 complete</li><li><strong>T+60</strong>: Security audit #1</li><li><strong>T+90</strong>: Public testnet</li><li><strong>T+120</strong>: Mainnet (3 partners)</li></ul>
         </div>
       </div>
     </div>
@@ -531,29 +454,14 @@ Phase 3 (7–12 mo): Growth
       <h2>Case Studies (Simulated)</h2>
       <p class="lead">Before/after snapshots with slippage and timing impact.</p>
       <div class="grid g-auto" style="margin-top:10px">
-        <div class="card">
-          <h3>V2 → V3 Rebalancing (WETH/USDC)</h3>
-          <ul>
-            <li><strong>Before:</strong> Manual removal → swap → mint; ~6 tx; ~0.45% slippage</li>
-            <li><strong>After:</strong> Single migration call; ≤2 tx; ≤0.08% slippage</li>
-            <li><strong>Time saved:</strong> ~12 minutes per move</li>
-          </ul>
+        <div class="card"><h3>V2 → V3 Rebalance (WETH/USDC)</h3>
+          <ul><li><strong>Before:</strong> Multiple tx; ~0.45% slippage</li><li><strong>After:</strong> ≤2 tx; ≤0.08% slippage</li><li><strong>Time saved:</strong> ~12 minutes per move</li></ul>
         </div>
-        <div class="card">
-          <h3>L2 Expansion (Arbitrum)</h3>
-          <ul>
-            <li><strong>Before:</strong> Ad-hoc bridging + re-minting; inconsistent fees</li>
-            <li><strong>After:</strong> Pre-quoted path with guardrails; deterministic fee bands</li>
-            <li><strong>Outcome:</strong> Predictable treasury rotations</li>
-          </ul>
+        <div class="card"><h3>L2 Expansion (Arbitrum)</h3>
+          <ul><li><strong>Before:</strong> Ad-hoc bridging; inconsistent fees</li><li><strong>After:</strong> Pre-quoted path; deterministic bands</li><li><strong>Outcome:</strong> Predictable treasury rotations</li></ul>
         </div>
-        <div class="card">
-          <h3>DAO Treasury Rotation</h3>
-          <ul>
-            <li><strong>Before:</strong> Governance overhead per venue</li>
-            <li><strong>After:</strong> Policy templates + timelock; signed audit trail</li>
-            <li><strong>Impact:</strong> Fewer governance cycles; safer execution</li>
-          </ul>
+        <div class="card"><h3>DAO Treasury Rotation</h3>
+          <ul><li><strong>Before:</strong> Governance overhead per venue</li><li><strong>After:</strong> Policy templates + timelock; audit trail</li><li><strong>Impact:</strong> Fewer cycles; safer execution</li></ul>
         </div>
       </div>
     </div>
@@ -563,14 +471,14 @@ Phase 3 (7–12 mo): Growth
   <section id="threat">
     <div class="container">
       <h2>Threat Model (STRIDE)</h2>
-      <p class="lead">Systemic view of plausible risks and concrete mitigations.</p>
+      <p class="lead">Systemic risks and mitigations.</p>
       <div class="grid g-auto" style="margin-top:10px">
-        <div class="card"><h3>Spoofing</h3><p>Signer spoofing, adapter address spoofing.</p><p><strong>Mitigation:</strong> EIP-712 typed data; whitelisted adapters; on-chain registry.</p></div>
-        <div class="card"><h3>Tampering</h3><p>Parameter tampering in flight.</p><p><strong>Mitigation:</strong> Timelock for admin changes; immutables; Merkle-proofed configs.</p></div>
-        <div class="card"><h3>Repudiation</h3><p>Dispute over who approved what.</p><p><strong>Mitigation:</strong> Signed audit logs, append-only store, SIEM ingestion.</p></div>
-        <div class="card"><h3>Information Disclosure</h3><p>Leak of migration intents.</p><p><strong>Mitigation:</strong> Commit-reveal for large moves; batching; optional MEV-protected relays.</p></div>
-        <div class="card"><h3>Denial of Service</h3><p>Griefing adapters, gas grief.</p><p><strong>Mitigation:</strong> Circuit breakers; rate-limits per address; back-pressure queues.</p></div>
-        <div class="card"><h3>Elevation of Privilege</h3><p>Admin takeover, guardian abuse.</p><p><strong>Mitigation:</strong> Multisig + hardware keys; scoped roles; emergency council with quorum.</p></div>
+        <div class="card"><h3>Spoofing</h3><p>Signer and adapter spoofing.</p><p><strong>Mitigation:</strong> EIP-712, whitelists, on-chain registry.</p></div>
+        <div class="card"><h3>Tampering</h3><p>Parameter tampering in flight.</p><p><strong>Mitigation:</strong> Timelock, immutables, Merkle-proofed configs.</p></div>
+        <div class="card"><h3>Repudiation</h3><p>Dispute over approvals.</p><p><strong>Mitigation:</strong> Signed logs, append-only store, SIEM.</p></div>
+        <div class="card"><h3>Info Disclosure</h3><p>Leak of intents.</p><p><strong>Mitigation:</strong> Commit-reveal, batching, MEV-protected relays.</p></div>
+        <div class="card"><h3>DoS</h3><p>Adapter griefing, gas grief.</p><p><strong>Mitigation:</strong> Circuit breakers, rate-limits, back-pressure queues.</p></div>
+        <div class="card"><h3>Privilege Escalation</h3><p>Admin takeover.</p><p><strong>Mitigation:</strong> Multisig + HW keys, scoped roles, emergency council quorum.</p></div>
       </div>
     </div>
   </section>
@@ -581,23 +489,11 @@ Phase 3 (7–12 mo): Growth
       <h2>Partner Integration Playbook</h2>
       <p class="lead">From sandbox to production with SLAs and observability.</p>
       <div class="grid g-2" style="margin-top:10px">
-        <div class="card">
-          <h3>Steps</h3>
-          <ol>
-            <li>Sandbox keys & adapter registry access</li>
-            <li>SDK install + sample flows (V2↔V3)</li>
-            <li>Staging fork tests on target pools</li>
-            <li>Alerting hooks + dashboards</li>
-            <li>Production rollout gate with small caps</li>
-          </ol>
+        <div class="card"><h3>Steps</h3>
+          <ol><li>Sandbox keys & adapter registry access</li><li>SDK install + sample flows</li><li>Staging fork tests on target pools</li><li>Alert hooks + dashboards</li><li>Production rollout with caps</li></ol>
         </div>
-        <div class="card">
-          <h3>SLAs</h3>
-          <ul>
-            <li>Latency: &lt; 2s orchestration</li>
-            <li>Availability: 99.9% monthly</li>
-            <li>Support: 24h P1 response</li>
-          </ul>
+        <div class="card"><h3>SLAs</h3>
+          <ul><li>Orchestration latency: &lt; 2s</li><li>Availability: 99.9% monthly</li><li>Support: 24h P1 response</li></ul>
         </div>
       </div>
     </div>
@@ -607,37 +503,25 @@ Phase 3 (7–12 mo): Growth
   <section id="audit">
     <div class="container">
       <h2>Audit Plan</h2>
-      <p class="lead">Scope, timelines, and community incentives.</p>
+      <p class="lead">Scope, timelines, and incentives.</p>
       <div class="grid g-2" style="margin-top:10px">
-        <div class="card">
-          <h3>Scope</h3>
-          <ul>
-            <li>Contracts: Teleport, Treasury, Adapters, Registry</li>
-            <li>Economic analysis: fee precision, rounding, griefing</li>
-            <li>Threat replay: historical exploits on forks</li>
-          </ul>
+        <div class="card"><h3>Scope</h3>
+          <ul><li>Contracts: Teleport, Treasury, Adapters, Registry</li><li>Economics: fee precision, rounding, griefing</li><li>Threat replay: historic exploits on forks</li></ul>
         </div>
-        <div class="card">
-          <h3>Timeline & incentives</h3>
-          <ul>
-            <li>Audit #1 (4 weeks), remediations (2 weeks)</li>
-            <li>Audit #2 (3 weeks) + public contest (Code4rena-style)</li>
-            <li>Bug bounty live at launch</li>
-          </ul>
+        <div class="card"><h3>Timeline & incentives</h3>
+          <ul><li>Audit #1 (4 wks), remediations (2 wks)</li><li>Audit #2 (3 wks) + public contest</li><li>Bug bounty at launch</li></ul>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- WHITEPAPER (PDF EMBED) -->
+  <!-- WHITEPAPER -->
   <section id="whitepaper">
     <div class="container">
-      <h2>Technical Whitepaper</h2>
-      <p class="lead">Inline PDF for investor & engineer review. Replace the file at <code>docs/whitepaper.pdf</code>.</p>
-      <div class="pdf-wrap" style="margin-top:10px">
-        <iframe class="pdf" src="docs/whitepaper.pdf" title="Gravitas Protocol Whitepaper" loading="lazy"></iframe>
-      </div>
-      <p style="margin-top:10px;color:var(--muted)">If the PDF doesn’t render in your browser, <a href="docs/whitepaper.pdf" target="_blank" rel="noopener">open it in a new tab</a>.</p>
+      <h2>Technical Whitepaper (PDF)</h2>
+      <p class="lead">Inline PDF for investor & engineer review. Place file at <code>docs/whitepaper.pdf</code>.</p>
+      <iframe class="pdf" src="docs/whitepaper.pdf" title="Gravitas Protocol Whitepaper" loading="lazy"></iframe>
+      <p style="margin-top:10px;color:var(--muted)">If the PDF doesn’t render, <a href="docs/whitepaper.pdf" target="_blank" rel="noopener">open it in a new tab</a>.</p>
     </div>
   </section>
 
@@ -647,9 +531,9 @@ Phase 3 (7–12 mo): Growth
       <h2>Investor & Technical FAQ</h2>
       <div class="grid g-auto" style="margin-top:10px">
         <details class="card"><summary>How do fees accrue?</summary><div class="details-body">Micro-fees (bps) are deducted during migrations and routed to Treasury. Transparent, auditable accounting.</div></details>
-        <details class="card"><summary>Is custody involved?</summary><div class="details-body">No. Gravitas orchestrates migrations via adapters with whitelisted routers; funds move through users’ authorized flows.</div></details>
-        <details class="card"><summary>What’s the token plan?</summary><div class="details-body">Optional. Only after product-market fit: governance, fee-sharing, and staking bonds for security.</div></details>
-        <details class="card"><summary>How are large moves protected?</summary><div class="details-body">Commit-reveal, batching windows, slippage caps, and optional MEV-protected relays.</div></details>
+        <details class="card"><summary>Is custody involved?</summary><div class="details-body">No. Gravitas orchestrates via whitelisted adapters/routers; funds move through user-authorized flows.</div></details>
+        <details class="card"><summary>What’s the token plan?</summary><div class="details-body">Optional after PMF: governance, fee-sharing, staking bonds for security.</div></details>
+        <details class="card"><summary>How are large moves protected?</summary><div class="details-body">Commit-reveal windows, slippage caps, batching, optional MEV-protected relays.</div></details>
       </div>
     </div>
   </section>
@@ -660,7 +544,7 @@ Phase 3 (7–12 mo): Growth
       <h2>Contact & Partnerships</h2>
       <p class="lead">Ready for diligence, partnerships, and integration pilots.</p>
       <div class="grid g-2" style="margin-top:10px">
-        <a class="card" style="text-decoration:none;color:inherit" href="mailto:abdusamedzelic98@gmail.com">
+        <a class="card" style="text-decoration:none;color:inherit" href="mailto:abdusamedzelic98@gmail.com?subject=Gravitas%20Protocol%20—%20Investor%20Inquiry&body=Hi%20Gravitas%20team,%0A%0AWe%27d%20like%20to%20request%20the%20deck%20and%20schedule%20a%20call.%0A%0A—%20">
           <h3>Email</h3><p style="color:var(--muted)">abdusamedzelic98@gmail.com</p>
         </a>
         <a class="card" style="text-decoration:none;color:inherit" href="tel:+385915668133">
@@ -689,24 +573,30 @@ Phase 3 (7–12 mo): Growth
     document.getElementById('y').textContent = new Date().getFullYear();
 
     // Theme toggle (persist)
-    const root = document.documentElement;
-    const key = 'gravitas_theme';
-    const saved = localStorage.getItem(key);
-    if(saved) document.documentElement.setAttribute('data-theme', saved);
+    const themeKey = 'gravitas_theme';
+    const savedTheme = localStorage.getItem(themeKey);
+    if(savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
     document.getElementById('themeToggle').addEventListener('click', ()=>{
       const cur = document.documentElement.getAttribute('data-theme') || 'light';
       const nxt = cur === 'light' ? 'dark' : 'light';
       document.documentElement.setAttribute('data-theme', nxt);
-      localStorage.setItem(key, nxt);
+      localStorage.setItem(themeKey, nxt);
     });
 
-    // Burger / Drawer
-    const burger = document.getElementById('burger');
+    // Mobile drawer
     const drawer = document.getElementById('drawer');
+    const burger = document.getElementById('burger');
     const drawerClose = document.getElementById('drawerClose');
-    const toggleDrawer = (open)=> drawer.classList.toggle('open', open);
-    burger.addEventListener('click', ()=> toggleDrawer(true));
-    drawerClose.addEventListener('click', ()=> toggleDrawer(false));
+    const backdrop = document.getElementById('backdrop');
+    const toggleDrawer = (open)=>{
+      drawer.classList.toggle('open', open);
+      backdrop.classList.toggle('show', open);
+      if(open){ drawer.querySelector('a').focus(); }
+    };
+    burger.addEventListener('click', ()=>toggleDrawer(true));
+    drawerClose.addEventListener('click', ()=>toggleDrawer(false));
+    backdrop.addEventListener('click', ()=>toggleDrawer(false));
+    document.addEventListener('keydown',(e)=>{ if(e.key==='Escape') toggleDrawer(false); });
     drawer.querySelectorAll('a').forEach(a=>a.addEventListener('click', ()=>toggleDrawer(false)));
 
     // Back to top
@@ -722,7 +612,7 @@ Phase 3 (7–12 mo): Growth
         try{
           await navigator.clipboard.writeText(code);
           const t = btn.textContent; btn.textContent='Copied ✓';
-          setTimeout(()=>btn.textContent=t, 1600);
+          setTimeout(()=>btn.textContent=t, 1500);
         }catch(e){ alert('Copy failed. Select text and copy manually.'); }
       });
     });
@@ -742,12 +632,16 @@ Phase 3 (7–12 mo): Growth
     window.addEventListener('resize', spy);
     document.addEventListener('DOMContentLoaded', spy);
 
-    // Smooth anchor accounting for sticky nav
+    // Smooth anchor with header offset
     document.querySelectorAll('a[href^="#"]').forEach(a=>{
       a.addEventListener('click', e=>{
-        const id = a.getAttribute('href'); const el = document.querySelector(id);
-        if(el){ e.preventDefault(); const top = el.getBoundingClientRect().top + window.scrollY - 86;
-          window.scrollTo({ top, behavior:'smooth' }); }
+        const id = a.getAttribute('href');
+        const el = document.querySelector(id);
+        if(el){
+          e.preventDefault();
+          const top = el.getBoundingClientRect().top + window.scrollY - 86;
+          window.scrollTo({ top, behavior:'smooth' });
+        }
       });
     });
 
