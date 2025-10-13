@@ -499,6 +499,14 @@
             border-radius: var(--border-radius);
         }
 
+        /* Competition Matrix */
+        .competition-matrix td:nth-child(n+2) {
+            text-align: center;
+        }
+        .tick::before { content: '✓'; color: #22c55e; }
+        .cross::before { content: '✗'; color: #ef4444; } /* Red-500 */
+        .partial::before { content: '○'; color: #f59e0b; } /* Amber-500 */
+        
         /* Architecture Diagram */
         .arch-diagram {
             width: 100%;
@@ -521,6 +529,7 @@
             stroke: var(--color-accent);
             marker-end: url(#arrowhead);
         }
+
 
         /* ========================================
         7. UTILITIES & MISC
@@ -652,7 +661,68 @@
                 
                 <hr>
 
-                <section id="architecture">
+                <section id="thesis">
+                    <h2>Investment Thesis</h2>
+                    <p>The maturation of DeFi requires a shift from retail-driven, high-risk yield farming to professional, risk-managed treasury operations. Currently, protocol treasuries, L2 foundations, and DAOs collectively manage billions in assets, yet lack the tooling to deploy this capital efficiently and safely. This creates a significant drag on capital efficiency and exposes ecosystems to systemic risks.</p>
+                    <p class="pull-quote">The next wave of DeFi growth will be unlocked by infrastructure that provides operational trust and policy-based automation for on-chain capital management.</p>
+                    <h4>Our thesis rests on three core assumptions:</h4>
+                    <ul>
+                        <li><strong>Demand for Durability:</strong> Protocols will increasingly prioritize sustainable, long-term liquidity and yield over short-term, speculative APYs.</li>
+                        <li><strong>Operational Overhead is a Bottleneck:</strong> Manual treasury management is slow, error-prone, and does not scale. Automation via secure, auditable smart contracts is the only viable path forward.</li>
+                        <li><strong>Neutrality Wins:</strong> A neutral infrastructure provider that does not compete with its clients (e.g., by launching its own yield products) will become the trusted standard for liquidity routing and management.</li>
+                    </ul>
+                </section>
+                
+                <hr>
+
+                <section id="market">
+                    <h2>Market Size (TAM/SAM/SOM)</h2>
+                    <p>The addressable market is defined by on-chain capital requiring professional management. We segment this into three tiers, based on assets held by DAOs, L2s, and established protocols.</p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Metric</th>
+                                <th>Market Size (USD)</th>
+                                <th>Assumptions & Rationale</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>TAM</strong> (Total Addressable Market)</td>
+                                <td class="kpi-number">~$50B+</td>
+                                <td>Total value in DAO/protocol treasuries and L2 foundations across major ecosystems.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>SAM</strong> (Serviceable Addressable Market)</td>
+                                <td class="kpi-number">~$10B</td>
+                                <td>Treasuries with >$10M AUM and a mandate for active capital management, accessible via EVM-compatible chains.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>SOM</strong> (Serviceable Obtainable Market, Y1)</td>
+                                <td class="kpi-number">~$1.2B</td>
+                                <td>Targeting <span class="kpi-number">10+</span> design partners & early adopters, with an average monthly volume of <span class="kpi-number">$100M</span>.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p>This market is durable and recurring. As DeFi grows, so does the AUM of these entities, directly increasing our TAM. Our revenue is tied to volume, creating a predictable, recurring stream.</p>
+                </section>
+                
+                <hr>
+
+                <section id="model">
+                    <h2>Business Model</h2>
+                    <p>Gravitas Protocol operates on a transparent, volume-based fee model, supplemented by enterprise-grade services for larger partners. Our goal is to align our success directly with the capital efficiency we provide to our clients.</p>
+                    <h4>Revenue Streams</h4>
+                    <ul>
+                        <li><strong>Core Protocol Fee:</strong> A basis point (bps) fee of <strong class="kpi-number">5-10 bps</strong> is charged on all volume routed through the protocol. This fee is programmatically collected and accrued to the protocol treasury.</li>
+                        <li><strong>Enterprise Add-ons:</strong> For large partners requiring dedicated infrastructure, bespoke policy modules, or priority support, we offer tailored service agreements with fixed retainers or tiered fee structures.</li>
+                        <li><strong>Future Token (Optional):</strong> Post-product-market fit, a token may be introduced for governance and potential fee-sharing, ensuring long-term alignment with the community. This is not part of the initial fundraising scope.</li>
+                    </ul>
+                </section>
+                
+                <hr>
+                
+                 <section id="architecture">
                     <h2>Protocol Architecture</h2>
                     <p>Gravitas is a modular, multi-layered system designed for security, extensibility, and operational resilience. The core logic is separated from external integrations, allowing for rapid development and isolated risk.</p>
                     
@@ -689,7 +759,6 @@
                         <li><strong>Guardian & Timelock:</strong> Governance controls form the highest security layer. A <strong>3/5 multisig</strong> controls critical changes, all subject to a <strong>48-hour timelock</strong>. A separate Guardian role has unilateral power to pause the system in emergencies, but cannot alter or withdraw funds.</li>
                         <li><strong>Telemetry:</strong> On-chain events that provide a real-time, transparent data stream of all protocol activity. This feeds into our monitoring and alerting infrastructure.</li>
                     </ul>
-
                 </section>
                 
                 <hr>
@@ -763,18 +832,68 @@
                         </tbody>
                     </table>
                 </section>
+
+                <hr>
                 
+                <section id="faq">
+                    <h2>Investor FAQ</h2>
+                    <h4>How do protocol fees accrue?</h4>
+                    <p>Fees are programmatically swept into a dedicated multisig treasury controlled by the protocol. Initially, these funds will be used to cover operational expenses and fund further development. Future governance may decide on other uses.</p>
+                    <h4>Is custody of funds ever taken?</h4>
+                    <p>No. Gravitas is entirely non-custodial. Partner funds are managed via smart contract allowances and are always held in the partner's own contracts or in the underlying DeFi protocols (e.g., Aave aTokens).</p>
+                    <h4>Why would a partner choose Gravitas over building in-house?</h4>
+                    <p>Building and maintaining a secure, efficient, and audited liquidity management system is a significant undertaking that distracts from a protocol's core mission. We provide this as a specialized service, offering greater security and lower overhead than an in-house solution.</p>
+                    <h4>What is the policy on a future token?</h4>
+                    <p>A token is not required for the protocol to function or generate revenue. A token would only be introduced if it serves a clear purpose for decentralizing governance and aligning long-term incentives, and only after we have achieved significant product-market fit.</p>
+                </section>
+
                 <hr>
 
                 <section id="whitepaper">
                     <h2>Technical Whitepaper</h2>
                     <p>For a detailed exploration of the protocol architecture, mathematical models for risk, and the complete policy engine specification, please review the full whitepaper.</p>
                     <iframe src="docs/whitepaper.pdf" title="Gravitas Protocol Whitepaper" class="pdf-embed" loading="lazy"></iframe>
-                    <p>If the PDF doesn’t render, you can <a href="docs/whitepaper.pdf" target="_blank" rel="noopener noreferrer">open it directly in a new tab</a>.</p>
+                    <p>If the PDF doesn’t render, you can <a href="docs/whitepaper.pdf" target="_blank" rel="noopener noreferrer">open it directly in a new tab</a>. The original markdown version is available on <a href="https://github.com/AbZe628/gravitas-protocol/blob/main/docs/whitepaper.md" target="_blank" rel="noopener noreferrer">GitHub</a>.</p>
                 </section>
-
-                <hr>
                 
+                <hr>
+
+                <section id="appendix">
+                    <h2>Technical Appendix</h2>
+                    <h4>Contracts & Adapters Map</h4>
+                    <p>The core system comprises a central `PolicyEngine` contract that interfaces with various `Adapters` (e.g., `AaveV3Adapter`, `CompoundV2Adapter`). A `Registry` contract manages active adapters and policies.</p>
+                    <h4>Test Plan & Security Posture</h4>
+                    <ul>
+                        <li><strong>Test Plan:</strong> Comprehensive suite using Foundry, with >95% code coverage, extensive fuzzing, and invariant testing.</li>
+                        <li><strong>Security Posture:</strong>
+                            <ul>
+                                <li>3/5 Multisig, 48h Timelock, Guardian Role.</li>
+                                <li>On-chain monitoring for events like `LARGE_MIGRATION`, `FAILED_TX_THRESHOLD`, `CIRCUIT_BREAKER_TRIPPED`, `FEE_CHANGE_PROPOSED`.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <h4>TypeScript SDK Example</h4>
+                    <p>Interacting with the protocol is streamlined via our TS SDK.</p>
+                    <div class="code-block-wrapper">
+                        <pre><code class="language-typescript">import { GravitasClient } from '@gravitas/sdk';
+
+const client = new GravitasClient(signer);
+
+// Migrate $1M USDC based on the 'moderate-risk' policy
+const tx = await client.migrate({
+  asset: 'USDC',
+  amount: 1_000_000,
+  policyId: 'moderate-risk',
+});
+
+await tx.wait(); // Migration complete in <30s
+</code></pre>
+                        <button class="copy-button" aria-label="Copy code snippet to clipboard">Copy</button>
+                    </div>
+                </section>
+                
+                <hr>
+
                 <section id="contact">
                     <h2>Contact & Partnerships</h2>
                     <p>We are actively seeking design partners and investors who share our vision for a more stable and efficient DeFi ecosystem. To learn more, please get in touch.</p>
@@ -791,6 +910,7 @@
                         </a>
                     </div>
                 </section>
+
             </div>
         </main>
     </div>
