@@ -12,22 +12,23 @@
 
     <style>
         /* ========================================
-        0. CSS VARIABLES & BASE SETUP
+        0. CSS VARIABLES & BASE SETUP ("QATAR EDITION")
         ========================================
         */
         :root {
             /* Colors */
-            --color-paper-light: #FAFAF7;
-            --color-ink-light: #0A0F1A;
-            --color-muted-light: #6B7280;
-            --color-lines-light: rgba(10, 15, 26, 0.12);
-            --color-accent: #0057FF;
-            --color-accent-hover: #0048CC;
+            --color-accent: #8A1538; /* Qatar Maroon */
+            --color-accent-hover: #6c102b;
 
-            --color-paper-dark: #0C111A;
-            --color-ink-dark: #EAF0FF;
-            --color-muted-dark: #8892B0;
-            --color-lines-dark: rgba(234, 240, 255, 0.12);
+            --color-paper-light: #FDFBF8;
+            --color-ink-light: #2A2123;
+            --color-muted-light: #6D6365;
+            --color-lines-light: rgba(42, 33, 35, 0.1);
+
+            --color-paper-dark: #1A1416;
+            --color-ink-dark: #F0E8E9;
+            --color-muted-dark: #9E9295;
+            --color-lines-dark: rgba(240, 232, 233, 0.12);
             
             /* Typography */
             --font-heading: 'IBM Plex Serif', serif;
@@ -64,7 +65,7 @@
 
         html {
             scroll-behavior: smooth;
-            scroll-padding-top: var(--header-height);
+            scroll-padding-top: calc(var(--header-height) + 24px);
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -178,7 +179,7 @@
 
 
         /* ========================================
-        3. HEADER / TOPBAR
+        3. HEADER / TOPBAR & CTAs
         ========================================
         */
         .topbar {
@@ -191,7 +192,7 @@
             align-items: center;
             justify-content: space-between;
             padding: 0 var(--spacing-unit);
-            background-color: rgba(var(--bg-paper), 0.85);
+            background-color: hsla(from var(--bg-paper) h s l / 0.85);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             border-bottom: 1px solid var(--border-lines);
@@ -211,20 +212,29 @@
         }
 
         .cta-button {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
             padding: 10px 18px;
             font-size: 0.9rem;
             font-weight: 500;
             border-radius: var(--border-radius);
-            transition: background-color 0.2s ease, color 0.2s ease;
+            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
             text-align: center;
+            white-space: nowrap;
+        }
+        .cta-button svg {
+            width: 16px;
+            height: 16px;
         }
         .cta-button.primary {
             background-color: var(--color-accent);
             color: white;
+            border: 1px solid var(--color-accent);
         }
         .cta-button.primary:hover {
             background-color: var(--color-accent-hover);
+            border-color: var(--color-accent-hover);
             text-decoration: none;
         }
         .cta-button.secondary {
@@ -234,6 +244,7 @@
         }
          .cta-button.secondary:hover {
             background-color: var(--border-lines);
+            border-color: var(--text-muted);
             text-decoration: none;
         }
 
@@ -260,7 +271,7 @@
         .burger-menu { display: flex; }
         
         @media (min-width: 1024px) {
-            .desktop-nav { display: flex; gap: var(--spacing-unit); }
+            .desktop-nav { display: flex; align-items: center; gap: var(--spacing-unit); }
             .burger-menu { display: none; }
         }
 
@@ -389,7 +400,7 @@
         }
 
         /* ========================================
-        6. SECTION STYLING
+        6. SECTION STYLING & COMPONENTS
         ========================================
         */
         .value-cards {
@@ -406,7 +417,6 @@
             border-radius: var(--border-radius);
             padding: var(--spacing-unit);
             background-color: var(--bg-paper);
-            box-shadow: 0 4px 6px -1px rgba(10,15,26,0.05), 0 2px 4px -2px rgba(10,15,26,0.05);
         }
         .card h4 { margin-top: 0; }
         .card p { margin-bottom: 0; font-size: 0.9rem; }
@@ -426,7 +436,7 @@
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background-color: #22c55e; /* Green-500 */
+            background-color: var(--color-accent);
         }
 
         /* Tables */
@@ -489,14 +499,28 @@
             border-radius: var(--border-radius);
         }
 
-        /* Competition Matrix */
-        .competition-matrix td:nth-child(n+2) {
-            text-align: center;
+        /* Architecture Diagram */
+        .arch-diagram {
+            width: 100%;
+            font-family: var(--font-body);
+            font-size: 12px;
         }
-        .tick::before { content: '✓'; color: #22c55e; }
-        .cross::before { content: '✗'; color: #ef4444; } /* Red-500 */
-        .partial::before { content: '○'; color: #f59e0b; } /* Amber-500 */
-
+        .arch-diagram .box {
+            stroke: var(--text-muted);
+            fill: var(--bg-paper);
+            rx: var(--border-radius);
+        }
+        .arch-diagram .text-label {
+            fill: var(--text-ink);
+            font-weight: 500;
+        }
+        .arch-diagram .text-desc {
+            fill: var(--text-muted);
+        }
+        .arch-diagram .arrow {
+            stroke: var(--color-accent);
+            marker-end: url(#arrowhead);
+        }
 
         /* ========================================
         7. UTILITIES & MISC
@@ -570,7 +594,10 @@
         <a href="#cover" class="brand">Gravitas Protocol</a>
         <div class="topbar-nav">
             <nav class="desktop-nav">
-                <a href="#whitepaper" class="cta-button secondary">Whitepaper</a>
+                <a href="https://github.com/AbZe628/gravitas-protocol/tree/main" target="_blank" rel="noopener noreferrer" class="cta-button secondary">
+                    <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><title>GitHub</title><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+                    <span>View MVP</span>
+                </a>
                 <a href="#contact" class="cta-button primary">Book a Call</a>
             </nav>
             <button class="theme-toggle" aria-label="Toggle dark mode">
@@ -595,14 +622,16 @@
         <main class="main-content">
             <div class="container">
                 <section id="cover">
-                    <div class="status-badge">Live on Mainnet & Actively Managed</div>
+                    <div class="status-badge">MVP Complete & Auditable</div>
                     <h1>The Invisible Engine of DeFi Liquidity.</h1>
                     <p style="font-size: 1.25rem; color: var(--text-muted); max-width: 90%;">Gravitas Protocol provides institutional-grade, policy-driven liquidity management for DeFi treasuries, L2s, and DAOs. We optimize yield and ensure deep, resilient liquidity without compromising on security or decentralization.</p>
                     
                     <div style="margin: calc(var(--spacing-unit) * 1.5) 0; display: flex; flex-wrap: wrap; gap: var(--spacing-unit);">
                         <a href="#contact" class="cta-button primary">Request the Deck</a>
-                        <a href="#contact" class="cta-button secondary">Book a Call</a>
-                        <a href="#whitepaper" class="cta-button secondary">View Whitepaper</a>
+                        <a href="https://github.com/AbZe628/gravitas-protocol/tree/main" target="_blank" rel="noopener noreferrer" class="cta-button secondary">
+                            <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><title>GitHub</title><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+                            <span>View MVP on GitHub</span>
+                        </a>
                     </div>
 
                     <div class="value-cards">
@@ -623,239 +652,80 @@
                 
                 <hr>
 
-                <section id="thesis">
-                    <h2>Investment Thesis</h2>
-                    <p>The maturation of DeFi requires a shift from retail-driven, high-risk yield farming to professional, risk-managed treasury operations. Currently, protocol treasuries, L2 foundations, and DAOs collectively manage billions in assets, yet lack the tooling to deploy this capital efficiently and safely. This creates a significant drag on capital efficiency and exposes ecosystems to systemic risks.</p>
-                    <p class="pull-quote">The next wave of DeFi growth will be unlocked by infrastructure that provides operational trust and policy-based automation for on-chain capital management.</p>
-                    <h4>Our thesis rests on three core assumptions:</h4>
+                <section id="architecture">
+                    <h2>Protocol Architecture</h2>
+                    <p>Gravitas is a modular, multi-layered system designed for security, extensibility, and operational resilience. The core logic is separated from external integrations, allowing for rapid development and isolated risk.</p>
+                    
+                    <svg class="arch-diagram" viewBox="0 0 400 200">
+                        <defs>
+                            <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+                                <polygon points="0 0, 10 3.5, 0 7" fill="var(--color-accent)"/>
+                            </marker>
+                        </defs>
+                        <rect x="10" y="80" width="100" height="40" class="box"/>
+                        <rect x="150" y="80" width="100" height="40" class="box"/>
+                        <rect x="290" y="80" width="100" height="40" class="box"/>
+                        
+                        <text x="60" y="95" text-anchor="middle" class="text-label">DAO / User</text>
+                        <text x="60" y="110" text-anchor="middle" class="text-desc">(Initiates Tx)</text>
+                        <text x="200" y="95" text-anchor="middle" class="text-label">PolicyEngine</text>
+                        <text x="200" y="110" text-anchor="middle" class="text-desc">(Enforces Rules)</text>
+                        <text x="340" y="95" text-anchor="middle" class="text-label">Adapters</text>
+                        <text x="340" y="110" text-anchor="middle" class="text-desc">(Talk to DeFi)</text>
+                        
+                        <line x1="110" y1="100" x2="150" y2="100" class="arrow"/>
+                        <line x1="250" y1="100" x2="290" y2="100" class="arrow"/>
+
+                        <rect x="150" y="10" width="100" height="40" class="box"/>
+                        <text x="200" y="25" text-anchor="middle" class="text-label">Guardian</text>
+                        <text x="200" y="40" text-anchor="middle" class="text-desc">(Pause Control)</text>
+                        <line x1="200" y1="50" x2="200" y2="80" class="arrow"/>
+                    </svg>
+                    
+                    <h3>Core Components</h3>
                     <ul>
-                        <li><strong>Demand for Durability:</strong> Protocols will increasingly prioritize sustainable, long-term liquidity and yield over short-term, speculative APYs.</li>
-                        <li><strong>Operational Overhead is a Bottleneck:</strong> Manual treasury management is slow, error-prone, and does not scale. Automation via secure, auditable smart contracts is the only viable path forward.</li>
-                        <li><strong>Neutrality Wins:</strong> A neutral infrastructure provider that does not compete with its clients (e.g., by launching its own yield products) will become the trusted standard for liquidity routing and management.</li>
+                        <li><strong>PolicyEngine:</strong> The central smart contract that orchestrates all operations. It validates transactions against a treasury's registered policy, ensuring no action can violate predefined rules (e.g., asset whitelists, concentration limits).</li>
+                        <li><strong>Adapters:</strong> A suite of modular contracts that translate PolicyEngine commands into specific function calls for external DeFi protocols (e.g., an `AaveV3Adapter` handles deposits and withdrawals from Aave). This isolates integration risk.</li>
+                        <li><strong>Guardian & Timelock:</strong> Governance controls form the highest security layer. A <strong>3/5 multisig</strong> controls critical changes, all subject to a <strong>48-hour timelock</strong>. A separate Guardian role has unilateral power to pause the system in emergencies, but cannot alter or withdraw funds.</li>
+                        <li><strong>Telemetry:</strong> On-chain events that provide a real-time, transparent data stream of all protocol activity. This feeds into our monitoring and alerting infrastructure.</li>
                     </ul>
+
                 </section>
                 
                 <hr>
 
-                <section id="market">
-                    <h2>Market Size (TAM/SAM/SOM)</h2>
-                    <p>The addressable market is defined by on-chain capital requiring professional management. We segment this into three tiers, based on assets held by DAOs, L2s, and established protocols.</p>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Metric</th>
-                                <th>Market Size (USD)</th>
-                                <th>Assumptions & Rationale</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><strong>TAM</strong> (Total Addressable Market)</td>
-                                <td class="kpi-number">~$50B+</td>
-                                <td>Total value in DAO/protocol treasuries and L2 foundations across major ecosystems.</td>
-                            </tr>
-                            <tr>
-                                <td><strong>SAM</strong> (Serviceable Addressable Market)</td>
-                                <td class="kpi-number">~$10B</td>
-                                <td>Treasuries with >$10M AUM and a mandate for active capital management, accessible via EVM-compatible chains.</td>
-                            </tr>
-                            <tr>
-                                <td><strong>SOM</strong> (Serviceable Obtainable Market, Y1)</td>
-                                <td class="kpi-number">~$1.2B</td>
-                                <td>Targeting <span class="kpi-number">10+</span> design partners & early adopters, with an average monthly volume of <span class="kpi-number">$100M</span>.</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <p>This market is durable and recurring. As DeFi grows, so does the AUM of these entities, directly increasing our TAM. Our revenue is tied to volume, creating a predictable, recurring stream.</p>
-                </section>
-                
-                <hr>
-
-                <section id="model">
-                    <h2>Business Model</h2>
-                    <p>Gravitas Protocol operates on a transparent, volume-based fee model, supplemented by enterprise-grade services for larger partners. Our goal is to align our success directly with the capital efficiency we provide to our clients.</p>
-                    <h4>Revenue Streams</h4>
+                <section id="security">
+                    <h2>Security & Risk Mitigation</h2>
+                    <p>Security is not a feature, but the foundation of the protocol. Our approach is multi-layered, combining proactive design, rigorous testing, and real-time monitoring to protect partner assets.</p>
+                    
+                    <div class="pull-quote">Our goal is to be the most secure and reliable component in our partners' operational stack.</div>
+                    
+                    <h4>Defense-in-Depth Layers</h4>
                     <ul>
-                        <li><strong>Core Protocol Fee:</strong> A basis point (bps) fee of <strong class="kpi-number">5-10 bps</strong> is charged on all volume routed through the protocol. This fee is programmatically collected and accrued to the protocol treasury.</li>
-                        <li><strong>Enterprise Add-ons:</strong> For large partners requiring dedicated infrastructure, bespoke policy modules, or priority support, we offer tailored service agreements with fixed retainers or tiered fee structures.</li>
-                        <li><strong>Future Token (Optional):</strong> Post-product-market fit, a token may be introduced for governance and potential fee-sharing, ensuring long-term alignment with the community. This is not part of the initial fundraising scope.</li>
-                    </ul>
-                </section>
-                
-                <hr>
-
-                <section id="unit-economics">
-                    <h2>Unit Economics</h2>
-                    <p>The protocol is designed for high margins and scalability. Our primary costs are fixed (engineering, security), while revenue scales linearly with volume, leading to strong operating leverage.</p>
-                    <ul>
-                        <li><strong>Gross Margin:</strong> <strong class="kpi-number">>85%</strong>. The primary cost of revenue is gas fees for automated rebalancing, which are minimized through efficient batching and L2 execution.</li>
-                        <li><strong>Support & Integration Cost:</strong> Minimal per-partner cost due to a standardized adapter architecture. New integrations are capital expenditures, not operational ones.</li>
-                        <li><strong>Leverage:</strong> Each new adapter (e.g., for Aave, Compound, Morpho) exponentially increases the number of possible strategies, creating compounding value for all users.</li>
-                    </ul>
-                    <h4>Revenue Sensitivity Analysis (bps × Volume)</h4>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Monthly Volume</th>
-                                <th>Revenue @ 5 bps</th>
-                                <th>Revenue @ 6 bps</th>
-                                <th>Revenue @ 10 bps</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><strong class="kpi-number">$50M</strong></td>
-                                <td>$25,000</td>
-                                <td>$30,000</td>
-                                <td>$50,000</td>
-                            </tr>
-                            <tr>
-                                <td><strong class="kpi-number">$83M</strong> (Break-even)</td>
-                                <td>$41,500</td>
-                                <td><strong class="accent-underline">$49,800</strong></td>
-                                <td>$83,000</td>
-                            </tr>
-                            <tr>
-                                <td><strong class="kpi-number">$100M</strong> (Y1 Target)</td>
-                                <td>$50,000</td>
-                                <td>$60,000</td>
-                                <td>$100,000</td>
-                            </tr>
-                            <tr>
-                                <td><strong class="kpi-number">$250M</strong></td>
-                                <td>$125,000</td>
-                                <td>$150,000</td>
-                                <td>$250,000</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </section>
-                
-                <hr>
-                
-                <section id="gtm">
-                    <h2>Go-To-Market Strategy</h2>
-                    <p>Our GTM is focused on establishing trust and demonstrating value with a select group of high-quality partners before scaling horizontally.</p>
-                    <h4>12-Month Milestones</h4>
-                    <ol>
-                        <li><strong>Phase 1 (M0-M3): Design Partners & Mainnet Launch.</strong> Onboard 3-5 initial design partners (L2s, established DAOs) with deep integrations. Finalize security audits and launch on Ethereum mainnet and one primary L2.</li>
-                        <li><strong>Phase 2 (M4-M9): L2 Expansion & Feature Velocity.</strong> Expand to 3+ L2s/sidechains. Develop and deploy advanced policy modules (e.g., dynamic risk scoring, automated hedging). Target <span class="kpi-number">10+</span> total partners.</li>
-                        <li><strong>Phase 3 (M10-M12): DAO Tooling & Community Growth.</strong> Release self-service tooling for smaller DAOs and treasuries. Begin community-building efforts and establish a clear path towards decentralized governance. Achieve <span class="kpi-number">1,000+</span> MAU across all integrations.</li>
-                    </ol>
-                </section>
-                
-                <hr>
-
-                <section id="competition">
-                    <h2>Competitive Landscape</h2>
-                    <p>We compete indirectly with yield aggregators and treasury management platforms. However, our core differentiation is our focus on being neutral, policy-driven infrastructure rather than a client-facing application.</p>
-                    <div class="pull-quote">We are not another vault. We are the engine that powers vaults.</div>
-                    <h4>Competitive Matrix</h4>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Feature</th>
-                                <th>Gravitas Protocol</th>
-                                <th>Yield Aggregators (e.g., Yearn)</th>
-                                <th>Treasury Platforms (e.g., Llama)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><strong>Neutral Infrastructure</strong></td>
-                                <td class="tick"></td>
-                                <td class="cross"></td>
-                                <td class="partial"></td>
-                            </tr>
-                             <tr>
-                                <td><strong>Policy-Driven Automation</strong></td>
-                                <td class="tick"></td>
-                                <td class="partial"></td>
-                                <td class="cross"></td>
-                            </tr>
-                             <tr>
-                                <td><strong>Non-Custodial</strong></td>
-                                <td class="tick"></td>
-                                <td class="tick"></td>
-                                <td class="tick"></td>
-                            </tr>
-                             <tr>
-                                <td><strong>Customizable Risk Guardrails</strong></td>
-                                <td class="tick"></td>
-                                <td class="cross"></td>
-                                <td class="partial"></td>
-                            </tr>
-                             <tr>
-                                <td><strong>For B2B / Protocols</strong></td>
-                                <td class="tick"></td>
-                                <td class="cross"></td>
-                                <td class="tick"></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </section>
-                
-                <hr>
-
-                <section id="moat">
-                    <h2>Moat (Defensibility)</h2>
-                    <p>Our long-term defensibility is built on network effects, operational trust, and governance neutrality.</p>
-                    <ul>
-                        <li><strong>Network of Integrations:</strong> Each new protocol adapter and partner integration strengthens the entire network, creating a flywheel effect. The deep, technical nature of these integrations creates high switching costs.</li>
-                        <li><strong>Operational Trust:</strong> In DeFi, trust is earned through uptime, security, and flawless execution. By achieving a track record of <span class="kpi-number">99.9%</span> uptime and <span class="kpi-number">0</span> critical incidents, we become the default, trusted provider.</li>
-                        <li><strong>Governance-Safe Policies:</strong> Our rigid, on-chain policy engine and timelocks make us a "governance-safe" choice for DAOs. They can integrate Gravitas without granting a third party discretionary control over their treasury.</li>
+                        <li><strong>Static Guards:</strong> Hardcoded, non-negotiable checks within the contracts. This includes reentrancy guards, strict input validation, and asset/protocol whitelisting enforced by the PolicyEngine.</li>
+                        <li><strong>Dynamic Guards:</strong> Real-time checks that adapt to market conditions. This includes stale oracle detection, adaptive slippage controls based on asset volatility, and velocity checks on fund movements.</li>
+                        <li><strong>Rigorous Testing & Verification:</strong>
+                            <ul>
+                                <li>The entire codebase is subject to <strong>invariant fuzz testing</strong> via Foundry to discover edge cases.</li>
+                                <li>We maintain a strict <strong>>95% code coverage</strong> target on all core contracts.</li>
+                                <li>The audit timeline includes <strong>two internal reviews</strong> and <strong>one external audit</strong> by a top-tier firm post-funding.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Comprehensive Monitoring Layer:</strong> We monitor for critical on-chain events in real-time, with automated alerts sent to an off-chain SIEM. Key monitored events include:
+                            <ul>
+                                <li>`FAILED_TX_THRESHOLD_REACHED`</li>
+                                <li>`CIRCUIT_BREAKER_TRIPPED`</li>
+                                <li>`POLICY_BREACH_ATTEMPT` (rejected transaction)</li>
+                            </ul>
+                        </li>
                     </ul>
                 </section>
                 
                 <hr>
                 
-                <section id="risk">
-                    <h2>Risks & Mitigation</h2>
-                    <p>We identify two primary categories of risk: market/adoption and security/execution.</p>
-                    <h4>Market & Adoption Risk</h4>
-                    <ul>
-                        <li><strong>Risk:</strong> Slow adoption by large protocols due to lengthy governance processes.</li>
-                        <li><strong>Mitigation:</strong> Focus on founder-led teams and L2 foundations initially, which have faster decision-making cycles. Build modular, easy-to-integrate solutions to reduce the burden on partner engineering teams.</li>
-                    </ul>
-                    <h4>Security & Execution Risk</h4>
-                    <ul>
-                        <li><strong>Risk:</strong> Smart contract vulnerability in our core logic or adapters.</li>
-                        <li><strong>Mitigation:</strong> A multi-layered security approach: multiple independent audits from top-tier firms, a public bug bounty program, comprehensive test coverage (>95%), and on-chain monitoring with automated circuit breakers.</li>
-                    </ul>
-                </section>
-                
-                <hr>
-                
-                <section id="governance">
-                    <h2>Governance & Compliance</h2>
-                    <p>The protocol is governed by a robust, security-first framework designed to protect user funds and ensure predictable, safe operation.</p>
-                    <h4>Security Posture</h4>
-                    <ul>
-                        <li><strong>Multisig Control:</strong> Critical functions are controlled by a <strong class="kpi-number">3/5</strong> Gnosis Safe multisig composed of the core team and trusted industry advisors.</li>
-                        <li><strong>Timelock:</strong> All critical changes (e.g., fee changes, new adapters) are subject to a <strong class="kpi-number">48-hour</strong> timelock, allowing partners to review and react to upcoming changes.</li>
-                        <li><strong>Guardian Role:</strong> A designated "Guardian" address has the power to pause the protocol in case of an emergency, but cannot withdraw funds or change parameters.</li>
-                    </ul>
-                    <p>We are actively engaging with legal counsel to ensure compliance with evolving digital asset regulations in key jurisdictions.</p>
-                </section>
-                
-                <hr>
-
-                <section id="team">
-                    <h2>Team & Advisors</h2>
-                    <p>The core team consists of experienced engineers and operators with a track record in both traditional finance and decentralized systems. We operate as a lean, execution-focused unit.</p>
-                    <ul>
-                        <li><strong>Core Contributor 1:</strong> [Role, e.g., Protocol Architect] - [Brief experience, e.g., Ex-ConsenSys, built X protocol].</li>
-                        <li><strong>Core Contributor 2:</strong> [Role, e.g., Systems Engineer] - [Brief experience, e.g., PhD in Distributed Systems, scaled infrastructure at Y].</li>
-                        <li><strong>Advisor 1:</strong> [Name] - [Title, e.g., Founder of Z Protocol].</li>
-                        <li><strong>Advisor 2:</strong> [Name] - [Title, e.g., Partner at A&B Ventures].</li>
-                    </ul>
-                </section>
-                
-                <hr>
-
                 <section id="use-of-funds">
-                    <h2>Use of Funds (Total Ask: ~$930k)</h2>
-                    <p>This pre-seed round is intended to provide 18-24 months of runway to achieve product-market fit, onboard our first 10+ partners, and establish the protocol as a trusted piece of DeFi infrastructure.</p>
+                    <h2>Pre-Seed Revised ($450k Ask)</h2>
+                    <p>With the MVP technically complete and validated, this revised funding request is focused exclusively on security, legal formalization, and establishing an operational base in a crypto-forward jurisdiction. This lean ask provides 18 months of runway for audits, compliance, and initial business development.</p>
                      <table>
                         <thead>
                             <tr>
@@ -866,156 +736,45 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td><strong>Engineering (2 Core)</strong></td>
-                                <td class="kpi-number">~$480k</td>
-                                <td>Salaries and benefits for the core engineering team for 24 months.</td>
+                                <td><strong>Security Audits & Formal Verification</strong></td>
+                                <td class="kpi-number">$150k</td>
+                                <td>Budget for a top-tier external audit (e.g., Trail of Bits) and formal verification of core logic.</td>
                             </tr>
                             <tr>
-                                <td><strong>Security Audits</strong></td>
-                                <td class="kpi-number">~$250k</td>
-                                <td>Budget for 2-3 independent audits from top-tier firms (e.g., Trail of Bits, OpenZeppelin).</td>
+                                <td><strong>Relocation & Qatar Corporate Setup</strong></td>
+                                <td class="kpi-number">$100k</td>
+                                <td>Costs associated with establishing the legal entity and team presence in a strategic, pro-innovation hub.</td>
                             </tr>
                              <tr>
-                                <td><strong>Business Development</strong></td>
-                                <td class="kpi-number">~$100k</td>
-                                <td>Conference attendance, partner incentives, and marketing to build our initial partner base.</td>
+                                <td><strong>Legal & Regulatory Compliance</strong></td>
+                                <td class="kpi-number">$80k</td>
+                                <td>Retainer for legal counsel to navigate digital asset regulations and draft partner agreements.</td>
                             </tr>
                             <tr>
-                                <td><strong>Infrastructure & Tooling</strong></td>
-                                <td class="kpi-number">~$50k</td>
-                                <td>Node providers, on-chain monitoring services, CI/CD, etc.</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Legal & Admin</strong></td>
-                                <td class="kpi-number">~$50k</td>
-                                <td>Corporate setup, legal opinions, and general administrative overhead.</td>
+                                <td><strong>Runway (Advisors, Infra, BD)</strong></td>
+                                <td class="kpi-number">$120k</td>
+                                <td>Covers essential infrastructure, advisor stipends, and initial go-to-market expenses.</td>
                             </tr>
                             <tr>
                                 <td><strong>Total</strong></td>
-                                <td><strong class="kpi-number">~$930k</strong></td>
-                                <td>Provides sufficient runway to reach cash-flow positive operations.</td>
+                                <td><strong class="kpi-number">$450k</strong></td>
+                                <td>Lean capital to achieve full audit, legal setup, and onboard first design partners.</td>
                             </tr>
                         </tbody>
                     </table>
                 </section>
                 
-                <hr>
-                
-                <section id="financials">
-                    <h2>Financial Projections</h2>
-                    <p>The following are illustrative projections based on our target GTM milestones and unit economics. Our primary goal is to reach break-even within 12-15 months.</p>
-                    <p>Break-even is estimated at <strong class="kpi-number">~$83M/month</strong> in volume at an average fee of <strong class="kpi-number">6 bps</strong>, covering an estimated Y1 OPEX of <strong class="kpi-number">~$500k</strong>.</p>
-                     <table>
-                        <thead>
-                            <tr>
-                                <th>Month</th>
-                                <th>Avg. Monthly Volume</th>
-                                <th>Avg. Fee (bps)</th>
-                                <th>Monthly Revenue</th>
-                                <th>Cumulative Revenue</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><strong>M3</strong></td>
-                                <td>$20M</td>
-                                <td>6</td>
-                                <td class="kpi-number">$12,000</td>
-                                <td class="kpi-number">$12,000</td>
-                            </tr>
-                            <tr>
-                                <td><strong>M6</strong></td>
-                                <td>$50M</td>
-                                <td>6</td>
-                                <td class="kpi-number">$30,000</td>
-                                <td class="kpi-number">$96,000</td>
-                            </tr>
-                            <tr>
-                                <td><strong>M9</strong></td>
-                                <td>$85M</td>
-                                <td>6</td>
-                                <td class="kpi-number">$51,000</td>
-                                <td class="kpi-number">$228,000</td>
-                            </tr>
-                            <tr>
-                                <td><strong>M12</strong></td>
-                                <td>$120M</td>
-                                <td>6</td>
-                                <td class="kpi-number">$72,000</td>
-                                <td class="kpi-number">$432,000</td>
-                            </tr>
-                            <tr>
-                                <td><strong>M15</strong></td>
-                                <td>$150M</td>
-                                <td>6</td>
-                                <td class="kpi-number">$90,000</td>
-                                <td class="kpi-number">$690,000</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </section>
-
-                <hr>
-
-                <section id="faq">
-                    <h2>Investor FAQ</h2>
-                    <h4>How do protocol fees accrue?</h4>
-                    <p>Fees are programmatically swept into a dedicated multisig treasury controlled by the protocol. Initially, these funds will be used to cover operational expenses and fund further development. Future governance may decide on other uses.</p>
-                    <h4>Is custody of funds ever taken?</h4>
-                    <p>No. Gravitas is entirely non-custodial. Partner funds are managed via smart contract allowances and are always held in the partner's own contracts or in the underlying DeFi protocols (e.g., Aave aTokens).</p>
-                    <h4>Why would a partner choose Gravitas over building in-house?</h4>
-                    <p>Building and maintaining a secure, efficient, and audited liquidity management system is a significant undertaking that distracts from a protocol's core mission. We provide this as a specialized service, offering greater security and lower overhead than an in-house solution.</p>
-                    <h4>What is the policy on a future token?</h4>
-                    <p>A token is not required for the protocol to function or generate revenue. A token would only be introduced if it serves a clear purpose for decentralizing governance and aligning long-term incentives, and only after we have achieved significant product-market fit.</p>
-                </section>
-
                 <hr>
 
                 <section id="whitepaper">
                     <h2>Technical Whitepaper</h2>
-                    <p>For a detailed exploration of the protocol architecture, policy engine, and security model, please review the full whitepaper.</p>
+                    <p>For a detailed exploration of the protocol architecture, mathematical models for risk, and the complete policy engine specification, please review the full whitepaper.</p>
                     <iframe src="docs/whitepaper.pdf" title="Gravitas Protocol Whitepaper" class="pdf-embed" loading="lazy"></iframe>
-                    <p>If the PDF doesn’t render, you can <a href="docs/whitepaper.pdf" target="_blank" rel="noopener noreferrer">open it directly in a new tab</a>. The original markdown version is available on <a href="https://github.com/AbZe628/gravitas-protocol/blob/main/docs/whitepaper.md" target="_blank" rel="noopener noreferrer">GitHub</a>.</p>
+                    <p>If the PDF doesn’t render, you can <a href="docs/whitepaper.pdf" target="_blank" rel="noopener noreferrer">open it directly in a new tab</a>.</p>
                 </section>
-                
+
                 <hr>
-
-                <section id="appendix">
-                    <h2>Technical Appendix</h2>
-                    <h4>Contracts & Adapters Map</h4>
-                    <p>The core system comprises a central `PolicyEngine` contract that interfaces with various `Adapters` (e.g., `AaveV3Adapter`, `CompoundV2Adapter`). A `Registry` contract manages active adapters and policies.</p>
-                    <h4>Test Plan & Security Posture</h4>
-                    <ul>
-                        <li><strong>Test Plan:</strong> Comprehensive suite using Foundry, with >95% code coverage, extensive fuzzing, and invariant testing.</li>
-                        <li><strong>Security Posture:</strong>
-                            <ul>
-                                <li>3/5 Multisig, 48h Timelock, Guardian Role.</li>
-                                <li>On-chain monitoring for events like `LARGE_MIGRATION`, `FAILED_TX_THRESHOLD`, `CIRCUIT_BREAKER_TRIPPED`, `FEE_CHANGE_PROPOSED`.</li>
-                            </ul>
-                        </li>
-                    </ul>
-                    <h4>TypeScript SDK Example</h4>
-                    <p>Interacting with the protocol is streamlined via our TS SDK.</p>
-                    <div class="code-block-wrapper">
-                        <pre><code class="language-typescript">import { GravitasClient } from '@gravitas/sdk';
-
-const client = new GravitasClient(signer);
-
-// Migrate $1M USDC based on the 'moderate-risk' policy
-const tx = await client.migrate({
-  asset: 'USDC',
-  amount: 1_000_000,
-  policyId: 'moderate-risk',
-});
-
-await tx.wait(); // Migration complete in <30s
-</code></pre>
-                        <button class="copy-button" aria-label="Copy code snippet to clipboard">Copy</button>
-                    </div>
-                </section>
                 
-                <hr>
-
                 <section id="contact">
                     <h2>Contact & Partnerships</h2>
                     <p>We are actively seeking design partners and investors who share our vision for a more stable and efficient DeFi ecosystem. To learn more, please get in touch.</p>
@@ -1024,11 +783,14 @@ await tx.wait(); // Migration complete in <30s
                         <p><strong>Phone:</strong> <a href="tel:+385915668133">+385 91 566 8133</a></p>
                         <p><strong>LinkedIn:</strong> <a href="https://www.linkedin.com/in/abdusamed-zeli%C4%87-5b5526183/" target="_blank" rel="noopener noreferrer">Abdusamed Zelić</a></p>
                     </div>
-                    <div style="margin-top: calc(var(--spacing-unit) * 1.5);">
+                    <div style="margin: calc(var(--spacing-unit) * 1.5) 0; display: flex; flex-wrap: wrap; gap: var(--spacing-unit);">
                         <a href="mailto:abdusamedzelic98@gmail.com" class="cta-button primary">Request Investment Deck</a>
+                        <a href="https://github.com/AbZe628/gravitas-protocol/tree/main" target="_blank" rel="noopener noreferrer" class="cta-button secondary">
+                             <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><title>GitHub</title><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+                            <span>View MVP on GitHub</span>
+                        </a>
                     </div>
                 </section>
-
             </div>
         </main>
     </div>
@@ -1089,6 +851,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     const createTocLinks = (listElement) => {
+        if (!listElement) return;
         listElement.innerHTML = '';
         tocItems.forEach(item => {
             const li = document.createElement('li');
@@ -1101,8 +864,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
-    if (desktopTocList) createTocLinks(desktopTocList);
-    if (mobileTocList) createTocLinks(mobileTocList);
+    createTocLinks(desktopTocList);
+    createTocLinks(mobileTocList);
     
     const desktopTocLinks = desktopTocList ? desktopTocList.querySelectorAll('a') : [];
     const mobileTocLinks = mobileTocList ? mobileTocList.querySelectorAll('a') : [];
@@ -1111,14 +874,14 @@ document.addEventListener('DOMContentLoaded', () => {
         entries.forEach(entry => {
             const id = entry.target.getAttribute('id');
             const correspondingLinks = document.querySelectorAll(`a[data-target-id="${id}"]`);
-            if (entry.isIntersecting) {
+            if (entry.isIntersecting && entry.intersectionRatio > 0.1) {
                 desktopTocLinks.forEach(link => link.classList.remove('active'));
                 mobileTocLinks.forEach(link => link.classList.remove('active'));
                 correspondingLinks.forEach(link => link.classList.add('active'));
             }
         });
     }, { 
-        rootMargin: `-${document.querySelector('.topbar').offsetHeight}px 0px 0px 0px`,
+        rootMargin: `-${document.querySelector('.topbar').offsetHeight}px 0px -40% 0px`,
         threshold: 0.1
     });
 
@@ -1170,7 +933,6 @@ document.addEventListener('DOMContentLoaded', () => {
         firstFocusableElement = focusableElements[0];
         lastFocusableElement = focusableElements[focusableElements.length - 1];
         
-        // Timeout to allow transition to finish before focusing
         setTimeout(() => firstFocusableElement.focus(), 100); 
     };
 
@@ -1187,7 +949,6 @@ document.addEventListener('DOMContentLoaded', () => {
     closeDrawerButton.addEventListener('click', closeDrawer);
     drawerBackdrop.addEventListener('click', closeDrawer);
     
-    // Close drawer on link click
     mobileTocLinks.forEach(link => {
         link.addEventListener('click', closeDrawer);
     });
@@ -1213,24 +974,30 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ===================================
-    // 4. Smooth Scrolling (respects prefers-reduced-motion)
+    // 4. Smooth Scrolling & Back to Top
     // ===================================
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const scrollOptions = {
+        behavior: prefersReducedMotion ? 'auto' : 'smooth'
+    };
+
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function(e) {
             e.preventDefault();
             const targetId = this.getAttribute('href');
             const targetElement = document.querySelector(targetId);
             if(targetElement) {
-                targetElement.scrollIntoView({
-                    behavior: prefersReducedMotion ? 'auto' : 'smooth'
-                });
+                targetElement.scrollIntoView(scrollOptions);
             }
         });
     });
 
+    backToTopButton.addEventListener('click', () => {
+        window.scrollTo({ top: 0, ...scrollOptions });
+    });
+
     // ===================================
-    // 5. Back to Top Button
+    // 5. Back to Top Button Visibility
     // ===================================
     const handleScroll = () => {
         if (window.scrollY > 600) {
@@ -1260,7 +1027,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     alert('Failed to copy text.');
                 });
             } else {
-                // Fallback for non-secure contexts or older browsers
                 alert('Copy feature is not available in this context. Please copy manually.');
             }
         });
