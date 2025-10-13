@@ -3,33 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gravitas Protocol | Quantum Liquidity Migration</title>
+    <title>Gravitas Protocol | The Future of DeFi Liquidity</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
         :root {
-            --primary: #C53F1F;
-            --secondary: #D98F4E;
-            --accent: #8C2F39;
-            --dark: #0A0A0A;
-            --light: #F4EDEA;
-            --gradient: linear-gradient(135deg, var(--primary), var(--accent));
+            --primary: #8A1538; /* Qatar Maroon */
+            --secondary: #D4AF37; /* Gold Accent */
+            --background: #121212;
+            --surface: #1C1C1C;
+            --text-light: #F5F5F5;
+            --text-muted: #A0A0A0;
+            --gradient: linear-gradient(135deg, var(--secondary), #B8860B);
         }
-        
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', system-ui, sans-serif;
+            font-family: 'Inter', system-ui, sans-serif;
+            scroll-behavior: smooth;
         }
-        
+
         body {
-            background-color: var(--dark);
-            color: var(--light);
+            background-color: var(--background);
+            color: var(--text-light);
             overflow-x: hidden;
-            line-height: 1.6;
+            line-height: 1.7;
         }
-        
+
         /* 3D Background */
         #canvas3d {
             position: fixed;
@@ -38,7 +43,34 @@
             width: 100%;
             height: 100%;
             z-index: -1;
-            opacity: 0.4;
+            opacity: 0.15;
+        }
+
+        /* Global Styles */
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 8rem 0;
+        }
+
+        .section-title {
+            font-size: 3rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .section-subtitle {
+            font-size: 1.25rem;
+            text-align: center;
+            color: var(--text-muted);
+            max-width: 700px;
+            margin: 0 auto 5rem auto;
         }
         
         /* Navigation */
@@ -46,78 +78,77 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1.5rem 5%;
+            padding: 1.25rem 5%;
             position: fixed;
             width: 100%;
-            z-index: 100;
-            background: rgba(10, 10, 10, 0.85);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(212, 143, 78, 0.2);
+            z-index: 1000;
+            background: rgba(18, 18, 18, 0.7);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+            transition: all 0.3s ease;
         }
         
         .logo {
-            font-size: 1.8rem;
-            font-weight: 700;
-            background: var(--gradient);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--text-light);
             display: flex;
             align-items: center;
+            gap: 10px;
         }
-        
+
         .logo i {
-            margin-right: 10px;
-            font-size: 2rem;
+            color: var(--secondary);
         }
-        
+
         .nav-links {
             display: flex;
-            gap: 2rem;
+            gap: 2.5rem;
         }
-        
+
         .nav-links a {
-            color: var(--light);
+            color: var(--text-muted);
             text-decoration: none;
             font-weight: 500;
             transition: all 0.3s ease;
             position: relative;
+            padding-bottom: 5px;
         }
-        
+
         .nav-links a:hover {
-            color: var(--secondary);
+            color: var(--text-light);
         }
-        
-        .nav-links a:after {
+
+        .nav-links a::after {
             content: '';
             position: absolute;
-            bottom: -5px;
+            bottom: 0;
             left: 0;
             width: 0;
             height: 2px;
             background: var(--gradient);
             transition: width 0.3s ease;
         }
-        
-        .nav-links a:hover:after {
+
+        .nav-links a:hover::after {
             width: 100%;
         }
-        
+
         .cta-button {
             background: var(--gradient);
-            color: white;
+            color: #000;
             border: none;
-            padding: 0.8rem 1.5rem;
+            padding: 0.75rem 1.75rem;
             border-radius: 50px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(197, 63, 31, 0.3);
+            box-shadow: 0 4px 20px rgba(212, 175, 55, 0.2);
         }
-        
+
         .cta-button:hover {
             transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(197, 63, 31, 0.5);
+            box-shadow: 0 8px 30px rgba(212, 175, 55, 0.3);
         }
         
         /* Hero Section */
@@ -125,257 +156,52 @@
             min-height: 100vh;
             display: flex;
             align-items: center;
-            padding: 0 5%;
-            position: relative;
+            text-align: center;
         }
         
         .hero-content {
-            max-width: 800px;
-            z-index: 2;
+            max-width: 900px;
+            margin: 0 auto;
             padding-top: 5rem;
         }
-        
+
         .hero h1 {
-            font-size: 4rem;
+            font-size: 4.5rem;
+            font-weight: 800;
             margin-bottom: 1.5rem;
             line-height: 1.1;
-            background: linear-gradient(to right, var(--light), var(--secondary));
+            background: linear-gradient(135deg, var(--text-light), var(--text-muted));
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
         }
         
+        .hero .highlight {
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
         .hero p {
-            font-size: 1.4rem;
+            font-size: 1.5rem;
             margin-bottom: 2.5rem;
-            opacity: 0.9;
-            max-width: 600px;
+            color: var(--text-muted);
+            line-height: 1.6;
         }
-        
-        .highlight {
-            color: var(--secondary);
-            font-weight: 700;
-        }
-        
-        /* Sections */
-        section {
-            padding: 6rem 5%;
-        }
-        
-        .section-title {
-            font-size: 2.5rem;
-            margin-bottom: 3rem;
-            text-align: center;
-            background: var(--gradient);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            position: relative;
-            display: inline-block;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-        
-        .section-title:after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            left: 0;
-            width: 100%;
-            height: 3px;
-            background: var(--gradient);
-            border-radius: 3px;
-        }
-        
-        /* Problem Solution */
-        .problem-solution {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 4rem;
-        }
-        
-        .card {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            padding: 2.5rem;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .card:before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 5px;
-            background: var(--gradient);
-        }
-        
-        .card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
-        }
-        
-        .card h3 {
-            font-size: 1.8rem;
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-        }
-        
-        .card h3 i {
-            margin-right: 10px;
-            color: var(--secondary);
-        }
-        
-        .card ul {
-            list-style-type: none;
-        }
-        
-        .card li {
-            margin-bottom: 1rem;
-            padding-left: 1.5rem;
-            position: relative;
-        }
-        
-        .card li:before {
-            content: '▸';
-            position: absolute;
-            left: 0;
-            color: var(--secondary);
-        }
-        
-        /* Investment */
-        .investment-highlights {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-        }
-        
-        .metric {
-            text-align: center;
-            padding: 2rem;
-        }
-        
-        .metric-value {
-            font-size: 3.5rem;
-            font-weight: 700;
-            background: var(--gradient);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            line-height: 1;
-            margin-bottom: 1rem;
-        }
-        
-        .metric-label {
-            font-size: 1.2rem;
-            opacity: 0.8;
-        }
-        
-        /* Team */
-        .team-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-        }
-        
-        .team-member {
-            text-align: center;
-        }
-        
-        .avatar {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            margin: 0 auto 1.5rem;
-            background: var(--gradient);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3rem;
-            color: white;
-        }
-        
-        /* Timeline */
-        .timeline {
-            position: relative;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        
-        .timeline:after {
-            content: '';
-            position: absolute;
-            width: 6px;
-            background: var(--gradient);
-            top: 0;
-            bottom: 0;
-            left: 50%;
-            margin-left: -3px;
-            border-radius: 3px;
-        }
-        
-        .timeline-item {
-            padding: 10px 40px;
-            position: relative;
-            width: 50%;
-            box-sizing: border-box;
-        }
-        
-        .timeline-item:nth-child(odd) {
-            left: 0;
-        }
-        
-        .timeline-item:nth-child(even) {
-            left: 50%;
-        }
-        
-        .timeline-content {
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .timeline-content h3 {
-            margin-bottom: 0.5rem;
-            color: var(--secondary);
-        }
-        
-        /* CTA Section */
-        .cta-section {
-            text-align: center;
-            padding: 6rem 5%;
-            background: rgba(197, 63, 31, 0.05);
-            border-radius: 30px;
-            margin: 4rem 5%;
-            border: 1px solid rgba(212, 143, 78, 0.2);
-        }
-        
-        .cta-section h2 {
-            font-size: 2.5rem;
-            margin-bottom: 1.5rem;
-        }
-        
-        .cta-buttons {
+
+        .hero-buttons {
             display: flex;
             justify-content: center;
             gap: 1.5rem;
-            margin-top: 2.5rem;
             flex-wrap: wrap;
         }
         
-        .github-button {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            padding: 0.8rem 1.5rem;
+        .secondary-button {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-light);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0.75rem 1.75rem;
             border-radius: 50px;
             font-weight: 600;
             cursor: pointer;
@@ -386,332 +212,453 @@
             text-decoration: none;
         }
         
-        .github-button:hover {
-            background: rgba(255, 255, 255, 0.2);
+        .secondary-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
             transform: translateY(-3px);
         }
-        
-        /* Footer */
-        footer {
-            padding: 3rem 5%;
-            text-align: center;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+
+        /* Main Content & Cards */
+        .card {
+            background: var(--surface);
+            border-radius: 20px;
+            padding: 2.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
         
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            border-color: rgba(212, 175, 55, 0.2);
+        }
+
+        .card h3 {
+            font-size: 1.75rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .card h3 i {
+            color: var(--secondary);
+            font-size: 1.5rem;
+        }
+
+        .card ul {
+            list-style-type: none;
+        }
+
+        .card li {
+            margin-bottom: 1rem;
+            padding-left: 2rem;
+            position: relative;
+            color: var(--text-muted);
+        }
+
+        .card li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--secondary);
+            font-weight: 700;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2.5rem;
+        }
+        
+        /* Investment Highlights */
+        .investment-highlights {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+        
+        .metric-value {
+            font-size: 4rem;
+            font-weight: 800;
+            line-height: 1;
+            margin-bottom: 1rem;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .metric-label {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+        }
+
+        /* Why Qatar Section */
+        #qatar {
+            background: var(--surface);
+        }
+        .qatar-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+        .qatar-text h3 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-light);
+        }
+        .qatar-text p {
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+        .qatar-flag {
+            background-color: var(--primary);
+            height: 100%;
+            min-height: 300px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 6rem;
+            color: white;
+            text-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+
+        /* Team Section */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+        }
+        .team-member {
+            text-align: center;
+        }
+        .avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            margin: 0 auto 1.5rem;
+            background: var(--surface);
+            border: 3px solid var(--secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: var(--secondary);
+        }
+        .team-member h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .team-member p {
+            color: var(--text-muted);
+        }
+
+        /* Roadmap */
+        .timeline {
+            position: relative;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .timeline::after {
+            content: '';
+            position: absolute;
+            width: 4px;
+            background: var(--gradient);
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            margin-left: -2px;
+            border-radius: 2px;
+        }
+
+        .timeline-item {
+            padding: 10px 40px;
+            position: relative;
+            width: 50%;
+        }
+
+        .timeline-item:nth-child(odd) { left: 0; text-align: right; }
+        .timeline-item:nth-child(even) { left: 50%; }
+
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            right: -10px;
+            background-color: var(--background);
+            border: 4px solid var(--secondary);
+            top: 25px;
+            border-radius: 50%;
+            z-index: 1;
+        }
+        
+        .timeline-item:nth-child(even)::after { left: -10px; }
+        .timeline-content {
+            padding: 25px 30px;
+            background: var(--surface);
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        /* CTA Section */
+        .cta-section {
+            text-align: center;
+            background: var(--surface);
+            border-radius: 30px;
+            padding: 5rem 2rem;
+            border: 1px solid rgba(212, 175, 55, 0.1);
+        }
+
+        .cta-section h2 {
+            font-size: 2.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Footer */
+        footer {
+            padding: 4rem 5% 2rem;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
         .social-links {
             display: flex;
             justify-content: center;
-            gap: 1.5rem;
+            gap: 2rem;
             margin: 2rem 0;
         }
-        
         .social-links a {
-            color: var(--light);
+            color: var(--text-muted);
             font-size: 1.5rem;
             transition: all 0.3s ease;
         }
-        
         .social-links a:hover {
             color: var(--secondary);
             transform: translateY(-5px);
         }
         
         /* Responsive */
-        @media (max-width: 968px) {
-            .problem-solution {
-                grid-template-columns: 1fr;
-            }
-            
-            .timeline:after {
-                left: 31px;
-            }
-            
-            .timeline-item {
-                width: 100%;
-                padding-left: 70px;
-                padding-right: 25px;
-            }
-            
-            .timeline-item:nth-child(even) {
-                left: 0;
-            }
-            
-            .hero h1 {
-                font-size: 3rem;
-            }
+        @media (max-width: 992px) {
+            .grid-2, .qatar-content { grid-template-columns: 1fr; }
+            .qatar-flag { margin-top: 2rem; }
+            .timeline::after { left: 31px; }
+            .timeline-item { width: 100%; padding-left: 70px; padding-right: 25px; }
+            .timeline-item:nth-child(even), .timeline-item:nth-child(odd) { left: 0; text-align: left;}
+            .timeline-item:nth-child(odd)::after { left: 21px; }
+            .timeline-item:nth-child(even)::after { left: 21px; }
+            .hero h1 { font-size: 3.5rem; }
+            .hero p { font-size: 1.25rem; }
         }
-        
+
         @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-            }
-            
-            .hero h1 {
-                font-size: 2.5rem;
-            }
-            
-            .hero p {
-                font-size: 1.2rem;
-            }
+            .nav-links { display: none; }
+            .hero h1 { font-size: 2.5rem; }
+            .section-title { font-size: 2.2rem; }
+            .container { padding: 5rem 0; }
         }
+
     </style>
 </head>
 <body>
-    <!-- 3D Background -->
     <div id="canvas3d"></div>
     
-    <!-- Navigation -->
     <nav>
         <div class="logo">
             <i class="fas fa-atom"></i>
-            GRAVITAS
+            <span>GRAVITAS</span>
         </div>
         <div class="nav-links">
-            <a href="#problem">Problem</a>
+            <a href="#opportunity">Opportunity</a>
             <a href="#solution">Solution</a>
-            <a href="#investment">Investment</a>
-            <a href="#technology">Technology</a>
+            <a href="#qatar">Why Qatar?</a>
             <a href="#team">Team</a>
             <a href="#roadmap">Roadmap</a>
         </div>
-        <button class="cta-button">Whitepaper</button>
+        <button class="cta-button">Pitch Deck</button>
     </nav>
     
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="hero-content">
-            <h1>Quantum Liquidity Migration for DeFi</h1>
-            <p>Gravitas Protocol enables <span class="highlight">atomic transfers of liquidity positions</span> between DEXs with zero slippage, creating invisible infrastructure for the next generation of decentralized finance.</p>
-            <p>Seeking <span class="highlight">$400K pre-seed</span> for Qatar relocation, code audits, and initial client acquisition.</p>
-            <div class="cta-buttons">
-                <button class="cta-button">Pitch Deck</button>
-                <a href="https://github.com/AbZe628/gravitas-protocol" class="github-button" target="_blank">
-                    <i class="fab fa-github"></i> GitHub MVP
-                </a>
-                <a href="https://www.linkedin.com/in/abdusamed-zeli%C4%87-5b5526183/" class="github-button" target="_blank">
-                    <i class="fab fa-linkedin"></i> LinkedIn
-                </a>
+    <main>
+        <section class="hero">
+            <div class="hero-content">
+                <h1>Unlocking <span class="highlight">Billions</span> in Fragmented DeFi Liquidity</h1>
+                <p>Gravitas is the foundational infrastructure for seamless, atomic liquidity migration across decentralized exchanges, transforming capital inefficiency into sustainable protocol revenue.</p>
+                <div class="hero-buttons">
+                    <button class="cta-button">Request Investor Docs</button>
+                    <a href="https://github.com/AbZe628/gravitas-protocol/blob/main/docs/whitepaper.md" class="secondary-button" target="_blank">
+                        <i class="fas fa-file-alt"></i> Read Whitepaper
+                    </a>
+                </div>
             </div>
-        </div>
-    </section>
-    
-    <!-- Problem Section -->
-    <section id="problem">
-        <h2 class="section-title">The Fragmented Liquidity Problem</h2>
-        <div class="problem-solution">
+        </section>
+
+        <section id="opportunity" class="container">
+            <h2 class="section-title">A $100 Billion+ Monthly Problem</h2>
+            <p class="section-subtitle">Decentralized Finance (DeFi) is hampered by a critical inefficiency: liquidity fragmentation. Capital is trapped in isolated pools, creating high costs for users and lost revenue for protocols.</p>
+            <div class="grid-2">
+                <div class="card">
+                    <h3><i class="fas fa-exclamation-triangle"></i> The Market's Pain Points</h3>
+                    <ul>
+                        <li><b>Fragmented Capital:</b> Liquidity is scattered across dozens of DEXs, reducing market depth and efficiency.</li>
+                        <li><b>High Migration Costs:</b> Moving liquidity positions involves multiple, complex transactions, incurring high gas fees and slippage.</li>
+                        <li><b>Capital Inefficiency:</b> Protocols cannot easily deploy their treasury liquidity to the most profitable venues, stunting growth.</li>
+                        <li><b>Poor User Experience:</b> Manual liquidity management is time-consuming and a significant barrier for both retail and institutional participants.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3><i class="fas fa-bullseye"></i> The Investment Thesis</h3>
+                    <ul>
+                        <li><b>Massive Market:</b> DEX trading volumes consistently exceed $100 billion per month, a vast ocean of potential fee generation.</li>
+                        <li><b>First-Mover Advantage:</b> No existing solution offers true, atomic, cross-DEX liquidity migration. This is a blue-ocean opportunity.</li>
+                        <li><b>B2B Focus:</b> By providing infrastructure to other protocols, Gravitas scales with the entire DeFi ecosystem.</li>
+                        <li><b>Essential Infrastructure:</b> As DeFi matures, tools for capital efficiency are not just useful—they are essential.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="solution" class="container">
+            <h2 class="section-title">The Gravitas Solution</h2>
+            <p class="section-subtitle">We have built the invisible rails for quantum liquidity migration. A single-transaction, zero-slippage protocol that makes moving capital between any DEX as simple as an API call.</p>
+            <div class="investment-highlights">
+                <div class="metric">
+                    <div class="metric-value">1-Click</div>
+                    <div class="metric-label">Migration Experience</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">0%</div>
+                    <div class="metric-label">Price Slippage</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">90%</div>
+                    <div class="metric-label">Reduction in Gas Fees</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">B2B</div>
+                    <div class="metric-label">SDK Integration</div>
+                </div>
+            </div>
             <div class="card">
-                <h3><i class="fas fa-exclamation-triangle"></i> Current Challenges</h3>
-                <ul>
-                    <li>DeFi liquidity is fragmented across multiple DEXs and chains</li>
-                    <li>Users waste time and money manually migrating positions</li>
-                    <li>Complex processes with multiple transactions and high slippage</li>
-                    <li>Projects lack passive income from their own liquidity</li>
-                    <li>Capital inefficiency reduces overall DeFi yield potential</li>
-                </ul>
+                <h3><i class="fas fa-chart-line"></i> Value Proposition & Business Model</h3>
+                <div class="grid-2">
+                    <div>
+                        <h4>For DeFi Protocols & DAOs</h4>
+                        <ul>
+                            <li><b>Sustainable Yield:</b> Generate passive income by efficiently managing protocol-owned liquidity.</li>
+                            <li><b>Treasury Management:</b> Dynamically reallocate assets to the highest-yield farms and pools instantly.</li>
+                            <li><b>Seamless Integration:</b> Our SDK allows any DeFi dashboard or aggregator to integrate Gravitas with a few lines of code.</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4>Revenue Generation</h4>
+                        <ul>
+                             <li><b>Fee Structure:</b> A competitive micro-fee of 5-10 basis points (0.05% - 0.10%) on all migration volume.</li>
+                             <li><b>Volume-Based:</b> With a target of $100M in monthly volume, this translates to $50k-$100k in monthly protocol revenue.</li>
+                             <li><b>Scalable & Defensible:</b> Our cross-DEX routing technology and first-mover partnerships create a strong competitive moat.</li>
+                        </ul>
+                    </div>
+                </div>
             </div>
-            <div class="card">
-                <h3><i class="fas fa-bullseye"></i> Market Opportunity</h3>
-                <ul>
-                    <li>DEX trading volume exceeding $100B monthly</li>
-                    <li>Growing LP positions across Uniswap V2/V3, Sushiswap, Curve</li>
-                    <li>Increasing demand for automated portfolio management</li>
-                    <li>No existing solution for atomic liquidity migration</li>
-                    <li>Protocol-owned liquidity becoming standard for new projects</li>
-                </ul>
-            </div>
-        </div>
-    </section>
-    
-    <!-- Solution Section -->
-    <section id="solution">
-        <h2 class="section-title">The Gravitas Solution</h2>
-        <div class="problem-solution">
-            <div class="card">
-                <h3><i class="fas fa-magic"></i> How It Works</h3>
-                <ul>
-                    <li>Atomic liquidity migrations between any DEX with single transaction</li>
-                    <li>Zero slippage through proprietary cross-DEX routing</li>
-                    <li>Micro-fees (5-10 bps) generate continuous protocol revenue</li>
-                    <li>Non-custodial design - users maintain control of assets</li>
-                    <li>SDK for seamless integration with existing DeFi platforms</li>
-                </ul>
-            </div>
-            <div class="card">
-                <h3><i class="fas fa-chart-line"></i> Value Proposition</h3>
-                <ul>
-                    <li>Creators earn sustainable yields from their protocol liquidity</li>
-                    <li>Users save time and transaction costs on position management</li>
-                    <li>DEXs benefit from increased cross-protocol liquidity flow</li>
-                    <li>Protocol earns sustainable revenue through massive volume</li>
-                    <li>Foundation for more advanced DeFi primitive development</li>
-                </ul>
-            </div>
-        </div>
-    </section>
-    
-    <!-- Investment Section -->
-    <section id="investment">
-        <h2 class="section-title">Investment Opportunity</h2>
-        <div class="investment-highlights">
-            <div class="metric">
-                <div class="metric-value">$400K</div>
-                <div class="metric-label">Pre-Seed Round</div>
-            </div>
-            <div class="metric">
-                <div class="metric-value">5-10 bps</div>
-                <div class="metric-label">Fee Structure</div>
-            </div>
-            <div class="metric">
-                <div class="metric-value">$100M</div>
-                <div class="metric-label">Target Monthly Volume</div>
-            </div>
-            <div class="metric">
-                <div class="metric-value">$50-100K</div>
-                <div class="metric-label">Projected Monthly Revenue</div>
-            </div>
-        </div>
+        </section>
         
-        <div class="card" style="margin-top: 3rem;">
-            <h3><i class="fas fa-dollar-sign"></i> Use of Funds</h3>
-            <div class="problem-solution">
-                <div>
+        <section id="qatar">
+            <div class="container qatar-content">
+                <div class="qatar-text">
+                    <h3>Why Qatar? A Strategic Vision</h3>
+                    <p>Our pre-seed funding of <strong>$400,000</strong> is allocated for a strategic relocation to Qatar, a nation rapidly positioning itself as a global leader in technology and finance.</p>
                     <ul>
-                        <li>Qatar Entity Establishment & Relocation</li>
-                        <li>Smart Contract Security Audits</li>
-                        <li>Core Team Expansion</li>
+                        <li><strong>Alignment with Vision 2030:</strong> Gravitas contributes to Qatar's goal of building a diversified, knowledge-based economy.</li>
+                        <li><strong>Favorable Ecosystem:</strong> Access to world-class regulatory sandboxes like the Qatar Financial Centre (QFC) and a burgeoning Web3 talent pool.</li>
+                        <li><strong>Gateway to Growth:</strong> A strategic hub for accessing capital and partnership opportunities across the MENA region and beyond.</li>
                     </ul>
                 </div>
-                <div>
-                    <ul>
-                        <li>Business Development & Partnerships</li>
-                        <li>Legal & Regulatory Compliance</li>
-                        <li>Marketing & Community Building</li>
-                    </ul>
+                <div class="qatar-flag">
+                    <i class="fas fa-star"></i>
                 </div>
             </div>
-        </div>
-    </section>
-    
-    <!-- Technology Section -->
-    <section id="technology">
-        <h2 class="section-title">Technical Architecture</h2>
-        <div class="card">
-            <h3><i class="fas fa-cogs"></i> Core Innovation</h3>
-            <div class="problem-solution">
-                <div>
-                    <h4>Smart Contract System</h4>
-                    <ul>
-                        <li>Teleport.sol - Main migration logic</li>
-                        <li>Treasury.sol - Protocol fee routing</li>
-                        <li>UniV2Adapter.sol / UniV3Adapter.sol</li>
-                        <li>Advanced error handling & slippage protection</li>
-                    </ul>
+        </section>
+
+        <section id="team" class="container">
+            <h2 class="section-title">Architecture Team</h2>
+            <p class="section-subtitle">Led by a team of dedicated DeFi specialists with deep expertise in smart contract engineering, blockchain security, and protocol architecture.</p>
+            <div class="team-grid">
+                <div class="team-member">
+                    <div class="avatar"><i class="fas fa-user-shield"></i></div>
+                    <h3>Abdusamed Zelić</h3>
+                    <p>Lead Architect & Smart Contract Engineer</p>
                 </div>
-                <div>
-                    <h4>Security & Infrastructure</h4>
-                    <ul>
-                        <li>100% test coverage with Hardhat</li>
-                        <li>Fuzzing and fork-based testing</li>
-                        <li>Dual external audits (Code4rena + Tier 1)</li>
-                        <li>Tenderly alerts & monitoring</li>
-                    </ul>
+                <div class="team-member">
+                    <div class="avatar"><i class="fas fa-user-cog"></i></div>
+                    <h3>Abdulah Zelić</h3>
+                    <p>Co-Architect & Security Engineer</p>
+                </div>
+                <div class="team-member">
+                    <div class="avatar"><i class="fas fa-user-tie"></i></div>
+                    <h3>Advisory Board (Expanding)</h3>
+                    <p>Seeking Qatar-based experts in finance, law, and business development.</p>
                 </div>
             </div>
-        </div>
-    </section>
-    
-    <!-- Team Section -->
-    <section id="team">
-        <h2 class="section-title">Architecture Team</h2>
-        <div class="team-grid">
-            <div class="team-member">
-                <div class="avatar">
-                    <i class="fas fa-user"></i>
+        </section>
+
+        <section id="roadmap" class="container">
+            <h2 class="section-title">Development Roadmap</h2>
+            <p class="section-subtitle">Our development is structured in four distinct phases, from core architecture to full mainnet launch and partner integration.</p>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <h3>Phase 1: Core Protocol</h3>
+                        <p>Completed: Smart contract architecture for Teleport.sol, Treasury, and DEX Adapters.</p>
+                    </div>
                 </div>
-                <h3>Abdusamed Zelić</h3>
-                <p>Lead Architect & Smart Contract Engineer</p>
-                <p>DeFi Protocol Specialist</p>
-                <p>+385 91 566 8133</p>
-                <p>abdusamedzelic98@gmail.com</p>
-            </div>
-            <div class="team-member">
-                <div class="avatar">
-                    <i class="fas fa-user"></i>
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <h3>Phase 2: Security & Audits</h3>
+                        <p>Achieve 100% test coverage. Undergo two independent external audits from top-tier firms.</p>
+                    </div>
                 </div>
-                <h3>Abdulah Zelić</h3>
-                <p>Co-Architect & Security Engineer</p>
-                <p>Blockchain Security Focus</p>
-            </div>
-        </div>
-        
-        <div class="card" style="margin-top: 3rem;">
-            <h3><i class="fas fa-users"></i> Advisory & Expansion Team</h3>
-            <p>Seeking Qatar-based blockchain advisors, legal compliance experts, and business development specialists to facilitate relocation and regional market entry.</p>
-        </div>
-    </section>
-    
-    <!-- Roadmap Section -->
-    <section id="roadmap">
-        <h2 class="section-title">Development Roadmap</h2>
-        <div class="timeline">
-            <div class="timeline-item">
-                <div class="timeline-content">
-                    <h3>Phase 1: Smart Contract Development</h3>
-                    <p>Week 1: Core contract architecture</p>
-                    <p>Weeks 2-4: Core implementation</p>
-                    <p>Teleport.sol, Treasury.sol, Adapters</p>
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <h3>Phase 3: SDK & Launch</h3>
+                        <p>Develop and release the Gravitas SDK. Deploy on testnet for partner integration testing.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <h3>Phase 4: Qatar Operations & Mainnet</h3>
+                        <p>Establish entity in Qatar. Launch on mainnet with initial protocol partners.</p>
+                    </div>
                 </div>
             </div>
-            <div class="timeline-item">
-                <div class="timeline-content">
-                    <h3>Phase 2: Testing & Security</h3>
-                    <p>100% code coverage with Hardhat</p>
-                    <p>Fuzzing and fork-based tests</p>
-                    <p>Dual external audits</p>
-                </div>
+        </section>
+
+        <section class="container cta-section">
+            <h2>Join the Future of DeFi Liquidity</h2>
+            <p class="section-subtitle" style="margin-bottom: 2.5rem;">We are raising a $400K pre-seed round to fund our relocation, complete security audits, and onboard our first cohort of protocol partners. We invite you to join us in building the foundational liquidity layer for the new financial internet.</p>
+            <div class="hero-buttons">
+                <button class="cta-button">Schedule a Meeting</button>
+                <a href="https://github.com/AbZe628/gravitas-protocol" class="secondary-button" target="_blank">
+                    <i class="fab fa-github"></i> Explore GitHub
+                </a>
+                <a href="https://www.linkedin.com/in/abdusamed-zeli%C4%87-5b5526183/" class="secondary-button" target="_blank">
+                     <i class="fab fa-linkedin"></i> Connect on LinkedIn
+                </a>
             </div>
-            <div class="timeline-item">
-                <div class="timeline-content">
-                    <h3>Phase 3: SDK & Infrastructure</h3>
-                    <p>Migration simulator</p>
-                    <p>Transaction builder</p>
-                    <p>Analytics dashboards</p>
-                </div>
-            </div>
-            <div class="timeline-item">
-                <div class="timeline-content">
-                    <h3>Phase 4: Deployment & Launch</h3>
-                    <p>Testnet deployment</p>
-                    <p>Mainnet launch</p>
-                    <p>Partner onboarding</p>
-                </div>
-            </div>
-        </div>
-    </section>
-    
-    <!-- CTA Section -->
-    <section class="cta-section">
-        <h2>Join the Future of DeFi Liquidity</h2>
-        <p>We're seeking strategic pre-seed investors to join our $400K round for protocol development, security audits, and Qatar market entry.</p>
-        <div class="cta-buttons">
-            <button class="cta-button">Schedule Meeting</button>
-            <a href="https://github.com/AbZe628/gravitas-protocol" class="github-button" target="_blank">
-                <i class="fab fa-github"></i> Explore MVP
-            </a>
-            <a href="https://github.com/AbZe628/gravitas-protocol/blob/main/docs/whitepaper.md" class="github-button" target="_blank">
-                <i class="fas fa-file-alt"></i> Read Whitepaper
-            </a>
-            <a href="https://www.linkedin.com/in/abdusamed-zeli%C4%87-5b5526183/" class="github-button" target="_blank">
-                <i class="fab fa-linkedin"></i> Connect on LinkedIn
-            </a>
-        </div>
-    </section>
-    
-    <!-- Footer -->
+        </section>
+    </main>
+
     <footer>
         <div class="logo" style="justify-content: center; margin-bottom: 1rem;">
             <i class="fas fa-atom"></i>
-            GRAVITAS PROTOCOL
+            <span>GRAVITAS PROTOCOL</span>
         </div>
         <p>Quantum Liquidity Migration Infrastructure</p>
         <div class="social-links">
@@ -723,65 +670,63 @@
         </div>
         <p>© 2025 Gravitas Protocol. All rights reserved.</p>
     </footer>
-    
+
     <script>
-        // Simple 3D background effect
         document.addEventListener('DOMContentLoaded', function() {
             const scene = new THREE.Scene();
             const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
             const renderer = new THREE.WebGLRenderer({ alpha: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             document.getElementById('canvas3d').appendChild(renderer.domElement);
-            
-            // Create particles
+
             const particlesGeometry = new THREE.BufferGeometry();
-            const particlesCount = 5000;
+            const particlesCount = 7000;
             const posArray = new Float32Array(particlesCount * 3);
-            
-            for(let i = 0; i < particlesCount * 3; i++) {
-                posArray[i] = (Math.random() - 0.5) * 10;
+
+            for (let i = 0; i < particlesCount * 3; i++) {
+                posArray[i] = (Math.random() - 0.5) * 15;
             }
-            
+
             particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
             
-            // Qatar-inspired colors
             const particlesMaterial = new THREE.PointsMaterial({
-                size: 0.02,
-                color: new THREE.Color(0xD98F4E),
+                size: 0.015,
+                color: new THREE.Color(0xD4AF37), // Gold accent
                 transparent: true,
-                opacity: 0.8
+                opacity: 0.7,
+                blending: THREE.AdditiveBlending
             });
-            
+
             const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
             scene.add(particlesMesh);
-            
-            camera.position.z = 3;
-            
-            // Mouse movement effect
+
+            camera.position.z = 5;
+
             let mouseX = 0;
             let mouseY = 0;
-            
+
             document.addEventListener('mousemove', (event) => {
-                mouseX = event.clientX / window.innerWidth - 0.5;
-                mouseY = event.clientY / window.innerHeight - 0.5;
+                mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+                mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
             });
-            
-            // Animation
+
+            const clock = new THREE.Clock();
+
             function animate() {
                 requestAnimationFrame(animate);
+                const elapsedTime = clock.getElapsedTime();
+
+                particlesMesh.rotation.y = elapsedTime * 0.05;
                 
-                particlesMesh.rotation.x += 0.001;
-                particlesMesh.rotation.y += 0.002;
-                
-                particlesMesh.rotation.x += mouseY * 0.0005;
-                particlesMesh.rotation.y += mouseX * 0.0005;
-                
+                // Parallax effect
+                camera.position.x += (mouseX * 0.5 - camera.position.x) * 0.05;
+                camera.position.y += (mouseY * 0.5 - camera.position.y) * 0.05;
+
                 renderer.render(scene, camera);
             }
-            
+
             animate();
-            
-            // Responsive resize
+
             window.addEventListener('resize', () => {
                 camera.aspect = window.innerWidth / window.innerHeight;
                 camera.updateProjectionMatrix();
