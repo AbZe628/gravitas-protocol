@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gravitas Protocol — The Invisible Engine of DeFi Liquidity</title>
-    <meta name="description" content="Gravitas Protocol provides institutional-grade, policy-driven liquidity management for DeFi treasuries, L2s, and DAOs, optimizing yield while minimizing risk.">
+    <meta name="description" content="Gravitas Protocol provides institutional-grade, policy-driven liquidity management for DeFi treasuries, L2s, and DAOs, optimizing yield while minimizing risk through a secure, non-custodial infrastructure.">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,35 +12,35 @@
 
     <style>
         /* ========================================
-        0. CSS VARIABLES & BASE SETUP ("QATAR EDITION")
-        ========================================
-        */
+        0. CSS VARIABLES & BASE SETUP (PRO UPGRADE)
+        ======================================== */
         :root {
-            /* Colors */
-            --color-accent: #8A1538; /* Qatar Maroon */
-            --color-accent-hover: #6c102b;
+            /* Palette */
+            --color-paper-light: #FCFCFA;
+            --color-ink-light: #111319;
+            --color-muted-light: #6B7280;
+            --color-lines-light: rgba(17, 19, 25, 0.08);
+            --color-accent: #8A1538;
+            --color-accent-hover: #6C102B;
 
-            --color-paper-light: #FDFBF8;
-            --color-ink-light: #2A2123;
-            --color-muted-light: #6D6365;
-            --color-lines-light: rgba(42, 33, 35, 0.1);
-
-            --color-paper-dark: #1A1416;
-            --color-ink-dark: #F0E8E9;
-            --color-muted-dark: #9E9295;
-            --color-lines-dark: rgba(240, 232, 233, 0.12);
+            --color-paper-dark: #100f12;
+            --color-ink-dark: #f0eef3;
+            --color-muted-dark: #8892B0;
+            --color-lines-dark: rgba(240, 238, 243, 0.1);
             
             /* Typography */
             --font-heading: 'IBM Plex Serif', serif;
             --font-body: 'Inter', sans-serif;
             --font-mono: 'Space Mono', monospace;
 
-            /* Layout */
+            /* Layout & Motion */
             --header-height: 72px;
             --sidebar-width: 280px;
-            --container-width: 800px;
+            --container-width: 820px;
             --spacing-unit: 24px;
-            --border-radius: 6px;
+            --border-radius: 8px;
+            --transition-curve: cubic-bezier(.2,.8,.2,1);
+            --transition-duration: 180ms;
         }
 
         [data-theme="light"] {
@@ -57,216 +57,148 @@
             --border-lines: var(--color-lines-dark);
         }
 
-        *, *::before, *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         html {
             scroll-behavior: smooth;
-            scroll-padding-top: calc(var(--header-height) + 24px);
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            html {
-                scroll-behavior: auto;
-            }
+            scroll-padding-top: calc(var(--header-height) + 48px);
         }
 
         body {
             font-family: var(--font-body);
             background-color: var(--bg-paper);
             color: var(--text-ink);
-            line-height: 1.6;
-            font-size: 16px;
+            line-height: 1.7;
+            font-size: 17px;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
             transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+            overflow-x: hidden;
         }
 
-        body.drawer-open {
-            overflow: hidden;
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            * { transition: none !important; animation: none !important; }
         }
+
+        body.drawer-open { overflow: hidden; }
 
         /* ========================================
         1. TYPOGRAPHY & COMMON ELEMENTS
-        ========================================
-        */
+        ======================================== */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: var(--color-accent);
+            color: white;
+            padding: 8px;
+            z-index: 9999;
+            transition: top var(--transition-duration) ease-in-out;
+        }
+        .skip-link:focus { top: 0; }
+
         h1, h2, h3, h4 {
             font-family: var(--font-heading);
             font-weight: 700;
             line-height: 1.2;
             color: var(--text-ink);
-            margin-bottom: calc(var(--spacing-unit) * 0.75);
+            letter-spacing: -0.02em;
         }
 
-        h1 { font-size: 3rem; }
-        h2 { font-size: 2rem; margin-top: calc(var(--spacing-unit) * 3); border-bottom: 1px solid var(--border-lines); padding-bottom: calc(var(--spacing-unit) / 2);}
-        h3 { font-size: 1.5rem; margin-top: calc(var(--spacing-unit) * 2); font-weight: 600; }
-        h4 { font-size: 1.1rem; margin-top: var(--spacing-unit); text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); }
+        h1 { font-size: 3.5rem; margin-bottom: var(--spacing-unit); }
+        h2 { font-size: 2.25rem; margin-top: calc(var(--spacing-unit) * 4); border-bottom: 1px solid var(--border-lines); padding-bottom: calc(var(--spacing-unit) / 2); margin-bottom: calc(var(--spacing-unit) * 1.5); }
+        h3 { font-size: 1.75rem; margin-top: calc(var(--spacing-unit) * 2.5); font-weight: 600; margin-bottom: var(--spacing-unit); }
+        h4 { font-size: 1.1rem; margin-top: var(--spacing-unit); font-family: var(--font-body); text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); font-weight: 500; }
 
         p, ul, ol, table {
             margin-bottom: var(--spacing-unit);
             color: var(--text-muted);
+            max-width: 75ch;
         }
+        ul, ol { padding-left: var(--spacing-unit); }
+        li { margin-bottom: calc(var(--spacing-unit) / 3); }
         
-        strong {
-            font-weight: 700;
-            color: var(--text-ink);
-        }
-
-        a {
-            color: var(--color-accent);
-            text-decoration: none;
-            transition: color 0.2s ease;
-        }
-        a:hover {
-            text-decoration: underline;
-            color: var(--color-accent-hover);
-        }
+        strong { font-weight: 600; color: var(--text-ink); }
+        a { color: var(--color-accent); text-decoration: none; transition: color var(--transition-duration) var(--transition-curve); }
+        a:hover { color: var(--color-accent-hover); text-decoration: underline; }
 
         .kpi-number {
             font-family: var(--font-mono);
             font-weight: 700;
             color: var(--text-ink);
+            font-variant-numeric: tabular-nums;
+            transition: transform var(--transition-duration) var(--transition-curve);
         }
+        .kpi-number:hover { transform: scale(1.02); }
 
-        .pull-quote {
-            border-left: 3px solid var(--color-accent);
-            padding-left: var(--spacing-unit);
-            margin: calc(var(--spacing-unit) * 1.5) 0;
-            font-size: 1.2rem;
-            font-style: italic;
-            color: var(--text-ink);
-        }
-        
-        .accent-underline {
-            border-bottom: 2px solid var(--color-accent);
-            padding-bottom: 2px;
-        }
-
-        hr {
-            border: none;
-            border-top: 1px solid var(--border-lines);
-            margin: calc(var(--spacing-unit) * 3) 0;
-        }
+        hr { border: none; border-top: 1px solid var(--border-lines); margin: calc(var(--spacing-unit) * 4) 0; }
 
         /* ========================================
-        2. LAYOUT
-        ========================================
-        */
-        .page-wrapper {
-            display: flex;
+        2. LAYOUT & ZAHA HADID ELEMENTS
+        ======================================== */
+        .page-wrapper { display: flex; }
+        .main-content { flex-grow: 1; padding: var(--header-height) var(--spacing-unit) 0; }
+        .container { max-width: var(--container-width); margin: 0 auto; padding: calc(var(--spacing-unit) * 3) 0; }
+        
+        .zaha-bg {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            opacity: 0.05;
+            pointer-events: none;
+            overflow: hidden;
+            transition: transform 0.5s var(--transition-curve);
         }
+        [data-theme="dark"] .zaha-bg { opacity: 0.03; }
+        .zaha-bg svg {
+            position: absolute;
+            width: 150%;
+            height: auto;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            min-width: 1200px;
+        }
+        
+        section { position: relative; }
 
-        .main-content {
-            flex-grow: 1;
-            padding: var(--header-height) var(--spacing-unit) 0;
-        }
-        
-        .container {
-            max-width: var(--container-width);
-            margin: 0 auto;
-            padding: calc(var(--spacing-unit) * 2) 0;
-        }
-        
         @media (min-width: 1024px) {
-            .main-content {
-                padding-left: calc(var(--sidebar-width) + var(--spacing-unit));
-            }
+            .main-content { padding-left: calc(var(--sidebar-width) + var(--spacing-unit)); }
         }
-
 
         /* ========================================
         3. HEADER / TOPBAR & CTAs
-        ========================================
-        */
+        ======================================== */
         .topbar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: var(--header-height);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            position: fixed; top: 0; left: 0; right: 0; height: var(--header-height);
+            display: flex; align-items: center; justify-content: space-between;
             padding: 0 var(--spacing-unit);
-            background-color: hsla(from var(--bg-paper) h s l / 0.85);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            background-color: hsla(from var(--bg-paper) h s l / 0.8);
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--border-lines);
             z-index: 1000;
         }
-
-        .brand {
-            font-family: var(--font-heading);
-            font-weight: 600;
-            font-size: 1.2rem;
-        }
-        
-        .topbar-nav {
-            display: flex;
-            align-items: center;
-            gap: calc(var(--spacing-unit) * 0.75);
-        }
+        .brand { font-family: var(--font-heading); font-weight: 600; font-size: 1.25rem; }
+        .topbar-nav { display: flex; align-items: center; gap: calc(var(--spacing-unit) * 0.5); }
 
         .cta-button {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 18px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            border-radius: var(--border-radius);
-            transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
-            text-align: center;
-            white-space: nowrap;
+            display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px;
+            font-size: 0.9rem; font-weight: 500; border-radius: var(--border-radius);
+            transition: all var(--transition-duration) var(--transition-curve);
+            text-align: center; white-space: nowrap;
         }
-        .cta-button svg {
-            width: 16px;
-            height: 16px;
-        }
-        .cta-button.primary {
-            background-color: var(--color-accent);
-            color: white;
-            border: 1px solid var(--color-accent);
-        }
-        .cta-button.primary:hover {
-            background-color: var(--color-accent-hover);
-            border-color: var(--color-accent-hover);
-            text-decoration: none;
-        }
-        .cta-button.secondary {
-            background-color: transparent;
-            color: var(--text-ink);
-            border: 1px solid var(--border-lines);
-        }
-         .cta-button.secondary:hover {
-            background-color: var(--border-lines);
-            border-color: var(--text-muted);
-            text-decoration: none;
-        }
+        .cta-button svg { width: 16px; height: 16px; }
+        .cta-button.primary { background-color: var(--color-accent); color: white; border: 1px solid var(--color-accent); }
+        .cta-button.primary:hover { background-color: var(--color-accent-hover); border-color: var(--color-accent-hover); transform: translateY(-2px); text-decoration: none; }
+        .cta-button.secondary { background-color: transparent; color: var(--text-ink); border: 1px solid var(--border-lines); }
+        .cta-button.secondary:hover { background-color: var(--border-lines); border-color: var(--text-muted); text-decoration: none; transform: translateY(-2px); }
 
         .theme-toggle, .burger-menu {
-            background: none;
-            border: none;
-            cursor: pointer;
-            width: 44px;
-            height: 44px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text-muted);
+            background: none; border: none; cursor: pointer; width: 44px; height: 44px;
+            display: flex; align-items: center; justify-content: center; color: var(--text-muted);
         }
-        .theme-toggle:hover, .burger-menu:hover {
-            color: var(--text-ink);
-        }
-        .theme-toggle svg, .burger-menu svg {
-            width: 24px;
-            height: 24px;
-        }
-
+        .theme-toggle:hover, .burger-menu:hover { color: var(--text-ink); }
         .desktop-nav { display: none; }
         .burger-menu { display: flex; }
         
@@ -275,338 +207,129 @@
             .burger-menu { display: none; }
         }
 
-
         /* ========================================
-        4. SIDEBAR TABLE OF CONTENTS (Desktop)
-        ========================================
-        */
-        .toc-sidebar {
-            display: none;
-        }
-
+        4. SIDEBAR & MOBILE DRAWER
+        ======================================== */
+        .toc-sidebar { display: none; }
         @media (min-width: 1024px) {
             .toc-sidebar {
-                display: block;
-                position: fixed;
-                top: var(--header-height);
-                left: 0;
-                width: var(--sidebar-width);
-                height: calc(100vh - var(--header-height));
+                display: block; position: fixed; top: var(--header-height); left: 0;
+                width: var(--sidebar-width); height: calc(100vh - var(--header-height));
                 padding: calc(var(--spacing-unit) * 2) var(--spacing-unit);
-                border-right: 1px solid var(--border-lines);
-                overflow-y: auto;
+                border-right: 1px solid var(--border-lines); overflow-y: auto;
             }
-            .toc-sidebar h4 {
-                margin-top: 0;
-                margin-bottom: var(--spacing-unit);
-                font-size: 0.8rem;
-                letter-spacing: 0.1em;
-                color: var(--text-muted);
-            }
-            .toc-sidebar ul {
-                list-style: none;
-            }
+            .toc-sidebar h4 { margin-top: 0; margin-bottom: var(--spacing-unit); font-size: 0.8rem; letter-spacing: 0.1em; }
+            .toc-sidebar ul { list-style: none; padding: 0; }
             .toc-sidebar li a {
-                display: block;
-                padding: 8px 12px;
-                border-radius: var(--border-radius);
-                font-size: 0.9rem;
-                color: var(--text-muted);
-                border-left: 2px solid transparent;
+                display: block; padding: 8px 12px; border-radius: var(--border-radius); font-size: 0.9rem; color: var(--text-muted);
+                border-left: 2px solid transparent; transition: all var(--transition-duration) var(--transition-curve);
             }
-            .toc-sidebar li a:hover {
-                background-color: var(--border-lines);
-                text-decoration: none;
-                color: var(--text-ink);
-            }
-            .toc-sidebar li a.active {
-                color: var(--color-accent);
-                font-weight: 500;
-                border-left-color: var(--color-accent);
-            }
+            .toc-sidebar li a:hover { background-color: var(--border-lines); text-decoration: none; color: var(--text-ink); }
+            .toc-sidebar li a.active { color: var(--color-accent); font-weight: 500; border-left-color: var(--color-accent); }
         }
-        
-
-        /* ========================================
-        5. MOBILE DRAWER
-        ========================================
-        */
         .drawer-backdrop {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(10, 15, 26, 0.5);
-            z-index: 1999;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(10, 15, 26, 0.5);
+            z-index: 1999; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease;
         }
-
         .drawer {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 300px;
-            height: 100%;
-            background-color: var(--bg-paper);
-            z-index: 2000;
-            transform: translateX(-100%);
-            transition: transform 0.3s ease;
-            display: flex;
-            flex-direction: column;
+            position: fixed; top: 0; left: 0; width: 300px; height: 100%; background-color: var(--bg-paper);
+            z-index: 2000; transform: translateX(-100%); transition: transform 0.3s ease; display: flex; flex-direction: column;
         }
-
-        .drawer.is-open {
-            transform: translateX(0);
-        }
-        .drawer-backdrop.is-open {
-            opacity: 1;
-            visibility: visible;
-        }
-        
+        .drawer.is-open { transform: translateX(0); }
+        .drawer-backdrop.is-open { opacity: 1; visibility: visible; }
         .drawer-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 var(--spacing-unit);
-            height: var(--header-height);
-            border-bottom: 1px solid var(--border-lines);
-            flex-shrink: 0;
+            display: flex; justify-content: space-between; align-items: center; padding: 0 var(--spacing-unit);
+            height: var(--header-height); border-bottom: 1px solid var(--border-lines); flex-shrink: 0;
         }
-        
-        .drawer-nav {
-            padding: var(--spacing-unit);
-            overflow-y: auto;
-            flex-grow: 1;
-        }
-        .drawer-nav ul { list-style: none; }
-        .drawer-nav li a {
-            display: block;
-            padding: 12px;
-            border-radius: var(--border-radius);
-            font-size: 1rem;
-            color: var(--text-muted);
-        }
-        .drawer-nav li a:hover {
-            background-color: var(--border-lines);
-            color: var(--text-ink);
-            text-decoration: none;
-        }
-        .drawer-nav li a.active {
-            color: var(--color-accent);
-            font-weight: 500;
-        }
+        .drawer-nav { padding: var(--spacing-unit); overflow-y: auto; flex-grow: 1; }
+        .drawer-nav ul { list-style: none; padding: 0; }
+        .drawer-nav li a { display: block; padding: 12px; border-radius: var(--border-radius); font-size: 1rem; color: var(--text-muted); }
+        .drawer-nav li a:hover { background-color: var(--border-lines); color: var(--text-ink); text-decoration: none; }
+        .drawer-nav li a.active { color: var(--color-accent); font-weight: 500; }
 
         /* ========================================
-        6. SECTION STYLING & COMPONENTS
-        ========================================
-        */
-        .value-cards {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: var(--spacing-unit);
-            margin: calc(var(--spacing-unit) * 2) 0;
-        }
-        @media(min-width: 768px) {
-            .value-cards { grid-template-columns: repeat(3, 1fr); }
-        }
-        .card {
-            border: 1px solid var(--border-lines);
-            border-radius: var(--border-radius);
-            padding: var(--spacing-unit);
-            background-color: var(--bg-paper);
-        }
-        .card h4 { margin-top: 0; }
-        .card p { margin-bottom: 0; font-size: 0.9rem; }
-
+        5. COMPONENTS & CONTENT STYLING
+        ======================================== */
         .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 12px;
-            border-radius: 20px;
-            border: 1px solid var(--border-lines);
-            font-size: 0.9rem;
-            margin-bottom: var(--spacing-unit);
+            display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px;
+            border-radius: 20px; border: 1px solid var(--border-lines);
+            font-size: 0.9rem; margin-bottom: var(--spacing-unit);
         }
-        .status-badge::before {
-            content: '';
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background-color: var(--color-accent);
+        .status-badge::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background-color: var(--color-accent); }
+        
+        .card {
+            border: 1px solid var(--border-lines); border-radius: var(--border-radius);
+            padding: var(--spacing-unit); background-color: var(--bg-paper);
+            transition: all var(--transition-duration) var(--transition-curve);
         }
-
-        /* Tables */
+        .card:hover { border-color: rgba(17,19,25,.2); box-shadow: 0 4px 8px -2px rgba(17,19,25,.04), 0 8px 16px -4px rgba(17,19,25,.08); }
+        .card h4 { margin-top: 0; }
+        
+        .executive-highlights {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--spacing-unit); margin: calc(var(--spacing-unit) * 2.5) 0;
+        }
+        .highlight-card p { font-size: 1rem; color: var(--text-muted); margin: 0; }
+        .highlight-card .kpi-number { font-size: 2rem; display: block; margin-bottom: 8px; }
+        
         table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.9rem;
+            width: 100%; border-collapse: collapse; font-size: 0.9rem;
         }
-        th, td {
-            text-align: left;
-            padding: 12px;
-            border-bottom: 1px solid var(--border-lines);
-        }
-        thead th {
-            font-weight: 700;
-            color: var(--text-ink);
-            border-bottom-width: 2px;
-        }
-        tbody tr:last-child td {
-            border-bottom: none;
-        }
+        th, td { text-align: left; padding: 14px; border-bottom: 1px solid var(--border-lines); }
+        thead th { font-weight: 600; color: var(--text-ink); border-bottom-width: 2px; }
+        tbody tr:nth-of-type(even) { background-color: hsla(from var(--border-lines) h s l / 0.3); }
 
-        /* Code Blocks */
-        .code-block-wrapper {
-            position: relative;
-            margin: var(--spacing-unit) 0;
-        }
-        pre {
-            background-color: var(--border-lines);
-            padding: var(--spacing-unit);
-            border-radius: var(--border-radius);
-            overflow-x: auto;
-            font-family: var(--font-mono);
-            font-size: 0.85rem;
-            line-height: 1.5;
-        }
-        .copy-button {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            background-color: var(--bg-paper);
-            border: 1px solid var(--border-lines);
-            color: var(--text-muted);
-            padding: 6px 10px;
-            font-size: 0.8rem;
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            opacity: 0.6;
-            transition: opacity 0.2s;
-        }
-        .code-block-wrapper:hover .copy-button {
-            opacity: 1;
-        }
-        
-        /* PDF Embed */
         .pdf-embed {
-            width: 100%;
-            height: 80vh;
-            border: 1px solid var(--border-lines);
-            border-radius: var(--border-radius);
+            width: 100%; height: 80vh; border: 1px solid var(--border-lines);
+            border-radius: var(--border-radius); background-color: var(--border-lines);
         }
 
-        /* Competition Matrix */
-        .competition-matrix td:nth-child(n+2) {
-            text-align: center;
+        .inline-svg-chart {
+            display: block; margin: var(--spacing-unit) 0;
+            stroke-width: 2; fill: none;
         }
-        .tick::before { content: '✓'; color: #22c55e; }
-        .cross::before { content: '✗'; color: #ef4444; } /* Red-500 */
-        .partial::before { content: '○'; color: #f59e0b; } /* Amber-500 */
+        .inline-svg-chart .gridline { stroke: var(--border-lines); stroke-width: 1; }
+        .inline-svg-chart .axis-label { fill: var(--text-muted); font-size: 10px; }
+        .inline-svg-chart .curve1 { stroke: var(--color-accent); }
+        .inline-svg-chart .curve2 { stroke: var(--text-muted); }
+        .inline-svg-chart .curve3 { stroke: var(--text-ink); opacity: 0.8; }
         
-        /* Architecture Diagram */
-        .arch-diagram {
-            width: 100%;
-            font-family: var(--font-body);
-            font-size: 12px;
-        }
-        .arch-diagram .box {
-            stroke: var(--text-muted);
-            fill: var(--bg-paper);
-            rx: var(--border-radius);
-        }
-        .arch-diagram .text-label {
-            fill: var(--text-ink);
-            font-weight: 500;
-        }
-        .arch-diagram .text-desc {
-            fill: var(--text-muted);
-        }
-        .arch-diagram .arrow {
-            stroke: var(--color-accent);
-            marker-end: url(#arrowhead);
-        }
-
-
         /* ========================================
-        7. UTILITIES & MISC
-        ========================================
-        */
+        6. UTILITIES & BACK-TO-TOP
+        ======================================== */
         .back-to-top {
-            position: fixed;
-            bottom: var(--spacing-unit);
-            right: var(--spacing-unit);
-            width: 48px;
-            height: 48px;
-            background-color: var(--color-accent);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 999;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(20px);
-            transition: opacity 0.3s, visibility 0.3s, transform 0.3s;
+            position: fixed; bottom: var(--spacing-unit); right: var(--spacing-unit);
+            width: 48px; height: 48px; background-color: var(--color-accent); color: white;
+            border: none; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; z-index: 999; opacity: 0; visibility: hidden;
+            transform: translateY(20px); transition: all var(--transition-duration) var(--transition-curve);
         }
-        .back-to-top.visible {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
-        .back-to-top svg {
-            width: 24px;
-            height: 24px;
-        }
-        
+        .back-to-top.visible { opacity: 1; visibility: visible; transform: translateY(0); }
+        .back-to-top:hover { background-color: var(--color-accent-hover); }
+
         /* ========================================
-        8. PRINT STYLES
-        ========================================
-        */
+        7. PRINT STYLES
+        ======================================== */
         @media print {
-            .topbar, .toc-sidebar, .drawer-backdrop, .drawer, .back-to-top, .cta-button, .theme-toggle, .burger-menu {
-                display: none !important;
-            }
-            body {
-                background-color: #fff;
-                color: #000;
-            }
-            .main-content, .container {
-                padding: 0;
-                margin: 0;
-                max-width: 100%;
-            }
-            h2 {
-                margin-top: 40px;
-                border: none;
-                page-break-after: avoid;
-            }
-            table, .card, .pull-quote {
-                page-break-inside: avoid;
-            }
-            a {
-                color: #000;
-                text-decoration: underline;
-            }
+            .topbar, .toc-sidebar, .drawer-backdrop, .drawer, .back-to-top, .cta-button, .theme-toggle, .burger-menu, .zaha-bg { display: none !important; }
+            body { background-color: #fff; color: #000; }
+            .main-content, .container { padding: 0; margin: 0; max-width: 100%; }
+            h2 { margin-top: 40px; border: none; page-break-after: avoid; }
+            table, .card { page-break-inside: avoid; }
+            a { color: #000; text-decoration: underline; }
         }
     </style>
 </head>
 <body>
 
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
     <header class="topbar">
         <a href="#cover" class="brand">Gravitas Protocol</a>
         <div class="topbar-nav">
-            <nav class="desktop-nav">
-                <a href="https://github.com/AbZe628/gravitas-protocol/tree/main" target="_blank" rel="noopener noreferrer" class="cta-button secondary">
-                    <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><title>GitHub</title><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
-                    <span>View MVP</span>
-                </a>
+            <nav class="desktop-nav" aria-label="Main navigation">
+                <a href="https://github.com/AbZe628/gravitas-protocol/tree/main" target="_blank" rel="noopener noreferrer" class="cta-button secondary">View MVP on GitHub</a>
+                <a href="#whitepaper" class="cta-button secondary">Whitepaper</a>
                 <a href="#contact" class="cta-button primary">Book a Call</a>
             </nav>
             <button class="theme-toggle" aria-label="Toggle dark mode">
@@ -628,33 +351,38 @@
             </nav>
         </aside>
 
-        <main class="main-content">
+        <main class="main-content" id="main-content">
             <div class="container">
                 <section id="cover">
+                    <div class="zaha-bg" aria-hidden="true" data-parallax-factor="0.2">
+                        <svg viewBox="0 0 1440 800" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M-200 800C-42.5 538.5 289.5 448 481.5 464C729.5 484.5 829 782 1085 711C1341 640 1640 200 1640 200V800H-200Z" fill="var(--color-accent)"/></svg>
+                    </div>
                     <div class="status-badge">MVP Complete & Auditable</div>
                     <h1>The Invisible Engine of DeFi Liquidity.</h1>
-                    <p style="font-size: 1.25rem; color: var(--text-muted); max-width: 90%;">Gravitas Protocol provides institutional-grade, policy-driven liquidity management for DeFi treasuries, L2s, and DAOs. We optimize yield and ensure deep, resilient liquidity without compromising on security or decentralization.</p>
+                    <p style="font-size: 1.3rem; color: var(--text-muted); max-width: 65ch;">Gravitas Protocol provides institutional-grade, policy-driven liquidity management for DeFi treasuries, L2s, and DAOs. We optimize yield and ensure deep, resilient liquidity without compromising on security or decentralization.</p>
                     
-                    <div style="margin: calc(var(--spacing-unit) * 1.5) 0; display: flex; flex-wrap: wrap; gap: var(--spacing-unit);">
-                        <a href="#contact" class="cta-button primary">Request the Deck</a>
-                        <a href="https://github.com/AbZe628/gravitas-protocol/tree/main" target="_blank" rel="noopener noreferrer" class="cta-button secondary">
-                            <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><title>GitHub</title><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
-                            <span>View MVP on GitHub</span>
-                        </a>
+                    <div style="margin: calc(var(--spacing-unit) * 2) 0; display: flex; flex-wrap: wrap; gap: var(--spacing-unit);">
+                        <a href="mailto:abdusamedzelic98@gmail.com" class="cta-button primary">Request the Deck</a>
+                        <a href="https://github.com/AbZe628/gravitas-protocol/tree/main" target="_blank" rel="noopener noreferrer" class="cta-button secondary">View MVP on GitHub</a>
+                        <a href="#whitepaper" class="cta-button secondary">View Whitepaper</a>
                     </div>
 
-                    <div class="value-cards">
-                        <div class="card">
-                            <h4>Neutral & Unbiased</h4>
-                            <p>As a non-custodial infrastructure layer, we act as a neutral arbiter, routing liquidity based on predefined risk and performance policies, not speculative yield chasing.</p>
+                    <div class="executive-highlights">
+                        <div class="card highlight-card">
+                            <span class="kpi-number">&lt;30s</span>
+                            <p>Average Migration Time</p>
                         </div>
-                        <div class="card">
-                            <h4>Policy-Driven Automation</h4>
-                            <p>Codify your treasury's risk tolerance. Our policy engine automates allocation, rebalancing, and risk mitigation, governed by on-chain guardrails and multisig controls.</p>
+                        <div class="card highlight-card">
+                            <span class="kpi-number">99.9%</span>
+                            <p>Uptime Target (SLO)</p>
                         </div>
-                        <div class="card">
-                            <h4>Capital Efficiency</h4>
-                            <p>We leverage a network of battle-tested adapters to access deep liquidity pools, ensuring low slippage and maximizing returns within your specified risk parameters.</p>
+                        <div class="card highlight-card">
+                            <span class="kpi-number">0</span>
+                            <p>Critical Incidents</p>
+                        </div>
+                        <div class="card highlight-card">
+                            <span class="kpi-number">$100M+</span>
+                            <p>Target Monthly Volume</p>
                         </div>
                     </div>
                 </section>
@@ -664,232 +392,170 @@
                 <section id="thesis">
                     <h2>Investment Thesis</h2>
                     <p>The maturation of DeFi requires a shift from retail-driven, high-risk yield farming to professional, risk-managed treasury operations. Currently, protocol treasuries, L2 foundations, and DAOs collectively manage billions in assets, yet lack the tooling to deploy this capital efficiently and safely. This creates a significant drag on capital efficiency and exposes ecosystems to systemic risks.</p>
-                    <p class="pull-quote">The next wave of DeFi growth will be unlocked by infrastructure that provides operational trust and policy-based automation for on-chain capital management.</p>
-                    <h4>Our thesis rests on three core assumptions:</h4>
-                    <ul>
-                        <li><strong>Demand for Durability:</strong> Protocols will increasingly prioritize sustainable, long-term liquidity and yield over short-term, speculative APYs.</li>
-                        <li><strong>Operational Overhead is a Bottleneck:</strong> Manual treasury management is slow, error-prone, and does not scale. Automation via secure, auditable smart contracts is the only viable path forward.</li>
-                        <li><strong>Neutrality Wins:</strong> A neutral infrastructure provider that does not compete with its clients (e.g., by launching its own yield products) will become the trusted standard for liquidity routing and management.</li>
-                    </ul>
+                    <p>Our thesis is that a neutral, non-custodial infrastructure layer that provides operational trust and policy-based automation for on-chain capital management will unlock the next wave of DeFi growth and institutional adoption.</p>
                 </section>
                 
                 <hr>
 
                 <section id="market">
-                    <h2>Market Size (TAM/SAM/SOM)</h2>
-                    <p>The addressable market is defined by on-chain capital requiring professional management. We segment this into three tiers, based on assets held by DAOs, L2s, and established protocols.</p>
+                    <h2>Market, Model & Unit Economics</h2>
+                    <p>The addressable market is the vast and growing pool of on-chain capital requiring professional management. Our business model is a simple, volume-based fee, ensuring our incentives are aligned with our partners' success.</p>
                     <table>
                         <thead>
-                            <tr>
-                                <th>Metric</th>
-                                <th>Market Size (USD)</th>
-                                <th>Assumptions & Rationale</th>
-                            </tr>
+                            <tr><th>Metric</th><th>Market Size (USD)</th><th>Rationale</th></tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td><strong>TAM</strong> (Total Addressable Market)</td>
-                                <td class="kpi-number">~$50B+</td>
-                                <td>Total value in DAO/protocol treasuries and L2 foundations across major ecosystems.</td>
-                            </tr>
-                            <tr>
-                                <td><strong>SAM</strong> (Serviceable Addressable Market)</td>
-                                <td class="kpi-number">~$10B</td>
-                                <td>Treasuries with >$10M AUM and a mandate for active capital management, accessible via EVM-compatible chains.</td>
-                            </tr>
-                            <tr>
-                                <td><strong>SOM</strong> (Serviceable Obtainable Market, Y1)</td>
-                                <td class="kpi-number">~$1.2B</td>
-                                <td>Targeting <span class="kpi-number">10+</span> design partners & early adopters, with an average monthly volume of <span class="kpi-number">$100M</span>.</td>
-                            </tr>
+                            <tr><td><strong>TAM</strong></td><td class="kpi-number">~$50B+</td><td>Total value in DAO/protocol treasuries across major ecosystems.</td></tr>
+                            <tr><td><strong>SAM</strong></td><td class="kpi-number">~$10B</td><td>Treasuries with >$10M AUM and a mandate for active capital management.</td></tr>
+                            <tr><td><strong>SOM (Y1)</strong></td><td class="kpi-number">~$1.2B</td><td>Targeting 10+ design partners with an average monthly volume of $100M.</td></tr>
                         </tbody>
                     </table>
-                    <p>This market is durable and recurring. As DeFi grows, so does the AUM of these entities, directly increasing our TAM. Our revenue is tied to volume, creating a predictable, recurring stream.</p>
+                    <h3>Illustrative Revenue vs. Volume</h3>
+                    <p>Our revenue scales linearly with volume, driven by a <strong>5-10 bps</strong> fee. The chart below illustrates potential monthly revenue based on volume at different fee tiers.</p>
+                    <svg class="inline-svg-chart" viewBox="0 0 300 150">
+                        <line x1="20" y1="10" x2="20" y2="130" class="gridline" />
+                        <line x1="20" y1="130" x2="280" y2="130" class="gridline" />
+                        <text x="10" y="15" class="axis-label" text-anchor="end">Rev</text>
+                        <text x="280" y="140" class="axis-label" text-anchor="middle">Volume</text>
+                        <path d="M 20 130 Q 100 90, 180 60 Q 260 30, 280 20" class="curve1" />
+                        <path d="M 20 130 Q 100 100, 180 80 Q 260 60, 280 50" class="curve2" />
+                        <path d="M 20 130 Q 100 110, 180 100 Q 260 90, 280 85" class="curve3" />
+                    </svg>
                 </section>
                 
                 <hr>
 
-                <section id="model">
-                    <h2>Business Model</h2>
-                    <p>Gravitas Protocol operates on a transparent, volume-based fee model, supplemented by enterprise-grade services for larger partners. Our goal is to align our success directly with the capital efficiency we provide to our clients.</p>
-                    <h4>Revenue Streams</h4>
-                    <ul>
-                        <li><strong>Core Protocol Fee:</strong> A basis point (bps) fee of <strong class="kpi-number">5-10 bps</strong> is charged on all volume routed through the protocol. This fee is programmatically collected and accrued to the protocol treasury.</li>
-                        <li><strong>Enterprise Add-ons:</strong> For large partners requiring dedicated infrastructure, bespoke policy modules, or priority support, we offer tailored service agreements with fixed retainers or tiered fee structures.</li>
-                        <li><strong>Future Token (Optional):</strong> Post-product-market fit, a token may be introduced for governance and potential fee-sharing, ensuring long-term alignment with the community. This is not part of the initial fundraising scope.</li>
-                    </ul>
-                </section>
-                
-                <hr>
-                
-                 <section id="architecture">
-                    <h2>Protocol Architecture</h2>
+                <section id="architecture-deep-dive">
+                     <div class="zaha-bg" aria-hidden="true" data-parallax-factor="0.15">
+                        <svg viewBox="0 0 1440 800" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1640 0C1442.5 261.5 1111.5 352 919.5 336C671.5 315.5 572 18 316 89C60 160 -200 600 -200 600V0H1640Z" fill="var(--color-accent)"/></svg>
+                    </div>
+                    <h2>Architecture Deep Dive</h2>
                     <p>Gravitas is a modular, multi-layered system designed for security, extensibility, and operational resilience. The core logic is separated from external integrations, allowing for rapid development and isolated risk.</p>
                     
-                    <svg class="arch-diagram" viewBox="0 0 400 200">
-                        <defs>
-                            <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
-                                <polygon points="0 0, 10 3.5, 0 7" fill="var(--color-accent)"/>
-                            </marker>
-                        </defs>
-                        <rect x="10" y="80" width="100" height="40" class="box"/>
-                        <rect x="150" y="80" width="100" height="40" class="box"/>
-                        <rect x="290" y="80" width="100" height="40" class="box"/>
-                        
-                        <text x="60" y="95" text-anchor="middle" class="text-label">DAO / User</text>
-                        <text x="60" y="110" text-anchor="middle" class="text-desc">(Initiates Tx)</text>
-                        <text x="200" y="95" text-anchor="middle" class="text-label">PolicyEngine</text>
-                        <text x="200" y="110" text-anchor="middle" class="text-desc">(Enforces Rules)</text>
-                        <text x="340" y="95" text-anchor="middle" class="text-label">Adapters</text>
-                        <text x="340" y="110" text-anchor="middle" class="text-desc">(Talk to DeFi)</text>
-                        
-                        <line x1="110" y1="100" x2="150" y2="100" class="arrow"/>
-                        <line x1="250" y1="100" x2="290" y2="100" class="arrow"/>
-
-                        <rect x="150" y="10" width="100" height="40" class="box"/>
-                        <text x="200" y="25" text-anchor="middle" class="text-label">Guardian</text>
-                        <text x="200" y="40" text-anchor="middle" class="text-desc">(Pause Control)</text>
-                        <line x1="200" y1="50" x2="200" y2="80" class="arrow"/>
+                    <svg class="inline-svg-chart" viewBox="0 0 400 220" style="stroke-width:1; margin-top: 48px; margin-bottom: 48px;">
+                         <defs><marker id="arrowhead" markerWidth="5" markerHeight="3.5" refX="0" refY="1.75" orient="auto"><polygon points="0 0, 5 1.75, 0 3.5" fill="var(--color-accent)"/></marker></defs>
+                        <g class="axis-label" style="font-size:12px;">
+                            <rect x="20" y="80" width="90" height="60" rx="4" stroke="var(--text-muted)" fill="var(--bg-paper)"/>
+                            <text x="65" y="115" text-anchor="middle">DAO/User</text>
+                            <rect x="155" y="80" width="90" height="60" rx="4" stroke="var(--text-muted)" fill="var(--bg-paper)"/>
+                            <text x="200" y="115" text-anchor="middle">PolicyEngine</text>
+                            <rect x="290" y="80" width="90" height="60" rx="4" stroke="var(--text-muted)" fill="var(--bg-paper)"/>
+                            <text x="335" y="115" text-anchor="middle">Adapters</text>
+                            <line x1="110" y1="110" x2="155" y2="110" stroke="var(--color-accent)" marker-end="url(#arrowhead)"/>
+                            <line x1="245" y1="110" x2="290" y2="110" stroke="var(--color-accent)" marker-end="url(#arrowhead)"/>
+                            <rect x="90" y="10" width="100" height="40" rx="4" stroke="var(--text-muted)" fill="var(--bg-paper)"/>
+                            <text x="140" y="35" text-anchor="middle">Guardian/Timelock</text>
+                            <line x1="180" y1="50" x2="180" y2="80" stroke="var(--color-accent)" marker-end="url(#arrowhead)"/>
+                            <rect x="220" y="10" width="100" height="40" rx="4" stroke="var(--text-muted)" fill="var(--bg-paper)"/>
+                            <text x="270" y="35" text-anchor="middle">Telemetry</text>
+                             <line x1="240" y1="50" x2="215" y2="80" stroke="var(--color-accent)" marker-end="url(#arrowhead)"/>
+                        </g>
                     </svg>
                     
-                    <h3>Core Components</h3>
+                    <h3>Sequence of Operations</h3>
+                    <ol>
+                        <li><strong>Policy Validation:</strong> A transaction is initiated, and the `PolicyEngine` verifies it against the treasury's registered policy constraints.</li>
+                        <li><strong>Simulation Check:</strong> The transaction is dry-run against a mainnet fork to predict outcomes like slippage and gas costs, ensuring they are within acceptable bounds.</li>
+                        <li><strong>Adapter Invocation:</strong> The `PolicyEngine` calls the appropriate, isolated `Adapter` contract to execute the transaction on the target DeFi protocol.</li>
+                        <li><strong>Fee Sweep:</strong> A protocol fee (5-10 bps) is programmatically swept to the protocol treasury upon successful execution.</li>
+                        <li><strong>Event Emission:</strong> A detailed log of the entire operation is emitted as an on-chain event for indexing and real-time monitoring.</li>
+                    </ol>
+                    <h3>Policy Constraints Framework</h3>
+                    <p>Each treasury can define a granular policy with rules enforced at runtime, including:</p>
                     <ul>
-                        <li><strong>PolicyEngine:</strong> The central smart contract that orchestrates all operations. It validates transactions against a treasury's registered policy, ensuring no action can violate predefined rules (e.g., asset whitelists, concentration limits).</li>
-                        <li><strong>Adapters:</strong> A suite of modular contracts that translate PolicyEngine commands into specific function calls for external DeFi protocols (e.g., an `AaveV3Adapter` handles deposits and withdrawals from Aave). This isolates integration risk.</li>
-                        <li><strong>Guardian & Timelock:</strong> Governance controls form the highest security layer. A <strong>3/5 multisig</strong> controls critical changes, all subject to a <strong>48-hour timelock</strong>. A separate Guardian role has unilateral power to pause the system in emergencies, but cannot alter or withdraw funds.</li>
-                        <li><strong>Telemetry:</strong> On-chain events that provide a real-time, transparent data stream of all protocol activity. This feeds into our monitoring and alerting infrastructure.</li>
+                        <li><strong>Asset Allowlist:</strong> A specific list of permissible assets for deposit and withdrawal.</li>
+                        <li><strong>Exposure Caps:</strong> Maximum allocation percentage per asset, protocol, or strategy.</li>
+                        <li><strong>Oracle Freshness Thresholds:</strong> Reverts if price data is older than a specified duration (e.g., 60 seconds).</li>
+                        <li><strong>Slippage Ceilings & Velocity Limits:</strong> Maximum permissible slippage on trades and limits on the value that can be moved within a given epoch.</li>
                     </ul>
                 </section>
                 
                 <hr>
 
-                <section id="security">
-                    <h2>Security & Risk Mitigation</h2>
-                    <p>Security is not a feature, but the foundation of the protocol. Our approach is multi-layered, combining proactive design, rigorous testing, and real-time monitoring to protect partner assets.</p>
+                <section id="security-assurance">
+                    <h2>Security & Assurance</h2>
+                    <p>Our security posture is built on a defense-in-depth model, assuming adversarial conditions at every layer. The protocol is designed to be failsafe, prioritizing the preservation of capital above all else.</p>
                     
-                    <div class="pull-quote">Our goal is to be the most secure and reliable component in our partners' operational stack.</div>
-                    
-                    <h4>Defense-in-Depth Layers</h4>
+                    <h4>Static Guards (Code-Level)</h4>
                     <ul>
-                        <li><strong>Static Guards:</strong> Hardcoded, non-negotiable checks within the contracts. This includes reentrancy guards, strict input validation, and asset/protocol whitelisting enforced by the PolicyEngine.</li>
-                        <li><strong>Dynamic Guards:</strong> Real-time checks that adapt to market conditions. This includes stale oracle detection, adaptive slippage controls based on asset volatility, and velocity checks on fund movements.</li>
-                        <li><strong>Rigorous Testing & Verification:</strong>
-                            <ul>
-                                <li>The entire codebase is subject to <strong>invariant fuzz testing</strong> via Foundry to discover edge cases.</li>
-                                <li>We maintain a strict <strong>>95% code coverage</strong> target on all core contracts.</li>
-                                <li>The audit timeline includes <strong>two internal reviews</strong> and <strong>one external audit</strong> by a top-tier firm post-funding.</li>
-                            </ul>
-                        </li>
-                        <li><strong>Comprehensive Monitoring Layer:</strong> We monitor for critical on-chain events in real-time, with automated alerts sent to an off-chain SIEM. Key monitored events include:
-                            <ul>
-                                <li>`FAILED_TX_THRESHOLD_REACHED`</li>
-                                <li>`CIRCUIT_BREAKER_TRIPPED`</li>
-                                <li>`POLICY_BREACH_ATTEMPT` (rejected transaction)</li>
-                            </ul>
-                        </li>
+                        <li><strong>Immutable Logic:</strong> Core contracts are immutable, preventing unauthorized upgrades.</li>
+                        <li><strong>Standard Protections:</strong> Built-in safeguards against reentrancy, integer overflow/underflow, and non-zero address checks.</li>
+                        <li><strong>Adapter Isolation:</strong> A vulnerability in one adapter cannot affect the core engine or other adapters.</li>
+                    </ul>
+
+                    <h4>Dynamic Guards (Runtime)</h4>
+                    <ul>
+                        <li><strong>Circuit Breakers:</strong> Automated triggers that can pause deposits to a specific asset or protocol if unusual activity is detected.</li>
+                        <li><strong>Volatility-Aware Slippage:</strong> Slippage tolerance is dynamically adjusted based on real-time market volatility of the underlying assets.</li>
+                    </ul>
+
+                    <h4>Governance & Testing</h4>
+                    <ul>
+                        <li><strong>Governance:</strong> A <strong>3/5 Gnosis Safe</strong> multisig controls non-critical parameters, with all changes passing through a <strong>48-hour timelock</strong>. A separate Guardian role can pause the system but cannot withdraw funds or modify parameters.</li>
+                        <li><strong>Testing Regimen:</strong> Our process includes <strong>Foundry-based invariant and fuzz testing</strong>, maintaining <strong>>95% code coverage</strong>, mainnet-fork simulations, and a library of historical exploit replay tests.</li>
+                    </ul>
+
+                    <h4>Monitoring & Audit Plan</h4>
+                    <ul>
+                        <li><strong>On-Chain Events:</strong> We emit detailed events for critical actions, including `FAILED_TX`, `CIRCUIT_BREAKER_TRIPPED`, `POLICY_BREACH_ATTEMPT`, and `FEE_CHANGE_PROPOSED`.</li>
+                        <li><strong>Audit Plan:</strong> One full internal review pass, followed by one external audit from a top-tier firm, and a formal verification engagement focused on the `PolicyEngine`'s core mathematical logic.</li>
                     </ul>
                 </section>
-                
+
                 <hr>
-                
+
                 <section id="use-of-funds">
                     <h2>Pre-Seed Revised ($450k Ask)</h2>
-                    <p>With the MVP technically complete and validated, this revised funding request is focused exclusively on security, legal formalization, and establishing an operational base in a crypto-forward jurisdiction. This lean ask provides 18 months of runway for audits, compliance, and initial business development.</p>
+                    <p>With the MVP technically complete, this revised funding request is focused exclusively on security, legal formalization, and establishing an operational base. This lean ask provides an 18-month runway for audits, compliance, and initial business development.</p>
+                    
+                    <svg class="inline-svg-chart" viewBox="0 0 300 40" style="margin: 32px 0;">
+                        <rect x="0" y="0" width="100" height="20" fill="var(--color-accent)" rx="2"/> <rect x="100" y="0" width="67" height="20" fill="var(--text-muted)" rx="2"/> <rect x="167" y="0" width="53" height="20" fill="var(--border-lines)" style="stroke: var(--text-muted); stroke-width: 1px;" rx="2"/> <rect x="220" y="0" width="80" height="20" fill="var(--text-ink)" rx="2"/> </svg>
+
                      <table>
                         <thead>
-                            <tr>
-                                <th>Category</th>
-                                <th>Amount (USD)</th>
-                                <th>Description</th>
-                            </tr>
+                            <tr><th>Category</th><th>Amount (USD)</th><th>Description</th></tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td><strong>Security Audits & Formal Verification</strong></td>
-                                <td class="kpi-number">$150k</td>
-                                <td>Budget for a top-tier external audit (e.g., Trail of Bits) and formal verification of core logic.</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Relocation & Qatar Corporate Setup</strong></td>
-                                <td class="kpi-number">$100k</td>
-                                <td>Costs associated with establishing the legal entity and team presence in a strategic, pro-innovation hub.</td>
-                            </tr>
-                             <tr>
-                                <td><strong>Legal & Regulatory Compliance</strong></td>
-                                <td class="kpi-number">$80k</td>
-                                <td>Retainer for legal counsel to navigate digital asset regulations and draft partner agreements.</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Runway (Advisors, Infra, BD)</strong></td>
-                                <td class="kpi-number">$120k</td>
-                                <td>Covers essential infrastructure, advisor stipends, and initial go-to-market expenses.</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Total</strong></td>
-                                <td><strong class="kpi-number">$450k</strong></td>
-                                <td>Lean capital to achieve full audit, legal setup, and onboard first design partners.</td>
-                            </tr>
+                            <tr><td><strong>Security Audits & Formal Verification</strong></td><td class="kpi-number">$150,000</td><td>External audit and formal verification of core logic.</td></tr>
+                            <tr><td><strong>Relocation & Qatar Corporate Setup</strong></td><td class="kpi-number">$100,000</td><td>Establishing the legal entity and team presence.</td></tr>
+                            <tr><td><strong>Legal & Regulatory Counsel</strong></td><td class="kpi-number">$80,000</td><td>Retainer for navigating digital asset regulations.</td></tr>
+                            <tr><td><strong>Runway (Advisors, Infra, BD)</strong></td><td class="kpi-number">$120,000</td><td>Essential infrastructure and go-to-market expenses.</td></tr>
+                            <tr><td><strong>Total</strong></td><td><strong class="kpi-number">$450,000</strong></td><td>18-month runway to reach PMF and onboard partners.</td></tr>
                         </tbody>
                     </table>
                 </section>
-
-                <hr>
                 
-                <section id="faq">
-                    <h2>Investor FAQ</h2>
-                    <h4>How do protocol fees accrue?</h4>
-                    <p>Fees are programmatically swept into a dedicated multisig treasury controlled by the protocol. Initially, these funds will be used to cover operational expenses and fund further development. Future governance may decide on other uses.</p>
-                    <h4>Is custody of funds ever taken?</h4>
-                    <p>No. Gravitas is entirely non-custodial. Partner funds are managed via smart contract allowances and are always held in the partner's own contracts or in the underlying DeFi protocols (e.g., Aave aTokens).</p>
-                    <h4>Why would a partner choose Gravitas over building in-house?</h4>
-                    <p>Building and maintaining a secure, efficient, and audited liquidity management system is a significant undertaking that distracts from a protocol's core mission. We provide this as a specialized service, offering greater security and lower overhead than an in-house solution.</p>
-                    <h4>What is the policy on a future token?</h4>
-                    <p>A token is not required for the protocol to function or generate revenue. A token would only be introduced if it serves a clear purpose for decentralizing governance and aligning long-term incentives, and only after we have achieved significant product-market fit.</p>
+                <hr>
+
+                <section id="operational-playbook">
+                    <h2>Operational Playbook</h2>
+                    <p>Reliability is paramount. We operate with a playbook that prioritizes transparency, predictability, and rapid, safe incident response.</p>
+                    <ul>
+                        <li><strong>Change Management:</strong> All protocol upgrades are queued via the timelock with on-chain announcements and human-readable diff previews.</li>
+                        <li><strong>Incident Response:</strong> A clear runbook for incident triage, activating Guardian pauses, stakeholder communication, and public postmortems.</li>
+                        <li><strong>Deployment Cadence:</strong> All new adapters and features are first deployed on an L2 testnet as a canary before being proposed for mainnet inclusion. Our primary SLO is <strong>99.9% availability</strong> for all core services.</li>
+                    </ul>
                 </section>
 
+                <hr>
+
+                <section id="data-telemetry">
+                    <h2>Data & Telemetry</h2>
+                    <p>The protocol is designed to be fully transparent and observable. All significant state changes and actions are logged as structured on-chain events.</p>
+                    <ul>
+                        <li><strong>Public Dashboards:</strong> We will provide public Dune dashboards for monitoring key metrics like total volume, fees generated, and adapter utilization.</li>
+                        <li><strong>SIEM Integration:</strong> A standardized webhook pattern is available for partners to ingest our on-chain event stream directly into their Security Information and Event Management (SIEM) systems.</li>
+                        <li><strong>Data Retention:</strong> On-chain events are retained indefinitely by the blockchain, providing a permanent, immutable audit trail.</li>
+                    </ul>
+                </section>
+                
                 <hr>
 
                 <section id="whitepaper">
                     <h2>Technical Whitepaper</h2>
-                    <p>For a detailed exploration of the protocol architecture, mathematical models for risk, and the complete policy engine specification, please review the full whitepaper.</p>
-                    <iframe src="docs/whitepaper.pdf" title="Gravitas Protocol Whitepaper" class="pdf-embed" loading="lazy"></iframe>
-                    <p>If the PDF doesn’t render, you can <a href="docs/whitepaper.pdf" target="_blank" rel="noopener noreferrer">open it directly in a new tab</a>. The original markdown version is available on <a href="https://github.com/AbZe628/gravitas-protocol/blob/main/docs/whitepaper.md" target="_blank" rel="noopener noreferrer">GitHub</a>.</p>
-                </section>
-                
-                <hr>
-
-                <section id="appendix">
-                    <h2>Technical Appendix</h2>
-                    <h4>Contracts & Adapters Map</h4>
-                    <p>The core system comprises a central `PolicyEngine` contract that interfaces with various `Adapters` (e.g., `AaveV3Adapter`, `CompoundV2Adapter`). A `Registry` contract manages active adapters and policies.</p>
-                    <h4>Test Plan & Security Posture</h4>
-                    <ul>
-                        <li><strong>Test Plan:</strong> Comprehensive suite using Foundry, with >95% code coverage, extensive fuzzing, and invariant testing.</li>
-                        <li><strong>Security Posture:</strong>
-                            <ul>
-                                <li>3/5 Multisig, 48h Timelock, Guardian Role.</li>
-                                <li>On-chain monitoring for events like `LARGE_MIGRATION`, `FAILED_TX_THRESHOLD`, `CIRCUIT_BREAKER_TRIPPED`, `FEE_CHANGE_PROPOSED`.</li>
-                            </ul>
-                        </li>
-                    </ul>
-                    <h4>TypeScript SDK Example</h4>
-                    <p>Interacting with the protocol is streamlined via our TS SDK.</p>
-                    <div class="code-block-wrapper">
-                        <pre><code class="language-typescript">import { GravitasClient } from '@gravitas/sdk';
-
-const client = new GravitasClient(signer);
-
-// Migrate $1M USDC based on the 'moderate-risk' policy
-const tx = await client.migrate({
-  asset: 'USDC',
-  amount: 1_000_000,
-  policyId: 'moderate-risk',
-});
-
-await tx.wait(); // Migration complete in <30s
-</code></pre>
-                        <button class="copy-button" aria-label="Copy code snippet to clipboard">Copy</button>
-                    </div>
+                    <p>For a complete exploration of the protocol architecture, mathematical models, and the full policy engine specification, please review the complete whitepaper.</p>
+                    <iframe class="pdf-embed" src="docs/whitepaper.pdf" title="Gravitas Protocol Whitepaper" loading="lazy"></iframe>
+                    <p>If the PDF doesn’t render, <a href="docs/whitepaper.pdf" target="_blank" rel="noopener">open it in a new tab</a>.</p>
                 </section>
                 
                 <hr>
@@ -900,10 +566,8 @@ await tx.wait(); // Migration complete in <30s
                     <div style="font-size: 1.1rem; line-height: 1.8;">
                         <p><strong>Email:</strong> <a href="mailto:abdusamedzelic98@gmail.com">abdusamedzelic98@gmail.com</a></p>
                         <p><strong>Phone:</strong> <a href="tel:+385915668133">+385 91 566 8133</a></p>
-                        <p><strong>LinkedIn:</strong> <a href="https://www.linkedin.com/in/abdusamed-zeli%C4%87-5b5526183/" target="_blank" rel="noopener noreferrer">Abdusamed Zelić</a></p>
                     </div>
-                    <div style="margin: calc(var(--spacing-unit) * 1.5) 0; display: flex; flex-wrap: wrap; gap: var(--spacing-unit);">
-                        <a href="mailto:abdusamedzelic98@gmail.com" class="cta-button primary">Request Investment Deck</a>
+                    <div style="margin-top: calc(var(--spacing-unit) * 1.5);">
                         <a href="https://github.com/AbZe628/gravitas-protocol/tree/main" target="_blank" rel="noopener noreferrer" class="cta-button secondary">
                              <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><title>GitHub</title><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
                             <span>View MVP on GitHub</span>
@@ -924,8 +588,7 @@ await tx.wait(); // Migration complete in <30s
             </button>
         </div>
         <div class="drawer-nav">
-             <ul id="mobile-toc-list">
-                </ul>
+             <ul id="mobile-toc-list"></ul>
         </div>
     </nav>
 
@@ -933,114 +596,68 @@ await tx.wait(); // Migration complete in <30s
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" /></svg>
     </button>
     
-
 <script>
 document.addEventListener('DOMContentLoaded', () => {
 
-    // ===================================
-    // 0. Element Selectors
-    // ===================================
     const sections = document.querySelectorAll('main section[id]');
     const desktopTocList = document.getElementById('desktop-toc-list');
     const mobileTocList = document.getElementById('mobile-toc-list');
-    
     const themeToggleButton = document.querySelector('.theme-toggle');
     const sunIcon = document.querySelector('.theme-toggle .sun');
     const moonIcon = document.querySelector('.theme-toggle .moon');
-
     const burgerMenuButton = document.querySelector('.burger-menu');
     const closeDrawerButton = document.getElementById('close-drawer-btn');
     const drawer = document.getElementById('mobile-drawer');
     const drawerBackdrop = document.getElementById('drawer-backdrop');
-    
     const backToTopButton = document.querySelector('.back-to-top');
-    const copyButtons = document.querySelectorAll('.copy-button');
+    const parallaxBgs = document.querySelectorAll('[data-parallax-factor]');
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    // ===================================
     // 1. Table of Contents & Scroll-Spy
-    // ===================================
-    const tocItems = [];
-    sections.forEach(section => {
+    const tocItems = Array.from(sections).map(section => {
         const titleEl = section.querySelector('h2');
-        if (titleEl) {
-            tocItems.push({
-                id: section.id,
-                title: titleEl.textContent
-            });
-        }
-    });
+        return titleEl ? { id: section.id, title: titleEl.textContent } : null;
+    }).filter(Boolean);
     
     const createTocLinks = (listElement) => {
         if (!listElement) return;
-        listElement.innerHTML = '';
-        tocItems.forEach(item => {
-            const li = document.createElement('li');
-            const a = document.createElement('a');
-            a.href = `#${item.id}`;
-            a.textContent = item.title;
-            a.dataset.targetId = item.id;
-            li.appendChild(a);
-            listElement.appendChild(li);
-        });
+        listElement.innerHTML = tocItems.map(item => `<li><a href="#${item.id}" data-target-id="${item.id}">${item.title}</a></li>`).join('');
     };
-
     createTocLinks(desktopTocList);
     createTocLinks(mobileTocList);
     
-    const desktopTocLinks = desktopTocList ? desktopTocList.querySelectorAll('a') : [];
-    const mobileTocLinks = mobileTocList ? mobileTocList.querySelectorAll('a') : [];
-
+    const tocLinks = document.querySelectorAll('.toc-sidebar a, .drawer-nav a');
     const observer = new IntersectionObserver(entries => {
         entries.forEach(entry => {
             const id = entry.target.getAttribute('id');
             const correspondingLinks = document.querySelectorAll(`a[data-target-id="${id}"]`);
             if (entry.isIntersecting && entry.intersectionRatio > 0.1) {
-                desktopTocLinks.forEach(link => link.classList.remove('active'));
-                mobileTocLinks.forEach(link => link.classList.remove('active'));
+                tocLinks.forEach(link => link.classList.remove('active'));
                 correspondingLinks.forEach(link => link.classList.add('active'));
             }
         });
-    }, { 
-        rootMargin: `-${document.querySelector('.topbar').offsetHeight}px 0px -40% 0px`,
-        threshold: 0.1
-    });
-
+    }, { rootMargin: `-${document.querySelector('.topbar').offsetHeight}px 0px -40% 0px`, threshold: 0.1 });
     sections.forEach(section => observer.observe(section));
 
-    // ===================================
     // 2. Dark Mode Toggle
-    // ===================================
     const applyTheme = (theme) => {
         document.documentElement.setAttribute('data-theme', theme);
-        if (theme === 'dark') {
-            sunIcon.style.display = 'none';
-            moonIcon.style.display = 'block';
-        } else {
-            sunIcon.style.display = 'block';
-            moonIcon.style.display = 'none';
-        }
+        sunIcon.style.display = theme === 'dark' ? 'none' : 'block';
+        moonIcon.style.display = theme === 'dark' ? 'block' : 'none';
     };
-
     const toggleTheme = () => {
-        const currentTheme = document.documentElement.getAttribute('data-theme');
-        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
         localStorage.setItem('gravitas_theme', newTheme);
         applyTheme(newTheme);
     };
-
     const persistedTheme = localStorage.getItem('gravitas_theme');
     const preferredTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     applyTheme(persistedTheme || preferredTheme);
-
     themeToggleButton.addEventListener('click', toggleTheme);
 
-    // ===================================
     // 3. Mobile Drawer Logic
-    // ===================================
     const focusableElementsSelector = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
-    let focusableElements;
-    let firstFocusableElement;
-    let lastFocusableElement;
+    let focusableElements, firstFocusableElement, lastFocusableElement;
     
     const openDrawer = () => {
         drawer.classList.add('is-open');
@@ -1052,7 +669,6 @@ document.addEventListener('DOMContentLoaded', () => {
         focusableElements = Array.from(drawer.querySelectorAll(focusableElementsSelector));
         firstFocusableElement = focusableElements[0];
         lastFocusableElement = focusableElements[focusableElements.length - 1];
-        
         setTimeout(() => firstFocusableElement.focus(), 100); 
     };
 
@@ -1068,89 +684,42 @@ document.addEventListener('DOMContentLoaded', () => {
     burgerMenuButton.addEventListener('click', openDrawer);
     closeDrawerButton.addEventListener('click', closeDrawer);
     drawerBackdrop.addEventListener('click', closeDrawer);
-    
-    mobileTocLinks.forEach(link => {
-        link.addEventListener('click', closeDrawer);
-    });
+    document.querySelectorAll('.drawer-nav a').forEach(link => link.addEventListener('click', closeDrawer));
 
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && drawer.classList.contains('is-open')) {
-            closeDrawer();
-        }
-
-        if (e.key === 'Tab' && drawer.classList.contains('is-open')) {
-            if (e.shiftKey) { // Shift + Tab
-                if (document.activeElement === firstFocusableElement) {
-                    lastFocusableElement.focus();
-                    e.preventDefault();
-                }
-            } else { // Tab
-                if (document.activeElement === lastFocusableElement) {
-                    firstFocusableElement.focus();
-                    e.preventDefault();
-                }
-            }
+        if (!drawer.classList.contains('is-open')) return;
+        if (e.key === 'Escape') closeDrawer();
+        if (e.key === 'Tab') {
+            if (e.shiftKey) { if (document.activeElement === firstFocusableElement) { lastFocusableElement.focus(); e.preventDefault(); } }
+            else { if (document.activeElement === lastFocusableElement) { firstFocusableElement.focus(); e.preventDefault(); } }
         }
     });
 
-    // ===================================
     // 4. Smooth Scrolling & Back to Top
-    // ===================================
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const scrollOptions = {
-        behavior: prefersReducedMotion ? 'auto' : 'smooth'
-    };
-
+    const scrollOptions = { behavior: prefersReducedMotion ? 'auto' : 'smooth' };
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function(e) {
             e.preventDefault();
-            const targetId = this.getAttribute('href');
-            const targetElement = document.querySelector(targetId);
-            if(targetElement) {
-                targetElement.scrollIntoView(scrollOptions);
-            }
+            const targetElement = document.querySelector(this.getAttribute('href'));
+            if(targetElement) targetElement.scrollIntoView(scrollOptions);
         });
     });
+    backToTopButton.addEventListener('click', () => window.scrollTo({ top: 0, ...scrollOptions }));
 
-    backToTopButton.addEventListener('click', () => {
-        window.scrollTo({ top: 0, ...scrollOptions });
-    });
-
-    // ===================================
-    // 5. Back to Top Button Visibility
-    // ===================================
+    // 5. Scroll-based Effects (Back-to-Top visibility and Parallax)
     const handleScroll = () => {
-        if (window.scrollY > 600) {
-            backToTopButton.classList.add('visible');
-        } else {
-            backToTopButton.classList.remove('visible');
+        const scrollY = window.scrollY;
+        backToTopButton.classList.toggle('visible', scrollY > 600);
+
+        if (!prefersReducedMotion) {
+            parallaxBgs.forEach(bg => {
+                const factor = parseFloat(bg.dataset.parallaxFactor) || 0.1;
+                const yOffset = scrollY * factor;
+                bg.style.transform = `translateY(${yOffset}px)`;
+            });
         }
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
-    
-    // ===================================
-    // 6. Copy to Clipboard
-    // ===================================
-    copyButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const codeBlock = button.previousElementSibling.querySelector('code');
-            const textToCopy = codeBlock.innerText;
-
-            if (navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard.writeText(textToCopy).then(() => {
-                    button.textContent = 'Copied!';
-                    setTimeout(() => {
-                        button.textContent = 'Copy';
-                    }, 2000);
-                }).catch(err => {
-                    console.error('Failed to copy: ', err);
-                    alert('Failed to copy text.');
-                });
-            } else {
-                alert('Copy feature is not available in this context. Please copy manually.');
-            }
-        });
-    });
 });
 </script>
 
