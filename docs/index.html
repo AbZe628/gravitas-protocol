@@ -1,1043 +1,642 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Gravitas Protocol — Policy-Driven Liquidity Orchestration</title>
-  <meta name="description" content="Gravitas Protocol is a neutral, policy-driven liquidity orchestration layer for treasuries, DAOs and L2s. Atomic migrations, auditable guardrails, institutional reliability."/>
-  <!-- Fonts & Icons -->
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
-  <!-- Three.js -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r152/three.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Gravitas Protocol — Liquidity that moves like light</title>
+  <meta name="description" content="Gravitas is a neutral, policy-driven orchestration layer for atomic, audited liquidity migrations across DEXs. Enterprise-grade security, SDK-first, and investor-ready story." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Serif:wght@600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/three@0.158.0/build/three.min.js"></script>
 
   <style>
-    :root{
-      --primary:#8A1538;        /* Qatar maroon */
-      --gold:#D4AF37;           /* Gold accent */
-      --paper:#0B0C10;          /* Deep charcoal */
-      --paper-grad:
-        radial-gradient(1200px 600px at 50% -10%, rgba(212,175,55,.12), transparent 60%),
-        radial-gradient(1400px 700px at 50% 120%, rgba(138,21,56,.16), transparent 55%);
-      --line:rgba(255,255,255,.08);
-      --muted:#A9ADBB;
-      --ink:#F6F6F8;
-      --grad:linear-gradient(135deg,var(--gold),#B8860B);
-      --glass-bg: rgba(255,255,255,.06);
-      --glass-stroke: rgba(255,255,255,.18);
-    }
-    *{box-sizing:border-box;margin:0;padding:0}
-    html{scroll-behavior:smooth}
-    body{
-      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-      background: var(--paper);
-      background-image: var(--paper-grad);
-      color:var(--ink); line-height:1.78; overflow-x:hidden;
-    }
-    a{color:inherit;text-decoration:none}
+  /* =========================================================
+     THEME / TOKENS
+  ========================================================= */
+  :root{
+    --bg:#0b0d10;
+    --ink:#eef2f7;
+    --muted:#a8b2c1;
+    --accent:#8A1538;      /* Qatar maroon */
+    --accent-2:#d4af37;    /* Gold */
+    --glass:rgba(255,255,255,.06);
+    --glass-2:rgba(255,255,255,.08);
+    --border:rgba(255,255,255,.12);
+    --blur:18px;
+    --radius:16px;
+    --radius-lg:22px;
+    --shadow:0 10px 30px rgba(0,0,0,.35);
+    --shadow-lg:0 20px 60px rgba(0,0,0,.5);
+    --max:1200px;
+    --spacing:24px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue","Noto Sans",sans-serif;
+    line-height:1.7; overflow-x:hidden;
+  }
+  a{color:var(--ink)}
+  .wrap{max-width:var(--max); width:92%; margin:0 auto}
+  section{padding:64px 0}
+  h2{font-family:"IBM Plex Serif",serif; font-weight:800; letter-spacing:-.3px; font-size:clamp(1.8rem,3vw,2.2rem); margin:0 0 10px}
+  .lead{color:var(--muted); max-width:980px}
 
-    /* Layers */
-    #bg3d{position:fixed; inset:0; z-index:-3}
-    #shaderCanvas{position:fixed; inset:0; z-index:-2; pointer-events:none}
-    #vignette{position:fixed; inset:0; z-index:-1; pointer-events:none;
-      background:
-        radial-gradient(1000px 700px at 50% 30%, rgba(255,255,255,.06), transparent 60%),
-        linear-gradient(to bottom, rgba(0,0,0,.0), rgba(0,0,0,.35))
-    }
+  /* =========================================================
+     LAYERS: 3D CANVAS + FOG PARALLAX
+  ========================================================= */
+  #scene{position:fixed; inset:0; z-index:-2}
+  .fog{
+    position:fixed; inset:0; z-index:-1; pointer-events:none;
+    background:
+      radial-gradient(1200px 600px at 70% 10%, rgba(212,175,55,.15), transparent 60%),
+      radial-gradient(1000px 600px at 20% 20%, rgba(138,21,56,.12), transparent 60%),
+      radial-gradient(1600px 900px at 50% 120%, rgba(255,255,255,.06), transparent 60%);
+    transition:transform .25s ease-out;
+  }
 
-    /* Topbar */
-    .topbar{
-      position:fixed; top:0; left:0; right:0; height:68px; z-index:1000;
-      display:flex; align-items:center; justify-content:space-between; padding:0 5%;
-      background:rgba(11,12,16,.45); backdrop-filter:blur(16px);
-      border-bottom:1px solid var(--line)
-    }
-    .brand{display:flex; gap:.6rem; align-items:center; font-weight:900; letter-spacing:.02em}
-    .brand i{color:var(--gold)} .brand span{font-size:1.05rem}
-    .nav-links{display:flex; gap:1.05rem}
-    .nav-links a{color:var(--muted); font-weight:800; padding:.25rem .1rem; position:relative}
-    .nav-links a:hover{color:#fff}
-    .nav-links a::after{
-      content:""; position:absolute; left:0; bottom:-6px; height:2px; width:0; background:var(--grad); transition:width .2s ease
-    }
-    .nav-links a:hover::after{width:100%}
-    .btn{border:none; border-radius:999px; cursor:pointer; font-weight:900; letter-spacing:.2px; padding:.64rem 1.05rem;
-      display:inline-flex; gap:.55rem; align-items:center; transition:transform .15s, box-shadow .25s}
-    .btn-ghost{background:transparent; color:#fff; border:1px solid var(--line)}
-    .btn-ghost:hover{border-color:rgba(255,255,255,.25)}
-    .btn-primary{background:var(--grad); color:#111}
-    .btn-primary:hover{transform:translateY(-2px); box-shadow:0 10px 26px rgba(212,175,55,.25)}
-    .cta-row{display:flex; gap:.6rem; align-items:center}
-    .burger{display:none; background:transparent; border:1px solid var(--line); border-radius:10px; width:40px; height:40px; color:#fff; align-items:center; justify-content:center}
-    @media (max-width:1180px){.nav-links{display:none}.burger{display:flex}}
+  /* =========================================================
+     NAV / HEADER
+  ========================================================= */
+  .nav{
+    position:sticky; top:0; z-index:50;
+    backdrop-filter: blur(var(--blur));
+    -webkit-backdrop-filter: blur(var(--blur));
+    background:rgba(10,12,15,.55);
+    border-bottom:1px solid var(--border);
+  }
+  .nav-inner{display:flex; align-items:center; justify-content:space-between; height:68px}
+  .brand{display:flex; align-items:center; gap:10px; text-decoration:none; color:var(--ink); font-weight:800; letter-spacing:.3px}
+  .brand-logo{height:34px; width:34px; border-radius:10px; display:grid; place-items:center;
+    background: radial-gradient(120% 120% at 0% 0%, var(--accent-2), var(--accent) 55%); box-shadow:var(--shadow)}
+  .nav-links{display:flex; gap:18px; align-items:center}
+  .nav-links a{color:var(--muted); text-decoration:none; font-weight:600; font-size:.95rem; padding:10px 12px; border-radius:10px; transition:.25s}
+  .nav-links a:hover{color:var(--ink); background:var(--glass)}
+  .nav-actions{display:flex; gap:10px; align-items:center}
+  .btn{
+    display:inline-flex; align-items:center; gap:8px; text-decoration:none; cursor:pointer;
+    background:linear-gradient(135deg, var(--accent-2), #b8891c);
+    color:#151515; border:none; padding:10px 16px; border-radius:999px; font-weight:800; font-size:.95rem; box-shadow:var(--shadow);
+    transition:transform .15s ease, box-shadow .3s ease, filter .2s ease;
+  }
+  .btn:hover{transform:translateY(-2px); box-shadow:var(--shadow-lg); filter:saturate(1.1)}
+  .btn-ghost{background:transparent; color:var(--ink); border:1px solid var(--border); box-shadow:none}
+  .btn-ghost:hover{background:var(--glass-2)}
+  .badge{display:inline-flex; gap:8px; align-items:center; font-weight:700; font-size:.85rem; color:var(--ink);
+    background:rgba(255,255,255,.06); border:1px solid var(--border); border-radius:999px; padding:8px 12px; backdrop-filter:blur(var(--blur))}
+  .burger{display:none; background:none; border:1px solid var(--border); border-radius:12px; color:var(--ink); padding:8px}
+  /* Drawer */
+  .drawer{position:fixed; inset:0 0 0 auto; width:82%; max-width:360px; background:#0f1115; transform:translateX(100%);
+    transition:transform .3s ease; z-index:60; display:flex; flex-direction:column; border-left:1px solid var(--border)}
+  .drawer.open{transform:none}
+  .drawer-head{display:flex; align-items:center; justify-content:space-between; padding:18px; border-bottom:1px solid var(--border)}
+  .drawer-links{display:flex; flex-direction:column; padding:12px}
+  .drawer-links a{padding:14px 12px; color:var(--muted); text-decoration:none; font-weight:600; border-radius:10px}
+  .drawer-links a:hover{background:var(--glass); color:var(--ink)}
+  .backdrop{position:fixed; inset:0; background:rgba(0,0,0,.45); opacity:0; visibility:hidden; transition:.2s; z-index:55}
+  .backdrop.show{opacity:1; visibility:visible}
 
-    /* Drawer */
-    .drawer-backdrop{position:fixed; inset:0; background:rgba(0,0,0,.55); backdrop-filter:blur(2px); z-index:999; display:none}
-    .drawer{position:fixed; top:0; left:0; height:100vh; width:332px; background:rgba(16,18,23,.8); border-right:1px solid var(--line);
-      z-index:1000; transform:translateX(-100%); transition:transform .25s ease; backdrop-filter:blur(16px)}
-    .drawer.open{transform:translateX(0)} .drawer-backdrop.open{display:block}
-    .drawer header{height:68px; display:flex; align-items:center; justify-content:space-between; padding:0 1rem; border-bottom:1px solid var(--line)}
-    .drawer nav{display:flex; flex-direction:column; padding:1rem}
-    .drawer nav a{padding:.95rem 1rem; border-radius:12px; color:var(--muted); font-weight:900}
-    .drawer nav a:hover{background:rgba(255,255,255,.06); color:#fff}
+  /* =========================================================
+     HERO
+  ========================================================= */
+  .hero{padding:84px 0 40px}
+  .hero h1{
+    font-family:"IBM Plex Serif",serif; font-weight:800; letter-spacing:-.5px; line-height:1.1;
+    font-size:clamp(2.4rem,5vw,4rem); margin:16px 0 14px;
+    background: linear-gradient(180deg, #fff, #cfd6e0 60%, #9eaabc 100%);
+    -webkit-background-clip:text; background-clip:text; color:transparent
+  }
+  .gold{background:linear-gradient(135deg,var(--accent-2),#fbe9a8); -webkit-background-clip:text; background-clip:text; color:transparent}
+  .hero p{color:var(--muted); font-size:clamp(1.02rem,2.1vw,1.18rem)}
+  .hero-cta{display:flex; flex-wrap:wrap; gap:12px; margin-top:18px}
 
-    /* Layout */
-    .container{width:92%; max-width:1240px; margin:0 auto; padding:7.6rem 0}
-    .section-title{font-size:3rem; font-weight:900; text-align:center; margin-bottom:1rem;
-      background:linear-gradient(135deg,#fff,#d0d0d9); -webkit-background-clip:text; background-clip:text; color:transparent}
-    .section-sub{max-width:1040px; margin:0 auto 2.8rem auto; text-align:center; color:var(--muted); font-size:1.14rem}
-    .grid-2{display:grid; grid-template-columns:1fr 1fr; gap:2rem}
-    .grid-3{display:grid; grid-template-columns:repeat(3,1fr); gap:2rem}
-    @media (max-width:1100px){.grid-2,.grid-3{grid-template-columns:1fr}}
+  /* KPI STRIP */
+  .kpis{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin:26px 0 6px}
+  .kpi{padding:18px; border-radius:16px; background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border:1px solid var(--border); backdrop-filter: blur(var(--blur)); text-align:center}
+  .kpi .v{font-weight:900; font-size:1.8rem; background:linear-gradient(135deg,var(--accent-2),#ffd36b); -webkit-background-clip:text; background-clip:text; color:transparent}
+  .kpi .l{color:var(--muted); font-weight:600; font-size:.9rem}
 
-    /* Glass */
-    .glass{background:var(--glass-bg); border:1px solid var(--glass-stroke); border-radius:18px; backdrop-filter: blur(14px)}
-    .card{padding:2rem; transition:transform .25s, border-color .2s, box-shadow .25s}
-    .card:hover{transform:translateY(-6px); border-color:rgba(212,175,55,.22); box-shadow:0 28px 70px rgba(0,0,0,.35)}
-    .card h3{font-size:1.45rem; margin-bottom:.65rem}
-    ul.clean{list-style:none}
-    ul.clean li{padding-left:1.25rem; position:relative; margin:.55rem 0; color:var(--muted)}
-    ul.clean li::before{content:""; position:absolute; left:0; top:.78rem; width:8px; height:8px; border-radius:50%; background:var(--gold)}
+  /* CARDS / GRIDS / GLASS */
+  .grid-2{display:grid; grid-template-columns:1fr 1fr; gap:24px; align-items:stretch}
+  .grid-3{display:grid; grid-template-columns:repeat(3,1fr); gap:22px}
+  .card{background:var(--glass); border:1px solid var(--border); border-radius:var(--radius-lg);
+    padding:22px; backdrop-filter: blur(var(--blur)); box-shadow:var(--shadow)}
+  .card h3{margin:0 0 8px}
+  .card p{color:var(--muted)}
+  .list{padding-left:18px}
+  .list li{margin:.45rem 0; color:var(--muted)}
+  .chip-row{display:flex; flex-wrap:wrap; gap:8px; margin:10px 0}
+  .chip{padding:6px 10px; border-radius:999px; background:rgba(255,255,255,.07); border:1px solid var(--border); color:#e8ecf4; font-weight:700; font-size:.8rem}
 
-    /* Tables */
-    .table-wrap{overflow:auto; border-radius:14px}
-    table{width:100%; border-collapse:collapse; font-size:.98rem; background:rgba(21,22,28,.7); border:1px solid var(--line)}
-    thead th{position:sticky; top:0; background:rgba(16,18,23,.9); border-bottom:1px solid var(--line); text-align:left; padding:12px; font-weight:900}
-    tbody td{border-top:1px solid var(--line); padding:12px; color:#dee}
-    tbody tr:nth-child(odd){background:rgba(20,22,26,.5)}
+  /* CTA STRIP */
+  .cta-strip{margin:36px 0 0; display:flex; gap:12px; flex-wrap:wrap; background:linear-gradient(180deg, rgba(138,21,56,.12), rgba(138,21,56,.06));
+    border:1px solid var(--border); padding:16px; border-radius:18px; backdrop-filter: blur(var(--blur))}
 
-    /* Hero */
-    .hero{min-height:100vh; display:flex; align-items:center}
-    .hero-inner{max-width:1060px; margin:0 auto; padding-top:6rem; text-align:center}
-    .eyebrow{display:inline-flex; gap:.5rem; align-items:center; border:1px solid var(--line); padding:.42rem .78rem; border-radius:999px; color:#EAEAF1; margin-bottom:1rem; backdrop-filter:blur(10px)}
-    .eyebrow i{color:var(--gold)}
-    .hero h1{font-size:4.1rem; line-height:1.05; font-weight:900; margin:.6rem 0 1rem;
-      background:linear-gradient(135deg,#fff,#c7c7d1); -webkit-background-clip:text; background-clip:text; color:transparent}
-    .hero p{color:var(--muted); font-size:1.22rem; margin:0 auto 1.6rem; max-width:920px}
-    .hero-ctas{display:flex; justify-content:center; gap:.8rem; flex-wrap:wrap}
+  /* TIMELINE */
+  .timeline{position:relative}
+  .timeline::before{content:""; position:absolute; left:calc(50% - 2px); top:0; bottom:0; width:4px; background:linear-gradient(180deg,var(--accent-2),transparent)}
+  .tl{position:relative; width:50%; padding:0 24px 28px}
+  .tl:nth-child(odd){left:0; text-align:right}
+  .tl:nth-child(even){left:50%}
+  .tl .bubble{display:inline-block; background:var(--glass); border:1px solid var(--border); border-radius:14px; padding:14px 16px; backdrop-filter:blur(var(--blur))}
+  .tl::after{content:""; position:absolute; top:10px; width:16px; height:16px; border-radius:50%; background:var(--accent-2); border:3px solid #231a1c}
+  .tl:nth-child(odd)::after{right:-8px}
+  .tl:nth-child(even)::after{left:-8px}
 
-    /* KPI band */
-    .kpi-band{margin-top:2.1rem; display:grid; grid-template-columns:repeat(4,1fr); gap:1rem}
-    .kpi{border:1px solid var(--line); border-radius:16px; background:rgba(21,22,28,.6); padding:1.1rem; text-align:center; backdrop-filter: blur(10px)}
-    .kpi .v{font-weight:900; font-size:1.9rem; background:var(--grad); -webkit-background-clip:text; background-clip:text; color:transparent}
-    .kpi .l{color:var(--muted); font-weight:700}
+  /* FAQ */
+  details{border:1px solid var(--border); border-radius:14px; background:var(--glass); padding:14px 16px; margin:10px 0; backdrop-filter: blur(var(--blur))}
+  summary{cursor:pointer; list-style:none; font-weight:700}
+  summary::marker, summary::-webkit-details-marker{display:none}
+  details[open]{background:rgba(255,255,255,.09)}
 
-    /* Timeline */
-    .timeline{position:relative; margin:1rem auto}
-    .timeline::before{content:""; position:absolute; left:calc(50% - 2px); top:0; bottom:0; width:4px; background:var(--grad); border-radius:2px; opacity:.45}
-    .t-item{position:relative; width:50%; padding:0 2rem 1.6rem}
-    .t-item .dot{position:absolute; top:.3rem; width:16px; height:16px; border-radius:50%; background:var(--paper); border:3px solid var(--gold); z-index:2}
-    .t-item.left{left:0; text-align:right}.t-item.left .dot{right:-8px}
-    .t-item.right{left:50%}.t-item.right .dot{left:-8px}
-    .t-card{display:inline-block; max-width:520px; padding:1rem 1.2rem}
-    @media (max-width:1100px){
-      .timeline::before{left:20px}
-      .t-item{width:100%; padding-left:3.2rem}
-      .t-item.left,.t-item.right{text-align:left; left:0}
-      .t-item .dot{left:12px}
-    }
+  /* FOOTER + TOP */
+  footer{border-top:1px solid var(--border); padding:24px 0 60px; margin-top:40px}
+  .foot{display:flex; justify-content:space-between; gap:18px; align-items:center; flex-wrap:wrap}
+  .foot a{color:var(--muted); text-decoration:none}
+  .foot a:hover{color:var(--ink)}
+  .to-top{position:fixed; right:16px; bottom:16px; width:48px; height:48px; border-radius:999px; border:1px solid var(--border);
+    background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)); color:var(--ink);
+    display:grid; place-items:center; box-shadow:var(--shadow); opacity:0; transform:translateY(12px); pointer-events:none; transition:.25s; z-index:40}
+  .to-top.show{opacity:1; transform:none; pointer-events:auto}
 
-    /* CTA band + Footer */
-    .cta-band{background:rgba(15,17,22,.6); border-top:1px solid var(--line); border-bottom:1px solid var(--line); backdrop-filter: blur(10px)}
-    .cta-band .inner{text-align:center}
-    .cta-band h2{font-size:2.3rem; margin-bottom:.75rem}
-    footer{padding:3.5rem 5% 2.2rem; border-top:1px solid var(--line); text-align:center; backdrop-filter: blur(6px)}
-    .foot-brand{display:flex; gap:.6rem; align-items:center; justify-content:center; margin-bottom:.6rem}
-    .foot-social{display:flex; gap:1rem; justify-content:center; margin:1rem 0}
-    .foot-social a{color:#9aa1b3; font-size:1.3rem}
-    .foot-social a:hover{color:var(--gold)}
-    .foot-cta{margin-top:1rem}
-
-    /* Back to top */
-    .to-top{position:fixed; right:18px; bottom:18px; z-index:800; border:none; border-radius:999px; width:46px; height:46px;
-      background:var(--grad); color:#111; display:flex; align-items:center; justify-content:center; cursor:pointer;
-      box-shadow:0 10px 22px rgba(212,175,55,.25); opacity:0; pointer-events:none; transition:opacity .2s, transform .2s}
-    .to-top.show{opacity:1; pointer-events:auto}
-    .to-top:hover{transform:translateY(-3px)}
-    .sr-only{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0; padding:0; margin:-1px}
-
-    /* Parallax helpers */
-    .parallax{will-change:transform}
-    [data-parallax]{transform:translateY(var(--pY,0))}
-
-    /* Doc embed */
-    .doc-embed{width:100%; height:70vh; border:1px solid var(--line); border-radius:16px}
+  /* RESPONSIVE */
+  @media (max-width:1100px){
+    .nav-links{display:none}
+    .burger{display:inline-flex}
+    .kpis{grid-template-columns:repeat(2,1fr)}
+    .grid-2{grid-template-columns:1fr}
+    .grid-3{grid-template-columns:1fr}
+    .timeline::before{left:10px}
+    .tl{width:100%; left:0; padding-left:40px; text-align:left}
+    .tl::after{left:2px}
+  }
+  @media (max-width:640px){
+    .kpis{grid-template-columns:1fr}
+  }
   </style>
 </head>
 <body>
-  <!-- Layers -->
-  <div id="bg3d" aria-hidden="true"></div>
-  <canvas id="shaderCanvas" aria-hidden="true"></canvas>
-  <div id="vignette" aria-hidden="true"></div>
 
-  <a class="sr-only" href="#main">Skip to content</a>
+<canvas id="scene" aria-hidden="true"></canvas>
+<div class="fog" aria-hidden="true"></div>
 
-  <!-- TOPBAR -->
-  <header class="topbar">
-    <a class="brand" href="#hero"><i class="fas fa-atom"></i><span>Gravitas Protocol</span></a>
+<header class="nav">
+  <div class="wrap nav-inner">
+    <a href="#home" class="brand" aria-label="Gravitas home">
+      <div class="brand-logo"><span>G</span></div>
+      <span>Gravitas Protocol</span>
+    </a>
+
     <nav class="nav-links" aria-label="Primary">
       <a href="#vision">Vision</a>
       <a href="#opportunity">Opportunity</a>
       <a href="#solution">Solution</a>
-      <a href="#economics">Economics</a>
-      <a href="#security">Security</a>
       <a href="#adapters">Adapters</a>
       <a href="#sdk">SDK/API</a>
-      <a href="#competition">Competition</a>
       <a href="#cases">Case Studies</a>
+      <a href="#security">Security</a>
+      <a href="#economics">Economics</a>
       <a href="#gtm">GTM</a>
-      <a href="#audit">Audit</a>
-      <a href="#risks">Risks</a>
-      <a href="#preseed">Pre-Seed</a>
       <a href="#faq">FAQ</a>
-      <a href="#whitepaper">Whitepaper</a>
       <a href="#contact">Contact</a>
     </nav>
-    <div class="cta-row">
-      <a class="btn btn-ghost" href="https://github.com/AbZe628/gravitas-protocol/tree/main" target="_blank" rel="noopener">
-        <i class="fab fa-github"></i> Explore MVP
-      </a>
-      <a class="btn btn-primary" href="https://github.com/AbZe628/gravitas-protocol/blob/main/docs/whitepaper.md" target="_blank" rel="noopener">
-        <i class="fa-solid fa-file-lines"></i> Read Whitepaper
-      </a>
-      <button class="burger" id="burger" aria-label="Open menu" aria-controls="drawer" aria-expanded="false"><i class="fa-solid fa-bars"></i></button>
+
+    <div class="nav-actions">
+      <a class="btn-ghost btn" href="https://github.com/AbZe628/gravitas-protocol/tree/main" target="_blank" rel="noopener">Explore MVP</a>
+      <a class="btn" href="https://github.com/AbZe628/gravitas-protocol/blob/main/docs/whitepaper.md" target="_blank" rel="noopener">Read Whitepaper</a>
+      <button class="burger" id="open-drawer" aria-label="Open menu">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </button>
     </div>
-  </header>
+  </div>
+</header>
 
-  <!-- MOBILE DRAWER -->
-  <div class="drawer-backdrop" id="backdrop" tabindex="-1"></div>
-  <aside class="drawer" id="drawer" aria-hidden="true">
-    <header>
-      <span class="brand"><i class="fas fa-atom" style="color:var(--gold)"></i>&nbsp;Gravitas</span>
-      <button class="burger" id="closeDrawer" aria-label="Close menu"><i class="fa-solid fa-xmark"></i></button>
-    </header>
-    <nav aria-label="Mobile">
-      <a href="#vision">Vision</a>
-      <a href="#opportunity">Opportunity</a>
-      <a href="#solution">Solution</a>
-      <a href="#economics">Economics</a>
-      <a href="#security">Security</a>
-      <a href="#adapters">Adapters</a>
-      <a href="#sdk">SDK/API</a>
-      <a href="#competition">Competition</a>
-      <a href="#cases">Case Studies</a>
-      <a href="#gtm">GTM</a>
-      <a href="#audit">Audit</a>
-      <a href="#risks">Risks</a>
-      <a href="#preseed">Pre-Seed</a>
-      <a href="#faq">FAQ</a>
-      <a href="#whitepaper">Whitepaper</a>
-      <a href="https://github.com/AbZe628/gravitas-protocol/tree/main" target="_blank" rel="noopener">Explore MVP</a>
-      <a href="#contact">Contact</a>
-    </nav>
-  </aside>
+<!-- Drawer -->
+<div class="backdrop" id="backdrop"></div>
+<aside class="drawer" id="drawer" aria-label="Mobile menu" aria-hidden="true">
+  <div class="drawer-head">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="brand-logo" style="height:28px;width:28px;border-radius:8px"><span>G</span></div>
+      <strong>Gravitas</strong>
+    </div>
+    <button class="burger" id="close-drawer" aria-label="Close menu">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <nav class="drawer-links">
+    <a href="#vision">Vision</a>
+    <a href="#opportunity">Opportunity</a>
+    <a href="#solution">Solution</a>
+    <a href="#adapters">Adapters</a>
+    <a href="#sdk">SDK/API</a>
+    <a href="#cases">Case Studies</a>
+    <a href="#security">Security</a>
+    <a href="#economics">Economics</a>
+    <a href="#gtm">Go-To-Market</a>
+    <a href="#faq">FAQ</a>
+    <a href="#contact">Contact</a>
+    <hr style="border:none;border-top:1px solid var(--border);margin:10px 0">
+    <a href="https://github.com/AbZe628/gravitas-protocol/tree/main" target="_blank" rel="noopener">Explore MVP</a>
+    <a href="https://github.com/AbZe628/gravitas-protocol/blob/main/docs/whitepaper.md" target="_blank" rel="noopener">Whitepaper (.md)</a>
+  </nav>
+</aside>
 
-  <main id="main">
-    <!-- HERO -->
-    <section class="hero" id="hero">
-      <div class="container hero-inner parallax" data-parallax data-speed="0.18">
-        <span class="eyebrow glass"><i class="fa-solid fa-shield"></i> MVP Complete • Policy-Driven • Non-Custodial</span>
-        <h1 class="parallax" data-parallax data-speed="0.1">Liquidity that <span style="background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent">moves like light</span> — secure, instant, auditable.</h1>
-        <p class="parallax" data-parallax data-speed="0.14">Gravitas is a neutral orchestration layer for treasuries, DAOs and L2 foundations. We turn fragmented liquidity into a reliable, revenue-generating engine — with explicit on-chain policies, guardian safeguards and atomic migrations across venues.</p>
-        <div class="hero-ctas parallax" data-parallax data-speed="0.2">
-          <a class="btn btn-primary" id="btn-request" href="mailto:abdusamedzelic98@gmail.com?subject=Gravitas%20Protocol%20—%20Investor%20Docs%20Request&body=Hi%20Gravitas%20team%2C%0A%0APlease%20send%20the%20latest%20investor%20deck%20and%20materials.%20Here%20are%20my%20details%3A%0A-%20Name%3A%0A-%20Fund%2FOrg%3A%0A-%20Check%20size%3A%0A-%20Focus%3A%0A%0AThank%20you!">Request Investor Docs</a>
-          <a class="btn btn-ghost" id="btn-schedule" href="mailto:abdusamedzelic98@gmail.com?subject=Gravitas%20—%20Intro%20Call&body=Hi%2C%20I'd%20like%20to%20book%20a%2030-minute%20intro%20call.%20My%20availability%3A%0A-%20Option%201%3A%0A-%20Option%202%3A%0A-%20Timezone%3A%0A%0AThank%20you!"><i class="fa-solid fa-calendar-days"></i> Schedule a Meeting</a>
-          <a class="btn btn-ghost" href="https://github.com/AbZe628/gravitas-protocol/tree/main" target="_blank" rel="noopener"><i class="fab fa-github"></i> Explore MVP</a>
-        </div>
+<main id="home">
+  <section class="hero wrap" style="padding-top:96px">
+    <span class="badge">MVP Complete • Policy-Driven • Non-Custodial</span>
+    <h1>Liquidity that <span class="gold">moves like light</span> — secure, instant, auditable.</h1>
+    <p>Gravitas je neutralni orkestracijski sloj za trezore, DAO-ove i L2 zaklade. Fragmentiranu likvidnost pretvaramo u pouzdan, prihodovni motor — s eksplicitnim on-chain pravilima, zaštitama skrbnika i **atomskim migracijama** preko venue-a.</p>
+    <div class="hero-cta">
+      <a class="btn" href="mailto:abdusamedzelic98@gmail.com?subject=Investor%20Docs%20Request%20-%20Gravitas&body=Hi%20Gravitas%20team%2C%0D%0A%0D%0APlease%20share%20the%20deck%20and%20data-room%20links.%0D%0A%0D%0ARegards%2C">Request Investor Docs</a>
+      <a class="btn-ghost btn" href="https://cal.com/abdusamed/gravitas" target="_blank" rel="noopener">Schedule a Meeting</a>
+      <a class="btn-ghost btn" href="https://github.com/AbZe628/gravitas-protocol/tree/main" target="_blank" rel="noopener">Explore MVP</a>
+    </div>
 
-        <div class="kpi-band parallax" data-parallax data-speed="0.22">
-          <div class="kpi glass"><div class="v">&lt;30s</div><div class="l">Avg Migration</div></div>
-          <div class="kpi glass"><div class="v">99.9%</div><div class="l">Uptime Target</div></div>
-          <div class="kpi glass"><div class="v">0</div><div class="l">Critical Incidents</div></div>
-          <div class="kpi glass"><div class="v">5–10 bps</div><div class="l">Micro-Fee</div></div>
-        </div>
+    <div class="kpis">
+      <div class="kpi"><div class="v">&lt;30s</div><div class="l">Avg Migration</div></div>
+      <div class="kpi"><div class="v">99.9%</div><div class="l">Uptime Target</div></div>
+      <div class="kpi"><div class="v">0</div><div class="l">Critical Incidents</div></div>
+      <div class="kpi"><div class="v">5–10 bps</div><div class="l">Micro-Fee</div></div>
+    </div>
+  </section>
+
+  <section id="vision" class="wrap">
+    <h2>Vision</h2>
+    <p class="lead">DeFi ne treba još jedan vault — treba mu **kontrolni toranj** za kapital. Gravitas uvodi operativno povjerenje: objektivna pravila, vidljiv telemetrijski trag i adapteri koji govore jezik svakog venue-a. Naš cilj je postati **nevidljivi motor** koji premješta likvidnost bez buke i izgovora.</p>
+    <div class="chip-row">
+      <span class="chip">Neutral Infrastructure</span>
+      <span class="chip">Policy-Driven Automation</span>
+      <span class="chip">SDK-First</span>
+      <span class="chip">Guardian + Timelock</span>
+      <span class="chip">Audit-ready Telemetry</span>
+    </div>
+  </section>
+
+  <section id="opportunity" class="wrap">
+    <h2>Opportunity</h2>
+    <div class="grid-2">
+      <div class="card">
+        <h3>Market Pain</h3>
+        <ul class="list">
+          <li>Fragmentirana likvidnost → plitka tržišta i skriveni troškovi.</li>
+          <li>Ručne migracije → kašnjenja, greške, klizanja cijene.</li>
+          <li>Bez politike nema ponovljivosti ni odgovornosti.</li>
+        </ul>
+        <p>Volumeni rastu, L2 naknade omogućuju česta rebalansiranja. Nedostaje **neutralni** transportni sloj s revizijskim tragom.</p>
       </div>
-    </section>
-
-    <!-- VISION -->
-    <section id="vision" class="container">
-      <h2 class="section-title parallax" data-parallax data-speed="0.08">Vision — The Liquidity Operating System</h2>
-      <p class="section-sub parallax" data-parallax data-speed="0.12">Capital should flow to its best use instantly, safely, and predictably. DeFi has the venues; Gravitas provides the operating system that routes liquidity with policy guarantees and institutional discipline.</p>
-      <div class="grid-3">
-        <div class="card glass parallax" data-parallax data-speed="0.18">
-          <h3>Neutral by Design</h3>
-          <ul class="clean">
-            <li>No product conflicts. We don’t launch yield strategies; we power them.</li>
-            <li>Policy-driven automation aligns with treasury mandates and governance.</li>
-            <li>Transparent fees accrue credibility, not complexity.</li>
-          </ul>
-        </div>
-        <div class="card glass parallax" data-parallax data-speed="0.22">
-          <h3>Trust via Operations</h3>
-          <ul class="clean">
-            <li>Guardian + timelock, auditable change-management, public telemetry.</li>
-            <li>Incident drills and postmortems like a Tier-1 infra team.</li>
-            <li>“Boring to depend on” is our product philosophy.</li>
-          </ul>
-        </div>
-        <div class="card glass parallax" data-parallax data-speed="0.26">
-          <h3>Network Effects</h3>
-          <ul class="clean">
-            <li>Each adapter compounds strategy surface area for everyone.</li>
-            <li>Design partners define the standard others adopt.</li>
-            <li>Sticky integrations, predictable SLAs, compounding volume.</li>
-          </ul>
-        </div>
+      <div class="card">
+        <h3>Thesis</h3>
+        <p>Efikasnost kapitala pobjeđuje desetljeće. Neutralni router koji kontrolira tok (bez custodyja) stvara **kompozabilni moat**. Monetizacija preko mikro-naknade na protok, ne na TVL.</p>
+        <ul class="list">
+          <li>Cilj: trezori DAO-a i L2-ova, veliki protokoli, MM-ovi.</li>
+          <li>Sticky integracije: nakon adaptera + politika + audita — skupo prebacivanje.</li>
+        </ul>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- OPPORTUNITY -->
-    <section id="opportunity" class="container">
-      <h2 class="section-title parallax" data-parallax data-speed="0.1">Opportunity — Liquidity Fragmentation is a Tax on Growth</h2>
-      <p class="section-sub parallax" data-parallax data-speed="0.14">DEX volumes exceed tens of billions monthly, yet treasuries remain under-optimized: assets idle, migrations manual, risk controls ad-hoc. Consolidating this into a policy-first engine unlocks durable revenue and systemic reliability.</p>
-      <div class="grid-2">
-        <div class="card glass parallax" data-parallax data-speed="0.18">
-          <h3>Market Pain</h3>
-          <ul class="clean">
-            <li>Fragmented capital: shallow pools, poor depth.</li>
-            <li>Operational overhead: governance + ops latency.</li>
-            <li>Inconsistent risk controls across venues.</li>
-            <li>No neutral, auditable orchestration standard.</li>
-          </ul>
-        </div>
-        <div class="card glass parallax" data-parallax data-speed="0.22">
-          <h3>Investment Case</h3>
-          <ul class="clean">
-            <li>B2B rails for on-chain capital operations.</li>
-            <li>Recurring, volume-linked revenues (bps).</li>
-            <li>Defensibility via integrations and reliability.</li>
-            <li>Aligned with the professionalization of DeFi.</li>
-          </ul>
-        </div>
+  <section id="solution" class="wrap">
+    <h2>Solution & Architecture</h2>
+    <p class="lead">Modularni pametni ugovori + SDK: <strong>PolicyEngine</strong> validira zahtjeve; <strong>Adapters</strong> izvršavaju pozive; <strong>Guardian</strong> pauzira; <strong>Timelock</strong> štiti promjene; <strong>Telemetry</strong> emitira bogate događaje.</p>
+    <div class="grid-3" style="margin-top:14px">
+      <div class="card">
+        <h3>PolicyEngine</h3>
+        <p>Statične i dinamičke zaštite: allowlisti, capovi koncentracije, starenje orakla, adaptivni slippage, velocity limiti i kvote per-address. Kršenje politike = tx ne prolazi.</p>
       </div>
-    </section>
-
-    <!-- SOLUTION -->
-    <section id="solution" class="container">
-      <h2 class="section-title parallax" data-parallax data-speed="0.1">Solution — Policy-Driven Orchestration Engine</h2>
-      <p class="section-sub parallax" data-parallax data-speed="0.14">One API, one policy, any venue: Gravitas executes migrations and rebalances under strict guardrails. Institutions define tolerance; we enforce it.</p>
-      <div class="grid-3">
-        <div class="card glass parallax" data-parallax data-speed="0.16">
-          <h3>Policy Engine</h3>
-          <ul class="clean">
-            <li>Whitelisted assets, venues, and concentration limits.</li>
-            <li>Max slippage, velocity caps, oracle freshness.</li>
-            <li>Programmatic approvals; no discretionary ops.</li>
-          </ul>
-        </div>
-        <div class="card glass parallax" data-parallax data-speed="0.2">
-          <h3>Atomic Migrations</h3>
-          <ul class="clean">
-            <li>One-click reallocation across pools/DEXs.</li>
-            <li>Batching and netting reduce gas by design.</li>
-            <li>Transparent events for auditability.</li>
-          </ul>
-        </div>
-        <div class="card glass parallax" data-parallax data-speed="0.24">
-          <h3>Adapters Network</h3>
-          <ul class="clean">
-            <li>Modular adapters (Aave, Morpho, Uni, Balancer...).</li>
-            <li>Risk-isolated integration surface.</li>
-            <li>Each new adapter increases strategy space.</li>
-          </ul>
-        </div>
+      <div class="card">
+        <h3>Adapters</h3>
+        <p>Izolirani moduli: UniV2/3, Curve, Balancer, Aave, Compound, Morpho. Try/catch granice, fail-fast, sigurna matematika. Novi venue = aditivno, bez invazije na core.</p>
       </div>
-    </section>
-
-    <!-- ECONOMICS with SVG charts -->
-    <section id="economics" class="container">
-      <h2 class="section-title parallax" data-parallax data-speed="0.1">Economics — Simple, Transparent, Aligned</h2>
-      <p class="section-sub parallax" data-parallax data-speed="0.14">We charge a micro-fee (5–10 bps) on routed volume. High gross margins; costs are mainly security, infra, and ops.</p>
-
-      <div class="grid-2">
-        <div class="card glass parallax" data-parallax data-speed="0.18">
-          <h3>Unit Economics</h3>
-          <div class="table-wrap" style="margin-top:.6rem">
-            <table>
-              <thead><tr><th>Monthly Volume</th><th>5 bps</th><th>8 bps</th><th>10 bps</th></tr></thead>
-              <tbody>
-                <tr><td>$50M</td><td>$25k</td><td>$40k</td><td>$50k</td></tr>
-                <tr><td>$100M</td><td>$50k</td><td>$80k</td><td>$100k</td></tr>
-                <tr><td>$250M</td><td>$125k</td><td>$200k</td><td>$250k</td></tr>
-                <tr><td>$500M</td><td>$250k</td><td>$400k</td><td>$500k</td></tr>
-              </tbody>
-            </table>
-          </div>
-          <p style="margin-top:.6rem;color:var(--muted)">Break-even achievable sub-$100M monthly volume at ~6–8 bps blended.</p>
-        </div>
-
-        <div class="card glass parallax" data-parallax data-speed="0.22">
-          <h3>Revenue Sensitivity (SVG)</h3>
-          <svg viewBox="0 0 520 240" width="100%" height="240" role="img" aria-label="Revenue sensitivity chart">
-            <defs>
-              <linearGradient id="g" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0" stop-color="#D4AF37"/>
-                <stop offset="1" stop-color="#B8860B"/>
-              </linearGradient>
-            </defs>
-            <!-- axes -->
-            <line x1="40" y1="200" x2="500" y2="200" stroke="rgba(255,255,255,.25)" stroke-width="1"/>
-            <line x1="40" y1="20" x2="40" y2="200" stroke="rgba(255,255,255,.25)" stroke-width="1"/>
-            <!-- x labels -->
-            <text x="80" y="215" fill="#A9ADBB" font-size="12">$50M</text>
-            <text x="180" y="215" fill="#A9ADBB" font-size="12">$100M</text>
-            <text x="300" y="215" fill="#A9ADBB" font-size="12">$250M</text>
-            <text x="430" y="215" fill="#A9ADBB" font-size="12">$500M</text>
-            <!-- y labels -->
-            <text x="5" y="200" fill="#A9ADBB" font-size="12">$0</text>
-            <text x="5" y="150" fill="#A9ADBB" font-size="12">$200k</text>
-            <text x="5" y="100" fill="#A9ADBB" font-size="12">$400k</text>
-            <text x="5" y="50" fill="#A9ADBB" font-size="12">$600k</text>
-            <!-- 10 bps line -->
-            <polyline fill="none" stroke="url(#g)" stroke-width="3"
-              points="80,175 180,150 300,100 430,50"/>
-            <!-- 8 bps ghost -->
-            <polyline fill="none" stroke="rgba(212,175,55,.55)" stroke-width="2" stroke-dasharray="4 6"
-              points="80,185 180,170 300,120 430,70"/>
-            <!-- 5 bps ghost -->
-            <polyline fill="none" stroke="rgba(212,175,55,.35)" stroke-width="2" stroke-dasharray="2 6"
-              points="80,195 180,185 300,150 430,100"/>
-            <!-- legend -->
-            <rect x="55" y="26" width="180" height="52" rx="10" ry="10" fill="rgba(255,255,255,.06)" stroke="rgba(255,255,255,.12)"/>
-            <line x1="65" y1="42" x2="95" y2="42" stroke="url(#g)" stroke-width="3"/>
-            <text x="105" y="46" fill="#EDEFF7" font-size="12">10 bps</text>
-            <line x1="65" y1="58" x2="95" y2="58" stroke="rgba(212,175,55,.55)" stroke-width="2" stroke-dasharray="4 6"/>
-            <text x="105" y="62" fill="#EDEFF7" font-size="12">8 bps</text>
-          </svg>
-          <p style="margin-top:.6rem;color:var(--muted)">Illustrative only; exact slope depends on venue mix, gas, and batching efficiency.</p>
-        </div>
+      <div class="card">
+        <h3>Operations</h3>
+        <p>3/5 Gnosis Safe; 48h timelock; Guardian smije samo pauzirati. On-chain događaji → SIEM (Slack/PagerDuty) u realnom vremenu.</p>
       </div>
-    </section>
+    </div>
+    <div class="cta-strip">
+      <a class="btn" href="https://github.com/AbZe628/gravitas-protocol/tree/main" target="_blank" rel="noopener">Explore MVP on GitHub</a>
+      <a class="btn-ghost btn" href="https://github.com/AbZe628/gravitas-protocol/blob/main/docs/whitepaper.md" target="_blank" rel="noopener">Open Technical Whitepaper (.md)</a>
+    </div>
+  </section>
 
-    <!-- SECURITY -->
-    <section id="security" class="container">
-      <h2 class="section-title parallax" data-parallax data-speed="0.1">Security — Defense in Depth</h2>
-      <p class="section-sub parallax" data-parallax data-speed="0.14">Security is not a feature; it’s the product. All flows are constrained by immutable checks and executable policies, with change-management visible on-chain.</p>
-      <div class="grid-3">
-        <div class="card glass parallax" data-parallax data-speed="0.18">
-          <h3>Static Guards</h3>
-          <ul class="clean">
-            <li>Reentrancy, rate-limits, allowance minimization.</li>
-            <li>Asset & venue whitelists enforced at entry.</li>
-            <li>Invariant checks + revert on policy breach.</li>
-          </ul>
-        </div>
-        <div class="card glass parallax" data-parallax data-speed="0.22">
-          <h3>Dynamic Guards</h3>
-          <ul class="clean">
-            <li>Oracle freshness & deviation bounds.</li>
-            <li>Adaptive slippage by volatility regime.</li>
-            <li>Velocity caps; circuit breaker events.</li>
-          </ul>
-        </div>
-        <div class="card glass parallax" data-parallax data-speed="0.26">
-          <h3>Governance-Safe</h3>
-          <ul class="clean">
-            <li>3/5 multisig with 48h timelock on critical changes.</li>
-            <li>Guardian pause (no withdraw authority).</li>
-            <li>Public telemetry & incident runbooks.</li>
-          </ul>
-        </div>
-      </div>
-    </section>
+  <section id="adapters" class="wrap">
+    <h2>Adapter Matrix</h2>
+    <div class="grid-3">
+      <div class="card"><h3>DEX Routing</h3><ul class="list"><li>Uniswap V2/V3 (exactIn/out)</li><li>Curve stables & metapools</li><li>Balancer weighted & boosted</li></ul></div>
+      <div class="card"><h3>Lending</h3><ul class="list"><li>Aave V3 supply/withdraw</li><li>Compound V2</li><li>Morpho (peer-to-pool)</li></ul></div>
+      <div class="card"><h3>Bridging (opt.)</h3><ul class="list"><li>Canonical bridges (L2)</li><li>Risk-scored third-party bridges</li><li>Time-boxed quotas</li></ul></div>
+    </div>
+  </section>
 
-    <!-- ADAPTERS -->
-    <section id="adapters" class="container">
-      <h2 class="section-title parallax" data-parallax data-speed="0.1">Adapters — Modular, Risk-Isolated</h2>
-      <p class="section-sub parallax" data-parallax data-speed="0.14">Each adapter speaks a venue’s language. Policy Engine remains lean; integration risk stays contained.</p>
-      <div class="grid-3">
-        <div class="card glass parallax" data-parallax data-speed="0.18">
-          <h3>DEX Adapters</h3>
-          <ul class="clean">
-            <li>Uniswap v3/v4, Balancer, Curve.</li>
-            <li>Concentrated liquidity & fee tier awareness.</li>
-            <li>Batch swaps; MEV-aware routing.</li>
-          </ul>
-        </div>
-        <div class="card glass parallax" data-parallax data-speed="0.22">
-          <h3>Lending Adapters</h3>
-          <ul class="clean">
-            <li>Aave/Morpho, Compound.</li>
-            <li>Collateral & LTV guardrails.</li>
-            <li>Safe unwind paths & rate bands.</li>
-          </ul>
-        </div>
-        <div class="card glass parallax" data-parallax data-speed="0.26">
-          <h3>Bridges & L2</h3>
-          <ul class="clean">
-            <li>Canonical bridges, risk-scored alternatives.</li>
-            <li>Timeouts & caps per route.</li>
-            <li>Async settlement tracking.</li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    <!-- SDK / API -->
-    <section id="sdk" class="container">
-      <h2 class="section-title parallax" data-parallax data-speed="0.1">Developer SDK & API</h2>
-      <p class="section-sub parallax" data-parallax data-speed="0.14">Integrate Gravitas in minutes. Policies configure behavior; the SDK handles execution and receipts.</p>
-      <div class="grid-2">
-        <div class="card glass parallax" data-parallax data-speed="0.18">
-<pre style="white-space:pre-wrap;overflow:auto"><code>// TypeScript example
-import { GravitasClient } from '@gravitas/sdk';
-
+  <section id="sdk" class="wrap">
+    <h2>SDK / API</h2>
+    <div class="grid-2">
+      <div class="card">
+        <h3>TypeScript</h3>
+<pre style="white-space:pre-wrap; font-size:.92rem"><code>import { GravitasClient } from '@gravitas/sdk';
 const client = new GravitasClient(signer);
 
-// Migrate $1M USDC under the 'moderate' policy
+// Migrate $1M USDC per policy 'moderate-risk'
 const tx = await client.migrate({
   asset: 'USDC',
   amount: 1_000_000,
-  policyId: 'moderate',
-  fromVenue: 'UniV3-0.05%',
-  toVenue: 'Balancer-80/20',
+  policyId: 'moderate-risk',
+  routeHint: ['UniswapV3', 'Curve'],
+});
+await tx.wait();</code></pre>
+      </div>
+      <div class="card">
+        <h3>Policy Spec (YAML)</h3>
+<pre style="white-space:pre-wrap; font-size:.92rem"><code>id: moderate-risk
+assets:
+  allow: [USDC, USDT, WETH]
+limits:
+  concentration: 0.45
+  dailyVelocityUsd: 5000000
+guards:
+  slippageBps: dynamic-vol-adjusted
+  oracleMaxAgeSec: 120
+roles:
+  guardian: 0xGuardian...
+  adminMultisig: 0xSafe...</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <section id="cases" class="wrap">
+    <h2>Case Studies</h2>
+    <div class="grid-3">
+      <div class="card">
+        <h3>L2 Foundation Treasury</h3>
+        <p>Automatske migracije između stables poolova s ciljanom volatilnošću → 38% niži slippage i stabilniji daily PnL.</p>
+      </div>
+      <div class="card">
+        <h3>Protocol-Owned Liquidity</h3>
+        <p>POL rebalansi u Uniswap/Curve metapoolove pod policama rizika → održan depth bez ručnih intervencija.</p>
+      </div>
+      <div class="card">
+        <h3>Aggregator Integration</h3>
+        <p>SDK integracija u postojeći dashboard; 1-click migracije, audit-logovi, granularne dozvole po adresi.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="security" class="wrap">
+    <h2>Security & Risk</h2>
+    <div class="grid-2">
+      <div class="card">
+        <h3>Defense-in-Depth</h3>
+        <ul class="list">
+          <li>Reentrancy locks, input sanitization, allowlists.</li>
+          <li>Oracle staleness, dynamic slippage, velocity caps.</li>
+          <li>Invariant fuzzing (Foundry), >95% coverage.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Monitoring & Breakers</h3>
+        <p>Watchers za <code>FAILED_TX_THRESHOLD</code>, <code>CIRCUIT_BREAKER_TRIPPED</code>, <code>POLICY_BREACH_ATTEMPT</code>. Alerti i automatska pauza.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="economics" class="wrap">
+    <h2>Economics</h2>
+    <div class="grid-2">
+      <div class="card">
+        <h3>Revenue Model</h3>
+        <ul class="list">
+          <li>5–10 bps na volumen migracije.</li>
+          <li>Enterprise add-ons: dedicated adapters, SLO.</li>
+          <li>Bez custodyja, bez “yield” igara.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Pre-Seed (Revised)</h3>
+        <ul class="list">
+          <li>Auditi + formal verification: <strong>$150k</strong></li>
+          <li>Relocation & Qatar setup: <strong>$100k</strong></li>
+          <li>Legal & compliance: <strong>$80k</strong></li>
+          <li>Runway (advisors, infra, BD): <strong>$120k</strong></li>
+          <li><strong>Total: $450k</strong></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="gtm" class="wrap">
+    <h2>Go-To-Market</h2>
+    <div class="timeline">
+      <div class="tl"><div class="bubble"><strong>Phase 1 — Design Partners</strong><br>3–5 trezora/L2; audit; mainnet + 1 L2.</div></div>
+      <div class="tl"><div class="bubble"><strong>Phase 2 — Expansion</strong><br>Više L2-ova, SDK distribucija, 10+ partnera.</div></div>
+      <div class="tl"><div class="bubble"><strong>Phase 3 — Self-Serve</strong><br>Tooling za DAO, policy templates, community.</div></div>
+    </div>
+  </section>
+
+  <section id="qatar" class="wrap">
+    <h2>Why Qatar?</h2>
+    <p class="lead">Relokacija uklapa Gravitas u ekosustav s **QFC** sandboxom, pro-inovacijskim okvirom i MENA hubom kapitala. Budžet pokriva entitet, pravnu arhitekturu i inicijalni BD.</p>
+  </section>
+
+  <section id="faq" class="wrap">
+    <h2>Investor FAQ</h2>
+    <details><summary>Custody?</summary><p>Nikad. Sredstva ostaju kod partnera ili u protokolima; Gravitas samo ruter pod pravilima.</p></details>
+    <details><summary>Zašto ne in-house?</summary><p>Adapteri + audit + ops + monitoring = cjelokupan proizvod. Mi amortiziramo trošak i rizik.</p></details>
+    <details><summary>Moat?</summary><p>Mreža integracija + operativno povjerenje + revizijski trag → visoki switching costs.</p></details>
+    <details><summary>Token?</summary><p>Nije potreban za prihod. Razmatra se tek nakon PMF-a radi upravljanja/alignmenta.</p></details>
+  </section>
+
+  <section id="contact" class="wrap">
+    <h2>Contact & Partnerships</h2>
+    <p class="lead">Ako želiš da se tvoja likvidnost kreće kao svjetlo — javi se.</p>
+    <div class="cta-strip">
+      <a class="btn" href="mailto:abdusamedzelic98@gmail.com?subject=Partnership%20Inquiry%20-%20Gravitas">Email: abdusamedzelic98@gmail.com</a>
+      <a class="btn-ghost btn" href="tel:+385915668133">Phone: +385 91 566 8133</a>
+      <a class="btn-ghost btn" href="https://cal.com/abdusamed/gravitas" target="_blank" rel="noopener">Schedule a Meeting</a>
+      <a class="btn-ghost btn" href="https://github.com/AbZe628/gravitas-protocol/tree/main" target="_blank" rel="noopener">Explore MVP</a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="brand-logo" style="height:28px;width:28px;border-radius:8px"><span>G</span></div>
+      <strong>Gravitas Protocol</strong>
+    </div>
+    <nav style="display:flex;gap:14px">
+      <a href="#vision">Vision</a>
+      <a href="#solution">Architecture</a>
+      <a href="#economics">Economics</a>
+      <a href="https://github.com/AbZe628/gravitas-protocol/tree/main" target="_blank" rel="noopener">MVP</a>
+      <a href="https://github.com/AbZe628/gravitas-protocol/blob/main/docs/whitepaper.md" target="_blank" rel="noopener">Whitepaper</a>
+    </nav>
+    <span style="color:var(--muted)">© 2025 Gravitas. All rights reserved.</span>
+  </div>
+</footer>
+
+<button class="to-top" id="to-top" aria-label="Back to top">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
+</button>
+
+<script>
+/* =======================
+   Drawer (mobile)
+======================= */
+const drawer = document.getElementById('drawer');
+const backdrop = document.getElementById('backdrop');
+const openBtn = document.getElementById('open-drawer');
+const closeBtn = document.getElementById('close-drawer');
+function openDrawer(){drawer.classList.add('open'); backdrop.classList.add('show'); drawer.setAttribute('aria-hidden','false')}
+function closeDrawer(){drawer.classList.remove('open'); backdrop.classList.remove('show'); drawer.setAttribute('aria-hidden','true')}
+openBtn.addEventListener('click', openDrawer);
+closeBtn.addEventListener('click', closeDrawer);
+backdrop.addEventListener('click', closeDrawer);
+drawer.querySelectorAll('a').forEach(a=>a.addEventListener('click', closeDrawer));
+
+/* =======================
+   Back to top
+======================= */
+const toTop = document.getElementById('to-top');
+window.addEventListener('scroll', ()=>{
+  if (window.scrollY>600) {toTop.classList.add('show')} else {toTop.classList.remove('show')}
+},{passive:true});
+toTop.addEventListener('click', ()=>window.scrollTo({top:0, behavior:'smooth'}));
+
+/* =======================
+   Scroll Spy (desktop)
+======================= */
+const sections = Array.from(document.querySelectorAll('main section[id]'));
+const links = Array.from(document.querySelectorAll('.nav-links a'));
+const linkMap = new Map(links.map(a=>[a.getAttribute('href').slice(1), a]));
+const obs = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      const id = e.target.id;
+      links.forEach(l=>l.classList.remove('active'));
+      const a = linkMap.get(id); if(a){a.classList.add('active')}
+    }
+  })
+},{rootMargin:'-40% 0px -55% 0px', threshold:0.01});
+sections.forEach(s=>obs.observe(s));
+
+/* =======================
+   Parallax fog
+======================= */
+document.addEventListener('scroll', ()=>{
+  const y = window.scrollY;
+  document.querySelector('.fog').style.transform = `translateY(${y*0.08}px)`;
+},{passive:true});
+
+/* =======================
+   THREE.js — Desert + Blockchain Grid
+======================= */
+const canvas = document.getElementById('scene');
+const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(55, window.innerWidth/window.innerHeight, 0.1, 1000);
+camera.position.set(0,1.4,3.6);
+const clock = new THREE.Clock();
+
+/* Lights */
+const hemi = new THREE.HemisphereLight(0xfff2cc, 0x08090b, 0.8);
+scene.add(hemi);
+const dir = new THREE.DirectionalLight(0xffd78a, 0.6);
+dir.position.set(-2,3,1.5);
+scene.add(dir);
+
+/* Dunes Shader */
+const duneVert = `
+varying vec2 vUv;
+varying vec3 vPos;
+uniform float uTime;
+void main(){
+  vUv = uv;
+  vec3 pos = position;
+  float n1 = sin((pos.x*1.5 + uTime*0.4))*0.08;
+  float n2 = sin((pos.z*1.2 - uTime*0.35))*0.06;
+  pos.y += n1 + n2;
+  vPos = pos;
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(pos,1.0);
+}`;
+const duneFrag = `
+varying vec2 vUv;
+varying vec3 vPos;
+uniform vec3 uTop;
+uniform vec3 uBottom;
+uniform float uTime;
+void main(){
+  float shade = smoothstep(-0.2, 0.6, vPos.y);
+  vec3 col = mix(uBottom, uTop, shade);
+  float line = smoothstep(0.48,0.5, fract(vUv.y*30.0 + uTime*0.15));
+  col += line*0.06;
+  gl_FragColor = vec4(col, 0.55);
+}`;
+const duneMat = new THREE.ShaderMaterial({
+  uniforms:{
+    uTime:{value:0},
+    uTop:{value:new THREE.Color(0x4b2a2f)},
+    uBottom:{value:new THREE.Color(0x1a1012)}
+  },
+  vertexShader:duneVert, fragmentShader:duneFrag, transparent:true
+});
+const duneGeo = new THREE.PlaneGeometry(20,20, 200,200);
+const dunes = new THREE.Mesh(duneGeo, duneMat);
+dunes.rotation.x = -Math.PI/2; dunes.position.y = -0.6; scene.add(dunes);
+
+/* Grid */
+const grid = new THREE.GridHelper(18, 36, 0xd4af37, 0x332a14);
+grid.material.opacity = 0.28; grid.material.transparent = true;
+grid.position.y = -0.59; scene.add(grid);
+
+/* Floating blocks */
+const cubes = new THREE.Group();
+const cubeGeo = new THREE.BoxGeometry(0.14,0.14,0.14);
+const cubeMat = new THREE.MeshPhysicalMaterial({
+  color:0xd4af37, metalness:0.3, roughness:0.3, transparent:true, opacity:0.6,
+  transmission:0.6, thickness:0.4, clearcoat:1
+});
+for(let i=0;i<24;i++){
+  const m = new THREE.Mesh(cubeGeo, cubeMat.clone());
+  m.position.set((Math.random()*8-4), Math.random()*1.6+0.2, (Math.random()*6-3));
+  m.userData.phase = Math.random()*Math.PI*2;
+  cubes.add(m);
+}
+scene.add(cubes);
+
+/* Parallax */
+let targetRotX = 0, targetRotY = 0;
+window.addEventListener('mousemove', (e)=>{
+  const mx = (e.clientX/window.innerWidth)*2-1;
+  const my = (e.clientY/window.innerHeight)*2-1;
+  targetRotY = mx*0.12; targetRotX = my*0.06;
 });
 
-await tx.wait(); // &lt;30s typical</code></pre>
-        </div>
-        <div class="card glass parallax" data-parallax data-speed="0.22">
-          <h3>SDK Guarantees</h3>
-          <ul class="clean">
-            <li>Typed policies; compile-time safety.</li>
-            <li>Receipts with full event trail.</li>
-            <li>Retry semantics for transient failures.</li>
-            <li>Telemetry hooks out-of-the-box.</li>
-          </ul>
-          <div style="margin-top:.6rem">
-            <a class="btn btn-ghost" href="https://github.com/AbZe628/gravitas-protocol/tree/main" target="_blank" rel="noopener"><i class="fab fa-github"></i> Explore MVP</a>
-          </div>
-        </div>
-      </div>
-    </section>
+function animate(){
+  const t = clock.getElapsedTime();
+  duneMat.uniforms.uTime.value = t;
+  camera.position.x += (Math.sin(t*0.1)*0.4 - camera.position.x)*0.02;
+  camera.position.y += (1.4 + targetRotX - camera.position.y)*0.05;
+  camera.lookAt(0,0,0);
+  dunes.rotation.z = Math.sin(t*0.03)*0.02;
+  cubes.children.forEach((c, i)=>{
+    const p = c.userData.phase;
+    c.position.y = 0.6 + Math.sin(t*0.9 + p)*0.25 + (i%3)*0.03;
+    c.rotation.x += 0.003; c.rotation.y += 0.004;
+  });
+  renderer.render(scene, camera);
+  requestAnimationFrame(animate);
+}
+animate();
+function onResize(){camera.aspect = window.innerWidth/window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight)}
+window.addEventListener('resize', onResize);
 
-    <!-- COMPETITION -->
-    <section id="competition" class="container">
-      <h2 class="section-title parallax" data-parallax data-speed="0.1">Competitive Landscape</h2>
-      <p class="section-sub parallax" data-parallax data-speed="0.14">We don’t sell vaults. We power safe, policy-bound liquidity operations for those who do.</p>
-      <div class="table-wrap card glass parallax" data-parallax data-speed="0.18">
-        <table>
-          <thead><tr><th>Feature</th><th>Gravitas</th><th>Yield Vaults</th><th>Treasury Tools</th></tr></thead>
-          <tbody>
-            <tr><td>Neutral Infrastructure</td><td>✓</td><td>✗</td><td>○</td></tr>
-            <tr><td>Policy-Driven Automation</td><td>✓</td><td>○</td><td>✗</td></tr>
-            <tr><td>Adapters Network Effects</td><td>✓</td><td>○</td><td>✗</td></tr>
-            <tr><td>Governance-Safe Guardrails</td><td>✓</td><td>✗</td><td>○</td></tr>
-            <tr><td>Non-Custodial</td><td>✓</td><td>✓</td><td>✓</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- CASE STUDIES -->
-    <section id="cases" class="container">
-      <h2 class="section-title parallax" data-parallax data-speed="0.1">Illustrative Case Studies</h2>
-      <p class="section-sub parallax" data-parallax data-speed="0.14">Examples show how policy-first orchestration compounds benefits over time.</p>
-      <div class="grid-3">
-        <div class="card glass parallax" data-parallax data-speed="0.18">
-          <h3>DAO Treasury</h3>
-          <ul class="clean">
-            <li>Rebalance between stable pools on shock days.</li>
-            <li>Cap exposure per venue to &lt;25%.</li>
-            <li>Net effect: reduced drawdowns; smoother revenue.</li>
-          </ul>
-        </div>
-        <div class="card glass parallax" data-parallax data-speed="0.22">
-          <h3>AMM Program</h3>
-          <ul class="clean">
-            <li>Automated range updates on Uni v3.</li>
-            <li>Policy ensures min depth & fee tier constraints.</li>
-            <li>Higher realized fee APR without manual ops.</li>
-          </ul>
-        </div>
-        <div class="card glass parallax" data-parallax data-speed="0.26">
-          <h3>L2 Foundation</h3>
-          <ul class="clean">
-            <li>Cross-venue liquidity bootstrapping at launch.</li>
-            <li>Guarded ramps; slippage & MEV controls.</li>
-            <li>Faster ecosystem growth with predictable risk.</li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    <!-- GTM -->
-    <section id="gtm" class="container">
-      <h2 class="section-title parallax" data-parallax data-speed="0.1">Go-To-Market — Design Partners First</h2>
-      <p class="section-sub parallax" data-parallax data-speed="0.14">We build trust with a small set of high-quality partners, then scale horizontally with adapters and tooling.</p>
-
-      <div class="timeline parallax" data-parallax data-speed="0.18">
-        <div class="t-item left">
-          <span class="dot"></span>
-          <div class="t-card glass card">
-            <h3>M0–M3: Design Partners</h3>
-            <p>Deep integrations with 3–5 DAOs/L2s, finalize audits, mainnet launch with essential adapters.</p>
-          </div>
-        </div>
-        <div class="t-item right">
-          <span class="dot"></span>
-          <div class="t-card glass card">
-            <h3>M4–M9: L2 Expansion</h3>
-            <p>Expand to 3+ L2s, roll out advanced policy modules, 10+ total partners.</p>
-          </div>
-        </div>
-        <div class="t-item left">
-          <span class="dot"></span>
-          <div class="t-card glass card">
-            <h3>M10–M12: Tooling</h3>
-            <p>Self-service policy tooling; community telemetry; clear path to decentralized governance.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- AUDIT & MONITORING -->
-    <section id="audit" class="container">
-      <h2 class="section-title parallax" data-parallax data-speed="0.1">Audit & Monitoring</h2>
-      <p class="section-sub parallax" data-parallax data-speed="0.14">Independent reviews, formal verification of core logic, and real-time alerting close the loop.</p>
-      <div class="grid-3">
-        <div class="card glass parallax" data-parallax data-speed="0.18">
-          <h3>External Audits</h3>
-          <ul class="clean">
-            <li>Top-tier firm engagement post-MVP.</li>
-            <li>Remediation windows enforced by timelock.</li>
-            <li>Public reports and diff reviews.</li>
-          </ul>
-        </div>
-        <div class="card glass parallax" data-parallax data-speed="0.22">
-          <h3>Formal Methods</h3>
-          <ul class="clean">
-            <li>Policy invariants as specs.</li>
-            <li>SMT-backed proofs for guardrails.</li>
-            <li>Fuzz + invariant testing &gt;95% coverage.</li>
-          </ul>
-        </div>
-        <div class="card glass parallax" data-parallax data-speed="0.26">
-          <h3>Monitoring</h3>
-          <ul class="clean">
-            <li>FAILED_TX_THRESHOLD, POLICY_BREACH_ATTEMPT.</li>
-            <li>CIRCUIT_BREAKER_TRIPPED alerts to SIEM.</li>
-            <li>Public dashboards for partners.</li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    <!-- RISKS -->
-    <section id="risks" class="container">
-      <h2 class="section-title parallax" data-parallax data-speed="0.1">Risks & Mitigations</h2>
-      <p class="section-sub parallax" data-parallax data-speed="0.14">We name risks early and instrument mitigations at design-time.</p>
-      <div class="grid-2">
-        <div class="card glass parallax" data-parallax data-speed="0.18">
-          <h3>Market/Adoption</h3>
-          <ul class="clean">
-            <li>Mitigation: founder-led teams & L2s first; short cycles.</li>
-            <li>Simplified adapters to cut partner eng overhead.</li>
-            <li>Transparent SLAs & shared telemetry build trust.</li>
-          </ul>
-        </div>
-        <div class="card glass parallax" data-parallax data-speed="0.22">
-          <h3>Security/Execution</h3>
-          <ul class="clean">
-            <li>Mitigation: audits/formal verification.</li>
-            <li>Timelocks + guardian pause w/o withdrawal power.</li>
-            <li>Strict release process and rollback plans.</li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    <!-- PRESEED -->
-    <section id="preseed" class="container">
-      <h2 class="section-title parallax" data-parallax data-speed="0.1">Pre-Seed Plan — $450k Lean Ask</h2>
-      <p class="section-sub parallax" data-parallax data-speed="0.14">MVP is complete; funds focus on audits, legal formalization, and establishing a base in Qatar for a crypto-forward environment.</p>
-      <div class="table-wrap card glass parallax" data-parallax data-speed="0.18">
-        <table>
-          <thead><tr><th>Category</th><th>Amount</th><th>Notes</th></tr></thead>
-          <tbody>
-            <tr><td>Security Audits & Formal Verification</td><td>$150k</td><td>Top-tier external + internal reviews</td></tr>
-            <tr><td>Relocation & Qatar Corporate Setup</td><td>$100k</td><td>Entity & operations setup; Visa/relocation</td></tr>
-            <tr><td>Legal & Regulatory</td><td>$80k</td><td>Opinions, agreements, compliance</td></tr>
-            <tr><td>Runway (Advisors, Infra, BD)</td><td>$120k</td><td>Infra, stipends, early GTM</td></tr>
-            <tr><td><strong>Total</strong></td><td><strong>$450k</strong></td><td>18-month lean runway</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- FAQ -->
-    <section id="faq" class="container">
-      <h2 class="section-title parallax" data-parallax data-speed="0.1">Investor FAQ</h2>
-      <div class="grid-2">
-        <div class="card glass parallax" data-parallax data-speed="0.16">
-          <h3>How do fees accrue?</h3>
-          <p>Micro-fees accrue to a protocol treasury multisig. Early stage: ops & audits. Governance may expand use post-PMF.</p>
-        </div>
-        <div class="card glass parallax" data-parallax data-speed="0.2">
-          <h3>Do you take custody?</h3>
-          <p>No. Funds remain in partner-owned contracts or underlying protocols. We operate via allowances within policy bounds.</p>
-        </div>
-        <div class="card glass parallax" data-parallax data-speed="0.22">
-          <h3>Token?</h3>
-          <p>Not required. Considered post-PMF for decentralizing governance and aligning long-term incentives.</p>
-        </div>
-        <div class="card glass parallax" data-parallax data-speed="0.26">
-          <h3>Why not build in-house?</h3>
-          <p>Security + operations are their own business. Gravitas delivers audited, neutral infra with faster iteration and lower risk.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- WHITEPAPER -->
-    <section id="whitepaper" class="container">
-      <h2 class="section-title parallax" data-parallax data-speed="0.1">Technical Whitepaper & Resources</h2>
-      <p class="section-sub parallax" data-parallax data-speed="0.14">Full architecture, policy semantics, and security model. Open the Markdown version on GitHub.</p>
-      <p style="text-align:center;margin-bottom:1rem" class="parallax" data-parallax data-speed="0.16">
-        <a class="btn btn-primary" href="https://github.com/AbZe628/gravitas-protocol/blob/main/docs/whitepaper.md" target="_blank" rel="noopener">
-          <i class="fa-solid fa-file-lines"></i>&nbsp;Open Whitepaper (.md)
-        </a>
-        <a class="btn btn-ghost" href="https://github.com/AbZe628/gravitas-protocol/tree/main" target="_blank" rel="noopener">
-          <i class="fab fa-github"></i>&nbsp;Explore MVP
-        </a>
-      </p>
-      <iframe class="doc-embed glass parallax" data-parallax data-speed="0.18" src="https://github.com/AbZe628/gravitas-protocol/blob/main/docs/whitepaper.md" title="Gravitas Whitepaper (.md)" loading="lazy"></iframe>
-    </section>
-
-    <!-- CTA BAND -->
-    <section class="cta-band">
-      <div class="container inner parallax" data-parallax data-speed="0.12">
-        <h2>Join the policy-driven liquidity standard.</h2>
-        <p class="section-sub">Design partners and investors are welcome — let’s make reliability the default.</p>
-        <p>
-          <a class="btn btn-primary" href="mailto:abdusamedzelic98@gmail.com?subject=Gravitas%20—%20Deck%20Request">Request Investor Docs</a>
-          <a class="btn btn-ghost" href="https://github.com/AbZe628/gravitas-protocol/tree/main" target="_blank" rel="noopener"><i class="fab fa-github"></i> Explore MVP</a>
-        </p>
-      </div>
-    </section>
-
-    <!-- CONTACT -->
-    <section id="contact" class="container">
-      <h2 class="section-title parallax" data-parallax data-speed="0.1">Contact & Partnerships</h2>
-      <p class="section-sub parallax" data-parallax data-speed="0.12">We’re onboarding design partners and investors who want policy-first automation to become the norm.</p>
-      <div class="grid-2">
-        <div class="card glass parallax" data-parallax data-speed="0.16">
-          <h3>Reach Us</h3>
-          <ul class="clean">
-            <li><strong>Email:</strong> <a href="mailto:abdusamedzelic98@gmail.com">abdusamedzelic98@gmail.com</a></li>
-            <li><strong>Phone:</strong> <a href="tel:+385915668133">+385 91 566 8133</a></li>
-            <li><strong>LinkedIn:</strong> <a href="https://www.linkedin.com/in/abdusamed-zeli%C4%87-5b5526183/" target="_blank" rel="noopener">Abdusamed Zelić</a></li>
-          </ul>
-          <div style="margin-top:.8rem;display:flex;gap:.6rem;flex-wrap:wrap">
-            <a class="btn btn-primary" href="mailto:abdusamedzelic98@gmail.com?subject=Gravitas%20—%20Deck%20Request">Request Investor Docs</a>
-            <a class="btn btn-ghost" href="https://github.com/AbZe628/gravitas-protocol/tree/main" target="_blank" rel="noopener"><i class="fab fa-github"></i> Explore MVP</a>
-            <a class="btn btn-ghost" href="https://github.com/AbZe628/gravitas-protocol/blob/main/docs/whitepaper.md" target="_blank" rel="noopener"><i class="fa-solid fa-file-lines"></i> Whitepaper</a>
-          </div>
-        </div>
-        <div class="card glass parallax" data-parallax data-speed="0.2">
-          <h3>Why Partners Choose Gravitas</h3>
-          <ul class="clean">
-            <li>Non-custodial, policy-driven automation with explicit guardrails.</li>
-            <li>Operational trust: transparent SLAs, telemetry, incident discipline.</li>
-            <li>Adapter network effects: each new venue increases value for all.</li>
-            <li>Neutrality: we don’t compete with your products — we power them.</li>
-          </ul>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <!-- FOOTER -->
-  <footer>
-    <div class="foot-brand"><i class="fas fa-atom" style="color:var(--gold)"></i><strong>&nbsp;Gravitas Protocol</strong></div>
-    <p style="color:#9aa1b3">Liquidity orchestration for institutions — secure, instant, auditable.</p>
-    <div class="foot-social">
-      <a href="https://www.linkedin.com/in/abdusamed-zeli%C4%87-5b5526183/" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
-      <a href="https://github.com/AbZe628/gravitas-protocol/tree/main" target="_blank" rel="noopener" aria-label="GitHub"><i class="fab fa-github"></i></a>
-    </div>
-    <div class="foot-cta">
-      <a class="btn btn-ghost" href="https://github.com/AbZe628/gravitas-protocol/tree/main" target="_blank" rel="noopener"><i class="fab fa-github"></i> Explore MVP</a>
-    </div>
-    <p style="margin-top:1rem;color:#9aa1b3">© 2025 Gravitas Protocol. All rights reserved.</p>
-  </footer>
-
-  <!-- BACK TO TOP -->
-  <button class="to-top" id="toTop" aria-label="Back to top"><i class="fa-solid fa-arrow-up"></i></button>
-
-  <script>
-    // === Sci-Fi “Blockchain Desert” (Three.js) ===
-    (function(){
-      const container = document.getElementById('bg3d');
-      const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(70, window.innerWidth/window.innerHeight, 0.1, 1000);
-      const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true });
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      container.appendChild(renderer.domElement);
-
-      const hemi = new THREE.HemisphereLight(0xFFE7B3, 0x1a0f0f, 0.9);
-      scene.add(hemi);
-      const dir = new THREE.DirectionalLight(0xD4AF37, 0.7);
-      dir.position.set(-5, 8, 5);
-      scene.add(dir);
-
-      const duneGeom = new THREE.PlaneGeometry(60, 34, 220, 140);
-      const duneMat = new THREE.MeshStandardMaterial({ color: 0x9a6a3a, roughness: 0.95, metalness: 0.05, flatShading: true });
-      const dunes = new THREE.Mesh(duneGeom, duneMat);
-      dunes.rotation.x = -Math.PI/2.35;
-      dunes.position.y = -3.2;
-      scene.add(dunes);
-
-      const pos = duneGeom.attributes.position;
-      for (let i=0;i<pos.count;i++){
-        const x = pos.getX(i), y = pos.getY(i);
-        const h = (Math.sin(x*0.35)+Math.cos(y*0.25))*0.35 + (Math.sin((x+y)*0.18))*0.25;
-        pos.setZ(i, h);
-      }
-      pos.needsUpdate = true;
-      duneGeom.computeVertexNormals();
-
-      const gridGeom = new THREE.PlaneGeometry(60, 34, 100, 60);
-      const gridMat = new THREE.MeshBasicMaterial({ color: 0xD4AF37, wireframe: true, transparent: true, opacity: 0.08 });
-      const grid = new THREE.Mesh(gridGeom, gridMat);
-      grid.rotation.x = -Math.PI/2.35;
-      grid.position.y = -3.08;
-      scene.add(grid);
-
-      const cubes = [];
-      const cubeMat = new THREE.MeshStandardMaterial({ color: 0xB8860B, metalness: 0.6, roughness: 0.2, emissive: 0x2b1a00, emissiveIntensity: 0.35 });
-      for(let i=0;i<28;i++){
-        const s = Math.random()*0.45 + 0.18;
-        const cube = new THREE.Mesh(new THREE.BoxGeometry(s,s,s), cubeMat);
-        cube.position.set((Math.random()-0.5)*18, Math.random()*4+0.4, -6 - Math.random()*12);
-        cube.rotation.set(Math.random(), Math.random(), Math.random());
-        cubes.push(cube);
-        scene.add(cube);
-      }
-
-      camera.position.set(0, 0.7, 6);
-
-      let mx=0,my=0;
-      window.addEventListener('mousemove', e=>{
-        mx = (e.clientX/window.innerWidth)*2-1;
-        my = -(e.clientY/window.innerHeight)*2+1;
-      }, {passive:true});
-
-      const clock = new THREE.Clock();
-      function animate(){
-        requestAnimationFrame(animate);
-        const t = clock.getElapsedTime();
-        grid.material.opacity = 0.06 + 0.02*Math.sin(t*0.8);
-        cubes.forEach((c,idx)=>{
-          c.position.y = 0.7 + Math.sin(t*0.8 + idx)*0.35 + (idx%3)*0.03;
-          c.rotation.y += 0.005 + idx*0.0003;
-        });
-        camera.position.x += (mx*0.7 - camera.position.x)*0.05;
-        camera.position.y += (my*0.3 - camera.position.y)*0.05;
-        renderer.render(scene,camera);
-      }
-      animate();
-
-      window.addEventListener('resize', ()=>{
-        camera.aspect = window.innerWidth/window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-      });
-    })();
-
-    // === HEX-GRID SHADER OVERLAY (pure WebGL2) ===
-    (function(){
-      const canvas = document.getElementById('shaderCanvas');
-      const gl = canvas.getContext('webgl2', { premultipliedAlpha: true });
-      if(!gl) return;
-
-      const DPR = Math.min(window.devicePixelRatio || 1, 2);
-      function resize(){
-        const w = Math.floor(window.innerWidth * DPR);
-        const h = Math.floor(window.innerHeight * DPR);
-        if(canvas.width !== w || canvas.height !== h){
-          canvas.width = w; canvas.height = h;
-        }
-        gl.viewport(0,0,gl.drawingBufferWidth, gl.drawingBufferHeight);
-      }
-      resize(); window.addEventListener('resize', resize);
-
-      const vs = `#version 300 es
-      in vec2 p; out vec2 vUv;
-      void main(){ vUv = (p+1.0)*0.5; gl_Position = vec4(p,0.0,1.0); }`;
-
-      const fs = `#version 300 es
-      precision highp float;
-      in vec2 vUv; out vec4 frag;
-
-      uniform vec2 uRes;
-      uniform float uTime;
-
-      mat2 rot(float a){ float c=cos(a), s=sin(a); return mat2(c,-s,s,c); }
-
-      vec3 hex(vec2 p){
-        const vec2 k = vec2(1.0, 1.7320508);
-        p = abs(p);
-        vec2 a = mod(p, k) - 0.5*k;
-        vec2 b = mod(p - 0.5*k, k) - 0.5*k;
-        vec2 g = (length(a) < length(b)) ? a : b;
-        float d = length(g);
-        return vec3(g, d);
-      }
-
-      void main(){
-        vec2 uv = vUv;
-        vec2 p = (uv*2.0 - 1.0);
-        p.x *= uRes.x/uRes.y;
-
-        float t = uTime*0.2;
-        p *= rot(0.05*sin(t*0.9));
-        p.y += 0.03*sin(p.x*2.0 + t*1.3);
-        p.x += 0.03*cos(p.y*2.0 - t*1.1);
-
-        float scale = 3.2;
-        vec3 h = hex(p*scale);
-
-        float line = smoothstep(0.01, 0.002, h.z);
-        float glow = smoothstep(0.06, 0.0, h.z)*0.25;
-
-        vec3 gold = vec3(212.0/255.0, 175.0/255.0, 55.0/255.0);
-        float shimmer = 0.45 + 0.25*sin(10.0*h.x + t*2.0) * cos(10.0*h.y - t*1.6);
-
-        float vig = smoothstep(1.2, 0.2, length(p));
-        float alpha = (line*0.35 + glow*0.25) * vig;
-
-        frag = vec4(gold * shimmer, alpha);
-      }`;
-
-      function compile(src, type){
-        const sh = gl.createShader(type);
-        gl.shaderSource(sh, src); gl.compileShader(sh);
-        if(!gl.getShaderParameter(sh, gl.COMPILE_STATUS)){
-          console.error(gl.getShaderInfoLog(sh));
-          gl.deleteShader(sh); return null;
-        }
-        return sh;
-      }
-      const prog = gl.createProgram();
-      const v = compile(vs, gl.VERTEX_SHADER);
-      const f = compile(fs, gl.FRAGMENT_SHADER);
-      gl.attachShader(prog, v); gl.attachShader(prog, f);
-      gl.linkProgram(prog);
-      if(!gl.getProgramParameter(prog, gl.LINK_STATUS)){
-        console.error(gl.getProgramInfoLog(prog)); return;
-      }
-
-      const buf = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-        -1,-1,  1,-1,  -1, 1,
-         1,-1,  1, 1,  -1, 1
-      ]), gl.STATIC_DRAW);
-
-      const locPos = gl.getAttribLocation(prog, 'p');
-      const uRes = gl.getUniformLocation(prog, 'uRes');
-      const uTime = gl.getUniformLocation(prog, 'uTime');
-
-      gl.useProgram(prog);
-      gl.enableVertexAttribArray(locPos);
-      gl.vertexAttribPointer(locPos, 2, gl.FLOAT, false, 0, 0);
-
-      let start = performance.now();
-      function render(){
-        const t = (performance.now()-start)/1000;
-        gl.viewport(0,0,gl.drawingBufferWidth, gl.drawingBufferHeight);
-        gl.enable(gl.BLEND);
-        gl.blendFuncSeparate(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-        gl.useProgram(prog);
-        gl.uniform2f(uRes, gl.drawingBufferWidth, gl.drawingBufferHeight);
-        gl.uniform1f(uTime, t);
-        gl.drawArrays(gl.TRIANGLES, 0, 6);
-        requestAnimationFrame(render);
-      }
-      render();
-    })();
-
-    // === Drawer, back-to-top ===
-    (function(){
-      const burger = document.getElementById('burger');
-      const drawer = document.getElementById('drawer');
-      const closeBtn = document.getElementById('closeDrawer');
-      const backdrop = document.getElementById('backdrop');
-      const toTop = document.getElementById('toTop');
-
-      const open = ()=>{
-        drawer.classList.add('open'); backdrop.classList.add('open');
-        drawer.setAttribute('aria-hidden','false'); burger.setAttribute('aria-expanded','true');
-        document.body.style.overflow='hidden';
-        setTimeout(()=>{ const first = drawer.querySelector('a'); first && first.focus(); }, 80);
-      };
-      const close = ()=>{
-        drawer.classList.remove('open'); backdrop.classList.remove('open');
-        drawer.setAttribute('aria-hidden','true'); burger.setAttribute('aria-expanded','false');
-        document.body.style.overflow=''; burger.focus();
-      };
-
-      burger.addEventListener('click', open);
-      closeBtn.addEventListener('click', close);
-      backdrop.addEventListener('click', close);
-      document.addEventListener('keydown', e=>{ if(e.key==='Escape' && drawer.classList.contains('open')) close(); });
-
-      drawer.querySelectorAll('a').forEach(a=>a.addEventListener('click', close));
-
-      const onScroll = ()=>{
-        if(window.scrollY>300){ toTop.classList.add('show'); } else { toTop.classList.remove('show'); }
-      };
-      window.addEventListener('scroll', onScroll, {passive:true});
-      toTop.addEventListener('click', ()=>{
-        const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        window.scrollTo({ top:0, behavior: reduced ? 'auto':'smooth' });
-      });
-    })();
-
-    // === Smooth anchors ===
-    (function(){
-      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      document.querySelectorAll('a[href^="#"]').forEach(a=>{
-        a.addEventListener('click', e=>{
-          const id = a.getAttribute('href');
-          if(!id || id==='#') return;
-          const el = document.querySelector(id);
-          if(!el) return;
-          e.preventDefault();
-          el.scrollIntoView({ behavior: reduced?'auto':'smooth', block:'start' });
-        });
-      });
-    })();
-
-    // === PARALLAX ENGINE (scroll-linked, cheap) ===
-    (function(){
-      const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if(prefersReduced) return;
-      const items = Array.from(document.querySelectorAll('[data-parallax]'));
-      const speeds = new WeakMap();
-      items.forEach(el => speeds.set(el, parseFloat(el.getAttribute('data-speed') || '0.15')));
-      let ticking = false;
-
-      const update = ()=>{
-        const vh = window.innerHeight;
-        for(const el of items){
-          const r = el.getBoundingClientRect();
-          const visible = r.top<vh && r.bottom>0;
-          if(!visible) continue;
-          const s = speeds.get(el);
-          const offset = (r.top - vh*0.5) * s * -0.12;
-          el.style.setProperty('--pY', offset.toFixed(2) + 'px');
-        }
-        ticking = false;
-      };
-      const onScroll = ()=>{
-        if(!ticking){ ticking = true; requestAnimationFrame(update); }
-      };
-      window.addEventListener('scroll', onScroll, {passive:true});
-      window.addEventListener('resize', onScroll);
-      update();
-    })();
-  </script>
+/* Reduced motion */
+const mq = window.matchMedia('(prefers-reduced-motion: reduce)'); if (mq.matches){renderer.setAnimationLoop(null);}
+</script>
 </body>
 </html>
