@@ -1,346 +1,481 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Gravitas Protocol — The Invisible Engine of DeFi Liquidity</title>
-  <meta name="description" content="Gravitas Protocol is a neutral, audit-first transport layer for atomic liquidity migrations across DEXs and L2s. Micro-fees on flow create sustainable protocol revenue." />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Gravitas Protocol — Investor & Product Brief</title>
+  <meta name="description" content="Investor-grade brief for Gravitas Protocol: market, strategy, economics, risk, governance, roadmap, and a technical appendix.">
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..800&family=Plus+Jakarta+Sans:wght@600;800&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet"/>
   <style>
-    /* ==================== DESIGN SYSTEM ==================== */
     :root{
-      --bg:#f6f8fb; --surface:#ffffff; --ink:#0b1220; --muted:#5f687a; --line:rgba(11,18,32,0.10);
-      --accent1:#6c7aff; --accent2:#b46ef7; --accent3:#79d2ff;
-      --grad:linear-gradient(135deg,var(--accent1),var(--accent2) 55%,var(--accent3));
-      --r-xl:22px; --r-lg:16px; --r:12px; --r-sm:10px;
-      --shadow-1:0 10px 28px rgba(15,23,42,.08);
-      --shadow-2:0 30px 80px rgba(15,23,42,.14);
-      --maxw:1240px;
+      --bg:#f5f7fb; --paper:#ffffff; --ink:#0b1120; --muted:#5d667a; --line:rgba(10,16,30,.12);
+      --accent:#1c7bf2; --accent-2:#6b5df6;
+      --grad:linear-gradient(135deg,#1c7bf2,#6b5df6);
+      --maxw:1200px; --w-sidebar:280px;
+      --r:14px; --r-lg:18px; --shadow-1:0 8px 28px rgba(15,23,42,.08); --shadow-2:0 22px 60px rgba(15,23,42,.12);
     }
     [data-theme="dark"]{
-      --bg:#0b1220; --surface:#0f172a; --ink:#ecf1ff; --muted:#a6b0c6; --line:rgba(255,255,255,0.10);
-      --shadow-1:0 10px 28px rgba(0,0,0,.45);
-      --shadow-2:0 30px 80px rgba(0,0,0,.60);
+      --bg:#0c1222; --paper:#0f172a; --ink:#ecf1ff; --muted:#a7b0c6; --line:rgba(255,255,255,.12);
+      --shadow-1:0 8px 28px rgba(0,0,0,.5); --shadow-2:0 22px 60px rgba(0,0,0,.6);
     }
-
     *{box-sizing:border-box}
     html{scroll-behavior:smooth}
-    body{
-      margin:0; color:var(--ink);
-      background:
-        radial-gradient(1200px 700px at 110% -10%, rgba(108,122,255,.09), transparent 55%),
-        radial-gradient(1000px 600px at -10% 0%, rgba(180,110,247,.09), transparent 55%),
-        var(--bg);
-      font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-      line-height:1.6; -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
-    }
-    .container{max-width:var(--maxw); margin:0 auto; padding:0 24px}
-    section{padding:96px 0; position:relative}
-    h1,h2{font-family:"Plus Jakarta Sans", Inter, system-ui; letter-spacing:-.02em; line-height:1.075}
-    h1{font-size:clamp(2.6rem,5vw,4.3rem); margin:16px 0 10px; font-weight:800}
-    h2{font-size:clamp(1.9rem,3vw,2.6rem); margin:0 0 10px; font-weight:800}
-    h3{font-size:1.12rem; margin:0 0 8px; font-weight:700}
-    p.lead{font-size:clamp(1.05rem,1.2vw,1.2rem); color:var(--muted); max-width:920px}
-
-    /* ==================== NAV ==================== */
-    .nav-wrap{position:sticky; top:0; z-index:50; backdrop-filter:saturate(180%) blur(18px);
-      background:color-mix(in oklab, var(--surface) 75%, transparent);
-      border-bottom:1px solid var(--line)}
-    .nav{display:flex; align-items:center; gap:14px; padding:14px 24px}
-    .brand{display:flex; align-items:center; gap:12px; text-decoration:none; color:var(--ink); font-weight:800}
-    .logo{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;color:#fff;background:var(--grad);
-      position:relative;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(255,255,255,.35)}
-    .logo:after{content:"";position:absolute;inset:-60% auto auto -60%;width:220%;height:220%;transform:rotate(35deg);
-      background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);animation:shine 3.6s linear infinite}
-    @keyframes shine{0%{transform:translateX(-60%) rotate(35deg)}100%{transform:translateX(60%) rotate(35deg)}}
+    body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.6}
+    h1,h2{font-family:"DM Serif Display",serif;letter-spacing:-.01em;line-height:1.08}
+    h1{font-size:clamp(2.4rem,4.8vw,4rem);margin:0 0 10px}
+    h2{font-size:clamp(1.8rem,3.2vw,2.6rem);margin:0 0 10px}
+    h3{font-size:1.12rem;margin:0 0 6px;font-weight:700}
+    p.lead{font-size:clamp(1.05rem,1.2vw,1.2rem);color:var(--muted);max-width:900px}
+    a{color:var(--accent);text-underline-offset:2px}
+    code,kbd{font:13px/1.6 ui-monospace,SFMono-Regular,Consolas,Menlo,monospace}
+    /* Topbar */
+    .topbar{position:sticky;top:0;z-index:50;backdrop-filter:saturate(180%) blur(16px);
+      background:color-mix(in oklab,var(--paper) 85%,transparent);border-bottom:1px solid var(--line)}
+    .topbar-inner{max-width:var(--maxw);margin:0 auto;padding:14px 16px;display:flex;align-items:center;gap:12px}
+    .logo{width:40px;height:40px;border-radius:12px;background:var(--grad);display:grid;place-items:center;color:#fff;font-weight:800}
+    .brand{font-weight:800;text-decoration:none;color:var(--ink)}
     .spacer{flex:1}
-    .menu{display:flex; gap:8px; align-items:center}
-    .menu a{padding:10px 12px; border-radius:10px; text-decoration:none; color:var(--ink); font-weight:600; font-size:.96rem}
-    .menu a:hover,.menu a.active{background:var(--surface); box-shadow:inset 0 0 0 1px var(--line)}
-    .btn{display:inline-flex; align-items:center; gap:10px; padding:10px 14px; border-radius:12px; text-decoration:none; font-weight:800}
-    .btn.grad{background:var(--grad); color:#fff; box-shadow:var(--shadow-1)}
-    .btn.ghost{border:1px solid var(--line); background:var(--surface); color:var(--ink)}
-    .theme{border:1px solid var(--line); background:var(--surface); border-radius:12px; padding:10px 12px; font-weight:800; cursor:pointer}
-
-    .burger{display:none; border:none; background:transparent; font-size:26px; cursor:pointer}
-    @media (max-width: 1100px){ .menu{display:none} .burger{display:block} }
-
-    .drawer{position:fixed; inset:0 0 0 auto; width:min(86vw,380px); background:var(--surface);
-      border-left:1px solid var(--line); box-shadow:var(--shadow-2); transform:translateX(100%);
-      transition:transform .35s ease; z-index:70; padding:22px 18px}
-    .drawer.open{transform:translateX(0)}
-    .drawer a{display:block; padding:12px 10px; text-decoration:none; color:var(--ink); font-weight:700; border-radius:10px}
-    .drawer a:hover{background:var(--bg)}
-    .backdrop{position:fixed; inset:0; background:rgba(0,0,0,.35); opacity:0; pointer-events:none; transition:opacity .25s ease; z-index:60}
-    .backdrop.show{opacity:1; pointer-events:auto}
-
-    /* ==================== HERO ==================== */
-    header.hero{padding:120px 0 80px; overflow:hidden}
-    .badge{display:inline-flex; gap:10px; align-items:center; padding:10px 14px; border:1px solid var(--line);
-      border-radius:999px; background:var(--surface); box-shadow:var(--shadow-1); font-weight:800}
-    .chips{display:flex; gap:10px; flex-wrap:wrap; margin-top:16px}
-    .chip{padding:10px 12px; border-radius:999px; border:1px solid var(--line); background:var(--surface); font-weight:600}
-
-    .hero-grid{display:grid; grid-template-columns:1.06fr .94fr; gap:28px; align-items:center; margin-top:24px}
-    @media (max-width: 980px){ .hero-grid{grid-template-columns:1fr} }
-    .panel{background:var(--surface); border:1px solid var(--line); border-radius:var(--r-xl); padding:22px; box-shadow:var(--shadow-2)}
-    .visual{position:relative; aspect-ratio:4/3; border-radius:24px; overflow:hidden; border:1px solid var(--line);
-      background:linear-gradient(180deg,#fff,#eef3ff)}
-    /* Zaha ribbons (organic, subtle) */
-    .ribbon{position:absolute; background:var(--grad); mix-blend-mode:multiply; opacity:.85;
-      border-radius:60% 40% 30% 70% / 60% 30% 70% 40%; animation:morph 18s ease-in-out infinite}
-    .r1{width:560px;height:220px; top:6%; left:-12%; transform:rotate(-6deg)}
-    .r2{width:480px;height:180px; bottom:-8%; right:-6%; animation-delay:-6s}
-    .r3{width:260px;height:260px; top:42%; left:32%; animation-delay:-12s}
-    @keyframes morph{
-      0%,100%{ border-radius:60% 40% 30% 70% / 60% 30% 70% 40%; transform:rotate(0) scale(1)}
-      25%{ border-radius:40% 60% 70% 30% / 50% 60% 30% 60%; transform:rotate(3deg) scale(1.03)}
-      50%{ border-radius:50% 60% 30% 60% / 60% 30% 70% 40%; transform:rotate(-3deg) scale(1.02)}
-      75%{ border-radius:35% 65% 40% 60% / 60% 40% 65% 35%; transform:rotate(2deg) scale(1.04)}
-    }
-
-    /* ==================== LAYOUT UTILITIES ==================== */
-    .grid{display:grid; gap:20px}
+    .theme{border:1px solid var(--line);background:var(--paper);border-radius:10px;padding:8px 10px;font-weight:700;cursor:pointer}
+    .burger{display:none;border:none;background:transparent;font-size:24px;cursor:pointer}
+    @media (max-width:980px){.burger{display:block}}
+    /* Layout: Sidebar + Content */
+    .wrap{max-width:var(--maxw);margin:0 auto;display:grid;grid-template-columns:var(--w-sidebar) 1fr;gap:22px;padding:24px 16px}
+    @media (max-width:980px){.wrap{grid-template-columns:1fr}}
+    .sidebar{position:sticky;top:70px;align-self:start}
+    .toc{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow-1);padding:16px}
+    .toc h3{font-size:1rem;color:var(--muted);margin-bottom:8px}
+    .toc a{display:block;padding:8px 10px;border-radius:10px;text-decoration:none;color:var(--ink);font-weight:600}
+    .toc a:hover,.toc a.active{background:color-mix(in oklab,var(--bg) 70%,transparent)}
+    .content{display:grid;gap:22px}
+    section{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow-1);padding:24px}
+    .hero{padding:28px 24px;background:
+      radial-gradient(1000px 600px at 110% -10%, rgba(28,123,242,.12), transparent 55%),
+      radial-gradient(900px 600px at -10% 0%, rgba(107,93,246,.12), transparent 55%),
+      var(--paper)}
+    .badge{display:inline-flex;gap:8px;align-items:center;padding:8px 12px;border:1px solid var(--line);border-radius:999px;background:var(--paper);font-weight:700}
+    .cta-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+    .btn{display:inline-flex;align-items:center;gap:10px;padding:10px 14px;border-radius:12px;text-decoration:none;font-weight:800}
+    .btn.grad{background:var(--grad);color:#fff;box-shadow:var(--shadow-1)}
+    .btn.ghost{border:1px solid var(--line);background:var(--paper);color:var(--ink)}
+    /* Grids & cards */
+    .grid{display:grid;gap:16px}
     .g-2{grid-template-columns:repeat(2,minmax(0,1fr))}
     .g-3{grid-template-columns:repeat(3,minmax(0,1fr))}
-    .g-auto{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
-    @media (max-width:980px){ .g-2,.g-3{grid-template-columns:1fr} }
-
-    .card{background:var(--surface); border:1px solid var(--line); border-radius:var(--r-lg); padding:20px; box-shadow:var(--shadow-1);
-      transition:transform .35s ease, box-shadow .35s ease}
-    .card:hover{transform:translateY(-3px); box-shadow:var(--shadow-2)}
-
-    .code{position:relative; border:1px solid var(--line); border-radius:14px; overflow:hidden; background:color-mix(in oklab, var(--bg) 65%, #fff)}
-    .code pre{margin:0; padding:16px; font:13px/1.6 ui-monospace,SFMono-Regular,Consolas,Menlo,monospace; color:var(--ink); overflow:auto}
-    .copy{position:absolute; right:10px; top:10px; font-size:12px; padding:6px 10px; border-radius:10px; background:var(--surface);
-      border:1px solid var(--line); cursor:pointer; font-weight:800}
-
-    details{border:1px solid var(--line); border-radius:14px; background:var(--surface); box-shadow:var(--shadow-1)}
-    summary{list-style:none; padding:18px 20px; cursor:pointer; font-weight:800}
-    summary::-webkit-details-marker{display:none}
-    details[open] summary{border-bottom:1px solid var(--line)}
-    .details-body{padding:16px 20px 20px}
-
-    .kpi{border:1px solid var(--line); border-radius:16px; padding:18px; background:var(--surface)}
-    .kpi .v{font-family:"Plus Jakarta Sans", Inter; font-size:1.7rem; font-weight:800; background:var(--grad);
-      -webkit-background-clip:text; background-clip:text; color:transparent}
-
-    .pdf{width:100%; height:70vh; border:0; background:#fff; border-radius:16px; box-shadow:var(--shadow-1)}
-
-    footer{border-top:1px solid var(--line); background:linear-gradient(180deg, color-mix(in oklab,var(--surface) 82%, transparent), var(--surface)); padding:36px 0}
-    .top{position:fixed; right:18px; bottom:18px; display:none; z-index:60; border:none; padding:12px 14px; border-radius:14px;
-      background:var(--grad); color:#fff; font-weight:800; cursor:pointer; box-shadow:var(--shadow-2)}
-
-    /* Accessibility / reduced motion */
-    @media (prefers-reduced-motion: reduce){
-      html{scroll-behavior:auto}
-      *{animation:none !important; transition:none !important}
+    @media (max-width:980px){.g-2,.g-3{grid-template-columns:1fr}}
+    .card{border:1px solid var(--line);border-radius:var(--r);padding:16px;background:color-mix(in oklab,var(--paper) 90%,transparent)}
+    /* Tables */
+    table{width:100%;border-collapse:collapse;font-size:.95rem}
+    th,td{padding:10px;border-bottom:1px solid var(--line)}
+    th{text-align:left;background:color-mix(in oklab,var(--bg) 60%,transparent)}
+    /* Callouts */
+    .callout{border-left:4px solid var(--accent);padding:12px 14px;background:color-mix(in oklab,var(--bg) 70%,transparent);border-radius:10px}
+    /* Code blocks */
+    .code{position:relative;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:color-mix(in oklab,var(--bg) 65%,#fff)}
+    .code pre{margin:0;padding:14px;overflow:auto}
+    .copy{position:absolute;right:10px;top:10px;border:1px solid var(--line);background:var(--paper);border-radius:9px;padding:6px 10px;font-weight:700;cursor:pointer}
+    /* PDF */
+    .pdf{width:100%;height:70vh;border:0;border-radius:12px;box-shadow:var(--shadow-1);background:#fff}
+    /* Footer & misc */
+    footer{max-width:var(--maxw);margin:24px auto;padding:12px 16px;color:var(--muted)}
+    .top{position:fixed;right:18px;bottom:18px;display:none;z-index:60;border:none;padding:12px 14px;border-radius:12px;background:var(--grad);color:#fff;font-weight:800;cursor:pointer;box-shadow:var(--shadow-2)}
+    /* Mobile drawer for TOC */
+    .drawer{position:fixed;inset:0 0 0 auto;width:min(86vw,360px);background:var(--paper);border-left:1px solid var(--line);box-shadow:var(--shadow-2);transform:translateX(100%);transition:transform .3s ease;z-index:70;padding:18px}
+    .drawer.open{transform:translateX(0)}
+    .backdrop{position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:60}
+    .backdrop.show{opacity:1;pointer-events:auto}
+    /* Print */
+    @media print{
+      .topbar,.sidebar,.top,.drawer,.backdrop{display:none!important}
+      body{background:#fff}
+      section{box-shadow:none;border-color:#ddd;page-break-inside:avoid}
     }
+    /* Reduced motion */
+    @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
   </style>
 </head>
 <body>
-  <!-- NAV -->
-  <div class="nav-wrap">
-    <nav class="nav" aria-label="Primary">
-      <a class="brand" href="#home"><span class="logo">G</span><span>Gravitas Protocol</span></a>
+  <!-- Topbar -->
+  <div class="topbar" role="banner">
+    <div class="topbar-inner">
+      <div class="logo" aria-hidden="true">G</div>
+      <a class="brand" href="#top">Gravitas Protocol</a>
       <div class="spacer"></div>
-      <div class="menu" id="menu">
-        <a href="#overview">Overview</a>
-        <a href="#market">Market</a>
-        <a href="#technology">Technology</a>
-        <a href="#security">Security</a>
-        <a href="#sdk">SDK</a>
-        <a href="#governance">Governance</a>
-        <a href="#investment">Investment</a>
-        <a href="#kpis">KPIs</a>
-        <a href="#roadmap">Roadmap</a>
-        <a href="#cases">Case Studies</a>
-        <a href="#threat">Threat Model</a>
-        <a href="#playbook">Playbook</a>
-        <a href="#audit">Audit Plan</a>
-        <a href="#whitepaper">Whitepaper</a>
-        <a href="#faq">FAQ</a>
-        <a href="#contact">Contact</a>
-      </div>
       <button class="theme" id="themeToggle" aria-label="Toggle theme">☀︎ / ☾</button>
-      <button class="burger" id="burger" aria-label="Open menu">☰</button>
-    </nav>
+      <button class="burger" id="openDrawer" aria-label="Open Table of Contents">☰</button>
+    </div>
   </div>
 
-  <!-- Drawer & Backdrop -->
+  <!-- Drawer (mobile TOC) -->
   <div class="backdrop" id="backdrop" aria-hidden="true"></div>
-  <aside class="drawer" id="drawer" aria-label="Mobile menu">
+  <aside class="drawer" id="drawer" aria-label="Table of Contents">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-      <strong style="font-size:1.1rem">Menu</strong>
-      <button class="theme" id="drawerClose" aria-label="Close menu">✕</button>
+      <strong>Contents</strong>
+      <button class="theme" id="closeDrawer" aria-label="Close">✕</button>
     </div>
-    <nav style="display:grid;gap:6px">
-      <a href="#overview">Overview</a><a href="#market">Market</a><a href="#technology">Technology</a><a href="#security">Security</a>
-      <a href="#sdk">SDK</a><a href="#governance">Governance</a><a href="#investment">Investment</a><a href="#kpis">KPIs</a>
-      <a href="#roadmap">Roadmap</a><a href="#cases">Case Studies</a><a href="#threat">Threat Model</a><a href="#playbook">Playbook</a>
-      <a href="#audit">Audit Plan</a><a href="#whitepaper">Whitepaper</a><a href="#faq">FAQ</a><a href="#contact">Contact</a>
-    </nav>
+    <nav id="drawerLinks" style="display:grid;gap:6px"></nav>
   </aside>
 
-  <!-- HERO -->
-  <header id="home" class="hero">
-    <div class="container">
-      <span class="badge">Status: READY • Enterprise build</span>
-      <h1>The Invisible Engine of <span style="background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent">DeFi Liquidity</span></h1>
-      <p class="lead">
-        Gravitas Protocol is a neutral transport layer for <strong>atomic liquidity migrations</strong> between DEXs (V2/V3) and L2s.
-        Micro-fees on flow create <strong>sustainable protocol revenue</strong>. Audit-first, institution-ready, partner-friendly.
-      </p>
-      <div class="chips" aria-label="Key capabilities">
-        <span class="chip">Atomic migrations</span><span class="chip">UniV2/V3 adapters</span>
-        <span class="chip">Multisig + Timelock</span><span class="chip">SDK & Observability</span><span class="chip">Fork & Fuzz Tests</span>
-      </div>
-      <div class="hero-grid">
-        <div class="panel">
-          <h3>Why this matters</h3>
-          <p style="margin:6px 0 14px;color:var(--muted)">Liquidity is fragmented. Strategies rotate quickly. Gravitas executes migrations with deterministic guardrails, near-zero operational drag, and verifiable audit logs.</p>
-          <div class="grid g-3">
-            <div class="kpi"><div class="v">&lt;30s</div><div style="color:var(--muted);font-size:.95rem">Typical migration time</div></div>
-            <div class="kpi"><div class="v">&lt;1%</div><div style="color:var(--muted);font-size:.95rem">Failed transaction rate</div></div>
-            <div class="kpi"><div class="v">99.9%</div><div style="color:var(--muted);font-size:.95rem">Availability SLO</div></div>
+  <main class="wrap" id="top">
+    <!-- Sidebar TOC -->
+    <aside class="sidebar" aria-label="Table of Contents">
+      <nav class="toc" id="toc">
+        <h3>Contents</h3>
+        <a href="#hero">Cover</a>
+        <a href="#investment-thesis">Investment Thesis</a>
+        <a href="#market">Market Size</a>
+        <a href="#business-model">Business Model</a>
+        <a href="#unit-economics">Unit Economics</a>
+        <a href="#gtm">Go-To-Market</a>
+        <a href="#competition">Competitive Landscape</a>
+        <a href="#moat">Moat</a>
+        <a href="#traction">Traction & Roadmap</a>
+        <a href="#risks">Risks & Mitigation</a>
+        <a href="#governance">Governance & Compliance</a>
+        <a href="#team">Team</a>
+        <a href="#use-of-funds">Use of Funds</a>
+        <a href="#financials">Financial Projections</a>
+        <a href="#faq">Investor FAQ</a>
+        <a href="#whitepaper">Whitepaper (PDF)</a>
+        <a href="#appendix">Technical Appendix</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </aside>
+
+    <!-- Content -->
+    <div class="content">
+      <!-- HERO -->
+      <section id="hero" class="hero">
+        <span class="badge">Status: READY • Enterprise build</span>
+        <h1>Gravitas Protocol — The Invisible Engine of DeFi Liquidity</h1>
+        <p class="lead">
+          A neutral, audit-first infrastructure layer that performs <strong>atomic liquidity migrations</strong> across DEX venues and L2s.
+          We monetize the inevitable flow: <strong>micro-fees on volume</strong> create durable protocol revenue.
+        </p>
+        <div class="cta-row">
+          <a class="btn grad" href="#contact">Start a Conversation</a>
+          <a class="btn ghost" href="#whitepaper">View Whitepaper</a>
+        </div>
+        <div class="grid g-3" style="margin-top:14px">
+          <div class="card"><strong>What we do</strong><br/>Deterministic, one-click migrations with strict guardrails (slippage, deadlines, whitelists).</div>
+          <div class="card"><strong>Who we serve</strong><br/>DEXs, DAOs/Treasuries, funds & market makers who rebalance across venues/chains.</div>
+          <div class="card"><strong>Why now</strong><br/>Liquidity rotates weekly; fragmentation increases. Execution needs to be safe, fast, and predictable.</div>
+        </div>
+      </section>
+
+      <!-- INVESTMENT THESIS -->
+      <section id="investment-thesis">
+        <h2>Investment Thesis</h2>
+        <p class="lead">We are building the neutral transport layer for liquidity — a category that compounds with market depth, partners, and integrations.</p>
+        <div class="grid g-2">
+          <div class="card">
+            <h3>Thesis in one sentence</h3>
+            <p>Liquidity flow is recurring and protocol-agnostic; capturing a <em>bps-level toll</em> on deterministic migrations is a defensible, high-margin business.</p>
+            <div class="callout"><strong>Key insight:</strong> execution certainty beats theoretical APR — desks pay for reliability.</div>
           </div>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">
-            <a class="btn grad" href="#contact">Start a Conversation</a>
-            <a class="btn ghost" href="#whitepaper">View Whitepaper</a>
-          </div>
-        </div>
-        <div class="visual" aria-hidden="true">
-          <div class="ribbon r1"></div><div class="ribbon r2"></div><div class="ribbon r3"></div>
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <!-- OVERVIEW -->
-  <section id="overview">
-    <div class="container">
-      <h2>Executive Overview</h2>
-      <p class="lead">Problem → Solution → Value for creators, users, and the protocol.</p>
-      <div class="grid g-3" style="margin-top:10px">
-        <div class="card"><h3>Problem</h3><p>DeFi liquidity sits in silos; manual moves waste time, create slippage, and add risk. Projects lack a predictable, recurring revenue stream from liquidity motion.</p></div>
-        <div class="card"><h3>Solution</h3><p><strong>Atomic migrations</strong> with audited adapters and strict guards (slippage, deadlines, whitelists). Transparent micro-fees scale with volume.</p></div>
-        <div class="card"><h3>Value</h3>
-          <ul><li><strong>Creators:</strong> higher net yields, less ops drag</li><li><strong>Users:</strong> 1-click moves, deterministic outcomes</li><li><strong>Protocol:</strong> usage-based, non-extractive revenue</li></ul>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- MARKET -->
-  <section id="market">
-    <div class="container">
-      <h2>Market & Positioning</h2>
-      <p class="lead">Agnostic migration infrastructure for a multi-venue, multi-chain reality.</p>
-      <div class="grid g-2" style="margin-top:10px">
-        <div class="card"><h3>Demand segments</h3>
-          <ul><li><strong>DEX partners:</strong> seamless in/out flows; reduce user churn</li><li><strong>DAOs/Treasuries:</strong> programmatic rebalancing</li><li><strong>MMs & funds:</strong> deterministic rotations</li></ul>
-        </div>
-        <div class="card"><h3>Differentiation</h3><p>Neutral, <em>audit-first</em> transport with signature-stable APIs. No custody; <strong>deterministic</strong> execution; timelocked rollbacks; verifiable logs.</p></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- TECHNOLOGY -->
-  <section id="technology">
-    <div class="container">
-      <h2>Technology Blueprint</h2>
-      <p class="lead">Phased build-out; contracts → adapters → SDK → observability.</p>
-
-      <details open class="card">
-        <summary>Phase 1: Smart contracts (Weeks 1–4)</summary>
-        <div class="details-body">
-          <div class="code"><button class="copy">Copy</button>
-<pre><code>/contracts/
-  /interfaces/ IUniswapV2Router.sol, IUniswapV3Pool.sol, INonfungiblePositionManager.sol
-  /adapters/   UniV2Adapter.sol, UniV3Adapter.sol
-  /libraries/  SafeERC20.sol, TokenValidation.sol
-  Teleport.sol, Treasury.sol
-
-npm init -y
-npm i @openzeppelin/contracts @uniswap/v3-core @uniswap/v3-periphery
-npx hardhat init</code></pre></div>
-          <div class="grid g-2" style="margin-top:14px">
-            <div class="card"><h3>Teleport.sol</h3>
-              <ul><li><code>migrateLiquidity</code> → main entry</li><li><code>_executeMigration</code> → orchestration</li><li><code>_takeProtocolFee</code> → exact bps; rounding guards</li><li><code>pause/unpause</code> via guardian</li></ul>
-            </div>
-            <div class="card"><h3>Adapter pattern</h3>
-              <ul><li>V2: remove/add LP with slippage + deadlines</li><li>V3: mint/increase with tick validation</li><li>External calls wrapped in try/catch</li></ul>
-            </div>
+          <div class="card">
+            <h3>Core assumptions</h3>
+            <ul>
+              <li>Venue proliferation and cross-chain rotation persist.</li>
+              <li>Institutions require auditability, policy controls, and rollback plans.</li>
+              <li>Agnostic infra wins partnerships faster than “walled-garden” UX layers.</li>
+            </ul>
           </div>
         </div>
-      </details>
+      </section>
 
-      <details class="card" style="margin-top:14px">
-        <summary>Phase 2: Testing & Security (Weeks 5–8)</summary>
-        <div class="details-body">
-          <div class="code"><button class="copy">Copy</button>
-<pre><code>/test/
-  /unit/        Teleport.test.ts, Adapters.test.ts, Fees.test.ts
-  /integration/ V2ToV2.test.ts, V2ToV3.test.ts, V3ToV3.test.ts
-  /fuzz/        MigrationFuzz.test.ts, FeeFuzz.test.ts
-  /fork/        MainnetFork.test.ts, HistoricalHacks.test.ts
+      <!-- MARKET SIZE -->
+      <section id="market">
+        <h2>Market Size</h2>
+        <p class="lead">We estimate a multi-hundred-million revenue pool for migration infrastructure based on DEX TVL and historical rotation rates.</p>
+        <div class="grid g-2">
+          <div class="card">
+            <h3>TAM / SAM / SOM</h3>
+            <table>
+              <thead><tr><th>Layer</th><th>Definition</th><th>Assumption</th><th>Implied Flow</th></tr></thead>
+              <tbody>
+                <tr><td><strong>TAM</strong></td><td>Global DEX liquidity rotations (all chains)</td><td>5–10% of TVL rotates monthly</td><td>$20–$40B/mo flow</td></tr>
+                <tr><td><strong>SAM</strong></td><td>Venues where Gravitas adapters exist</td><td>~30% coverage Y1</td><td>$6–$12B/mo</td></tr>
+                <tr><td><strong>SOM</strong></td><td>Flows executed via Gravitas</td><td>1–2% capture Y1</td><td>$60–$240M/mo</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card">
+            <h3>Why this is durable</h3>
+            <ul>
+              <li>Rotations are <em>recurring</em> (strategy and venue drift).</li>
+              <li>Execution surface grows with partners and supported pools.</li>
+              <li>Regulated entities demand <strong>verifiable</strong> processes and logs.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
 
-Targets:
-- ~100% coverage
-- Full math fuzzing
-- Mainnet fork states
-- Historic incident replays</code></pre></div>
+      <!-- BUSINESS MODEL -->
+      <section id="business-model">
+        <h2>Business Model</h2>
+        <p class="lead">We earn bps on successful migrations and offer enterprise features on top.</p>
+        <div class="grid g-2">
+          <div class="card">
+            <h3>Revenue streams</h3>
+            <ul>
+              <li><strong>Protocol fees:</strong> 5–10 bps per migration (transparent, on-chain).</li>
+              <li><strong>Enterprise add-ons:</strong> SLA support, SSO, policy templates, custom reporting.</li>
+              <li><strong>Optional:</strong> fee-sharing and staking bonds if a token is introduced post-PMF.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Pricing rationale</h3>
+            <p>For desks, failed execution is more expensive than fees. Our bps toll is a fraction of slippage avoided and time saved.</p>
+            <div class="callout"><strong>Target:</strong> $100M monthly volume → $50k–$100k monthly revenue at 5–10 bps.</div>
+          </div>
         </div>
-      </details>
-    </div>
-  </section>
+      </section>
 
-  <!-- SECURITY -->
-  <section id="security">
-    <div class="container">
-      <h2>Security Protocols</h2>
-      <p class="lead">Defense-in-depth with verifiable governance and live alerts.</p>
-      <div class="grid g-2" style="margin-top:10px">
-        <div class="card"><h3>Access & governance</h3>
-          <div class="code"><button class="copy">Copy</button>
-<pre><code>Treasury Multisig: 3/5 (2 founders, 2 advisors, 1 community)
-Timelock: 48h (admin changes, fees, whitelist)
-Guardian (hot): emergency pause only</code></pre></div>
+      <!-- UNIT ECONOMICS -->
+      <section id="unit-economics">
+        <h2>Unit Economics</h2>
+        <div class="grid g-2">
+          <div class="card">
+            <h3>Contribution model</h3>
+            <table>
+              <thead><tr><th>Metric</th><th>Assumption</th></tr></thead>
+              <tbody>
+                <tr><td>Gross margin</td><td>&gt; 85% (infra + compute are modest vs. fee revenue)</td></tr>
+                <tr><td>Support cost / partner</td><td>$1–3k/month with SLA</td></tr>
+                <tr><td>Engineering leverage</td><td>Adapters scale horizontally; SDK is reusable</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="card">
+            <h3>Sensitivity (bps × volume)</h3>
+            <table>
+              <thead><tr><th>Monthly Volume</th><th>5 bps</th><th>8 bps</th><th>10 bps</th></tr></thead>
+              <tbody>
+                <tr><td>$50M</td><td>$25k</td><td>$40k</td><td>$50k</td></tr>
+                <tr><td>$100M</td><td>$50k</td><td>$80k</td><td>$100k</td></tr>
+                <tr><td>$250M</td><td>$125k</td><td>$200k</td><td>$250k</td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
-        <div class="card"><h3>Monitoring & alerts</h3>
-          <div class="code"><button class="copy">Copy</button>
-<pre><code>const CRITICAL_ALERTS = {
-  LARGE_MIGRATION: { threshold: 100000, priority:'HIGH' },
-  FAILED_TX:       { threshold: 10000,  priority:'MEDIUM' },
-  CIRCUIT_BREAKER: { threshold: 1,      priority:'CRITICAL' },
-  FEE_CHANGE:      { threshold: 1,      priority:'HIGH' }
-};</code></pre></div>
-          <ul><li>Signed audit logs + SIEM export</li><li>Rollback runbooks under timelock</li><li>24/7 on-call with automated escalation</li></ul>
-        </div>
-      </div>
-    </div>
-  </section>
+      </section>
 
-  <!-- SDK -->
-  <section id="sdk">
-    <div class="container">
-      <h2>SDK & APIs</h2>
-      <p class="lead">Typed adapters, idempotent calls, deterministic results.</p>
-      <div class="grid g-2" style="margin-top:10px">
-        <div class="card"><h3>Package structure</h3>
-          <div class="code"><button class="copy">Copy</button>
-<pre><code>/sdk/
-  /core/ client.ts, signer.ts
-  /dex/  univ2.ts, univ3.ts
-  /types/ index.d.ts
-  /utils/ math.ts, slippage.ts, deadlines.ts</code></pre></div>
-          <p><strong>Reliability:</strong> SemVer, LTS branch, 24h security fixes.</p>
+      <!-- GTM -->
+      <section id="gtm">
+        <h2>Go-To-Market</h2>
+        <div class="grid g-2">
+          <div class="card">
+            <h3>Motion</h3>
+            <ul>
+              <li><strong>Design partners:</strong> 3–5 DEXs on Ethereum mainnet.</li>
+              <li><strong>L2 expansion:</strong> Arbitrum / Optimism pools with real volume.</li>
+              <li><strong>DAOs & funds:</strong> treasury rotations with policy templates.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>12-month milestones</h3>
+            <ol>
+              <li>Public testnet with audits complete.</li>
+              <li>Mainnet launch with 3 partners.</li>
+              <li>10+ integrations; $100M+/month migration volume.</li>
+            </ol>
+          </div>
         </div>
-        <div class="card"><h3>TypeScript example</h3>
-          <div class="code"><button class="copy">Copy</button>
-<pre><code>import { GravitasClient } from '@gravitas/sdk';
+      </section>
+
+      <!-- COMPETITION -->
+      <section id="competition">
+        <h2>Competitive Landscape</h2>
+        <p class="lead">We’re infra, not a front-end yield app. We win by neutrality, auditability, and policy control.</p>
+        <table>
+          <thead><tr><th>Vector</th><th>Yield apps</th><th>Aggregation routers</th><th><strong>Gravitas</strong></th></tr></thead>
+          <tbody>
+            <tr><td>Neutrality</td><td>Low</td><td>Medium</td><td><strong>High</strong></td></tr>
+            <tr><td>Deterministic guardrails</td><td>Medium</td><td>Medium</td><td><strong>High</strong></td></tr>
+            <tr><td>Audit-first posture</td><td>Varies</td><td>Medium</td><td><strong>High</strong></td></tr>
+            <tr><td>Institution features</td><td>Low</td><td>Medium</td><td><strong>High</strong> (timelock, policies, logs)</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- MOAT -->
+      <section id="moat">
+        <h2>Moat</h2>
+        <div class="grid g-3">
+          <div class="card"><h3>Integration network</h3><p>Adapters + SDK embedded across venues → switching costs.</p></div>
+          <div class="card"><h3>Operational trust</h3><p>Signed logs, reproducible flows, on-call SLAs → institutional preference.</p></div>
+          <div class="card"><h3>Policy & compliance</h3><p>Timelocks, approvals, rollbacks → governance-safe adoption.</p></div>
+        </div>
+      </section>
+
+      <!-- TRACTION & ROADMAP -->
+      <section id="traction">
+        <h2>Traction & Roadmap</h2>
+        <div class="grid g-2">
+          <div class="card">
+            <h3>Next 24 hours</h3>
+            <ul><li>Repo hardening; CI/CD; staging deploy</li><li>Adapter registry with signatures</li><li>Alert pipeline scaffold</li></ul>
+            <h3 style="margin-top:10px">Next 7 days</h3>
+            <ul><li>Teleport.sol skeleton + unit tests</li><li>Fork tests for target pools</li><li>Design partner shortlist & outreach</li></ul>
+          </div>
+          <div class="card">
+            <h3>Milestones</h3>
+            <ul><li><strong>T+30</strong>: Phase 1 complete</li><li><strong>T+60</strong>: Security audit #1</li><li><strong>T+90</strong>: Public testnet</li><li><strong>T+120</strong>: Mainnet (3 partners)</li></ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- RISKS -->
+      <section id="risks">
+        <h2>Risks & Mitigation</h2>
+        <div class="grid g-2">
+          <div class="card">
+            <h3>Market & adoption</h3>
+            <ul>
+              <li><strong>Risk:</strong> Slower partner onboarding. <strong>Mitigation:</strong> Design-partner incentives; integration pods.</li>
+              <li><strong>Risk:</strong> Competing UX layers. <strong>Mitigation:</strong> Infra neutrality + fee sharing.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Security & execution</h3>
+            <ul>
+              <li><strong>Risk:</strong> Adapter bugs. <strong>Mitigation:</strong> Multi-audit, contest, bounties, circuit breakers.</li>
+              <li><strong>Risk:</strong> MEV & slippage. <strong>Mitigation:</strong> Commit-reveal, batching, protected relays.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- GOVERNANCE -->
+      <section id="governance">
+        <h2>Governance & Compliance</h2>
+        <div class="grid g-2">
+          <div class="card">
+            <h3>Access control</h3>
+            <div class="code"><button class="copy">Copy</button><pre><code>Treasury Multisig: 3/5 (2 founders, 2 advisors, 1 community)
+Timelock: 48h (admin changes, fees, adapter whitelist)
+Guardian: emergency pause only</code></pre></div>
+          </div>
+          <div class="card">
+            <h3>Post-PMF token (optional)</h3>
+            <p>Utility for governance, fee-sharing, and staking bonds. Disciplined unlocks and protocol-owned liquidity to avoid mercenary pressure.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- TEAM -->
+      <section id="team">
+        <h2>Team</h2>
+        <div class="grid g-3">
+          <div class="card">
+            <h3>Core Engineering</h3>
+            <ul>
+              <li>Lead Smart Contract Engineers (2×): audits, adapters, Teleport core</li>
+              <li>SDK Lead: TS packages, signing, idempotency</li>
+              <li>DevOps & Security: CI/CD, forks, SIEM, alerts</li>
+              <li>Product/CTO: specs, partner playbooks, SLOs</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Advisors</h3>
+            <ul>
+              <li>DeFi security (part-time)</li>
+              <li>BD / exchange partnerships</li>
+              <li>Legal & compliance (retainer)</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Operating model</h3>
+            <p>Ship in phases with clear risk gates. Partner-led roadmaps. Strict incident runbooks and postmortems.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- USE OF FUNDS -->
+      <section id="use-of-funds">
+        <h2>Use of Funds</h2>
+        <table>
+          <thead><tr><th>Category</th><th>Budget</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td>Engineering (5 senior, 4 mo)</td><td>$480k</td><td>Core contracts, adapters, SDK</td></tr>
+            <tr><td>Security (audits ×2)</td><td>$250k</td><td>Firm + public contest</td></tr>
+            <tr><td>Infra & tools</td><td>$50k</td><td>Nodes, CI, observability</td></tr>
+            <tr><td>Legal & compliance</td><td>$50k</td><td>Policy, reviews</td></tr>
+            <tr><td>BD & partnerships</td><td>$100k</td><td>Design-partner incentives</td></tr>
+            <tr><th>Total</th><th>$930k</th><th>Initial capex</th></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- FINANCIALS -->
+      <section id="financials">
+        <h2>Financial Projections (Illustrative)</h2>
+        <p class="lead">Volume-driven revenue with disciplined cost base; positive unit economics from day one.</p>
+        <table>
+          <thead><tr><th>Month</th><th>Volume</th><th>Fee (bps)</th><th>Revenue</th><th>Run-rate Opex</th><th>EBITDA</th></tr></thead>
+          <tbody>
+            <tr><td>M3</td><td>$20M</td><td>6</td><td>$12k</td><td>$80k</td><td>-$68k</td></tr>
+            <tr><td>M6</td><td>$60M</td><td>6</td><td>$36k</td><td>$90k</td><td>-$54k</td></tr>
+            <tr><td>M9</td><td>$100M</td><td>6</td><td>$60k</td><td>$95k</td><td>-$35k</td></tr>
+            <tr><td>M12</td><td>$150M</td><td>6</td><td>$90k</td><td>$100k</td><td>-$10k</td></tr>
+            <tr><td>M15</td><td>$250M</td><td>6</td><td>$150k</td><td>$110k</td><td>+$40k</td></tr>
+          </tbody>
+        </table>
+        <div class="callout">Break-even around ~$83M monthly volume at 6 bps, assuming steady-state opex.</div>
+      </section>
+
+      <!-- FAQ -->
+      <section id="faq">
+        <h2>Investor FAQ</h2>
+        <div class="grid g-2">
+          <div class="card"><h3>How do fees accrue?</h3><p>Bps-level micro-fees are deducted on successful migrations and routed to the protocol Treasury with on-chain transparency.</p></div>
+          <div class="card"><h3>Is there custody risk?</h3><p>No. Gravitas orchestrates via whitelisted adapters and routers; funds travel through user-authorized flows.</p></div>
+          <div class="card"><h3>Why will partners integrate?</h3><p>We lift conversion and retention by removing migration friction and offering institution-grade controls and logs.</p></div>
+          <div class="card"><h3>Will you issue a token?</h3><p>Only post-PMF if it strengthens governance and long-term incentives (fee-sharing, staking bonds) without harming neutrality.</p></div>
+        </div>
+      </section>
+
+      <!-- WHITEPAPER -->
+      <section id="whitepaper">
+        <h2>Technical Whitepaper (Embedded)</h2>
+        <p class="lead">Inline PDF reader for diligence. Place the file at <code>docs/whitepaper.pdf</code>.</p>
+        <iframe class="pdf" src="docs/whitepaper.pdf" title="Gravitas Protocol Whitepaper" loading="lazy"></iframe>
+        <p style="margin-top:10px;color:var(--muted)">If the PDF doesn’t render, <a href="docs/whitepaper.pdf" target="_blank" rel="noopener">open it in a new tab</a>.</p>
+      </section>
+
+      <!-- TECH APPENDIX -->
+      <section id="appendix">
+        <h2>Technical Appendix (Concise)</h2>
+        <div class="grid g-2">
+          <div class="card">
+            <h3>Contracts & adapters</h3>
+            <div class="code"><button class="copy">Copy</button><pre><code>/contracts/
+  interfaces: IUniswapV2Router, IUniswapV3Pool, INonfungiblePositionManager
+  adapters:   UniV2Adapter, UniV3Adapter
+  libraries:  SafeERC20, TokenValidation
+  Teleport.sol, Treasury.sol</code></pre></div>
+          </div>
+          <div class="card">
+            <h3>Testing strategy</h3>
+            <div class="code"><button class="copy">Copy</button><pre><code>/test/
+  unit: Teleport, Adapters, Fees
+  integration: V2↔V3 flows
+  fuzz: math, slippage, deadlines
+  fork: mainnet states, historic incidents</code></pre></div>
+          </div>
+          <div class="card">
+            <h3>Security posture</h3>
+            <ul>
+              <li>Multi-audit + public contest + bounties</li>
+              <li>Timelocked changes, signed logs, SIEM export</li>
+              <li>Circuit breakers; rollback runbooks</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>SDK example</h3>
+            <div class="code"><button class="copy">Copy</button><pre><code>import { GravitasClient } from '@gravitas/sdk';
 const client = new GravitasClient({ rpc: process.env.RPC_URL });
 await client.connect(wallet);
 await client.migrate({
@@ -348,224 +483,38 @@ await client.migrate({
   to:{ dex:'univ3', pool:'WETH/USDC', feeTier:500 },
   amountLP:'100.0', slippageBps:30, deadlineSec:120
 });</code></pre></div>
+          </div>
         </div>
-      </div>
+      </section>
+
+      <!-- CONTACT -->
+      <section id="contact">
+        <h2>Contact & Partnerships</h2>
+        <div class="grid g-2">
+          <div class="card">
+            <h3>Email</h3>
+            <p><a href="mailto:abdusamedzelic98@gmail.com">abdusamedzelic98@gmail.com</a></p>
+          </div>
+          <div class="card">
+            <h3>Phone</h3>
+            <p><a href="tel:+385915668133">+385 91 566 8133</a></p>
+          </div>
+        </div>
+        <div class="cta-row" style="margin-top:10px">
+          <a class="btn grad" href="mailto:abdusamedzelic98@gmail.com?subject=Gravitas%20Protocol%20—%20Investor%20Deck&body=Hi%20Gravitas%20team%2C%0A%0AWe%27d%20like%20to%20request%20the%20deck%20and%20arrange%20a%20call.%0A">Request the Deck</a>
+          <a class="btn ghost" href="#whitepaper">Open Whitepaper</a>
+        </div>
+      </section>
     </div>
-  </section>
+  </main>
 
-  <!-- GOVERNANCE -->
-  <section id="governance">
-    <div class="container">
-      <h2>Governance & Compliance</h2>
-      <p class="lead">Minimize risk, maximize verifiability. Token optional later.</p>
-      <div class="grid g-2" style="margin-top:10px">
-        <div class="card"><h3>Model</h3>
-          <ul><li>Phase 0–1: multisig + timelock</li><li>Phase 2: DAO parameter oversight (fees, adapter whitelist)</li><li>Compliance: infrastructure only; no custody</li></ul>
-        </div>
-        <div class="card"><h3>Token (optional)</h3><p>Utility: governance, fee-sharing, staking bonds for adapter security with disciplined unlocks and protocol-owned liquidity.</p></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- INVESTMENT -->
-  <section id="investment">
-    <div class="container">
-      <h2>Investment Blueprint</h2>
-      <p class="lead">Transparent economics with a credible path to revenue on volume.</p>
-      <div class="grid g-2" style="margin-top:10px">
-        <div class="card"><h3>Revenue & metrics</h3>
-          <div class="code"><button class="copy">Copy</button>
-<pre><code>Fee: 5–10 bps (0.05–0.1%)
-Year-1 Volume Target: $100M / month
-Projected Revenue: $50k–$100k / month
-Break-even (6 bps): ~ $83M / month</code></pre></div>
-          <p>100% of fees accrue to Treasury → development, security, partnerships; later fee-sharing via DAO votes.</p>
-        </div>
-        <div class="card"><h3>Costs & runway</h3>
-          <div class="code"><button class="copy">Copy</button>
-<pre><code>Senior Devs (5×, 4 mo) : ~$480k
-Audits (2×)            : ~$250k
-Infra & Tools          : ~$50k
-Legal & Compliance     : ~$50k
-BD & Partnerships      : ~$100k
------------------------------
-Initial Capex          : ~$930k</code></pre></div>
-          <p>Year-1 OPEX ≈ $500k. Focus on early strategic DEX partners for faster break-even.</p>
-        </div>
-      </div>
-
-      <div class="card" style="margin-top:14px">
-        <h3>Go-to-Market (12 months)</h3>
-        <div class="code"><button class="copy">Copy</button>
-<pre><code>Phase 1 (1–3 mo): Early Adopters
-- 3–5 DEX partners on Ethereum mainnet
-- $10M/month volume target
-
-Phase 2 (4–6 mo): Scale
-- 10+ partners, add L2 (Arbitrum/Optimism)
-- $50M/month
-
-Phase 3 (7–12 mo): Growth
-- Cross-chain expansion
-- $100M+/month</code></pre></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- KPIs -->
-  <section id="kpis">
-    <div class="container">
-      <h2>Success Metrics (Year 1)</h2>
-      <p class="lead">Technical → Business → User outcomes.</p>
-      <div class="grid g-3" style="margin-top:10px">
-        <div class="kpi"><div class="v">99.9%</div><div style="color:var(--muted);font-size:.95rem">Uptime</div></div>
-        <div class="kpi"><div class="v">0</div><div style="color:var(--muted);font-size:.95rem">Critical incidents</div></div>
-        <div class="kpi"><div class="v">&lt;1%</div><div style="color:var(--muted);font-size:.95rem">Failed tx rate</div></div>
-        <div class="kpi"><div class="v">$100M+</div><div style="color:var(--muted);font-size:.95rem">Monthly migration volume</div></div>
-        <div class="kpi"><div class="v">10+</div><div style="color:var(--muted);font-size:.95rem">Integrated partners</div></div>
-        <div class="kpi"><div class="v">1,000+</div><div style="color:var(--muted);font-size:.95rem">Monthly active migrators</div></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ROADMAP -->
-  <section id="roadmap">
-    <div class="container">
-      <h2>Roadmap</h2>
-      <p class="lead">From testnet to mainnet to scale.</p>
-      <div class="grid g-2" style="margin-top:10px">
-        <div class="card">
-          <h3>Next 24h</h3>
-          <ul><li>Hardhat/Foundry setup, repo init</li><li>Deploy TimelockController (testnet)</li><li>CI/CD + security baselines</li></ul>
-          <h3 style="margin-top:12px">Next 7 days</h3>
-          <ul><li>Teleport.sol skeleton + unit tests</li><li>Alerts + observability</li><li>Identify 3 launch partners</li></ul>
-        </div>
-        <div class="card">
-          <h3>Milestones</h3>
-          <ul><li><strong>T+30</strong>: Phase 1 complete</li><li><strong>T+60</strong>: Security audit #1</li><li><strong>T+90</strong>: Public testnet</li><li><strong>T+120</strong>: Mainnet (3 partners)</li></ul>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- CASE STUDIES -->
-  <section id="cases">
-    <div class="container">
-      <h2>Case Studies (Simulated)</h2>
-      <p class="lead">Before/after snapshots with slippage and timing impact.</p>
-      <div class="grid g-auto" style="margin-top:10px">
-        <div class="card"><h3>V2 → V3 Rebalance (WETH/USDC)</h3>
-          <ul><li><strong>Before:</strong> Multiple tx; ~0.45% slippage</li><li><strong>After:</strong> ≤2 tx; ≤0.08% slippage</li><li><strong>Time saved:</strong> ~12 minutes per move</li></ul>
-        </div>
-        <div class="card"><h3>L2 Expansion (Arbitrum)</h3>
-          <ul><li><strong>Before:</strong> Ad-hoc bridging; inconsistent fees</li><li><strong>After:</strong> Pre-quoted path; deterministic bands</li><li><strong>Outcome:</strong> Predictable treasury rotations</li></ul>
-        </div>
-        <div class="card"><h3>DAO Treasury Rotation</h3>
-          <ul><li><strong>Before:</strong> Governance overhead per venue</li><li><strong>After:</strong> Policy templates + timelock; audit trail</li><li><strong>Impact:</strong> Fewer cycles; safer execution</li></ul>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- THREAT MODEL -->
-  <section id="threat">
-    <div class="container">
-      <h2>Threat Model (STRIDE)</h2>
-      <p class="lead">Systemic risks and mitigations.</p>
-      <div class="grid g-auto" style="margin-top:10px">
-        <div class="card"><h3>Spoofing</h3><p>Signer and adapter spoofing.</p><p><strong>Mitigation:</strong> EIP-712, whitelists, on-chain registry.</p></div>
-        <div class="card"><h3>Tampering</h3><p>Parameter tampering in flight.</p><p><strong>Mitigation:</strong> Timelock, immutables, Merkle-proofed configs.</p></div>
-        <div class="card"><h3>Repudiation</h3><p>Dispute over approvals.</p><p><strong>Mitigation:</strong> Signed logs, append-only store, SIEM.</p></div>
-        <div class="card"><h3>Info Disclosure</h3><p>Leak of intents.</p><p><strong>Mitigation:</strong> Commit-reveal, batching, MEV-protected relays.</p></div>
-        <div class="card"><h3>DoS</h3><p>Adapter griefing, gas grief.</p><p><strong>Mitigation:</strong> Circuit breakers, rate-limits, back-pressure queues.</p></div>
-        <div class="card"><h3>Privilege Escalation</h3><p>Admin takeover.</p><p><strong>Mitigation:</strong> Multisig + HW keys, scoped roles, emergency council quorum.</p></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PARTNER PLAYBOOK -->
-  <section id="playbook">
-    <div class="container">
-      <h2>Partner Integration Playbook</h2>
-      <p class="lead">From sandbox to production with SLAs and observability.</p>
-      <div class="grid g-2" style="margin-top:10px">
-        <div class="card"><h3>Steps</h3>
-          <ol><li>Sandbox keys & adapter registry access</li><li>SDK install + sample flows</li><li>Staging fork tests on target pools</li><li>Alert hooks + dashboards</li><li>Production rollout with caps</li></ol>
-        </div>
-        <div class="card"><h3>SLAs</h3>
-          <ul><li>Orchestration latency: &lt; 2s</li><li>Availability: 99.9% monthly</li><li>Support: 24h P1 response</li></ul>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- AUDIT PLAN -->
-  <section id="audit">
-    <div class="container">
-      <h2>Audit Plan</h2>
-      <p class="lead">Scope, timelines, and incentives.</p>
-      <div class="grid g-2" style="margin-top:10px">
-        <div class="card"><h3>Scope</h3>
-          <ul><li>Contracts: Teleport, Treasury, Adapters, Registry</li><li>Economics: fee precision, rounding, griefing</li><li>Threat replay: historic exploits on forks</li></ul>
-        </div>
-        <div class="card"><h3>Timeline & incentives</h3>
-          <ul><li>Audit #1 (4 wks), remediations (2 wks)</li><li>Audit #2 (3 wks) + public contest</li><li>Bug bounty at launch</li></ul>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- WHITEPAPER -->
-  <section id="whitepaper">
-    <div class="container">
-      <h2>Technical Whitepaper (PDF)</h2>
-      <p class="lead">Inline PDF for investor & engineer review. Place file at <code>docs/whitepaper.pdf</code>.</p>
-      <iframe class="pdf" src="docs/whitepaper.pdf" title="Gravitas Protocol Whitepaper" loading="lazy"></iframe>
-      <p style="margin-top:10px;color:var(--muted)">If the PDF doesn’t render, <a href="docs/whitepaper.pdf" target="_blank" rel="noopener">open it in a new tab</a>.</p>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section id="faq">
-    <div class="container">
-      <h2>Investor & Technical FAQ</h2>
-      <div class="grid g-auto" style="margin-top:10px">
-        <details class="card"><summary>How do fees accrue?</summary><div class="details-body">Micro-fees (bps) are deducted during migrations and routed to Treasury. Transparent, auditable accounting.</div></details>
-        <details class="card"><summary>Is custody involved?</summary><div class="details-body">No. Gravitas orchestrates via whitelisted adapters/routers; funds move through user-authorized flows.</div></details>
-        <details class="card"><summary>What’s the token plan?</summary><div class="details-body">Optional after PMF: governance, fee-sharing, staking bonds for security.</div></details>
-        <details class="card"><summary>How are large moves protected?</summary><div class="details-body">Commit-reveal windows, slippage caps, batching, optional MEV-protected relays.</div></details>
-      </div>
-    </div>
-  </section>
-
-  <!-- CONTACT -->
-  <section id="contact">
-    <div class="container">
-      <h2>Contact & Partnerships</h2>
-      <p class="lead">Ready for diligence, partnerships, and integration pilots.</p>
-      <div class="grid g-2" style="margin-top:10px">
-        <a class="card" style="text-decoration:none;color:inherit" href="mailto:abdusamedzelic98@gmail.com?subject=Gravitas%20Protocol%20—%20Investor%20Inquiry&body=Hi%20Gravitas%20team,%0A%0AWe%27d%20like%20to%20request%20the%20deck%20and%20schedule%20a%20call.%0A%0A—%20">
-          <h3>Email</h3><p style="color:var(--muted)">abdusamedzelic98@gmail.com</p>
-        </a>
-        <a class="card" style="text-decoration:none;color:inherit" href="tel:+385915668133">
-          <h3>Phone</h3><p style="color:var(--muted)">+385 91 566 8133</p>
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- FOOTER -->
   <footer role="contentinfo">
-    <div class="container" style="display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap">
-      <p style="margin:0;color:var(--muted)">© <span id="y"></span> Gravitas Protocol • All rights reserved</p>
-      <div style="display:flex;gap:14px">
-        <a href="#whitepaper" style="text-decoration:none;color:var(--muted)">Whitepaper</a>
-        <a href="#contact" style="text-decoration:none;color:var(--muted)">Contact</a>
-      </div>
+    <div style="display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap">
+      <span>© <span id="y"></span> Gravitas Protocol</span>
+      <span style="color:var(--muted)">Neutral migration infrastructure for DeFi liquidity.</span>
     </div>
   </footer>
 
-  <!-- Back to top -->
   <button class="top" id="topBtn" aria-label="Back to top">↑</button>
 
   <script>
@@ -573,37 +522,15 @@ Phase 3 (7–12 mo): Growth
     document.getElementById('y').textContent = new Date().getFullYear();
 
     // Theme toggle (persist)
-    const themeKey = 'gravitas_theme';
-    const savedTheme = localStorage.getItem(themeKey);
-    if(savedTheme) document.documentElement.setAttribute('data-theme', savedTheme);
-    document.getElementById('themeToggle').addEventListener('click', ()=>{
-      const cur = document.documentElement.getAttribute('data-theme') || 'light';
-      const nxt = cur === 'light' ? 'dark' : 'light';
-      document.documentElement.setAttribute('data-theme', nxt);
-      localStorage.setItem(themeKey, nxt);
+    const themeKey='gravitas_theme';
+    const saved=localStorage.getItem(themeKey);
+    if(saved) document.documentElement.setAttribute('data-theme', saved);
+    document.getElementById('themeToggle').addEventListener('click',()=>{
+      const cur=document.documentElement.getAttribute('data-theme')||'light';
+      const nxt=cur==='light'?'dark':'light';
+      document.documentElement.setAttribute('data-theme',nxt);
+      localStorage.setItem(themeKey,nxt);
     });
-
-    // Mobile drawer
-    const drawer = document.getElementById('drawer');
-    const burger = document.getElementById('burger');
-    const drawerClose = document.getElementById('drawerClose');
-    const backdrop = document.getElementById('backdrop');
-    const toggleDrawer = (open)=>{
-      drawer.classList.toggle('open', open);
-      backdrop.classList.toggle('show', open);
-      if(open){ drawer.querySelector('a').focus(); }
-    };
-    burger.addEventListener('click', ()=>toggleDrawer(true));
-    drawerClose.addEventListener('click', ()=>toggleDrawer(false));
-    backdrop.addEventListener('click', ()=>toggleDrawer(false));
-    document.addEventListener('keydown',(e)=>{ if(e.key==='Escape') toggleDrawer(false); });
-    drawer.querySelectorAll('a').forEach(a=>a.addEventListener('click', ()=>toggleDrawer(false)));
-
-    // Back to top
-    const topBtn = document.getElementById('topBtn');
-    const onScroll = ()=>{ topBtn.style.display = (window.scrollY > 600) ? 'inline-flex' : 'none'; };
-    window.addEventListener('scroll', onScroll, { passive:true });
-    topBtn.addEventListener('click', ()=> window.scrollTo({ top:0, behavior:'smooth' }));
 
     // Copy buttons
     document.querySelectorAll('.copy').forEach(btn=>{
@@ -611,43 +538,70 @@ Phase 3 (7–12 mo): Growth
         const code = btn.parentElement.querySelector('pre').textContent;
         try{
           await navigator.clipboard.writeText(code);
-          const t = btn.textContent; btn.textContent='Copied ✓';
-          setTimeout(()=>btn.textContent=t, 1500);
-        }catch(e){ alert('Copy failed. Select text and copy manually.'); }
+          const t=btn.textContent; btn.textContent='Copied ✓';
+          setTimeout(()=>btn.textContent=t,1500);
+        }catch(e){ alert('Copy failed. Select and copy manually.'); }
       });
     });
 
-    // Scroll spy
-    const menuLinks = [...document.querySelectorAll('.menu a')];
-    const sections = menuLinks.map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
-    const spy = ()=>{
-      let activeId = ''; const offset = 120;
-      sections.forEach(sec=>{
-        const r = sec.getBoundingClientRect();
-        if(r.top <= offset && r.bottom > offset){ activeId = '#' + sec.id; }
-      });
-      menuLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href')===activeId));
-    };
-    window.addEventListener('scroll', spy, { passive:true });
-    window.addEventListener('resize', spy);
-    document.addEventListener('DOMContentLoaded', spy);
+    // Back to top
+    const topBtn=document.getElementById('topBtn');
+    const onScroll=()=>{ topBtn.style.display=(window.scrollY>600)?'inline-flex':'none'; };
+    window.addEventListener('scroll',onScroll,{passive:true});
+    topBtn.addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
 
-    // Smooth anchor with header offset
+    // Build drawer TOC from sidebar (mobile)
+    const toc = document.querySelectorAll('.toc a');
+    const drawer = document.getElementById('drawer');
+    const drawerLinks = document.getElementById('drawerLinks');
+    toc.forEach(a=>{
+      const clone=a.cloneNode(true);
+      drawerLinks.appendChild(clone);
+    });
+    const openDrawer=document.getElementById('openDrawer');
+    const closeDrawer=document.getElementById('closeDrawer');
+    const backdrop=document.getElementById('backdrop');
+    const toggleDrawer=(open)=>{
+      drawer.classList.toggle('open',open);
+      backdrop.classList.toggle('show',open);
+    };
+    openDrawer.addEventListener('click',()=>toggleDrawer(true));
+    closeDrawer.addEventListener('click',()=>toggleDrawer(false));
+    backdrop.addEventListener('click',()=>toggleDrawer(false));
+    document.addEventListener('keydown',(e)=>{ if(e.key==='Escape') toggleDrawer(false); });
+    drawerLinks.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>toggleDrawer(false)));
+
+    // Scroll spy
+    const links = [...document.querySelectorAll('.toc a')];
+    const sections = links.map(a=>document.querySelector(a.getAttribute('href'))).filter(Boolean);
+    const spy=()=>{
+      let activeId=''; const offset=120;
+      sections.forEach(sec=>{
+        const r=sec.getBoundingClientRect();
+        if(r.top<=offset && r.bottom>offset){ activeId='#'+sec.id; }
+      });
+      links.forEach(a=>a.classList.toggle('active',a.getAttribute('href')===activeId));
+    };
+    window.addEventListener('scroll',spy,{passive:true});
+    window.addEventListener('resize',spy);
+    document.addEventListener('DOMContentLoaded',spy);
+
+    // Smooth anchor (account for topbar)
     document.querySelectorAll('a[href^="#"]').forEach(a=>{
-      a.addEventListener('click', e=>{
-        const id = a.getAttribute('href');
-        const el = document.querySelector(id);
+      a.addEventListener('click',e=>{
+        const id=a.getAttribute('href');
+        const el=document.querySelector(id);
         if(el){
           e.preventDefault();
-          const top = el.getBoundingClientRect().top + window.scrollY - 86;
-          window.scrollTo({ top, behavior:'smooth' });
+          const top=el.getBoundingClientRect().top + window.scrollY - 76;
+          window.scrollTo({top,behavior:'smooth'});
         }
       });
     });
 
     // Respect reduced motion
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      document.documentElement.style.scrollBehavior = 'auto';
+      document.documentElement.style.scrollBehavior='auto';
     }
   </script>
 </body>
