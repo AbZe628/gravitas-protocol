@@ -1,509 +1,793 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gravitas Protocol — The Invisible Engine of DeFi Liquidity</title>
-    <meta name="description" content="Gravitas Protocol provides institutional-grade, policy-driven liquidity management for DeFi treasuries, L2s, and DAOs, optimizing yield while minimizing risk.">
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@600;700&family=Inter:wght@400;500;700&family=Space+Mono:wght@700&display=swap" rel="stylesheet">
-
+    <title>Gravitas Protocol | Quantum Liquidity Migration</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
-        /* ========================================
-        0. CSS VARIABLES & BASE (APPLE x ZAHA REDESIGN)
-        ======================================== */
         :root {
-            --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
-            --transition-duration: 400ms;
-            
-            --font-heading: 'IBM Plex Serif', serif;
-            --font-body: 'Inter', sans-serif;
-            --font-mono: 'Space Mono', monospace;
-
-            --header-height: 80px;
-            --sidebar-width: 280px;
-            --container-width: 1200px;
-            --content-width: 700px;
-            --spacing-unit: 24px;
-            --border-radius: 12px;
+            --primary: #C53F1F;
+            --secondary: #D98F4E;
+            --accent: #8C2F39;
+            --dark: #0A0A0A;
+            --light: #F4EDEA;
+            --gradient: linear-gradient(135deg, var(--primary), var(--accent));
         }
-
-        [data-theme="light"] {
-            --bg-paper: #F5F5F7;
-            --text-ink: #1D1D1F;
-            --text-muted: #6E6E73;
-            --border-lines: rgba(0, 0, 0, 0.1);
-            --bg-card: #FFFFFF;
-            --accent-color: #8A1538;
-            --accent-hover: #6C102B;
-        }
-
-        [data-theme="dark"] {
-            --bg-paper: #000000;
-            --text-ink: #F5F5F7;
-            --text-muted: #86868B;
-            --border-lines: rgba(255, 255, 255, 0.15);
-            --bg-card: #1D1D1F;
-            --accent-color: #d33a69;
-            --accent-hover: #b02a54;
-        }
-
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         
-        @media (prefers-reduced-motion: reduce) {
-            html { scroll-behavior: auto; }
-            * { transition: none !important; animation: none !important; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
         }
-
-        html { scroll-behavior: smooth; }
         
         body {
-            font-family: var(--font-body);
-            background-color: var(--bg-paper);
-            color: var(--text-ink);
-            font-size: 16px;
-            line-height: 1.8;
-            -webkit-font-smoothing: antialiased;
-            transition: background-color var(--transition-duration), color var(--transition-duration);
+            background-color: var(--dark);
+            color: var(--light);
+            overflow-x: hidden;
+            line-height: 1.6;
         }
         
-        body.drawer-open { overflow: hidden; }
-
-        /* ========================================
-        1. LAYOUT & STRUCTURE
-        ======================================== */
-        .page-wrapper {
-            display: flex;
-            justify-content: center;
-        }
-        .sidebar { display: none; }
-        
-        @media (min-width: 1024px) {
-            .page-wrapper {
-                display: grid;
-                grid-template-columns: 1fr minmax(auto, var(--content-width)) 1fr;
-                padding: 0 var(--spacing-unit);
-            }
-            .sidebar {
-                display: block;
-                position: sticky;
-                top: 0;
-                height: 100vh;
-                padding: var(--header-height) var(--spacing-unit) 0 0;
-                grid-column: 1 / 2;
-            }
-            .sidebar nav {
-                position: sticky;
-                top: var(--header-height);
-            }
-        }
-        
-        .main-content {
-            padding: var(--header-height) var(--spacing-unit);
+        /* 3D Background */
+        #canvas3d {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            max-width: var(--content-width);
+            height: 100%;
+            z-index: -1;
+            opacity: 0.4;
         }
-         @media (min-width: 1024px) {
-             .main-content { grid-column: 2 / 3; }
-         }
-
-        section {
-            padding: calc(var(--spacing-unit) * 3) 0;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.8s var(--ease-out-quint), transform 0.8s var(--ease-out-quint);
-        }
-        section.is-visible { opacity: 1; transform: translateY(0); }
         
-        /* ========================================
-        2. TYPOGRAPHY
-        ======================================== */
-        h1, h2, h3, h4 {
-            font-family: var(--font-heading);
+        /* Navigation */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 5%;
+            position: fixed;
+            width: 100%;
+            z-index: 100;
+            background: rgba(10, 10, 10, 0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(212, 143, 78, 0.2);
+        }
+        
+        .logo {
+            font-size: 1.8rem;
             font-weight: 700;
-            line-height: 1.1;
-            letter-spacing: -0.04em;
-            color: var(--text-ink);
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: flex;
+            align-items: center;
         }
-        h1 { font-size: clamp(3rem, 10vw, 5rem); }
-        h2 { font-size: clamp(2rem, 8vw, 3rem); margin-top: var(--spacing-unit); border-bottom: 1px solid var(--border-lines); padding-bottom: var(--spacing-unit); margin-bottom: calc(var(--spacing-unit) * 1.5); }
-        h3 { font-size: 1.5rem; margin-top: calc(var(--spacing-unit) * 2); margin-bottom: calc(var(--spacing-unit) / 2); }
-        h4 { font-family: var(--font-body); font-size: 0.8rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: var(--spacing-unit); }
         
-        p, ul, ol { color: var(--text-muted); margin-bottom: 1.5em; max-width: 65ch; }
-        ul, ol { padding-left: 1.5em; }
-        li { margin-bottom: 0.5em; }
-
-        a { color: var(--accent-color); text-decoration: none; transition: color var(--transition-duration); }
-        a:hover { color: var(--accent-hover); }
-        
-        .kpi-number { font-family: var(--font-mono); font-weight: 700; }
-
-        /* ========================================
-        3. NAVIGATION (MOBILE & DESKTOP)
-        ======================================== */
-        .mobile-header {
-            position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
-            display: flex; justify-content: space-between; align-items: center;
-            height: var(--header-height); padding: 0 var(--spacing-unit);
-            background: hsla(from var(--bg-paper) h s l / 0.8);
-            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border-lines);
+        .logo i {
+            margin-right: 10px;
+            font-size: 2rem;
         }
-        @media (min-width: 1024px) { .mobile-header { display: none; } }
         
-        .sidebar nav h4 { font-size: 1rem; letter-spacing: normal; text-transform: none; font-family: var(--font-heading); font-weight: 600; }
-        .sidebar ul { list-style: none; padding: 0; }
-        .sidebar li a {
-            display: block; padding: 8px 0; font-size: 0.9rem; color: var(--text-muted);
-            transition: all var(--transition-duration) var(--ease-out-quint);
+        .nav-links {
+            display: flex;
+            gap: 2rem;
         }
-        .sidebar li a:hover { color: var(--text-ink); }
-        .sidebar li a.active { color: var(--accent-color); font-weight: 500; }
-
-        .drawer-backdrop { position: fixed; inset: 0; z-index: 1999; background: rgba(0,0,0,0.5); opacity: 0; visibility: hidden; transition: opacity var(--transition-duration); }
-        .drawer { position: fixed; top: 0; right: 0; bottom: 0; width: 320px; z-index: 2000; background: var(--bg-paper); transform: translateX(100%); transition: transform var(--transition-duration) var(--ease-out-quint); display: flex; flex-direction: column; }
-        .drawer.is-open { transform: translateX(0); }
-        .drawer-backdrop.is-open { opacity: 1; visibility: visible; }
-        .drawer-header { display: flex; justify-content: flex-end; align-items: center; padding: 0 var(--spacing-unit); height: var(--header-height); border-bottom: 1px solid var(--border-lines); }
-        .drawer-nav { padding: var(--spacing-unit); overflow-y: auto; }
-        .drawer-nav ul { list-style: none; padding: 0; }
-        .drawer-nav li a { display: block; padding: 12px; font-size: 1rem; color: var(--text-ink); font-weight: 500; border-radius: 8px; }
-        .drawer-nav li a:hover { background-color: var(--border-lines); }
-        .drawer-nav li a.active { color: var(--accent-color); }
         
-        /* ========================================
-        4. COMPONENTS (ZAHA INSPIRED)
-        ======================================== */
-        .card {
-            background-color: var(--bg-card);
-            border: 1px solid var(--border-lines);
-            border-radius: var(--border-radius);
-            padding: calc(var(--spacing-unit) * 1.5);
-            margin-bottom: var(--spacing-unit);
-            clip-path: polygon(0 0, 100% 0, 100% 100%, 10% 100%, 0 90%);
+        .nav-links a {
+            color: var(--light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .nav-links a:hover {
+            color: var(--secondary);
+        }
+        
+        .nav-links a:after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--gradient);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-links a:hover:after {
+            width: 100%;
         }
         
         .cta-button {
-            display: inline-block; padding: 12px 24px; font-size: 1rem; font-weight: 500;
-            border-radius: 30px; border: 1px solid transparent;
-            background-color: var(--accent-color); color: white;
-            transition: all var(--transition-duration) var(--ease-out-quint);
+            background: var(--gradient);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(197, 63, 31, 0.3);
         }
-        .cta-button:hover { background-color: var(--accent-hover); transform: scale(1.05); }
         
-        .pdf-container iframe { width: 100%; height: 80vh; border: none; border-radius: var(--border-radius); }
-        .pdf-container { border: 1px solid var(--border-lines); border-radius: var(--border-radius); overflow: hidden; padding: 4px; }
-        
-        /* ========================================
-        5. APPLE-STYLE CHARTS
-        ======================================== */
-        .chart-container {
-            border: 1px solid var(--border-lines);
-            background-color: var(--bg-card);
-            border-radius: var(--border-radius);
-            padding: var(--spacing-unit); margin-top: var(--spacing-unit);
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(197, 63, 31, 0.5);
         }
-        .chart-container svg { display: block; width: 100%; }
-        .chart-container .grid-line { stroke: var(--border-lines); stroke-width: 1; }
-        .chart-container .axis-label { fill: var(--text-muted); font-size: 11px; }
-        .chart-container .line-chart-path { stroke-width: 2.5; fill: none; }
-        .chart-container .bar-chart-rect { transition: width var(--transition-duration) var(--ease-out-quint); }
-        .chart-container .bar-label { font-family: var(--font-mono); font-size: 12px; fill: var(--text-muted); }
-        .chart-container .bar-value { font-family: var(--font-mono); font-weight: 700; font-size: 14px; fill: var(--text-ink); }
+        
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 0 5%;
+            position: relative;
+        }
+        
+        .hero-content {
+            max-width: 800px;
+            z-index: 2;
+            padding-top: 5rem;
+        }
+        
+        .hero h1 {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+            background: linear-gradient(to right, var(--light), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .hero p {
+            font-size: 1.4rem;
+            margin-bottom: 2.5rem;
+            opacity: 0.9;
+            max-width: 600px;
+        }
+        
+        .highlight {
+            color: var(--secondary);
+            font-weight: 700;
+        }
+        
+        /* Sections */
+        section {
+            padding: 6rem 5%;
+        }
+        
+        .section-title {
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            text-align: center;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            position: relative;
+            display: inline-block;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .section-title:after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--gradient);
+            border-radius: 3px;
+        }
+        
+        /* Problem Solution */
+        .problem-solution {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 2.5rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--gradient);
+        }
+        
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .card h3 i {
+            margin-right: 10px;
+            color: var(--secondary);
+        }
+        
+        .card ul {
+            list-style-type: none;
+        }
+        
+        .card li {
+            margin-bottom: 1rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+        
+        .card li:before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: var(--secondary);
+        }
+        
+        /* Investment */
+        .investment-highlights {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .metric {
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .metric-value {
+            font-size: 3.5rem;
+            font-weight: 700;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            line-height: 1;
+            margin-bottom: 1rem;
+        }
+        
+        .metric-label {
+            font-size: 1.2rem;
+            opacity: 0.8;
+        }
+        
+        /* Team */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+        
+        .team-member {
+            text-align: center;
+        }
+        
+        .avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            margin: 0 auto 1.5rem;
+            background: var(--gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: white;
+        }
+        
+        /* Timeline */
+        .timeline {
+            position: relative;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .timeline:after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            background: var(--gradient);
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            margin-left: -3px;
+            border-radius: 3px;
+        }
+        
+        .timeline-item {
+            padding: 10px 40px;
+            position: relative;
+            width: 50%;
+            box-sizing: border-box;
+        }
+        
+        .timeline-item:nth-child(odd) {
+            left: 0;
+        }
+        
+        .timeline-item:nth-child(even) {
+            left: 50%;
+        }
+        
+        .timeline-content {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .timeline-content h3 {
+            margin-bottom: 0.5rem;
+            color: var(--secondary);
+        }
+        
+        /* CTA Section */
+        .cta-section {
+            text-align: center;
+            padding: 6rem 5%;
+            background: rgba(197, 63, 31, 0.05);
+            border-radius: 30px;
+            margin: 4rem 5%;
+            border: 1px solid rgba(212, 143, 78, 0.2);
+        }
+        
+        .cta-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 2.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .github-button {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+        
+        .github-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
+        }
+        
+        /* Footer */
+        footer {
+            padding: 3rem 5%;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        
+        .social-links a {
+            color: var(--light);
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .social-links a:hover {
+            color: var(--secondary);
+            transform: translateY(-5px);
+        }
+        
+        /* Responsive */
+        @media (max-width: 968px) {
+            .problem-solution {
+                grid-template-columns: 1fr;
+            }
+            
+            .timeline:after {
+                left: 31px;
+            }
+            
+            .timeline-item {
+                width: 100%;
+                padding-left: 70px;
+                padding-right: 25px;
+            }
+            
+            .timeline-item:nth-child(even) {
+                left: 0;
+            }
+            
+            .hero h1 {
+                font-size: 3rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero p {
+                font-size: 1.2rem;
+            }
+        }
     </style>
 </head>
 <body>
-    <header class="mobile-header">
-        <span style="font-family: var(--font-heading); font-weight: 600;">Gravitas</span>
-        <button class="burger-menu" aria-label="Open navigation menu" aria-haspopup="true" aria-expanded="false" aria-controls="mobile-drawer">
-            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
-        </button>
-    </header>
-
-    <div class="page-wrapper">
-        <aside class="sidebar">
-            <nav>
-                <h4>Gravitas Protocol</h4>
-                <ul id="desktop-toc-list"></ul>
-                <button class="theme-toggle" style="margin-top: 1.5rem; padding: 8px; border-radius: 8px; border: 1px solid var(--border-lines); background: transparent; color: var(--text-muted); width: 100%; text-align: left; font-size: 0.9rem;">Toggle Theme</button>
-            </nav>
-        </aside>
-
-        <main class="main-content" id="main-content">
-            <section id="cover" style="min-height: 80vh; display: flex; align-items: center;">
-                <div>
-                    <h4>The Invisible Engine of DeFi Liquidity</h4>
-                    <h1>Institutional-grade, policy-driven liquidity management.</h1>
-                    <a href="#contact" class="cta-button" style="margin-top: 1rem;">Book a Call</a>
-                </div>
-            </section>
-            
-            <section id="thesis">
-                <h2>Investment Thesis</h2>
-                <p>The maturation of DeFi requires a shift from retail-driven, high-risk yield farming to professional, risk-managed treasury operations. Currently, protocol treasuries, L2 foundations, and DAOs collectively manage billions in assets, yet lack the tooling to deploy this capital efficiently and safely. This creates a significant drag on capital efficiency and exposes ecosystems to systemic risks.</p>
-                <div class="card">
-                    <p>The next wave of DeFi growth will be unlocked by infrastructure that provides <strong>operational trust</strong> and <strong>policy-based automation</strong> for on-chain capital management.</p>
-                </div>
-                <h3>Our thesis rests on three core assumptions:</h3>
-                <ul>
-                    <li><strong>Demand for Durability:</strong> Protocols will increasingly prioritize sustainable, long-term liquidity and yield over short-term, speculative APYs.</li>
-                    <li><strong>Operational Overhead is a Bottleneck:</strong> Manual treasury management is slow, error-prone, and does not scale.</li>
-                    <li><strong>Neutrality Wins:</strong> A neutral infrastructure provider that does not compete with its clients will become the trusted standard.</li>
-                </ul>
-            </section>
-
-            <section id="market">
-                <h2>Market Size</h2>
-                <p>The addressable market is defined by on-chain capital requiring professional management. We segment this into three tiers.</p>
-                <div class="card">
-                    <h4>TAM / SAM / SOM</h4>
-                    <p><strong>~$50B+ TAM:</strong> Total value in DAO & protocol treasuries.</p>
-                    <p><strong>~$10B SAM:</strong> Treasuries with >$10M AUM and an active mandate.</p>
-                    <p><strong>~$1.2B SOM (Y1):</strong> Targeting 10+ partners with avg. $100M monthly volume.</p>
-                </div>
-            </section>
-            
-            <section id="model">
-                <h2>Business Model</h2>
-                <p>Gravitas Protocol operates on a transparent, volume-based fee model, supplemented by enterprise-grade services for larger partners.</p>
-                 <div class="chart-container">
-                    <h4>Revenue vs. Volume (Illustrative)</h4>
-                    <svg class="revenue-chart" viewBox="0 0 400 200"></svg>
-                 </div>
-            </section>
-
-            <section id="use-of-funds">
-                <h2>Pre-Seed Revised ($450k Ask)</h2>
-                <p>With the MVP technically complete, this revised funding is focused exclusively on security, legal formalization, and establishing an operational base.</p>
-                <div class="chart-container">
-                    <h4>Cost Allocation</h4>
-                    <svg class="budget-chart" viewBox="0 0 400 150"></svg>
-                </div>
-            </section>
-            
-            <section id="architecture">
-                <h2>Protocol Architecture</h2>
-                <p>Gravitas is a modular, multi-layered system designed for security, extensibility, and operational resilience. The core logic is separated from external integrations, allowing for rapid development and isolated risk.</p>
-                <h3>Core Components</h3>
-                <ul>
-                    <li><strong>PolicyEngine:</strong> The central smart contract that orchestrates all operations.</li>
-                    <li><strong>Adapters:</strong> A suite of modular contracts that translate PolicyEngine commands for external DeFi protocols.</li>
-                    <li><strong>Guardian & Timelock:</strong> Governance controls form the highest security layer.</li>
-                    <li><strong>Telemetry:</strong> On-chain events that provide a real-time, transparent data stream.</li>
-                </ul>
-            </section>
-            
-            <section id="security">
-                <h2>Security & Assurance</h2>
-                <p>Our security posture is built on a defense-in-depth model, assuming adversarial conditions at every layer.</p>
-                 <div class="card">
-                    <h4>Static & Dynamic Guards</h4>
-                    <p>Static guards like reentrancy protection and adapter isolation are built-in. Dynamic guards include real-time circuit-breakers, oracle staleness checks (<60s), and volatility-aware slippage.</p>
-                </div>
-                <div class="card">
-                    <h4>Governance & Testing</h4>
-                    <p>A <strong>3/5 multisig</strong> with a <strong>48h timelock</strong> governs protocol parameters. Our testing regimen includes Foundry invariants, fuzzing, >95% coverage, and mainnet-fork simulations.</p>
-                </div>
-                 <div class="card">
-                    <h4>Monitoring & Events</h4>
-                    <p>We monitor critical on-chain events: `FAILED_TX`, `CIRCUIT_BREAKER_TRIPPED`, `POLICY_BREACH_ATTEMPT`, `FEE_CHANGE_PROPOSED`.</p>
-                </div>
-            </section>
-
-            <section id="faq">
-                <h2>Investor F.A.Q.</h2>
-                <div class="card">
-                    <h4>How do protocol fees accrue?</h4>
-                    <p>Fees are programmatically swept into a dedicated multisig treasury controlled by the protocol. Initially, these funds will be used to cover operational expenses and fund further development.</p>
-                </div>
-                <div class="card">
-                    <h4>Is custody of funds ever taken?</h4>
-                    <p>No. Gravitas is entirely non-custodial. Partner funds are managed via smart contract allowances and are always held in the partner's own contracts or in the underlying DeFi protocols.</p>
-                </div>
-                <div class="card">
-                    <h4>Why would a partner choose Gravitas over building in-house?</h4>
-                    <p>Building and maintaining a secure, efficient, and audited liquidity management system is a significant undertaking that distracts from a protocol's core mission.</p>
-                </div>
-                <div class="card">
-                    <h4>What is the policy on a future token?</h4>
-                    <p>A token is not required for the protocol to function or generate revenue. A token would only be introduced if it serves a clear purpose for decentralizing governance.</p>
-                </div>
-            </section>
-            
-            <section id="whitepaper">
-                <h2>Technical Whitepaper</h2>
-                <p>For a complete exploration of the protocol architecture, mathematical models, and the full policy engine specification, please review the complete whitepaper.</p>
-                <div class="pdf-container">
-                    <iframe src="https://markup.su/viewer/?url=https://raw.githubusercontent.com/AbZe628/gravitas-protocol/main/docs/whitepaper.md" title="Gravitas Protocol Whitepaper" loading="lazy"></iframe>
-                </div>
-                <p style="text-align:center; margin-top:1rem;">If the PDF doesn’t render, <a href="https://github.com/AbZe628/gravitas-protocol/blob/main/docs/whitepaper.md" target="_blank" rel="noopener">open it in a new tab</a>.</p>
-            </section>
-
-            <section id="contact">
-                <h2>Contact & Partnerships</h2>
-                <p>We are actively seeking design partners and investors who share our vision. To learn more, please get in touch.</p>
-                 <div class="card" style="max-width: 450px;">
-                    <p><strong>Email:</strong> <a href="mailto:abdusamedzelic98@gmail.com">abdusamedzelic98@gmail.com</a></p>
-                    <p><strong>Phone:</strong> <a href="tel:+3530894335439">+353 089 433 5439</a></p>
-                    <p><strong>LinkedIn:</strong> <a href="https://www.linkedin.com/in/abdusamed-zeli%C4%87-5b5526183/" target="_blank" rel="noopener noreferrer">Abdusamed Zelić</a></p>
-                </div>
-                 <a href="https://github.com/AbZe628/gravitas-protocol/tree/main" target="_blank" rel="noopener noreferrer" class="cta-button" style="display:inline-block; margin-top:1rem; background: var(--bg-card); color: var(--text-ink); border-color: var(--border-lines);">View MVP on GitHub</a>
-            </section>
-        </main>
-    </div>
-
-    <div class="drawer-backdrop" id="drawer-backdrop" aria-hidden="true"></div>
-    <nav class="drawer" id="mobile-drawer" aria-labelledby="drawer-title" aria-hidden="true">
-        <div class="drawer-header">
-            <button id="close-drawer-btn" aria-label="Close navigation menu">
-                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
-            </button>
+    <!-- 3D Background -->
+    <div id="canvas3d"></div>
+    
+    <!-- Navigation -->
+    <nav>
+        <div class="logo">
+            <i class="fas fa-atom"></i>
+            GRAVITAS
         </div>
-        <div class="drawer-nav">
-            <h4 id="drawer-title">Navigation</h4>
-            <ul id="mobile-toc-list"></ul>
+        <div class="nav-links">
+            <a href="#problem">Problem</a>
+            <a href="#solution">Solution</a>
+            <a href="#investment">Investment</a>
+            <a href="#technology">Technology</a>
+            <a href="#team">Team</a>
+            <a href="#roadmap">Roadmap</a>
         </div>
+        <button class="cta-button">Whitepaper</button>
     </nav>
     
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    try {
-        const tocSections = Array.from(document.querySelectorAll('main section[id]'));
-        const desktopTocList = document.getElementById('desktop-toc-list');
-        const mobileTocList = document.getElementById('mobile-toc-list');
-        const themeToggles = document.querySelectorAll('.theme-toggle');
-        const burgerMenu = document.querySelector('.burger-menu');
-        const closeDrawerBtn = document.getElementById('close-drawer-btn');
-        const drawer = document.getElementById('mobile-drawer');
-        const drawerBackdrop = document.getElementById('drawer-backdrop');
-        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-        // --- THEME ---
-        const applyTheme = (theme) => document.documentElement.setAttribute('data-theme', theme);
-        const toggleTheme = () => {
-            const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-            localStorage.setItem('gravitas_theme', newTheme);
-            applyTheme(newTheme);
-        };
-        const currentTheme = localStorage.getItem('gravitas_theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-        applyTheme(currentTheme);
-        themeToggles.forEach(btn => btn.addEventListener('click', toggleTheme));
-
-        // --- TOC & SCROLLSPY ---
-        const tocItems = tocSections.map(s => ({ id: s.id, title: s.querySelector('h2')?.textContent })).filter(i => i.title);
-        const createTocLinks = (listEl) => {
-            if (!listEl) return;
-            listEl.innerHTML = tocItems.map(item => `<li><a href="#${item.id}" data-target-id="${item.id}">${item.title}</a></li>`).join('');
-        };
-        createTocLinks(desktopTocList);
-        createTocLinks(mobileTocList);
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Quantum Liquidity Migration for DeFi</h1>
+            <p>Gravitas Protocol enables <span class="highlight">atomic transfers of liquidity positions</span> between DEXs with zero slippage, creating invisible infrastructure for the next generation of decentralized finance.</p>
+            <p>Seeking <span class="highlight">$400K pre-seed</span> for Qatar relocation, code audits, and initial client acquisition.</p>
+            <div class="cta-buttons">
+                <button class="cta-button">Pitch Deck</button>
+                <a href="https://github.com/AbZe628/gravitas-protocol" class="github-button" target="_blank">
+                    <i class="fab fa-github"></i> GitHub MVP
+                </a>
+                <a href="https://www.linkedin.com/in/abdusamed-zeli%C4%87-5b5526183/" class="github-button" target="_blank">
+                    <i class="fab fa-linkedin"></i> LinkedIn
+                </a>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Problem Section -->
+    <section id="problem">
+        <h2 class="section-title">The Fragmented Liquidity Problem</h2>
+        <div class="problem-solution">
+            <div class="card">
+                <h3><i class="fas fa-exclamation-triangle"></i> Current Challenges</h3>
+                <ul>
+                    <li>DeFi liquidity is fragmented across multiple DEXs and chains</li>
+                    <li>Users waste time and money manually migrating positions</li>
+                    <li>Complex processes with multiple transactions and high slippage</li>
+                    <li>Projects lack passive income from their own liquidity</li>
+                    <li>Capital inefficiency reduces overall DeFi yield potential</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3><i class="fas fa-bullseye"></i> Market Opportunity</h3>
+                <ul>
+                    <li>DEX trading volume exceeding $100B monthly</li>
+                    <li>Growing LP positions across Uniswap V2/V3, Sushiswap, Curve</li>
+                    <li>Increasing demand for automated portfolio management</li>
+                    <li>No existing solution for atomic liquidity migration</li>
+                    <li>Protocol-owned liquidity becoming standard for new projects</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Solution Section -->
+    <section id="solution">
+        <h2 class="section-title">The Gravitas Solution</h2>
+        <div class="problem-solution">
+            <div class="card">
+                <h3><i class="fas fa-magic"></i> How It Works</h3>
+                <ul>
+                    <li>Atomic liquidity migrations between any DEX with single transaction</li>
+                    <li>Zero slippage through proprietary cross-DEX routing</li>
+                    <li>Micro-fees (5-10 bps) generate continuous protocol revenue</li>
+                    <li>Non-custodial design - users maintain control of assets</li>
+                    <li>SDK for seamless integration with existing DeFi platforms</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3><i class="fas fa-chart-line"></i> Value Proposition</h3>
+                <ul>
+                    <li>Creators earn sustainable yields from their protocol liquidity</li>
+                    <li>Users save time and transaction costs on position management</li>
+                    <li>DEXs benefit from increased cross-protocol liquidity flow</li>
+                    <li>Protocol earns sustainable revenue through massive volume</li>
+                    <li>Foundation for more advanced DeFi primitive development</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Investment Section -->
+    <section id="investment">
+        <h2 class="section-title">Investment Opportunity</h2>
+        <div class="investment-highlights">
+            <div class="metric">
+                <div class="metric-value">$400K</div>
+                <div class="metric-label">Pre-Seed Round</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value">5-10 bps</div>
+                <div class="metric-label">Fee Structure</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value">$100M</div>
+                <div class="metric-label">Target Monthly Volume</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value">$50-100K</div>
+                <div class="metric-label">Projected Monthly Revenue</div>
+            </div>
+        </div>
         
-        const tocLinks = document.querySelectorAll('#desktop-toc-list a, #mobile-toc-list a');
-        const scrollSpyObserver = new IntersectionObserver(entries => {
-            entries.forEach(entry => {
-                const id = entry.target.getAttribute('id');
-                const link = document.querySelector(`.sidebar a[href="#${id}"]`);
-                if (link) {
-                    if (entry.isIntersecting && entry.intersectionRatio > 0) {
-                        link.classList.add('active');
-                    } else {
-                        link.classList.remove('active');
-                    }
-                }
+        <div class="card" style="margin-top: 3rem;">
+            <h3><i class="fas fa-dollar-sign"></i> Use of Funds</h3>
+            <div class="problem-solution">
+                <div>
+                    <ul>
+                        <li>Qatar Entity Establishment & Relocation</li>
+                        <li>Smart Contract Security Audits</li>
+                        <li>Core Team Expansion</li>
+                    </ul>
+                </div>
+                <div>
+                    <ul>
+                        <li>Business Development & Partnerships</li>
+                        <li>Legal & Regulatory Compliance</li>
+                        <li>Marketing & Community Building</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Technology Section -->
+    <section id="technology">
+        <h2 class="section-title">Technical Architecture</h2>
+        <div class="card">
+            <h3><i class="fas fa-cogs"></i> Core Innovation</h3>
+            <div class="problem-solution">
+                <div>
+                    <h4>Smart Contract System</h4>
+                    <ul>
+                        <li>Teleport.sol - Main migration logic</li>
+                        <li>Treasury.sol - Protocol fee routing</li>
+                        <li>UniV2Adapter.sol / UniV3Adapter.sol</li>
+                        <li>Advanced error handling & slippage protection</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Security & Infrastructure</h4>
+                    <ul>
+                        <li>100% test coverage with Hardhat</li>
+                        <li>Fuzzing and fork-based testing</li>
+                        <li>Dual external audits (Code4rena + Tier 1)</li>
+                        <li>Tenderly alerts & monitoring</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Team Section -->
+    <section id="team">
+        <h2 class="section-title">Architecture Team</h2>
+        <div class="team-grid">
+            <div class="team-member">
+                <div class="avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <h3>Abdusamed Zelić</h3>
+                <p>Lead Architect & Smart Contract Engineer</p>
+                <p>DeFi Protocol Specialist</p>
+                <p>+385 91 566 8133</p>
+                <p>abdusamedzelic98@gmail.com</p>
+            </div>
+            <div class="team-member">
+                <div class="avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <h3>Abdulah Zelić</h3>
+                <p>Co-Architect & Security Engineer</p>
+                <p>Blockchain Security Focus</p>
+            </div>
+        </div>
+        
+        <div class="card" style="margin-top: 3rem;">
+            <h3><i class="fas fa-users"></i> Advisory & Expansion Team</h3>
+            <p>Seeking Qatar-based blockchain advisors, legal compliance experts, and business development specialists to facilitate relocation and regional market entry.</p>
+        </div>
+    </section>
+    
+    <!-- Roadmap Section -->
+    <section id="roadmap">
+        <h2 class="section-title">Development Roadmap</h2>
+        <div class="timeline">
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <h3>Phase 1: Smart Contract Development</h3>
+                    <p>Week 1: Core contract architecture</p>
+                    <p>Weeks 2-4: Core implementation</p>
+                    <p>Teleport.sol, Treasury.sol, Adapters</p>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <h3>Phase 2: Testing & Security</h3>
+                    <p>100% code coverage with Hardhat</p>
+                    <p>Fuzzing and fork-based tests</p>
+                    <p>Dual external audits</p>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <h3>Phase 3: SDK & Infrastructure</h3>
+                    <p>Migration simulator</p>
+                    <p>Transaction builder</p>
+                    <p>Analytics dashboards</p>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <h3>Phase 4: Deployment & Launch</h3>
+                    <p>Testnet deployment</p>
+                    <p>Mainnet launch</p>
+                    <p>Partner onboarding</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <h2>Join the Future of DeFi Liquidity</h2>
+        <p>We're seeking strategic pre-seed investors to join our $400K round for protocol development, security audits, and Qatar market entry.</p>
+        <div class="cta-buttons">
+            <button class="cta-button">Schedule Meeting</button>
+            <a href="https://github.com/AbZe628/gravitas-protocol" class="github-button" target="_blank">
+                <i class="fab fa-github"></i> Explore MVP
+            </a>
+            <a href="https://github.com/AbZe628/gravitas-protocol/blob/main/docs/whitepaper.md" class="github-button" target="_blank">
+                <i class="fas fa-file-alt"></i> Read Whitepaper
+            </a>
+            <a href="https://www.linkedin.com/in/abdusamed-zeli%C4%87-5b5526183/" class="github-button" target="_blank">
+                <i class="fab fa-linkedin"></i> Connect on LinkedIn
+            </a>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer>
+        <div class="logo" style="justify-content: center; margin-bottom: 1rem;">
+            <i class="fas fa-atom"></i>
+            GRAVITAS PROTOCOL
+        </div>
+        <p>Quantum Liquidity Migration Infrastructure</p>
+        <div class="social-links">
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-discord"></i></a>
+            <a href="https://www.linkedin.com/in/abdusamed-zeli%C4%87-5b5526183/"><i class="fab fa-linkedin"></i></a>
+            <a href="https://github.com/AbZe628/gravitas-protocol"><i class="fab fa-github"></i></a>
+            <a href="#"><i class="fab fa-telegram"></i></a>
+        </div>
+        <p>© 2025 Gravitas Protocol. All rights reserved.</p>
+    </footer>
+    
+    <script>
+        // Simple 3D background effect
+        document.addEventListener('DOMContentLoaded', function() {
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.getElementById('canvas3d').appendChild(renderer.domElement);
+            
+            // Create particles
+            const particlesGeometry = new THREE.BufferGeometry();
+            const particlesCount = 5000;
+            const posArray = new Float32Array(particlesCount * 3);
+            
+            for(let i = 0; i < particlesCount * 3; i++) {
+                posArray[i] = (Math.random() - 0.5) * 10;
+            }
+            
+            particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+            
+            // Qatar-inspired colors
+            const particlesMaterial = new THREE.PointsMaterial({
+                size: 0.02,
+                color: new THREE.Color(0xD98F4E),
+                transparent: true,
+                opacity: 0.8
             });
-        }, { rootMargin: `-100px 0px -50% 0px` });
-        tocSections.forEach(s => scrollSpyObserver.observe(s));
-
-        // --- DRAWER (BUG-FREE) ---
-        const openDrawer = () => {
-            drawer.classList.add('is-open'); drawerBackdrop.classList.add('is-open');
-            drawer.setAttribute('aria-hidden', 'false'); burgerMenu.setAttribute('aria-expanded', 'true');
-            document.body.classList.add('drawer-open');
-            const focusable = drawer.querySelectorAll('a[href], button');
-            if (focusable.length > 0) focusable[0].focus();
-        };
-        const closeDrawer = () => {
-            drawer.classList.remove('is-open'); drawerBackdrop.classList.remove('is-open');
-            drawer.setAttribute('aria-hidden', 'true'); burgerMenu.setAttribute('aria-expanded', 'false');
-            document.body.classList.remove('drawer-open');
-            burgerMenu.focus();
-        };
-        burgerMenu.addEventListener('click', openDrawer);
-        closeDrawerBtn.addEventListener('click', closeDrawer);
-        drawerBackdrop.addEventListener('click', closeDrawer);
-        document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && drawer.classList.contains('is-open')) closeDrawer(); });
-        document.querySelectorAll('.drawer-nav a').forEach(link => link.addEventListener('click', closeDrawer));
-
-        // --- SCROLL-TRIGGERED ANIMATIONS ---
-        if (!prefersReducedMotion) {
-            const sectionObserver = new IntersectionObserver((entries, observer) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('is-visible');
-                        observer.unobserve(entry.target);
-                    }
-                });
-            }, { threshold: 0.1 });
-            tocSections.forEach(s => sectionObserver.observe(s));
-        } else {
-            tocSections.forEach(s => s.classList.add('is-visible'));
-        }
-
-        // --- APPLE-STYLE CHARTS ---
-        const createCharts = () => {
-            const revenueChartEl = document.querySelector('.revenue-chart');
-            if(revenueChartEl){
-                const revenueSVG = `<g class="grid-lines">
-                    <line x1="40" y1="20" x2="40" y2="170" class="grid-line"></line>
-                    <line x1="40" y1="170" x2="380" y2="170" class="grid-line"></line>
-                </g>
-                <g class="labels">
-                    <text x="35" y="25" class="axis-label" text-anchor="end">$200k</text>
-                    <text x="35" y="170" class="axis-label" text-anchor="end">$0</text>
-                    <text x="380" y="185" class="axis-label" text-anchor="end">$200M Volume</text>
-                </g>
-                <path class="line-chart-path" d="M 40 170 C 150 120, 250 60, 380 20" style="stroke:var(--accent-color);"></path>
-                <path class="line-chart-path" d="M 40 170 C 150 140, 250 100, 380 70" style="stroke:var(--text-muted); opacity:0.7;"></path>`;
-                revenueChartEl.innerHTML = revenueSVG;
+            
+            const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+            scene.add(particlesMesh);
+            
+            camera.position.z = 3;
+            
+            // Mouse movement effect
+            let mouseX = 0;
+            let mouseY = 0;
+            
+            document.addEventListener('mousemove', (event) => {
+                mouseX = event.clientX / window.innerWidth - 0.5;
+                mouseY = event.clientY / window.innerHeight - 0.5;
+            });
+            
+            // Animation
+            function animate() {
+                requestAnimationFrame(animate);
+                
+                particlesMesh.rotation.x += 0.001;
+                particlesMesh.rotation.y += 0.002;
+                
+                particlesMesh.rotation.x += mouseY * 0.0005;
+                particlesMesh.rotation.y += mouseX * 0.0005;
+                
+                renderer.render(scene, camera);
             }
-
-            const budgetChartEl = document.querySelector('.budget-chart');
-            if(budgetChartEl){
-                const budgetData = [
-                    { label: "Security", value: 150, color: "var(--accent-color)" },
-                    { label: "Relocation", value: 100, color: "var(--text-muted)" },
-                    { label: "Legal", value: 80, color: "var(--border-lines)" },
-                    { label: "Runway", value: 120, color: "var(--text-ink)" }
-                ];
-                let budgetSVG = '';
-                budgetData.forEach((item, i) => {
-                    const y = 15 + i * 35;
-                    const barWidth = (item.value / 150) * 250; // Max value is 150k for scaling
-                    budgetSVG += `<g>
-                        <text x="0" y="${y+1}" class="bar-label">${item.label}</text>
-                        <rect x="130" y="${y-10}" width="${barWidth}" height="15" rx="4" fill="${item.color}" class="bar-chart-rect"></rect>
-                        <text x="135" y="${y+1}" class="bar-value" ${item.value > 110 ? 'style="fill:var(--bg-paper)"': ''}>$${item.value}k</text>
-                    </g>`;
-                });
-                budgetChartEl.innerHTML = budgetSVG;
-            }
-        };
-
-        const chartObserver = new IntersectionObserver((entries, observer) => {
-             entries.forEach(entry => {
-                if(entry.isIntersecting){
-                    createCharts();
-                    observer.unobserve(entry.target);
-                }
-             });
-        }, {threshold: 0.5});
-        document.querySelectorAll('.chart-container').forEach(c => chartObserver.observe(c));
-
-    } catch(e) { console.error("Error initializing site:", e); }
-});
-</script>
+            
+            animate();
+            
+            // Responsive resize
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        });
+    </script>
 </body>
 </html>
