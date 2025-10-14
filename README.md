@@ -206,6 +206,24 @@ npx hardhat run scripts\migrate.ts  --network localhost
 
 ---
 📘 [Read the full Gravitas Protocol Blueprint](./docs/whitepaper.md)
+---
+
+## ⚙️ Scope & Limitations
+
+This MVP represents the core logic of Gravitas Protocol — demonstrating the architecture, adapters, and policy enforcement.
+
+**Scope:**
+- Supports Uniswap V2-style pools
+- Local Hardhat deployment with demo tokens
+- Core migration flow: remove → optional swap → add
+- Guardian + Timelock governance simulation
+
+**Limitations:**
+- No testnet deployment yet
+- No fuzzing or formal audit (WIP)
+- SDK integration planned for v0.2
+- Not connected to live liquidity oracles
+
 
 
 ## License
