@@ -1,4 +1,4 @@
-![CI](https://github.com/AbZe628/gravitas-protocol/actions/workflows/ci.yml/badge.svg?branch=main)
+
 
 
 # Gravitas Protocol — MVP (Liquidity Teleport & Fee Harvesting)
