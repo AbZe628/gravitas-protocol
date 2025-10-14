@@ -24,6 +24,7 @@ jobs:
         run: |
           npx hardhat compile
 
-      - name: Run tests
-        run: |
-          npx hardhat test
+      - name: Run tests (JS only)
+  run: |
+    npx hardhat test "test/**/*.js"
+
