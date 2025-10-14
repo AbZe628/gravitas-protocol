@@ -1,3 +1,5 @@
+![CI](https://github.com/AbZe628/gravitas-protocol/actions/workflows/ci.yml/badge.svg)
+
 # Gravitas Protocol — MVP (Liquidity Teleport & Fee Harvesting)
 **Invisible infrastructure for atomic liquidity migration between decentralized exchanges (DEXs).**
 
