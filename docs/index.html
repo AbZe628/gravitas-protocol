@@ -10,12 +10,14 @@
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://abze628.github.io/gravitas-protocol/" />
   <meta name="theme-color" content="#0b0d10" />
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Serif:wght@600;700&display=swap" rel="stylesheet" />
+
   <style>
     /* ===============================
-       0) THEME / TOKENS (Glass + Qatar)
+       THEME / TOKENS (Glass + Qatar)
        =============================== */
     :root{
       --bg:#0b0d10; --ink:#eef2f7; --muted:#a8b2c1;
@@ -40,6 +42,7 @@
     h2{font-family:"IBM Plex Serif",serif;font-weight:800;font-size:clamp(1.8rem,3.5vw,2.3rem);margin:0 0 12px}
     .lead{color:var(--muted);max-width:980px}
     .muted{color:var(--muted)}
+
     /* === 3D canvas + fog layers === */
     #scene{position:fixed;inset:0;z-index:-2}
     .fog{position:fixed;inset:0;z-index:-1;pointer-events:none;background:
@@ -47,6 +50,7 @@
       radial-gradient(1000px 600px at 20% 20%, rgba(138,21,56,.12), transparent 60%),
       radial-gradient(1600px 900px at 50% 120%, rgba(255,255,255,.06), transparent 60%);
       transition:transform .25s ease-out}
+
     /* === NAV === */
     .nav{position:sticky;top:0;z-index:60;background:rgba(10,12,15,.55);backdrop-filter:blur(var(--blur));-webkit-backdrop-filter:blur(var(--blur));border-bottom:1px solid var(--border)}
     .nav-inner{display:flex;align-items:center;justify-content:space-between;height:68px}
@@ -63,6 +67,7 @@
     .btn-ghost{background:transparent;color:var(--ink);border:1px solid var(--border);box-shadow:none}
     .btn-ghost:hover{background:var(--glass-2)}
     .burger{display:none;background:transparent;border:1px solid var(--border);border-radius:12px;color:var(--ink);padding:8px}
+
     /* === Drawer (mobile) === */
     .backdrop{position:fixed;inset:0;background:rgba(0,0,0,.45);opacity:0;visibility:hidden;transition:.2s;z-index:59}
     .backdrop.show{opacity:1;visibility:visible}
@@ -72,6 +77,7 @@
     .drawer-links{display:flex;flex-direction:column;padding:12px}
     .drawer-links a{padding:14px 12px;color:var(--muted);font-weight:600;border-radius:10px}
     .drawer-links a:hover{background:var(--glass);color:#fff}
+
     /* === HERO === */
     .hero{padding:104px 0 48px}
     .badge{display:inline-flex;gap:8px;align-items:center;font-weight:800;font-size:.85rem;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:999px;padding:8px 12px;backdrop-filter:blur(var(--blur))}
@@ -79,11 +85,13 @@
     .gold{background:linear-gradient(135deg,var(--gold),#fbe9a8);-webkit-background-clip:text;background-clip:text;color:transparent}
     .hero p{color:var(--muted);font-size:clamp(1.02rem,2.1vw,1.18rem)}
     .hero-cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:18px}
+
     /* KPIs */
     .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:26px 0 6px}
     .kpi{padding:18px;border-radius:18px;background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.02));border:1px solid var(--border);backdrop-filter:blur(var(--blur));text-align:center}
     .kpi .v{font-weight:900;font-size:1.8rem;background:linear-gradient(135deg,var(--gold),#ffd36b);-webkit-background-clip:text;background-clip:text;color:transparent}
     .kpi .l{color:var(--muted);font-weight:600;font-size:.9rem}
+
     /* Cards / grids */
     .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:24px}
     .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
@@ -96,6 +104,7 @@
     .chip{padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid var(--border);color:#e8ecf4;font-weight:700;font-size:.8rem}
     .code{background:rgba(255,255,255,.08);padding:14px;border-radius:12px;border:1px solid var(--border);overflow-x:auto}
     .cta-strip{margin:36px 0 0;display:flex;gap:12px;flex-wrap:wrap;background:linear-gradient(180deg,rgba(138,21,56,.12),rgba(138,21,56,.06));border:1px solid var(--border);padding:16px;border-radius:18px;backdrop-filter:blur(var(--blur))}
+
     /* Timeline */
     .timeline{position:relative;margin-top:8px}
     .timeline::before{content:"";position:absolute;left:calc(50% - 2px);top:0;bottom:0;width:4px;background:linear-gradient(180deg,var(--gold),transparent)}
@@ -106,11 +115,13 @@
     .tl::after{content:"";position:absolute;top:10px;width:16px;height:16px;border-radius:50%;background:var(--gold);border:3px solid #231a1c}
     .tl:nth-child(odd)::after{right:-8px}
     .tl:nth-child(even)::after{left:-8px}
+
     /* FAQ */
     details{border:1px solid var(--border);border-radius:14px;background:var(--glass);padding:14px 16px;margin:10px 0;backdrop-filter:blur(var(--blur))}
     summary{cursor:pointer;list-style:none;font-weight:800}
     summary::marker, summary::-webkit-details-marker{display:none}
     details[open]{background:rgba(255,255,255,.09)}
+
     /* Footer & top button */
     footer{border-top:1px solid var(--border);padding:24px 0 72px;margin-top:40px}
     .foot{display:flex;justify-content:space-between;gap:18px;align-items:center;flex-wrap:wrap}
@@ -119,6 +130,7 @@
     .foot a:hover{color:#fff}
     .to-top{position:fixed;right:16px;bottom:16px;width:48px;height:48px;border-radius:999px;border:1px solid var(--border);background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));color:#fff;display:grid;place-items:center;box-shadow:var(--shadow);opacity:0;transform:translateY(12px);pointer-events:none;transition:.25s;z-index:58}
     .to-top.show{opacity:1;transform:none;pointer-events:auto}
+
     /* Responsive */
     @media (max-width:1100px){
       .nav-links{display:none}
@@ -152,7 +164,7 @@
         <a href="#architecture">Architecture</a>
         <a href="#adapters">Adapters</a>
         <a href="#sdk">SDK/API</a>
-        <a href="#cases">Cases</a>
+        <a href="#cases">Case Studies</a>
         <a href="#security">Security</a>
         <a href="#risk">Risk</a>
         <a href="#economics">Economics</a>
@@ -186,7 +198,7 @@
     <nav class="drawer-links">
       <a href="#vision">Vision</a><a href="#opportunity">Opportunity</a><a href="#solution">Solution</a>
       <a href="#architecture">Architecture</a><a href="#adapters">Adapters</a><a href="#sdk">SDK/API</a>
-      <a href="#cases">Cases</a><a href="#security">Security</a><a href="#risk">Risk</a>
+      <a href="#cases">Case Studies</a><a href="#security">Security</a><a href="#risk">Risk</a>
       <a href="#economics">Economics</a><a href="#gtm">GTM</a><a href="#governance">Governance</a>
       <a href="#qatar">Qatar</a><a href="#faq">FAQ</a><a href="#contact">Contact</a>
       <hr />
@@ -200,7 +212,7 @@
     <section class="hero wrap">
       <span class="badge">MVP Complete • Policy-Driven • Non-Custodial</span>
       <h1>Liquidity that <span class="gold">moves like light</span> — secure, instant, auditable.</h1>
-      <p>Gravitas je neutralni orkestracijski sloj za trezore, DAO-ove i L2 fondacije. Fragmentiranu likvidnost pretvaramo u pouzdan, prihodovni motor — s eksplicitnim on-chain politikama, guardian zaštitama i atomskim migracijama između venuea.</p>
+      <p>Gravitas is a neutral orchestration layer for treasuries, DAOs and L2 foundations. We turn fragmented liquidity into a reliable, revenue-generating engine — with explicit on-chain policies, guardian safeguards and atomic migrations across venues.</p>
       <div class="hero-cta">
         <a class="btn" href="mailto:abdusamedzelic98@gmail.com?subject=Investor%20Docs%20Request%20-%20Gravitas&body=Hi%20Gravitas%20team%2C%0D%0APlease%20share%20the%20deck%20and%20data-room.%0D%0ARegards%2C">Request Investor Docs</a>
         <a class="btn-ghost btn" href="https://cal.com/abdusamed/gravitas" target="_blank" rel="noopener">Schedule a Meeting</a>
@@ -217,7 +229,7 @@
     <!-- VISION -->
     <section id="vision" class="wrap">
       <h2>Vision</h2>
-      <p class="lead">DeFi ne treba još jedan vault — treba **kontrolni toranj za kapital**. Gravitas provodi objektivna pravila, emitira **auditabilan** trag i govori jezik svakog venuea kroz adaptere. Naš posao je biti **nevidljivi motor** iza duboke, trajne likvidnosti.</p>
+      <p class="lead">DeFi doesn’t need another vault — it needs a **capital control tower**. Gravitas enforces objective rules, emits an **auditable trace**, and speaks every venue’s language via adapters. We are the **invisible engine** behind durable, deep liquidity.</p>
       <div class="chip-row">
         <span class="chip">Neutral Infrastructure</span><span class="chip">Policy-Driven Automation</span><span class="chip">SDK-First</span>
         <span class="chip">Guardian + Timelock</span><span class="chip">Audit-grade Telemetry</span><span class="chip">Non-custodial</span>
@@ -229,20 +241,20 @@
       <h2>Opportunity</h2>
       <div class="grid-2">
         <div class="card">
-          <h3>Pain</h3>
+          <h3>Pain Points</h3>
           <ul class="list">
-            <li>Fragmentirana likvidnost → plitka tržišta & skriveni troškovi.</li>
-            <li>Ručne migracije → kašnjenja, greške, slippage.</li>
-            <li>Bez politika → nema ponovljivosti ni odgovornosti.</li>
+            <li>Fragmented liquidity → shallow books & hidden costs.</li>
+            <li>Manual migrations → delays, errors, slippage.</li>
+            <li>No policy rails → zero repeatability or accountability.</li>
           </ul>
-          <p>Volumeni rastu; L2 naknade omogućuju česta rebalansiranja. Nedostaje **neutralni transportni sloj** s tragom koji se može auditirati.</p>
+          <p>Volumes keep growing; L2 fees enable frequent rebalancing. What’s missing is a **neutral transport layer** with an audit trail.</p>
         </div>
         <div class="card">
-          <h3>Thesis</h3>
-          <p>U sljedećem desetljeću pobjeđuje **kapitalna učinkovitost**. Neutralni router koji kontrolira tok (bez skrbništva) stvara **kompozabilan jarak**. Monetiziramo **tok**, ne TVL.</p>
+          <h3>Investment Thesis</h3>
+          <p>Over the next decade, **capital efficiency** wins. A neutral router that governs **flow** (not custody) creates a **composable moat**. We monetize **throughput**, not TVL.</p>
           <ul class="list">
-            <li>Meta: DAO trezori, L2, veliki protokoli, market makeri.</li>
-            <li>Ljepljive integracije → adapteri + politike + auditi povisuju switching cost.</li>
+            <li>Targets: DAO treasuries, L2s, large protocols, market makers.</li>
+            <li>Sticky integrations → adapters + policies + audits raise switching cost.</li>
           </ul>
         </div>
       </div>
@@ -251,11 +263,11 @@
     <!-- SOLUTION -->
     <section id="solution" class="wrap">
       <h2>Solution</h2>
-      <p class="lead"><strong>PolicyEngine</strong> validira zahtjev; <strong>Adapters</strong> izvršavaju; <strong>Guardian</strong> može samo pauzirati; <strong>Timelock</strong> štiti izmjene; <strong>Telemetry</strong> emitira događaje za SIEM.</p>
+      <p class="lead"><strong>PolicyEngine</strong> validates; <strong>Adapters</strong> execute; <strong>Guardian</strong> can only pause; <strong>Timelock</strong> protects changes; <strong>Telemetry</strong> emits events for SIEM.</p>
       <div class="grid-3" style="margin-top:12px">
-        <div class="card"><h3>Static Guards</h3><p>Allowliste, koncentracijski capovi, validacije inputa, reentrancy zaštita, ograničen vanjski gas.</p></div>
-        <div class="card"><h3>Dynamic Guards</h3><p>Starenje orakla, adaptivni slippage po volatilnosti, velocity capovi, kvote po adresi.</p></div>
-        <div class="card"><h3>Operations</h3><p>3/5 Safe; 48h timelock; Guardian samo <em>pause</em>. Alerti na <code>FAILED_TX_THRESHOLD</code>, <code>CIRCUIT_BREAKER_TRIPPED</code>, <code>POLICY_BREACH_ATTEMPT</code>.</p></div>
+        <div class="card"><h3>Static Guards</h3><p>Allowlists, concentration caps, input validation, reentrancy protection, bounded external gas.</p></div>
+        <div class="card"><h3>Dynamic Guards</h3><p>Oracle staleness, volatility-adjusted slippage, velocity caps, per-address quotas.</p></div>
+        <div class="card"><h3>Operations</h3><p>3/5 Safe; 48h timelock; Guardian is pause-only. Alerts on <code>FAILED_TX_THRESHOLD</code>, <code>CIRCUIT_BREAKER_TRIPPED</code>, <code>POLICY_BREACH_ATTEMPT</code>.</p></div>
       </div>
       <div class="cta-strip">
         <a class="btn" href="https://github.com/AbZe628/gravitas-protocol/tree/main" target="_blank" rel="noopener">Explore MVP on GitHub</a>
@@ -263,10 +275,10 @@
       </div>
     </section>
 
-    <!-- ARCHITECTURE (diagram SVG) -->
+    <!-- ARCHITECTURE DIAGRAM -->
     <section id="architecture" class="wrap">
       <h2>Architecture</h2>
-      <p class="lead">Modularni slojevi izoliraju rizik: jezgra ostaje stabilna dok se integracije šire.</p>
+      <p class="lead">Modular layers isolate risk: the core remains stable while integrations expand.</p>
       <div class="card" style="overflow:auto">
 <svg width="100%" height="280" viewBox="0 0 980 280" xmlns="http://www.w3.org/2000/svg">
   <defs>
@@ -314,17 +326,17 @@
         <div class="card">
           <h3>DEX Routing</h3>
           <ul class="list"><li>Uniswap v2/v3 (exactIn/out)</li><li>Curve stables & metapools</li><li>Balancer weighted & boosted</li></ul>
-          <p>Fail-fast, ograničeni vanjski pozivi, sigurna matematika.</p>
+          <p>Fail-fast, bounded external calls, safe math.</p>
         </div>
         <div class="card">
           <h3>Lending</h3>
           <ul class="list"><li>Aave v3 supply/withdraw</li><li>Compound v2</li><li>Morpho (peer-to-pool)</li></ul>
-          <p>Izolirani moduli — minimiziraju blast radius.</p>
+          <p>Isolated modules minimize blast radius.</p>
         </div>
         <div class="card">
-          <h3>Bridging (opcionalno)</h3>
-          <ul class="list"><li>Kanonski L2 mostovi</li><li>Eksterni mostovi (risk-score)</li><li>Time-boxed kvote</li></ul>
-          <p>Bridge risk = zasebne politike + limiti.</p>
+          <h3>Bridging (optional)</h3>
+          <ul class="list"><li>Canonical L2 bridges</li><li>External bridges (risk-scored)</li><li>Time-boxed quotas</li></ul>
+          <p>Bridge risk = separate policies + hard limits.</p>
         </div>
       </div>
     </section>
@@ -378,9 +390,9 @@ print(r.json())</code></pre>
     <section id="cases" class="wrap">
       <h2>Case Studies</h2>
       <div class="grid-3">
-        <div class="card"><h3>L2 Treasury</h3><p>Automatsko rebalansiranje stableova po volatilnosti → 38% niži slippage, glađa dnevna PnL.</p></div>
-        <div class="card"><h3>Protocol-Owned Liquidity</h3><p>Ponovno raspoređivanje POL-a između Uni/Curve po pravilima bez ručnih intervencija.</p></div>
-        <div class="card"><h3>Aggregator SDK</h3><p>1-klik migracije, audit logovi, granularne dozvole po adresi.</p></div>
+        <div class="card"><h3>L2 Treasury</h3><p>Volatility-aware stable rebalancing → 38% lower slippage and smoother daily PnL.</p></div>
+        <div class="card"><h3>Protocol-Owned Liquidity</h3><p>Policy-based reallocation of POL between Uni/Curve with zero manual intervention.</p></div>
+        <div class="card"><h3>Aggregator SDK</h3><p>1-click migrations, immutable audit logs, granular per-address permissions.</p></div>
       </div>
     </section>
 
@@ -388,18 +400,18 @@ print(r.json())</code></pre>
     <section id="security" class="wrap">
       <h2>Security</h2>
       <div class="grid-2">
-        <div class="card"><h3>Defense-in-Depth</h3><ul class="list"><li>Reentrancy guard, validacija ulaza, allowliste.</li><li>Oracle starenje, adaptivni slippage, velocity capovi.</li><li>Invariant fuzzing (Foundry), &gt;95% coverage.</li></ul></div>
-        <div class="card"><h3>Monitoring</h3><p>Watcher-i za <code>FAILED_TX_THRESHOLD</code>, <code>CIRCUIT_BREAKER_TRIPPED</code>, <code>POLICY_BREACH_ATTEMPT</code>. Alerti + automatska pauza preko Guardiana.</p></div>
+        <div class="card"><h3>Defense-in-Depth</h3><ul class="list"><li>Reentrancy guards, strict input validation, allowlists.</li><li>Oracle aging, adaptive slippage, velocity caps.</li><li>Invariant fuzzing (Foundry), &gt;95% coverage.</li></ul></div>
+        <div class="card"><h3>Monitoring</h3><p>Watchers for <code>FAILED_TX_THRESHOLD</code>, <code>CIRCUIT_BREAKER_TRIPPED</code>, <code>POLICY_BREACH_ATTEMPT</code>. Alerts + automated pause via Guardian.</p></div>
       </div>
     </section>
 
-    <!-- RISK REGISTER -->
+    <!-- RISK -->
     <section id="risk" class="wrap">
       <h2>Risk Register & Mitigation</h2>
       <div class="grid-3">
-        <div class="card"><h3>Smart Contract</h3><p>Mitigacija: višestruki auditi, formalno provjeravanje jezgri, invariant fuzzing, ograničeni eksterni pozivi.</p></div>
-        <div class="card"><h3>Market/Liquidity</h3><p>Mitigacija: dinamički limiti, slippage adaptacija, kvote po adresi, velocity capovi.</p></div>
-        <div class="card"><h3>Governance</h3><p>Mitigacija: 3/5 Safe, 48h timelock, odvojeni Guardian (pause-only), javna objava promjena.</p></div>
+        <div class="card"><h3>Smart Contract</h3><p>Mitigation: multi-audit, formal checks on core, invariant fuzzing, bounded external calls.</p></div>
+        <div class="card"><h3>Market/Liquidity</h3><p>Mitigation: dynamic limits, vol-adjusted slippage, quotas per address, velocity caps.</p></div>
+        <div class="card"><h3>Governance</h3><p>Mitigation: 3/5 Safe, 48h timelock, separate Guardian (pause-only), public change announcements.</p></div>
       </div>
     </section>
 
@@ -408,26 +420,25 @@ print(r.json())</code></pre>
       <h2>Economics</h2>
       <div class="grid-2">
         <div class="card">
-          <h3>Model prihoda</h3>
+          <h3>Revenue Model</h3>
           <ul class="list">
-            <li>5–10 bps na volumen migracija</li>
-            <li>Enterprise: dedicirani adapteri, SLA, suport</li>
-            <li>Nema skrbništva, nema product-conflicta</li>
+            <li>5–10 bps on migration volume.</li>
+            <li>Enterprise: dedicated adapters, SLAs, support.</li>
+            <li>No custody, no product conflict.</li>
           </ul>
-          <p>Prihod ~ linearno s volumenom; troškovi uglavnom fiksni (security, infra) → jaka operativna poluga.</p>
+          <p>Revenue ~ linear with volume; costs mostly fixed (security, infra) → strong operating leverage.</p>
         </div>
         <div class="card">
-          <h3>Pre-Seed (Revidirano $450k)</h3>
+          <h3>Pre-Seed (Revised $450k)</h3>
           <ul class="list">
-            <li>Auditi + formalna verifikacija — <strong>$150k</strong></li>
-            <li>Relokacija & Qatar setup — <strong>$100k</strong></li>
+            <li>Audits + formal verification — <strong>$150k</strong></li>
+            <li>Relocation & Qatar setup — <strong>$100k</strong></li>
             <li>Legal & compliance — <strong>$80k</strong></li>
-            <li>Runway (advisori, infra, BD) — <strong>$120k</strong></li>
+            <li>Runway (advisors, infra, BD) — <strong>$120k</strong></li>
             <li><strong>Total: $450k</strong></li>
           </ul>
         </div>
       </div>
-      <!-- SVG mini chart (bps x volume) -->
       <div class="card" style="margin-top:16px">
         <h3>Revenue Sensitivity (illustrative)</h3>
         <svg viewBox="0 0 800 200" width="100%" height="200" xmlns="http://www.w3.org/2000/svg">
@@ -446,18 +457,13 @@ print(r.json())</code></pre>
       </div>
     </section>
 
----
-
-## PART 2 / 2 — (zalijepi odmah ispod PART 1/2, bez praznih tagova)
-
-```html
     <!-- GTM -->
     <section id="gtm" class="wrap">
       <h2>Go-To-Market</h2>
       <div class="timeline">
-        <div class="tl"><div class="bubble"><strong>Phase 1 — Design Partners (M0-M3)</strong><br/>3–5 trezora/L2; audit; Ethereum mainnet + 1 L2.</div></div>
-        <div class="tl"><div class="bubble"><strong>Phase 2 — Expansion (M4-M9)</strong><br/>Više L2-ova, napredne politike, 10+ partnera.</div></div>
-        <div class="tl"><div class="bubble"><strong>Phase 3 — Self-Serve (M10-M12)</strong><br/>DAO tooling, policy templates, community governance putanja.</div></div>
+        <div class="tl"><div class="bubble"><strong>Phase 1 — Design Partners (M0-M3)</strong><br/>3–5 treasuries/L2s; audit; Ethereum mainnet + 1 L2.</div></div>
+        <div class="tl"><div class="bubble"><strong>Phase 2 — Expansion (M4-M9)</strong><br/>More L2s, advanced policies, 10+ partners.</div></div>
+        <div class="tl"><div class="bubble"><strong>Phase 3 — Self-Serve (M10-M12)</strong><br/>DAO tooling, policy templates, community governance path.</div></div>
       </div>
     </section>
 
@@ -465,21 +471,21 @@ print(r.json())</code></pre>
     <section id="governance" class="wrap">
       <h2>Governance & Compliance</h2>
       <div class="grid-3">
-        <div class="card"><h3>Controls</h3><p>3/5 Safe za kritične funkcije; sve promjene preko 48h timelocka; Guardian može samo <em>pause</em> bez mijenjanja parametara.</p></div>
-        <div class="card"><h3>Process</h3><p>On-chain objave, upgrade playbook, odvojene role (operator, admin, guardian), change-window prozori.</p></div>
-        <div class="card"><h3>Compliance</h3><p>Pravni okviri u ključnim jurisdikcijama (KYC/AML partneri za enterprise), ugovori s partnerima, DPI sigurnost.</p></div>
+        <div class="card"><h3>Controls</h3><p>3/5 Safe for critical functions; all changes via 48h timelock; Guardian can only <em>pause</em>, never change parameters or move funds.</p></div>
+        <div class="card"><h3>Process</h3><p>On-chain announcements, upgrade playbook, separated roles (operator, admin, guardian), change-window discipline.</p></div>
+        <div class="card"><h3>Compliance</h3><p>Legal frameworks in key jurisdictions (KYC/AML partners for enterprise), partner agreements, DPI security posture.</p></div>
       </div>
     </section>
 
     <!-- QATAR -->
     <section id="qatar" class="wrap">
       <h2>Why Qatar?</h2>
-      <p class="lead">Relokacija povezuje Gravitas s **QFC** sandboxom i pro-inovacijskim regulatornim hubom uz direktan pristup MENA kapitalu. Budžet pokriva pravno tijelo, legal arhitekturu i početni BD/partnerstva.</p>
+      <p class="lead">Relocation connects Gravitas with the **QFC** sandbox and a pro-innovation regulatory hub with direct access to MENA capital. The budget covers legal entity formation, regulatory architecture and initial BD/partnerships.</p>
       <div class="card">
         <ul class="list">
-          <li>Usklađenost s Vision 2030 — knowledge-based economy</li>
-          <li>Regulatorni sandbox & brzi dijalog s institucijama</li>
-          <li>Pristup partnerstvima i kapitalu regije</li>
+          <li>Alignment with Vision 2030 — knowledge-based economy.</li>
+          <li>Regulatory sandbox & fast dialogue with institutions.</li>
+          <li>Access to regional partnerships and capital.</li>
         </ul>
       </div>
     </section>
@@ -487,21 +493,22 @@ print(r.json())</code></pre>
     <!-- FAQ -->
     <section id="faq" class="wrap">
       <h2>Investor FAQ</h2>
-      <details><summary>Uzimate li skrbništvo?</summary><p>Ne. Sredstva ostaju kod partnera ili u baznim protokolima; Gravitas samo orkestrira rutu sukladno politici.</p></details>
-      <details><summary>Zašto ne graditi interno?</summary><p>Adapteri + auditi + ops + monitoring = pun proizvod. Mi amortiziramo trošak/rizik preko više partnera; vaš tim ostaje fokusiran na core roadmap.</p></details>
-      <details><summary>Što je moat?</summary><p>Mreža integracija, operativno povjerenje i audit trail → visoki troškovi prelaska. Neutralnost — ne konkuriramo klijentima.</p></details>
-      <details><summary>Token?</summary><p>Nije potreban za prihode. Razmatra se **nakon PMF-a** isključivo za governance usklađivanje.</p></details>
+      <details><summary>Do you ever take custody?</summary><p>No. Funds remain with the partner or the underlying protocols; Gravitas only orchestrates routes according to policy.</p></details>
+      <details><summary>Why not build in-house?</summary><p>Adapters + audits + ops + monitoring = a full product. We amortize cost/risk across many partners so your team stays focused on your core roadmap.</p></details>
+      <details><summary>What’s the moat?</summary><p>Integration network, operational trust and audit trail → high switching costs. Neutral infrastructure — we don’t compete with clients.</p></details>
+      <details><summary>Token?</summary><p>Not required for revenue. Considered **post-PMF** only for governance alignment.</p></details>
     </section>
 
     <!-- CONTACT -->
     <section id="contact" class="wrap">
       <h2>Contact & Partnerships</h2>
-      <p class="lead">Ako želite da se vaša likvidnost kreće poput svjetla — razgovarajmo.</p>
+      <p class="lead">If you want your liquidity to move like light — let’s talk.</p>
       <div class="cta-strip">
         <a class="btn" href="mailto:abdusamedzelic98@gmail.com?subject=Partnership%20Inquiry%20-%20Gravitas">Email: abdusamedzelic98@gmail.com</a>
         <a class="btn-ghost btn" href="tel:+385915668133">Phone: +385 91 566 8133</a>
         <a class="btn-ghost btn" href="https://cal.com/abdusamed/gravitas" target="_blank" rel="noopener">Schedule a Meeting</a>
         <a class="btn-ghost btn" href="https://github.com/AbZe628/gravitas-protocol/tree/main" target="_blank" rel="noopener">Explore MVP</a>
+        <a class="btn-ghost btn" href="https://www.linkedin.com/in/abdusamed-zeli%C4%87-5b5526183/" target="_blank" rel="noopener">LinkedIn</a>
       </div>
     </section>
   </main>
@@ -515,6 +522,7 @@ print(r.json())</code></pre>
         <a href="#vision">Vision</a><a href="#solution">Architecture</a><a href="#economics">Economics</a>
         <a href="https://github.com/AbZe628/gravitas-protocol/tree/main" target="_blank" rel="noopener">MVP</a>
         <a href="https://github.com/AbZe628/gravitas-protocol/blob/main/docs/whitepaper.md" target="_blank" rel="noopener">Whitepaper</a>
+        <a href="https://www.linkedin.com/in/abdusamed-zeli%C4%87-5b5526183/" target="_blank" rel="noopener">LinkedIn</a>
       </nav>
       <span class="muted">© 2025 Gravitas. All rights reserved.</span>
     </div>
@@ -629,6 +637,7 @@ print(r.json())</code></pre>
       grid.material.opacity = 0.28; grid.material.transparent = true;
       grid.position.y = -0.59; scene.add(grid);
 
+      // “Blockchain” floating glass blocks
       cubes = new THREE.Group();
       const cubeGeo = new THREE.BoxGeometry(0.14,0.14,0.14);
       for(let i=0;i<26;i++){
