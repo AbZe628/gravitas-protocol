@@ -1,4 +1,17 @@
 
+🌐 **Deployment Evidence (Local Hardhat Demo)**
+
+- Deployment executed locally via Hardhat node (chainId: 31337)
+- Contracts deployed: Teleport.sol, UniV2Adapter.sol, TokenA.sol, TokenB.sol
+- Scripts executed: deploy.ts → seed.ts → migrate.ts
+- Event emitted: LiquidityMigratedV2(user, from, to, tokenA, tokenB, amtA, amtB, liquidityMinted)
+- Console logs & addresses recorded during demo
+- Identical to Arbitrum Sepolia process (no gas required)
+- Awaiting small testnet ETH for on-chain redeploy
+
+📸 *Screenshots available on request — full command logs attached in repo.*
+
+---
 
 
 # Gravitas Protocol — MVP (Liquidity Teleport & Fee Harvesting)
