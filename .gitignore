@@ -21,3 +21,5 @@ Thumbs.db
 # IDE
 .vscode/
 .idea/
+# Osobne datoteke/kljucevi koje NE smiju ici na GitHub
+.env
