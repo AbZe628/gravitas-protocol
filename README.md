@@ -17,17 +17,33 @@ The code proves the core concept: secure, atomic migration of liquidity between 
 
 ## 🛠️ CRITICAL TECHNICAL NOTE FOR REVIEWERS
 
-The integrity of the code is proven by connecting to the live Ethereum Mainnet state.
+The core test uses **Ethereum Mainnet Forking** (via Alchemy RPC) to prove functionality with real tokens (WBTC/WETH) and actual Uniswap/Sushiswap Factory contracts.
 
-1.  **Technical Proof:** The test successfully simulates transferring real UNI V2 LP tokens (WBTC/WETH) from a whale, burning them for underlying assets, and minting new LP tokens on a different factory (Sushiswap).
-2.  **Authorization:** Hardhat configuration (`hardhat.config.js`) securely uses the **`.env`** file and `ALCHEMY_API_KEY`.
-3.  **Test Status:** If the test fails with an **`Error: 401 Unauthorized`**, this is due to an external Alchemy API authentication issue (e.g., rate limit, IP restriction), not a flaw in the contract logic. The framework is correctly configured.
-4.  **How to Run the Test:**
+1.  **Authorization:** Hardhat configuration (`hardhat.config.js`) securely uses the **`.env`** file and `ALCHEMY_API_KEY` for authentication.
+2.  **Test Status:** If the test fails with an **`Error: 401 Unauthorized`**, this is due to an external Alchemy API limitation (e.g., rate limit, IP restriction), not a flaw in the contract logic.
+
+### 💻 Step-by-Step Execution (For Reviewers)
+
+To replicate the Mainnet Forking proof-of-concept, please follow these steps:
+
+1.  **Clone the Repository and Install Dependencies:**
     ```bash
-    # Test requires a valid ALCHEMY_API_KEY in your local .env file
-    npx hardhat test
+    npm install
     ```
+2.  **Setup Environment Variables:**
+    Create a file named **`.env`** in the root directory and paste your valid Alchemy API Key (Ethereum Mainnet) into it:
+    ```
+    # Example: Paste your key from Alchemy Dashboard
+    ALCHEMY_API_KEY="YOUR_ALCH_API_KEY_HERE" 
+    ```
+3.  **Execute the Mainnet Forking Test:**
+    This single command performs contract compilation, initiates the Mainnet Fork on a random latest block, runs the full migration scenario (Impersonation, Approve, Transfer, Migrate, Check Balances), and reports the success.
+    ```bash
+    npm run test
+    ```
+    *(Alternatively: `npx hardhat test`)*
 
+---
 ---
 
 # 📖 CORE PROTOCOL ARCHITECTURE
