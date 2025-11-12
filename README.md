@@ -131,3 +131,5 @@ The current repository reflects the final state of the core migration logic.
 
 ---
 *MIT © 2025 Gravitas Protocol*
+Developed by Abdusamed Zelić – Gravitas Protocol Founder & Lead Engineer
+
