@@ -2,6 +2,26 @@
 
 This repository contains the architecture and the Minimum Viable Product (MVP) for the Gravitas Protocol. Our core mission is to solve DeFi liquidity fragmentation and generate sustainable protocol revenue through fee harvesting and atomic liquidity migration.
 
+---> _Resubmitted under Developer Tooling domain per Arbitrum review team recommendation (Nov 2025)._
+
+
+## 🏆 LIVE PROOF OF DEPLOYMENT (ARBITRUM SEPOLIA)
+
+The Gravitas Protocol MVP contract (`Teleport.sol`) has been successfully **deployed, verified, and tested live on the Arbitrum Sepolia testnet**. This demonstrates full end-to-end functionality, from RPC connection to on-chain "write" execution.
+
+* **1. Deployed Contract:** The core protocol is live and verifiable on Arbiscan.
+    * **Arbiscan Link:** `https://sepolia.arbiscan.io/address/0xb2ffB8704a2bb15c4AFc37789d9C0b598Cb79f64`
+
+* **2. Live 'Write' Transaction:** We executed a live "write" call to the deployed contract by calling `transferOwnership()` as the owner. This transaction was successfully confirmed by the network.
+    * **TX Hash Proof:** `https://sepolia.arbiscan.io/tx/0xa1bc6c05460a7da043e7fe94620ac90a7c313857ef0d0485a285f981726a6d18`
+
+* **3. Terminal Evidence:** A full terminal log showing the successful deploy, contract read (check), and function call (interact) is available in this repository at `/docs/proof.png`.
+
+---## 🧠 Security & Audit Plan
+Internal static analysis (Slither + Mythril) planned pre-audit. 
+Code4rena or Hacken audit scheduled in Milestone 2.
+Community bug bounty to follow SDK release.
+
 ---
 
 # 🚀 ARBITRUM GRANT REVIEW FOCUS: TELEPORT (MVP Proof-of-Concept)
@@ -22,7 +42,7 @@ The core test uses **Ethereum Mainnet Forking** (via Alchemy RPC) to prove funct
 1.  **Authorization:** Hardhat configuration (`hardhat.config.js`) securely uses the **`.env`** file and `ALCHEMY_API_KEY` for authentication.
 2.  **Test Status:** If the test fails with an **`Error: 401 Unauthorized`**, this is due to an external Alchemy API limitation (e.g., rate limit, IP restriction), not a flaw in the contract logic.
 
-### 💻 Step-by-Step Execution (For Reviewers)
+### Optional: Replicating the Local Mainnet Forking Test
 
 To replicate the Mainnet Forking proof-of-concept, please follow these steps:
 
@@ -45,6 +65,9 @@ To replicate the Mainnet Forking proof-of-concept, please follow these steps:
 
 ---
 ---
+## ⚖️ Arbitrum Runtime Assumptions
+Gravitas Teleport operates under L2-specific constraints: sequencer downtime and oracle staleness are handled via policy guards (pause & deadline enforcement), gas estimation is Arbitrum-optimized (EIP-1559 style), and all adapter calls respect L2 retry semantics. 
+
 
 # 📖 CORE PROTOCOL ARCHITECTURE
 
