@@ -1,110 +1,49 @@
-# 🌌 GRAVITAS PROTOCOL: DECENTRALIZED LIQUIDITY TELEPORT
+🌌 GRAVITAS PROTOCOL: DECENTRALIZED LIQUIDITY TELEPORT
 
-This repository contains the architecture and the Minimum Viable Product (MVP) for the Gravitas Protocol. Our core mission is to solve DeFi liquidity fragmentation and generate sustainable protocol revenue through fee harvesting and atomic liquidity migration.
+This repository contains the architecture and the **Reviewer-Proof MVP** for the Gravitas Protocol.
 
----
-
-# 🚀 ARBITRUM GRANT REVIEW FOCUS: TELEPORT (MVP Proof-of-Concept)
-
-**The primary focus for this grant review is the successful operation of the Liquidity Teleport functionality.**
-
-The code proves the core concept: secure, atomic migration of liquidity between V2 pools on a single chain.
-
-* **Contract for Review:** `contracts/Teleport.sol` (Orchestrates migration logic).
-* **Proof of Concept:** Functionality is demonstrated via a **Mainnet Forking Test** (`test/teleport.test.js`).
+Gravitas is a decentralized liquidity infrastructure layer designed to solve DeFi liquidity fragmentation through **atomic, deterministic, on-chain liquidity migration**.
 
 ---
 
-## 🛠️ CRITICAL TECHNICAL NOTE FOR REVIEWERS
+# 🚀 ARBITRUM GRANT STATUS: DEPLOYED & VERIFIED
 
-The core test uses **Ethereum Mainnet Forking** (via Alchemy RPC) to prove functionality with real tokens (WBTC/WETH) and actual Uniswap/Sushiswap Factory contracts.
+**The primary focus for this grant review is the successful operation of the Liquidity Teleport (MVP).**
 
-1.  **Authorization:** Hardhat configuration (`hardhat.config.js`) securely uses the **`.env`** file and `ALCHEMY_API_KEY` for authentication.
-2.  **Test Status:** If the test fails with an **`Error: 401 Unauthorized`**, this is due to an external Alchemy API limitation (e.g., rate limit, IP restriction), not a flaw in the contract logic.
+The Liquidity Teleport MVP is **deployed and verified on Arbitrum Sepolia** as a production-grade proof of execution. This deployment demonstrates the **safe router-based deposit logic** requested during the review process, replacing unsafe ERC20 transfer patterns and preventing trapped funds.
 
-### 💻 Step-by-Step Execution (For Reviewers)
+### 🔗 LIVE MVP DEPLOYMENT (ARBITRUM SEPOLIA)
 
-To replicate the Mainnet Forking proof-of-concept, please follow these steps:
+* **Network:** Arbitrum Sepolia (Chain ID: 421614)
+* **Contract:** `Teleport.sol`
+* **Address:** `0xA5a5397A141ea0d8f8e8A56c5BF95f66Cecf500B`
+* **Arbiscan (Verified – Exact Match):** [View Code on Arbiscan](https://sepolia.arbiscan.io/address/0xA5a5397A141ea0d8f8e8A56c5BF95f66Cecf500B#code)
+* **Sourcify Verification:** [View Sourcify Repo](https://repo.sourcify.dev/421614/0xA5a5397A141ea0d8f8e8A56c5BF95f66Cecf500B)
 
-1.  **Clone the Repository and Install Dependencies:**
-    ```bash
-    npm install
-    ```
-2.  **Setup Environment Variables:**
-    Create a file named **`.env`** in the root directory and paste your valid Alchemy API Key (Ethereum Mainnet) into it:
-    ```
-    # Example: Paste your key from Alchemy Dashboard
-    ALCHEMY_API_KEY="YOUR_ALCH_API_KEY_HERE" 
-    ```
-3.  **Execute the Mainnet Forking Test:**
-    This single command performs contract compilation, initiates the Mainnet Fork on a random latest block, runs the full migration scenario (Impersonation, Approve, Transfer, Migrate, Check Balances), and reports the success.
-    ```bash
-    npm run test
-    ```
-    *(Alternatively: `npx hardhat test`)*
+The contract is verified as an **Exact Match**, confirming that the deployed bytecode corresponds 1:1 with the source code in this repository.
 
 ---
----
 
-# 📖 CORE PROTOCOL ARCHITECTURE
+## 🛡️ SAFETY & POLICY CONFIGURATION
 
-Gravitas Protocol is an infrastructure layer that allows users and DeFi projects to move their LP tokens between DEXs instantly, safely, and with micro-fees that generate protocol income.
+The Teleport contract is **intentionally policy-gated by default** to ensure deterministic and safe execution.
 
-## ⚙️ I. ARCHITECTURE & COMPONENTS
+### 1. Router Allow-Listing (Required)
+Teleport blocks all target routers by default. The contract owner must explicitly allow a router before migration can occur:
 
-The protocol is built around modular, secure contracts designed for extensibility across different AMM versions (V2/V3) and chains.
-
-### Core Components (Vision & Current Status)
-
-| Component | Status | Function |
-| :--- | :--- | :--- |
-| **Teleport.sol** | **MVP Complete** | The central coordinator. Executes atomic `remove-liquidity` → `transfer tokens` → `add-liquidity` flow. Secured with `nonReentrant`. |
-| **Treasury.sol** | Planned (Phase 2) | Collects protocol fees (5-10 bps) and residual dust/value from migrations. Manages multi-sig treasury. |
-| **Adapters** | MVP/Planned | Wrappers for external DEXs. Currently includes `UniV2Adapter.sol` (for context), with V3 adapters planned. |
-| **Demo Tokens** | Complete | `TokenA.sol`/`TokenB.sol` used for local testing and scenario creation. |
-| **Libraries** | Complete | Security and validation helpers (`ReentrancyGuard`, `SafeERC20`). |
-
-### MVP Demonstrated Flow
-
-The MVP successfully demonstrates the on-chain transition of assets:
-
-`[User Wallet] → [Teleport.sol (Receives LP)] → [Teleport.sol (Calls Factory Burn)] → [Underlying Tokens] → [Teleport.sol (Calls Factory Mint)] → [New LP Tokens (Sent to Teleport)]`
-
-## 📊 II. MVP STATUS AND TECHNICAL STACK
-
-The current repository reflects the final state of the core migration logic.
-
-| Scope/Item | Description | Status |
-| :--- | :--- | :--- |
-| **Core Logic** | V2 Liquidity Migration (Same-Chain) | ✅ Complete |
-| **Security** | ReentrancyGuard implementation | ✅ Complete |
-| **Test Coverage** | Full Mainnet Forking Test | ✅ Complete |
-| **Code Structure** | Modular, using OpenZeppelin standards. | ✅ Complete |
-
-### Technical Stack (Post-Cleanup)
-* **Solidity:** 0.8.24 (optimized with `viaIR`)
-* **EVM Framework:** Hardhat (v2.22.6)
-* **Testing:** JavaScript (Ethers v6) / Chai
-* **Security:** OpenZeppelin Contracts, `ReentrancyGuard`
-
-## 💡 III. DEVELOPMENT ROADMAP (Full Vision)
-
-| Phase | Description | Status |
-| :--- | :--- | :--- |
-| **Phase 1: MVP Core Logic** | Finalize secure single-chain V2 migration and testing (Current State). | ✅ Complete |
-| **Phase 2: Protocol Revenue** | Implement **Treasury.sol** and fee harvesting logic into Teleport.sol. | 🔜 Planned |
-| **Phase 3: Cross-Chain & V3** | Implement **UniV3/Curve Adapters**. Explore cross-chain migration via canonical bridges. | 🔜 Planned |
-| **Phase 4: Audit & Launch** | Formal Security Audit (Code4rena/MythX) and Mainnet deployment on Arbitrum. | 🔜 Planned |
-
-## ⚙️ REPOSITORY LAYOUT (Current, Clean State)
-
-| Path | Description |
-| :--- | :--- |
-| `contracts/Teleport.sol` | Core coordinator for V2 liquidity migration. |
-| `contracts/UniV2Adapter.sol` | Thin wrapper logic (used for context). |
-| `test/teleport.test.js` | **The Mainnet Forking Test** (Proof of Concept). |
-| `hardhat.config.js` | Final Hardhat configuration (JS, uses .env). |
-| `.env` | **DO NOT COMMIT.** Stores `ALCHEMY_API_KEY` securely. |
-
----
-*MIT © 2025 Gravitas Protocol*
+```solidity
+setAllowedRouter(ROUTER_ADDRESS, true)
+If omitted, migrations revert with: Teleport: router not allowed. This prevents liquidity from being routed to arbitrary or unsafe addresses.2. Executor Configuration (Optional)By default, only the contract owner can execute migrations. To enable off-chain keepers, SDK-based execution, or multisig-controlled execution, the owner may authorize executors:SoliditysetExecutor(EXECUTOR_ADDRESS, true)
+3. Deterministic On-Chain EnforcementEach liquidity migration enforces deterministic, on-chain rules:Slippage bounds: amountAMin, amountBMinExecution deadline: deadlineCooldown: Prevents rapid repeated migrations for the same route.Max move cap: maxMoveBps (basis-point cap per execution).All routing decisions are enforced on-chain and are fully verifiable.🔄 EXECUTION FLOW (DEPLOYED VERSION)The deployed Teleport contract executes the following atomic on-chain flow:Plaintext[LP Holder]
+    ↓ (approve LP)
+[Teleport.sol]
+    ↓ (burn LP on source pair)
+[Underlying Tokens]
+    ↓ (router.addLiquidity — protocol deposit logic)
+[Target Pool]
+    ↓
+[New LP Tokens → Recipient]
+⚠️ Note: Teleport never relies on raw ERC20 transfers as a substitute for protocol deposit logic.🧪 TESTING STRATEGYTwo complementary proofs of correctness are provided:1. Arbitrum Sepolia DeploymentDemonstrates verified on-chain execution, policy-gated safety, and production-style behavior.2. Ethereum Mainnet Forking TestDemonstrates correctness using real Mainnet contracts (WBTC/WETH, Uniswap/Sushiswap).💻 Step-by-Step: Run the Mainnet Fork TestCritical Note: The test uses Ethereum Mainnet Forking via Alchemy RPC.Install Dependencies:Bashnpm install
+Setup Environment:Create a .env file in the root directory:Isječak kodaALCHEMY_API_KEY="YOUR_ALCH_API_KEY_HERE"
+Execute the Test:Bashnpm run test
+This command compiles contracts, forks Ethereum Mainnet, executes the full LP migration scenario, and validates resulting balances.📖 CORE PROTOCOL ARCHITECTUREGravitas Protocol is an infrastructure layer enabling instant, safe, and composable LP mobility across DeFi.⚙️ I. ARCHITECTURE & COMPONENTSComponentStatusDescriptionTeleport.solMVP CompleteCore coordinator. Executes atomic LP burn → router deposit flow.Treasury.solPlanned (Phase 2)Collects protocol fees (5–10 bps) and residual value.AdaptersMVP / PlannedWrappers for external protocols (UniV2 live, V3 planned).LibrariesCompleteSecurity helpers (ReentrancyGuard, SafeERC20).📊 II. MVP STATUSScopeDescriptionStatusCore LogicV2 Liquidity Migration (Router Integrated)✅ CompleteSecurityReentrancyGuard & Policy Gating✅ CompleteTest CoverageMainnet Forking Test✅ CompleteDeploymentVerified on Arbitrum Sepolia✅ Complete⚙️ REPOSITORY LAYOUTPathDescriptioncontracts/Teleport.solCORE MVP. Verified, policy-driven migration contract.scripts/deploy.jsDeployment script.hardhat.config.jsviaIR enabled, Arbitrum Sepolia config.test/teleport.test.jsMainnet Forking Test (Proof of Concept).📝 NOTES FOR REVIEWERSThis MVP demonstrates on-chain execution, not off-chain signaling.Teleport does not custody funds beyond a single atomic transaction.External SDKs or keepers are optional and do not control execution.The design prioritizes safety, determinism, and composability.✅ STATUS SUMMARYTeleport MVP deployed on Arbitrum SepoliaSource code verified (Exact Match)Unsafe ERC20 transfer logic removedDeterministic, policy-driven execution enforcedReady for ecosystem integration and milestone expansionMIT © 2025 Gravitas Protocol
