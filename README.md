@@ -11,7 +11,7 @@ This repository contains:
 
 ✅ Uniswap V3 Teleport (Teleport V3) — deployed & verified
 
-🧪 Advanced / Audit-grade evolution (Teleport V6) — reference implementation
+
 
 🚀 Arbitrum Grant Status
 
