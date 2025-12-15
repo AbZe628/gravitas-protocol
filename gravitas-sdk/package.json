@@ -1,0 +1,24 @@
+{
+  "name": "@gravitas-protocol/sdk",
+  "version": "0.1.0-alpha",
+  "description": "Infrastructure SDK for Gravitas Protocol (Vortex Layer) liquidity migration.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "lint": "eslint src/**/*.ts"
+  },
+  "peerDependencies": {
+    "ethers": "^6.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.2.0",
+    "@types/node": "^20.0.0"
+  },
+  "author": "Gravitas Protocol Labs",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  }
+}
