@@ -16,8 +16,7 @@ Security patches and improvements will be continuously integrated as the project
 
 If you discover a security issue, please **do not create a public GitHub issue**.  
 Instead, report it directly to:
-
-📧 gravitas-security@proton.me
+abdusamedzelicc98@gmail.com
 
 You can use GPG or encrypted email if you prefer.  
 All valid reports will be acknowledged and rewarded with early contributor status once the program is launched.
