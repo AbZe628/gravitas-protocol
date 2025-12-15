@@ -1,6 +1,14 @@
 🌌 Gravitas Protocol (Vortex Layer)
 Deterministic Cross-DEX Liquidity Migration Infrastructure for Arbitrum
 
+## SDK
+
+The Gravitas SDK (alpha) lives under `/gravitas-sdk` and provides:
+- deterministic policy validation
+- off-chain simulation
+- transaction payload construction for Teleport.sol
+
+
 Gravitas Protocol (Vortex Layer) is a developer-first liquidity infrastructure layer designed to eliminate liquidity fragmentation across decentralized exchanges on Arbitrum.
 
 The protocol enables atomic, policy-driven liquidity migration — allowing LP positions and Uniswap V3 NFTs to be moved safely between DEXs using standard router logic, strict on-chain enforcement, and zero custodial risk.
