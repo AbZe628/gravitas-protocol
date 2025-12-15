@@ -24,7 +24,7 @@ The contract is verified as an **Exact Match**, confirming that the deployed byt
 
 ---## 🛡️ Security & Architecture Update (v6.0)
 
-We have upgraded the core infrastructure to a **"Reviewer-Proof" Uniswap V3** standard. The new `TeleportV6.sol` contract implements:
+We have upgraded the core infrastructure to a **"Reviewer-Proof" Uniswap V3** standard. The new `TeleportV3.sol` contract implements:
 
 - **Atomic V3 Migration:** Handles NFT transfer, liquidity decrease, optional auto-swap (for ratio rebalancing), and re-minting in a single transaction.
 - **Strict Delta Tracking:** Uses snapshot-based accounting to ensure only funds from the user's position are used, preventing "dust griefing" attacks.
