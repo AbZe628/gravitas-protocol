@@ -32,8 +32,6 @@ We have upgraded the core infrastructure to a **"Reviewer-Proof" Uniswap V3** st
 - **Authorized Keeper Model:** Execution is currently gated to whitelisted executors to ensure safe, deterministic pathfinding during the beta phase.
 - **Rich Events:** Emits detailed telemetry (`newFee`, `ticks`) for easier off-chain indexing.
 
-**Verified Contract (Arbitrum Sepolia):**
-[OVDJE ZALIJEPI LINK SA ARBISCANA KAD NAPRAVIŠ DEPLOY]
 
 ## 🛡️ SAFETY & POLICY CONFIGURATION
 
