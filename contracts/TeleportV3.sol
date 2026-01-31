@@ -116,6 +116,13 @@ contract TeleportV3 is ReentrancyGuard, Ownable, IERC721Receiver {
         uint24 swapFee;
     }
 
+    /**
+     * @notice Executes an atomic migration of a Uniswap V3 position to a new fee tier or tick range.
+     * @dev Handles the full lifecycle: Burn -> Collect -> (Optional Swap) -> Mint -> Refund.
+     * @param params The migration parameters including slippage and swap details.
+     * @return newTokenId The ID of the newly minted Uniswap V3 position NFT.
+     * @return newLiquidity The amount of liquidity in the new position.
+     */
     function teleportLiquidity(TeleportParams calldata params) 
         external 
         nonReentrant 
@@ -222,30 +229,34 @@ contract TeleportV3 is ReentrancyGuard, Ownable, IERC721Receiver {
      * @dev This function saves ~2,000 gas per call by bypassing Solidity's high-level checks
      *      and using direct memory manipulation for the transfer call.
      *      Shariah Compliance: Ensures no funds are trapped (Gharar avoidance).
-     * @param token The address of the token to refund.
-     * @param to The address to send the dust to.
+     * @param tokenAddress The address of the token to refund.
+     * @param recipientAddress The address to send the dust to.
      * @param balanceBefore The balance of the token before the migration.
      */
-    function _refundDeltaYul(address token, address to, uint256 balanceBefore) private {
-        uint256 balanceAfter = IERC20(token).balanceOf(address(this));
+    function _refundDeltaYul(address tokenAddress, address recipientAddress, uint256 balanceBefore) private {
+        // Edge Case: Ensure recipient is not zero address
+        if (recipientAddress == address(0)) return;
+
+        uint256 balanceAfter = IERC20(tokenAddress).balanceOf(address(this));
         
         if (balanceAfter > balanceBefore) {
             uint256 delta;
             unchecked { delta = balanceAfter - balanceBefore; }
             
             // Yul-optimized transfer call
-            // Saves gas by avoiding high-level return data parsing and using custom error handling
             assembly {
                 // ERC20 transfer(address,uint256) selector: 0xa9059cbb
                 let ptr := mload(0x40)
                 mstore(ptr, 0xa9059cbb00000000000000000000000000000000000000000000000000000000)
-                mstore(add(ptr, 0x04), and(to, 0xffffffffffffffffffffffffffffffffffffffff))
+                mstore(add(ptr, 0x04), and(recipientAddress, 0xffffffffffffffffffffffffffffffffffffffff))
                 mstore(add(ptr, 0x24), delta)
 
-                let success := call(gas(), token, 0, ptr, 0x44, 0, 0)
+                // Execute call and check success
+                let success := call(gas(), tokenAddress, 0, ptr, 0x44, ptr, 0x20)
                 
-                if iszero(success) {
-                    // Revert with generic error if transfer fails
+                // If call failed, or if it returned data and that data is false (0)
+                let returnedFalse := and(gt(returndatasize(), 0), iszero(mload(ptr)))
+                if or(iszero(success), returnedFalse) {
                     revert(0, 0)
                 }
             }

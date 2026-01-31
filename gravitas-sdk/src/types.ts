@@ -1,10 +1,12 @@
-import { z } from 'zod';
-import { Address, Hex } from 'viem';
+import { z } from "zod";
+import { Address, Hex } from "viem";
 
 /**
  * @notice Strict Ethereum Address validation schema
  */
-export const AddressSchema = z.string().regex(/^0x[a-fA-F0-9]{40}$/) as z.ZodType<Address>;
+export const AddressSchema = z
+  .string()
+  .regex(/^0x[a-fA-F0-9]{40}$/) as z.ZodType<Address>;
 
 /**
  * @notice Migration parameters schema for runtime validation
@@ -34,7 +36,7 @@ export type MigrationParams = z.infer<typeof MigrationParamsSchema>;
 export class ShariahViolationError extends Error {
   constructor(message: string) {
     super(`[Shariah Violation] ${message}`);
-    this.name = 'ShariahViolationError';
+    this.name = "ShariahViolationError";
   }
 }
 

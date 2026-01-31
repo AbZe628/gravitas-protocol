@@ -1,16 +1,22 @@
-Compiling 1 files with Solc 0.8.33
-Solc 0.8.33 finished in 739.09ms
-Compiler run successful!
+Compiling 2 files with Solc 0.8.33
+Solc 0.8.33 finished in 11.33s
+Compiler run successful with warnings:
+Warning (2018): Function state mutability can be restricted to view
+  --> test/foundry/GravitasInvariants.t.sol:81:5:
+   |
+81 |     function test_AssetIntegrityInvariant() public {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
 
 Ran 2 tests for test/Counter.t.sol:CounterTest
-[PASS] testFuzz_SetNumber(uint256) (runs: 256, μ: 52390, ~: 54112)
+[PASS] testFuzz_SetNumber(uint256) (runs: 256, μ: 53568, ~: 54136)
 [PASS] test_Increment() (gas: 54001)
-Suite result: ok. 2 passed; 0 failed; 0 skipped; finished in 10.27ms (10.15ms CPU time)
+Suite result: ok. 2 passed; 0 failed; 0 skipped; finished in 48.58ms (55.41ms CPU time)
 
 Ran 2 tests for test/foundry/GravitasInvariants.t.sol:GravitasInvariants
-[PASS] testFuzz_ComplianceInvariant(address) (runs: 256, μ: 87228, ~: 87305)
+[PASS] testFuzz_ComplianceInvariant(address) (runs: 256, μ: 87214, ~: 87305)
 [PASS] test_AssetIntegrityInvariant() (gas: 24445)
-Suite result: ok. 2 passed; 0 failed; 0 skipped; finished in 38.48ms (37.44ms CPU time)
+Suite result: ok. 2 passed; 0 failed; 0 skipped; finished in 137.53ms (114.69ms CPU time)
 
 ╭----------------------------------------------------------------------+-----------------+-------+--------+-------+---------╮
 | contracts/GravitasPolicyRegistry.sol:GravitasPolicyRegistry Contract |                 |       |        |       |         |
@@ -43,13 +49,13 @@ Suite result: ok. 2 passed; 0 failed; 0 skipped; finished in 38.48ms (37.44ms CP
 +===============================================================================================+
 | Deployment Cost                          | Deployment Size |       |        |       |         |
 |------------------------------------------+-----------------+-------+--------+-------+---------|
-| 1955287                                  | 9600            |       |        |       |         |
+| 1955299                                  | 9600            |       |        |       |         |
 |------------------------------------------+-----------------+-------+--------+-------+---------|
 |                                          |                 |       |        |       |         |
 |------------------------------------------+-----------------+-------+--------+-------+---------|
 | Function Name                            | Min             | Avg   | Median | Max   | # Calls |
 |------------------------------------------+-----------------+-------+--------+-------+---------|
-| migrateLiquidityV2                       | 48997           | 49148 | 49225  | 49225 | 256     |
+| migrateLiquidityV2                       | 48997           | 49134 | 49225  | 49225 | 256     |
 ╰------------------------------------------+-----------------+-------+--------+-------+---------╯
 
 ╭----------------------------------+-----------------+-------+--------+-------+---------╮
@@ -67,7 +73,7 @@ Suite result: ok. 2 passed; 0 failed; 0 skipped; finished in 38.48ms (37.44ms CP
 |----------------------------------+-----------------+-------+--------+-------+---------|
 | number                           | 2641            | 2641  | 2641   | 2641  | 257     |
 |----------------------------------+-----------------+-------+--------+-------+---------|
-| setNumber                        | 24073           | 42169 | 44033  | 44357 | 258     |
+| setNumber                        | 24073           | 43339 | 44057  | 44357 | 258     |
 ╰----------------------------------+-----------------+-------+--------+-------+---------╯
 
 ╭----------------------------------------------------------+-----------------+------+--------+------+---------╮
@@ -85,4 +91,4 @@ Suite result: ok. 2 passed; 0 failed; 0 skipped; finished in 38.48ms (37.44ms CP
 ╰----------------------------------------------------------+-----------------+------+--------+------+---------╯
 
 
-Ran 2 test suites in 86.29ms (48.75ms CPU time): 4 tests passed, 0 failed, 0 skipped (4 total tests)
+Ran 2 test suites in 264.90ms (186.11ms CPU time): 4 tests passed, 0 failed, 0 skipped (4 total tests)

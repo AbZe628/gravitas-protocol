@@ -1,11 +1,11 @@
-import { createPublicClient, http, PublicClient, Address } from 'viem';
-import { ClientConfig, ClientConfigSchema } from './types.js';
-import { ComplianceService } from './compliance.js';
-import { MigrationBuilder } from './teleport.js';
+import { createPublicClient, http, PublicClient, Address } from "viem";
+import { ClientConfig, ClientConfigSchema } from "./types.js";
+import { ComplianceService } from "./compliance.js";
+import { MigrationBuilder } from "./teleport.js";
 
-export * from './types.js';
-export * from './compliance.js';
-export * from './teleport.js';
+export * from "./types.js";
+export * from "./compliance.js";
+export * from "./teleport.js";
 
 /**
  * @title GravitasClient
@@ -17,7 +17,7 @@ export class GravitasClient {
 
   constructor(private config: ClientConfig) {
     ClientConfigSchema.parse(config);
-    
+
     // Explicitly cast to PublicClient to resolve version-specific type mismatches in the build environment
     this.publicClient = createPublicClient({
       chain: { id: config.chainId } as any,

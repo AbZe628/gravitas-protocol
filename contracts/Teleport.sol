@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./GravitasPolicyRegistry.sol";
 
-// --- Interfaces (Moved to separate file in final refactor, kept here for compilation) ---
+// --- Interfaces ---
 interface IUniswapV2Factory {
     function getPair(address tokenA, address tokenB) external view returns (address pair);
 }
@@ -220,11 +220,13 @@ contract Teleport is ReentrancyGuard, Ownable {
     /**
      * @notice Allows the owner to rescue any accidentally sent ERC20 tokens from the contract.
      * @dev This is a standard emergency function to prevent funds from being permanently locked.
-     * @param token The address of the token to rescue.
-     * @param to The address to send the rescued tokens to.
+     * @param tokenAddress The address of the token to rescue.
+     * @param recipientAddress The address to send the rescued tokens to.
      */
-    function rescueTokens(address token, address to) external onlyOwner {
-        uint256 bal = IERC20(token).balanceOf(address(this));
-        if (bal > 0) IERC20(token).safeTransfer(to, bal);
+    function rescueTokens(address tokenAddress, address recipientAddress) external onlyOwner {
+        uint256 contractBalance = IERC20(tokenAddress).balanceOf(address(this));
+        if (contractBalance > 0) {
+            IERC20(tokenAddress).safeTransfer(recipientAddress, contractBalance);
+        }
     }
 }
