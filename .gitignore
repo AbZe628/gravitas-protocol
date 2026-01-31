@@ -1,18 +1,29 @@
+# Hardhat
+artifacts/
+cache/
+typechain/
+typechain-types/
+coverage/
+coverage.json
+.env
+.env.*
+
+# Foundry
+out/
+lib/
+!lib/forge-std/
+
 # Node
 node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+.pnpm-debug.log*
 pnpm-lock.yaml
 
-# Hardhat/Artifacts
-cache/
-artifacts/
-typechain-types/
-
-# Env / Keys
-.env
-.env.*
+# SDK
+gravitas-sdk/dist/
+gravitas-sdk/node_modules/
 
 # OS
 .DS_Store
@@ -21,5 +32,3 @@ Thumbs.db
 # IDE
 .vscode/
 .idea/
-# Osobne datoteke/kljucevi koje NE smiju ici na GitHub
-.env
