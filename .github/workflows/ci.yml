@@ -1,30 +1,58 @@
-name: CI
+name: Bank-Grade CI Pipeline
 
 on:
   push:
+    branches: [ "main" ]
   pull_request:
+    branches: [ "main" ]
+
+env:
+  FOUNDRY_PROFILE: default
 
 jobs:
-  test:
+  # JOB 1: Smart Contracts (Solidity)
+  contracts:
+    name: 🛡️ Audit Contracts (Foundry)
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
-      - name: Use Node.js 20.x
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+
+      - name: Install Forge Dependencies
+        run: forge install
+
+      - name: Build Contracts
+        run: forge build --sizes
+
+      - name: Run Unit & Fuzz Tests
+        run: forge test -vv
+
+      - name: Verify Gas Efficiency
+        run: forge snapshot --check
+
+  # JOB 2: SDK (TypeScript)
+  sdk:
+    name: 🏦 Verify SDK (TypeScript)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: '20'
 
-      - name: Install deps (clean)
-        run: |
-          npm ci || npm install
+      - name: Install SDK Dependencies
+        working-directory: ./gravitas-sdk
+        run: npm install
 
-      - name: Compile
-        run: |
-          npx hardhat compile
-
-      - name: Run tests (JS only)
-  run: |
-    npx hardhat test "test/**/*.js"
-
+      # OVO JE KLJUČNO: Ako build faila, želimo vidjeti zašto
+      - name: Build SDK
+        working-directory: ./gravitas-sdk
+        run: npm run build
