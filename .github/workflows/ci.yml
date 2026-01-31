@@ -19,13 +19,20 @@ jobs:
         with:
           submodules: recursive
 
+      # --- NOVO: Instaliraj Node.js i OpenZeppelin ---
+      - name: Setup Node.js (for Dependencies)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install OpenZeppelin & Deps
+        run: npm install
+      # -----------------------------------------------
+
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
         with:
           version: nightly
-
-      - name: Install Forge Dependencies
-        run: forge install
 
       - name: Build Contracts
         run: forge build --sizes
@@ -52,7 +59,6 @@ jobs:
         working-directory: ./gravitas-sdk
         run: npm install
 
-      # OVO JE KLJUČNO: Ako build faila, želimo vidjeti zašto
       - name: Build SDK
         working-directory: ./gravitas-sdk
         run: npm run build
