@@ -1,13 +1,13 @@
 No files changed, compilation skipped
 
 Ran 2 tests for test/Counter.t.sol:CounterTest
-[PASS] testFuzz_SetNumber(uint256) (runs: 256, μ: 30471, ~: 30860)
-[PASS] test_Increment() (gas: 30937)
-Suite result: ok. 2 passed; 0 failed; 0 skipped; finished in 6.07ms (5.85ms CPU time)
+[PASS] testFuzz_SetNumber(uint256) (runs: 256, μ: 27839, ~: 28384)
+[PASS] test_Increment() (gas: 28409)
+Suite result: ok. 2 passed; 0 failed; 0 skipped; finished in 3.81ms (3.61ms CPU time)
 
 Ran 2 tests for test/foundry/GravitasInvariants.t.sol:GravitasInvariants
-[PASS] testFuzz_ComplianceInvariant(address) (runs: 256, μ: 55397, ~: 55397)
-[PASS] test_AssetIntegrityInvariant() (gas: 22445)
-Suite result: ok. 2 passed; 0 failed; 0 skipped; finished in 24.52ms (23.47ms CPU time)
+[PASS] testFuzz_ComplianceInvariant(address) (runs: 256, μ: 40719, ~: 40719)
+[PASS] test_AssetIntegrityInvariant() (gas: 17688)
+Suite result: ok. 2 passed; 0 failed; 0 skipped; finished in 11.20ms (10.76ms CPU time)
 
-Ran 2 test suites in 25.74ms (30.59ms CPU time): 4 tests passed, 0 failed, 0 skipped (4 total tests)
+Ran 2 test suites in 12.82ms (15.01ms CPU time): 4 tests passed, 0 failed, 0 skipped (4 total tests)
