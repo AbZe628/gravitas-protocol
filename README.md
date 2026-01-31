@@ -240,7 +240,7 @@ Deep-tech engineer with focus on smart contract security and protocol architectu
 
 - **Website**: [gravitas.finance](https://gravitas.finance) (Coming Soon)
 - **GitHub**: [github.com/AbZe628/gravitas-protocol](https://github.com/AbZe628/gravitas-protocol)
-- **Email**: contact@gravitas.finance
+- **Email**: abdusamedzelic98@gmail.com
 
 ---
 
