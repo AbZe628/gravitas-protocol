@@ -6,9 +6,18 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 /**
  * @title GravitasPolicyRegistry
  * @notice Centralized registry for Shariah-compliant assets, authorized routers, and protocol executors.
- * @dev This contract serves as the "Risk & Compliance Oracle" mentioned in the Gravitas vision,
- *      enforcing institutional governance rules on-chain. It is designed to be the single source
- *      of truth for compliance status across all Gravitas protocol versions (V2, V3, etc.).
+ * @dev This contract serves as the "Risk & Compliance Oracle" mentioned in the Gravitas Protocol thesis,
+ *      enforcing institutional governance rules on-chain through Policy-Constrained Routing.
+ *      It is designed to be the single source of truth for compliance status across all Gravitas
+ *      protocol versions (V2, V3, etc.), enabling Gharar Elimination through deterministic asset validation.
+ *
+ *      Key Compliance Features:
+ *      - Asset Whitelisting: Filters non-compliant assets (e.g., gambling, alcohol-related tokens)
+ *      - Router Authorization: Ensures only audited DEX routers are used
+ *      - Executor Access Control: Institutional-grade security for migration execution
+ *
+ *      This registry is a core component of Gravitas's Shariah-aligned infrastructure,
+ *      positioning the protocol as a gateway for the $3 Trillion+ Islamic Finance market.
  */
 contract GravitasPolicyRegistry is Ownable {
     
@@ -48,7 +57,15 @@ contract GravitasPolicyRegistry is Ownable {
      * @notice Updates the Shariah compliance status for a specific asset (token).
      * @dev This function is critical for enforcing the "Asset Whitelisting" policy, preventing
      *      the protocol from routing liquidity into non-compliant assets (e.g., those associated
-     *      with Riba, Gharar, or Maysir). Only the contract owner can call this.
+     *      with Riba (interest), Gharar (uncertainty), or Maysir (speculation/gambling)).
+     *
+     *      Shariah Compliance Enforcement:
+     *      - Eliminates Gharar by ensuring deterministic asset validation before routing
+     *      - Prevents Riba by excluding interest-bearing or usurious tokens
+     *      - Avoids Maysir by filtering gambling and speculative assets
+     *
+     *      Only the contract owner can call this function to maintain institutional control.
+     *
      * @param asset The token address to update.
      * @param status True if the asset is Shariah-compliant, false otherwise.
      */
@@ -60,8 +77,16 @@ contract GravitasPolicyRegistry is Ownable {
 
     /**
      * @notice Updates the authorization status for a DEX router.
-     * @dev This enforces the "Router Authorization" policy, ensuring that the Teleport engine
-     *      only interacts with trusted and audited liquidity venues. Only the contract owner can call this.
+     * @dev This enforces the "Router Authorization" policy as part of Policy-Constrained Routing,
+     *      ensuring that the Teleport engine only interacts with trusted and audited liquidity venues.
+     *
+     *      Institutional Security:
+     *      - Prevents routing through unaudited or malicious DEX contracts
+     *      - Enables deterministic execution by limiting to verified routers
+     *      - Supports compliance with institutional risk thresholds
+     *
+     *      Only the contract owner can call this function to maintain protocol integrity.
+     *
      * @param router The router address to update.
      * @param status True if the router is authorized, false otherwise.
      */
@@ -86,8 +111,17 @@ contract GravitasPolicyRegistry is Ownable {
 
     /**
      * @notice Checks if a pair of tokens is compliant.
-     * @dev This is the primary check used by the Teleport engine before any migration is executed.
-     *      It ensures that both tokenA and tokenB in the liquidity pair are Shariah-compliant.
+     * @dev This is the primary check used by the Teleport engine before any migration is executed,
+     *      implementing Gharar Elimination through deterministic asset validation.
+     *
+     *      Compliance Validation:
+     *      - Both tokenA and tokenB must be whitelisted as Shariah-compliant
+     *      - Ensures no non-compliant assets are routed (e.g., gambling, alcohol-related tokens)
+     *      - Enables Policy-Constrained Routing by enforcing pre-defined compliance parameters
+     *
+     *      This function is critical for maintaining the protocol's Shariah governance standards
+     *      and providing mathematical certainty for institutional users.
+     *
      * @param tokenA The address of the first token.
      * @param tokenB The address of the second token.
      * @return A boolean indicating whether both tokens are compliant.

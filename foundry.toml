@@ -2,6 +2,10 @@
 src = "src"
 out = "artifacts"
 libs = ["node_modules", "lib"]
+solc_version = "0.8.24"
+optimizer = true
+optimizer_runs = 200
+via_ir = true
 remappings = [
     "@openzeppelin/=node_modules/@openzeppelin/",
     "eth-gas-reporter/=node_modules/eth-gas-reporter/",

@@ -66,8 +66,19 @@ interface ISwapRouter {
 
 /**
  * @title TeleportV3 (Institutional Edition)
- * @notice The core V3 engine for atomic migration of Uniswap V3 NFT liquidity positions.
- * @dev Optimized with Yul (Inline Assembly) for hot-path gas efficiency.
+ * @notice The core V3 migration engine implementing Deterministic Liquidity Routing for Uniswap V3 NFT positions.
+ * @dev This contract is the execution layer of Gravitas Protocol's infrastructure thesis, enabling
+ *      atomic liquidity migration with guaranteed outcomes (no partial failures). Optimized with Yul
+ *      (Inline Assembly) for institutional-grade gas efficiency.
+ *
+ *      Core Principles:
+ *      - Deterministic Execution: Transactions revert entirely if parameters are not met
+ *      - Gharar Elimination: Users know exactly what they receive before execution
+ *      - Policy-Constrained Routing: All migrations validated against Shariah compliance parameters
+ *      - Atomic Migration: Remove Liquidity → Swap → Add Liquidity in a single transaction
+ *
+ *      This contract is designed for institutional players (banks, fintechs, family offices) who
+ *      require mathematical certainty and cannot use tools that "might" work.
  */
 contract TeleportV3 is ReentrancyGuard, Ownable, IERC721Receiver {
     using SafeERC20 for IERC20;
@@ -126,6 +137,8 @@ contract TeleportV3 is ReentrancyGuard, Ownable, IERC721Receiver {
         
         (,, address token0, address token1, , , , uint128 liquidity, , , , ) = positionManager.positions(params.tokenId);
         require(liquidity > 0, "TV3: No liquidity");
+        // Shariah Compliance Check: Enforce Asset Whitelisting via Policy Registry
+        // This implements Gharar Elimination by ensuring only compliant assets are routed
         require(registry.areTokensCompliant(token0, token1), "TV3: Non-compliant assets");
         require(positionManager.ownerOf(params.tokenId) == msg.sender, "TV3: Not NFT owner");
 
@@ -221,7 +234,15 @@ contract TeleportV3 is ReentrancyGuard, Ownable, IERC721Receiver {
      * @notice Optimized dust refund using Yul (Inline Assembly).
      * @dev This function saves ~2,000 gas per call by bypassing Solidity's high-level checks
      *      and using direct memory manipulation for the transfer call.
-     *      Shariah Compliance: Ensures no funds are trapped (Gharar avoidance).
+     *
+     *      Shariah Compliance (Gharar Elimination):
+     *      - Ensures no funds are trapped in the contract
+     *      - Provides deterministic refund of unused tokens (dust)
+     *      - Eliminates uncertainty by returning exact remaining balances
+     *
+     *      This is a critical component of the protocol's institutional-grade execution model,
+     *      ensuring users receive guaranteed outcomes with no partial failures.
+     *
      * @param token The address of the token to refund.
      * @param to The address to send the dust to.
      * @param balanceBefore The balance of the token before the migration.

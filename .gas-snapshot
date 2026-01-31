@@ -1,0 +1,4 @@
+CounterTest:testFuzz_SetNumber(uint256) (runs: 256, μ: 27451, ~: 28384)
+CounterTest:test_Increment() (gas: 28409)
+GravitasInvariants:testFuzz_ComplianceInvariant(address) (runs: 256, μ: 40579, ~: 40579)
+GravitasInvariants:test_AssetIntegrityInvariant() (gas: 17688)
