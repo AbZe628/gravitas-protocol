@@ -18,10 +18,11 @@ export class GravitasClient {
   constructor(private config: ClientConfig) {
     ClientConfigSchema.parse(config);
     
+    // Explicitly cast to PublicClient to resolve version-specific type mismatches in the build environment
     this.publicClient = createPublicClient({
       chain: { id: config.chainId } as any,
       transport: http(config.rpcUrl),
-    });
+    }) as PublicClient;
 
     this.compliance = new ComplianceService(
       this.publicClient,

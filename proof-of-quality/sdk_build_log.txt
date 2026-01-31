@@ -2,8 +2,3 @@
 > @gravitas/sdk@2.0.0 build
 > tsc
 
-src/compliance.ts(1,49): error TS2307: Cannot find module 'viem' or its corresponding type declarations.
-src/index.ts(1,65): error TS2307: Cannot find module 'viem' or its corresponding type declarations.
-src/teleport.ts(1,83): error TS2307: Cannot find module 'viem' or its corresponding type declarations.
-src/types.ts(1,19): error TS2307: Cannot find module 'zod' or its corresponding type declarations.
-src/types.ts(2,30): error TS2307: Cannot find module 'viem' or its corresponding type declarations.
