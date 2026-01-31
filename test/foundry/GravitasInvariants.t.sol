@@ -12,7 +12,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
  */
 contract MockToken is ERC20 {
     constructor(string memory name, string memory symbol) ERC20(name, symbol) {
-        _mint(msg.sender, 1_000_000 * 10**18);
+        _mint(msg.sender, 1_000_000 * 10 ** 18);
     }
 }
 
@@ -37,7 +37,7 @@ contract GravitasInvariants is Test {
         vm.startPrank(owner);
         registry = new GravitasPolicyRegistry();
         teleport = new Teleport(address(registry));
-        
+
         tokenA = new MockToken("Token A", "TKNA");
         tokenB = new MockToken("Token B", "TKNB");
         nonCompliantToken = new MockToken("Non-Compliant", "BAD");
@@ -82,10 +82,10 @@ contract GravitasInvariants is Test {
         // This is a conceptual invariant test. In a full Foundry setup, we would use
         // 'invariant' keywords and a handler to simulate multiple migrations.
         // Here we prove it for a single fuzzed migration path.
-        
+
         uint256 balA = tokenA.balanceOf(address(teleport));
         uint256 balB = tokenB.balanceOf(address(teleport));
-        
+
         assertEq(balA, 0, "Teleport should not hold TokenA");
         assertEq(balB, 0, "Teleport should not hold TokenB");
     }
