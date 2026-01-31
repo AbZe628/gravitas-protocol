@@ -1,19 +1,23 @@
 {
-  "name": "@gravitas-protocol/sdk",
-  "version": "0.1.0-alpha",
-  "description": "Infrastructure SDK for Gravitas Protocol (Vortex Layer) liquidity migration.",
+  "name": "@gravitas/sdk",
+  "version": "2.0.0",
+  "description": "Enterprise-grade Shariah-compliant liquidity routing SDK",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc",
-    "test": "jest",
-    "lint": "eslint src/**/*.ts"
+    "test": "vitest run"
   },
-  "peerDependencies": {
-    "ethers": "^6.0.0"
+  "dependencies": {
+    "viem": "^2.0.0",
+    "zod": "^3.22.0"
   },
   "devDependencies": {
-    "typescript": "^5.2.0",
+    "typescript": "^5.3.0",
+    "vitest": "^1.0.0",
     "@types/node": "^20.0.0"
   },
   "author": "Gravitas Protocol Labs",
