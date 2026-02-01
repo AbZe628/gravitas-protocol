@@ -10,8 +10,9 @@ coverage.json
 
 # Foundry
 out/
-lib/
+lib/*
 !lib/forge-std/
+!lib/openzeppelin-contracts/
 
 # Node
 node_modules/

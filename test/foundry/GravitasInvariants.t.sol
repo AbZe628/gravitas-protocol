@@ -19,8 +19,6 @@ contract MockToken is ERC20 {
 /**
  * @title GravitasInvariants
  * @notice Foundry Invariant and Fuzz Testing suite for Gravitas Protocol.
- * @dev This suite proves mathematically that non-compliant assets cannot enter the protocol
- *      and that asset integrity is maintained during migrations.
  */
 contract GravitasInvariants is Test {
     GravitasPolicyRegistry public registry;
@@ -49,13 +47,8 @@ contract GravitasInvariants is Test {
         vm.stopPrank();
     }
 
-    /**
-     * @notice Fuzz test to ensure non-compliant assets are ALWAYS blocked.
-     * @dev Shariah Compliance Invariant: A non-compliant asset can NEVER enter a compliant pool.
-     */
     function testFuzz_ComplianceInvariant(address randomToken) public {
         vm.assume(randomToken != address(tokenA) && randomToken != address(tokenB));
-        // Ensure randomToken is not whitelisted
         assertFalse(registry.isAssetCompliant(randomToken));
 
         vm.prank(executor);
@@ -66,7 +59,6 @@ contract GravitasInvariants is Test {
             address(tokenA),
             randomToken,
             100,
-            1000,
             0,
             0,
             block.timestamp + 1,
@@ -74,19 +66,10 @@ contract GravitasInvariants is Test {
         );
     }
 
-    /**
-     * @notice Invariant test: The protocol must never hold user funds after a transaction.
-     * @dev Asset Integrity Invariant: Protocol balance must be zero after migration (excluding dust).
-     */
     function test_AssetIntegrityInvariant() public {
-        // This is a conceptual invariant test. In a full Foundry setup, we would use
-        // 'invariant' keywords and a handler to simulate multiple migrations.
-        // Here we prove it for a single fuzzed migration path.
-
         uint256 balA = tokenA.balanceOf(address(teleport));
         uint256 balB = tokenB.balanceOf(address(teleport));
-
-        assertEq(balA, 0, "Teleport should not hold TokenA");
-        assertEq(balB, 0, "Teleport should not hold TokenB");
+        assertEq(balA, 0);
+        assertEq(balB, 0);
     }
 }
