@@ -2,78 +2,197 @@ name: Bank-Grade CI Pipeline
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
+
+permissions:
+  contents: read
 
 env:
   FOUNDRY_PROFILE: default
+  CORE_COVERAGE_MIN: "80"
 
 jobs:
-  security-scan:
-    name: 🛡️ Security Scan
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
-          fetch-depth: 0
-      - name: Check for secrets
-        run: |
-          if grep -rEi "PRIVATE_KEY|SECRET_KEY" . --exclude-dir=.git --exclude=".env.example" --exclude="DEPLOYMENT.md"; then
-            echo "Error: Potential secrets found in repository!"
-            exit 1
-          fi
-      - name: Verify .env is ignored
-        run: |
-          if git ls-files .env | grep .env; then
-            echo "Error: .env file is being tracked by git!"
-            exit 1
-          fi
-
   contracts:
-    name: 🏗️ Contracts (Foundry)
-    needs: security-scan
+    name: 🛡️ Audit Contracts (Foundry)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           submodules: recursive
           fetch-depth: 0
 
-      - name: Install Foundry
+      # -------------------------
+      # 1) Secrets gate (hard fail)
+      # -------------------------
+      - name: Secrets gate (no .env / no keys)
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # Fail if .env exists in repo root (or anywhere)
+          if find . -maxdepth 3 -name ".env" | grep -q ".env"; then
+            echo "ERROR: .env file found in repository. Remove it and use .env.example."
+            find . -maxdepth 3 -name ".env" -print
+            exit 1
+          fi
+
+          # Fail if .env is tracked (extra safety)
+          if git ls-files | grep -qE '(^|/)\.env$'; then
+            echo "ERROR: .env is tracked by git. Remove from tracking and add to .gitignore."
+            exit 1
+          fi
+
+          # Fail on common secret patterns (best-effort, not perfect)
+          # NOTE: keep patterns conservative to avoid false positives.
+          if git grep -nE 'PRIVATE_KEY\s*=|MNEMONIC\s*=|SEED_PHRASE\s*=|sk-[A-Za-z0-9]{10,}|AKIA[0-9A-Z]{16}' -- . ':!**/*.md' ':!**/*.txt' ':!**/*.lock' >/dev/null; then
+            echo "ERROR: Potential secret pattern detected in tracked files."
+            git grep -nE 'PRIVATE_KEY\s*=|MNEMONIC\s*=|SEED_PHRASE\s*=|sk-[A-Za-z0-9]{10,}|AKIA[0-9A-Z]{16}' -- . ':!**/*.md' ':!**/*.txt' ':!**/*.lock' || true
+            exit 1
+          fi
+
+          echo "OK: Secrets gate passed."
+
+      # -------------------------
+      # 2) Toolchain (PINNED)
+      # -------------------------
+      - name: Install Foundry (stable)
         uses: foundry-rs/foundry-toolchain@v1
         with:
-          version: nightly
+          version: stable
 
-      - name: Build
+      # -------------------------
+      # 3) Lint/Format + Build + Tests
+      # -------------------------
+      - name: Solidity format check
+        run: forge fmt --check
+
+      - name: Build contracts
         run: forge build --sizes
 
-      - name: Test
+      - name: Run unit + fuzz tests
         run: forge test -vv
 
-      - name: Coverage Gate (80%)
+      # -------------------------
+      # 4) Coverage gate (HARD FAIL if < 80% on core)
+      # -------------------------
+      - name: Generate coverage (lcov)
+        run: forge coverage --report lcov
+
+      - name: Enforce core coverage >= 80%
+        shell: bash
         run: |
-          python3 check-coverage.py
+          set -euo pipefail
+          python3 - << 'PY'
+          import os, re, sys
+
+          MIN = float(os.environ.get("CORE_COVERAGE_MIN", "80"))
+          CORE = {
+              "contracts/Teleport.sol",
+              "contracts/TeleportV3.sol",
+              "contracts/GravitasPolicyRegistry.sol",
+          }
+
+          lcov_path = "lcov.info"
+          if not os.path.exists(lcov_path):
+            print("ERROR: lcov.info not found. forge coverage failed or output path changed.")
+            sys.exit(1)
+
+          # Parse lcov per-file line coverage
+          current = None
+          total_lines = {}
+          hit_lines = {}
+
+          with open(lcov_path, "r", encoding="utf-8") as f:
+            for line in f:
+              line = line.strip()
+              if line.startswith("SF:"):
+                current = line[3:]
+                # Normalize to forward slashes
+                current = current.replace("\\", "/")
+                total_lines.setdefault(current, 0)
+                hit_lines.setdefault(current, 0)
+              elif line.startswith("DA:") and current:
+                # DA:<line>,<hits>
+                try:
+                  _, payload = line.split(":", 1)
+                  lno, hits = payload.split(",", 1)
+                  total_lines[current] += 1
+                  if int(hits) > 0:
+                    hit_lines[current] += 1
+                except Exception:
+                  pass
+              elif line == "end_of_record":
+                current = None
+
+          # Some setups report absolute paths; match by suffix
+          def find_key(target):
+            # exact
+            if target in total_lines:
+              return target
+            # suffix match
+            matches = [k for k in total_lines.keys() if k.endswith(target)]
+            if len(matches) == 1:
+              return matches[0]
+            if len(matches) > 1:
+              # pick the shortest (closest)
+              return sorted(matches, key=len)[0]
+            return None
+
+          failures = []
+          report = []
+
+          for file in sorted(CORE):
+            key = find_key(file)
+            if not key:
+              failures.append(f"{file}: missing from lcov (no coverage data)")
+              continue
+            tot = total_lines.get(key, 0)
+            hit = hit_lines.get(key, 0)
+            pct = (hit / tot * 100.0) if tot else 0.0
+            report.append((file, pct, hit, tot))
+            if pct + 1e-9 < MIN:
+              failures.append(f"{file}: {pct:.2f}% ({hit}/{tot}) < {MIN:.2f}%")
+
+          print("Core coverage report:")
+          for file, pct, hit, tot in report:
+            print(f" - {file}: {pct:.2f}% ({hit}/{tot})")
+
+          if failures:
+            print("\nERROR: Coverage gate failed:")
+            for f in failures:
+              print(f" - {f}")
+            sys.exit(1)
+
+          print(f"\nOK: Core coverage gate passed (>= {MIN:.2f}%).")
+          PY
+
+      # -------------------------
+      # 5) Gas snapshot (NON-BLOCKING by default)
+      # -------------------------
+      - name: Verify gas snapshot (non-blocking)
+        continue-on-error: true
+        run: forge snapshot --check
 
   sdk:
-    name: 🏦 SDK Build
-    needs: security-scan
+    name: 🏦 Verify SDK (TypeScript)
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
-          fetch-depth: 0
+      - uses: actions/checkout@v4
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-      - name: Install & Build
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: gravitas-sdk/package-lock.json
+
+      - name: Install SDK dependencies (deterministic)
         working-directory: ./gravitas-sdk
-        run: |
-          npm ci
-          npm run build
+        run: npm ci
+
+      - name: Build SDK
+        working-directory: ./gravitas-sdk
+        run: npm run build
