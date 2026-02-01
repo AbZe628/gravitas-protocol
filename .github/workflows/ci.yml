@@ -24,15 +24,12 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
-      # -------------------------
-      # Secrets gate (hard fail)
-      # -------------------------
       - name: Check for secrets
         shell: bash
         run: |
           set -euo pipefail
 
-          if grep -rEi "PRIVATE_KEY|SECRET_KEY|MNEMONIC|SEED|sk-|AKIA" . \
+          if grep -rEi "PRIVATE_KEY|SECRET_KEY|MNEMONIC|SEED_PHRASE|RECOVERY_PHRASE|sk-|AKIA" . \
             --exclude-dir=.git \
             --exclude-dir=.github \
             --exclude-dir=lib \
@@ -82,18 +79,12 @@ jobs:
       - name: Run tests
         run: forge test -vv
 
-      # -------------------------
-      # Coverage gate (>= 80%)
-      # -------------------------
       - name: Generate coverage
-        run: forge coverage --via-ir --report lcov
+        run: FOUNDRY_PROFILE=coverage forge coverage --ir-minimum --report lcov
 
       - name: Enforce coverage gate
         run: python3 check-coverage.py
 
-      # -------------------------
-      # Gas snapshot (non-blocking)
-      # -------------------------
       - name: Verify gas snapshot (non-blocking)
         continue-on-error: true
         run: forge snapshot --check
