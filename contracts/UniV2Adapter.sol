@@ -32,15 +32,16 @@ contract UniV2Adapter {
         lp.forceApprove(router, 0);
         lp.forceApprove(router, liquidity);
 
-        (amountA, amountB) = IUniswapV2Router02(router).removeLiquidity(
-            tokenA,
-            tokenB,
-            liquidity,
-            amountAMin,
-            amountBMin,
-            address(this), // tokeni sjedaju u ovaj adapter
-            deadline
-        );
+        (amountA, amountB) = IUniswapV2Router02(router)
+            .removeLiquidity(
+                tokenA,
+                tokenB,
+                liquidity,
+                amountAMin,
+                amountBMin,
+                address(this), // tokeni sjedaju u ovaj adapter
+                deadline
+            );
     }
 
     /// @notice Dodaj prikupljene tokene kao likvidnost i mintaj LP korisniku `to`
@@ -60,15 +61,7 @@ contract UniV2Adapter {
         IERC20(tokenB).forceApprove(router, 0);
         IERC20(tokenB).forceApprove(router, amountBDesired);
 
-        (amountA, amountB, liquidity) = IUniswapV2Router02(router).addLiquidity(
-            tokenA,
-            tokenB,
-            amountADesired,
-            amountBDesired,
-            amountAMin,
-            amountBMin,
-            to,
-            deadline
-        );
+        (amountA, amountB, liquidity) = IUniswapV2Router02(router)
+            .addLiquidity(tokenA, tokenB, amountADesired, amountBDesired, amountAMin, amountBMin, to, deadline);
     }
 }

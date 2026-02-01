@@ -10,11 +10,10 @@ import "@openzeppelin/contracts/access/Ownable.sol";
  * @dev V0 admin-controlled registry. Recommend multisig owner for production.
  */
 contract GravitasPolicyRegistry is Ownable {
-    
     // ═══════════════════════════════════════════════════════════════════════════════════
     //                              STATE VARIABLES
     // ═══════════════════════════════════════════════════════════════════════════════════
-    
+
     mapping(address => bool) public isAssetCompliant;
     mapping(address => bool) public isRouterAuthorized;
     mapping(address => bool) public isExecutor;

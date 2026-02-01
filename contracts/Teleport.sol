@@ -31,6 +31,7 @@ interface IUniswapV2Router01 {
         uint256 deadline
     ) external returns (uint256 amountA, uint256 amountB, uint256 liquidity);
 }
+
 // --- End Interfaces ---
 
 /**
@@ -50,7 +51,7 @@ contract Teleport is ReentrancyGuard, Ownable {
     // --------------------
     /// @notice Minimum time (in seconds) that must pass between migrations for the same pair/router combination.
     uint256 public cooldownSeconds = 15 minutes;
-    
+
     /// @notice Maximum percentage of the total LP balance that can be moved in a single transaction, in Basis Points (e.g., 2000 = 20%).
     uint256 public maxMoveBps = 2000;
 
@@ -59,7 +60,7 @@ contract Teleport is ReentrancyGuard, Ownable {
 
     /// @dev Emitted when the protocol's core risk policies are updated by the owner.
     event PolicyUpdated(uint256 cooldownSeconds, uint256 maxMoveBps);
-    
+
     /// @dev Emitted upon successful atomic liquidity migration.
     event LiquidityMigrated(
         address indexed executor,
@@ -158,16 +159,8 @@ contract Teleport is ReentrancyGuard, Ownable {
         IERC20(tokenA).forceApprove(routerTo, amountAOut);
         IERC20(tokenB).forceApprove(routerTo, amountBOut);
 
-        (,, uint256 liquidityMinted) = IUniswapV2Router01(routerTo).addLiquidity(
-            tokenA,
-            tokenB,
-            amountAOut,
-            amountBOut,
-            amountAMin,
-            amountBMin,
-            recipient,
-            deadline
-        );
+        (,, uint256 liquidityMinted) = IUniswapV2Router01(routerTo)
+            .addLiquidity(tokenA, tokenB, amountAOut, amountBOut, amountAMin, amountBMin, recipient, deadline);
 
         // 7. Cleanup & State Update
         _refundDust(tokenA, recipient);
@@ -175,15 +168,7 @@ contract Teleport is ReentrancyGuard, Ownable {
         lastMigrationAt[key] = block.timestamp;
 
         emit LiquidityMigrated(
-            msg.sender,
-            factoryFrom,
-            routerTo,
-            pairFrom,
-            tokenA,
-            tokenB,
-            lpAmount,
-            liquidityMinted,
-            recipient
+            msg.sender, factoryFrom, routerTo, pairFrom, tokenA, tokenB, lpAmount, liquidityMinted, recipient
         );
     }
 

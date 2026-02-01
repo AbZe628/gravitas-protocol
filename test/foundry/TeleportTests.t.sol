@@ -9,7 +9,10 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract LocalMockERC20 is ERC20 {
     constructor(string memory name, string memory symbol) ERC20(name, symbol) {}
-    function mint(address to, uint256 amount) external { _mint(to, amount); }
+
+    function mint(address to, uint256 amount) external {
+        _mint(to, amount);
+    }
 }
 
 contract TeleportTests is Test {
@@ -18,7 +21,7 @@ contract TeleportTests is Test {
     TeleportV3 teleportV3;
     LocalMockERC20 token0;
     LocalMockERC20 token1;
-    
+
     address owner = address(0x1);
     address executor = address(0x2);
     address user = address(0x3);
@@ -28,10 +31,10 @@ contract TeleportTests is Test {
         registry = new GravitasPolicyRegistry();
         teleportV2 = new Teleport(address(registry));
         teleportV3 = new TeleportV3(address(0x10), address(0x11), address(registry));
-        
+
         token0 = new LocalMockERC20("Token 0", "TK0");
         token1 = new LocalMockERC20("Token 1", "TK1");
-        
+
         registry.setAssetCompliance(address(token0), true);
         registry.setAssetCompliance(address(token1), true);
         registry.setExecutorStatus(executor, true);
@@ -100,19 +103,25 @@ contract TeleportTests is Test {
         address badToken = address(0x666);
         vm.prank(executor);
         vm.expectRevert("Teleport: non-compliant assets");
-        teleportV2.migrateLiquidityV2(address(0), address(0x4), address(token0), badToken, 0, 0, 0, block.timestamp, address(0));
+        teleportV2.migrateLiquidityV2(
+            address(0), address(0x4), address(token0), badToken, 0, 0, 0, block.timestamp, address(0)
+        );
     }
 
     function test_V2_RevertOnExpiredDeadline() public {
         vm.prank(executor);
         vm.expectRevert("Teleport: deadline passed");
-        teleportV2.migrateLiquidityV2(address(0), address(0x4), address(token0), address(token1), 0, 0, 0, block.timestamp - 1, address(0));
+        teleportV2.migrateLiquidityV2(
+            address(0), address(0x4), address(token0), address(token1), 0, 0, 0, block.timestamp - 1, address(0)
+        );
     }
 
     function test_V2_RevertOnUnauthorizedRouter() public {
         vm.prank(executor);
         vm.expectRevert("Teleport: router not authorized");
-        teleportV2.migrateLiquidityV2(address(0), address(0x5), address(token0), address(token1), 0, 0, 0, block.timestamp, address(0));
+        teleportV2.migrateLiquidityV2(
+            address(0), address(0x5), address(token0), address(token1), 0, 0, 0, block.timestamp, address(0)
+        );
     }
 
     function test_V2_SetPolicy() public {
@@ -142,9 +151,9 @@ contract TeleportTests is Test {
     // --- V3 Tests ---
     function test_V3_RevertOnInvalidFee() public {
         TeleportV3.AtomicMigrationParams memory params;
-        params.newFee = 400; 
+        params.newFee = 400;
         params.deadline = block.timestamp;
-        
+
         vm.prank(executor);
         vm.expectRevert("TV3: Invalid fee tier");
         teleportV3.executeAtomicMigration(params, "");
@@ -156,7 +165,7 @@ contract TeleportTests is Test {
         params.newTickLower = -123; // not divisible by 10
         params.newTickUpper = 100;
         params.deadline = block.timestamp;
-        
+
         vm.prank(executor);
         vm.expectRevert("TV3: Invalid tick spacing");
         teleportV3.executeAtomicMigration(params, "");
@@ -168,8 +177,8 @@ contract TeleportTests is Test {
         params.newTickLower = -100;
         params.newTickUpper = 100;
         params.deadline = block.timestamp;
-        params.amount0MinMint = 0; 
-        
+        params.amount0MinMint = 0;
+
         vm.prank(executor);
         vm.expectRevert("TV3: Zero slippage not allowed");
         teleportV3.executeAtomicMigration(params, "");
@@ -178,7 +187,7 @@ contract TeleportTests is Test {
     function test_V3_RevertOnDeadline() public {
         TeleportV3.AtomicMigrationParams memory params;
         params.deadline = block.timestamp - 1;
-        
+
         vm.prank(executor);
         vm.expectRevert("TV3: Deadline expired");
         teleportV3.executeAtomicMigration(params, "");
@@ -187,11 +196,24 @@ contract TeleportTests is Test {
     function test_V3_NonAuthorized() public {
         vm.prank(user);
         vm.expectRevert("TV3: Not authorized executor");
-        teleportV3.executeAtomicMigration(TeleportV3.AtomicMigrationParams({
-            tokenId: 1, newFee: 500, newTickLower: -10, newTickUpper: 10,
-            amount0MinMint: 1, amount1MinMint: 1, amount0MinDecrease: 1, amount1MinDecrease: 1,
-            deadline: block.timestamp, executeSwap: false, zeroForOne: false,
-            swapAmountIn: 0, swapAmountOutMin: 0, swapFeeTier: 500
-        }), "");
+        teleportV3.executeAtomicMigration(
+            TeleportV3.AtomicMigrationParams({
+                tokenId: 1,
+                newFee: 500,
+                newTickLower: -10,
+                newTickUpper: 10,
+                amount0MinMint: 1,
+                amount1MinMint: 1,
+                amount0MinDecrease: 1,
+                amount1MinDecrease: 1,
+                deadline: block.timestamp,
+                executeSwap: false,
+                zeroForOne: false,
+                swapAmountIn: 0,
+                swapAmountOutMin: 0,
+                swapFeeTier: 500
+            }),
+            ""
+        );
     }
 }

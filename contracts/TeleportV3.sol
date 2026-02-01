@@ -18,12 +18,14 @@ interface INonfungiblePositionManager {
         uint256 amount1Min;
         uint256 deadline;
     }
+
     struct CollectParams {
         uint256 tokenId;
         address recipient;
         uint128 amount0Max;
         uint128 amount1Max;
     }
+
     struct MintParams {
         address token0;
         address token1;
@@ -37,15 +39,32 @@ interface INonfungiblePositionManager {
         address recipient;
         uint256 deadline;
     }
-    function positions(uint256 tokenId) external view returns (
-        uint96 nonce, address operator, address token0, address token1, uint24 fee,
-        int24 tickLower, int24 tickUpper, uint128 liquidity,
-        uint256 feeGrowthInside0LastX128, uint256 feeGrowthInside1LastX128,
-        uint128 tokensOwed0, uint128 tokensOwed1
-    );
-    function decreaseLiquidity(DecreaseLiquidityParams calldata params) external payable returns (uint256 amount0, uint256 amount1);
+    function positions(uint256 tokenId)
+        external
+        view
+        returns (
+            uint96 nonce,
+            address operator,
+            address token0,
+            address token1,
+            uint24 fee,
+            int24 tickLower,
+            int24 tickUpper,
+            uint128 liquidity,
+            uint256 feeGrowthInside0LastX128,
+            uint256 feeGrowthInside1LastX128,
+            uint128 tokensOwed0,
+            uint128 tokensOwed1
+        );
+    function decreaseLiquidity(DecreaseLiquidityParams calldata params)
+        external
+        payable
+        returns (uint256 amount0, uint256 amount1);
     function collect(CollectParams calldata params) external payable returns (uint256 amount0, uint256 amount1);
-    function mint(MintParams calldata params) external payable returns (uint256 tokenId, uint128 liquidity, uint256 amount0, uint256 amount1);
+    function mint(MintParams calldata params)
+        external
+        payable
+        returns (uint256 tokenId, uint128 liquidity, uint256 amount0, uint256 amount1);
     function safeTransferFrom(address from, address to, uint256 tokenId) external;
     function burn(uint256 tokenId) external payable;
     function ownerOf(uint256 tokenId) external view returns (address);
@@ -93,9 +112,9 @@ contract TeleportV3 is ReentrancyGuard, Ownable, IERC721Receiver, EIP712 {
         bool swapExecuted
     );
 
-    constructor(address _positionManager, address _swapRouter, address _registry) 
-        Ownable(msg.sender) 
-        EIP712("GravitasTeleportV3", "1") 
+    constructor(address _positionManager, address _swapRouter, address _registry)
+        Ownable(msg.sender)
+        EIP712("GravitasTeleportV3", "1")
     {
         require(_positionManager != address(0), "TV3: Invalid PositionManager");
         require(_swapRouter != address(0), "TV3: Invalid SwapRouter");
@@ -130,20 +149,17 @@ contract TeleportV3 is ReentrancyGuard, Ownable, IERC721Receiver, EIP712 {
     /**
      * @notice Executes atomic liquidity migration with intent verification.
      */
-    function executeAtomicMigration(
-        AtomicMigrationParams calldata params,
-        bytes calldata signature
-    ) 
-        external 
-        nonReentrant 
-        onlyAuthorized 
-        returns (uint256 newTokenId, uint128 newLiquidity) 
+    function executeAtomicMigration(AtomicMigrationParams calldata params, bytes calldata signature)
+        external
+        nonReentrant
+        onlyAuthorized
+        returns (uint256 newTokenId, uint128 newLiquidity)
     {
         // 1. Parameter & Signature Validation
         require(params.deadline >= block.timestamp, "TV3: Deadline expired");
         require(_isValidFeeTier(params.newFee), "TV3: Invalid fee tier");
         require(params.newTickLower < params.newTickUpper, "TV3: Invalid ticks");
-        
+
         // Tick spacing validation
         int24 spacing = _getTickSpacing(params.newFee);
         require(params.newTickLower % spacing == 0 && params.newTickUpper % spacing == 0, "TV3: Invalid tick spacing");
@@ -153,7 +169,7 @@ contract TeleportV3 is ReentrancyGuard, Ownable, IERC721Receiver, EIP712 {
         _verifyIntent(params, owner, signature);
 
         // 2. Position Data & Compliance
-        (,, address token0, address token1, , , , uint128 liquidity, , , , ) = positionManager.positions(params.tokenId);
+        (,, address token0, address token1,,,, uint128 liquidity,,,,) = positionManager.positions(params.tokenId);
         require(liquidity > 0, "TV3: No liquidity");
         require(registry.areTokensCompliant(token0, token1), "TV3: Non-compliant assets");
 
@@ -162,33 +178,34 @@ contract TeleportV3 is ReentrancyGuard, Ownable, IERC721Receiver, EIP712 {
         uint256 balance1Start = IERC20(token1).balanceOf(address(this));
 
         positionManager.safeTransferFrom(owner, address(this), params.tokenId);
-        
-        positionManager.decreaseLiquidity(INonfungiblePositionManager.DecreaseLiquidityParams({
-            tokenId: params.tokenId,
-            liquidity: liquidity,
-            amount0Min: params.amount0MinDecrease,
-            amount1Min: params.amount1MinDecrease,
-            deadline: params.deadline
-        }));
 
-        (uint256 amount0Available, uint256 amount1Available) = positionManager.collect(INonfungiblePositionManager.CollectParams({
-            tokenId: params.tokenId,
-            recipient: address(this),
-            amount0Max: type(uint128).max,
-            amount1Max: type(uint128).max
-        }));
-        
+        positionManager.decreaseLiquidity(
+            INonfungiblePositionManager.DecreaseLiquidityParams({
+                tokenId: params.tokenId,
+                liquidity: liquidity,
+                amount0Min: params.amount0MinDecrease,
+                amount1Min: params.amount1MinDecrease,
+                deadline: params.deadline
+            })
+        );
+
+        (uint256 amount0Available, uint256 amount1Available) = positionManager.collect(
+            INonfungiblePositionManager.CollectParams({
+                tokenId: params.tokenId,
+                recipient: address(this),
+                amount0Max: type(uint128).max,
+                amount1Max: type(uint128).max
+            })
+        );
+
         positionManager.burn(params.tokenId);
 
         if (params.executeSwap && params.swapAmountIn > 0) {
-            (amount0Available, amount1Available) = _executeRebalancingSwap(
-                params, token0, token1, amount0Available, amount1Available
-            );
+            (amount0Available, amount1Available) =
+                _executeRebalancingSwap(params, token0, token1, amount0Available, amount1Available);
         }
 
-        (newTokenId, newLiquidity) = _mintNewPosition(
-            params, token0, token1, amount0Available, amount1Available, owner
-        );
+        (newTokenId, newLiquidity) = _mintNewPosition(params, token0, token1, amount0Available, amount1Available, owner);
 
         _refundDustSafe(token0, owner, balance0Start);
         _refundDustSafe(token1, owner, balance1Start);
@@ -197,15 +214,17 @@ contract TeleportV3 is ReentrancyGuard, Ownable, IERC721Receiver, EIP712 {
     }
 
     function _verifyIntent(AtomicMigrationParams calldata params, address owner, bytes calldata signature) internal {
-        bytes32 structHash = keccak256(abi.encode(
-            MIGRATION_TYPEHASH,
-            params.tokenId,
-            params.newFee,
-            params.newTickLower,
-            params.newTickUpper,
-            params.deadline,
-            nonces[owner]++
-        ));
+        bytes32 structHash = keccak256(
+            abi.encode(
+                MIGRATION_TYPEHASH,
+                params.tokenId,
+                params.newFee,
+                params.newTickLower,
+                params.newTickUpper,
+                params.deadline,
+                nonces[owner]++
+            )
+        );
         bytes32 hash = _hashTypedDataV4(structHash);
         address signer = ECDSA.recover(hash, signature);
         require(signer == owner, "TV3: Invalid signature");
@@ -224,8 +243,8 @@ contract TeleportV3 is ReentrancyGuard, Ownable, IERC721Receiver, EIP712 {
     }
 
     function _executeRebalancingSwap(
-        AtomicMigrationParams calldata params, 
-        address token0, 
+        AtomicMigrationParams calldata params,
+        address token0,
         address token1,
         uint256 amount0Available,
         uint256 amount1Available
@@ -237,25 +256,27 @@ contract TeleportV3 is ReentrancyGuard, Ownable, IERC721Receiver, EIP712 {
         require(amountIn <= (params.zeroForOne ? amount0Available : amount1Available), "TV3: Swap exceeds available");
 
         IERC20(tokenIn).forceApprove(address(swapRouter), amountIn);
-        uint256 amountOut = swapRouter.exactInputSingle(ISwapRouter.ExactInputSingleParams({
-            tokenIn: tokenIn,
-            tokenOut: tokenOut,
-            fee: params.swapFeeTier,
-            recipient: address(this),
-            deadline: params.deadline,
-            amountIn: amountIn,
-            amountOutMinimum: params.swapAmountOutMin,
-            sqrtPriceLimitX96: 0
-        }));
+        uint256 amountOut = swapRouter.exactInputSingle(
+            ISwapRouter.ExactInputSingleParams({
+                tokenIn: tokenIn,
+                tokenOut: tokenOut,
+                fee: params.swapFeeTier,
+                recipient: address(this),
+                deadline: params.deadline,
+                amountIn: amountIn,
+                amountOutMinimum: params.swapAmountOutMin,
+                sqrtPriceLimitX96: 0
+            })
+        );
 
-        return params.zeroForOne 
+        return params.zeroForOne
             ? (amount0Available - amountIn, amount1Available + amountOut)
             : (amount0Available + amountOut, amount1Available - amountIn);
     }
 
     function _mintNewPosition(
-        AtomicMigrationParams calldata params, 
-        address token0, 
+        AtomicMigrationParams calldata params,
+        address token0,
         address token1,
         uint256 amount0Budget,
         uint256 amount1Budget,
@@ -264,19 +285,21 @@ contract TeleportV3 is ReentrancyGuard, Ownable, IERC721Receiver, EIP712 {
         IERC20(token0).forceApprove(address(positionManager), amount0Budget);
         IERC20(token1).forceApprove(address(positionManager), amount1Budget);
 
-        (tokenId, liquidity, , ) = positionManager.mint(INonfungiblePositionManager.MintParams({
-            token0: token0,
-            token1: token1,
-            fee: params.newFee,
-            tickLower: params.newTickLower,
-            tickUpper: params.newTickUpper,
-            amount0Desired: amount0Budget,
-            amount1Desired: amount1Budget,
-            amount0Min: params.amount0MinMint,
-            amount1Min: params.amount1MinMint,
-            recipient: recipient,
-            deadline: params.deadline
-        }));
+        (tokenId, liquidity,,) = positionManager.mint(
+            INonfungiblePositionManager.MintParams({
+                token0: token0,
+                token1: token1,
+                fee: params.newFee,
+                tickLower: params.newTickLower,
+                tickUpper: params.newTickUpper,
+                amount0Desired: amount0Budget,
+                amount1Desired: amount1Budget,
+                amount0Min: params.amount0MinMint,
+                amount1Min: params.amount1MinMint,
+                recipient: recipient,
+                deadline: params.deadline
+            })
+        );
     }
 
     function _refundDustSafe(address token, address recipient, uint256 balanceBefore) private {
