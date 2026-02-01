@@ -86,7 +86,7 @@ jobs:
       # Coverage gate (>= 80%)
       # -------------------------
       - name: Generate coverage
-        run: forge coverage --report lcov
+        run: forge coverage --via-ir --report lcov
 
       - name: Enforce coverage gate
         run: python3 check-coverage.py
