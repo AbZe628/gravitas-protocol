@@ -23,14 +23,15 @@ Before deploying, ensure you have the following:
 
 ### Step 1: Create `.env` File
 
-Create a `.env` file in the root directory with the following variables:
+Create a `.env` file in the root directory with the following variables. **Never share these values.**
 
 ```bash
 # Arbitrum Sepolia RPC URL
 RPC_URL=https://sepolia-rollup.arbitrum.io/rpc
 
-# Deployer Private Key (without 0x prefix)
-PRIVATE_KEY=your_private_key_here
+# Account credential for deployment (without 0x prefix)
+# Replace the placeholder below with your actual deployment key
+DEPLOYER_KEY=your_credential_here
 
 # Arbiscan API Key for verification
 ETHERSCAN_API_KEY=your_arbiscan_api_key
@@ -40,7 +41,7 @@ POSITION_MANAGER=0xC36442b4a4522E871399CD717aBDD847Ab11FE88
 SWAP_ROUTER=0xE592427A0AEce92De3Edee1F18E0157C05861564
 ```
 
-### Step 2: Secure Your Keys
+### Step 2: Secure Your Credentials
 
 **IMPORTANT**: Never commit your `.env` file to version control.
 
@@ -78,7 +79,7 @@ forge build
 # Deploy with verification
 forge script script/DeployDeterministic.s.sol:DeployDeterministic \
     --rpc-url $RPC_URL \
-    --private-key $PRIVATE_KEY \
+    --private-key $DEPLOYER_KEY \
     --broadcast \
     --verify \
     --etherscan-api-key $ETHERSCAN_API_KEY

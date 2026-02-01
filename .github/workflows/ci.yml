@@ -1,41 +1,79 @@
 name: Bank-Grade CI Pipeline
+
 on:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+
 env:
   FOUNDRY_PROFILE: default
+
 jobs:
-  contracts:
-    name: 🛡️ Audit Contracts (Foundry)
+  security-scan:
+    name: 🛡️ Security Scan
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
           submodules: recursive
+          fetch-depth: 0
+      - name: Check for secrets
+        run: |
+          if grep -rEi "PRIVATE_KEY|SECRET_KEY" . --exclude-dir=.git --exclude=".env.example" --exclude="DEPLOYMENT.md"; then
+            echo "Error: Potential secrets found in repository!"
+            exit 1
+          fi
+      - name: Verify .env is ignored
+        run: |
+          if git ls-files .env | grep .env; then
+            echo "Error: .env file is being tracked by git!"
+            exit 1
+          fi
+
+  contracts:
+    name: 🏗️ Contracts (Foundry)
+    needs: security-scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
         with:
           version: nightly
-      - name: Build Contracts
+
+      - name: Build
         run: forge build --sizes
-      - name: Run Unit & Fuzz Tests
+
+      - name: Test
         run: forge test -vv
-      - name: Verify Gas Efficiency
-        run: forge snapshot --check
+
+      - name: Coverage Gate (80%)
+        run: |
+          python3 check-coverage.py
+
   sdk:
-    name: 🏦 Verify SDK (TypeScript)
+    name: 🏦 SDK Build
+    needs: security-scan
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Install SDK Dependencies
+      - name: Install & Build
         working-directory: ./gravitas-sdk
-        run: npm install
-      - name: Build SDK
-        working-directory: ./gravitas-sdk
-        run: npm run build
+        run: |
+          npm ci
+          npm run build

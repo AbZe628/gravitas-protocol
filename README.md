@@ -5,7 +5,7 @@
 [![CI](https://github.com/AbZe628/gravitas-protocol/actions/workflows/ci.yml/badge.svg)](https://github.com/AbZe628/gravitas-protocol/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Solidity](https://img.shields.io/badge/Solidity-0.8.24-blue.svg)](https://soliditylang.org/)
-[![Audit: Internal Passed](https://img.shields.io/badge/Audit-Internal%20Passed-blueviolet.svg)](./proof-of-quality/SECURITY_AUDIT.md)
+[![Audit: Internal Passed](https://img.shields.io/badge/Audit-Internal%20Passed-blueviolet.svg)](./proof-of-quality/INTERNAL_REVIEW.md)
 
 ---
 
@@ -126,7 +126,7 @@ gravitas-protocol/
 ├── proof-of-quality/             # Audit & test artifacts
 │   ├── test_results.txt             # Test execution results
 │   ├── gas_report.txt               # Gas snapshot report
-│   └── SECURITY_AUDIT.md            # Internal security audit
+│   └── INTERNAL_REVIEW.md           # Internal security review
 ├── DEPLOYMENT.md                 # Testnet deployment guide
 └── deploy_testnet.sh             # One-click deployment script
 ```
@@ -208,7 +208,7 @@ The protocol is built on the principle of **Gharar Elimination**. Every migratio
 
 | Audit Type | Status | Report |
 |------------|--------|--------|
-| Internal Security Review | ✅ Completed | [SECURITY_AUDIT.md](./proof-of-quality/SECURITY_AUDIT.md) |
+| Internal Security Review | ✅ Completed | [INTERNAL_REVIEW.md](./proof-of-quality/INTERNAL_REVIEW.md) |
 | External Audit (OpenZeppelin) | 📋 Planned | Q2 2026 |
 | Formal Verification | 📋 Planned | Q3 2026 |
 
