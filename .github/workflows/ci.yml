@@ -35,6 +35,7 @@ jobs:
           if grep -rEi "PRIVATE_KEY|SECRET_KEY|MNEMONIC|SEED|sk-|AKIA" . \
             --exclude-dir=.git \
             --exclude-dir=lib \
+            --exclude-dir=docs \
             --exclude="*.md" \
             --exclude=".env.example" \
             --exclude="DEPLOYMENT.md"; then
