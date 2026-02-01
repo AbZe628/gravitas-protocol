@@ -1,31 +1,18 @@
 # Security Policy
 
-## Supported Versions
-The Gravitas Protocol MVP is currently under active development.
-Security patches and improvements will be continuously integrated as the project matures.
+## Critical Warning: Key Rotation
+**If secrets (private keys, API keys, .env) have ever been committed to this repository, they MUST be considered compromised.**
+1.  **Rotate all keys** immediately.
+2.  **Revoke permissions** for compromised addresses in `GravitasPolicyRegistry`.
+3.  **Transfer ownership** to a new, secure multi-sig wallet.
 
-| Version | Supported          |
-| -------- | ------------------ |
-| MVP (v0.1) | ✅ Active |
-| Future testnet releases | ⚙️ Planned |
-| Mainnet | 🚧 Pending audit |
+## Threat Model
+- **Non-Compliant Asset Entry**: Prevented by `GravitasPolicyRegistry` whitelisting.
+- **Unauthorized Migration**: Prevented by `onlyAuthorized` modifier and executor registry.
+- **Liquidity Drain**: Prevented by `maxMoveBps` risk policy and atomic execution.
+- **Signature Replay (V3)**: Prevented by EIP-712 nonces and domain separator.
 
----
-
-## Reporting a Vulnerability
-
-If you discover a security issue, please **do not create a public GitHub issue**.  
-Instead, report it directly to:
-abdusamedzelicc98@gmail.com
-
-You can use GPG or encrypted email if you prefer.  
-All valid reports will be acknowledged and rewarded with early contributor status once the program is launched.
-
----
-
-## Security Practices
-
-- Guardian role can only **pause** contracts — cannot withdraw or upgrade logic.  
-- All upgrades are protected by a **48h timelock**.  
-- Policies are externally auditable and executed via **non-custodial adapters**.  
-- No user funds are ever directly held by Gravitas contracts.
+## Secret Management
+- **NEVER** commit `.env` or private keys.
+- Use `.env.example` as a template for local development.
+- CI/CD pipelines must use GitHub Secrets, never hardcoded values.

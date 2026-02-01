@@ -143,6 +143,10 @@ contract TeleportV3 is ReentrancyGuard, Ownable, IERC721Receiver, EIP712 {
         require(params.deadline >= block.timestamp, "TV3: Deadline expired");
         require(_isValidFeeTier(params.newFee), "TV3: Invalid fee tier");
         require(params.newTickLower < params.newTickUpper, "TV3: Invalid ticks");
+        
+        // Tick spacing validation
+        int24 spacing = _getTickSpacing(params.newFee);
+        require(params.newTickLower % spacing == 0 && params.newTickUpper % spacing == 0, "TV3: Invalid tick spacing");
         require(params.amount0MinMint > 0 && params.amount1MinMint > 0, "TV3: Zero slippage not allowed");
 
         address owner = positionManager.ownerOf(params.tokenId);
@@ -209,6 +213,14 @@ contract TeleportV3 is ReentrancyGuard, Ownable, IERC721Receiver, EIP712 {
 
     function _isValidFeeTier(uint24 fee) internal pure returns (bool) {
         return (fee == 100 || fee == 500 || fee == 3000 || fee == 10000);
+    }
+
+    function _getTickSpacing(uint24 fee) internal pure returns (int24) {
+        if (fee == 100) return 1;
+        if (fee == 500) return 10;
+        if (fee == 3000) return 60;
+        if (fee == 10000) return 200;
+        revert("TV3: Unsupported fee");
     }
 
     function _executeRebalancingSwap(
