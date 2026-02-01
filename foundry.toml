@@ -7,15 +7,21 @@ remappings = [
     "forge-std/=lib/forge-std/src/"
 ]
 
-# Solidity compiler settings
+# Solidity compiler
 solc_version = "0.8.24"
 via_ir = true
 optimizer = true
 optimizer_runs = 200
 
-# Test configuration
+# Tests & scripts
 test = "test"
 script = "script"
 
 # Gas reporting
 gas_reports = ["*"]
+
+# Coverage profile (fixes stack-too-deep during coverage)
+[profile.coverage]
+via_ir = true
+optimizer = true
+optimizer_runs = 200
