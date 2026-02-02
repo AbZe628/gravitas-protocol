@@ -17,6 +17,7 @@ jobs:
   security-scan:
     name: 🛡️ Security Scan
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -27,42 +28,42 @@ jobs:
       - name: Check for secrets
         shell: bash
         run: |
-          set -euo pipefail
+            set -euo pipefail
 
-          if grep -rEi "PRIVATE_KEY|SECRET_KEY|MNEMONIC|SEED_PHRASE|RECOVERY_PHRASE|sk-|AKIA" . \
-  --exclude-dir=.git \
-  --exclude-dir=.github \
-  --exclude-dir=lib \
-  --exclude-dir=docs \
-  --exclude-dir=node_modules \
-  --exclude="*.md" \
-  --exclude=".env.example" \
-  --exclude="DEPLOYMENT.md" \
-  --exclude="pnpm-lock.yaml" \
-  --exclude="package-lock.json" \
-  --exclude="yarn.lock"; then
+            if grep -rEi "PRIVATE_KEY|SECRET_KEY|MNEMONIC|SEED_PHRASE|RECOVERY_PHRASE|sk-|AKIA" . \
+                --exclude-dir=.git \
+                --exclude-dir=.github \
+                --exclude-dir=lib \
+                --exclude-dir=docs \
+                --exclude-dir=node_modules \
+                --exclude="*.md" \
+                --exclude=".env.example" \
+                --exclude="DEPLOYMENT.md" \
+                --exclude="pnpm-lock.yaml" \
+                --exclude="package-lock.json" \
+                --exclude="yarn.lock"; then
 
+                echo "ERROR: Potential secrets found in repository!"
+                exit 1
+            fi
 
-            echo "ERROR: Potential secrets found in repository!"
-            exit 1
-          fi
-
-          echo "OK: No secrets detected."
+            echo "OK: No secrets detected."
 
       - name: Verify .env is ignored
         shell: bash
         run: |
-          if git ls-files | grep -qE '(^|/)\.env$'; then
-            echo "ERROR: .env file is being tracked by git!"
-            exit 1
-          fi
+            if git ls-files | grep -qE '(^|/)\.env$'; then
+                echo "ERROR: .env file is being tracked by git!"
+                exit 1
+            fi
 
-          echo "OK: .env not tracked."
+            echo "OK: .env not tracked."
 
   contracts:
     name: 🏗️ Contracts (Foundry)
     needs: security-scan
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -98,6 +99,7 @@ jobs:
     name: 🏦 SDK Build
     needs: security-scan
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -112,5 +114,5 @@ jobs:
       - name: Install & Build SDK
         working-directory: ./gravitas-sdk
         run: |
-          npm ci
-          npm run build
+            npm ci
+            npm run build
