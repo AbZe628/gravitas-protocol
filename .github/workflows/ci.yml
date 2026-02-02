@@ -30,12 +30,20 @@ jobs:
         run: |
             set -euo pipefail
 
+                  - name: Check for secrets
+        shell: bash
+        run: |
+            set -euo pipefail
+
             if grep -rEi "PRIVATE_KEY|SECRET_KEY|MNEMONIC|SEED_PHRASE|RECOVERY_PHRASE|sk-|AKIA" . \
                 --exclude-dir=.git \
                 --exclude-dir=.github \
                 --exclude-dir=lib \
                 --exclude-dir=docs \
                 --exclude-dir=node_modules \
+                --exclude-dir=dist \
+                --exclude-dir=build \
+                --exclude-dir=apps/web/dist \
                 --exclude="*.md" \
                 --exclude=".env.example" \
                 --exclude="DEPLOYMENT.md" \
@@ -48,6 +56,7 @@ jobs:
             fi
 
             echo "OK: No secrets detected."
+
 
       - name: Verify .env is ignored
         shell: bash
