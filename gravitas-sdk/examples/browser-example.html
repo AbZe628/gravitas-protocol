@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gravitas SDK - Browser Example</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    button {
+      background: #0066cc;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 5px;
+    }
+    button:hover {
+      background: #0052a3;
+    }
+    .output {
+      background: #f5f5f5;
+      padding: 15px;
+      border-radius: 5px;
+      margin-top: 20px;
+      font-family: monospace;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <h1>Gravitas SDK - Browser Example</h1>
+  <p>This example demonstrates how to use the Gravitas SDK in a browser environment with MetaMask.</p>
+
+  <div>
+    <button onclick="connectWallet()">Connect Wallet</button>
+    <button onclick="checkCompliance()">Check Asset Compliance</button>
+    <button onclick="simulateMigration()">Simulate Migration</button>
+  </div>
+
+  <div class="output" id="output">Output will appear here...</div>
+
+  <script type="module">
+    import { GravitasClient } from '../dist/index.js';
+    import { createWalletClient, custom } from 'viem';
+    import { arbitrumSepolia } from 'viem/chains';
+
+    let walletClient;
+    let account;
+    let gravitasClient;
+
+    window.connectWallet = async function() {
+      try {
+        if (!window.ethereum) {
+          log('❌ MetaMask not detected. Please install MetaMask.');
+          return;
+        }
+
+        // Request account access
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        account = accounts[0];
+
+        // Create wallet client
+        walletClient = createWalletClient({
+          chain: arbitrumSepolia,
+          transport: custom(window.ethereum),
+        });
+
+        // Initialize Gravitas client
+        gravitasClient = new GravitasClient({
+          rpcUrl: 'https://sepolia-rollup.arbitrum.io/rpc',
+          chainId: 421614,
+          registryAddress: '0xbcaE3069362B0f0b80f44139052f159456C84679',
+          teleportV3Address: '0x5D423f8d01539B92D3f3953b91682D9884D1E993',
+        });
+
+        log(`✅ Connected: ${account}`);
+      } catch (error) {
+        log(`❌ Error: ${error.message}`);
+      }
+    };
+
+    window.checkCompliance = async function() {
+      if (!gravitasClient) {
+        log('❌ Please connect wallet first');
+        return;
+      }
+
+      try {
+        const tokenAddress = '0x...'; // Replace with actual token address
+        const isCompliant = await gravitasClient.compliance.isAssetCompliant(tokenAddress);
+        log(`Asset ${tokenAddress} compliance: ${isCompliant ? '✅ Compliant' : '❌ Non-compliant'}`);
+      } catch (error) {
+        log(`❌ Error: ${error.message}`);
+      }
+    };
+
+    window.simulateMigration = async function() {
+      if (!gravitasClient || !account) {
+        log('❌ Please connect wallet first');
+        return;
+      }
+
+      try {
+        const tokenId = 123n; // Replace with actual NFT position ID
+
+        const migration = gravitasClient.migration()
+          .tokenId(tokenId)
+          .newFee(3000)
+          .ticks(-887220, 887220)
+          .slippage(0n, 0n, 0n, 0n)
+          .deadline(BigInt(Math.floor(Date.now() / 1000) + 3600));
+
+        log('Simulating migration...');
+        const result = await migration.simulate(account);
+        log(`✅ Simulation successful:\n${JSON.stringify(result, null, 2)}`);
+      } catch (error) {
+        log(`❌ Error: ${error.message}`);
+      }
+    };
+
+    function log(message) {
+      const output = document.getElementById('output');
+      output.textContent += `\n${new Date().toLocaleTimeString()}: ${message}`;
+      output.scrollTop = output.scrollHeight;
+    }
+  </script>
+</body>
+</html>
