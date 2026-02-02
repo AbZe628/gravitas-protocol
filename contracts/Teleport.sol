@@ -6,33 +6,15 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./GravitasPolicyRegistry.sol";
+import "./interfaces/IUniswapV2Factory.sol";
+import "./interfaces/IUniswapV2Router02.sol";
 
-// --- Interfaces ---
-interface IUniswapV2Factory {
-    function getPair(address tokenA, address tokenB) external view returns (address pair);
-}
-
-interface IUniswapV2Pair {
+interface IUniswapV2PairExtended {
     function token0() external view returns (address);
     function token1() external view returns (address);
     function totalSupply() external view returns (uint256);
     function burn(address to) external returns (uint256 amount0, uint256 amount1);
 }
-
-interface IUniswapV2Router01 {
-    function addLiquidity(
-        address tokenA,
-        address tokenB,
-        uint256 amountADesired,
-        uint256 amountBDesired,
-        uint256 amountAMin,
-        uint256 amountBMin,
-        address to,
-        uint256 deadline
-    ) external returns (uint256 amountA, uint256 amountB, uint256 liquidity);
-}
-
-// --- End Interfaces ---
 
 /**
  * @title TeleportV2 (Institutional Edition)
@@ -137,7 +119,7 @@ contract Teleport is ReentrancyGuard, Ownable {
         require(pairFrom != address(0), "Teleport: pairFrom not found");
 
         // 3. Policy Enforcement (On-chain supply check)
-        uint256 totalSupply = IUniswapV2Pair(pairFrom).totalSupply();
+        uint256 totalSupply = IUniswapV2PairExtended(pairFrom).totalSupply();
         require(totalSupply > 0, "Teleport: bad supply");
         uint256 maxAllowed = (totalSupply * maxMoveBps) / 10_000;
         require(lpAmount <= maxAllowed, "Teleport: exceeds maxMoveBps");
@@ -148,10 +130,10 @@ contract Teleport is ReentrancyGuard, Ownable {
         // 4. Execution: Burn (Remove Liquidity)
         IERC20(pairFrom).safeTransferFrom(msg.sender, address(this), lpAmount);
         IERC20(pairFrom).safeTransfer(pairFrom, lpAmount);
-        (uint256 amount0, uint256 amount1) = IUniswapV2Pair(pairFrom).burn(address(this));
+        (uint256 amount0, uint256 amount1) = IUniswapV2PairExtended(pairFrom).burn(address(this));
 
         // 5. Token Mapping
-        address t0 = IUniswapV2Pair(pairFrom).token0();
+        address t0 = IUniswapV2PairExtended(pairFrom).token0();
         uint256 amountAOut = (t0 == tokenA) ? amount0 : amount1;
         uint256 amountBOut = (t0 == tokenA) ? amount1 : amount0;
 
@@ -159,7 +141,7 @@ contract Teleport is ReentrancyGuard, Ownable {
         IERC20(tokenA).forceApprove(routerTo, amountAOut);
         IERC20(tokenB).forceApprove(routerTo, amountBOut);
 
-        (,, uint256 liquidityMinted) = IUniswapV2Router01(routerTo)
+        (,, uint256 liquidityMinted) = IUniswapV2Router02(routerTo)
             .addLiquidity(tokenA, tokenB, amountAOut, amountBOut, amountAMin, amountBMin, recipient, deadline);
 
         // 7. Cleanup & State Update
