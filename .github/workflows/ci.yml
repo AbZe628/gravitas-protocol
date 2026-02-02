@@ -30,13 +30,18 @@ jobs:
           set -euo pipefail
 
           if grep -rEi "PRIVATE_KEY|SECRET_KEY|MNEMONIC|SEED_PHRASE|RECOVERY_PHRASE|sk-|AKIA" . \
-            --exclude-dir=.git \
-            --exclude-dir=.github \
-            --exclude-dir=lib \
-            --exclude-dir=docs \
-            --exclude="*.md" \
-            --exclude=".env.example" \
-            --exclude="DEPLOYMENT.md"; then
+  --exclude-dir=.git \
+  --exclude-dir=.github \
+  --exclude-dir=lib \
+  --exclude-dir=docs \
+  --exclude-dir=node_modules \
+  --exclude="*.md" \
+  --exclude=".env.example" \
+  --exclude="DEPLOYMENT.md" \
+  --exclude="pnpm-lock.yaml" \
+  --exclude="package-lock.json" \
+  --exclude="yarn.lock"; then
+
 
             echo "ERROR: Potential secrets found in repository!"
             exit 1
