@@ -9,7 +9,7 @@
 
 ---
 
-**🌐 Live Frontend**: [https://abze628.github.io/gravitas-protocol/](https://abze628.github.io/gravitas-protocol/)
+**🌐 Live Frontend**: https://abze628.github.io/gravitas-protocol/
 
 Our core contracts ([TeleportV3](https://sepolia.arbiscan.io/address/0x5D423f8d01539B92D3f3953b91682D9884D1E993#events) and [GravitasPolicyRegistry](https://sepolia.arbiscan.io/address/0xbcaE3069362B0f0b80f44139052f159456C84679#code)) are deployed and verified on Arbitrum Sepolia with real on-chain activity, demonstrating atomic liquidity migration and policy-enforced execution.
 

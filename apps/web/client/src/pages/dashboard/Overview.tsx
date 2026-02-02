@@ -1,4 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, TrendingDown, DollarSign, Users, Activity, ArrowUpRight } from "lucide-react";
 import { useReadContract } from "wagmi";
@@ -44,6 +46,18 @@ const volumeData = [
 ];
 
 export default function Overview() {
+  const [todos, setTodos] = useState([
+    { id: 1, text: "Connect Wallet to Arbitrum Sepolia", completed: true },
+    { id: 2, text: "Review Shariah Compliance Policy", completed: true },
+    { id: 3, text: "Simulate V3 Liquidity Migration", completed: false },
+    { id: 4, text: "Execute Atomic Teleport", completed: false },
+    { id: 5, text: "Verify Transaction on Arbiscan", completed: false },
+  ]);
+
+  const toggleTodo = (id: number) => {
+    setTodos(todos.map(t => t.id === id ? { ...t, completed: !t.completed } : t));
+  };
+
   const { data: cooldownPeriod } = useReadContract({
     address: CONTRACTS.TELEPORT_V3 as `0x${string}`,
     abi: TELEPORT_V3_ABI,
@@ -216,35 +230,68 @@ export default function Overview() {
         </motion.div>
       </div>
 
-      {/* Protocol Parameters */}
-      <motion.div variants={itemVariants}>
-        <Card className="border-[#D4AF37]/20 bg-[#0F1E35]/50 backdrop-blur">
-          <CardHeader>
-            <CardTitle className="text-white">Protocol Parameters</CardTitle>
-            <CardDescription className="text-white/70">
-              Current configuration for TeleportV3 contract
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="grid gap-4 md:grid-cols-3">
-            <div className="p-4 rounded-lg bg-[#0A1628]/50 border border-[#D4AF37]/20">
-              <p className="text-sm text-white/50 mb-1">Cooldown Period</p>
-              <p className="text-2xl font-bold text-white">
-                {cooldownPeriod ? `${Number(cooldownPeriod) / 60} min` : "Loading..."}
-              </p>
-            </div>
-            <div className="p-4 rounded-lg bg-[#0A1628]/50 border border-[#D4AF37]/20">
-              <p className="text-sm text-white/50 mb-1">Max Price Movement</p>
-              <p className="text-2xl font-bold text-white">
-                {maxMoveBps ? `${Number(maxMoveBps) / 100}%` : "Loading..."}
-              </p>
-            </div>
-            <div className="p-4 rounded-lg bg-[#0A1628]/50 border border-[#D4AF37]/20">
-              <p className="text-sm text-white/50 mb-1">Network</p>
-              <Badge className="bg-[#D4AF37] text-[#0A1628] mt-2">Arbitrum Sepolia</Badge>
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
+      {/* Protocol Parameters & Todo List */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        <motion.div variants={itemVariants}>
+          <Card className="border-[#D4AF37]/20 bg-[#0F1E35]/50 backdrop-blur h-full">
+            <CardHeader>
+              <CardTitle className="text-white">Protocol Parameters</CardTitle>
+              <CardDescription className="text-white/70">
+                Current configuration for TeleportV3 contract
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="grid gap-4">
+              <div className="p-4 rounded-lg bg-[#0A1628]/50 border border-[#D4AF37]/20">
+                <p className="text-sm text-white/50 mb-1">Cooldown Period</p>
+                <p className="text-2xl font-bold text-white">
+                  {cooldownPeriod ? `${Number(cooldownPeriod) / 60} min` : "Loading..."}
+                </p>
+              </div>
+              <div className="p-4 rounded-lg bg-[#0A1628]/50 border border-[#D4AF37]/20">
+                <p className="text-sm text-white/50 mb-1">Max Price Movement</p>
+                <p className="text-2xl font-bold text-white">
+                  {maxMoveBps ? `${Number(maxMoveBps) / 100}%` : "Loading..."}
+                </p>
+              </div>
+              <div className="p-4 rounded-lg bg-[#0A1628]/50 border border-[#D4AF37]/20">
+                <p className="text-sm text-white/50 mb-1">Network</p>
+                <Badge className="bg-[#D4AF37] text-[#0A1628] mt-2">Arbitrum Sepolia</Badge>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        <motion.div variants={itemVariants}>
+          <Card className="border-[#D4AF37]/20 bg-[#0F1E35]/50 backdrop-blur h-full">
+            <CardHeader>
+              <CardTitle className="text-white">MVP Launch Checklist</CardTitle>
+              <CardDescription className="text-white/70">
+                Track your progress through the Gravitas Protocol
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {todos.map((todo) => (
+                  <div key={todo.id} className="flex items-center space-x-3 p-3 rounded-lg bg-[#0A1628]/30 border border-[#D4AF37]/10">
+                    <Checkbox 
+                      id={`todo-${todo.id}`} 
+                      checked={todo.completed} 
+                      onCheckedChange={() => toggleTodo(todo.id)}
+                      className="border-[#D4AF37] data-[state=checked]:bg-[#D4AF37] data-[state=checked]:text-[#0A1628]"
+                    />
+                    <label 
+                      htmlFor={`todo-${todo.id}`}
+                      className={`text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 ${todo.completed ? 'text-white/40 line-through' : 'text-white'}`}
+                    >
+                      {todo.text}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </div>
     </motion.div>
   );
 }
