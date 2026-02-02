@@ -9,9 +9,9 @@
 
 ---
 
-Our core contracts (TeleportV3: https://sepolia.arbiscan.io/address/0x5D423f8d01539B92D3f3953b91682D9884D1E993#events  emits real on-chain events such as AtomicLiquidityMigrated, demonstrating actual liquidity migration with tracked input/output amounts on Arbitrum Sepolia.
- and GravitasPolicyRegistry: https://sepolia.arbiscan.io/address/0xbcaE3069362B0f0b80f44139052f159456C84679#code
-) are deployed and verified on Arbitrum Sepolia with real on-chain activity, demonstrating atomic liquidity migration and policy-enforced execution.
+**🌐 Live Frontend**: [https://abze628.github.io/gravitas-protocol/](https://abze628.github.io/gravitas-protocol/)
+
+Our core contracts ([TeleportV3](https://sepolia.arbiscan.io/address/0x5D423f8d01539B92D3f3953b91682D9884D1E993#events) and [GravitasPolicyRegistry](https://sepolia.arbiscan.io/address/0xbcaE3069362B0f0b80f44139052f159456C84679#code)) are deployed and verified on Arbitrum Sepolia with real on-chain activity, demonstrating atomic liquidity migration and policy-enforced execution.
 
 
 ## Executive Summary
@@ -51,28 +51,9 @@ Gravitas acts as the **middleware layer** enabling "Deterministic Liquidity Rout
 
 ## Technical Architecture
 
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                           GRAVITAS PROTOCOL                                 │
-├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                             │
-│  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐         │
-│  │   Gravitas SDK  │───▶│  Policy Registry │───▶│   TeleportV3    │         │
-│  │  (TypeScript)   │    │ (Risk & Compliance│    │ (Migration      │         │
-│  │                 │    │     Oracle)       │    │    Engine)      │         │
-│  └─────────────────┘    └─────────────────┘    └─────────────────┘         │
-│         │                       │                       │                   │
-│         ▼                       ▼                       ▼                   │
-│  ┌─────────────────────────────────────────────────────────────────┐       │
-│  │                    COMPLIANCE FLOW                               │       │
-│  │  Step 1: Intent Capture (SDK)                                   │       │
-│  │  Step 2: Deterministic Pathing (Routing Engine)                 │       │
-│  │  Step 3: Risk & Compliance Check (Policy Registry)              │       │
-│  │  Step 4: Atomic Execution (TeleportV3)                          │       │
-│  └─────────────────────────────────────────────────────────────────┘       │
-│                                                                             │
-└─────────────────────────────────────────────────────────────────────────────┘
-```
+![Gravitas Protocol Architecture](./docs/architecture.png)
+
+*Comprehensive system architecture showing the interaction between user layer, application layer, smart contracts, DeFi protocols, and governance mechanisms.*
 
 ### Key Components
 
