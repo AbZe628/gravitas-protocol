@@ -127,9 +127,9 @@ export default function Home() {
             className="max-w-4xl"
           >
             <motion.div variants={fadeUp}>
-              <Badge className="mb-6 px-4 py-1.5 bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-[#D4AF37] text-xs font-semibold tracking-wider uppercase">
+              <Badge className="mb-6 px-4 py-1.5 bg-amber-500/10 border border-amber-500/30 text-amber-500 text-xs font-semibold tracking-wider uppercase">
                 <Shield className="h-3 w-3 mr-2" />
-                Shariah-Compliant DeFi Infrastructure · Arbitrum Sepolia
+                Testnet Only · Mock Data · Arbitrum Sepolia
               </Badge>
             </motion.div>
 
@@ -196,13 +196,13 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── CONTRACTS LIVE BANNER ── */}
-      <section className="border-y border-[#D4AF37]/10 bg-[#0A1628]/50 py-6">
+      {/* ── CONTRACTS TESTNET BANNER ── */}
+      <section className="border-y border-amber-500/20 bg-amber-500/5 py-6">
         <div className="container px-4 md:px-6">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="h-2 w-2 rounded-full bg-green-400 animate-pulse" />
-              <span className="text-xs md:text-sm text-white/60">Live on Arbitrum Sepolia Testnet</span>
+              <div className="h-2 w-2 rounded-full bg-amber-400 animate-pulse" />
+              <span className="text-xs md:text-sm text-amber-200">⚠️ Testnet Only (Mock Data) - Arbitrum Sepolia</span>
             </div>
             <div className="flex flex-col sm:flex-row flex-wrap gap-3 md:gap-6 text-xs md:text-sm w-full md:w-auto">
               <a

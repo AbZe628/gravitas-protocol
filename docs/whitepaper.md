@@ -1,8 +1,11 @@
 # Gravitas Protocol — Whitepaper
 
+> ⚠️ **DISCLAIMER:** This protocol is currently deployed on **Arbitrum Sepolia Testnet only**. All data, metrics, and transaction volumes are **mock data for demonstration purposes**. This is not a mainnet deployment. Do not use with real funds.
+
 **Version:** 1.0.0  
-**Status:** Audit-Ready  
-**Last Updated:** February 2026
+**Status:** Audit-Ready (Testnet)  
+**Last Updated:** February 2026  
+**Network:** Arbitrum Sepolia Testnet (Mock Data)
 
 ---
 
@@ -141,13 +144,15 @@ Proof: EIP-712 typed data prevents signature reuse. Nonce increments per migrati
 
 ## 3. Deployment Status
 
-### 3.1 Testnet (Arbitrum Sepolia)
+### 3.1 Testnet (Arbitrum Sepolia) — Mock Data
+
+> **Note:** All contracts are deployed on **Arbitrum Sepolia Testnet only**. Data is for demonstration and testing purposes. Not suitable for production use.
 
 | Contract | Address | Status | Explorer |
 | :--- | :--- | :--- | :--- |
-| GravitasPolicyRegistry | `0xbcaE3069362B0f0b80f44139052f159456C84679` | ✅ Live | [Arbiscan](https://sepolia.arbiscan.io/address/0xbcaE3069362B0f0b80f44139052f159456C84679) |
-| TeleportV2 | `0x68b3465833fb72B5A828cCEA02FFAD6bFB335AaF` | ✅ Live | [Arbiscan](https://sepolia.arbiscan.io) |
-| TeleportV3 | `0x5D423f8d01539B92D3f3953b91682D9884D1E993` | ✅ Live | [Arbiscan](https://sepolia.arbiscan.io/address/0x5D423f8d01539B92D3f3953b91682D9884D1E993) |
+| GravitasPolicyRegistry | `0xbcaE3069362B0f0b80f44139052f159456C84679` | ✅ Testnet | [Arbiscan](https://sepolia.arbiscan.io/address/0xbcaE3069362B0f0b80f44139052f159456C84679) |
+| TeleportV2 | `0x68b3465833fb72B5A828cCEA02FFAD6bFB335AaF` | ✅ Testnet | [Arbiscan](https://sepolia.arbiscan.io) |
+| TeleportV3 | `0x5D423f8d01539B92D3f3953b91682D9884D1E993` | ✅ Testnet | [Arbiscan](https://sepolia.arbiscan.io/address/0x5D423f8d01539B92D3f3953b91682D9884D1E993) |
 
 ### 3.2 Mainnet Readiness
 
