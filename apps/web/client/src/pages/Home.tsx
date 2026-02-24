@@ -165,19 +165,32 @@ export default function Home() {
             {/* Stats row */}
             <motion.div variants={stagger} className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
               {[
-                { label: "Test Coverage", value: "90%+", icon: CheckCircle },
-                { label: "Gas Optimized", value: "~2K saved", icon: Zap },
-                { label: "Contracts Deployed", value: "3 Live", icon: Database },
-                { label: "Target Market", value: "$3T+", icon: TrendingUp },
-              ].map((stat, i) => (
-                <motion.div key={i} variants={fadeUp} className="flex flex-col gap-1">
-                  <div className="flex items-center gap-2 text-[#D4AF37]">
-                    <stat.icon className="h-4 w-4" />
-                    <span className="text-lg md:text-2xl font-bold text-white">{stat.value}</span>
+                { label: "Test Coverage", value: "90%+", icon: CheckCircle, link: "https://github.com/AbZe628/gravitas-protocol" },
+                { label: "Atomic Migrations", value: "Single TX", icon: Zap, link: "https://sepolia.arbiscan.io/address/0x5D423f8d01539B92D3f3953b91682D9884D1E993" },
+                { label: "Live Contracts", value: "3 on Sepolia", icon: Database, link: "https://sepolia.arbiscan.io" },
+                { label: "Islamic Finance", value: "$3T+ Market", icon: TrendingUp },
+              ].map((stat, i) => {
+                const content = (
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-2 text-[#D4AF37]">
+                      <stat.icon className="h-4 w-4" />
+                      <span className="text-lg md:text-2xl font-bold text-white">{stat.value}</span>
+                    </div>
+                    <span className="text-xs md:text-sm text-white/40">{stat.label}</span>
                   </div>
-                  <span className="text-xs md:text-sm text-white/40">{stat.label}</span>
-                </motion.div>
-              ))}
+                );
+                return (
+                  <motion.div key={i} variants={fadeUp}>
+                    {stat.link ? (
+                      <a href={stat.link} target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity cursor-pointer block">
+                        {content}
+                      </a>
+                    ) : (
+                      content
+                    )}
+                  </motion.div>
+                );
+              })}
             </motion.div>
           </motion.div>
         </div>
