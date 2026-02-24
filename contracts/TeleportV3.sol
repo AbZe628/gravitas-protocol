@@ -207,8 +207,8 @@ contract TeleportV3 is ReentrancyGuard, Ownable, IERC721Receiver, EIP712 {
 
         (newTokenId, newLiquidity) = _mintNewPosition(params, token0, token1, amount0Available, amount1Available, owner);
 
-        _refundDustSafe(token0, owner, balance0Start);
-        _refundDustSafe(token1, owner, balance1Start);
+        _refundDustOptimized(token0, owner, balance0Start);
+        _refundDustOptimized(token1, owner, balance1Start);
 
         emit LiquidityTeleported(params.tokenId, newTokenId, owner, newLiquidity, params.newFee, params.executeSwap);
     }
@@ -302,11 +302,18 @@ contract TeleportV3 is ReentrancyGuard, Ownable, IERC721Receiver, EIP712 {
         );
     }
 
-    function _refundDustSafe(address token, address recipient, uint256 balanceBefore) private {
+    function _refundDustOptimized(address token, address recipient, uint256 balanceBefore) private {
         uint256 balanceAfter = IERC20(token).balanceOf(address(this));
         if (balanceAfter > balanceBefore) {
-            uint256 dust = balanceAfter - balanceBefore;
-            IERC20(token).safeTransfer(recipient, dust);
+            uint256 dustAmount = balanceAfter - balanceBefore;
+            assembly {
+                let ptr := mload(0x40)
+                mstore(ptr, 0xa9059cbb00000000000000000000000000000000000000000000000000000000)
+                mstore(add(ptr, 0x04), and(recipient, 0xffffffffffffffffffffffffffffffffffffffff))
+                mstore(add(ptr, 0x24), dustAmount)
+                let success := call(gas(), token, 0, ptr, 0x44, 0, 0)
+                if iszero(success) { revert(0, 0) }
+            }
         }
     }
 

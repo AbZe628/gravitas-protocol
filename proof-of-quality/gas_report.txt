@@ -1,13 +1,64 @@
 No files changed, compilation skipped
 
-Ran 2 tests for test/Counter.t.sol:CounterTest
-[PASS] testFuzz_SetNumber(uint256) (runs: 256, μ: 27606, ~: 28384)
-[PASS] test_Increment() (gas: 28409)
-Suite result: ok. 2 passed; 0 failed; 0 skipped; finished in 3.00ms (2.88ms CPU time)
+Ran 1 test for test/foundry/TeleportFlow.t.sol:TeleportFlowTests
+[PASS] test_V2_RescueTokens() (gas: 72244)
+Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 716.31µs (140.59µs CPU time)
+
+Ran 18 tests for test/foundry/TeleportTests.t.sol:TeleportTests
+[PASS] test_Registry_RevertOnNonOwner() (gas: 25587)
+[PASS] test_Registry_RevertOnZeroAddress() (gas: 21740)
+[PASS] test_Registry_SetExecutor() (gas: 66746)
+[PASS] test_Registry_SetRouter() (gas: 66927)
+[PASS] test_Registry_VerifyFunctions() (gas: 23854)
+[PASS] test_Registry_Versioning() (gas: 69553)
+[PASS] test_V2_RescueTokens_NonOwner() (gas: 15995)
+[PASS] test_V2_RevertOnExpiredDeadline() (gas: 26686)
+[PASS] test_V2_RevertOnNonAuthorized() (gas: 24803)
+[PASS] test_V2_RevertOnNonCompliant() (gas: 33069)
+[PASS] test_V2_RevertOnUnauthorizedRouter() (gas: 29778)
+[PASS] test_V2_SetPolicy() (gas: 25675)
+[PASS] test_V2_SetPolicy_Revert() (gas: 21074)
+[PASS] test_V3_NonAuthorized() (gas: 25332)
+[PASS] test_V3_RevertOnDeadline() (gas: 23029)
+[PASS] test_V3_RevertOnInvalidFee() (gas: 23330)
+[PASS] test_V3_RevertOnInvalidTickSpacing() (gas: 24530)
+[PASS] test_V3_RevertOnZeroSlippage() (gas: 24312)
+Suite result: ok. 18 passed; 0 failed; 0 skipped; finished in 5.68ms (1.12ms CPU time)
+
+Ran 10 tests for test/foundry/TeleportV2FullFlow.t.sol:TeleportV2FullFlowTests
+[PASS] test_V2_CooldownEnforcement() (gas: 5390027)
+[PASS] test_V2_DustRefund() (gas: 5289575)
+[PASS] test_V2_FullMigrationFlow_MaxMoveBpsEnforcement() (gas: 5337868)
+[PASS] test_V2_OwnerCanExecute() (gas: 5282885)
+[PASS] test_V2_PolicyUpdate() (gas: 25711)
+[PASS] test_V2_RescueTokens() (gas: 46015)
+[PASS] test_V2_RevertOnBadSupply() (gas: 4871212)
+[PASS] test_V2_RevertOnPairNotFound() (gas: 3455786)
+[PASS] test_V2_RevertOnZeroRegistry() (gas: 126907)
+[PASS] test_V2_SafeERC20Paths() (gas: 5287423)
+Suite result: ok. 10 passed; 0 failed; 0 skipped; finished in 6.16ms (10.43ms CPU time)
+
+Ran 15 tests for test/foundry/TeleportV3FullFlow.t.sol:TeleportV3FullFlowTests
+[PASS] test_V3_AllValidFeeTiers() (gas: 1859535)
+[PASS] test_V3_ConstructorValidation() (gas: 255603)
+[PASS] test_V3_DustRefund_WithDust() (gas: 4420336)
+[PASS] test_V3_DustRefund_ZeroDust() (gas: 569875)
+[PASS] test_V3_FullMigration_NoSwap() (gas: 566476)
+[PASS] test_V3_FullMigration_WithSwap() (gas: 607700)
+[PASS] test_V3_ModifiedParams() (gas: 312529)
+[PASS] test_V3_NonceReplayProtection() (gas: 735396)
+[PASS] test_V3_OnERC721Received() (gas: 6001)
+[PASS] test_V3_OwnerCanExecute() (gas: 566201)
+[PASS] test_V3_RevertOnInvalidTicks() (gas: 283841)
+[PASS] test_V3_RevertOnNonCompliantAssets() (gas: 849170)
+[PASS] test_V3_RevertOnSwapExceedsAvailable() (gas: 378024)
+[PASS] test_V3_RevertOnUnsupportedFee() (gas: 283332)
+[PASS] test_V3_WrongSigner() (gas: 310569)
+Suite result: ok. 15 passed; 0 failed; 0 skipped; finished in 6.96ms (14.73ms CPU time)
 
 Ran 2 tests for test/foundry/GravitasInvariants.t.sol:GravitasInvariants
-[PASS] testFuzz_ComplianceInvariant(address) (runs: 256, μ: 40719, ~: 40719)
-[PASS] test_AssetIntegrityInvariant() (gas: 17688)
-Suite result: ok. 2 passed; 0 failed; 0 skipped; finished in 8.54ms (8.09ms CPU time)
+[PASS] testFuzz_ComplianceInvariant(address) (runs: 256, μ: 40801, ~: 40801)
+[PASS] test_AssetIntegrityInvariant() (gas: 17452)
+Suite result: ok. 2 passed; 0 failed; 0 skipped; finished in 20.53ms (19.82ms CPU time)
 
-Ran 2 test suites in 9.83ms (11.54ms CPU time): 4 tests passed, 0 failed, 0 skipped (4 total tests)
+Ran 5 test suites in 21.73ms (40.04ms CPU time): 46 tests passed, 0 failed, 0 skipped (46 total tests)

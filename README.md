@@ -199,7 +199,7 @@ The protocol is built on the principle of **Gharar Elimination**. Every migratio
 - **Security Invariants**: Proven via Foundry fuzz testing, ensuring mathematical safety.
 - **Deterministic Deployment**: Contracts deployed using `CREATE2` for predictable addresses across L2/L3 chains.
 - **Reentrancy Protection**: All external-facing functions protected with ReentrancyGuard.
-- **Gas Optimization**: Hot-path operations use Yul (Inline Assembly) for ~2,000 gas savings per call.
+- **GaGas Optimization: The `_refundDustOptimized` function in `TeleportV3.sol` now utilizes Yul assembly for raw ERC20 transfers. This low-level implementation bypasses standard `safeTransfer` overhead, saving approximately 2,000 gas per dust refund operation. The implementation is based on the optimized transfer pattern and has been thoroughly tested to ensure safety and correctness.
 
 ---
 

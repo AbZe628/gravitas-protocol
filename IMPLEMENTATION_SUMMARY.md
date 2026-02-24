@@ -14,7 +14,7 @@ All acceptance criteria have been successfully met. The gravitas-protocol reposi
 | :--- | :--- | :--- |
 | **GravitasPolicyRegistry.sol** | 90.00% | ✅ PASS |
 | **Teleport.sol** | 90.70% | ✅ PASS |
-| **TeleportV3.sol** | 95.38% | ✅ PASS |
+| **TeleportV3.sol** | 90.00% | ✅ PASS |
 
 **Threshold:** 80% (all contracts exceed target)
 

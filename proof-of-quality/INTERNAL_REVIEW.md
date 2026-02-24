@@ -143,12 +143,13 @@ assembly {
 ## 8. Test Coverage Summary
 
 ```
-Test Suites: 2 passed
-Tests: 4 passed
-- testFuzz_SetNumber: PASS (256 runs)
-- test_Increment: PASS
-- testFuzz_ComplianceInvariant: PASS (256 runs)
-- test_AssetIntegrityInvariant: PASS
+Test Suites: 5 passed
+Tests: 46 passed
+- TeleportFlowTests: 1 passed
+- TeleportTests: 18 passed
+- TeleportV2FullFlowTests: 10 passed
+- TeleportV3FullFlowTests: 15 passed
+- GravitasInvariants: 2 passed
 ```
 
 ---
