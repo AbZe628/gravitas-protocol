@@ -13,6 +13,8 @@ import {
   Wallet,
   ExternalLink,
   LogOut,
+  X,
+  Settings,
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { useAccount, useConnect, useDisconnect, useSwitchChain } from "wagmi";
@@ -44,6 +46,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     { icon: ArrowLeftRight, label: "Migrate", path: "/dashboard/migrate" },
     { icon: BarChart3, label: "Analytics", path: "/dashboard/analytics" },
     { icon: History, label: "History", path: "/dashboard/history" },
+    { icon: Settings, label: "Admin", path: "/admin" },
   ];
 
   const isActive = (path: string) => {
@@ -57,91 +60,117 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     <div className="min-h-screen bg-gradient-to-br from-[#0A1628] via-[#0F1E35] to-[#0A1628]">
       {/* Mobile Header */}
       <header className="lg:hidden sticky top-0 z-50 w-full border-b border-[#D4AF37]/20 bg-[#0A1628]/95 backdrop-blur">
-        <div className="container flex h-16 items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-[#D4AF37] to-[#B8941F] flex items-center justify-center">
-              <span className="text-[#0A1628] font-bold text-xl">G</span>
+        <div className="flex h-16 items-center justify-between px-4">
+          <div className="flex items-center gap-2 shrink-0">
+            <div className="h-9 w-9 rounded-lg bg-gradient-to-br from-[#D4AF37] to-[#B8941F] flex items-center justify-center">
+              <span className="text-[#0A1628] font-bold text-lg">G</span>
             </div>
-            <div>
-              <h1 className="text-lg font-bold text-white">Gravitas</h1>
-              <p className="text-xs text-white/50">Dashboard</p>
+            <div className="hidden xs:block">
+              <h1 className="text-sm font-bold text-white">Gravitas</h1>
+              <p className="text-xs text-white/40">Dashboard</p>
             </div>
           </div>
-          <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="text-[#D4AF37]">
-                <Menu className="h-5 w-5" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-[300px] bg-[#0A1628] border-[#D4AF37]/20">
-              <nav className="flex flex-col gap-4 mt-8">
+
+          <div className="flex items-center gap-2">
+            {isConnected && (
+              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#0F1E35]/50 border border-[#D4AF37]/20">
+                <div className="h-2 w-2 rounded-full bg-green-400" />
+                <span className="text-xs font-mono text-white/70">
+                  {address?.slice(0, 6)}...{address?.slice(-4)}
+                </span>
+              </div>
+            )}
+
+            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+              <SheetTrigger asChild>
                 <Button
                   variant="ghost"
-                  onClick={() => {
-                    navigate("/");
-                    setMobileMenuOpen(false);
-                  }}
-                  className="justify-start text-white hover:text-[#D4AF37]"
+                  size="icon"
+                  className="text-[#D4AF37] hover:bg-[#D4AF37]/10 lg:hidden"
                 >
-                  <Home className="h-4 w-4 mr-2" />
-                  Home
+                  {mobileMenuOpen ? (
+                    <X className="h-5 w-5" />
+                  ) : (
+                    <Menu className="h-5 w-5" />
+                  )}
                 </Button>
-                <Separator className="bg-[#D4AF37]/20" />
-                {navItems.map((item) => (
+              </SheetTrigger>
+              <SheetContent
+                side="right"
+                className="w-[280px] bg-[#0A1628] border-[#D4AF37]/20 p-0"
+              >
+                <nav className="flex flex-col gap-1 pt-6 px-4">
                   <Button
-                    key={item.path}
                     variant="ghost"
                     onClick={() => {
-                      navigate(item.path);
+                      navigate("/");
                       setMobileMenuOpen(false);
                     }}
-                    className={`justify-start ${
-                      isActive(item.path)
-                        ? "bg-[#D4AF37]/20 text-[#D4AF37]"
-                        : "text-white hover:text-[#D4AF37]"
-                    }`}
+                    className="justify-start text-white/70 hover:text-[#D4AF37] hover:bg-[#D4AF37]/10 h-10"
                   >
-                    <item.icon className="h-4 w-4 mr-2" />
-                    {item.label}
+                    <Home className="h-4 w-4 mr-3" />
+                    Home
                   </Button>
-                ))}
-                <Separator className="bg-[#D4AF37]/20" />
-                {isConnected ? (
-                  <>
-                    <div className="px-4 py-2">
-                      <p className="text-xs text-white/50 mb-1">Connected</p>
-                      <p className="text-sm font-mono text-white">
-                        {address?.slice(0, 6)}...{address?.slice(-4)}
-                      </p>
-                    </div>
+                  <Separator className="bg-[#D4AF37]/20 my-2" />
+                  {navItems.map((item) => (
                     <Button
+                      key={item.path}
                       variant="ghost"
                       onClick={() => {
-                        disconnect();
+                        navigate(item.path);
                         setMobileMenuOpen(false);
                       }}
-                      className="justify-start text-white hover:text-[#D4AF37]"
+                      className={`justify-start h-10 ${
+                        isActive(item.path)
+                          ? "bg-[#D4AF37]/20 text-[#D4AF37]"
+                          : "text-white/70 hover:text-[#D4AF37] hover:bg-[#D4AF37]/10"
+                      }`}
                     >
-                      <LogOut className="h-4 w-4 mr-2" />
-                      Disconnect
+                      <item.icon className="h-4 w-4 mr-3" />
+                      {item.label}
                     </Button>
-                  </>
-                ) : (
-                  <Button
-                    variant="ghost"
-                    onClick={() => {
-                      connect({ connector: connectors[0] });
-                      setMobileMenuOpen(false);
-                    }}
-                    className="justify-start text-[#D4AF37]"
-                  >
-                    <Wallet className="h-4 w-4 mr-2" />
-                    Connect Wallet
-                  </Button>
-                )}
-              </nav>
-            </SheetContent>
-          </Sheet>
+                  ))}
+                  <Separator className="bg-[#D4AF37]/20 my-2" />
+                  {isConnected ? (
+                    <>
+                      <div className="px-3 py-3">
+                        <p className="text-xs text-white/40 mb-1">Connected Wallet</p>
+                        <p className="text-xs font-mono text-white mb-2">
+                          {address?.slice(0, 10)}...{address?.slice(-8)}
+                        </p>
+                        <Badge className="bg-green-500/20 text-green-500 border-green-500/30 text-xs">
+                          {chain?.name || "Unknown"}
+                        </Badge>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          disconnect();
+                          setMobileMenuOpen(false);
+                        }}
+                        className="w-full border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37]/10 h-9 text-xs"
+                      >
+                        <LogOut className="h-3 w-3 mr-2" />
+                        Disconnect
+                      </Button>
+                    </>
+                  ) : (
+                    <Button
+                      onClick={() => {
+                        connect({ connector: connectors[0] });
+                        setMobileMenuOpen(false);
+                      }}
+                      className="w-full bg-[#D4AF37] text-[#0A1628] hover:bg-[#D4AF37]/90 h-9 text-xs"
+                    >
+                      <Wallet className="h-3 w-3 mr-2" />
+                      Connect Wallet
+                    </Button>
+                  )}
+                </nav>
+              </SheetContent>
+            </Sheet>
+          </div>
         </div>
       </header>
 
@@ -151,10 +180,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         <motion.aside
           initial={{ x: -300, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
-          className="w-64 border-r border-[#D4AF37]/20 bg-[#0A1628]/50 backdrop-blur flex flex-col"
+          className="w-64 border-r border-[#D4AF37]/20 bg-[#0A1628]/50 backdrop-blur flex flex-col overflow-y-auto"
         >
           {/* Logo */}
-          <div className="p-6 border-b border-[#D4AF37]/20">
+          <div className="p-6 border-b border-[#D4AF37]/20 shrink-0">
             <div className="flex items-center gap-3">
               <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-[#D4AF37] to-[#B8941F] flex items-center justify-center">
                 <span className="text-[#0A1628] font-bold text-2xl">G</span>
@@ -167,43 +196,43 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 p-4 space-y-2">
+          <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
             <Button
               variant="ghost"
               onClick={() => navigate("/")}
-              className="w-full justify-start text-white/70 hover:text-[#D4AF37] hover:bg-[#D4AF37]/10"
+              className="w-full justify-start text-white/70 hover:text-[#D4AF37] hover:bg-[#D4AF37]/10 h-10"
             >
-              <Home className="h-4 w-4 mr-2" />
+              <Home className="h-4 w-4 mr-3" />
               Home
             </Button>
-            <Separator className="bg-[#D4AF37]/20 my-4" />
+            <Separator className="bg-[#D4AF37]/20 my-3" />
             {navItems.map((item) => (
               <Button
                 key={item.path}
                 variant="ghost"
                 onClick={() => navigate(item.path)}
-                className={`w-full justify-start ${
+                className={`w-full justify-start h-10 ${
                   isActive(item.path)
                     ? "bg-[#D4AF37]/20 text-[#D4AF37]"
                     : "text-white/70 hover:text-[#D4AF37] hover:bg-[#D4AF37]/10"
                 }`}
               >
-                <item.icon className="h-4 w-4 mr-2" />
+                <item.icon className="h-4 w-4 mr-3" />
                 {item.label}
               </Button>
             ))}
           </nav>
 
           {/* Wallet Section */}
-          <div className="p-4 border-t border-[#D4AF37]/20">
+          <div className="p-4 border-t border-[#D4AF37]/20 shrink-0">
             {isConnected ? (
               <div className="space-y-3">
-                <div className="p-3 rounded-lg bg-[#0F1E35]/50">
+                <div className="p-3 rounded-lg bg-[#0F1E35]/50 border border-[#D4AF37]/10">
                   <p className="text-xs text-white/50 mb-1">Connected Wallet</p>
-                  <p className="text-sm font-mono text-white mb-2">
-                    {address?.slice(0, 10)}...{address?.slice(-8)}
+                  <p className="text-xs font-mono text-white mb-2 break-all">
+                    {address?.slice(0, 12)}...{address?.slice(-10)}
                   </p>
-                  <Badge className="bg-green-500/20 text-green-500 border-green-500/30">
+                  <Badge className="bg-green-500/20 text-green-500 border-green-500/30 text-xs">
                     {chain?.name || "Unknown"}
                   </Badge>
                 </div>
@@ -211,16 +240,16 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                   variant="outline"
                   size="sm"
                   onClick={() => disconnect()}
-                  className="w-full border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37]/10"
+                  className="w-full border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37]/10 h-9 text-xs"
                 >
-                  <LogOut className="h-4 w-4 mr-2" />
+                  <LogOut className="h-3 w-3 mr-2" />
                   Disconnect
                 </Button>
               </div>
             ) : (
               <Button
                 onClick={() => connect({ connector: connectors[0] })}
-                className="w-full bg-[#D4AF37] text-[#0A1628] hover:bg-[#D4AF37]/90"
+                className="w-full bg-[#D4AF37] text-[#0A1628] hover:bg-[#D4AF37]/90 h-10 text-sm font-semibold"
               >
                 <Wallet className="h-4 w-4 mr-2" />
                 Connect Wallet
@@ -232,13 +261,13 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         {/* Main Content */}
         <div className="flex-1 flex flex-col overflow-hidden">
           {/* Top Bar */}
-          <header className="h-16 border-b border-[#D4AF37]/20 bg-[#0A1628]/50 backdrop-blur flex items-center justify-between px-6">
-            <div className="flex items-center gap-4">
-              <h2 className="text-xl font-semibold text-white">
+          <header className="h-16 border-b border-[#D4AF37]/20 bg-[#0A1628]/50 backdrop-blur flex items-center justify-between px-6 shrink-0">
+            <div className="flex items-center gap-4 min-w-0">
+              <h2 className="text-lg font-semibold text-white truncate">
                 {navItems.find((item) => isActive(item.path))?.label || "Dashboard"}
               </h2>
               {chain?.id !== arbitrumSepolia.id && isConnected && (
-                <Badge variant="outline" className="border-red-500 text-red-500">
+                <Badge variant="outline" className="border-red-500 text-red-500 text-xs shrink-0">
                   Wrong Network
                 </Badge>
               )}
@@ -247,25 +276,27 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               href="https://sepolia.arbiscan.io/address/0x5D423f8d01539B92D3f3953b91682D9884D1E993"
               target="_blank"
               rel="noopener noreferrer"
+              className="shrink-0"
             >
               <Button
                 variant="outline"
                 size="sm"
-                className="border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37]/10"
+                className="border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37]/10 h-9 text-xs"
               >
-                <ExternalLink className="h-4 w-4 mr-2" />
-                View on Arbiscan
+                <ExternalLink className="h-3 w-3 mr-2" />
+                Arbiscan
               </Button>
             </a>
           </header>
 
           {/* Page Content */}
-          <main className="flex-1 overflow-y-auto p-6">
+          <main className="flex-1 overflow-y-auto overflow-x-hidden">
             <motion.div
               key={location}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
+              className="p-6"
             >
               {children}
             </motion.div>
@@ -274,12 +305,13 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       </div>
 
       {/* Mobile Content */}
-      <main className="lg:hidden p-4">
+      <main className="lg:hidden pb-safe">
         <motion.div
           key={location}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
+          className="p-4 space-y-4"
         >
           {children}
         </motion.div>

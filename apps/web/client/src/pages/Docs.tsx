@@ -39,9 +39,11 @@ function CodeBlock({ code, language = "bash" }: { code: string; language?: strin
           {copied ? <CheckCheck className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
         </Button>
       </div>
-      <pre className="p-4 overflow-x-auto text-sm">
-        <code className="text-[#D4AF37]/90 font-mono">{code}</code>
+      <div className="overflow-x-auto overflow-y-hidden max-h-96 sm:max-h-full">
+        <pre className="p-3 sm:p-4 text-xs sm:text-sm min-w-min">
+        <code className="text-[#D4AF37]/90 font-mono whitespace-pre-wrap break-words sm:whitespace-pre">{code}</code>
       </pre>
+      </div>
     </div>
   );
 }

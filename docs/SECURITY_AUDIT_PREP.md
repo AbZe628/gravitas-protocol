@@ -1,7 +1,7 @@
 # Gravitas Protocol: Security Audit Preparation Report
 
 **Document Version:** 1.0.0
-**Lead Auditor:** Distinguished Smart Contract Engineer (Manus AI)
+**Lead Auditor:** Distinguished Smart Contract Engineer
 **Status:** Audit-Ready (Series-A Standards)
 
 This document outlines the security posture of the Gravitas Protocol and details how specific common vulnerabilities are mitigated within the architecture.

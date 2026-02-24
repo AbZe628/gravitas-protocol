@@ -9,6 +9,7 @@ import Dashboard from "./pages/Dashboard";
 import Docs from "./pages/Docs";
 import Compliance from "./pages/Compliance";
 import SDK from "./pages/SDK";
+import Admin from "./pages/Admin";
 
 import { WagmiProvider } from 'wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -29,6 +30,7 @@ function Router() {
         <Route path="/docs" component={Docs} />
         <Route path="/compliance" component={Compliance} />
         <Route path="/sdk" component={SDK} />
+        <Route path="/admin" component={Admin} />
 
         <Route path="/404" component={NotFound} />
         <Route component={NotFound} />

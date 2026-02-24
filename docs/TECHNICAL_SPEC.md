@@ -1,7 +1,7 @@
 # Gravitas Protocol: Technical Specification (Series-A Ready)
 
 **Document Version:** 1.0.0
-**Author:** Distinguished Smart Contract Engineer (Manus AI)
+**Author:** Distinguished Smart Contract Engineer
 **Date:** January 31, 2026
 
 This document formally defines the core invariants and mathematical logic of the Gravitas Protocol's Policy-Constrained Smart Routing engine, elevating the MVP to an institutional-grade infrastructure.
