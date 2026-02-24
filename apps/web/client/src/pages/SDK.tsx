@@ -275,7 +275,7 @@ async function migratePosition(tokenId: bigint) {
   const provider = new ethers.JsonRpcProvider(
     'https://sepolia-rollup.arbitrum.io/rpc'
   );
-  const signer = new ethers.Wallet(process.env.PRIVATE_KEY!, provider);
+  const signer = new ethers.Wallet(process.env.WALLET_SIGNER_KEY!, provider);
 
   // Initialize Gravitas client
   const client = new GravitasClient({
