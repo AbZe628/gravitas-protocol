@@ -1,24 +1,35 @@
 <!doctype html>
 <html lang="en">
-
   <head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1" />
-    <title>Gravitas Protocol - Shariah-C    <title>Gravitas Protocol - Shariah-Compliant Liquidity Routing</title>
-    <meta name="description" content="Institutional-grade Shariah-compliant liquidity infrastructure for DeFi. Deterministic routing and atomic migrations across DEX ecosystems." />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <title>Gravitas Protocol — Shariah-Compliant Liquidity Routing</title>
+    <meta name="description" content="Institutional-grade Shariah-compliant liquidity infrastructure for DeFi. Deterministic routing and atomic migrations across DEX ecosystems on Arbitrum." />
+    <meta property="og:title" content="Gravitas Protocol — Shariah-Compliant Liquidity Routing" />
+    <meta property="og:description" content="Institutional-grade Shariah-compliant liquidity infrastructure for DeFi. Deterministic routing and atomic migrations across DEX ecosystems on Arbitrum." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Gravitas Protocol" />
+    <meta name="twitter:description" content="Institutional-grade Shariah-compliant liquidity infrastructure for DeFi." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" /> </head>
-
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+    <!-- GitHub Pages SPA redirect handler -->
+    <script type="text/javascript">
+      (function(l) {
+        if (l.search[1] === '/' ) {
+          var decoded = l.search.slice(1).split('&').map(function(s) {
+            return s.replace(/~and~/g, '&')
+          }).join('?');
+          window.history.replaceState(null, null,
+            l.pathname.slice(0, -1) + decoded + l.hash
+          );
+        }
+      }(window.location))
+    </script>
+  </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    <script
-      defer
-      src="%VITE_ANALYTICS_ENDPOINT%/umami"
-      data-website-id="%VITE_ANALYTICS_WEBSITE_ID%"></script>
   </body>
-
 </html>

@@ -1,116 +1,98 @@
-# GRAVITAS PROTOCOL
+# <p align="center">Gravitas Protocol</p>
 
-**Institutional-Grade Shariah-Compliant Liquidity Infrastructure**
+<p align="center">
+  <strong>Institutional-Grade Shariah-Compliant Liquidity Infrastructure</strong>
+</p>
 
-[![CI](https://github.com/AbZe628/gravitas-protocol/actions/workflows/ci.yml/badge.svg)](https://github.com/AbZe628/gravitas-protocol/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Solidity](https://img.shields.io/badge/Solidity-0.8.24-blue.svg)](https://soliditylang.org/)
-[![Audit: Internal Passed](https://img.shields.io/badge/Audit-Internal%20Passed-blueviolet.svg)](./proof-of-quality/INTERNAL_REVIEW.md)
+<p align="center">
+  <a href="https://abze628.github.io/gravitas-protocol/" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/badge/Live%20Frontend-Launch%20App-blue.svg?style=for-the-badge" alt="Live Frontend"></a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/AbZe628/gravitas-protocol/actions/workflows/ci.yml"><img src="https://github.com/AbZe628/gravitas-protocol/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://github.com/AbZe628/gravitas-protocol/actions/workflows/deploy-frontend.yml"><img src="https://github.com/AbZe628/gravitas-protocol/actions/workflows/deploy-frontend.yml/badge.svg" alt="Deploy Frontend"></a>
+  <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
+  <a href="https://soliditylang.org/"><img src="https://img.shields.io/badge/Solidity-0.8.24-blue.svg" alt="Solidity"></a>
+  <a href="./proof-of-quality/INTERNAL_REVIEW.md"><img src="https://img.shields.io/badge/Audit-Internal%20Passed-blueviolet.svg" alt="Audit: Internal Passed"></a>
+</p>
 
 ---
 
+**Gravitas Protocol** is a deep-tech infrastructure layer designed to solve liquidity fragmentation in Decentralized Finance (DeFi). We provide deterministic routing and atomic liquidity migration, enabling capital to move efficiently across DEX ecosystems without friction, high costs, or technical opacity. 
 
+Built from the ground up with **Shariah compliance** as a core governance principle, Gravitas is positioned as the primary gateway for the **$3 Trillion+ Islamic Finance market** to enter the Web3 ecosystem.
 
-Our core contracts ([TeleportV3](https://sepolia.arbiscan.io/address/0x5D423f8d01539B92D3f3953b91682D9884D1E993#events) and [GravitasPolicyRegistry](https://sepolia.arbiscan.io/address/0xbcaE3069362B0f0b80f44139052f159456C84679#code)) are deployed and verified on Arbitrum Sepolia with real on-chain activity, demonstrating atomic liquidity migration and policy-enforced execution.
-
-
-## Executive Summary
-
-Gravitas Protocol is a **deep-tech infrastructure layer** designed to solve the fragmentation of liquidity in Decentralized Finance (DeFi). We provide **deterministic routing and liquidity migration logic** that allows capital to move efficiently across DEX ecosystems without friction, high costs, or technical opacity.
-
-**Strategic Positioning**: Built from the ground up with **Shariah compliance** as a core governance principle, positioning the protocol as a primary gateway for the **$3 Trillion+ Islamic Finance market** to enter the Web3 ecosystem.
+| Quick Links | Description |
+|---|---|
+| 🌐 **[Live Frontend](https://abze628.github.io/gravitas-protocol/)** | Explore the dashboard, analytics, and migration tools. |
+| 📄 **[Whitepaper](https://abze628.github.io/gravitas-protocol/whitepaper)** | Read the full technical and business specification. |
+| 📚 **[Documentation](https://abze628.github.io/gravitas-protocol/docs)** | Full protocol documentation and integration guides. |
+| 💻 **[SDK Reference](https://abze628.github.io/gravitas-protocol/sdk)** | Integrate with the Gravitas TypeScript SDK. |
 
 ---
 
 ## The Problem: Liquidity Fragmentation
 
-Currently, liquidity in DeFi is siloed. Moving capital from one protocol (e.g., Uniswap) to another (e.g., a lending protocol or another DEX) is:
+Currently, liquidity in DeFi is siloed. Moving capital from one protocol to another is expensive, risky, and manual—making institutional adoption nearly impossible.
 
-| Challenge | Impact |
-|-----------|--------|
-| **Expensive** | Multiple approvals and gas fees |
-| **Risky** | Exposure to slippage and MEV (Maximal Extractable Value) bots |
-| **Manual** | Institutional players cannot automate this movement securely at scale |
+| Challenge | Impact on Institutions |
+|---|---|
+| **Expensive** | Multiple approvals and gas fees result in **0.5–2% value loss** per migration cycle. |
+| **Risky** | Exposure to **slippage and MEV bots** during multi-step migrations. |
+| **Manual** | Lack of secure automation prevents **liquidity management at scale**. |
 
----
+## The Solution: Deterministic Liquidity Routing
 
-## The Gravitas Solution: Deterministic Liquidity Routing
-
-Gravitas acts as the **middleware layer** enabling "Deterministic Liquidity Routing." Users or institutions define an intent (e.g., "Move liquidity to the highest yield source within Shariah-compliant parameters"), and Gravitas executes the migration **atomically with guaranteed outcomes**.
-
-### Core Principles
-
-| Principle | Implementation |
-|-----------|----------------|
-| **Deterministic Execution** | Transactions revert entirely if parameters are not met |
-| **Gharar Elimination** | Users know exactly what they receive before execution |
-| **Policy-Constrained Routing** | All migrations validated against Shariah parameters |
-| **Atomic Migration** | Remove Liquidity → Swap → Add Liquidity in ONE transaction |
-
----
-
-## Technical Architecture
+Gravitas acts as the middleware layer enabling "Deterministic Liquidity Routing." Users or institutions define an intent, and Gravitas executes the migration **atomically with guaranteed outcomes**.
 
 ![Gravitas Protocol Architecture](./docs/architecture.png)
 
-*Comprehensive system architecture showing the interaction between user layer, application layer, smart contracts, DeFi protocols, and governance mechanisms.*
-
-### Key Components
+### Core Components
 
 | Component | Description |
-|-----------|-------------|
-| **GravitasPolicyRegistry** | Risk & Compliance Oracle - validates assets, routers, and executors |
-| **TeleportV3** | Deterministic Liquidity Routing Engine for Uniswap V3 positions |
-| **Gravitas SDK** | TypeScript SDK for institutional integrations (Stripe-like DX) |
+|---|---|
+| **GravitasPolicyRegistry** | **Risk & Compliance Oracle.** Validates assets, routers, and executors against Shariah parameters before every transaction. | 
+| **TeleportV3** | **V3 Migration Engine.** EIP-712 signed migrations for Uniswap V3 NFT positions with Yul-optimized gas savings. |
+| **TeleportV2** | **V2 Migration Engine.** Atomic migrations for Uniswap V2 LP positions with cooldown and slippage protection. |
+| **Gravitas SDK** | **TypeScript SDK.** A Stripe-like developer experience for institutional integrations. |
 
 ---
 
-## Shariah Alignment & Certification Path
+## Shariah Compliance by Design
 
-Gravitas Protocol treats Shariah compliance as a **technical requirement**, not a marketing label. We address the primary concerns of Islamic Finance in Web3:
+Gravitas Protocol treats Shariah compliance as a **technical requirement**, not a marketing label. The `GravitasPolicyRegistry` contract programmatically enforces the core principles of Islamic Finance.
 
 | Principle | Implementation |
-|-----------|----------------|
-| **No Riba (Interest)** | Revenue via service fees, not interest-based lending |
-| **Eliminating Gharar (Uncertainty)** | Deterministic routing removes ambiguity in execution |
-| **Asset Whitelisting** | Filter non-compliant assets (gambling, alcohol tokens) |
-| **No Maysir (Speculation)** | Filters gambling and speculative assets |
+|---|---|
+| **No Riba (Interest)** | Revenue model based exclusively on service fees (0.05-0.1%), not interest. |
+| **No Gharar (Uncertainty)** | Deterministic routing and simulation APIs provide exact outcomes before execution. |
+| **No Maysir (Gambling)** | Protocol-level filtering of speculative and gambling-related tokens. |
+| **Asset Halal Verification** | On-chain whitelist of Shariah-compliant tokens maintained by governance. |
 
 ### Certification Roadmap
 
-| Phase | Timeline | Status |
-|-------|----------|--------|
-| **Phase 1: Self-Regulation** | Current | ✅ Internal AAOIFI standards adherence |
-| **Phase 2: Shariah Advisory Board** | Q3 2026 | 🔄 Engagement with recognized board |
-| **Phase 3: Shariah Seal** | 2027 | 📋 Formal certification for GCC integration |
+| Phase | Status | Description |
+|---|---|---|
+| **Phase 1: Self-Regulation** | ✅ **Completed** | Internal AAOIFI standards adherence; `GravitasPolicyRegistry` is live. |
+| **Phase 2: Advisory Board** | 📋 **Planned (Q3 2026)** | Engagement with recognized Shariah scholars for formal advisory. |
+| **Phase 3: Formal Certification** | 📋 **Planned (2027)** | Obtain a formal Shariah Seal for GCC market integration. |
 
 ---
 
-## Repository Structure
+## Development & CI/CD
 
-```
-gravitas-protocol/
-├── contracts/                    # Solidity smart contracts
-│   ├── GravitasPolicyRegistry.sol   # Risk & Compliance Oracle
-│   ├── TeleportV3.sol               # V3 Migration Engine
-│   ├── Teleport.sol                 # V2 Migration Engine
-│   └── interfaces/                  # External interfaces
-├── gravitas-sdk/                 # TypeScript SDK
-│   └── src/
-│       ├── compliance.ts            # Shariah pre-flight checks
-│       ├── teleport.ts              # Migration builder
-│       └── types.ts                 # Type definitions
-├── script/                       # Deployment scripts
-│   └── DeployDeterministic.s.sol    # Foundry deployment script
-├── test/                         # Test suites
-│   └── foundry/                     # Foundry tests
-├── proof-of-quality/             # Audit & test artifacts
-│   ├── test_results.txt             # Test execution results
-│   ├── gas_report.txt               # Gas snapshot report
-│   └── INTERNAL_REVIEW.md           # Internal security review
-├── DEPLOYMENT.md                 # Testnet deployment guide
-└── deploy_testnet.sh             # One-click deployment script
-```
+This project is a monorepo managed with `pnpm` workspaces.
+
+- `apps/web`: The React frontend application.
+- `packages/contracts`: Solidity smart contracts.
+- `packages/sdk`: TypeScript SDK.
+
+### Continuous Integration & Deployment
+
+Two primary GitHub Actions workflows ensure code quality and deployment:
+
+1.  **`ci.yml`**: Triggered on pushes to `main`. Runs Foundry tests for all smart contracts to ensure correctness and security.
+2.  **`deploy-frontend.yml`**: Triggered on pushes to `apps/web`. Builds the React application and deploys it to GitHub Pages.
 
 ---
 
@@ -119,123 +101,34 @@ gravitas-protocol/
 ### Prerequisites
 
 - [Foundry](https://getfoundry.sh/) (for smart contracts)
-- [Node.js 20+](https://nodejs.org/) (for SDK)
+- [Node.js 22+](https://nodejs.org/) & [pnpm 10+](https://pnpm.io/)
 
-### Installation
+### Run Frontend Locally
 
 ```bash
 # Clone the repository
 git clone https://github.com/AbZe628/gravitas-protocol.git
 cd gravitas-protocol
 
-# Install contract dependencies
-npm install
+# Install dependencies for the entire monorepo
+pnpm install
 
-# Install SDK dependencies
-cd gravitas-sdk && npm install && cd ..
-
-# Build contracts
-forge build
-
-# Run tests
-forge test -vv
+# Run the frontend application
+pnpm --filter web dev
 ```
 
-### SDK Usage
-
-```typescript
-import { GravitasClient } from '@gravitas/sdk';
-
-const client = new GravitasClient({
-  rpcUrl: 'https://sepolia-rollup.arbitrum.io/rpc',
-  registryAddress: '0x...',
-  teleportV3Address: '0x...',
-  chainId: 421614,
-});
-
-// Build and simulate a migration
-const result = await client.migration()
-  .tokenId(123n)
-  .newFee(3000)
-  .ticks(-887220, 887220)
-  .slippage(0n, 0n, 0n, 0n)
-  .deadline(BigInt(Math.floor(Date.now() / 1000) + 3600))
-  .simulate(userAddress);
-```
-
----
-
-## Deployment
-
-### Testnet (Arbitrum Sepolia)
+### Run Contract Tests
 
 ```bash
-# Configure environment
-cp .env.example .env
-# Edit .env with your RPC_URL, PRIVATE_KEY, ETHERSCAN_API_KEY
+# Build contracts
+pnpm --filter contracts build
 
-# One-click deployment
-chmod +x deploy_testnet.sh
-./deploy_testnet.sh
+# Run tests
+pnpm --filter contracts test
 ```
-
-See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed instructions.
-
----
-
-## Security & Compliance
-
-The protocol is built on the principle of **Gharar Elimination**. Every migration is an atomic transaction, ensuring a deterministic outcome.
-
-| Audit Type | Status | Report |
-|------------|--------|--------|
-| Internal Security Review | ✅ Completed | [INTERNAL_REVIEW.md](./proof-of-quality/INTERNAL_REVIEW.md) |
-| External Audit (OpenZeppelin) | 📋 Planned | Q2 2026 |
-| Formal Verification | 📋 Planned | Q3 2026 |
-
-### Security Features
-
-- **Shariah Governance**: Enforced by the `GravitasPolicyRegistry`, which whitelists compliant assets and authorized routers.
-- **Security Invariants**: Proven via Foundry fuzz testing, ensuring mathematical safety.
-- **Deterministic Deployment**: Contracts deployed using `CREATE2` for predictable addresses across L2/L3 chains.
-- **Reentrancy Protection**: All external-facing functions protected with ReentrancyGuard.
-- **GaGas Optimization: The `_refundDustOptimized` function in `TeleportV3.sol` now utilizes Yul assembly for raw ERC20 transfers. This low-level implementation bypasses standard `safeTransfer` overhead, saving approximately 2,000 gas per dust refund operation. The implementation is based on the optimized transfer pattern and has been thoroughly tested to ensure safety and correctness.
-
----
-
-## Business Model
-
-Gravitas utilizes a diversified, sustainable revenue model that scales with volume and adoption:
-
-| Revenue Stream | Description |
-|----------------|-------------|
-| **Migration Fees** | Small fee per atomic migration (0.05-0.1%) |
-| **SDK Licensing** | Enterprise SDK licenses for institutional integrations |
-| **Compliance API** | Subscription access to compliance oracle |
-
----
-
-## Team
-
-**Abdusamed Zelic** — Founder & Lead Architect  
-Deep-tech engineer with focus on smart contract security and protocol architecture.
-
----
-
-## Contact
-
-- **Website**: [gravitas.finance](https://gravitas.finance) (Coming Soon)
-- **GitHub**: [github.com/AbZe628/gravitas-protocol](https://github.com/AbZe628/gravitas-protocol)
-- **Email**: abdusamedzelic98@gmail.com
 
 ---
 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-<p align="center">
-  <strong>Building Bank-Grade Infrastructure for the Next Generation of DeFi</strong>
-</p>

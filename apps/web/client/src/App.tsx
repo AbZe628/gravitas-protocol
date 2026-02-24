@@ -6,6 +6,10 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
+import Docs from "./pages/Docs";
+import Compliance from "./pages/Compliance";
+import SDK from "./pages/SDK";
+import Whitepaper from "./pages/Whitepaper";
 import { WagmiProvider } from 'wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { config } from './lib/wagmi';
@@ -22,6 +26,10 @@ function Router() {
         <Route path="/" component={Home} />
         <Route path="/dashboard" component={Dashboard} />
         <Route path="/dashboard/:any*" component={Dashboard} />
+        <Route path="/docs" component={Docs} />
+        <Route path="/compliance" component={Compliance} />
+        <Route path="/sdk" component={SDK} />
+        <Route path="/whitepaper" component={Whitepaper} />
         <Route path="/404" component={NotFound} />
         <Route component={NotFound} />
       </Switch>
