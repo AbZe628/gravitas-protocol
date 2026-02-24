@@ -143,8 +143,8 @@ const client = new GravitasClient({
                 {[
                   { prop: "rpcUrl", type: "string", desc: "Arbitrum Sepolia RPC endpoint" },
                   { prop: "chainId", type: "number", desc: "Chain ID (421614 for Arbitrum Sepolia)" },
-                  { prop: "registryAddress", type: "`0x${string}`", desc: "GravitasPolicyRegistry contract address" },
-                  { prop: "teleportV3Address", type: "`0x${string}`", desc: "TeleportV3 contract address" },
+                  { prop: "registryAddress", type: "\`0x\${string}\`", desc: "GravitasPolicyRegistry contract address" },
+                  { prop: "teleportV3Address", type: "\`0x\${string}\`", desc: "TeleportV3 contract address" },
                   { prop: "signer", type: "Signer (optional)", desc: "Ethers.js signer for write operations" },
                   { prop: "timeout", type: "number (optional)", desc: "Request timeout in milliseconds" },
                 ].map((prop, i) => (
@@ -257,7 +257,6 @@ const receipt = await tx.wait();`}
                 <Code2 className="h-6 w-6 text-[#D4AF37]" />
                 <h2 className="text-2xl font-bold">SDK Snippet Generator</h2>
               </div>
-              <p className="text-white/50 mb-6">Generate ready-to-use code snippets for your integration.</p>
 
               <Card className="border border-[#D4AF37]/10 bg-[#0A1628]/60">
                 <CardHeader>
@@ -275,7 +274,7 @@ async function migratePosition(tokenId: bigint) {
   const provider = new ethers.JsonRpcProvider(
     'https://sepolia-rollup.arbitrum.io/rpc'
   );
-  constconst signer = new ethers.Wallet(process.env.WALLET_SIGNER_KEY!, provider);;
+  const signer = new ethers.Wallet(process.env.WALLET_SIGNER_KEY!, provider);
 
   // Initialize Gravitas client
   const client = new GravitasClient({
@@ -368,6 +367,20 @@ async function migratePosition(tokenId: bigint) {
           </motion.div>
         </div>
       </div>
+
+      {/* Footer */}
+      <footer className="border-t border-[#D4AF37]/10 py-8 bg-[#060E1A]">
+        <div className="container flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-sm text-white/30">
+            © 2026 Gravitas Protocol. Built for institutional DeFi.
+          </p>
+          <div className="flex items-center gap-4 text-xs text-white/30">
+            <span>MIT License</span>
+            <span>·</span>
+            <a href="https://github.com/AbZe628/gravitas-protocol" target="_blank" rel="noopener noreferrer" className="hover:text-[#D4AF37] transition-colors">GitHub</a>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

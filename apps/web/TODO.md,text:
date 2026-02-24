@@ -1,0 +1,57 @@
+# Gravitas Protocol Frontend - Implementation Roadmap
+
+## ✅ Completed (MVP & Recent Improvements)
+
+- [x] Professional landing page with protocol overview
+- [x] Wallet connection (MetaMask via wagmi)
+- [x] Network auto-switch to Arbitrum Sepolia
+- [x] Basic dashboard layout with tabs
+- [x] Contract address display with copy/Arbiscan links
+- [x] Responsive design with institutional theme
+- [x] Typography system (IBM Plex Sans + Space Grotesk)
+- [x] Color palette (Navy + Gold institutional theme)
+- [x] **Verified Sepolia Contract Links** added to README and UI
+- [x] **Mobile-friendly navigation** and layout fixes
+- [x] **Removed Manus branding** and replaced with Gravitas Protocol signature
+- [x] **CI/CD Fix**: Resolved security scan failure in SDK code examples
+
+## 🚧 Phase 1: Contract Read Interfaces (Priority: HIGH)
+
+### Policy Registry Reader
+- [x] Display current policy version (Live on Overview)
+- [x] Check if an asset is compliant (Live on Migrate & Compliance pages)
+- [ ] List recent policy updates (if events are indexed)
+
+### Teleport V3 State Viewer
+- [x] Display user's current nonce (Live on Migrate)
+- [x] Show valid fee tiers (100, 500, 3000, 10000)
+- [ ] Display recent migrations (if events available)
+
+## 🚧 Phase 2: Write Transaction Interfaces (Priority: HIGH)
+
+### Teleport V2 Migration Form
+- [ ] Input fields for all migration parameters
+- [ ] Validation (check compliance, cooldown, maxMoveBps)
+- [ ] Gas estimation before submission
+- [ ] Transaction submission with loading states
+
+### Teleport V3 EIP-712 Signing Flow
+- [ ] Form for all AtomicMigration parameters
+- [ ] EIP-712 domain construction
+- [ ] Signature generation with `useSignTypedData`
+- [ ] Transaction submission with signature
+
+## 🚧 Phase 3: Advanced Features (Priority: MEDIUM)
+
+### Transaction History Viewer
+- [ ] Query past transactions from Arbiscan API or subgraph
+- [x] Mock UI for history (Live on History page)
+- [ ] Export to CSV
+
+## 🚀 Deployment
+
+- [x] GitHub Pages Configuration
+- [x] Automated deployment via GitHub Actions
+
+---
+*Last updated: February 24, 2026*

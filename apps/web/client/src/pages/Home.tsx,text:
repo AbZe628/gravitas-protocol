@@ -1,0 +1,374 @@
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  ArrowRight, Shield, Zap, Lock, ExternalLink, Github,
+  BookOpen, Code2, FileText, ChevronRight, CheckCircle,
+  TrendingUp, Users, Globe, Award, ArrowUpRight, Layers,
+  Cpu, Database, Network
+} from "lucide-react";
+import { Link } from "wouter";
+import { motion } from "framer-motion";
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
+};
+
+const stagger = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.12 } },
+};
+
+export default function Home() {
+  return (
+    <div className="min-h-screen bg-[#060E1A] text-white overflow-x-hidden">
+
+      {/* ── TOP NAV ── */}
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-[#D4AF37]/10 bg-[#060E1A]/80 backdrop-blur-xl">
+        <div className="container flex h-16 items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="h-9 w-9 rounded-lg bg-gradient-to-br from-[#D4AF37] to-[#B8941F] flex items-center justify-center shadow-lg shadow-[#D4AF37]/20">
+              <span className="text-[#060E1A] font-black text-lg">G</span>
+            </div>
+            <span className="font-bold text-lg tracking-tight">Gravitas Protocol</span>
+          </div>
+          <div className="hidden md:flex items-center gap-6 text-sm text-white/60">
+            <Link href="/docs" className="hover:text-[#D4AF37] transition-colors cursor-pointer">Docs</Link>
+            <Link href="/compliance" className="hover:text-[#D4AF37] transition-colors cursor-pointer">Compliance</Link>
+            <Link href="/sdk" className="hover:text-[#D4AF37] transition-colors cursor-pointer">SDK</Link>
+            <Link href="/whitepaper" className="hover:text-[#D4AF37] transition-colors cursor-pointer">Whitepaper</Link>
+            <a
+              href="https://github.com/AbZe628/gravitas-protocol"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-[#D4AF37] transition-colors"
+            >
+              <Github className="h-4 w-4" />
+            </a>
+          </div>
+          <Button asChild size="sm" className="bg-[#D4AF37] text-[#060E1A] hover:bg-[#D4AF37]/90 font-semibold">
+            <Link href="/dashboard">Launch App</Link>
+          </Button>
+        </div>
+      </nav>
+
+      {/* ── HERO ── */}
+      <section className="relative min-h-screen flex items-center pt-16">
+        {/* Background grid */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#D4AF3708_1px,transparent_1px),linear-gradient(to_bottom,#D4AF3708_1px,transparent_1px)] bg-[size:64px_64px]" />
+        {/* Radial glow */}
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[600px] bg-[#D4AF37]/5 rounded-full blur-[120px] pointer-events-none" />
+
+        <div className="container relative z-10 py-24">
+          <motion.div
+            variants={stagger}
+            initial="hidden"
+            animate="visible"
+            className="max-w-4xl"
+          >
+            <motion.div variants={fadeUp}>
+              <Badge className="mb-6 px-4 py-1.5 bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-[#D4AF37] text-xs font-semibold tracking-wider uppercase">
+                <Shield className="h-3 w-3 mr-2" />
+                Shariah-Compliant DeFi Infrastructure · Arbitrum Sepolia
+              </Badge>
+            </motion.div>
+
+            <motion.h1 variants={fadeUp} className="text-6xl lg:text-7xl xl:text-8xl font-bold leading-[1.05] mb-6 tracking-tight">
+              Institutional-Grade
+              <br />
+              <span className="bg-gradient-to-r from-[#D4AF37] via-[#F4D03F] to-[#D4AF37] bg-clip-text text-transparent">
+                Liquidity Routing
+              </span>
+            </motion.h1>
+
+            <motion.p variants={fadeUp} className="text-xl text-white/60 mb-10 max-w-2xl leading-relaxed">
+              Gravitas Protocol enables deterministic, Shariah-compliant liquidity migrations across
+              Uniswap V2 and V3 with atomic execution guarantees, EIP-712 signatures, and
+              institutional-grade security — targeting the $3T+ Islamic Finance market.
+            </motion.p>
+
+            <motion.div variants={fadeUp} className="flex flex-wrap gap-4 mb-16">
+              <Button asChild size="lg" className="bg-[#D4AF37] text-[#060E1A] hover:bg-[#D4AF37]/90 font-semibold gap-2 px-8 h-12 text-base shadow-xl shadow-[#D4AF37]/20">
+                <Link href="/dashboard">
+                  Launch App
+                  <ArrowRight className="h-5 w-5" />
+                </Link>
+              </Button>
+              <Button asChild variant="outline" size="lg" className="border-white/20 text-white hover:bg-white/5 gap-2 px-8 h-12 text-base">
+                <Link href="/whitepaper">
+                  <FileText className="h-5 w-5" />
+                  Read Whitepaper
+                </Link>
+              </Button>
+              <Button asChild variant="ghost" size="lg" className="text-white/60 hover:text-white gap-2 px-6 h-12">
+                <a href="https://github.com/AbZe628/gravitas-protocol" target="_blank" rel="noopener noreferrer">
+                  <Github className="h-5 w-5" />
+                  GitHub
+                </a>
+              </Button>
+            </motion.div>
+
+            {/* Stats row */}
+            <motion.div variants={stagger} className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              {[
+                { label: "Test Coverage", value: "90%+", icon: CheckCircle },
+                { label: "Gas Optimized", value: "~2K saved", icon: Zap },
+                { label: "Contracts Deployed", value: "3 Live", icon: Database },
+                { label: "Target Market", value: "$3T+", icon: TrendingUp },
+              ].map((stat, i) => (
+                <motion.div key={i} variants={fadeUp} className="flex flex-col gap-1">
+                  <div className="flex items-center gap-2 text-[#D4AF37]">
+                    <stat.icon className="h-4 w-4" />
+                    <span className="text-2xl font-bold text-white">{stat.value}</span>
+                  </div>
+                  <span className="text-sm text-white/40">{stat.label}</span>
+                </motion.div>
+              ))}
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ── CONTRACTS LIVE BANNER ── */}
+      <section className="border-y border-[#D4AF37]/10 bg-[#0A1628]/50 py-6">
+        <div className="container">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="h-2 w-2 rounded-full bg-green-400 animate-pulse" />
+              <span className="text-sm text-white/60">Live on Arbitrum Sepolia Testnet</span>
+            </div>
+            <div className="flex flex-wrap gap-6 text-sm">
+              <a
+                href="https://sepolia.arbiscan.io/address/0xbcaE3069362B0f0b80f44139052f159456C84679"
+                target="_blank" rel="noopener noreferrer"
+                className="flex items-center gap-2 text-white/60 hover:text-[#D4AF37] transition-colors"
+              >
+                <span className="font-mono">PolicyRegistry: 0xbcaE...4679</span>
+                <ExternalLink className="h-3 w-3" />
+              </a>
+              <a
+                href="https://sepolia.arbiscan.io/address/0x5D423f8d01539B92D3f3953b91682D9884D1E993"
+                target="_blank" rel="noopener noreferrer"
+                className="flex items-center gap-2 text-white/60 hover:text-[#D4AF37] transition-colors"
+              >
+                <span className="font-mono">TeleportV3: 0x5D42...E993</span>
+                <ExternalLink className="h-3 w-3" />
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── FEATURES ── */}
+      <section className="py-32">
+        <div className="container">
+          <motion.div
+            variants={stagger}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="text-center mb-20"
+          >
+            <motion.div variants={fadeUp}>
+              <Badge className="mb-4 bg-[#D4AF37]/10 border-[#D4AF37]/30 text-[#D4AF37]">Core Features</Badge>
+            </motion.div>
+            <motion.h2 variants={fadeUp} className="text-4xl lg:text-5xl font-bold mb-4">
+              Built for Institutions
+            </motion.h2>
+            <motion.p variants={fadeUp} className="text-lg text-white/50 max-w-2xl mx-auto">
+              Enterprise-grade infrastructure designed for banks, funds, and institutional traders
+              requiring Shariah compliance and deterministic execution.
+            </motion.p>
+          </motion.div>
+
+          <motion.div
+            variants={stagger}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="grid md:grid-cols-3 gap-6"
+          >
+            {[
+              {
+                icon: Shield,
+                title: "Shariah Compliant",
+                description: "Built-in policy registry ensures all transactions meet Islamic finance principles with automated compliance checks. No Riba, no Gharar, no Maysir.",
+                badge: "AAOIFI Standards",
+              },
+              {
+                icon: Zap,
+                title: "Atomic Execution",
+                description: "All-or-nothing transaction guarantees with deterministic routing eliminate partial execution risks and MEV exposure across Uniswap V2/V3.",
+                badge: "Zero MEV Risk",
+              },
+              {
+                icon: Lock,
+                title: "EIP-712 Signatures",
+                description: "Secure, human-readable transaction signing with nonce-based replay protection for institutional custody solutions and multi-sig workflows.",
+                badge: "Institutional Grade",
+              },
+              {
+                icon: Layers,
+                title: "Multi-Protocol Support",
+                description: "Seamlessly migrate liquidity between Uniswap V2 LP positions and V3 NFT positions with a single atomic transaction on Arbitrum.",
+                badge: "V2 + V3",
+              },
+              {
+                icon: Cpu,
+                title: "Gas Optimized",
+                description: "Yul inline assembly optimization for dust refunds saves ~2,000 gas per migration, providing best-in-class capital efficiency.",
+                badge: "Yul Optimized",
+              },
+              {
+                icon: Network,
+                title: "Deterministic Routing",
+                description: "Simulation APIs provide exact outcomes before execution, eliminating uncertainty and ensuring transparency for institutional reporting.",
+                badge: "Transparent",
+              },
+            ].map((feature, i) => (
+              <motion.div key={i} variants={fadeUp}>
+                <Card className="h-full border-[#D4AF37]/10 bg-[#0A1628]/40 hover:border-[#D4AF37]/30 transition-all group">
+                  <CardHeader>
+                    <div className="h-12 w-12 rounded-xl bg-[#D4AF37]/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                      <feature.icon className="h-6 w-6 text-[#D4AF37]" />
+                    </div>
+                    <Badge className="w-fit mb-2 bg-white/5 border-white/10 text-white/40 text-[10px] uppercase tracking-widest">{feature.badge}</Badge>
+                    <CardTitle className="text-xl text-white group-hover:text-[#D4AF37] transition-colors">{feature.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-white/50 leading-relaxed">{feature.description}</p>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ── CTA ── */}
+      <section className="py-32 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[#D4AF37]/5 blur-[120px] rounded-full -translate-y-1/2" />
+        <div className="container relative z-10">
+          <motion.div
+            variants={stagger}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="max-w-4xl mx-auto text-center"
+          >
+            <motion.div variants={fadeUp}>
+              <Badge className="mb-6 bg-[#D4AF37]/10 border-[#D4AF37]/30 text-[#D4AF37]">
+                Ready for Institutional Adoption
+              </Badge>
+            </motion.div>
+            <motion.h2 variants={fadeUp} className="text-4xl lg:text-6xl font-bold mb-6">
+              The Future of
+              <br />
+              <span className="bg-gradient-to-r from-[#D4AF37] to-[#F4D03F] bg-clip-text text-transparent">
+                Compliant DeFi
+              </span>
+            </motion.h2>
+            <motion.p variants={fadeUp} className="text-xl text-white/50 mb-10 max-w-2xl mx-auto">
+              Connect your wallet and start interacting with Shariah-compliant liquidity infrastructure
+              built for the next generation of institutional DeFi.
+            </motion.p>
+            <motion.div variants={fadeUp} className="flex flex-wrap gap-4 justify-center">
+              <Button asChild size="lg" className="bg-[#D4AF37] text-[#060E1A] hover:bg-[#D4AF37]/90 font-semibold gap-2 px-10 h-14 text-lg shadow-2xl shadow-[#D4AF37]/20">
+                <Link href="/dashboard">
+                  Launch Dashboard
+                  <ArrowRight className="h-5 w-5" />
+                </Link>
+              </Button>
+              <Button asChild variant="outline" size="lg" className="border-[#D4AF37]/30 text-white hover:bg-[#D4AF37]/10 gap-2 px-10 h-14 text-lg">
+                <a href="https://github.com/AbZe628/gravitas-protocol" target="_blank" rel="noopener noreferrer">
+                  <Github className="h-5 w-5" />
+                  View on GitHub
+                </a>
+              </Button>
+            </motion.div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ── FOOTER ── */}
+      <footer className="border-t border-[#D4AF37]/10 py-12 bg-[#060E1A]">
+        <div className="container">
+          <div className="grid md:grid-cols-4 gap-8 mb-8">
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-[#D4AF37] to-[#B8941F] flex items-center justify-center">
+                  <span className="text-[#060E1A] font-black">G</span>
+                </div>
+                <span className="font-bold text-white">Gravitas Protocol</span>
+              </div>
+              <p className="text-sm text-white/40 leading-relaxed">
+                Institutional-grade Shariah-compliant liquidity infrastructure on Arbitrum.
+              </p>
+            </div>
+            <div>
+              <h4 className="font-semibold text-white mb-4 text-sm uppercase tracking-wider">Protocol</h4>
+              <div className="space-y-2">
+                {[
+                  { label: "Dashboard", href: "/dashboard", external: false },
+                  { label: "Documentation", href: "/docs", external: false },
+                  { label: "Whitepaper", href: "/whitepaper", external: false },
+                ].map((l, i) => (
+                  <div key={i}>
+                    {l.external ? (
+                      <a href={l.href} target="_blank" rel="noopener noreferrer" className="text-sm text-white/40 hover:text-[#D4AF37] transition-colors block">{l.label}</a>
+                    ) : (
+                      <Link href={l.href} className="text-sm text-white/40 hover:text-[#D4AF37] transition-colors block">{l.label}</Link>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div>
+              <h4 className="font-semibold text-white mb-4 text-sm uppercase tracking-wider">Developers</h4>
+              <div className="space-y-2">
+                {[
+                  { label: "SDK Reference", href: "/sdk", external: false },
+                  { label: "Compliance API", href: "/compliance", external: false },
+                  { label: "GitHub", href: "https://github.com/AbZe628/gravitas-protocol", external: true },
+                ].map((l, i) => (
+                  <div key={i}>
+                    {l.external ? (
+                      <a href={l.href} target="_blank" rel="noopener noreferrer" className="text-sm text-white/40 hover:text-[#D4AF37] transition-colors block">{l.label}</a>
+                    ) : (
+                      <Link href={l.href} className="text-sm text-white/40 hover:text-[#D4AF37] transition-colors block">{l.label}</Link>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div>
+              <h4 className="font-semibold text-white mb-4 text-sm uppercase tracking-wider">On-Chain</h4>
+              <div className="space-y-2">
+                <a href="https://sepolia.arbiscan.io/address/0xbcaE3069362B0f0b80f44139052f159456C84679" target="_blank" rel="noopener noreferrer" className="text-sm text-white/40 hover:text-[#D4AF37] transition-colors flex items-center gap-1">
+                  PolicyRegistry <ExternalLink className="h-3 w-3" />
+                </a>
+                <a href="https://sepolia.arbiscan.io/address/0x5D423f8d01539B92D3f3953b91682D9884D1E993" target="_blank" rel="noopener noreferrer" className="text-sm text-white/40 hover:text-[#D4AF37] transition-colors flex items-center gap-1">
+                  TeleportV3 <ExternalLink className="h-3 w-3" />
+                </a>
+                <a href="https://sepolia.arbiscan.io" target="_blank" rel="noopener noreferrer" className="text-sm text-white/40 hover:text-[#D4AF37] transition-colors flex items-center gap-1">
+                  Arbiscan <ExternalLink className="h-3 w-3" />
+                </a>
+              </div>
+            </div>
+          </div>
+          <div className="border-t border-[#D4AF37]/10 pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p className="text-sm text-white/30">
+              © 2026 Gravitas Protocol. Built for institutional DeFi.
+            </p>
+            <div className="flex items-center gap-4 text-xs text-white/30">
+              <span>MIT License</span>
+              <span>·</span>
+              <a href="mailto:abdusamedzelic98@gmail.com" className="hover:text-[#D4AF37] transition-colors">abdusamedzelic98@gmail.com</a>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}
