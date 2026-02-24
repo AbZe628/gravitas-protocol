@@ -10,7 +10,6 @@
 
 <p align="center">
   <a href="https://github.com/AbZe628/gravitas-protocol/actions/workflows/ci.yml"><img src="https://github.com/AbZe628/gravitas-protocol/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
-  <a href="https://github.com/AbZe628/gravitas-protocol/actions/workflows/deploy-frontend.yml"><img src="https://github.com/AbZe628/gravitas-protocol/actions/workflows/deploy-frontend.yml/badge.svg" alt="Deploy Frontend"></a>
   <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
   <a href="https://soliditylang.org/"><img src="https://img.shields.io/badge/Solidity-0.8.24-blue.svg" alt="Solidity"></a>
   <a href="./proof-of-quality/INTERNAL_REVIEW.md"><img src="https://img.shields.io/badge/Audit-Internal%20Passed-blueviolet.svg" alt="Audit: Internal Passed"></a>
@@ -22,10 +21,22 @@
 
 Built from the ground up with **Shariah compliance** as a core governance principle, Gravitas is positioned as the primary gateway for the **$3 Trillion+ Islamic Finance market** to enter the Web3 ecosystem.
 
-| Quick Links | Description |
+## ⛓️ Verified Smart Contracts (Arbitrum Sepolia)
+
+The protocol is live and verified on the Arbitrum Sepolia testnet. All contract addresses are provided below with direct links to Arbiscan for transparency and verification.
+
+| Contract | Address | Explorer |
+|---|---|---|
+| **GravitasPolicyRegistry** | `0xbcaE3069362B0f0b80f44139052f159456C84679` | [View on Arbiscan](https://sepolia.arbiscan.io/address/0xbcaE3069362B0f0b80f44139052f159456C84679) |
+| **TeleportV3** | `0x5D423f8d01539B92D3f3953b91682D9884D1E993` | [View on Arbiscan](https://sepolia.arbiscan.io/address/0x5D423f8d01539B92D3f3953b91682D9884D1E993) |
+
+---
+
+## Quick Links
+
+| Link | Description |
 |---|---|
 | 🌐 **[Live Frontend](https://abze628.github.io/gravitas-protocol/)** | Explore the dashboard, analytics, and migration tools. |
-| 📄 **[Whitepaper](https://abze628.github.io/gravitas-protocol/whitepaper)** | Read the full technical and business specification. |
 | 📚 **[Documentation](https://abze628.github.io/gravitas-protocol/docs)** | Full protocol documentation and integration guides. |
 | 💻 **[SDK Reference](https://abze628.github.io/gravitas-protocol/sdk)** | Integrate with the Gravitas TypeScript SDK. |
 
@@ -132,3 +143,8 @@ pnpm --filter contracts test
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+<p align="center">
+  Built by <strong>Gravitas Protocol</strong>
+</p>

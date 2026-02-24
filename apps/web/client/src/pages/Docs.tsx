@@ -6,7 +6,7 @@ import { Link } from "wouter";
 import { motion } from "framer-motion";
 import {
   BookOpen, Code2, Shield, Zap, ArrowRight, Copy, CheckCheck,
-  ExternalLink, ChevronRight, Home, Terminal, Package, FileCode
+  ExternalLink, ChevronRight, Home, Terminal, Package, FileCode, Menu, X
 } from "lucide-react";
 
 const fadeUp = {
@@ -59,25 +59,26 @@ const sections = [
 
 export default function Docs() {
   const [activeSection, setActiveSection] = useState("overview");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-[#060E1A] text-white">
       {/* Nav */}
       <nav className="fixed top-0 left-0 right-0 z-50 border-b border-[#D4AF37]/10 bg-[#060E1A]/80 backdrop-blur-xl">
-        <div className="container flex h-16 items-center justify-between">
+        <div className="container flex h-16 items-center justify-between px-4 md:px-6">
           <div className="flex items-center gap-3">
             <Link href="/">
               <div className="flex items-center gap-2 cursor-pointer">
                 <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-[#D4AF37] to-[#B8941F] flex items-center justify-center">
                   <span className="text-[#060E1A] font-black">G</span>
                 </div>
-                <span className="font-bold text-white">Gravitas</span>
+                <span className="font-bold text-white hidden sm:inline">Gravitas</span>
               </div>
             </Link>
             <ChevronRight className="h-4 w-4 text-white/30" />
             <span className="text-white/60 text-sm">Documentation</span>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-3">
             <Button asChild variant="ghost" size="sm" className="text-white/60 hover:text-white">
               <Link href="/"><Home className="h-4 w-4 mr-2" />Home</Link>
             </Button>
@@ -85,10 +86,45 @@ export default function Docs() {
               <Link href="/dashboard">Launch App</Link>
             </Button>
           </div>
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden p-2 text-white/60 hover:text-[#D4AF37] transition-colors"
+          >
+            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
         </div>
+
+        {/* Mobile Menu */}
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="md:hidden border-t border-[#D4AF37]/10 bg-[#0A1628]/95 backdrop-blur max-h-[60vh] overflow-y-auto"
+          >
+            <div className="px-4 py-4 space-y-2">
+              {sections.map((s) => (
+                <button
+                  key={s.id}
+                  onClick={() => {
+                    setActiveSection(s.id);
+                    setMobileMenuOpen(false);
+                  }}
+                  className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all text-left ${
+                    activeSection === s.id
+                      ? "bg-[#D4AF37]/15 text-[#D4AF37]"
+                      : "text-white/50 hover:text-white hover:bg-white/5"
+                  }`}
+                >
+                  <s.icon className="h-4 w-4 shrink-0" />
+                  {s.label}
+                </button>
+              ))}
+            </div>
+          </motion.div>
+        )}
       </nav>
 
-      <div className="flex pt-16">
+      <div className="flex flex-col lg:flex-row pt-16">
         {/* Sidebar */}
         <aside className="hidden lg:block w-64 fixed left-0 top-16 bottom-0 border-r border-[#D4AF37]/10 bg-[#060E1A]/80 backdrop-blur overflow-y-auto">
           <div className="p-4">
@@ -114,14 +150,14 @@ export default function Docs() {
 
         {/* Main content */}
         <main className="flex-1 lg:ml-64 min-h-screen">
-          <div className="max-w-4xl mx-auto px-6 py-12">
+          <div className="max-w-4xl mx-auto px-4 md:px-6 py-12">
             <motion.div variants={stagger} initial="hidden" animate="visible" className="space-y-12">
 
               {/* Overview */}
               <motion.section variants={fadeUp} id="overview">
                 <Badge className="mb-4 bg-[#D4AF37]/10 border-[#D4AF37]/30 text-[#D4AF37]">Documentation</Badge>
-                <h1 className="text-4xl font-bold mb-4">Gravitas Protocol Docs</h1>
-                <p className="text-lg text-white/60 leading-relaxed mb-6">
+                <h1 className="text-3xl md:text-4xl font-bold mb-4">Gravitas Protocol Docs</h1>
+                <p className="text-base md:text-lg text-white/60 leading-relaxed mb-6">
                   Gravitas Protocol is an institutional-grade, Shariah-compliant liquidity infrastructure
                   built on Arbitrum. This documentation covers everything you need to integrate
                   with the protocol — from the TypeScript SDK to direct contract interactions.
@@ -147,7 +183,7 @@ export default function Docs() {
 
               {/* Quick Start */}
               <motion.section variants={fadeUp} id="quickstart">
-                <h2 className="text-2xl font-bold mb-2 flex items-center gap-2">
+                <h2 className="text-2xl md:text-3xl font-bold mb-2 flex items-center gap-2">
                   <Terminal className="h-6 w-6 text-[#D4AF37]" />
                   Quick Start
                 </h2>
@@ -194,7 +230,7 @@ console.log('Estimated gas:', result.gasEstimate);`} language="typescript" />
 
               {/* Contract Addresses */}
               <motion.section variants={fadeUp} id="contracts">
-                <h2 className="text-2xl font-bold mb-2 flex items-center gap-2">
+                <h2 className="text-2xl md:text-3xl font-bold mb-2 flex items-center gap-2">
                   <FileCode className="h-6 w-6 text-[#D4AF37]" />
                   Contract Addresses
                 </h2>
@@ -217,16 +253,16 @@ console.log('Estimated gas:', result.gasEstimate);`} language="typescript" />
                   ].map((contract, i) => (
                     <Card key={i} className="border border-[#D4AF37]/10 bg-[#0A1628]/60">
                       <CardContent className="pt-4">
-                        <div className="flex items-start justify-between gap-4">
-                          <div className="flex-1">
+                        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                          <div className="flex-1 min-w-0">
                             <h4 className="font-semibold text-white mb-1">{contract.name}</h4>
                             <p className="text-sm text-white/50 mb-3">{contract.desc}</p>
-                            <code className="text-sm font-mono text-[#D4AF37] bg-[#060E1A] px-3 py-1 rounded-lg border border-[#D4AF37]/10">
+                            <code className="text-xs md:text-sm font-mono text-[#D4AF37] bg-[#060E1A] px-3 py-1 rounded-lg border border-[#D4AF37]/10 break-all">
                               {contract.address}
                             </code>
                           </div>
                           <a href={contract.link} target="_blank" rel="noopener noreferrer">
-                            <Button size="sm" variant="outline" className="border-[#D4AF37]/30 text-[#D4AF37] hover:bg-[#D4AF37]/10 shrink-0">
+                            <Button size="sm" variant="outline" className="border-[#D4AF37]/30 text-[#D4AF37] hover:bg-[#D4AF37]/10 shrink-0 whitespace-nowrap">
                               <ExternalLink className="h-3 w-3 mr-1" />
                               Arbiscan
                             </Button>
@@ -238,49 +274,24 @@ console.log('Estimated gas:', result.gasEstimate);`} language="typescript" />
                 </div>
               </motion.section>
 
-              {/* Error Reference */}
-              <motion.section variants={fadeUp} id="errors">
-                <h2 className="text-2xl font-bold mb-2 flex items-center gap-2">
-                  <Code2 className="h-6 w-6 text-[#D4AF37]" />
-                  Error Reference
-                </h2>
-                <p className="text-white/50 mb-6">Custom error selectors and their human-readable descriptions.</p>
-
-                <div className="space-y-3">
-                  {[
-                    { error: "AssetNotCompliant", desc: "The asset is not on the Shariah-compliant whitelist in PolicyRegistry.", code: "0x1a2b3c4d" },
-                    { error: "CooldownNotMet", desc: "The cooldown period between migrations has not elapsed.", code: "0x2b3c4d5e" },
-                    { error: "InvalidSignature", desc: "The EIP-712 signature is invalid or has been replayed.", code: "0x3c4d5e6f" },
-                    { error: "MaxMoveBpsExceeded", desc: "Price movement exceeds the maximum allowed basis points.", code: "0x4d5e6f7a" },
-                    { error: "ExecutorNotAuthorized", desc: "The executor address is not authorized in PolicyRegistry.", code: "0x5e6f7a8b" },
-                    { error: "DeadlineExpired", desc: "The transaction deadline has passed.", code: "0x6f7a8b9c" },
-                  ].map((err, i) => (
-                    <div key={i} className="flex items-start gap-4 p-4 rounded-xl border border-[#D4AF37]/10 bg-[#0A1628]/40">
-                      <code className="text-xs font-mono text-[#D4AF37] bg-[#060E1A] px-2 py-1 rounded shrink-0">{err.error}</code>
-                      <p className="text-sm text-white/60">{err.desc}</p>
-                    </div>
-                  ))}
-                </div>
-              </motion.section>
-
-              {/* CTA */}
-              <motion.div variants={fadeUp} className="border border-[#D4AF37]/20 rounded-2xl p-8 bg-gradient-to-br from-[#D4AF37]/5 to-transparent text-center">
-                <h3 className="text-2xl font-bold mb-2">Ready to integrate?</h3>
-                <p className="text-white/50 mb-6">Launch the app or explore the SDK reference for deeper integration.</p>
-                <div className="flex gap-4 justify-center">
-                  <Button asChild className="bg-[#D4AF37] text-[#060E1A] hover:bg-[#D4AF37]/90 font-semibold gap-2">
-                    <Link href="/dashboard">Launch App <ArrowRight className="h-4 w-4" /></Link>
-                  </Button>
-                  <Button asChild variant="outline" className="border-[#D4AF37]/30 text-white hover:bg-[#D4AF37]/10 gap-2">
-                    <Link href="/sdk">SDK Reference</Link>
-                  </Button>
-                </div>
-              </motion.div>
-
             </motion.div>
           </div>
         </main>
       </div>
+
+      {/* Footer */}
+      <footer className="border-t border-[#D4AF37]/10 py-8 bg-[#060E1A]">
+        <div className="container px-4 md:px-6 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-sm text-white/30">
+            © 2026 Gravitas Protocol. Built for institutional DeFi.
+          </p>
+          <div className="flex items-center gap-4 text-xs text-white/30">
+            <span>MIT License</span>
+            <span>·</span>
+            <a href="https://github.com/AbZe628/gravitas-protocol" target="_blank" rel="noopener noreferrer" className="hover:text-[#D4AF37] transition-colors">GitHub</a>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
