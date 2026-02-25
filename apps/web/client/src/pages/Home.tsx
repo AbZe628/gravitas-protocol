@@ -367,12 +367,7 @@ export default function Home() {
 
         <div className="max-w-7xl mx-auto relative z-10 w-full py-8 md:py-28 px-3 sm:px-4 md:px-6 lg:px-8">
           <motion.div variants={stagger} initial="hidden" animate="visible" className="max-w-4xl">
-            <motion.div variants={fadeUp}>
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.375rem', padding: '0.25rem 0.5rem', marginBottom: '1rem', backgroundColor: 'rgba(217, 119, 6, 0.1)', border: '1px solid rgba(217, 119, 6, 0.3)', color: 'rgb(251, 146, 60)', fontSize: '0.625rem', fontWeight: '600', letterSpacing: '0.1em', textTransform: 'uppercase', borderRadius: '9999px', maxWidth: '100%', whiteSpace: 'normal', wordBreak: 'break-word', lineHeight: '1.2' }}>
-                <span style={{ height: '0.25rem', width: '0.25rem', borderRadius: '50%', backgroundColor: 'rgb(251, 146, 60)', animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite', flexShrink: 0 }} />
-                <span>Testnet Demo · Arbitrum Sepolia</span>
-              </div>
-            </motion.div>
+
 
             <motion.h1
               variants={fadeUp}
