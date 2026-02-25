@@ -299,7 +299,22 @@ export default function Home() {
                   <a
                     key={item.href}
                     href={item.href}
-                    onClick={(e) => { e.preventDefault(); setMobileMenuOpen(false); document.getElementById(item.href.slice(1))?.scrollIntoView({ behavior: 'smooth' }); }}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setMobileMenuOpen(false);
+                      setTimeout(() => {
+                        const element = document.getElementById(item.href.slice(1));
+                        if (element) {
+                          const headerOffset = 80;
+                          const elementPosition = element.getBoundingClientRect().top;
+                          const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                          window.scrollTo({
+                            top: offsetPosition,
+                            behavior: "smooth"
+                          });
+                        }
+                      }, 100);
+                    }}
                     className="px-4 py-3 text-sm text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
                   >
                     {item.label}
