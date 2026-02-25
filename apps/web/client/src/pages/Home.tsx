@@ -368,10 +368,10 @@ export default function Home() {
         <div className="max-w-7xl mx-auto relative z-10 w-full py-8 md:py-28 px-3 sm:px-4 md:px-6 lg:px-8">
           <motion.div variants={stagger} initial="hidden" animate="visible" className="max-w-4xl">
             <motion.div variants={fadeUp}>
-              <Badge className="mb-4 md:mb-6 px-2 xs:px-3 sm:px-4 py-1 md:py-1.5 bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[10px] xs:text-xs font-semibold tracking-wider uppercase gap-1.5 inline-flex items-center flex-wrap">
+              <div className="mb-4 md:mb-6 px-2 xs:px-3 sm:px-4 py-1 md:py-1.5 bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[10px] xs:text-xs font-semibold tracking-wider uppercase rounded-full inline-flex items-center gap-1.5 flex-wrap max-w-full">
                 <span className="h-1 w-1 xs:h-1.5 xs:w-1.5 rounded-full bg-amber-400 animate-pulse flex-shrink-0" />
-                <span className="truncate">Testnet Demo</span>
-              </Badge>
+                <span className="break-words">Testnet Demo · Arbitrum Sepolia</span>
+              </div>
             </motion.div>
 
             <motion.h1
