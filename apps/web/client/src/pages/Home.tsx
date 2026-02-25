@@ -561,7 +561,7 @@ export default function Home() {
                 {faqSections.map((section) => (
                   <button
                     key={section.category}
-                    onClick={() => setActiveFaqCategory(section.category)}
+                    onClick={(e) => { e.preventDefault(); setActiveFaqCategory(section.category); }}
                     className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all whitespace-nowrap lg:whitespace-normal flex-shrink-0 lg:flex-shrink ${
                       activeFaqCategory === section.category
                         ? "bg-[#D4AF37] text-[#060E1A] shadow-lg shadow-[#D4AF37]/20"

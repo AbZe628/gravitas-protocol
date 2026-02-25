@@ -61,7 +61,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       {/* Mobile Header */}
       <header className="lg:hidden sticky top-0 z-50 w-full border-b border-[#D4AF37]/20 bg-[#0A1628]/95 backdrop-blur">
         <div className="flex h-16 items-center justify-between px-4">
-          <button onClick={() => navigate("/")} className="flex items-center gap-2 shrink-0 hover:opacity-80 transition-opacity">
+          <button onClick={(e) => { e.preventDefault(); navigate("/"); }} className="flex items-center gap-2 shrink-0 hover:opacity-80 transition-opacity">
             <div className="h-9 w-9 rounded-lg bg-gradient-to-br from-[#D4AF37] to-[#B8941F] flex items-center justify-center">
               <span className="text-[#0A1628] font-bold text-lg">G</span>
             </div>
@@ -102,7 +102,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 <nav className="flex flex-col gap-1 pt-6 px-4">
                   <Button
                     variant="ghost"
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.preventDefault();
                       navigate("/");
                       setMobileMenuOpen(false);
                     }}
@@ -116,7 +117,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                     <Button
                       key={item.path}
                       variant="ghost"
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.preventDefault();
                         navigate(item.path);
                         setMobileMenuOpen(false);
                       }}
@@ -183,7 +185,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           className="w-64 border-r border-[#D4AF37]/20 bg-[#0A1628]/50 backdrop-blur flex flex-col overflow-y-auto"
         >
           {/* Logo */}
-          <button onClick={() => navigate("/")} className="p-6 border-b border-[#D4AF37]/20 shrink-0 w-full hover:bg-[#D4AF37]/5 transition-colors">
+          <button onClick={(e) => { e.preventDefault(); navigate("/"); }} className="p-6 border-b border-[#D4AF37]/20 shrink-0 w-full hover:bg-[#D4AF37]/5 transition-colors">
             <div className="flex items-center gap-3">
               <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-[#D4AF37] to-[#B8941F] flex items-center justify-center flex-shrink-0">
                 <span className="text-[#0A1628] font-bold text-2xl">G</span>
@@ -199,7 +201,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
             <Button
               variant="ghost"
-              onClick={() => navigate("/")}
+              onClick={(e) => { e.preventDefault(); navigate("/"); }}
               className="w-full justify-start text-white/70 hover:text-[#D4AF37] hover:bg-[#D4AF37]/10 h-10"
             >
               <Home className="h-4 w-4 mr-3" />
@@ -210,7 +212,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               <Button
                 key={item.path}
                 variant="ghost"
-                onClick={() => navigate(item.path)}
+                onClick={(e) => { e.preventDefault(); navigate(item.path); }}
                 className={`w-full justify-start h-10 ${
                   isActive(item.path)
                     ? "bg-[#D4AF37]/20 text-[#D4AF37]"
