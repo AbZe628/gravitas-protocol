@@ -146,7 +146,7 @@ const contracts = [
   },
   {
     name: "TeleportV2",
-    address: "0x...(see DEPLOYMENTS.md)",
+    address: "0x0000000000000000000000000000000000000000",
     description: "Atomic Uniswap V2 LP token migration with slippage protection.",
     explorer: "https://github.com/AbZe628/gravitas-protocol/blob/main/docs/DEPLOYMENTS.md",
     verified: false,
@@ -298,7 +298,7 @@ export default function Home() {
 
           {/* Mobile: CTA + Hamburger */}
           <div className="md:hidden flex items-center gap-1.5 flex-shrink-0">
-            <Button asChild size="sm" className="bg-[#D4AF37] text-[#060E1A] hover:bg-[#D4AF37]/90 font-semibold h-8 px-2 text-xs flex-shrink-0">
+            <Button asChild size="sm" className="bg-[#D4AF37] text-[#060E1A] hover:bg-[#D4AF37]/90 font-bold text-[10px] h-7 px-2 shadow-lg shadow-[#D4AF37]/20">
               <Link href="/dashboard">App</Link>
             </Button>
             <button
@@ -367,8 +367,6 @@ export default function Home() {
 
         <div className="max-w-7xl mx-auto relative z-10 w-full py-8 md:py-28 px-3 sm:px-4 md:px-6 lg:px-8">
           <motion.div variants={stagger} initial="hidden" animate="visible" className="max-w-4xl">
-
-
             <motion.h1
               variants={fadeUp}
               className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] md:leading-[1.05] mb-4 md:mb-8 tracking-tight break-words"
@@ -454,15 +452,15 @@ export default function Home() {
 
       {/* ── TESTNET BANNER ── */}
       <section className="border-y border-amber-500/20 bg-amber-500/5 py-4" aria-label="Network status">
-        <div className="container px-4 md:px-6">
+        <div className="container px-4 md:px-6 mx-auto">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
             <div className="flex items-center gap-2">
               <AlertTriangle className="h-4 w-4 text-amber-400 shrink-0" />
-              <span className="text-xs md:text-sm text-amber-200 font-medium">
+              <span className="text-xs md:text-sm text-amber-200 font-medium leading-tight">
                 Testnet Only — All dashboard metrics are Demo/Simulation data. No real funds at risk.
               </span>
             </div>
-            <div className="flex flex-col sm:flex-row flex-wrap gap-3 text-xs">
+            <div className="flex flex-col sm:flex-row flex-wrap gap-3 text-[10px] sm:text-xs">
               <a
                 href="https://sepolia.arbiscan.io/address/0xbcaE3069362B0f0b80f44139052f159456C84679"
                 target="_blank" rel="noopener noreferrer"
@@ -484,15 +482,9 @@ export default function Home() {
 
       {/* ── WHAT'S LIVE TODAY ── */}
       <section className="py-12 md:py-16 bg-[#060E1A]" aria-label="What's live today">
-        <div className="container px-4 md:px-6">
+        <div className="container px-4 md:px-6 mx-auto">
           <div className="grid md:grid-cols-2 gap-6">
-            {/* Live Today */}
-            <motion.div
-              variants={fadeUp}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-            >
+            <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
               <Card className="h-full border-green-500/20 bg-green-500/5">
                 <CardHeader className="pb-3">
                   <div className="flex items-center gap-2 mb-1">
@@ -513,41 +505,35 @@ export default function Home() {
                   ].map((item, i) => (
                     <div key={i} className="flex items-start gap-2.5">
                       <CheckCircle className="h-3.5 w-3.5 text-green-400 shrink-0 mt-0.5" />
-                      <span className="text-xs text-white/70">{item}</span>
+                      <span className="text-xs text-white/70 leading-snug">{item}</span>
                     </div>
                   ))}
                 </CardContent>
               </Card>
             </motion.div>
 
-            {/* Planned After Audit */}
-            <motion.div
-              variants={fadeUp}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-            >
-              <Card className="h-full border-[#D4AF37]/20 bg-[#D4AF37]/3">
+            <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
+              <Card className="h-full border-amber-500/20 bg-amber-500/5">
                 <CardHeader className="pb-3">
                   <div className="flex items-center gap-2 mb-1">
-                    <Clock className="h-3.5 w-3.5 text-[#D4AF37]" />
+                    <Clock className="h-4 w-4 text-amber-400" />
                     <CardTitle className="text-base text-white">Planned After Audit</CardTitle>
                   </div>
-                  <CardDescription className="text-[#D4AF37]/60 text-xs">Mainnet Roadmap</CardDescription>
+                  <CardDescription className="text-amber-400/70 text-xs">Mainnet Readiness Roadmap</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-2.5">
                   {[
-                    "Formal third-party security audit (P0 blocker)",
-                    "Timelock + multi-sig governance for PolicyRegistry",
-                    "Shariah advisory board formation",
-                    "Mainnet deployment on Arbitrum One",
-                    "Hosted simulation API for institutional integrators",
-                    "Cross-chain expansion (Base, Optimism)",
-                    "Institutional dashboard with CSV export + reporting",
+                    "Formal 3rd-party security audit (P0)",
+                    "Shariah Advisory Board formal engagement",
+                    "Time-locked governance for PolicyRegistry",
+                    "Multi-sig protocol guardian deployment",
+                    "Institutional reporting & analytics dashboard",
+                    "Mainnet deployment with TVL caps",
+                    "Cross-chain compliance expansion",
                   ].map((item, i) => (
                     <div key={i} className="flex items-start gap-2.5">
-                      <ChevronRight className="h-3.5 w-3.5 text-[#D4AF37]/60 shrink-0 mt-0.5" />
-                      <span className="text-xs text-white/55">{item}</span>
+                      <div className="h-1.5 w-1.5 rounded-full bg-amber-400 shrink-0 mt-1.5" />
+                      <span className="text-xs text-white/70 leading-snug">{item}</span>
                     </div>
                   ))}
                 </CardContent>
@@ -557,646 +543,128 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── HOW IT WORKS ── */}
-      <section className="py-16 md:py-28 relative" aria-label="How it works">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#D4AF3705_1px,transparent_1px),linear-gradient(to_bottom,#D4AF3705_1px,transparent_1px)] bg-[size:48px_48px]" aria-hidden="true" />
-        <div className="container relative z-10 px-4 md:px-6">
-          <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-12 md:mb-20">
-            <motion.div variants={fadeUp}>
-              <Badge className="mb-4 bg-[#D4AF37]/10 border-[#D4AF37]/30 text-[#D4AF37]">Migration Flow</Badge>
-            </motion.div>
-            <motion.h2 variants={fadeUp} className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 text-balance">
-              Atomic. Policy-Enforced. Verifiable.
-            </motion.h2>
-            <motion.p variants={fadeUp} className="text-base md:text-lg text-white/50 max-w-2xl mx-auto">
-              Every migration follows the same deterministic path — compliance first, execution second, verification always.
-            </motion.p>
-          </motion.div>
-
-          {/* Stepper */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              {
-                step: "01",
-                icon: Shield,
-                title: "Compliance Check",
-                desc: "PolicyRegistry.isTokenCompliant() and isRouterAuthorized() are called on-chain. Transaction reverts immediately if either check fails.",
-                color: "text-[#D4AF37]",
-                bg: "bg-[#D4AF37]/10",
-              },
-              {
-                step: "02",
-                icon: Lock,
-                title: "Sign Intent",
-                desc: "For V3: EIP-712 typed data is signed with a per-address nonce. Human-readable in hardware wallets. Replay-protected by design.",
-                color: "text-blue-400",
-                bg: "bg-blue-400/10",
-              },
-              {
-                step: "03",
-                icon: Zap,
-                title: "Atomic Execute",
-                desc: "Remove LP → Swap → Add LP in a single transaction. All-or-nothing. No partial states. No MEV exposure between steps.",
-                color: "text-green-400",
-                bg: "bg-green-400/10",
-              },
-              {
-                step: "04",
-                icon: Eye,
-                title: "Verify On-Chain",
-                desc: "Transaction hash, block number, and new position ID are returned. Verify directly on Arbiscan. No trust required.",
-                color: "text-purple-400",
-                bg: "bg-purple-400/10",
-              },
-            ].map((item, i) => (
-              <motion.div
-                key={i}
-                variants={fadeUp}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                className="relative"
-              >
-                <Card className="h-full border-[#D4AF37]/10 bg-[#0A1628]/60 hover:border-[#D4AF37]/25 transition-all card-hover">
-                  <CardContent className="pt-6 pb-6">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className={`h-10 w-10 rounded-xl ${item.bg} flex items-center justify-center`}>
-                        <item.icon className={`h-5 w-5 ${item.color}`} />
-                      </div>
-                      <span className="font-mono text-xs text-white/30 font-bold">{item.step}</span>
-                    </div>
-                    <h3 className="font-semibold text-white mb-2 text-sm md:text-base">{item.title}</h3>
-                    <p className="text-xs text-white/45 leading-relaxed">{item.desc}</p>
-                  </CardContent>
-                </Card>
-                {i < 3 && (
-                  <div className="hidden lg:block absolute top-1/2 -right-3 z-10 text-[#D4AF37]/30">
-                    <ChevronRight className="h-5 w-5" />
-                  </div>
-                )}
-              </motion.div>
-            ))}
+      {/* ── Q&A SECTION ── */}
+      <section className="py-16 md:py-28 bg-[#060E1A] relative" aria-label="Questions and answers">
+        <div className="container px-4 md:px-6 mx-auto">
+          <div className="text-center mb-12">
+            <Badge className="mb-4 bg-[#D4AF37]/10 border-[#D4AF37]/30 text-[#D4AF37]">Q&A</Badge>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Questions & Answers</h2>
+            <p className="text-sm md:text-base text-white/50 max-w-2xl mx-auto">
+              Precise answers to the questions institutions actually ask.
+            </p>
           </div>
-        </div>
-      </section>
 
-      {/* ── FEATURES ── */}
-      <section className="py-16 md:py-28 bg-[#060E1A]" aria-label="Core features">
-        <div className="container px-4 md:px-6">
-          <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-12 md:mb-20">
-            <motion.div variants={fadeUp}>
-              <Badge className="mb-4 bg-[#D4AF37]/10 border-[#D4AF37]/30 text-[#D4AF37]">Core Features</Badge>
-            </motion.div>
-            <motion.h2 variants={fadeUp} className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 text-balance">
-              Built for Institutions
-            </motion.h2>
-            <motion.p variants={fadeUp} className="text-base md:text-lg text-white/50 max-w-2xl mx-auto">
-              Enterprise-grade infrastructure designed for funds and institutional traders requiring Shariah compliance and deterministic execution.
-            </motion.p>
-          </motion.div>
-          <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }} className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {[
-              {
-                icon: Shield,
-                title: "Policy-Enforced Compliance",
-                description: "On-chain PolicyRegistry enforces Shariah compliance at the contract level. No UI bypass possible. Token whitelist and router authorization checked before every execution.",
-                badge: "On-Chain",
-              },
-              {
-                icon: Zap,
-                title: "Atomic Execution",
-                description: "All-or-nothing transaction guarantees with deterministic routing eliminate partial execution risks and MEV exposure across Uniswap V2/V3 positions.",
-                badge: "Zero Partial States",
-              },
-              {
-                icon: Lock,
-                title: "EIP-712 Signed Intents",
-                description: "Human-readable transaction signing with nonce-based replay protection. Compatible with hardware wallets, multi-sig, and institutional custody solutions.",
-                badge: "Replay-Protected",
-              },
-              {
-                icon: Layers,
-                title: "V2 + V3 Support",
-                description: "Migrate Uniswap V2 LP tokens or V3 NFT positions atomically. Single SDK, unified compliance layer, consistent execution guarantees.",
-                badge: "Multi-Protocol",
-              },
-              {
-                icon: Cpu,
-                title: "Yul-Optimized Gas",
-                description: "Inline assembly optimization for dust refunds saves ~2,000 gas per migration. Best-in-class capital efficiency for high-frequency institutional operations.",
-                badge: "~2k Gas Saved",
-              },
-              {
-                icon: Network,
-                title: "Deterministic Routing",
-                description: "Preflight simulation APIs provide exact outcomes before execution. Eliminates uncertainty and supports institutional reporting and audit trails.",
-                badge: "Pre-Verifiable",
-              },
-            ].map((feature, i) => (
-              <motion.div key={i} variants={fadeUp}>
-                <Card className="h-full border-[#D4AF37]/10 bg-[#0A1628]/40 hover:border-[#D4AF37]/30 transition-all card-hover group">
-                  <CardHeader>
-                    <div className="h-11 w-11 rounded-xl bg-[#D4AF37]/10 flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
-                      <feature.icon className="h-5 w-5 text-[#D4AF37]" />
-                    </div>
-                    <div className="flex items-start justify-between gap-2">
-                      <CardTitle className="text-white text-base">{feature.title}</CardTitle>
-                      <Badge className="bg-[#D4AF37]/10 text-[#D4AF37] border-[#D4AF37]/20 text-[10px] shrink-0">{feature.badge}</Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-white/50 leading-relaxed">{feature.description}</p>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </motion.div>
+          <div className="flex flex-col lg:flex-row gap-8">
+            {/* Sidebar Categories */}
+            <div className="lg:w-1/4">
+              <div className="flex lg:flex-col overflow-x-auto lg:overflow-visible gap-2 pb-4 lg:pb-0 scrollbar-hide">
+                {faqSections.map((section) => (
+                  <button
+                    key={section.category}
+                    onClick={() => setActiveFaqCategory(section.category)}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all whitespace-nowrap lg:whitespace-normal flex-shrink-0 lg:flex-shrink ${
+                      activeFaqCategory === section.category
+                        ? "bg-[#D4AF37] text-[#060E1A] shadow-lg shadow-[#D4AF37]/20"
+                        : "bg-white/5 text-white/60 hover:bg-white/10"
+                    }`}
+                  >
+                    <section.icon className="h-4 w-4 shrink-0" />
+                    {section.category}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Questions List */}
+            <div className="lg:w-3/4">
+              <Card className="border-[#D4AF37]/10 bg-[#0A1628]/60 overflow-hidden">
+                <CardContent className="p-0 divide-y divide-[#D4AF37]/10">
+                  {faqSections
+                    .find((s) => s.category === activeFaqCategory)
+                    ?.questions.map((item, i) => (
+                      <FAQItem key={i} q={item.q} a={item.a} />
+                    ))}
+                </CardContent>
+              </Card>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* ── PROOF & TRUST ── */}
       <section className="py-16 md:py-28 relative" id="proof" aria-label="Proof and trust">
         <div className="absolute inset-0 bg-gradient-to-b from-[#060E1A] via-[#0A1628]/50 to-[#060E1A]" aria-hidden="true" />
-        <div className="container relative z-10 px-4 md:px-6">
-          <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-12 md:mb-16">
-            <motion.div variants={fadeUp}>
-              <Badge className="mb-4 bg-[#D4AF37]/10 border-[#D4AF37]/30 text-[#D4AF37]">Proof & Trust</Badge>
-            </motion.div>
-            <motion.h2 variants={fadeUp} className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 text-balance">
-              Verify Everything On-Chain
-            </motion.h2>
-            <motion.p variants={fadeUp} className="text-base md:text-lg text-white/50 max-w-2xl mx-auto">
-              No trust required. Every contract is deployed, verified, and inspectable on Arbiscan. Every claim below is independently verifiable.
-            </motion.p>
-          </motion.div>
+        <div className="container relative z-10 px-4 md:px-6 mx-auto">
+          <div className="text-center mb-12 md:mb-16">
+            <Badge className="mb-4 bg-[#D4AF37]/10 border-[#D4AF37]/30 text-[#D4AF37]">Proof & Trust</Badge>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Verify Everything On-Chain</h2>
+            <p className="text-sm md:text-base text-white/50 max-w-2xl mx-auto">
+              No trust required. Every contract is deployed, verified, and inspectable on Arbiscan.
+            </p>
+          </div>
 
           {/* System Status */}
-          <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-            <Card className="mb-8 border-[#D4AF37]/20 bg-[#0A1628]/60">
-              <CardContent className="py-4 px-6">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <span className="text-xs text-white/40 font-mono uppercase tracking-wider">System Status</span>
-                  <SystemStatusWidget />
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
+          <Card className="mb-8 border-[#D4AF37]/20 bg-[#0A1628]/60">
+            <CardContent className="py-4 px-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <span className="text-xs text-white/40 font-mono uppercase tracking-wider">System Status</span>
+                <SystemStatusWidget />
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Contract Cards */}
           <div className="grid md:grid-cols-3 gap-5 mb-8">
             {contracts.map((contract, i) => (
-              <motion.div
-                key={i}
-                variants={fadeUp}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-              >
-                <Card className="h-full border-[#D4AF37]/20 bg-[#0A1628]/60 card-hover">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between mb-1">
-                      <CardTitle className="text-sm text-white font-mono">{contract.name}</CardTitle>
-                      {contract.verified ? (
-                        <Badge className="bg-green-500/10 text-green-400 border-green-500/20 text-[10px]">Verified</Badge>
-                      ) : (
-                        <Badge className="bg-white/5 text-white/40 border-white/10 text-[10px]">See Docs</Badge>
-                      )}
-                    </div>
-                    <CardDescription className="text-white/40 text-xs leading-relaxed">{contract.description}</CardDescription>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <div className="flex items-center gap-1 bg-[#060E1A]/60 rounded-lg px-3 py-2 border border-[#D4AF37]/10">
-                      <span className="font-mono text-[11px] text-white/60 flex-1 truncate">{contract.address}</span>
-                      <CopyButton text={contract.address} />
-                    </div>
-                    <a
-                      href={contract.explorer}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-3 flex items-center gap-1.5 text-xs text-[#D4AF37]/70 hover:text-[#D4AF37] transition-colors"
-                    >
-                      <ExternalLink className="h-3 w-3" />
-                      View on Arbiscan
-                    </a>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-
-          {/* Trust Metrics */}
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            {[
-              {
-                icon: FileCode,
-                label: "Test Coverage",
-                value: "90%+",
-                sub: "Foundry + invariant tests",
-                link: "https://github.com/AbZe628/gravitas-protocol",
-              },
-              {
-                icon: GitBranch,
-                label: "Security Audit",
-                value: "Planned",
-                sub: "P0 before mainnet",
-                link: "https://github.com/AbZe628/gravitas-protocol/blob/main/docs/SECURITY_AUDIT_PREP.md",
-              },
-              {
-                icon: Shield,
-                label: "Formal Verification",
-                value: "In Scope",
-                sub: "Invariant test suite",
-                link: "https://github.com/AbZe628/gravitas-protocol",
-              },
-              {
-                icon: Globe,
-                label: "Network",
-                value: "Sepolia",
-                sub: "Arbitrum testnet",
-                link: "https://sepolia.arbiscan.io",
-              },
-            ].map((item, i) => (
-              <motion.div key={i} variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-                <a href={item.link} target="_blank" rel="noopener noreferrer" className="block">
-                  <Card className="border-[#D4AF37]/15 bg-[#0A1628]/40 hover:border-[#D4AF37]/30 transition-all card-hover">
-                    <CardContent className="pt-5 pb-5">
-                      <item.icon className="h-5 w-5 text-[#D4AF37] mb-3" />
-                      <div className="text-xl font-bold text-white mb-0.5">{item.value}</div>
-                      <div className="text-xs font-medium text-white/70 mb-0.5">{item.label}</div>
-                      <div className="text-[10px] text-white/35 font-mono">{item.sub}</div>
-                    </CardContent>
-                  </Card>
-                </a>
-              </motion.div>
-            ))}
-          </div>
-
-          {/* Trust Model + Security Posture */}
-          <div className="grid md:grid-cols-2 gap-6">
-            <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-              <Card className="h-full border-[#D4AF37]/15 bg-[#0A1628]/40">
-                <CardHeader>
-                  <CardTitle className="text-white text-base flex items-center gap-2">
-                    <Lock className="h-4 w-4 text-[#D4AF37]" />
-                    Trust Model
-                  </CardTitle>
+              <Card key={i} className="h-full border-[#D4AF37]/20 bg-[#0A1628]/60">
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between mb-1">
+                    <CardTitle className="text-sm text-white font-mono truncate mr-2">{contract.name}</CardTitle>
+                    {contract.verified ? (
+                      <Badge className="bg-green-500/10 text-green-400 border-green-500/20 text-[10px] shrink-0">Verified</Badge>
+                    ) : (
+                      <Badge className="bg-white/5 text-white/40 border-white/10 text-[10px] shrink-0">See Docs</Badge>
+                    )}
+                  </div>
+                  <CardDescription className="text-white/40 text-xs leading-relaxed line-clamp-2">{contract.description}</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-3 text-sm text-white/55">
-                  <p><span className="text-white/80 font-medium">Permissions:</span> PolicyRegistry owner is currently the deployer EOA. No timelock implemented on testnet.</p>
-                  <p><span className="text-white/80 font-medium">Planned:</span> Multi-sig + timelock for all registry changes. Public change log. Advisory board governance.</p>
-                  <p><span className="text-white/80 font-medium">Execution:</span> TeleportV3/V2 contracts are non-upgradeable. Logic is immutable once deployed.</p>
-                  <p><span className="text-white/80 font-medium">Compliance is technical:</span> The protocol enforces policy at the contract level. Governance of what is "compliant" is a separate off-chain process.</p>
+                <CardContent className="pt-0">
+                  <div className="flex items-center gap-1 bg-[#060E1A]/60 rounded-lg px-3 py-2 border border-[#D4AF37]/10 overflow-hidden">
+                    <span className="font-mono text-[11px] text-white/60 flex-1 truncate">{contract.address}</span>
+                    <CopyButton text={contract.address} />
+                  </div>
+                  <a
+                    href={contract.explorer}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-3 flex items-center gap-1.5 text-xs text-[#D4AF37]/70 hover:text-[#D4AF37] transition-colors"
+                  >
+                    <ExternalLink className="h-3 w-3" />
+                    View on Arbiscan
+                  </a>
                 </CardContent>
               </Card>
-            </motion.div>
-            <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-              <Card className="h-full border-[#D4AF37]/15 bg-[#0A1628]/40">
-                <CardHeader>
-                  <CardTitle className="text-white text-base flex items-center gap-2">
-                    <Shield className="h-4 w-4 text-[#D4AF37]" />
-                    Security Posture
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3 text-sm text-white/55">
-                  <p><span className="text-white/80 font-medium">Testing:</span> 90%+ coverage with Foundry unit tests, integration tests, and invariant/fuzz tests.</p>
-                  <p><span className="text-white/80 font-medium">Threat model:</span> Replay attacks (EIP-712 nonces), reentrancy (CEI pattern), MEV (slippage params), unauthorized policy changes (owner access control).</p>
-                  <p><span className="text-white/80 font-medium">No audit yet:</span> Formal audit is a P0 requirement before mainnet. No firm has been engaged or named.</p>
-                  <p><span className="text-white/80 font-medium">Verify yourself:</span> All contracts are open source and verified on Arbiscan. Read the code directly.</p>
-                </CardContent>
-              </Card>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── ARCHITECTURE ── */}
-      <section className="py-16 md:py-24 bg-[#060E1A]" aria-label="Architecture">
-        <div className="container px-4 md:px-6">
-          <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-10 md:mb-16">
-            <motion.div variants={fadeUp}>
-              <Badge className="mb-4 bg-[#D4AF37]/10 border-[#D4AF37]/30 text-[#D4AF37]">Architecture</Badge>
-            </motion.div>
-            <motion.h2 variants={fadeUp} className="text-3xl md:text-4xl font-bold mb-4 text-balance">
-              How Compliance is Technical
-            </motion.h2>
-            <motion.p variants={fadeUp} className="text-base text-white/50 max-w-2xl mx-auto">
-              Compliance is not a UI checkbox. It is enforced at the smart contract execution layer.
-            </motion.p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-3 gap-5">
-            {[
-              {
-                title: "PolicyRegistry",
-                icon: Database,
-                color: "border-[#D4AF37]/30",
-                items: [
-                  "Token whitelist (isTokenCompliant)",
-                  "Router authorization (isRouterAuthorized)",
-                  "Registry version tracking",
-                  "Owner-controlled (timelock planned)",
-                ],
-              },
-              {
-                title: "TeleportV3",
-                icon: Zap,
-                color: "border-blue-500/30",
-                items: [
-                  "EIP-712 signed migration intents",
-                  "Nonce-based replay protection",
-                  "Calls PolicyRegistry before execution",
-                  "Atomic: remove → swap → add in 1 TX",
-                ],
-              },
-              {
-                title: "TeleportV2",
-                icon: Layers,
-                color: "border-green-500/30",
-                items: [
-                  "LP token approval + migration",
-                  "Slippage-protected amounts",
-                  "Calls PolicyRegistry before execution",
-                  "Dust refund via Yul inline assembly",
-                ],
-              },
-            ].map((arch, i) => (
-              <motion.div key={i} variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-                <Card className={`h-full bg-[#0A1628]/60 border ${arch.color}`}>
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center gap-2">
-                      <arch.icon className="h-4 w-4 text-[#D4AF37]" />
-                      <CardTitle className="text-white text-sm font-mono">{arch.title}</CardTitle>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="space-y-2">
-                      {arch.items.map((item, j) => (
-                        <li key={j} className="flex items-start gap-2 text-xs text-white/55">
-                          <span className="text-[#D4AF37] mt-0.5">→</span>
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
-                  </CardContent>
-                </Card>
-              </motion.div>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* ── Q&A ── */}
-      <section className="py-16 md:py-28 relative" id="faq" aria-label="Frequently asked questions">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#D4AF3706_1px,transparent_1px),linear-gradient(to_bottom,#D4AF3706_1px,transparent_1px)] bg-[size:64px_64px]" aria-hidden="true" />
-        <div className="container relative z-10 px-4 md:px-6">
-          <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-10 md:mb-16">
-            <motion.div variants={fadeUp}>
-              <Badge className="mb-4 bg-[#D4AF37]/10 border-[#D4AF37]/30 text-[#D4AF37]">Q&A</Badge>
-            </motion.div>
-            <motion.h2 variants={fadeUp} className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 text-balance">
-              Questions & Answers
-            </motion.h2>
-            <motion.p variants={fadeUp} className="text-base md:text-lg text-white/50 max-w-2xl mx-auto">
-              Precise answers to the questions institutions actually ask.
-            </motion.p>
-          </motion.div>
-
-          {/* Category Tabs — horizontal scroll on mobile */}
-          <div className="flex gap-2 mb-8 overflow-x-auto pb-2 scrollbar-thin -mx-4 px-4 md:mx-0 md:px-0 md:flex-wrap">
-            {faqSections.map((section) => (
-              <button
-                key={section.category}
-                onClick={() => setActiveFaqCategory(section.category)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all touch-target ${
-                  activeFaqCategory === section.category
-                    ? "bg-[#D4AF37] text-[#060E1A] shadow-lg shadow-[#D4AF37]/20"
-                    : "bg-[#0A1628]/60 text-white/60 border border-[#D4AF37]/15 hover:text-white hover:border-[#D4AF37]/30"
-                }`}
-              >
-                <section.icon className="h-3.5 w-3.5" />
-                {section.category}
-              </button>
-            ))}
-          </div>
-
-          {/* FAQ Items */}
-          <AnimatePresence mode="wait">
-            {faqSections
-              .filter((s) => s.category === activeFaqCategory)
-              .map((section) => (
-                <motion.div
-                  key={section.category}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <Card className="border-[#D4AF37]/15 bg-[#0A1628]/60">
-                    <CardContent className="pt-6 px-4 md:px-6">
-                      {section.questions.map((item, i) => (
-                        <FAQItem key={i} q={item.q} a={item.a} />
-                      ))}
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              ))}
-          </AnimatePresence>
-        </div>
-      </section>
-
-      {/* ── SDK CTA ── */}
-      <section className="py-16 md:py-24 bg-[#060E1A]" aria-label="Developer resources">
-        <div className="container px-4 md:px-6">
-          <div className="grid md:grid-cols-2 gap-6">
-            <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-              <Card className="h-full border-[#D4AF37]/20 bg-gradient-to-br from-[#0A1628] to-[#0F1E35] card-hover">
-                <CardHeader>
-                  <div className="h-12 w-12 rounded-xl bg-[#D4AF37]/10 flex items-center justify-center mb-3">
-                    <Code2 className="h-6 w-6 text-[#D4AF37]" />
-                  </div>
-                  <CardTitle className="text-white text-xl">SDK Reference</CardTitle>
-                  <CardDescription className="text-white/50">
-                    Integrate compliance checks and migration execution in minutes.
-                    TypeScript-first, viem-compatible, fully typed.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="code-block mb-4 text-xs">
-                    <span className="text-white/30">$</span>{" "}
-                    <span className="text-green-400">npm install</span>{" "}
-                    <span className="text-white/80">@gravitas-protocol/sdk</span>
-                  </div>
-                  <Button asChild className="bg-[#D4AF37] text-[#060E1A] hover:bg-[#D4AF37]/90 font-semibold w-full sm:w-auto">
-                    <Link href="/sdk">
-                      SDK Documentation
-                      <ArrowRight className="h-4 w-4 ml-2" />
-                    </Link>
-                  </Button>
-                </CardContent>
-              </Card>
-            </motion.div>
-
-            <motion.div variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-              <Card className="h-full border-[#D4AF37]/20 bg-gradient-to-br from-[#0A1628] to-[#0F1E35] card-hover">
-                <CardHeader>
-                  <div className="h-12 w-12 rounded-xl bg-[#D4AF37]/10 flex items-center justify-center mb-3">
-                    <BookOpen className="h-6 w-6 text-[#D4AF37]" />
-                  </div>
-                  <CardTitle className="text-white text-xl">Documentation</CardTitle>
-                  <CardDescription className="text-white/50">
-                    Full technical specification, architecture diagrams, deployment guides,
-                    and compliance framework documentation.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {["Technical Spec", "Whitepaper", "Deployment Guide", "Security Prep"].map((tag) => (
-                      <Badge key={tag} className="bg-[#D4AF37]/8 text-[#D4AF37]/70 border-[#D4AF37]/15 text-xs">{tag}</Badge>
-                    ))}
-                  </div>
-                  <Button asChild variant="outline" className="border-[#D4AF37]/30 text-[#D4AF37] hover:bg-[#D4AF37]/8 w-full sm:w-auto">
-                    <Link href="/docs">
-                      Read Documentation
-                      <ArrowRight className="h-4 w-4 ml-2" />
-                    </Link>
-                  </Button>
-                </CardContent>
-              </Card>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── FINAL CTA ── */}
-      <section className="py-20 md:py-32 relative overflow-hidden" aria-label="Call to action">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#060E1A] to-[#0A1628]" aria-hidden="true" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-[#D4AF37]/5 rounded-full blur-[120px] pointer-events-none" aria-hidden="true" />
-        <div className="container relative z-10 px-4 md:px-6 text-center">
-          <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-            <motion.div variants={fadeUp}>
-              <Badge className="mb-6 bg-[#D4AF37]/10 border-[#D4AF37]/30 text-[#D4AF37]">
-                <span className="h-1.5 w-1.5 rounded-full bg-[#D4AF37] animate-pulse mr-2" />
-                Live on Testnet
-              </Badge>
-            </motion.div>
-            <motion.h2 variants={fadeUp} className="text-3xl md:text-5xl lg:text-6xl font-bold mb-6 text-balance">
-              Try It on Testnet.
-              <br />
-              <span className="gold-gradient">Verify Everything.</span>
-            </motion.h2>
-            <motion.p variants={fadeUp} className="text-base md:text-lg text-white/50 max-w-2xl mx-auto mb-10">
-              Connect a wallet to Arbitrum Sepolia, run a migration simulation, and inspect every step on Arbiscan. No real funds required.
-            </motion.p>
-            <motion.div variants={fadeUp} className="flex flex-col sm:flex-row justify-center gap-4">
-              <Button
-                asChild
-                size="lg"
-                className="bg-[#D4AF37] text-[#060E1A] hover:bg-[#D4AF37]/90 font-semibold gap-2 px-10 h-13 text-base shadow-xl shadow-[#D4AF37]/25 hover:-translate-y-0.5 transition-all"
-              >
-                <Link href="/dashboard">
-                  Launch App
-                  <ArrowRight className="h-5 w-5" />
-                </Link>
-              </Button>
-              <Button
-                asChild
-                variant="outline"
-                size="lg"
-                className="border-white/15 text-white hover:bg-white/5 gap-2 px-10 h-13 text-base"
-              >
-                <a href="https://github.com/AbZe628/gravitas-protocol" target="_blank" rel="noopener noreferrer">
-                  <Github className="h-5 w-5" />
-                  View on GitHub
-                </a>
-              </Button>
-            </motion.div>
-          </motion.div>
         </div>
       </section>
 
       {/* ── FOOTER ── */}
-      <footer className="border-t border-[#D4AF37]/10 py-12 bg-[#060E1A]" role="contentinfo">
-        <div className="container px-4 md:px-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-10">
-            <div className="col-span-2 md:col-span-1">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-[#D4AF37] to-[#B8941F] flex items-center justify-center">
-                  <span className="text-[#060E1A] font-black" aria-hidden="true">G</span>
-                </div>
-                <span className="font-bold text-white">Gravitas Protocol</span>
+      <footer className="py-12 border-t border-[#D4AF37]/10 bg-[#060E1A]">
+        <div className="container px-4 md:px-6 mx-auto">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+            <div className="flex items-center gap-2">
+              <div className="h-8 w-8 rounded-lg bg-[#D4AF37] flex items-center justify-center">
+                <span className="text-[#060E1A] font-bold">G</span>
               </div>
-              <p className="text-sm text-white/35 leading-relaxed mb-4">
-                Institutional-grade Shariah-compliant liquidity infrastructure on Arbitrum.
-                Testnet only — no mainnet deployment.
-              </p>
-              <SystemStatusWidget />
+              <span className="font-bold text-white">Gravitas Protocol</span>
             </div>
-            <div>
-              <h4 className="font-semibold text-white mb-4 text-xs uppercase tracking-wider text-white/50">Protocol</h4>
-              <div className="space-y-2.5">
-                {[
-                  { label: "Dashboard", href: "/dashboard", external: false },
-                  { label: "Documentation", href: "/docs", external: false },
-                  { label: "Compliance", href: "/compliance", external: false },
-                  { label: "Whitepaper", href: "/docs", external: false },
-                ].map((l, i) => (
-                  <div key={i}>
-                    {l.external ? (
-                      <a href={l.href} target="_blank" rel="noopener noreferrer" className="text-sm text-white/40 hover:text-[#D4AF37] transition-colors block">{l.label}</a>
-                    ) : (
-                      <Link href={l.href} className="text-sm text-white/40 hover:text-[#D4AF37] transition-colors block">{l.label}</Link>
-                    )}
-                  </div>
-                ))}
-              </div>
+            <div className="flex gap-6 text-sm text-white/40">
+              <Link href="/docs" className="hover:text-[#D4AF37] transition-colors">Docs</Link>
+              <Link href="/sdk" className="hover:text-[#D4AF37] transition-colors">SDK</Link>
+              <a href="https://github.com/AbZe628/gravitas-protocol" target="_blank" rel="noopener noreferrer" className="hover:text-[#D4AF37] transition-colors">GitHub</a>
             </div>
-            <div>
-              <h4 className="font-semibold text-white mb-4 text-xs uppercase tracking-wider text-white/50">Developers</h4>
-              <div className="space-y-2.5">
-                {[
-                  { label: "SDK Reference", href: "/sdk", external: false },
-                  { label: "Compliance API", href: "/compliance", external: false },
-                  { label: "GitHub", href: "https://github.com/AbZe628/gravitas-protocol", external: true },
-                  { label: "Security Prep", href: "https://github.com/AbZe628/gravitas-protocol/blob/main/docs/SECURITY_AUDIT_PREP.md", external: true },
-                ].map((l, i) => (
-                  <div key={i}>
-                    {l.external ? (
-                      <a href={l.href} target="_blank" rel="noopener noreferrer" className="text-sm text-white/40 hover:text-[#D4AF37] transition-colors flex items-center gap-1">
-                        {l.label} <ExternalLink className="h-2.5 w-2.5" />
-                      </a>
-                    ) : (
-                      <Link href={l.href} className="text-sm text-white/40 hover:text-[#D4AF37] transition-colors block">{l.label}</Link>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div>
-              <h4 className="font-semibold text-white mb-4 text-xs uppercase tracking-wider text-white/50">On-Chain</h4>
-              <div className="space-y-2.5">
-                <a href="https://sepolia.arbiscan.io/address/0xbcaE3069362B0f0b80f44139052f159456C84679" target="_blank" rel="noopener noreferrer" className="text-sm text-white/40 hover:text-[#D4AF37] transition-colors flex items-center gap-1">
-                  PolicyRegistry <ExternalLink className="h-2.5 w-2.5" />
-                </a>
-                <a href="https://sepolia.arbiscan.io/address/0x5D423f8d01539B92D3f3953b91682D9884D1E993" target="_blank" rel="noopener noreferrer" className="text-sm text-white/40 hover:text-[#D4AF37] transition-colors flex items-center gap-1">
-                  TeleportV3 <ExternalLink className="h-2.5 w-2.5" />
-                </a>
-                <a href="https://sepolia.arbiscan.io" target="_blank" rel="noopener noreferrer" className="text-sm text-white/40 hover:text-[#D4AF37] transition-colors flex items-center gap-1">
-                  Arbiscan Explorer <ExternalLink className="h-2.5 w-2.5" />
-                </a>
-              </div>
-            </div>
-          </div>
-          <div className="border-t border-[#D4AF37]/10 pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-xs text-white/25">
-              © 2026 Gravitas Protocol. MIT License. Testnet only — no mainnet deployment.
-            </p>
-            <div className="flex items-center gap-4 text-xs text-white/25">
-              <a href="mailto:abdusamedzelic98@gmail.com" className="hover:text-[#D4AF37] transition-colors">Contact</a>
-              <span>·</span>
-              <a href="https://github.com/AbZe628/gravitas-protocol" target="_blank" rel="noopener noreferrer" className="hover:text-[#D4AF37] transition-colors flex items-center gap-1">
-                GitHub <ExternalLink className="h-2.5 w-2.5" />
-              </a>
-            </div>
+            <p className="text-xs text-white/20">© 2026 Gravitas Protocol. Testnet v1.0.</p>
           </div>
         </div>
       </footer>
