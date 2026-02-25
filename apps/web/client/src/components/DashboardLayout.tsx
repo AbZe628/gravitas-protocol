@@ -61,7 +61,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       {/* Mobile Header */}
       <header className="lg:hidden sticky top-0 z-50 w-full border-b border-[#D4AF37]/20 bg-[#0A1628]/95 backdrop-blur">
         <div className="flex h-16 items-center justify-between px-4">
-          <div className="flex items-center gap-2 shrink-0">
+          <button onClick={() => navigate("/")} className="flex items-center gap-2 shrink-0 hover:opacity-80 transition-opacity">
             <div className="h-9 w-9 rounded-lg bg-gradient-to-br from-[#D4AF37] to-[#B8941F] flex items-center justify-center">
               <span className="text-[#0A1628] font-bold text-lg">G</span>
             </div>
@@ -69,7 +69,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               <h1 className="text-sm font-bold text-white">Gravitas</h1>
               <p className="text-xs text-white/40">Dashboard</p>
             </div>
-          </div>
+          </button>
 
           <div className="flex items-center gap-2">
             {isConnected && (
@@ -183,17 +183,17 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           className="w-64 border-r border-[#D4AF37]/20 bg-[#0A1628]/50 backdrop-blur flex flex-col overflow-y-auto"
         >
           {/* Logo */}
-          <div className="p-6 border-b border-[#D4AF37]/20 shrink-0">
+          <button onClick={() => navigate("/")} className="p-6 border-b border-[#D4AF37]/20 shrink-0 w-full hover:bg-[#D4AF37]/5 transition-colors">
             <div className="flex items-center gap-3">
-              <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-[#D4AF37] to-[#B8941F] flex items-center justify-center">
+              <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-[#D4AF37] to-[#B8941F] flex items-center justify-center flex-shrink-0">
                 <span className="text-[#0A1628] font-bold text-2xl">G</span>
               </div>
-              <div>
+              <div className="text-left">
                 <h1 className="text-xl font-bold text-white">Gravitas</h1>
                 <p className="text-xs text-white/50">Protocol Dashboard</p>
               </div>
             </div>
-          </div>
+          </button>
 
           {/* Navigation */}
           <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
