@@ -10,17 +10,16 @@ import {
   BarChart3,
   History,
   Menu,
-  Wallet,
   ExternalLink,
-  LogOut,
   X,
   Settings,
 } from "lucide-react";
 import { useLocation } from "wouter";
-import { useAccount, useConnect, useDisconnect, useSwitchChain } from "wagmi";
+import { useAccount, useDisconnect, useSwitchChain } from "wagmi";
 import { arbitrumSepolia } from "wagmi/chains";
 import { useEffect } from "react";
 import { motion } from "framer-motion";
+import { WalletButton, WalletModal, ConnectedWallet } from "./WalletModal";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -29,10 +28,10 @@ interface DashboardLayoutProps {
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [location, navigate] = useLocation();
   const { address, isConnected, chain } = useAccount();
-  const { connect, connectors } = useConnect();
   const { disconnect } = useDisconnect();
   const { switchChain } = useSwitchChain();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [walletModalOpen, setWalletModalOpen] = useState(false);
 
   // Auto-switch to Arbitrum Sepolia
   useEffect(() => {
@@ -61,7 +60,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       {/* Mobile Header */}
       <header className="lg:hidden sticky top-0 z-50 w-full border-b border-[#D4AF37]/20 bg-[#0A1628]/95 backdrop-blur">
         <div className="flex h-16 items-center justify-between px-4">
-          <button onClick={(e) => { e.preventDefault(); navigate("/"); }} className="flex items-center gap-2 shrink-0 hover:opacity-80 transition-opacity">
+          <button
+            onClick={() => navigate("/")}
+            className="flex items-center gap-2 shrink-0 hover:opacity-80 transition-opacity"
+          >
             <div className="h-9 w-9 rounded-lg bg-gradient-to-br from-[#D4AF37] to-[#B8941F] flex items-center justify-center">
               <span className="text-[#0A1628] font-bold text-lg">G</span>
             </div>
@@ -72,11 +74,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           </button>
 
           <div className="flex items-center gap-2">
-            {isConnected && (
+            {isConnected && address && (
               <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#0F1E35]/50 border border-[#D4AF37]/20">
                 <div className="h-2 w-2 rounded-full bg-green-400" />
                 <span className="text-xs font-mono text-white/70">
-                  {address?.slice(0, 6)}...{address?.slice(-4)}
+                  {address.slice(0, 6)}…{address.slice(-4)}
                 </span>
               </div>
             )}
@@ -87,26 +89,16 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                   variant="ghost"
                   size="icon"
                   className="text-[#D4AF37] hover:bg-[#D4AF37]/10 lg:hidden"
+                  aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
                 >
-                  {mobileMenuOpen ? (
-                    <X className="h-5 w-5" />
-                  ) : (
-                    <Menu className="h-5 w-5" />
-                  )}
+                  {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
                 </Button>
               </SheetTrigger>
-              <SheetContent
-                side="right"
-                className="w-[280px] bg-[#0A1628] border-[#D4AF37]/20 p-0"
-              >
+              <SheetContent side="right" className="w-[280px] bg-[#0A1628] border-[#D4AF37]/20 p-0">
                 <nav className="flex flex-col gap-1 pt-6 px-4">
                   <Button
                     variant="ghost"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      navigate("/");
-                      setMobileMenuOpen(false);
-                    }}
+                    onClick={() => { navigate("/"); setMobileMenuOpen(false); }}
                     className="justify-start text-white/70 hover:text-[#D4AF37] hover:bg-[#D4AF37]/10 h-10"
                   >
                     <Home className="h-4 w-4 mr-3" />
@@ -117,11 +109,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                     <Button
                       key={item.path}
                       variant="ghost"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        navigate(item.path);
-                        setMobileMenuOpen(false);
-                      }}
+                      onClick={() => { navigate(item.path); setMobileMenuOpen(false); }}
                       className={`justify-start h-10 ${
                         isActive(item.path)
                           ? "bg-[#D4AF37]/20 text-[#D4AF37]"
@@ -133,42 +121,22 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                     </Button>
                   ))}
                   <Separator className="bg-[#D4AF37]/20 my-2" />
-                  {isConnected ? (
-                    <>
-                      <div className="px-3 py-3">
-                        <p className="text-xs text-white/40 mb-1">Connected Wallet</p>
-                        <p className="text-xs font-mono text-white mb-2">
-                          {address?.slice(0, 10)}...{address?.slice(-8)}
-                        </p>
-                        <Badge className="bg-green-500/20 text-green-500 border-green-500/30 text-xs">
-                          {chain?.name || "Unknown"}
-                        </Badge>
-                      </div>
+                  <div className="px-1 py-2">
+                    {isConnected && address ? (
+                      <ConnectedWallet
+                        address={address}
+                        chainName={chain?.name}
+                        onDisconnect={() => { disconnect(); setMobileMenuOpen(false); }}
+                      />
+                    ) : (
                       <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          disconnect();
-                          setMobileMenuOpen(false);
-                        }}
-                        className="w-full border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37]/10 h-9 text-xs"
+                        onClick={() => { setWalletModalOpen(true); setMobileMenuOpen(false); }}
+                        className="w-full bg-[#D4AF37] text-[#0A1628] hover:bg-[#D4AF37]/90 h-10 text-sm font-semibold"
                       >
-                        <LogOut className="h-3 w-3 mr-2" />
-                        Disconnect
+                        Connect Wallet
                       </Button>
-                    </>
-                  ) : (
-                    <Button
-                      onClick={() => {
-                        connect({ connector: connectors[0] });
-                        setMobileMenuOpen(false);
-                      }}
-                      className="w-full bg-[#D4AF37] text-[#0A1628] hover:bg-[#D4AF37]/90 h-9 text-xs"
-                    >
-                      <Wallet className="h-3 w-3 mr-2" />
-                      Connect Wallet
-                    </Button>
-                  )}
+                    )}
+                  </div>
                 </nav>
               </SheetContent>
             </Sheet>
@@ -185,12 +153,15 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           className="w-64 border-r border-[#D4AF37]/20 bg-[#0A1628]/50 backdrop-blur flex flex-col overflow-y-auto"
         >
           {/* Logo */}
-          <button onClick={(e) => { e.preventDefault(); navigate("/"); }} className="p-6 border-b border-[#D4AF37]/20 shrink-0 w-full hover:bg-[#D4AF37]/5 transition-colors">
+          <button
+            onClick={() => navigate("/")}
+            className="p-6 border-b border-[#D4AF37]/20 shrink-0 w-full hover:bg-[#D4AF37]/5 transition-colors text-left"
+          >
             <div className="flex items-center gap-3">
-              <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-[#D4AF37] to-[#B8941F] flex items-center justify-center flex-shrink-0">
+              <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-[#D4AF37] to-[#B8941F] flex items-center justify-center shrink-0">
                 <span className="text-[#0A1628] font-bold text-2xl">G</span>
               </div>
-              <div className="text-left">
+              <div>
                 <h1 className="text-xl font-bold text-white">Gravitas</h1>
                 <p className="text-xs text-white/50">Protocol Dashboard</p>
               </div>
@@ -198,10 +169,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           </button>
 
           {/* Navigation */}
-          <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+          <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
             <Button
               variant="ghost"
-              onClick={(e) => { e.preventDefault(); navigate("/"); }}
+              onClick={() => navigate("/")}
               className="w-full justify-start text-white/70 hover:text-[#D4AF37] hover:bg-[#D4AF37]/10 h-10"
             >
               <Home className="h-4 w-4 mr-3" />
@@ -212,7 +183,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               <Button
                 key={item.path}
                 variant="ghost"
-                onClick={(e) => { e.preventDefault(); navigate(item.path); }}
+                onClick={() => navigate(item.path)}
                 className={`w-full justify-start h-10 ${
                   isActive(item.path)
                     ? "bg-[#D4AF37]/20 text-[#D4AF37]"
@@ -227,33 +198,17 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
           {/* Wallet Section */}
           <div className="p-4 border-t border-[#D4AF37]/20 shrink-0">
-            {isConnected ? (
-              <div className="space-y-3">
-                <div className="p-3 rounded-lg bg-[#0F1E35]/50 border border-[#D4AF37]/10">
-                  <p className="text-xs text-white/50 mb-1">Connected Wallet</p>
-                  <p className="text-xs font-mono text-white mb-2 break-all">
-                    {address?.slice(0, 12)}...{address?.slice(-10)}
-                  </p>
-                  <Badge className="bg-green-500/20 text-green-500 border-green-500/30 text-xs">
-                    {chain?.name || "Unknown"}
-                  </Badge>
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => disconnect()}
-                  className="w-full border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37]/10 h-9 text-xs"
-                >
-                  <LogOut className="h-3 w-3 mr-2" />
-                  Disconnect
-                </Button>
-              </div>
+            {isConnected && address ? (
+              <ConnectedWallet
+                address={address}
+                chainName={chain?.name}
+                onDisconnect={() => disconnect()}
+              />
             ) : (
               <Button
-                onClick={() => connect({ connector: connectors[0] })}
+                onClick={() => setWalletModalOpen(true)}
                 className="w-full bg-[#D4AF37] text-[#0A1628] hover:bg-[#D4AF37]/90 h-10 text-sm font-semibold"
               >
-                <Wallet className="h-4 w-4 mr-2" />
                 Connect Wallet
               </Button>
             )}
@@ -269,8 +224,12 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 {navItems.find((item) => isActive(item.path))?.label || "Dashboard"}
               </h2>
               {chain?.id !== arbitrumSepolia.id && isConnected && (
-                <Badge variant="outline" className="border-red-500 text-red-500 text-xs shrink-0">
-                  Wrong Network
+                <Badge
+                  variant="outline"
+                  className="border-amber-500/50 text-amber-400 text-xs shrink-0 cursor-pointer hover:bg-amber-500/10 transition-colors"
+                  onClick={() => switchChain({ chainId: arbitrumSepolia.id })}
+                >
+                  Wrong Network — click to switch
                 </Badge>
               )}
             </div>
@@ -283,7 +242,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               <Button
                 variant="outline"
                 size="sm"
-                className="border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37]/10 h-9 text-xs"
+                className="border-[#D4AF37]/20 text-[#D4AF37] hover:bg-[#D4AF37]/10 h-9 text-xs"
               >
                 <ExternalLink className="h-3 w-3 mr-2" />
                 Arbiscan
@@ -318,6 +277,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           {children}
         </motion.div>
       </main>
+
+      {/* Global Wallet Modal */}
+      <WalletModal open={walletModalOpen} onOpenChange={setWalletModalOpen} />
     </div>
   );
 }

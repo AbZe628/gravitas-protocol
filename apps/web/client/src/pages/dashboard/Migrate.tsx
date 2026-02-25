@@ -11,6 +11,7 @@ import {
   ArrowRight, AlertCircle, Loader2, CheckCircle2, Shield,
   Zap, Info, ExternalLink, Search
 } from "lucide-react";
+import { WalletButton } from "@/components/WalletModal";
 import {
   useAccount,
   useReadContract,
@@ -22,6 +23,7 @@ import { arbitrumSepolia } from "wagmi/chains";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { CONTRACTS } from "@/lib/wagmi";
+import { decodeContractError } from "@/lib/errorDecoder";
 
 // ─── ABIs ─────────────────────────────────────────────────────────────────────
 const POLICY_REGISTRY_ABI = [
@@ -331,8 +333,7 @@ export default function Migrate() {
       setV2TxHash(hash);
       toast.info(`V2 migration submitted: ${hash.slice(0, 10)}...`);
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Transaction failed";
-      toast.error(msg.includes("User rejected") || msg.includes("user rejected") ? "Rejected by user" : msg.slice(0, 100));
+      toast.error(decodeContractError(err));
     }
   };
 
@@ -397,8 +398,7 @@ export default function Migrate() {
       setV3TxHash(hash);
       toast.info(`V3 migration submitted: ${hash.slice(0, 10)}...`);
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Transaction failed";
-      toast.error(msg.includes("User rejected") || msg.includes("user rejected") ? "Rejected by user" : msg.slice(0, 100));
+      toast.error(decodeContractError(err));
     }
   };
 
@@ -411,12 +411,15 @@ export default function Migrate() {
   return (
     <div className="space-y-6">
       {!isConnected && (
-        <Alert className="border-[#D4AF37]/30 bg-[#0F1E35]/50">
-          <AlertCircle className="h-4 w-4 text-[#D4AF37]" />
-          <AlertDescription className="text-white/70">
-            Connect your wallet to Arbitrum Sepolia to start migrating liquidity positions
-          </AlertDescription>
-        </Alert>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-xl border border-[#D4AF37]/30 bg-[#0F1E35]/50">
+          <div className="flex items-start gap-3">
+            <AlertCircle className="h-5 w-5 text-[#D4AF37] shrink-0 mt-0.5" />
+            <p className="text-sm text-white/70 leading-snug">
+              Connect your wallet to Arbitrum Sepolia to start migrating liquidity positions
+            </p>
+          </div>
+          <WalletButton size="sm" className="shrink-0" />
+        </div>
       )}
 
       <ComplianceChecker />

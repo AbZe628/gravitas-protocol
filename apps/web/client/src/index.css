@@ -283,6 +283,29 @@
 }
 
 @layer utilities {
+  /* xs breakpoint helper — used in Home.tsx */
+  @media (min-width: 480px) {
+    .xs\:hidden { display: none; }
+    .xs\:inline { display: inline; }
+    .xs\:block { display: block; }
+    .xs\:flex { display: flex; }
+    .xs\:text-4xl { font-size: 2.25rem; line-height: 2.5rem; }
+    .xs\:text-lg { font-size: 1.125rem; line-height: 1.75rem; }
+    .xs\:text-xs { font-size: 0.75rem; line-height: 1rem; }
+    .xs\:text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+    .xs\:text-base { font-size: 1rem; line-height: 1.5rem; }
+    .xs\:text-\[10px\] { font-size: 10px; }
+    .xs\:h-3\.5 { height: 0.875rem; }
+    .xs\:w-3\.5 { width: 0.875rem; }
+    .xs\:gap-2 { gap: 0.5rem; }
+    .xs\:gap-3 { gap: 0.75rem; }
+    .xs\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .xs\:text-xl { font-size: 1.25rem; line-height: 1.75rem; }
+    .xs\:text-2xl { font-size: 1.5rem; line-height: 2rem; }
+    .xs\:px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
+    .xs\:w-auto { width: auto; }
+  }
+
   /* Scrollbar styling */
   .scrollbar-thin {
     scrollbar-width: thin;
@@ -298,6 +321,15 @@
   .scrollbar-thin::-webkit-scrollbar-thumb {
     background: rgba(212,175,55,0.3);
     border-radius: 2px;
+  }
+
+  /* Hide scrollbar but keep scrollable */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
   }
 
   /* Text balance */

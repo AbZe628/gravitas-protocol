@@ -11,11 +11,13 @@ import {
   Shield, Lock, AlertCircle, Loader2, CheckCircle2,
   ExternalLink, Settings, Users, Sliders, RefreshCw
 } from "lucide-react";
+import { WalletButton } from "@/components/WalletModal";
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { arbitrumSepolia } from "wagmi/chains";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { CONTRACTS } from "@/lib/wagmi";
+import { decodeContractError } from "@/lib/errorDecoder";
 
 // ─── ABIs ────────────────────────────────────────────────────────────────────
 const POLICY_REGISTRY_ABI = [
@@ -143,8 +145,7 @@ function AssetManagement() {
       setPendingTxHash(hash);
       toast.info(`Transaction submitted: ${hash.slice(0, 10)}...`);
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Transaction failed";
-      toast.error(msg.includes("User rejected") ? "Transaction rejected by user" : msg.slice(0, 80));
+      toast.error(decodeContractError(err));
     }
   };
 
@@ -233,8 +234,7 @@ function RouterExecutorManagement() {
       setRouterTxHash(hash);
       toast.info(`Router tx submitted: ${hash.slice(0, 10)}...`);
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Transaction failed";
-      toast.error(msg.includes("User rejected") ? "Rejected" : msg.slice(0, 80));
+      toast.error(decodeContractError(err));
     }
   };
 
@@ -254,8 +254,7 @@ function RouterExecutorManagement() {
       setExecutorTxHash(hash);
       toast.info(`Executor tx submitted: ${hash.slice(0, 10)}...`);
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Transaction failed";
-      toast.error(msg.includes("User rejected") ? "Rejected" : msg.slice(0, 80));
+      toast.error(decodeContractError(err));
     }
   };
 
@@ -391,8 +390,7 @@ function PolicyUpdates() {
       setPolicyTxHash(hash);
       toast.info(`Policy update submitted: ${hash.slice(0, 10)}...`);
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Transaction failed";
-      toast.error(msg.includes("User rejected") ? "Rejected" : msg.slice(0, 80));
+      toast.error(decodeContractError(err));
     }
   };
 
@@ -535,12 +533,15 @@ export default function Admin() {
 
         {/* Access Gate */}
         {!isConnected && (
-          <Alert className="border-[#D4AF37]/30 bg-[#0F1E35]/50">
-            <Lock className="h-4 w-4 text-[#D4AF37]" />
-            <AlertDescription className="text-white/70">
-              Connect your wallet to verify ownership. This panel is restricted to the registry owner.
-            </AlertDescription>
-          </Alert>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-xl border border-[#D4AF37]/30 bg-[#0F1E35]/50">
+            <div className="flex items-start gap-3">
+              <Lock className="h-5 w-5 text-[#D4AF37] shrink-0 mt-0.5" />
+              <p className="text-sm text-white/70 leading-snug">
+                Connect your wallet to verify ownership. This panel is restricted to the registry owner.
+              </p>
+            </div>
+            <WalletButton size="sm" className="shrink-0" />
+          </div>
         )}
 
         {isWrongNetwork && (
