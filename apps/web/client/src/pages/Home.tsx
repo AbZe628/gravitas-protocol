@@ -371,22 +371,22 @@ export default function Home() {
 
             <motion.h1
               variants={fadeUp}
-              className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-[1.1] md:leading-[1.05] mb-3 md:mb-6 tracking-tight"
+              className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] md:leading-[1.05] mb-4 md:mb-8 tracking-tight break-words"
             >
               Institutional-Grade
-              <br className="hidden xs:block" />
-              <span className="gold-gradient">Liquidity Routing</span>
+              <br className="hidden sm:block" />
+              <span className="gold-gradient"> Liquidity Routing</span>
             </motion.h1>
 
             <motion.p variants={fadeUp} className="text-xs xs:text-sm sm:text-base md:text-lg text-white/55 mb-6 md:mb-10 max-w-2xl leading-relaxed">
               Deterministic, Shariah-compliant liquidity migrations across Uniswap V2 and V3 with atomic execution and on-chain compliance verification.
             </motion.p>
 
-            <motion.div variants={fadeUp} className="flex flex-col xs:flex-row flex-wrap gap-2 xs:gap-3 mb-10 md:mb-14">
+            <motion.div variants={fadeUp} className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 mb-10 md:mb-14">
               <Button
                 asChild
                 size="lg"
-                className="bg-[#D4AF37] text-[#060E1A] hover:bg-[#D4AF37]/90 font-semibold gap-1.5 xs:gap-2 px-4 xs:px-6 md:px-8 h-10 xs:h-11 md:h-12 text-xs xs:text-sm md:text-base shadow-xl shadow-[#D4AF37]/25 transition-all hover:shadow-[#D4AF37]/40 hover:-translate-y-0.5 w-full xs:w-auto"
+                className="bg-[#D4AF37] text-[#060E1A] hover:bg-[#D4AF37]/90 font-semibold gap-1.5 sm:gap-2 px-4 sm:px-6 md:px-8 h-11 sm:h-12 text-sm sm:text-base shadow-xl shadow-[#D4AF37]/25 transition-all hover:shadow-[#D4AF37]/40 hover:-translate-y-0.5 w-full sm:w-auto"
               >
                 <Link href="/dashboard">
                   Launch App
@@ -397,7 +397,7 @@ export default function Home() {
                 asChild
                 variant="outline"
                 size="lg"
-                className="border-white/15 text-white hover:bg-white/5 hover:border-white/25 gap-1.5 xs:gap-2 px-4 xs:px-6 md:px-8 h-10 xs:h-11 md:h-12 text-xs xs:text-sm md:text-base transition-all w-full xs:w-auto"
+                className="border-white/15 text-white hover:bg-white/5 hover:border-white/25 gap-1.5 sm:gap-2 px-4 sm:px-6 md:px-8 h-11 sm:h-12 text-sm sm:text-base transition-all w-full sm:w-auto"
               >
                 <a href="https://github.com/AbZe628/gravitas-protocol" target="_blank" rel="noopener noreferrer">
                   <Github className="h-3 w-3 xs:h-3.5 xs:w-3.5 md:h-4 md:w-4" />
@@ -409,7 +409,7 @@ export default function Home() {
                 asChild
                 variant="outline"
                 size="lg"
-                className="border-[#D4AF37]/20 text-[#D4AF37] hover:bg-[#D4AF37]/8 gap-1.5 xs:gap-2 px-4 xs:px-6 md:px-8 h-10 xs:h-11 md:h-12 text-xs xs:text-sm md:text-base transition-all w-full xs:w-auto"
+                className="border-[#D4AF37]/20 text-[#D4AF37] hover:bg-[#D4AF37]/8 gap-1.5 sm:gap-2 px-4 sm:px-6 md:px-8 h-11 sm:h-12 text-sm sm:text-base transition-all w-full sm:w-auto"
               >
                 <Link href="/docs">
                   <BookOpen className="h-3 w-3 xs:h-3.5 xs:w-3.5 md:h-4 md:w-4" />
