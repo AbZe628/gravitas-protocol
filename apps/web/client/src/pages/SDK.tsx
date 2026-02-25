@@ -45,25 +45,25 @@ export default function SDK() {
   return (
     <div className="min-h-screen bg-[#060E1A] text-white">
       {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-[#D4AF37]/10 bg-[#060E1A]/80 backdrop-blur-xl">
-        <div className="container flex h-16 items-center justify-between">
-          <div className="flex items-center gap-3">
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-[#D4AF37]/10 bg-[#060E1A]/90 backdrop-blur-xl" role="navigation">
+        <div className="container flex h-16 items-center justify-between px-4 md:px-6 mx-auto max-w-7xl">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
             <Link href="/">
-              <div className="flex items-center gap-2 cursor-pointer">
+              <div className="flex items-center gap-2 cursor-pointer shrink-0">
                 <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-[#D4AF37] to-[#B8941F] flex items-center justify-center">
-                  <span className="text-[#060E1A] font-black">G</span>
+                  <span className="text-[#060E1A] font-black text-sm">G</span>
                 </div>
-                <span className="font-bold text-white">Gravitas</span>
+                <span className="font-bold text-white hidden sm:block">Gravitas</span>
               </div>
             </Link>
-            <ChevronRight className="h-4 w-4 text-white/30" />
-            <span className="text-white/60 text-sm">SDK Reference</span>
+            <ChevronRight className="h-4 w-4 text-white/30 shrink-0" />
+            <span className="text-white/60 text-sm truncate">SDK Reference</span>
           </div>
-          <div className="flex items-center gap-3">
-            <Button asChild variant="ghost" size="sm" className="text-white/60 hover:text-white">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            <Button asChild variant="ghost" size="sm" className="text-white/60 hover:text-white hidden sm:flex">
               <Link href="/"><Home className="h-4 w-4 mr-2" />Home</Link>
             </Button>
-            <Button asChild size="sm" className="bg-[#D4AF37] text-[#060E1A] hover:bg-[#D4AF37]/90 font-semibold">
+            <Button asChild size="sm" className="bg-[#D4AF37] text-[#060E1A] hover:bg-[#D4AF37]/90 font-semibold text-xs sm:text-sm px-3 sm:px-4">
               <Link href="/dashboard">Launch App</Link>
             </Button>
           </div>
@@ -275,7 +275,7 @@ async function migratePosition(tokenId: bigint) {
   const provider = new ethers.JsonRpcProvider(
     'https://sepolia-rollup.arbitrum.io/rpc'
   );
-  constconst signer = new ethers.Wallet(process.env.WALLET_SIGNER_KEY!, provider);;
+  const signer = new ethers.Wallet(process.env.WALLET_SIGNER_KEY!, provider);
 
   // Initialize Gravitas client
   const client = new GravitasClient({

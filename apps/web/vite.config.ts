@@ -19,6 +19,17 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    chunkSizeWarningLimit: 600,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          "vendor-react": ["react", "react-dom"],
+          "vendor-wagmi": ["wagmi", "viem"],
+          "vendor-query": ["@tanstack/react-query"],
+          "vendor-motion": ["framer-motion"],
+        },
+      },
+    },
   },
   server: {
     port: 3000,

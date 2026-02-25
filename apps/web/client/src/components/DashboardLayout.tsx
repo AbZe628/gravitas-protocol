@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -13,13 +13,13 @@ import {
   ExternalLink,
   X,
   Settings,
+  Wallet,
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { useAccount, useDisconnect, useSwitchChain } from "wagmi";
 import { arbitrumSepolia } from "wagmi/chains";
-import { useEffect } from "react";
 import { motion } from "framer-motion";
-import { WalletButton, WalletModal, ConnectedWallet } from "./WalletModal";
+import { WalletModal, ConnectedWallet } from "./WalletModal";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -48,6 +48,13 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     { icon: Settings, label: "Admin", path: "/admin" },
   ];
 
+  const bottomNavItems = [
+    { icon: LayoutDashboard, label: "Overview", path: "/dashboard" },
+    { icon: ArrowLeftRight, label: "Migrate", path: "/dashboard/migrate" },
+    { icon: BarChart3, label: "Analytics", path: "/dashboard/analytics" },
+    { icon: History, label: "History", path: "/dashboard/history" },
+  ];
+
   const isActive = (path: string) => {
     if (path === "/dashboard") {
       return location === "/dashboard";
@@ -58,7 +65,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0A1628] via-[#0F1E35] to-[#0A1628]">
       {/* Mobile Header */}
-      <header className="lg:hidden sticky top-0 z-50 w-full border-b border-[#D4AF37]/20 bg-[#0A1628]/95 backdrop-blur">
+      <header className="lg:hidden sticky top-0 z-50 w-full border-b border-[#D4AF37]/20 bg-[#0A1628]/95 backdrop-blur-xl">
         <div className="flex h-16 items-center justify-between px-4">
           <button
             onClick={() => navigate("/")}
@@ -67,20 +74,30 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             <div className="h-9 w-9 rounded-lg bg-gradient-to-br from-[#D4AF37] to-[#B8941F] flex items-center justify-center">
               <span className="text-[#0A1628] font-bold text-lg">G</span>
             </div>
-            <div className="hidden xs:block">
-              <h1 className="text-sm font-bold text-white">Gravitas</h1>
-              <p className="text-xs text-white/40">Dashboard</p>
+            <div>
+              <h1 className="text-sm font-bold text-white leading-tight">Gravitas</h1>
+              <p className="text-[10px] text-white/40 leading-tight">Protocol</p>
             </div>
           </button>
 
           <div className="flex items-center gap-2">
-            {isConnected && address && (
-              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#0F1E35]/50 border border-[#D4AF37]/20">
-                <div className="h-2 w-2 rounded-full bg-green-400" />
+            {isConnected && address && chain?.id === arbitrumSepolia.id && (
+              <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0F1E35]/80 border border-[#D4AF37]/20">
+                <div className="h-1.5 w-1.5 rounded-full bg-green-400" />
                 <span className="text-xs font-mono text-white/70">
                   {address.slice(0, 6)}…{address.slice(-4)}
                 </span>
               </div>
+            )}
+            {!isConnected && (
+              <Button
+                size="sm"
+                onClick={() => setWalletModalOpen(true)}
+                className="bg-[#D4AF37] text-[#0A1628] hover:bg-[#D4AF37]/90 font-semibold h-8 px-3 text-xs"
+              >
+                <Wallet className="h-3.5 w-3.5 mr-1.5" />
+                Connect
+              </Button>
             )}
 
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
@@ -131,10 +148,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                     ) : (
                       <Button
                         onClick={() => { setWalletModalOpen(true); setMobileMenuOpen(false); }}
-                        className="w-full bg-[#D4AF37] text-[#0A1628] hover:bg-[#D4AF37]/90 h-10 text-sm font-semibold"
-                      >
-                        Connect Wallet
-                      </Button>
+              className="w-full bg-[#D4AF37] text-[#0A1628] hover:bg-[#D4AF37]/90 h-10 text-sm font-semibold"
+            >
+              <Wallet className="h-4 w-4 mr-2" />
+              Connect Wallet
+            </Button>
                     )}
                   </div>
                 </nav>
@@ -145,11 +163,12 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       </header>
 
       {/* Desktop Layout */}
-      <div className="hidden lg:flex h-screen">
+      <div className="hidden lg:flex h-screen overflow-hidden">
         {/* Sidebar */}
         <motion.aside
-          initial={{ x: -300, opacity: 0 }}
+          initial={{ x: -20, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
+          transition={{ duration: 0.3 }}
           className="w-64 border-r border-[#D4AF37]/20 bg-[#0A1628]/50 backdrop-blur flex flex-col overflow-y-auto"
         >
           {/* Logo */}
@@ -266,10 +285,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       </div>
 
       {/* Mobile Content */}
-      <main className="lg:hidden pb-safe">
+      <main className="lg:hidden pb-24">
         <motion.div
           key={location}
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
           className="p-4 space-y-4"
@@ -277,6 +296,36 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           {children}
         </motion.div>
       </main>
+
+      {/* Mobile Bottom Navigation */}
+      <nav
+        className="lg:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-[#D4AF37]/20 bg-[#0A1628]/98 backdrop-blur-xl"
+        style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
+        aria-label="Mobile bottom navigation"
+      >
+        <div className="flex items-center justify-around h-16">
+          {bottomNavItems.map((item) => {
+            const active = isActive(item.path);
+            return (
+              <button
+                key={item.path}
+                onClick={() => navigate(item.path)}
+                className={`relative flex flex-col items-center justify-center gap-1 flex-1 h-full transition-colors ${
+                  active ? "text-[#D4AF37]" : "text-white/40 hover:text-white/70"
+                }`}
+                aria-label={item.label}
+                aria-current={active ? "page" : undefined}
+              >
+                <item.icon className={`h-5 w-5 transition-transform ${active ? "scale-110" : ""}`} />
+                <span className="text-[10px] font-medium leading-none">{item.label}</span>
+                {active && (
+                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 w-8 bg-[#D4AF37] rounded-t-full" />
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </nav>
 
       {/* Global Wallet Modal */}
       <WalletModal open={walletModalOpen} onOpenChange={setWalletModalOpen} />
