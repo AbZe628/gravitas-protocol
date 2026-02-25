@@ -360,70 +360,72 @@ export default function Home() {
       {/* ── HERO ── */}
       <section className="relative min-h-screen flex items-center pt-16" aria-label="Hero">
         {/* Layered background */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#D4AF3708_1px,transparent_1px),linear-gradient(to_bottom,#D4AF3708_1px,transparent_1px)] bg-[size:64px_64px]" aria-hidden="true" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#D4AF3708_1px,transparent_1px),linear-gradient(to_bottom,#D4AF3708_1px,transparent_1px)] bg-[size:32px_32px] md:bg-[size:64px_64px]" aria-hidden="true" />
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#D4AF37]/20 to-transparent" aria-hidden="true" />
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] bg-[#D4AF37]/4 rounded-full blur-[140px] pointer-events-none" aria-hidden="true" />
-        <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[300px] bg-blue-900/10 rounded-full blur-[100px] pointer-events-none" aria-hidden="true" />
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] md:w-[700px] h-[300px] md:h-[500px] bg-[#D4AF37]/4 rounded-full blur-[80px] md:blur-[140px] pointer-events-none" aria-hidden="true" />
+        <div className="absolute bottom-1/4 right-1/4 w-[250px] md:w-[400px] h-[200px] md:h-[300px] bg-blue-900/10 rounded-full blur-[60px] md:blur-[100px] pointer-events-none" aria-hidden="true" />
 
-        <div className="container relative z-10 py-16 md:py-28 px-4 md:px-6">
+        <div className="max-w-7xl mx-auto relative z-10 w-full py-8 md:py-28 px-3 sm:px-4 md:px-6 lg:px-8">
           <motion.div variants={stagger} initial="hidden" animate="visible" className="max-w-4xl">
             <motion.div variants={fadeUp}>
-              <Badge className="mb-6 px-4 py-1.5 bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold tracking-wider uppercase gap-2">
-                <span className="h-1.5 w-1.5 rounded-full bg-amber-400 animate-pulse" />
-                Testnet Demo · Arbitrum Sepolia · No Mainnet Deployment
+              <Badge className="mb-4 md:mb-6 px-2 xs:px-3 sm:px-4 py-1 md:py-1.5 bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[10px] xs:text-xs font-semibold tracking-wider uppercase gap-1.5 inline-flex items-center flex-wrap">
+                <span className="h-1 w-1 xs:h-1.5 xs:w-1.5 rounded-full bg-amber-400 animate-pulse flex-shrink-0" />
+                <span className="truncate">Testnet Demo</span>
               </Badge>
             </motion.div>
 
             <motion.h1
               variants={fadeUp}
-              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.05] mb-6 tracking-tight text-balance"
+              className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-[1.1] md:leading-[1.05] mb-3 md:mb-6 tracking-tight"
             >
               Institutional-Grade
-              <br />
+              <br className="hidden xs:block" />
               <span className="gold-gradient">Liquidity Routing</span>
             </motion.h1>
 
-            <motion.p variants={fadeUp} className="text-base md:text-lg text-white/55 mb-10 max-w-2xl leading-relaxed">
-              Deterministic, Shariah-compliant liquidity migrations across Uniswap V2 and V3 with atomic execution, EIP-712 signed intents, and policy-enforced compliance checks — verifiable on-chain at every step.
+            <motion.p variants={fadeUp} className="text-xs xs:text-sm sm:text-base md:text-lg text-white/55 mb-6 md:mb-10 max-w-2xl leading-relaxed">
+              Deterministic, Shariah-compliant liquidity migrations across Uniswap V2 and V3 with atomic execution and on-chain compliance verification.
             </motion.p>
 
-            <motion.div variants={fadeUp} className="flex flex-col sm:flex-row flex-wrap gap-3 mb-14">
+            <motion.div variants={fadeUp} className="flex flex-col xs:flex-row flex-wrap gap-2 xs:gap-3 mb-10 md:mb-14">
               <Button
                 asChild
                 size="lg"
-                className="bg-[#D4AF37] text-[#060E1A] hover:bg-[#D4AF37]/90 font-semibold gap-2 px-8 h-12 text-base shadow-xl shadow-[#D4AF37]/25 transition-all hover:shadow-[#D4AF37]/40 hover:-translate-y-0.5"
+                className="bg-[#D4AF37] text-[#060E1A] hover:bg-[#D4AF37]/90 font-semibold gap-1.5 xs:gap-2 px-4 xs:px-6 md:px-8 h-10 xs:h-11 md:h-12 text-xs xs:text-sm md:text-base shadow-xl shadow-[#D4AF37]/25 transition-all hover:shadow-[#D4AF37]/40 hover:-translate-y-0.5 w-full xs:w-auto"
               >
                 <Link href="/dashboard">
                   Launch App
-                  <ArrowRight className="h-4 w-4" />
+                  <ArrowRight className="h-3 w-3 xs:h-3.5 xs:w-3.5 md:h-4 md:w-4" />
                 </Link>
               </Button>
               <Button
                 asChild
                 variant="outline"
                 size="lg"
-                className="border-white/15 text-white hover:bg-white/5 hover:border-white/25 gap-2 px-8 h-12 text-base transition-all"
+                className="border-white/15 text-white hover:bg-white/5 hover:border-white/25 gap-1.5 xs:gap-2 px-4 xs:px-6 md:px-8 h-10 xs:h-11 md:h-12 text-xs xs:text-sm md:text-base transition-all w-full xs:w-auto"
               >
                 <a href="https://github.com/AbZe628/gravitas-protocol" target="_blank" rel="noopener noreferrer">
-                  <Github className="h-4 w-4" />
-                  View Source
+                  <Github className="h-3 w-3 xs:h-3.5 xs:w-3.5 md:h-4 md:w-4" />
+                  <span className="hidden xs:inline">View Source</span>
+                  <span className="xs:hidden">GitHub</span>
                 </a>
               </Button>
               <Button
                 asChild
                 variant="outline"
                 size="lg"
-                className="border-[#D4AF37]/20 text-[#D4AF37] hover:bg-[#D4AF37]/8 gap-2 px-8 h-12 text-base transition-all"
+                className="border-[#D4AF37]/20 text-[#D4AF37] hover:bg-[#D4AF37]/8 gap-1.5 xs:gap-2 px-4 xs:px-6 md:px-8 h-10 xs:h-11 md:h-12 text-xs xs:text-sm md:text-base transition-all w-full xs:w-auto"
               >
                 <Link href="/docs">
-                  <BookOpen className="h-4 w-4" />
-                  Read Docs
+                  <BookOpen className="h-3 w-3 xs:h-3.5 xs:w-3.5 md:h-4 md:w-4" />
+                  <span className="hidden xs:inline">Read Docs</span>
+                  <span className="xs:hidden">Docs</span>
                 </Link>
               </Button>
             </motion.div>
 
             {/* Stats row */}
-            <motion.div variants={stagger} className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 pt-6 border-t border-[#D4AF37]/10">
+            <motion.div variants={stagger} className="grid grid-cols-2 xs:grid-cols-2 md:grid-cols-4 gap-2 xs:gap-3 md:gap-6 pt-4 md:pt-6 border-t border-[#D4AF37]/10">
               {[
                 { label: "Test Coverage", value: "90%+", icon: CheckCircle, link: "https://github.com/AbZe628/gravitas-protocol", note: "Foundry" },
                 { label: "Atomic Execution", value: "Single TX", icon: Zap, link: "https://sepolia.arbiscan.io/address/0x5D423f8d01539B92D3f3953b91682D9884D1E993", note: "All-or-nothing" },
@@ -431,13 +433,13 @@ export default function Home() {
                 { label: "Islamic Finance", value: "$3T+ Market", icon: TrendingUp, note: "Addressable" },
               ].map((stat, i) => {
                 const content = (
-                  <div className="flex flex-col gap-1 group">
-                    <div className="flex items-center gap-2">
-                      <stat.icon className="h-4 w-4 text-[#D4AF37]" />
-                      <span className="text-xl md:text-2xl font-bold text-white">{stat.value}</span>
+                  <div className="flex flex-col gap-0.5 group">
+                    <div className="flex items-center gap-1.5">
+                      <stat.icon className="h-3 w-3 xs:h-3.5 xs:w-3.5 md:h-4 md:w-4 text-[#D4AF37] flex-shrink-0" />
+                      <span className="text-base xs:text-lg sm:text-xl md:text-2xl font-bold text-white truncate">{stat.value}</span>
                     </div>
-                    <span className="text-xs text-white/40">{stat.label}</span>
-                    <span className="text-[10px] text-[#D4AF37]/50 font-mono">{stat.note}</span>
+                    <span className="text-[10px] xs:text-xs text-white/40 truncate">{stat.label}</span>
+                    <span className="text-[8px] xs:text-[10px] text-[#D4AF37]/50 font-mono truncate">{stat.note}</span>
                   </div>
                 );
                 return (
