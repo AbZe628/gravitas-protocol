@@ -2,6 +2,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
 import { Route, Switch, Router as WouterRouter } from "wouter";
+import ScrollToTop from "./components/ScrollToTop";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
@@ -23,6 +24,7 @@ const base = import.meta.env.BASE_URL || "/gravitas-protocol/";
 function Router() {
   return (
     <WouterRouter base={base.endsWith('/') ? base.slice(0, -1) : base}>
+      <ScrollToTop />
       <Switch>
         <Route path="/" component={Home} />
         <Route path="/dashboard" component={Dashboard} />

@@ -9,8 +9,9 @@ import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Shield, Lock, AlertCircle, Loader2, CheckCircle2,
-  ExternalLink, Settings, Users, Sliders, RefreshCw
+  ExternalLink, Settings, Users, Sliders, RefreshCw, Home
 } from "lucide-react";
+import { Link } from "wouter";
 import { WalletButton } from "@/components/WalletModal";
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { arbitrumSepolia } from "wagmi/chains";
@@ -513,6 +514,12 @@ export default function Admin() {
             </p>
           </div>
           <div className="flex items-center gap-3">
+            <Button asChild variant="outline" size="sm" className="border-white/15 text-white/60 hover:text-white hover:bg-white/5">
+              <Link href="/">
+                <Home className="h-4 w-4 mr-2" />
+                Home
+              </Link>
+            </Button>
             {policyVersion !== undefined && (
               <Badge className="bg-[#D4AF37]/20 text-[#D4AF37] border-[#D4AF37]/30">
                 Policy v{policyVersion.toString()}
