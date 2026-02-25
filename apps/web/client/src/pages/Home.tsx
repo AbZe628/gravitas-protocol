@@ -230,21 +230,23 @@ export default function Home() {
       {/* ── NAVIGATION ── */}
       <header className="fixed top-0 left-0 right-0 z-50 border-b border-[#D4AF37]/10 bg-[#060E1A]/90 backdrop-blur-xl" role="banner">
         <div className="container flex h-16 items-center justify-between px-4 md:px-6 mx-auto max-w-7xl">
-          <Link href="/">
-            <div className="flex items-center gap-2 cursor-pointer group" aria-label="Gravitas Protocol home">
-              <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-[#D4AF37] to-[#B8941F] flex items-center justify-center shadow-lg shadow-[#D4AF37]/20 group-hover:shadow-[#D4AF37]/40 transition-shadow">
-                <span className="text-[#060E1A] font-black text-sm">G</span>
-              </div>
-              <span className="font-bold text-white hidden sm:block">Gravitas Protocol</span>
-              <span className="font-bold text-white sm:hidden">Gravitas</span>
+          <button
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            className="flex items-center gap-2 cursor-pointer group hover:opacity-80 transition-opacity" 
+            aria-label="Gravitas Protocol home - scroll to top"
+          >
+            <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-[#D4AF37] to-[#B8941F] flex items-center justify-center shadow-lg shadow-[#D4AF37]/20 group-hover:shadow-[#D4AF37]/40 transition-shadow">
+              <span className="text-[#060E1A] font-black text-sm">G</span>
             </div>
-          </Link>
+            <span className="font-bold text-white hidden sm:block">Gravitas Protocol</span>
+            <span className="font-bold text-white sm:hidden">Gravitas</span>
+          </button>
 
           <nav className="hidden lg:flex items-center gap-1" aria-label="Main navigation">
-            <a href="#architecture" className="px-3 py-2 text-sm text-white/60 hover:text-white transition-colors rounded-lg hover:bg-white/5">Architecture</a>
-            <a href="#compliance" className="px-3 py-2 text-sm text-white/60 hover:text-white transition-colors rounded-lg hover:bg-white/5">Compliance</a>
-            <a href="#security" className="px-3 py-2 text-sm text-white/60 hover:text-white transition-colors rounded-lg hover:bg-white/5">Security</a>
-            <a href="#roadmap" className="px-3 py-2 text-sm text-white/60 hover:text-white transition-colors rounded-lg hover:bg-white/5">Roadmap</a>
+            <a href="#architecture" onClick={(e) => { e.preventDefault(); document.getElementById('architecture')?.scrollIntoView({ behavior: 'smooth' }); }} className="px-3 py-2 text-sm text-white/60 hover:text-white transition-colors rounded-lg hover:bg-white/5">Architecture</a>
+            <a href="#compliance" onClick={(e) => { e.preventDefault(); document.getElementById('compliance')?.scrollIntoView({ behavior: 'smooth' }); }} className="px-3 py-2 text-sm text-white/60 hover:text-white transition-colors rounded-lg hover:bg-white/5">Compliance</a>
+            <a href="#security" onClick={(e) => { e.preventDefault(); document.getElementById('security')?.scrollIntoView({ behavior: 'smooth' }); }} className="px-3 py-2 text-sm text-white/60 hover:text-white transition-colors rounded-lg hover:bg-white/5">Security</a>
+            <a href="#roadmap" onClick={(e) => { e.preventDefault(); document.getElementById('roadmap')?.scrollIntoView({ behavior: 'smooth' }); }} className="px-3 py-2 text-sm text-white/60 hover:text-white transition-colors rounded-lg hover:bg-white/5">Roadmap</a>
             <Link href="/docs" className="px-3 py-2 text-sm text-white/60 hover:text-white transition-colors rounded-lg hover:bg-white/5">Docs</Link>
             <Link href="/sdk" className="px-3 py-2 text-sm text-white/60 hover:text-white transition-colors rounded-lg hover:bg-white/5">SDK</Link>
           </nav>
@@ -297,7 +299,7 @@ export default function Home() {
                   <a
                     key={item.href}
                     href={item.href}
-                    onClick={() => setMobileMenuOpen(false)}
+                    onClick={(e) => { e.preventDefault(); setMobileMenuOpen(false); document.getElementById(item.href.slice(1))?.scrollIntoView({ behavior: 'smooth' }); }}
                     className="px-4 py-3 text-sm text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
                   >
                     {item.label}
