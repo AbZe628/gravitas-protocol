@@ -368,9 +368,9 @@ export default function Home() {
         <div className="max-w-7xl mx-auto relative z-10 w-full py-8 md:py-28 px-3 sm:px-4 md:px-6 lg:px-8">
           <motion.div variants={stagger} initial="hidden" animate="visible" className="max-w-4xl">
             <motion.div variants={fadeUp}>
-              <div className="mb-4 md:mb-6 px-2 xs:px-3 sm:px-4 py-1 md:py-1.5 bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[10px] xs:text-xs font-semibold tracking-wider uppercase rounded-full inline-flex items-center gap-1.5 flex-wrap max-w-full">
-                <span className="h-1 w-1 xs:h-1.5 xs:w-1.5 rounded-full bg-amber-400 animate-pulse flex-shrink-0" />
-                <span className="break-words">Testnet Demo · Arbitrum Sepolia</span>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.375rem', padding: '0.25rem 0.5rem', marginBottom: '1rem', backgroundColor: 'rgba(217, 119, 6, 0.1)', border: '1px solid rgba(217, 119, 6, 0.3)', color: 'rgb(251, 146, 60)', fontSize: '0.625rem', fontWeight: '600', letterSpacing: '0.1em', textTransform: 'uppercase', borderRadius: '9999px', maxWidth: '100%', whiteSpace: 'normal', wordBreak: 'break-word', lineHeight: '1.2' }}>
+                <span style={{ height: '0.25rem', width: '0.25rem', borderRadius: '50%', backgroundColor: 'rgb(251, 146, 60)', animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite', flexShrink: 0 }} />
+                <span>Testnet Demo · Arbitrum Sepolia</span>
               </div>
             </motion.div>
 
