@@ -1207,6 +1207,14 @@ export default function Home() {
                 <a href="https://github.com/AbZe628/gravitas-protocol/blob/main/docs/DEPLOYMENTS.md" target="_blank" rel="noopener noreferrer" className="block text-xs text-white/40 hover:text-[#D4AF37] transition-colors">Deployment Docs</a>
               </div>
             </div>
+            <div>
+              <h4 className="text-xs font-semibold text-white/60 uppercase tracking-wider mb-4">Contact</h4>
+              <div className="space-y-2.5">
+                <a href="mailto:abdusamed@gravitasprotocol.xyz" className="block text-xs text-white/40 hover:text-[#D4AF37] transition-colors">CEO & Architect</a>
+                <a href="mailto:abdulah@gravitasprotocol.xyz" className="block text-xs text-white/40 hover:text-[#D4AF37] transition-colors">CFO</a>
+                <a href="mailto:salman@gravitasprotocol.xyz" className="block text-xs text-white/40 hover:text-[#D4AF37] transition-colors">CIO (Investments)</a>
+              </div>
+            </div>
           </div>
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6 border-t border-[#D4AF37]/10">
             <p className="text-xs text-white/20">© 2026 Gravitas Protocol. MIT License. Testnet only — no mainnet deployment.</p>
