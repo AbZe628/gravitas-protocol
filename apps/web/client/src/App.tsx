@@ -18,8 +18,8 @@ import { config } from './lib/wagmi';
 
 const queryClient = new QueryClient();
 
-// Get base path from environment or default to /gravitas-protocol/ for GitHub Pages
-const base = import.meta.env.BASE_URL || "/gravitas-protocol/";
+// Get base path from environment or default to / for custom domain
+const base = import.meta.env.BASE_URL || "/";
 
 function Router() {
   return (
