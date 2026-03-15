@@ -10,7 +10,7 @@
 
 <p align="center">
   <a href="https://github.com/AbZe628/gravitas-protocol/actions/workflows/ci.yml"><img src="https://github.com/AbZe628/gravitas-protocol/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
-  <a href="https://github.com/AbZe628/gravitas-protocol/actions/workflows/deploy-frontend.yml"><img src="https://github.com/AbZe628/gravitas-protocol/actions/workflows/deploy-frontend.yml/badge.svg" alt="Deploy Frontend"></a>
+
   <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
   <a href="https://soliditylang.org/"><img src="https://img.shields.io/badge/Solidity-0.8.24-blue.svg" alt="Solidity"></a>
   <a href="./proof-of-quality/INTERNAL_REVIEW.md"><img src="https://img.shields.io/badge/Audit-Internal%20Passed-blueviolet.svg" alt="Audit: Internal Passed"></a>
