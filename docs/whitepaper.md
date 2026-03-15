@@ -181,7 +181,7 @@ Proof: EIP-712 typed data prevents signature reuse. Nonce increments per migrati
 
 | Risk | Mitigation | Status |
 | :--- | :--- | :--- |
-| Smart contract bugs | Multiple audits + fuzzing | ✅ Implemented |
+| Smart contract bugs | Internal audit complete + fuzzing; external audit scheduled Q2 2026 | 🔄 In Progress |
 | Replay attacks | EIP-712 domain separation | ✅ Implemented |
 | Sandwich attacks | Cooldown + max-move limits | ✅ Implemented |
 | Market volatility | Slippage protection + deadline | ✅ Implemented |

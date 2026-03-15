@@ -34,7 +34,7 @@ Gravitas has achieved significant technical milestones and is on a clear path to
 | Phase | Status | Key Deliverables |
 | :--- | :--- | :--- |
 | **Phase 1: Technical Validation** | ✅ **Completed** | - Core contracts deployed and verified on Arbitrum Sepolia.<br>- Real on-chain transactions demonstrating atomic migration.<br>- Internal security review and 90%+ test coverage achieved. |
-| **Phase 2: Market & Governance** | 🔄 **In Progress** | - Final certification stage with Mufti Billal Omarjee (AmanX Advisory) — Q2 2026.<br>- Planned external audit with a top-tier firm like OpenZeppelin (Q2 2026).<br>- Mainnet launch on a leading L2 (e.g., Arbitrum, Base). |
+| **Phase 2: Market & Governance** | 🔄 **In Progress** | - Final certification stage with Mufti Billal Omarjee (AmanX Advisory) — Q2 2026.<br>- External audit planned with Hacken or Certik (Q2 2026).<br>- Mainnet launch on a leading L2 (e.g., Arbitrum, Base). |
 | **Phase 3: Ecosystem Integration** | 📋 **Planned** | - Formal Shariah certification to facilitate GCC integration (2027).<br>- Partnerships with institutional asset managers and Islamic finance institutions.<br>- Expansion of the Compliance API as a standalone revenue stream. |
 
 ## 4. Security & Risk Mitigation
@@ -43,7 +43,7 @@ Security is the bedrock of the Gravitas Protocol. Our security posture is multi-
 
 - **Internal Security Review:** A comprehensive internal audit has been completed, with all findings addressed. The report is available in the repository at `proof-of-quality/INTERNAL_REVIEW.md`.
 - **High Test Coverage:** The protocol's core contracts have achieved **>90% line coverage** through deterministic, mock-based testing, ensuring that all critical paths, including complex swap logic, are thoroughly validated.
-- **External Audit Planned:** We have budgeted for and scheduled an external audit with a world-class security firm to provide independent verification of the contract's safety and correctness.
+- **External Audit Planned:** An external audit with a tier-2 firm (Hacken or Certik) is planned for Q2 2026, budgeted as part of the pre-seed funding round.
 - **Operational Controls:** We strongly recommend that the protocol's ownership and administrative functions be managed by a **multi-signature wallet (e.g., 3-of-5)** to prevent single points of failure. Furthermore, all critical policy changes should be executed through a **timelock contract**, providing a delay that allows users and stakeholders to review and react to upcoming changes.
 
 ## 5. Shariah Compliance Framework

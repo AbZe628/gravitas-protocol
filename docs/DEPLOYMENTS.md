@@ -80,7 +80,7 @@ forge verify-contract \
 
 ### Deployment Checklist
 
-- [ ] External audit completed (OpenZeppelin or equivalent)
+- [ ] External audit completed (Hacken, Certik or equivalent)
 - [ ] Shariah certification obtained
 - [ ] Testnet validation complete (>1000 successful migrations)
 - [ ] Multi-sig wallet configured for ownership
@@ -176,7 +176,7 @@ If a critical vulnerability is discovered:
 ## Contact
 
 For deployment-related questions:
-- **Technical**: dev@gravitas-protocol.io
+- **Technical**: abdusamed@gravitasprotocol.xyz
 - **Security**: abdusamed@gravitasprotocol.xyz
 - **General**: abdusamed@gravitasprotocol.xyz
 
