@@ -226,4 +226,4 @@ Before announcing deployment:
 
 For deployment assistance:
 - **GitHub Issues**: [gravitas-protocol/issues](https://github.com/AbZe628/gravitas-protocol/issues)
-- **Email**: contact@gravitas.finance
+- **Email**: abdusamed@gravitasprotocol.xyz

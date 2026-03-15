@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <a href="https://abze628.github.io/gravitas-protocol/" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/badge/Live%20Frontend-Launch%20App-blue.svg?style=for-the-badge" alt="Live Frontend"></a>
+  <a href="https://gravitasprotocol.xyz" target="_blank" rel="noopener noreferrer"><img src="https://img.shields.io/badge/Live%20App-gravitasprotocol.xyz-blue.svg?style=for-the-badge" alt="Live App"></a>
 </p>
 
 <p align="center">
@@ -36,9 +36,9 @@ The protocol is live and verified on the Arbitrum Sepolia testnet. All contract 
 
 | Link | Description |
 |---|---|
-| 🌐 **[Live Frontend](https://abze628.github.io/gravitas-protocol/)** | Explore the dashboard, analytics, and migration tools. |
-| 📚 **[Documentation](https://abze628.github.io/gravitas-protocol/docs)** | Full protocol documentation and integration guides. |
-| 💻 **[SDK Reference](https://abze628.github.io/gravitas-protocol/sdk)** | Integrate with the Gravitas TypeScript SDK. |
+| 🌐 **[Live Frontend](https://gravitasprotocol.xyz/)** | Explore the dashboard, analytics, and migration tools. |
+| 📚 **[Documentation](https://gravitasprotocol.xyz/docs)** | Full protocol documentation and integration guides. |
+| 💻 **[SDK Reference](https://gravitasprotocol.xyz/sdk)** | Integrate with the Gravitas TypeScript SDK. |
 
 ---
 
@@ -85,7 +85,7 @@ Gravitas Protocol treats Shariah compliance as a **technical requirement**, not 
 | Phase | Status | Description |
 |---|---|---|
 | **Phase 1: Self-Regulation** | ✅ **Completed** | Internal AAOIFI standards adherence; `GravitasPolicyRegistry` is live. |
-| **Phase 2: Advisory Board** | 📋 **Planned (Q3 2026)** | Engagement with recognized Shariah scholars for formal advisory. |
+| **Phase 2: Advisory Board** | 🔄 **In Progress (Q2 2026)** | Final certification stage with Mufti Billal Omarjee (AmanX Advisory). |
 | **Phase 3: Formal Certification** | 📋 **Planned (2027)** | Obtain a formal Shariah Seal for GCC market integration. |
 
 ---

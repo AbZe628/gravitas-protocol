@@ -34,7 +34,7 @@ Gravitas has achieved significant technical milestones and is on a clear path to
 | Phase | Status | Key Deliverables |
 | :--- | :--- | :--- |
 | **Phase 1: Technical Validation** | ✅ **Completed** | - Core contracts deployed and verified on Arbitrum Sepolia.<br>- Real on-chain transactions demonstrating atomic migration.<br>- Internal security review and 90%+ test coverage achieved. |
-| **Phase 2: Market & Governance** | 🔄 **In Progress** | - Engagement with a recognized Shariah Advisory Board (Q3 2026).<br>- Planned external audit with a top-tier firm like OpenZeppelin (Q2 2026).<br>- Mainnet launch on a leading L2 (e.g., Arbitrum, Base). |
+| **Phase 2: Market & Governance** | 🔄 **In Progress** | - Final certification stage with Mufti Billal Omarjee (AmanX Advisory) — Q2 2026.<br>- Planned external audit with a top-tier firm like OpenZeppelin (Q2 2026).<br>- Mainnet launch on a leading L2 (e.g., Arbitrum, Base). |
 | **Phase 3: Ecosystem Integration** | 📋 **Planned** | - Formal Shariah certification to facilitate GCC integration (2027).<br>- Partnerships with institutional asset managers and Islamic finance institutions.<br>- Expansion of the Compliance API as a standalone revenue stream. |
 
 ## 4. Security & Risk Mitigation

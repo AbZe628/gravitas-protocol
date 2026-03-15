@@ -4,7 +4,7 @@ Professional institutional-grade frontend for Gravitas Protocol - Shariah-Compli
 
 ## 🚀 Live Demo
 
-**Production:** https://abze628.github.io/gravitas-protocol/
+**Production:** https://gravitasprotocol.xyz/
 
 ## 📦 Tech Stack
 
@@ -235,7 +235,7 @@ MIT License - see [LICENSE](../../LICENSE) for details.
 ## 🔗 Links
 
 - **GitHub:** https://github.com/AbZe628/gravitas-protocol
-- **Live Site:** https://abze628.github.io/gravitas-protocol/
+- **Live Site:** https://gravitasprotocol.xyz/
 - **Arbiscan:** https://sepolia.arbiscan.io
 - **Arbitrum Docs:** https://docs.arbitrum.io
 

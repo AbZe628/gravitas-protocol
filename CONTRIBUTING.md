@@ -117,7 +117,7 @@ Types:
 
 Report security vulnerabilities privately via:
 - GitHub Security Advisories
-- Email: security@gravitas-protocol.io
+- Email: abdusamed@gravitasprotocol.xyz
 
 See [SECURITY.md](./SECURITY.md) for details.
 

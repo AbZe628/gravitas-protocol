@@ -284,7 +284,7 @@ Gravitas Protocol adheres to **AAOIFI (Accounting and Auditing Organization for 
 | :--- | :--- | :--- |
 | **Q1 2026** | Core contracts + frontend | ✅ Complete |
 | **Q2 2026** | External security audit | ⏳ Scheduled |
-| **Q2 2026** | Shariah certification | ⏳ In progress |
+| **Q2 2026** | Shariah certification | ⏳ Final certification stage with Mufti Billal Omarjee, AmanX Advisory |
 | **Q3 2026** | Mainnet launch (Arbitrum One) | 📅 Planned |
 | **Q4 2026** | L2 expansion (Optimism, Polygon) | 📅 Planned |
 | **Q1 2027** | DAO governance launch | 📅 Planned |

@@ -177,8 +177,8 @@ If a critical vulnerability is discovered:
 
 For deployment-related questions:
 - **Technical**: dev@gravitas-protocol.io
-- **Security**: security@gravitas-protocol.io
-- **General**: info@gravitas-protocol.io
+- **Security**: abdusamed@gravitasprotocol.xyz
+- **General**: abdusamed@gravitasprotocol.xyz
 
 ## References
 

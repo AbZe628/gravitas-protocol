@@ -699,7 +699,7 @@ jobs:
 
 ## 📝 Notes
 
-- All ABIs need to be extracted from contract artifacts in `/home/ubuntu/gravitas-protocol/out/`
+- All ABIs can be extracted from contract artifacts in `./out/` after running `forge build`
 - Consider using a subgraph for event indexing instead of direct RPC calls
 - Add comprehensive error handling for all network requests
 - Implement loading skeletons for better UX
