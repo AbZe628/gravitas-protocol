@@ -1,11 +1,21 @@
 {
   "name": "@gravitas/sdk",
-  "version": "2.0.0",
-  "description": "Enterprise-grade Shariah-compliant liquidity routing SDK",
+  "version": "0.1.0",
+  "description": "Institutional-grade Shariah-compliant DeFi liquidity routing SDK for Arbitrum",
   "main": "dist/index.js",
+  "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
   "files": [
-    "dist"
+    "dist",
+    "README.md",
+    "CHANGELOG.md"
   ],
   "scripts": {
     "build": "tsc",
@@ -20,9 +30,33 @@
     "vitest": "^1.0.0",
     "@types/node": "^20.0.0"
   },
+  "keywords": [
+    "defi",
+    "shariah",
+    "islamic-finance",
+    "arbitrum",
+    "liquidity",
+    "uniswap",
+    "web3",
+    "ethereum",
+    "sdk"
+  ],
   "author": "Gravitas Protocol Labs",
   "license": "MIT",
   "engines": {
     "node": ">=18"
+  },
+  "homepage": "https://gravitasprotocol.xyz",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AbZe628/gravitas-protocol.git",
+    "directory": "gravitas-sdk"
+  },
+  "bugs": {
+    "url": "https://github.com/AbZe628/gravitas-protocol/issues",
+    "email": "abdusamed@gravitasprotocol.xyz"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

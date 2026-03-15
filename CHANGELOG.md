@@ -21,6 +21,20 @@ All notable changes to Gravitas Protocol are documented here.
 
 ---
 
+## [0.1.1] — 2026-03 — Governance Upgrade
+
+### Changed
+- `GravitasPolicyRegistry`: Upgraded from `Ownable` to `Ownable2Step` for safer ownership transfers
+- Added `contracts/governance/GravitasTimelock.sol` — TimelockController for production multisig governance
+- Added `contracts/governance/MultisigSetup.md` — Production deployment guide for Gnosis Safe + Timelock
+
+### Security
+- Eliminates single private key risk for compliance policy management
+- 48-hour timelock delay recommended for mainnet production configuration
+- Full Gnosis Safe integration guide provided for GCC institutional deployment
+
+---
+
 ## Upcoming
 
 ### [0.2.0] — Planned Q2 2026

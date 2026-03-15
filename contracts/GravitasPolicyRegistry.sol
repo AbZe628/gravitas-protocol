@@ -1,15 +1,20 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/access/Ownable2Step.sol";
 
 /**
  * @title GravitasPolicyRegistry
  * @notice The Risk & Compliance Oracle - Centralized registry for Shariah-compliant assets,
  *         authorized routers, and protocol executors.
- * @dev V0 admin-controlled registry. Recommend multisig owner for production.
+ * @dev Governance: Transfer ownership to a GravitasTimelock (TimelockController) 
+ *      backed by a Gnosis Safe multisig before mainnet deployment.
+ *      Recommended production config:
+ *      - Owner: GravitasTimelock contract address
+ *      - Timelock proposers: Gnosis Safe multisig (3-of-5 recommended for GCC institutional use)
+ *      - Timelock delay: 48 hours minimum
  */
-contract GravitasPolicyRegistry is Ownable {
+contract GravitasPolicyRegistry is Ownable2Step {
     // ═══════════════════════════════════════════════════════════════════════════════════
     //                              STATE VARIABLES
     // ═══════════════════════════════════════════════════════════════════════════════════

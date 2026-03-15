@@ -1,0 +1,7 @@
+src/
+tsconfig.json
+vitest.config.*
+*.test.ts
+*.spec.ts
+node_modules/
+.env
