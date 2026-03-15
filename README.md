@@ -40,7 +40,7 @@ The protocol is live and verified on the Arbitrum Sepolia testnet. All contract 
 | 🌐 **[Live Frontend](https://gravitasprotocol.xyz/)** | Explore the dashboard, analytics, and migration tools. |
 | 📚 **[Documentation](https://gravitasprotocol.xyz/docs)** | Full protocol documentation and integration guides. |
 | 💻 **[SDK Reference](https://gravitasprotocol.xyz/sdk)** | Integrate with the Gravitas TypeScript SDK. |
-| 📦 **[NPM Package](https://www.npmjs.com/package/@gravitas/sdk)** | Install the Gravitas TypeScript SDK via npm. |
+| 📦 **[SDK Source](./gravitas-sdk/)** | TypeScript SDK source — NPM publish coming post-audit. |
 
 ---
 
