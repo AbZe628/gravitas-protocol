@@ -34,7 +34,7 @@ In the event of a suspected key compromise, an emergency rotation procedure must
 
 We encourage security researchers to review our contracts and report any potential vulnerabilities. We are committed to working with the community to ensure the safety of our users' funds.
 
-- **Reporting:** Please email any security findings to `security@gravitas.finance` (or `abdusamedzelic98@gmail.com` if the alias is not yet set up). Please provide a detailed description of the vulnerability and steps to reproduce it.
+- **Reporting:** Please email any security findings to `security@gravitas.finance` (or `abdusamed@gravitasprotocol.xyz` if the alias is not yet set up). Please provide a detailed description of the vulnerability and steps to reproduce it.
 - **Bounty Program:** A formal bug bounty program will be established post-mainnet launch to reward researchers for their contributions.
 - **Disclosure Timeline:** We will work with you to agree on a reasonable timeline for public disclosure, typically after a fix has been developed and deployed.
 

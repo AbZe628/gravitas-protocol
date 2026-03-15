@@ -5,7 +5,7 @@ import path from "node:path";
 import { defineConfig } from "vite";
 
 export default defineConfig({
-  base: process.env.NODE_ENV === 'production' ? '/gravitas-protocol/' : '/',
+  base: '/',
   plugins: [react(), tailwindcss(), jsxLocPlugin()],
   resolve: {
     alias: {
