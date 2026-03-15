@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/access/Ownable2Step.sol";
  * @title GravitasPolicyRegistry
  * @notice The Risk & Compliance Oracle - Centralized registry for Shariah-compliant assets,
  *         authorized routers, and protocol executors.
- * @dev Governance: Transfer ownership to a GravitasTimelock (TimelockController) 
+ * @dev Governance: Transfer ownership to a GravitasTimelock (TimelockController)
  *      backed by a Gnosis Safe multisig before mainnet deployment.
  *      Recommended production config:
  *      - Owner: GravitasTimelock contract address

@@ -19,22 +19,22 @@ contract GravitasPolicyRegistryMultisigTest is Test {
         // Initiate transfer
         vm.prank(owner);
         registry.transferOwnership(newOwner);
-        
+
         // Owner is still the original owner
         assertEq(registry.owner(), owner);
         assertEq(registry.pendingOwner(), newOwner);
-        
+
         // New owner must accept
         vm.prank(newOwner);
         registry.acceptOwnership();
-        
+
         assertEq(registry.owner(), newOwner);
     }
 
     function test_Ownable2Step_AttackerCannotAccept() public {
         vm.prank(owner);
         registry.transferOwnership(newOwner);
-        
+
         vm.prank(attacker);
         vm.expectRevert();
         registry.acceptOwnership();

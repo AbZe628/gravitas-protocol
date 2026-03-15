@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/governance/TimelockController.sol";
  * @notice Timelock controller for GravitasPolicyRegistry governance.
  * @dev All policy changes go through a minimum delay, providing a safety window
  *      for the community and institutional partners to review changes.
- *      
+ *
  *      Production configuration:
  *      - minDelay: 48 hours (172800 seconds) — gives institutional partners time to review
  *      - proposers: Gnosis Safe multisig address(es)
@@ -16,10 +16,7 @@ import "@openzeppelin/contracts/governance/TimelockController.sol";
  *      - admin: address(0) — no admin, fully decentralized
  */
 contract GravitasTimelock is TimelockController {
-    constructor(
-        uint256 minDelay,
-        address[] memory proposers,
-        address[] memory executors,
-        address admin
-    ) TimelockController(minDelay, proposers, executors, admin) {}
+    constructor(uint256 minDelay, address[] memory proposers, address[] memory executors, address admin)
+        TimelockController(minDelay, proposers, executors, admin)
+    {}
 }
