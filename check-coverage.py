@@ -4,7 +4,7 @@ import re
 
 CORE_CONTRACTS = [
     "contracts/GravitasPolicyRegistry.sol",
-    "contracts/Teleport.sol",
+    "contracts/TeleportV2.sol",
     "contracts/TeleportV3.sol",
 ]
 
@@ -32,7 +32,10 @@ def parse_summary(summary: str):
     """
     coverage = {}
 
+    excluded_contracts = ["WETH9.sol", "MockUniswapV2Factory.sol", "MockUniswapV2Pair.sol", "MockUniswapV2Router.sol", "MockUniswapV3PositionManager.sol", "MockUniswapV3SwapRouter.sol"]
     for line in summary.splitlines():
+        if any(excluded_contract in line for excluded_contract in excluded_contracts):
+            continue
         if "|" not in line:
             continue
 
