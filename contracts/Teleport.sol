@@ -112,7 +112,10 @@ contract Teleport is ReentrancyGuard, Ownable {
         // 1. Basic Checks
         require(deadline >= block.timestamp, "Teleport: deadline passed");
         require(registry.isRouterAuthorized(routerTo), "Teleport: router not authorized");
-        require(registry.verifyAssetCompliance(tokenA) && registry.verifyAssetCompliance(tokenB), "Teleport: non-compliant assets");
+        require(
+            registry.verifyAssetCompliance(tokenA) && registry.verifyAssetCompliance(tokenB),
+            "Teleport: non-compliant assets"
+        );
 
         // 2. Pair Identification
         address pairFrom = IUniswapV2Factory(factoryFrom).getPair(tokenA, tokenB);
