@@ -31,16 +31,18 @@ interface IShariahPolicyChecker {
     function verifyExecutorStatus(address executor) external view returns (bool authorized);
 
     /**
-     * @notice Comprehensive check for Libeara subscription flows.
-     * @dev This is the primary hook for Libeara's UltraManager. It ensures both the
-     *      subscriber's intent and the asset itself meet Shariah standards.
-     *      Integration: Call this in `_beforeMint` or `subscribe` functions.
-     * @param subscriber The address of the investor.
-     * @param subscriptionToken The address of the asset being subscribed to.
-     * @return status A status code (e.g., 1 for success) or reverts on failure.
+     * @notice Single-call compliance gate for Libeara's UltraManager subscription flow.
+     * @dev Checks two conditions atomically:
+     *      1. subscriptionToken is Shariah-compliant (asset whitelist)
+     *      2. msg.sender (the calling contract, e.g. Libeara's UltraManager) is an
+     *         authorized institutional executor — NOT the end subscriber.
+     *         The subscriber parameter is reserved for future per-investor policy logic.
+     * @param subscriber The end-investor address (reserved for future use; not checked in v1).
+     * @param subscriptionToken The ERC-20 token address being subscribed to.
+     * @return policyVersion The current governance version, for audit trail recording.
      */
     function checkSubscriptionCompliance(address subscriber, address subscriptionToken)
         external
         view
-        returns (uint256 status);
+        returns (uint256 policyVersion);
 }

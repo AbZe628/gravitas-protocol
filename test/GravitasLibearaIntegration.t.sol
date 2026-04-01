@@ -24,9 +24,11 @@ contract GravitasLibearaIntegrationTest is Test {
     }
 
     function test_CheckSubscriptionCompliance_Success() public {
+        // NOTE: This tests that the *calling contract* (executor = UltraManager) is authorized.
+        // The `subscriber` parameter is reserved for future per-investor policy logic (v2).
         vm.prank(executor);
-        uint256 status = registry.checkSubscriptionCompliance(subscriber, asset);
-        assertEq(status, 1);
+        uint256 policyVersion = registry.checkSubscriptionCompliance(subscriber, asset);
+        assertEq(policyVersion, registry.currentVersion());
     }
 
     function test_CheckSubscriptionCompliance_RevertOnNonCompliantAsset() public {
@@ -38,7 +40,7 @@ contract GravitasLibearaIntegrationTest is Test {
 
     function test_CheckSubscriptionCompliance_RevertOnUnauthorizedExecutor() public {
         vm.prank(unauthorized);
-        vm.expectRevert("GPR: Unauthorized executor for subscription");
+        vm.expectRevert("GPR: Calling contract not an authorized executor");
         registry.checkSubscriptionCompliance(subscriber, asset);
     }
 

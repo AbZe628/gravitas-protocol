@@ -1,8 +1,6 @@
 # Gravitas Protocol — Whitepaper
 
-> ⚠️ **DISCLAIMER:** This protocol is currently deployed on **Arbitrum Sepolia Testnet only**. All data, metrics, and transaction volumes are **mock data for demonstration purposes**. This is not a mainnet deployment. Do not use with real funds.
-
-**Version:** 1.0.0  
+Version:** 1.0.0  
 **Status:** Audit-Ready (Testnet)  
 **Last Updated:** February 2026  
 **Network:** Arbitrum Sepolia Testnet (Mock Data)
@@ -310,3 +308,9 @@ The protocol is audit-ready and positioned for mainnet deployment in Q3 2026.
 ---
 
 **For inquiries or partnership opportunities, please visit:** https://github.com/AbZe628/gravitas-protocol
+
+---
+
+## Legal Disclaimers
+
+> ⚠️ **DISCLAIMER:** This protocol is currently deployed on **Arbitrum Sepolia Testnet only**. All data, metrics, and transaction volumes are **mock data for demonstration purposes**. This is not a mainnet deployment. Do not use with real funds.

@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
-import "./GravitasPolicyRegistry.sol";
+import "./interfaces/IShariahPolicyChecker.sol";
 
 // --- External Interfaces ---
 interface INonfungiblePositionManager {
@@ -94,7 +94,7 @@ contract TeleportV3 is ReentrancyGuard, Ownable, IERC721Receiver, EIP712 {
     // --- Immutable State ---
     INonfungiblePositionManager public immutable positionManager;
     ISwapRouter public immutable swapRouter;
-    GravitasPolicyRegistry public immutable registry;
+    IShariahPolicyChecker public immutable registry;
 
     // --- Signature Verification ---
     bytes32 private constant MIGRATION_TYPEHASH = keccak256(
@@ -121,11 +121,11 @@ contract TeleportV3 is ReentrancyGuard, Ownable, IERC721Receiver, EIP712 {
         require(_registry != address(0), "TV3: Invalid Registry");
         positionManager = INonfungiblePositionManager(_positionManager);
         swapRouter = ISwapRouter(_swapRouter);
-        registry = GravitasPolicyRegistry(_registry);
+        registry = IShariahPolicyChecker(_registry);
     }
 
     modifier onlyAuthorized() {
-        require(registry.isExecutor(msg.sender) || msg.sender == owner(), "TV3: Not authorized executor");
+        require(registry.verifyExecutorStatus(msg.sender) || msg.sender == owner(), "TV3: Not authorized executor");
         _;
     }
 
@@ -171,7 +171,7 @@ contract TeleportV3 is ReentrancyGuard, Ownable, IERC721Receiver, EIP712 {
         // 2. Position Data & Compliance
         (,, address token0, address token1,,,, uint128 liquidity,,,,) = positionManager.positions(params.tokenId);
         require(liquidity > 0, "TV3: No liquidity");
-        require(registry.areTokensCompliant(token0, token1), "TV3: Non-compliant assets");
+        require(registry.verifyAssetCompliance(token0) && registry.verifyAssetCompliance(token1), "TV3: Non-compliant assets");
 
         // 3. Execution
         uint256 balance0Start = IERC20(token0).balanceOf(address(this));

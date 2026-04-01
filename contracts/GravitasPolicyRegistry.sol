@@ -94,23 +94,24 @@ contract GravitasPolicyRegistry is Ownable2Step, IShariahPolicyChecker {
     }
 
     /**
-     * @notice Comprehensive check for Libeara subscription flows.
-     * @dev Implementation of IShariahPolicyChecker. Ensures asset is compliant
-     *      and the executor (msg.sender) is authorized.
-     * @param subscriber The address of the investor (currently unused, but reserved for future policy expansion).
-     * @param subscriptionToken The address of the asset being subscribed to.
-     * @return status Returns 1 if compliant, reverts otherwise.
+     * @notice Single-call compliance gate for Libeara's UltraManager subscription flow.
+     * @dev Checks two conditions atomically:
+     *      1. subscriptionToken is Shariah-compliant (asset whitelist)
+     *      2. msg.sender (the calling contract, e.g. Libeara's UltraManager) is an
+     *         authorized institutional executor — NOT the end subscriber.
+     *         The subscriber parameter is reserved for future per-investor policy logic.
+     * @param subscriber The end-investor address (reserved for future use; not checked in v1).
+     * @param subscriptionToken The ERC-20 token address being subscribed to.
+     * @return policyVersion The current governance version, for audit trail recording.
      */
     function checkSubscriptionCompliance(address subscriber, address subscriptionToken)
         external
         view
-        returns (uint256)
+        returns (uint256 policyVersion)
     {
         require(isAssetCompliant[subscriptionToken], "GPR: Asset not Shariah-compliant");
-        require(isExecutor[msg.sender], "GPR: Unauthorized executor for subscription");
-
-        // Additional logic for subscriber-specific policies can be added here
-
-        return 1;
+        require(isExecutor[msg.sender], "GPR: Calling contract not an authorized executor");
+        // subscriber is passed through for future per-investor KYC policy expansion
+        return currentVersion;
     }
 }

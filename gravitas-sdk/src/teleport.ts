@@ -133,10 +133,14 @@ export class MigrationBuilder {
    *      4. Simulation (dry-run the transaction)
    *
    * @param account The address that will execute the migration.
+   * @param signature EIP-712 signature from the position owner.
+   *        Obtain via: wallet.signTypedData(EIP712_DOMAIN, EIP712_TYPES, message)
+   *        Note: For simulation/pre-flight only, you may pass a dummy 65-byte signature.
+   *        For on-chain execution, a valid owner signature is required.
    * @returns Simulation result with expected outcomes.
    * @throws {ShariahViolationError} If tokens are not Shariah-compliant.
    */
-  async simulate(account: Address, signature: `0x${string}` = "0x") {
+  async simulate(account: Address, signature: `0x${string}`) {
     const validatedParams = MigrationParamsSchema.parse(this.params);
     
     // Step 1: Fetch Position Manager address from TeleportV3
@@ -170,9 +174,13 @@ export class MigrationBuilder {
   /**
    * @notice Encodes the migration calldata for manual transaction submission.
    * @dev Useful for integrations that need raw calldata (e.g., multisig wallets).
+   * @param signature EIP-712 signature from the position owner.
+   *        Obtain via: wallet.signTypedData(EIP712_DOMAIN, EIP712_TYPES, message)
+   *        Note: For simulation/pre-flight only, you may pass a dummy 65-byte signature.
+   *        For on-chain execution, a valid owner signature is required.
    * @returns Encoded function calldata.
    */
-  encodeCalldata(signature: `0x${string}` = "0x"): `0x${string}` {
+  encodeCalldata(signature: `0x${string}`): `0x${string}` {
     const validatedParams = MigrationParamsSchema.parse(this.params);
     return encodeFunctionData({
       abi: TELEPORT_V3_ABI,

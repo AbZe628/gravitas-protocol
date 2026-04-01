@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-SC Ventures' Libeara platform, a leading tokenization solution with over $1B AUM, currently lacks Shariah-compliance capabilities, thereby excluding it from the vast and rapidly growing $3 trillion Islamic institutional market in the GCC. Gravitas Protocol offers a seamless, plug-and-play middleware solution that integrates directly with Libeara's existing smart contract architecture, enabling Shariah-compliant tokenization without requiring any structural rebuilds of Libeara's core platform. This integration provides a significant competitive advantage, opening up new revenue streams and market opportunities for Libeara.
+SC Ventures' Libeara platform, a leading tokenization solution with over $1B AUM, currently lacks Shariah-compliance capabilities, thereby excluding it from the vast and rapidly growing $3 trillion Islamic institutional market in the the GCC. Gravitas Protocol offers a seamless, plug-and-play middleware solution that integrates directly with Libeara's existing smart contract architecture, enabling Shariah-compliant tokenization without requiring any structural rebuilds of Libeara's core platform. This integration provides a significant competitive advantage, opening up new revenue streams and market opportunities for Libeara.
 
 ## Value Proposition: Accessing the Islamic Institutional Market
 
@@ -57,12 +57,12 @@ contract UltraManager is Ownable {
     }
 
     // Example: Hook into a _beforeMint function in UltraManager
-    function _beforeMint(address subscriber, address subscriptionToken, uint256 amount) internal view {
+    function _beforeMint(address subscriber, address subscriptionToken) internal view {
         // Existing Libeara KYC/AML checks would go here
 
         // Gravitas Shariah Compliance Check
-        uint256 complianceStatus = gravitasPolicyChecker.checkSubscriptionCompliance(subscriber, subscriptionToken);
-        require(complianceStatus == 1, "UltraManager: Shariah compliance check failed");
+        uint256 policyVersion = gravitasPolicyChecker.checkSubscriptionCompliance(subscriber, subscriptionToken);
+        require(policyVersion > 0, "UltraManager: Shariah compliance check failed");
 
         // Continue with minting logic if compliant
     }
@@ -71,14 +71,15 @@ contract UltraManager is Ownable {
 }
 ```
 
-This integration requires **ZERO structural rebuilds** of Libeara's core platform. It is a simple, external `view` call that adds a crucial layer of Shariah compliance, enabling Libeara to tap into the Islamic institutional market efficiently and effectively.
+This integration requires **no architectural changes** to Libeara's core platform. A single import statement and one `view` call — both added to the existing `_beforeMint` hook — are the only modifications needed. Libeara's trust model, custodial structure, KYC pipeline, and NAV mechanics remain entirely unchanged.
 
 ## Market Traction & Institutional Validation
 
-Gravitas Protocol has already secured significant interest from key players in the Islamic finance and Web3 banking sectors. The following Letters of Intent (LOIs) demonstrate the institutional demand for our Shariah-compliance middleware:
+Gravitas Protocol has secured three signed Letters of Intent from key 
+players in Islamic finance and Web3 banking. These documents are available 
+upon request under NDA to qualified institutional parties.
 
-*   [MRHB Network LOI](./docs/proof-of-traction/MRHB-Network-LOI.md)
-*   [Bunn Web3 Bank LOI](./docs/proof-of-traction/Bunn-Web3-Bank-LOI.md)
-*   [AmanX Advisory LOI](./docs/proof-of-traction/AmanX-Advisory-LOI.md)
-
-These partnerships validate the market need for a robust, technical solution to Shariah compliance in the tokenized asset space and provide a strong foundation for Gravitas Protocol's growth and adoption.
+**LOI Counterparties:**
+- **MRHB Network** — Anchor integration partner (signed LOI, available under NDA)
+- **BUNN** — Web3 Islamic banking integration (signed LOI, available under NDA)  
+- **AmanX Advisory** — Shariah certification endorsement (LOI in final stages)

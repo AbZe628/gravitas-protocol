@@ -145,7 +145,7 @@ export default function Compliance() {
   const { data: policyVersion } = useReadContract({
     address: CONTRACTS.POLICY_REGISTRY as `0x${string}`,
     abi: POLICY_REGISTRY_ABI,
-    functionName: "getPolicyVersion",
+    functionName: "currentVersion",
     chainId: 421614,
   });
 
@@ -288,7 +288,7 @@ export default function Compliance() {
                   <AddressChecker
                     title="Executor Authorization Check"
                     placeholder="0x... (executor address)"
-                    functionName="isExecutorAuthorized"
+                    functionName="isExecutor"
                     description="Verify if an executor is authorized to perform migrations"
                   />
                 </motion.div>
