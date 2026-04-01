@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-SC Ventures' Libeara platform, a leading tokenization solution with over $1B AUM, currently lacks Shariah-compliance capabilities, thereby excluding it from the vast and rapidly growing $3 trillion Islamic institutional market in the GCC. Gravitas Protocol offers a seamless, plug-and-play middleware solution that integrates directly with Libeara's existing smart contract architecture, enabling Shariah-compliant tokenization without requiring any structural rebuilds of Libeara's core platform. This integration provides a significant competitive advantage, opening up new revenue streams and market opportunities for Libeara.
+SC Ventures' Libeara platform, a leading tokenization solution with over $1B AUM, currently lacks Shariah-compliance capabilities, thereby excluding it from the vast and rapidly growing $3 trillion Islamic institutional market in the GCC. Gravitas Protocol offers a seamless, plug-and-play middleware solution that integrates directly with Libeara's existing smart contract architecture, enabling Shariah-compliant tokenization with no architectural changes to Libeara's core platform. This integration provides a significant competitive advantage, opening up new revenue streams and market opportunities for Libeara.
 
 ## Value Proposition: Accessing the Islamic Institutional Market
 

@@ -32,8 +32,10 @@ This modular architecture ensures that the protocol is not only robust and secur
 Gravitas has achieved significant technical milestones and is on a clear path toward market leadership and formal certification.
 
 | Phase | Status | Key Deliverables |
-| | **Phase 1: Technical Validation** | ✅ **Completed** | - Contracts deployed, verified and source-matched on Arbitrum Sepolia.<br>- 46 passing deterministic tests with >90% coverage validating all execution paths.<br>- Internal security review and 90%+ test coverage achieved. |In Progress** | - Final certification stage with Mufti Billal Omarjee (AmanX Advisory) — Q2 2026.<br>- External audit planned with Hacken or Certik (Q2 2026).<br>- Mainnet launch on a leading L2 (e.g., Arbitrum, Base). |
-| **Phase 3: Ecosystem Integration** | 📋 **Planned** | - Formal Shariah certification to facilitate GCC integration (2027).<br>- Partnerships with institutional asset managers and Islamic finance institutions.<br>- Expansion of the Compliance API as a standalone revenue stream. |
+| :--- | :--- | :--- |
+| **Phase 1: Technical Validation** | ✅ **Completed** | Contracts deployed and verified on Arbitrum Sepolia. 46 passing deterministic tests with >90% coverage. Internal security review completed. |
+| **Phase 2: Market & Governance** | 🔄 **In Progress** | Final certification with Mufti Billal Omarjee (AmanX Advisory) — Q2 2026. External audit planned (Hacken or Certik, Q2 2026). Mainnet launch on Arbitrum or Base. |
+| **Phase 3: Ecosystem Integration** | 📋 **Planned** | Formal Shariah certification for GCC integration (2027). Partnerships with institutional asset managers. Compliance API as standalone revenue stream. |
 
 ## 4. Security & Risk Mitigation
 
