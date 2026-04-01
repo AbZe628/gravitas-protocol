@@ -45,4 +45,11 @@ interface IShariahPolicyChecker {
         external
         view
         returns (uint256 policyVersion);
+
+    /**
+     * @notice Verifies if a DEX router is authorized for migrations.
+     * @param router The address of the DEX router (e.g., Uniswap V2 Router).
+     * @return authorized True if the router is whitelisted.
+     */
+    function isRouterAuthorized(address router) external view returns (bool authorized);
 }
