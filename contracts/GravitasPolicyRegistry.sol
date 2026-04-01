@@ -108,9 +108,9 @@ contract GravitasPolicyRegistry is Ownable2Step, IShariahPolicyChecker {
     {
         require(isAssetCompliant[subscriptionToken], "GPR: Asset not Shariah-compliant");
         require(isExecutor[msg.sender], "GPR: Unauthorized executor for subscription");
-        
+
         // Additional logic for subscriber-specific policies can be added here
-        
+
         return 1;
     }
 }
