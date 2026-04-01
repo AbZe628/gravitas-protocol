@@ -26,10 +26,10 @@ contract PausableTests is Test {
     function test_Registry_PauseUnpause() public {
         vm.startPrank(owner);
         assertFalse(registry.paused());
-        
+
         registry.pause();
         assertTrue(registry.paused());
-        
+
         registry.unpause();
         assertFalse(registry.paused());
         vm.stopPrank();
@@ -45,10 +45,10 @@ contract PausableTests is Test {
     function test_Teleport_PauseUnpause() public {
         vm.startPrank(owner);
         assertFalse(teleport.paused());
-        
+
         teleport.pause();
         assertTrue(teleport.paused());
-        
+
         teleport.unpause();
         assertFalse(teleport.paused());
         vm.stopPrank();
@@ -71,7 +71,7 @@ contract PausableTests is Test {
         vm.startPrank(user);
         TeleportV3.AtomicMigrationParams memory params;
         bytes memory signature = "";
-        
+
         vm.expectRevert(abi.encodeWithSignature("EnforcedPause()"));
         teleport.executeAtomicMigration(params, signature);
         vm.stopPrank();

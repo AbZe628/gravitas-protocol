@@ -67,8 +67,13 @@ contract GravitasPolicyRegistry is Ownable2Step, Pausable, IShariahPolicyChecker
         emit ExecutorStatusUpdated(executor, status);
     }
 
-    function pause() external onlyOwner whenNotPaused { _pause(); }
-    function unpause() external onlyOwner whenPaused { _unpause(); }
+    function pause() external onlyOwner whenNotPaused {
+        _pause();
+    }
+
+    function unpause() external onlyOwner whenPaused {
+        _unpause();
+    }
 
     function _updateVersion() internal {
         currentVersion++;

@@ -150,8 +150,13 @@ contract TeleportV3 is ReentrancyGuard, Pausable, Ownable, IERC721Receiver, EIP7
     /**
      * @notice Executes atomic liquidity migration with intent verification.
      */
-    function pause() external onlyOwner whenNotPaused { _pause(); }
-    function unpause() external onlyOwner whenPaused { _unpause(); }
+    function pause() external onlyOwner whenNotPaused {
+        _pause();
+    }
+
+    function unpause() external onlyOwner whenPaused {
+        _unpause();
+    }
 
     function executeAtomicMigration(AtomicMigrationParams calldata params, bytes calldata signature)
         external
