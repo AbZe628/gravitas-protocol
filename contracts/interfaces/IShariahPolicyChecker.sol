@@ -4,7 +4,7 @@ pragma solidity ^0.8.24;
 /**
  * @title IShariahPolicyChecker
  * @notice Interface for Libeara to integrate Gravitas Shariah-compliance middleware.
- * @dev This interface allows Libeara's UltraManager or KYC contracts to verify 
+ * @dev This interface allows Libeara's UltraManager or KYC contracts to verify
  *      compliance before executing financial operations like minting or subscribing.
  */
 interface IShariahPolicyChecker {
@@ -32,12 +32,15 @@ interface IShariahPolicyChecker {
 
     /**
      * @notice Comprehensive check for Libeara subscription flows.
-     * @dev This is the primary hook for Libeara's UltraManager. It ensures both the 
+     * @dev This is the primary hook for Libeara's UltraManager. It ensures both the
      *      subscriber's intent and the asset itself meet Shariah standards.
      *      Integration: Call this in `_beforeMint` or `subscribe` functions.
      * @param subscriber The address of the investor.
      * @param subscriptionToken The address of the asset being subscribed to.
      * @returns status A status code (e.g., 1 for success) or reverts on failure.
      */
-    function checkSubscriptionCompliance(address subscriber, address subscriptionToken) external view returns (uint256 status);
+    function checkSubscriptionCompliance(address subscriber, address subscriptionToken)
+        external
+        view
+        returns (uint256 status);
 }

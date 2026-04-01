@@ -95,13 +95,17 @@ contract GravitasPolicyRegistry is Ownable2Step, IShariahPolicyChecker {
 
     /**
      * @notice Comprehensive check for Libeara subscription flows.
-     * @dev Implementation of IShariahPolicyChecker. Ensures asset is compliant 
+     * @dev Implementation of IShariahPolicyChecker. Ensures asset is compliant
      *      and the executor (msg.sender) is authorized.
      * @param subscriber The address of the investor (currently unused, but reserved for future policy expansion).
      * @param subscriptionToken The address of the asset being subscribed to.
      * @returns status Returns 1 if compliant, reverts otherwise.
      */
-    function checkSubscriptionCompliance(address subscriber, address subscriptionToken) external view returns (uint256) {
+    function checkSubscriptionCompliance(address subscriber, address subscriptionToken)
+        external
+        view
+        returns (uint256)
+    {
         require(isAssetCompliant[subscriptionToken], "GPR: Asset not Shariah-compliant");
         require(isExecutor[msg.sender], "GPR: Unauthorized executor for subscription");
         
