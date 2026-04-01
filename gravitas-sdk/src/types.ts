@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { Address, Hex } from 'viem';
+import { Address } from 'viem';
 
 /**
  * @title Gravitas SDK Type Definitions

@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-SC Ventures' Libeara platform, a leading tokenization solution with over $1B AUM, currently lacks Shariah-compliance capabilities, thereby excluding it from the vast and rapidly growing $3 trillion Islamic institutional market in the the GCC. Gravitas Protocol offers a seamless, plug-and-play middleware solution that integrates directly with Libeara's existing smart contract architecture, enabling Shariah-compliant tokenization without requiring any structural rebuilds of Libeara's core platform. This integration provides a significant competitive advantage, opening up new revenue streams and market opportunities for Libeara.
+SC Ventures' Libeara platform, a leading tokenization solution with over $1B AUM, currently lacks Shariah-compliance capabilities, thereby excluding it from the vast and rapidly growing $3 trillion Islamic institutional market in the GCC. Gravitas Protocol offers a seamless, plug-and-play middleware solution that integrates directly with Libeara's existing smart contract architecture, enabling Shariah-compliant tokenization without requiring any structural rebuilds of Libeara's core platform. This integration provides a significant competitive advantage, opening up new revenue streams and market opportunities for Libeara.
 
 ## Value Proposition: Accessing the Islamic Institutional Market
 
@@ -13,7 +13,7 @@ By integrating Gravitas Protocol's IShariahPolicyChecker interface, Libeara can:
 *   **Unlock New Markets:** Directly access the $3 trillion Islamic institutional investor base, expanding its addressable market significantly.
 *   **Enhance Product Offering:** Provide Shariah-compliant tokenized assets, meeting the specific demands of a previously untapped investor segment.
 *   **Maintain Competitive Edge:** Position Libeara as a pioneer in Shariah-compliant tokenization, attracting new partnerships and capital flows.
-*   **Zero Structural Rebuilds:** Achieve Shariah compliance with minimal integration effort, preserving Libeara's existing, battle-tested infrastructure.
+*   **Minimal Integration Effort:** Achieve Shariah compliance with no architectural changes to Libeara's core platform — a single interface import and one `view` call.
 
 ## Technical Integration: Gravitas as Shariah-Compliance Middleware
 
@@ -32,7 +32,7 @@ Gravitas Protocol introduces an `IShariahPolicyChecker` interface, which acts as
 3.  **Shariah Compliance Check:** The `checkSubscriptionCompliance` function within the Gravitas Policy Registry verifies two key aspects:
     *   **Asset Compliance:** Ensures the tokenized asset (e.g., MG999 Gold Fund) is whitelisted as Shariah-compliant.
     *   **Executor Authorization:** Confirms that the entity initiating the transaction (e.g., Libeara's `UltraManager` or an authorized fund manager) is approved to perform Shariah-compliant operations.
-4.  **Transaction Execution:** If both checks pass, the `checkSubscriptionCompliance` function returns a success status (e.g., `1`), allowing Libeara's `UltraManager` to proceed with the minting or subscription. If either check fails, the transaction is reverted, preventing non-compliant operations.
+4.  **Transaction Execution:** If both checks pass, the `checkSubscriptionCompliance` function returns the current policy version (a positive integer), confirming compliance and enabling Libeara's `UltraManager` to proceed. If either check fails, the call reverts atomically.
 
 ### Solidity Integration Snippet
 

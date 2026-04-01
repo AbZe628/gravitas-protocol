@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "./GravitasPolicyRegistry.sol";
+import "./interfaces/IShariahPolicyChecker.sol";
 import "./interfaces/IUniswapV2Factory.sol";
 import "./interfaces/IUniswapV2Router02.sol";
 
@@ -26,7 +26,7 @@ contract Teleport is ReentrancyGuard, Ownable {
     using SafeERC20 for IERC20;
 
     /// @notice Immutable reference to the Gravitas Policy Registry contract.
-    GravitasPolicyRegistry public immutable registry;
+    IShariahPolicyChecker public immutable registry;
 
     // --------------------
     // Policy Controls
@@ -60,7 +60,7 @@ contract Teleport is ReentrancyGuard, Ownable {
      * @dev Modifier to ensure the caller is either the contract owner or an authorized executor in the Policy Registry.
      */
     modifier onlyAuthorized() {
-        require(registry.isExecutor(msg.sender) || msg.sender == owner(), "Teleport: not authorized");
+        require(registry.verifyExecutorStatus(msg.sender) || msg.sender == owner(), "Teleport: not authorized");
         _;
     }
 
@@ -70,7 +70,7 @@ contract Teleport is ReentrancyGuard, Ownable {
      */
     constructor(address _registry) Ownable(msg.sender) {
         require(_registry != address(0), "Teleport: zero registry");
-        registry = GravitasPolicyRegistry(_registry);
+        registry = IShariahPolicyChecker(_registry);
     }
 
     /**
@@ -112,7 +112,7 @@ contract Teleport is ReentrancyGuard, Ownable {
         // 1. Basic Checks
         require(deadline >= block.timestamp, "Teleport: deadline passed");
         require(registry.isRouterAuthorized(routerTo), "Teleport: router not authorized");
-        require(registry.areTokensCompliant(tokenA, tokenB), "Teleport: non-compliant assets");
+        require(registry.verifyAssetCompliance(tokenA) && registry.verifyAssetCompliance(tokenB), "Teleport: non-compliant assets");
 
         // 2. Pair Identification
         address pairFrom = IUniswapV2Factory(factoryFrom).getPair(tokenA, tokenB);

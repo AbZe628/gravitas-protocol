@@ -1,4 +1,4 @@
-import { PublicClient, WalletClient, Address, parseAbi, encodeFunctionData } from 'viem';
+import { PublicClient, Address, parseAbi, encodeFunctionData } from 'viem';
 import { MigrationParams, MigrationParamsSchema } from './types.js';
 import { ComplianceService } from './compliance.js';
 

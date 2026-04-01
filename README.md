@@ -69,9 +69,7 @@ Gravitas acts as the middleware layer enabling "Deterministic Liquidity Routing.
 | **TeleportV2** | **V2 Migration Engine.** Atomic migrations for Uniswap V2 LP positions with cooldown and slippage protection. |
 | **Gravitas SDK** | **TypeScript SDK.** A Stripe-like developer experience for institutional integrations. |
 
----
-
-## Shariah Compliance by Design
+---## Shariah Compliance by Design
 
 Gravitas Protocol treats Shariah compliance as a **technical requirement**, not a marketing label. The `GravitasPolicyRegistry` contract programmatically enforces the core principles of Islamic Finance.
 
@@ -92,12 +90,16 @@ Gravitas Protocol treats Shariah compliance as a **technical requirement**, not 
 
 ---
 
-## Development & CI/CD
+## Institutional Integration: Libeara & Tokenized Fund Compliance
 
-This project is a monorepo managed with `pnpm` workspaces.
+The `GravitasPolicyRegistry` is architectured as a **jurisdiction-agnostic compliance oracle** — deployable as middleware for any tokenization platform requiring on-chain policy enforcement. The `IShariahPolicyChecker` interface (`contracts/interfaces/`) allows external protocols to integrate a single `view` call without architectural changes.
 
-- `apps/web`: The React frontend application.
-- `packages/contracts`: Solidity smart contracts.
+**Reference integration:** [`SC-VENTURES-INTEGRATION.md`](./SC-VENTURES-INTEGRATION.md)  
+**Interface file:** [`contracts/interfaces/IShariahPolicyChecker.sol`](./contracts/interfaces/IShariahPolicyChecker.sol)
+
+---
+
+## Development & CI/CDages/contracts`: Solidity smart contracts.
 - `packages/sdk`: TypeScript SDK.
 
 ### Continuous Integration & Deployment

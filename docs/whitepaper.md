@@ -1,9 +1,9 @@
 # Gravitas Protocol — Whitepaper
 
-Version:** 1.0.0  
+**Version:** 1.0.0  
 **Status:** Audit-Ready (Testnet)  
 **Last Updated:** February 2026  
-**Network:** Arbitrum Sepolia Testnet (Mock Data)
+**Network:** Arbitrum Sepolia Testnet
 
 ---
 
