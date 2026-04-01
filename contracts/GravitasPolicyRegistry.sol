@@ -2,6 +2,7 @@
 pragma solidity ^0.8.24;
 
 import "@openzeppelin/contracts/access/Ownable2Step.sol";
+import "@openzeppelin/contracts/utils/Pausable.sol";
 import "./interfaces/IShariahPolicyChecker.sol";
 
 /**
@@ -15,7 +16,7 @@ import "./interfaces/IShariahPolicyChecker.sol";
  *      - Timelock proposers: Gnosis Safe multisig (3-of-5 recommended for GCC institutional use)
  *      - Timelock delay: 48 hours minimum
  */
-contract GravitasPolicyRegistry is Ownable2Step, IShariahPolicyChecker {
+contract GravitasPolicyRegistry is Ownable2Step, Pausable, IShariahPolicyChecker {
     // ═══════════════════════════════════════════════════════════════════════════════════
     //                              STATE VARIABLES
     // ═══════════════════════════════════════════════════════════════════════════════════
@@ -66,6 +67,9 @@ contract GravitasPolicyRegistry is Ownable2Step, IShariahPolicyChecker {
         emit ExecutorStatusUpdated(executor, status);
     }
 
+    function pause() external onlyOwner whenNotPaused { _pause(); }
+    function unpause() external onlyOwner whenPaused { _unpause(); }
+
     function _updateVersion() internal {
         currentVersion++;
         bytes32 policyHash = keccak256(abi.encode(block.timestamp, msg.sender, currentVersion));
@@ -113,5 +117,9 @@ contract GravitasPolicyRegistry is Ownable2Step, IShariahPolicyChecker {
         require(isExecutor[msg.sender], "GPR: Calling contract not an authorized executor");
         // subscriber is passed through for future per-investor KYC policy expansion
         return currentVersion;
+    }
+
+    function getPolicyVersion() external view returns (uint256 policyVersion) {
+        policyVersion = currentVersion;
     }
 }

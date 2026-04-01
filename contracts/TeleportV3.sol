@@ -5,6 +5,7 @@ import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/Pausable.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 import "./interfaces/IShariahPolicyChecker.sol";
@@ -88,7 +89,7 @@ interface ISwapRouter {
  * @title TeleportV3 (Institutional Edition)
  * @notice The Deterministic Liquidity Routing Engine for atomic migration of Uniswap V3 NFT positions.
  */
-contract TeleportV3 is ReentrancyGuard, Ownable, IERC721Receiver, EIP712 {
+contract TeleportV3 is ReentrancyGuard, Pausable, Ownable, IERC721Receiver, EIP712 {
     using SafeERC20 for IERC20;
 
     // --- Immutable State ---
@@ -149,10 +150,14 @@ contract TeleportV3 is ReentrancyGuard, Ownable, IERC721Receiver, EIP712 {
     /**
      * @notice Executes atomic liquidity migration with intent verification.
      */
+    function pause() external onlyOwner whenNotPaused { _pause(); }
+    function unpause() external onlyOwner whenPaused { _unpause(); }
+
     function executeAtomicMigration(AtomicMigrationParams calldata params, bytes calldata signature)
         external
         nonReentrant
         onlyAuthorized
+        whenNotPaused
         returns (uint256 newTokenId, uint128 newLiquidity)
     {
         // 1. Parameter & Signature Validation

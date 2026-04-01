@@ -14,9 +14,12 @@ const REGISTRY_ABI = parseAbi([
   'function verifyAssetCompliance(address asset) view returns (bool compliant)',
   'function verifyRouterAuthorization(address router) view returns (bool authorized)',
   'function verifyExecutorStatus(address executor) view returns (bool authorized)',
+  'function checkSubscriptionCompliance(address subscriber, address subscriptionToken) view returns (uint256)',
+  'function getPolicyVersion() view returns (uint256)',
   // Direct mapping accessors
   'function isExecutor(address executor) view returns (bool)',
-  'function getPolicyVersion() view returns (uint256)',
+  'function owner() view returns (address)',
+  'function paused() view returns (bool)',
 ]);
 
 /**

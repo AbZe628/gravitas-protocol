@@ -14,6 +14,10 @@ const TELEPORT_V3_ABI = parseAbi([
   'function positionManager() view returns (address)',
   'function swapRouter() view returns (address)',
   'function registry() view returns (address)',
+  'function paused() view returns (bool)',
+  'function owner() view returns (address)',
+  'function pause() external',
+  'function unpause() external',
 ]);
 
 const POSITION_MANAGER_ABI = parseAbi([

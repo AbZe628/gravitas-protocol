@@ -60,7 +60,7 @@ contract UltraManager is Ownable {
         // Existing Libeara KYC/AML checks would go here
 
         // Gravitas Shariah Compliance Check
-        uint256 policyVersion = gravitasPolicyChecker.getPolicyVersion();
+        uint256 policyVersion = gravitasPolicyChecker.checkSubscriptionCompliance(subscriber, subscriptionToken);
         require(policyVersion > 0, "UltraManager: Shariah compliance check failed");
 
         // Continue with minting logic if compliant
@@ -69,7 +69,7 @@ contract UltraManager is Ownable {
     // Other UltraManager functions...
 }
 ```
-This integration requires **no architectural changes** to Libeara\'s core platform. A single import statement and one `view` call — both added to the existing `_beforeMint` hook — are the only modifications needed. Libeara\'s trust model, custodial structure, KYC pipeline, and NAV mechanics remain entirely unchanged. The `getPolicyVersion` function is a simple view call and does not require any arguments.
+This integration requires **no architectural changes** to Libeara\'s core platform. A single import statement and one `view` call — both added to the existing `_beforeMint` hook — are the only modifications needed. Libeara\'s trust model, custodial structure, KYC pipeline, and NAV mechanics remain entirely unchanged. The `checkSubscriptionCompliance` function is a view call that takes `subscriber` and `subscriptionToken` as arguments.
 ## Market Traction & Institutional Validation
 
 Gravitas Protocol has secured three signed Letters of Intent from key 
@@ -79,4 +79,4 @@ upon request under NDA to qualified institutional parties.
 **LOI Counterparties:**
 - **MRHB Network** — Anchor integration partner (signed LOI, available under NDA)
 - **BUNN** — Web3 Islamic banking integration (signed LOI, available under NDA)  
-- **AmanX Advisory** — Shariah certification endorsement (LOI in final stages)
+- **AmanX Advisory** — Shariah certification endorsement (signed LOI, dated 29 March 2026)

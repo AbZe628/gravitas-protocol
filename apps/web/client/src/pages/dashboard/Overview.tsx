@@ -12,15 +12,8 @@ import { Link } from "wouter";
 const TELEPORT_V3_ABI = [
   {
     inputs: [],
-    name: "cooldownPeriod",
-    outputs: [{ name: "", type: "uint256" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "maxMoveBps",
-    outputs: [{ name: "", type: "uint16" }],
+    name: "paused",
+    outputs: [{ name: "", type: "bool" }],
     stateMutability: "view",
     type: "function",
   },
@@ -84,17 +77,10 @@ function ContractAddress({ label, address, short, href }: { label: string; addre
 }
 
 export default function Overview() {
-  const { data: cooldownPeriod } = useReadContract({
+  const { data: isPaused } = useReadContract({
     address: CONTRACTS.TELEPORT_V3 as `0x${string}`,
     abi: TELEPORT_V3_ABI,
-    functionName: "cooldownPeriod",
-    chainId: 421614,
-  });
-
-  const { data: maxMoveBps } = useReadContract({
-    address: CONTRACTS.TELEPORT_V3 as `0x${string}`,
-    abi: TELEPORT_V3_ABI,
-    functionName: "maxMoveBps",
+    functionName: "paused",
     chainId: 421614,
   });
 
@@ -225,17 +211,9 @@ export default function Overview() {
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="p-4 rounded-xl bg-[#0A1628]/50 border border-[#D4AF37]/10">
-                <p className="text-xs text-white/40 mb-1 uppercase tracking-wider">Cooldown Period</p>
+                <p className="text-xs text-white/40 mb-1 uppercase tracking-wider">Protocol Status</p>
                 <p className="text-2xl font-bold text-white">
-                  {cooldownPeriod !== undefined ? `${Number(cooldownPeriod) / 60} min` : (
-                    <span className="text-white/30 text-lg">Querying...</span>
-                  )}
-                </p>
-              </div>
-              <div className="p-4 rounded-xl bg-[#0A1628]/50 border border-[#D4AF37]/10">
-                <p className="text-xs text-white/40 mb-1 uppercase tracking-wider">Max Price Movement</p>
-                <p className="text-2xl font-bold text-white">
-                  {maxMoveBps !== undefined ? `${Number(maxMoveBps) / 100}%` : (
+                  {isPaused !== undefined ? (isPaused ? "🔴 Paused" : "🟢 Active") : (
                     <span className="text-white/30 text-lg">Querying...</span>
                   )}
                 </p>
