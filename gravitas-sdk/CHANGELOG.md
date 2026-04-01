@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.1.0] — 2026-03 — Initial Release
+## [2.0.0] — 2026-04 — Initial Release
 
 - First public release of the Gravitas Protocol SDK
 - Support for Arbitrum Sepolia testnet

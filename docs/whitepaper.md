@@ -39,7 +39,7 @@ DeFi liquidity remains fragmented across multiple DEXs and chains. Users face:
 
 ### 1.1 System Components
 
-The Gravitas Protocol consists of three core smart contracts:
+The Gravitas Protocol consists of three core smart contracts: `GravitasPolicyRegistry`, `TeleportV2.sol`, and `TeleportV3.sol`.
 
 #### **GravitasPolicyRegistry**
 - Maintains whitelist of Shariah-compliant assets (AAOIFI standards)
@@ -47,13 +47,13 @@ The Gravitas Protocol consists of three core smart contracts:
 - Enforces compliance rules before execution
 - Owner-controlled (upgradeable via timelock)
 
-#### **TeleportV2**
+#### **TeleportV2.sol**
 - Handles Uniswap V2 liquidity migrations
 - Implements cooldown enforcement (prevents sandwich attacks)
 - Enforces max-move limits per transaction
 - Supports deterministic fee routing
 
-#### **TeleportV3**
+#### **TeleportV3.sol**
 - Handles Uniswap V3 concentrated liquidity migrations
 - Implements EIP-712 typed data signing for replay protection
 - Atomic swap execution with slippage protection
@@ -64,7 +64,7 @@ The Gravitas Protocol consists of three core smart contracts:
 ```
 User Position (V2 or V3)
     ↓
-[Compliance Check] ← GravitasPolicyRegistry
+[Compliance Check] ← GravitasPolicyRegistry (using `verifyAssetCompliance`)
     ↓
 [Burn Liquidity] ← Remove from DEX
     ↓
@@ -107,7 +107,7 @@ User New Position + Protocol Fees
 ```
 Balance_Start = Balance_End + Fees + Slippage
 ```
-Proof: All operations execute atomically within single transaction. `_refundDelta` ensures dust is returned.
+Proof: All operations execute atomically within single transaction. `_refundDustOptimized` ensures dust is returned.
 
 **Invariant 2: Shariah Compliance**
 ```
@@ -126,9 +126,9 @@ Proof: EIP-712 typed data prevents signature reuse. Nonce increments per migrati
 | Contract | Coverage | Tests | Status |
 | :--- | :--- | :--- | :--- |
 | GravitasPolicyRegistry | 90% | 15 | ✅ Passing |
-| TeleportV2 | 90.7% | 18 | ✅ Passing |
-| TeleportV3 | 90% | 11 | ✅ Passing |
-| **Total** | **90.2%** | **44** | **✅ Passing** |
+| TeleportV2 | 90.7% | 21 | ✅ Passing |
+| TeleportV3 | 90% | 19 | ✅ Passing |
+| **Total** | **90.2%** | **55** | **✅ Passing** |
 
 ### 2.3 Gas Optimization
 
@@ -149,7 +149,7 @@ Proof: EIP-712 typed data prevents signature reuse. Nonce increments per migrati
 | Contract | Address | Status | Explorer |
 | :--- | :--- | :--- | :--- |
 | GravitasPolicyRegistry | `0xbcaE3069362B0f0b80f44139052f159456C84679` | ✅ Testnet | [Arbiscan](https://sepolia.arbiscan.io/address/0xbcaE3069362B0f0b80f44139052f159456C84679) |
-| TeleportV2 | `0x68b3465833fb72B5A828cCEA02FFAD6bFB335AaF` | ✅ Testnet | [Arbiscan](https://sepolia.arbiscan.io) |
+| TeleportV2 | `0x68b3465833fb72B5A828cCEA02FFAD6bFB335AaF` | ✅ Testnet | [Arbiscan](https://sepolia.arbiscan.io/address/0x68b3465833fb72B5A828cCEA02FFAD6bFB335AaF) |
 | TeleportV3 | `0x5D423f8d01539B92D3f3953b91682D9884D1E993` | ✅ Testnet | [Arbiscan](https://sepolia.arbiscan.io/address/0x5D423f8d01539B92D3f3953b91682D9884D1E993) |
 
 ### 3.2 Mainnet Readiness

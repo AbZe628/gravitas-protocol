@@ -16,6 +16,7 @@ const REGISTRY_ABI = parseAbi([
   'function verifyExecutorStatus(address executor) view returns (bool authorized)',
   // Direct mapping accessors
   'function isExecutor(address executor) view returns (bool)',
+  'function getPolicyVersion() view returns (uint256)',
 ]);
 
 /**
@@ -174,6 +175,15 @@ export class ComplianceService {
    * @param tokenB The address of the second token.
    * @returns Object containing compliance status for each check.
    */
+  async getPolicyVersion(): Promise<bigint> {
+    const version = await this.client.readContract({
+      address: this.registryAddress,
+      abi: REGISTRY_ABI,
+      functionName: 'getPolicyVersion',
+    });
+    return version as bigint;
+  }
+
   async getComplianceStatus(tokenA: Address, tokenB: Address): Promise<{
     tokenACompliant: boolean;
     tokenBCompliant: boolean;

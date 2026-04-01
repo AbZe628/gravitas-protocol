@@ -33,10 +33,9 @@ const client = new GravitasClient({
 ## Check Asset Compliance
 
 ```typescript
-const isCompliant = await client.registry.isAssetCompliant('0xTokenAddress...');
-console.log('Asset compliant:', isCompliant);
+await client.compliance.validateAsset(\'0xTokenAddress...\');
+console.log(\'Asset compliant: ✅ Compliant\');
 ```
-
 ## Simulate a V3 Migration
 
 ```typescript
@@ -47,18 +46,10 @@ const migration = client.migration()
   .slippage(0n, 0n, 0n, 0n)
   .deadline(BigInt(Math.floor(Date.now() / 1000) + 3600));
 
-const simulation = await migration.simulate('0xYourWalletAddress...');
-console.log('Estimated gas:', simulation.gasEstimate);
+const simulation = await migration.simulate(\'0xYourWalletAddress...\', \'0x\');
+console.log(\'Estimated gas:\', simulation.gasEstimate);
 ```
 
-## Execute a V3 Migration
-
-```typescript
-const result = await migration.execute(signer);
-console.log('Transaction hash:', result.hash);
-await result.wait();
-console.log('Migration complete');
-```
 
 ## Contract Addresses
 

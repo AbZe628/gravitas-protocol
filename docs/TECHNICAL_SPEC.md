@@ -31,7 +31,7 @@ $$
 $$
 
 **Proof of Mitigation:**
-- The `migrateLiquidityV2` and `teleportLiquidity` functions include a mandatory `require(registry.areTokensCompliant(tokenA, tokenB))` check at the beginning of the execution path.
+- The `migrateLiquidityV2` function in `TeleportV2.sol` and `executeAtomicMigration` function in `TeleportV3.sol` include mandatory `require(registry.verifyAssetCompliance(tokenA) && registry.verifyAssetCompliance(tokenB))` checks at the beginning of their execution paths.
 - This invariant ensures the protocol cannot be used to route capital into non-compliant (e.g., Riba, Maysir) pools.
 
 ### Invariant 3: Gharar Avoidance (Deterministic Execution)
@@ -79,7 +79,7 @@ $$
 
 ## 3. V3 Liquidity Teleport Flow
 
-The `teleportLiquidity` function follows a strict, non-custodial sequence:
+The `executeAtomicMigration` function in `TeleportV3.sol` follows a strict, non-custodial sequence:
 
 1.  **Pre-Check**: Validate NFT ownership, check Shariah compliance of tokens, and enforce deadline.
 2.  **Decrease Liquidity**: Call `positionManager.decreaseLiquidity` to remove the liquidity from the NFT position.
@@ -87,4 +87,4 @@ The `teleportLiquidity` function follows a strict, non-custodial sequence:
 4.  **Burn NFT**: Call `positionManager.burn` to destroy the old NFT, cleaning up the state.
 5.  **Optional Swap**: If `doSwap` is true, call `swapRouter.exactInputSingle` to rebalance the collected tokens.
 6.  **Mint New Position**: Call `positionManager.mint` to create a new NFT position with the collected/rebalanced tokens, minting the new NFT directly to the user's address.
-7.  **Refund Dust**: Call `_refundDelta` to return any unused tokens to the user.
+7.  **Refund Dust**: Call `_refundDustOptimized` to return any unused tokens to the user.

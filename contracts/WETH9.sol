@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-// Minimal WETH9 (za lokalni Uniswap V2 router)
+// Minimal WETH9 (for local Uniswap V2 router)
 contract WETH9 {
     string public name = "Wrapped Ether";
     string public symbol = "WETH";

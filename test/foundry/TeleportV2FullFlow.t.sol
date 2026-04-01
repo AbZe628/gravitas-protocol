@@ -2,7 +2,7 @@
 pragma solidity ^0.8.24;
 
 import "forge-std/Test.sol";
-import "../../contracts/Teleport.sol";
+import "../../contracts/TeleportV2.sol";
 import "../../contracts/GravitasPolicyRegistry.sol";
 import "../../contracts/mocks/MockUniswapV2Factory.sol";
 import "../../contracts/mocks/MockUniswapV2Router.sol";
@@ -25,7 +25,7 @@ contract TestToken is ERC20 {
  */
 contract TeleportV2FullFlowTests is Test {
     GravitasPolicyRegistry registry;
-    Teleport teleport;
+    TeleportV2 teleport;
     TestToken tokenX;
     TestToken tokenY;
 
@@ -38,7 +38,7 @@ contract TeleportV2FullFlowTests is Test {
 
         // Deploy core contracts
         registry = new GravitasPolicyRegistry();
-        teleport = new Teleport(address(registry));
+        teleport = new TeleportV2(address(registry));
 
         // Deploy test tokens
         tokenX = new TestToken("Token X", "TKX");
@@ -320,7 +320,7 @@ contract TeleportV2FullFlowTests is Test {
      */
     function test_V2_RevertOnZeroRegistry() public {
         vm.expectRevert("Teleport: zero registry");
-        new Teleport(address(0));
+        new TeleportV2(address(0));
     }
 
     /**

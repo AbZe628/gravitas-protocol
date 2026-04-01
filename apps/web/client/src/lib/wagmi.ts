@@ -3,7 +3,7 @@ import { arbitrumSepolia } from 'wagmi/chains';
 import { injected, metaMask, coinbaseWallet, walletConnect } from 'wagmi/connectors';
 
 // WalletConnect project ID — replace with your own from https://cloud.walletconnect.com
-const WC_PROJECT_ID = import.meta.env.VITE_WC_PROJECT_ID || 'a8d1d5c2f3e4b6a7c8d9e0f1a2b3c4d5'; // TODO: Replace with your actual WalletConnect Project ID from .env
+const WC_PROJECT_ID = import.meta.env.VITE_WC_PROJECT_ID || 'YOUR_WALLETCONNECT_PROJECT_ID';
 
 export const config = createConfig({
   chains: [arbitrumSepolia],

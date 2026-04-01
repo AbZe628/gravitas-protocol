@@ -29,14 +29,13 @@ Gravitas Protocol introduces an `IShariahPolicyChecker` interface, which acts as
 
 1.  **Libeara User Initiates Action:** An investor on the Libeara platform initiates a transaction (e.g., subscribing to a tokenized fund).
 2.  **UltraManager Hook:** Libeara's `UltraManager` contract, before executing the minting or subscription logic, makes a `view` call to the deployed Gravitas Policy Registry via the `IShariahPolicyChecker` interface.
-3.  **Shariah Compliance Check:** The `checkSubscriptionCompliance` function within the Gravitas Policy Registry verifies two key aspects:
+3.  **Shariah Compliance Check:** The `getPolicyVersion` function within the Gravitas Policy Registry returns the current policy version.
     *   **Asset Compliance:** Ensures the tokenized asset (e.g., MG999 Gold Fund) is whitelisted as Shariah-compliant.
     *   **Executor Authorization:** Confirms that the entity initiating the transaction (e.g., Libeara's `UltraManager` or an authorized fund manager) is approved to perform Shariah-compliant operations.
-4.  **Transaction Execution:** If both checks pass, the `checkSubscriptionCompliance` function returns the current policy version (a positive integer), confirming compliance and enabling Libeara's `UltraManager` to proceed. If either check fails, the call reverts atomically.
+4.  **Transaction Execution:** If the call to `getPolicyVersion` is successful, it returns the current policy version (a positive integer), confirming compliance and enabling Libeara\'s `UltraManager` to proceed. If the call reverts, it indicates a compliance failure.
 
 ### Solidity Integration Snippet
-
-Below is an example of how Libeara's `UltraManager` contract could integrate the `checkSubscriptionCompliance` hook. This snippet demonstrates the simplicity and non-disruptive nature of the integration.
+Below is an example of how Libeara\'s `UltraManager` contract could integrate the `getPolicyVersion` hook. This snippet demonstrates the simplicity and non-disruptive nature of the integration.
 
 ```solidity
 // SPDX-License-Identifier: MIT
@@ -61,7 +60,7 @@ contract UltraManager is Ownable {
         // Existing Libeara KYC/AML checks would go here
 
         // Gravitas Shariah Compliance Check
-        uint256 policyVersion = gravitasPolicyChecker.checkSubscriptionCompliance(subscriber, subscriptionToken);
+        uint256 policyVersion = gravitasPolicyChecker.getPolicyVersion();
         require(policyVersion > 0, "UltraManager: Shariah compliance check failed");
 
         // Continue with minting logic if compliant
@@ -70,9 +69,7 @@ contract UltraManager is Ownable {
     // Other UltraManager functions...
 }
 ```
-
-This integration requires **no architectural changes** to Libeara's core platform. A single import statement and one `view` call — both added to the existing `_beforeMint` hook — are the only modifications needed. Libeara's trust model, custodial structure, KYC pipeline, and NAV mechanics remain entirely unchanged.
-
+This integration requires **no architectural changes** to Libeara\'s core platform. A single import statement and one `view` call — both added to the existing `_beforeMint` hook — are the only modifications needed. Libeara\'s trust model, custodial structure, KYC pipeline, and NAV mechanics remain entirely unchanged. The `getPolicyVersion` function is a simple view call and does not require any arguments.
 ## Market Traction & Institutional Validation
 
 Gravitas Protocol has secured three signed Letters of Intent from key 

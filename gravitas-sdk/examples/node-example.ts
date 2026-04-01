@@ -19,19 +19,19 @@ async function main() {
   console.log('✅ Gravitas client initialized');
 
   // Example 1: Check asset compliance
-  const tokenAddress = '0x...'; // Replace with actual token address
+  const tokenAddress = '0x5FbDB2315678afecb367f032d93F642f64180aa3'; // Example token address
   try {
-    const isCompliant = await client.compliance.isAssetCompliant(tokenAddress);
-    console.log(`Asset ${tokenAddress} compliance:`, isCompliant ? '✅ Compliant' : '❌ Non-compliant');
+    await client.compliance.validateAsset(tokenAddress);
+    console.log(`Asset ${tokenAddress} compliance: ✅ Compliant`);
   } catch (error) {
     console.error('Error checking compliance:', error);
   }
 
   // Example 2: Check executor authorization
-  const executorAddress = '0x...'; // Replace with actual executor address
+  const executorAddress = '0x70997970C51812dc3A01088eB04e2e082E20bEBa'; // Example executor address
   try {
-    const isAuthorized = await client.compliance.isExecutorAuthorized(executorAddress);
-    console.log(`Executor ${executorAddress} authorization:`, isAuthorized ? '✅ Authorized' : '❌ Unauthorized');
+    await client.compliance.validateExecutor(executorAddress);
+    console.log(`Executor ${executorAddress} authorization: ✅ Authorized`);
   } catch (error) {
     console.error('Error checking authorization:', error);
   }
@@ -45,8 +45,8 @@ async function main() {
   }
 
   // Example 4: Build a migration (simulation only)
-  const ownerAddress = '0x...'; // Replace with actual owner address
-  const tokenId = 123n; // Replace with actual NFT position ID
+  const ownerAddress = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'; // Example owner address
+  const tokenId = 123n;
 
   try {
     const migration = client.migration()
@@ -59,7 +59,7 @@ async function main() {
     console.log('Migration builder created successfully');
 
     // Simulate the migration
-    const result = await migration.simulate(ownerAddress);
+    const result = await migration.simulate(ownerAddress, '0x');
     console.log('Migration simulation result:', result);
   } catch (error) {
     console.error('Error simulating migration:', error);

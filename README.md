@@ -64,12 +64,9 @@ Gravitas acts as the middleware layer enabling "Deterministic Liquidity Routing.
 
 | Component | Description |
 |---|---|
-| **GravitasPolicyRegistry** | **Risk & Compliance Oracle.** Validates assets, routers, and executors against Shariah parameters before every transaction. | 
-| **TeleportV3** | **V3 Migration Engine.** EIP-712 signed migrations for Uniswap V3 NFT positions with Yul-optimized gas savings. |
+| **GravitasPolicyRegistry** | **Risk & Compliance Oracle.** Validates assets, routers, and executors against Shariah parameters before every transaction. |
 | **TeleportV2** | **V2 Migration Engine.** Atomic migrations for Uniswap V2 LP positions with cooldown and slippage protection. |
-| **Gravitas SDK** | **TypeScript SDK.** A Stripe-like developer experience for institutional integrations. |
-
----## Shariah Compliance by Design
+| **TeleportV3** | **V3 Migration Engine.** EIP-712 signed migrations for Uniswap V3 NFT positions with Yul-optimized gas savings. |
 
 Gravitas Protocol treats Shariah compliance as a **technical requirement**, not a marketing label. The `GravitasPolicyRegistry` contract programmatically enforces the core principles of Islamic Finance.
 
@@ -111,7 +108,7 @@ This project is a monorepo managed with `pnpm` workspaces.
 
 Two primary GitHub Actions workflows ensure code quality and deployment:
 
-1.  **`ci.yml`**: Triggered on pushes to `main`. Runs Foundry tests for all smart contracts to ensure correctness and security.
+1.  **`ci.yml`**: Triggered on pushes to `main`. Runs Foundry tests for all smart contracts to ensure correctness and security. (55 passing tests)
 2.  **`deploy-frontend.yml`**: Triggered on pushes to `apps/web`. Builds the React application and deploys it to GitHub Pages.
 
 ---

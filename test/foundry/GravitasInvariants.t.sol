@@ -2,7 +2,7 @@
 pragma solidity ^0.8.24;
 
 import "forge-std/Test.sol";
-import "../../contracts/Teleport.sol";
+import "../../contracts/TeleportV2.sol";
 import "../../contracts/GravitasPolicyRegistry.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
@@ -22,7 +22,7 @@ contract MockToken is ERC20 {
  */
 contract GravitasInvariants is Test {
     GravitasPolicyRegistry public registry;
-    Teleport public teleport;
+    TeleportV2 public teleport;
     MockToken public tokenA;
     MockToken public tokenB;
     MockToken public nonCompliantToken;
@@ -34,7 +34,7 @@ contract GravitasInvariants is Test {
     function setUp() public {
         vm.startPrank(owner);
         registry = new GravitasPolicyRegistry();
-        teleport = new Teleport(address(registry));
+        teleport = new TeleportV2(address(registry));
 
         tokenA = new MockToken("Token A", "TKNA");
         tokenB = new MockToken("Token B", "TKNB");

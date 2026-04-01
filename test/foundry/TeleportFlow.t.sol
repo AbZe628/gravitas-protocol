@@ -2,7 +2,7 @@
 pragma solidity ^0.8.24;
 
 import "forge-std/Test.sol";
-import "../../contracts/Teleport.sol";
+import "../../contracts/TeleportV2.sol";
 import "../../contracts/GravitasPolicyRegistry.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
@@ -16,7 +16,7 @@ contract LocalMockERC20 is ERC20 {
 
 contract TeleportFlowTests is Test {
     GravitasPolicyRegistry registry;
-    Teleport teleportV2;
+    TeleportV2 teleportV2;
     LocalMockERC20 t0;
 
     address owner = address(0x1);
@@ -24,7 +24,7 @@ contract TeleportFlowTests is Test {
     function setUp() public {
         vm.startPrank(owner);
         registry = new GravitasPolicyRegistry();
-        teleportV2 = new Teleport(address(registry));
+        teleportV2 = new TeleportV2(address(registry));
         t0 = new LocalMockERC20("T0", "T0");
         vm.stopPrank();
     }

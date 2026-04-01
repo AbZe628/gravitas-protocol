@@ -22,7 +22,7 @@ interface IUniswapV2PairExtended {
  * @dev This contract implements the "Policy-Constrained Smart Routing" logic, ensuring
  *      atomic execution and compliance with Shariah governance rules via the Policy Registry.
  */
-contract Teleport is ReentrancyGuard, Ownable {
+contract TeleportV2 is ReentrancyGuard, Ownable {
     using SafeERC20 for IERC20;
 
     /// @notice Immutable reference to the Gravitas Policy Registry contract.
