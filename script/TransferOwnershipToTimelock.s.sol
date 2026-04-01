@@ -7,10 +7,10 @@ import "../contracts/governance/GravitasTimelock.sol";
 
 contract TransferOwnershipToTimelock is Script {
     function run() external returns (GravitasPolicyRegistry registry, GravitasTimelock timelock) {
-        uint256 deployerPrivateKey = vm.envUint("DEPLOYER_PRIVATE_KEY");
-        address deployer = vm.addr(deployerPrivateKey);
+        uint256 deployerKey = vm.envUint("DEPLOYER_KEY");
+        address deployer = vm.addr(deployerKey);
 
-        vm.startBroadcast(deployerPrivateKey);
+        vm.startBroadcast(deployerKey);
 
         // 1. Deploy GravitasTimelock
         // Using a short delay for testnet (e.g., 5 minutes = 300 seconds)
