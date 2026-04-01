@@ -15,7 +15,7 @@ contract GravitasLibearaIntegrationTest is Test {
     function setUp() public {
         vm.prank(owner);
         registry = new GravitasPolicyRegistry();
-        
+
         // Setup initial compliance
         vm.startPrank(owner);
         registry.setAssetCompliance(asset, true);
@@ -41,21 +41,21 @@ contract GravitasLibearaIntegrationTest is Test {
         vm.expectRevert("GPR: Unauthorized executor for subscription");
         registry.checkSubscriptionCompliance(subscriber, asset);
     }
-    
+
     function test_VerifyAssetCompliance() public {
         assertTrue(registry.verifyAssetCompliance(asset));
         assertFalse(registry.verifyAssetCompliance(address(0xdead)));
     }
-    
+
     function test_AreTokensCompliant() public {
         address asset2 = address(0x101);
         vm.prank(owner);
         registry.setAssetCompliance(asset2, true);
-        
+
         assertTrue(registry.areTokensCompliant(asset, asset2));
         assertFalse(registry.areTokensCompliant(asset, address(0xdead)));
     }
-    
+
     function test_VerifyExecutorStatus() public {
         assertTrue(registry.verifyExecutorStatus(executor));
         assertFalse(registry.verifyExecutorStatus(unauthorized));
