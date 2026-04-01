@@ -9,7 +9,7 @@ import { ComplianceService } from './compliance.js';
  */
 const TELEPORT_V3_ABI = parseAbi([
   // Core migration function - matches TeleportV3.executeAtomicMigration()
-  'function executeAtomicMigration((uint256 tokenId, uint24 newFee, int24 newTickLower, int24 newTickUpper, uint256 amount0MinMint, uint256 amount1MinMint, uint256 amount0MinDecrease, uint256 amount1MinDecrease, uint256 deadline, bool executeSwap, bool zeroForOne, uint256 swapAmountIn, uint256 swapAmountOutMin, uint24 swapFeeTier) params) external returns (uint256 newTokenId, uint128 newLiquidity)',
+  'function executeAtomicMigration((uint256 tokenId, uint24 newFee, int24 newTickLower, int24 newTickUpper, uint256 amount0MinMint, uint256 amount1MinMint, uint256 amount0MinDecrease, uint256 amount1MinDecrease, uint256 deadline, bool executeSwap, bool zeroForOne, uint256 swapAmountIn, uint256 swapAmountOutMin, uint24 swapFeeTier) params, bytes calldata signature) external returns (uint256 newTokenId, uint128 newLiquidity)',
   // View functions
   'function positionManager() view returns (address)',
   'function swapRouter() view returns (address)',
@@ -136,7 +136,7 @@ export class MigrationBuilder {
    * @returns Simulation result with expected outcomes.
    * @throws {ShariahViolationError} If tokens are not Shariah-compliant.
    */
-  async simulate(account: Address) {
+  async simulate(account: Address, signature: `0x${string}` = "0x") {
     const validatedParams = MigrationParamsSchema.parse(this.params);
     
     // Step 1: Fetch Position Manager address from TeleportV3
@@ -162,7 +162,7 @@ export class MigrationBuilder {
       address: this.teleportAddress,
       abi: TELEPORT_V3_ABI,
       functionName: 'executeAtomicMigration',
-      args: [validatedParams],
+      args: [validatedParams, signature],
       account,
     });
   }
@@ -172,12 +172,12 @@ export class MigrationBuilder {
    * @dev Useful for integrations that need raw calldata (e.g., multisig wallets).
    * @returns Encoded function calldata.
    */
-  encodeCalldata(): `0x${string}` {
+  encodeCalldata(signature: `0x${string}` = "0x"): `0x${string}` {
     const validatedParams = MigrationParamsSchema.parse(this.params);
     return encodeFunctionData({
       abi: TELEPORT_V3_ABI,
       functionName: 'executeAtomicMigration',
-      args: [validatedParams],
+      args: [validatedParams, signature],
     });
   }
 }

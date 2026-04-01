@@ -2,6 +2,7 @@
 pragma solidity ^0.8.24;
 
 import "@openzeppelin/contracts/access/Ownable2Step.sol";
+import "./interfaces/IShariahPolicyChecker.sol";
 
 /**
  * @title GravitasPolicyRegistry
@@ -14,7 +15,7 @@ import "@openzeppelin/contracts/access/Ownable2Step.sol";
  *      - Timelock proposers: Gnosis Safe multisig (3-of-5 recommended for GCC institutional use)
  *      - Timelock delay: 48 hours minimum
  */
-contract GravitasPolicyRegistry is Ownable2Step {
+contract GravitasPolicyRegistry is Ownable2Step, IShariahPolicyChecker {
     // ═══════════════════════════════════════════════════════════════════════════════════
     //                              STATE VARIABLES
     // ═══════════════════════════════════════════════════════════════════════════════════
@@ -90,5 +91,22 @@ contract GravitasPolicyRegistry is Ownable2Step {
 
     function verifyExecutorStatus(address executor) external view returns (bool authorized) {
         authorized = isExecutor[executor];
+    }
+
+    /**
+     * @notice Comprehensive check for Libeara subscription flows.
+     * @dev Implementation of IShariahPolicyChecker. Ensures asset is compliant 
+     *      and the executor (msg.sender) is authorized.
+     * @param subscriber The address of the investor (currently unused, but reserved for future policy expansion).
+     * @param subscriptionToken The address of the asset being subscribed to.
+     * @returns status Returns 1 if compliant, reverts otherwise.
+     */
+    function checkSubscriptionCompliance(address subscriber, address subscriptionToken) external view returns (uint256) {
+        require(isAssetCompliant[subscriptionToken], "GPR: Asset not Shariah-compliant");
+        require(isExecutor[msg.sender], "GPR: Unauthorized executor for subscription");
+        
+        // Additional logic for subscriber-specific policies can be added here
+        
+        return 1;
     }
 }

@@ -32,14 +32,14 @@ const POLICY_REGISTRY_ABI = [
   },
   {
     inputs: [{ name: "executor", type: "address" }],
-    name: "isExecutorAuthorized",
+    name: "isExecutor",
     outputs: [{ name: "", type: "bool" }],
     stateMutability: "view",
     type: "function",
   },
   {
     inputs: [],
-    name: "getPolicyVersion",
+    name: "currentVersion",
     outputs: [{ name: "", type: "uint256" }],
     stateMutability: "view",
     type: "function",
@@ -54,7 +54,7 @@ function AddressChecker({
 }: {
   title: string;
   placeholder: string;
-  functionName: "isAssetCompliant" | "isExecutorAuthorized";
+    functionName: "isAssetCompliant" | "isExecutor";
   description: string;
 }) {
   const [input, setInput] = useState("");
