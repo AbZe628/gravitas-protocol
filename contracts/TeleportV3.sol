@@ -171,7 +171,10 @@ contract TeleportV3 is ReentrancyGuard, Ownable, IERC721Receiver, EIP712 {
         // 2. Position Data & Compliance
         (,, address token0, address token1,,,, uint128 liquidity,,,,) = positionManager.positions(params.tokenId);
         require(liquidity > 0, "TV3: No liquidity");
-        require(registry.verifyAssetCompliance(token0) && registry.verifyAssetCompliance(token1), "TV3: Non-compliant assets");
+        require(
+            registry.verifyAssetCompliance(token0) && registry.verifyAssetCompliance(token1),
+            "TV3: Non-compliant assets"
+        );
 
         // 3. Execution
         uint256 balance0Start = IERC20(token0).balanceOf(address(this));
