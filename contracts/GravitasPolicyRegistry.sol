@@ -99,7 +99,7 @@ contract GravitasPolicyRegistry is Ownable2Step, IShariahPolicyChecker {
      *      and the executor (msg.sender) is authorized.
      * @param subscriber The address of the investor (currently unused, but reserved for future policy expansion).
      * @param subscriptionToken The address of the asset being subscribed to.
-     * @returns status Returns 1 if compliant, reverts otherwise.
+     * @return status Returns 1 if compliant, reverts otherwise.
      */
     function checkSubscriptionCompliance(address subscriber, address subscriptionToken)
         external
