@@ -16,7 +16,7 @@ contract UniV2Adapter {
         return IUniswapV2Factory(factory).getPair(tokenA, tokenB);
     }
 
-    /// @notice Ukloni svu zadanu količinu LP-a i zadrži tokene A/B u ovom adapteru
+    /// @notice Remove all specified LP amount and keep tokens A/B in this adapter
     function removeLiquidityAll(
         address router,
         address tokenA,
@@ -28,7 +28,7 @@ contract UniV2Adapter {
     ) external returns (uint256 amountA, uint256 amountB) {
         IERC20 lp = IERC20(getPair(router, tokenA, tokenB));
 
-        // OZ v5: koristimo forceApprove umjesto (safe)approve
+        // OZ v5: use forceApprove instead of (safe)approve
         lp.forceApprove(router, 0);
         lp.forceApprove(router, liquidity);
 
@@ -39,12 +39,12 @@ contract UniV2Adapter {
                 liquidity,
                 amountAMin,
                 amountBMin,
-                address(this), // tokeni sjedaju u ovaj adapter
+                address(this), // tokens are held in this adapter
                 deadline
             );
     }
 
-    /// @notice Dodaj prikupljene tokene kao likvidnost i mintaj LP korisniku `to`
+    /// @notice Add collected tokens as liquidity and mint LP to recipient `to`
     function addLiquidityAll(
         address router,
         address tokenA,

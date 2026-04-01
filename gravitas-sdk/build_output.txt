@@ -1,3 +1,4 @@
 
 > @gravitas/sdk@2.0.0 build /home/ubuntu/gravitas-protocol/gravitas-sdk
 > tsc
+
