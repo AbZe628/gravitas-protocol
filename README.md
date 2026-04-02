@@ -107,8 +107,8 @@ The `GravitasPolicyRegistry` is architectured as a **jurisdiction-agnostic compl
 This project is a monorepo managed with `pnpm` workspaces.
 
 - `apps/web`: The React frontend application.
-- `packages/contracts`: Solidity smart contracts.
-- `packages/sdk`: TypeScript SDK.
+- `contracts/`: Solidity smart contracts.
+- `gravitas-sdk/`: TypeScript SDK.
 
 ### Continuous Integration & Deployment
 

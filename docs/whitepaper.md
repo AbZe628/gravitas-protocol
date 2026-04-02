@@ -149,7 +149,7 @@ Proof: EIP-712 typed data prevents signature reuse. Nonce increments per migrati
 | Contract | Address | Status | Explorer |
 | :--- | :--- | :--- | :--- |
 | GravitasPolicyRegistry | `0xbcaE3069362B0f0b80f44139052f159456C84679` | ✅ Testnet | [Arbiscan](https://sepolia.arbiscan.io/address/0xbcaE3069362B0f0b80f44139052f159456C84679) |
-| TeleportV2 | `0x68b3465833fb72B5A828cCEA02FFAD6bFB335AaF` | ✅ Testnet | [Arbiscan](https://sepolia.arbiscan.io/address/0x68b3465833fb72B5A828cCEA02FFAD6bFB335AaF) |
+| TeleportV2 | Deployment pending post-audit | ⏳ Scheduled | — |
 | TeleportV3 | `0x5D423f8d01539B92D3f3953b91682D9884D1E993` | ✅ Testnet | [Arbiscan](https://sepolia.arbiscan.io/address/0x5D423f8d01539B92D3f3953b91682D9884D1E993) |
 
 ### 3.2 Mainnet Readiness

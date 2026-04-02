@@ -2,7 +2,7 @@
 
 **Document Version:** 1.0.0
 **Lead Auditor:** Distinguished Smart Contract Engineer
-**Status:** Audit-Ready (Series-A Standards)
+**Status:** Audit-Ready (Pre-Seed Standards)
 
 This document outlines the security posture of the Gravitas Protocol and details how specific common vulnerabilities are mitigated within the architecture.
 
@@ -34,7 +34,7 @@ The protocol has been subjected to rigorous Invariant Testing using the Foundry 
 
 ## 3. Static Analysis Integration
 
-The repository is integrated with **Slither** via GitHub Actions. Every push to the `institutional-refactor` or `main` branches triggers an automated static analysis sweep to detect:
+The repository utilizes GitHub Actions for continuous integration, including comprehensive Foundry tests and coverage checks on every push to the `main` branch to detect:
 - Uninitialized state variables.
 - Unused return values.
 - Dangerous usage of `tx.origin`.
@@ -42,6 +42,6 @@ The repository is integrated with **Slither** via GitHub Actions. Every push to 
 
 ---
 
-## 4. Auditor Notes for Series-A Review
+## 4. Auditor Notes for Pre-Seed Review
 
 The codebase has been refactored to prioritize **readability** and **deterministic outcomes**. We have moved away from complex, multi-contract inheritance in favor of a clean "Hub-and-Spoke" model with the `GravitasPolicyRegistry` at the center. This reduces the attack surface and simplifies the formal verification process for third-party auditors.

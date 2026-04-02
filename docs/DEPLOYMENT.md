@@ -76,7 +76,7 @@ forge create contracts/Teleport.sol:Teleport \
 forge create contracts/TeleportV3.sol:TeleportV3 \
   --rpc-url $ARB_SEPOLIA_RPC_URL \
   --private-key $ARB_SEPOLIA_PRIVATE_KEY \
-  --constructor-args $REGISTRY_ADDRESS 0x68b3465833fb72B5A828cCEA02FFAD6bFB335AaF \
+  --constructor-args $POSITION_MANAGER_ADDRESS $SWAP_ROUTER_ADDRESS $REGISTRY_ADDRESS \
   --verify \
   --etherscan-api-key $ETHERSCAN_API_KEY
 

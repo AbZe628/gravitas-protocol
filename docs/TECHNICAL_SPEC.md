@@ -21,7 +21,7 @@ $$
 
 **Proof of Mitigation:**
 - The entire process (Burn $\rightarrow$ Collect $\rightarrow$ Swap $\rightarrow$ Mint) is executed atomically within a single transaction.
-- The `_refundDelta` function ensures any token dust remaining in the contract is immediately returned to the user, preventing asset lock-up.
+- The `_refundDustOptimized` function ensures any token dust remaining in the contract is immediately returned to the user, preventing asset lock-up.
 
 ### Invariant 2: Shariah Compliance (Asset Whitelisting)
 A migration MUST only be executed if both tokens in the liquidity pair are registered as compliant in the `GravitasPolicyRegistry`.

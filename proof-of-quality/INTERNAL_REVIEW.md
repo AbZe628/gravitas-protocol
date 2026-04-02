@@ -156,20 +156,23 @@ assembly {
 ## 8. Test Coverage Summary
 
 ```
-Test Suites: 5 passed
-Tests: 46 passed
+Test Suites: 8 passed
+Tests: 60 passed
 - TeleportFlowTests: 1 passed
 - TeleportTests: 18 passed
 - TeleportV2FullFlowTests: 10 passed
 - TeleportV3FullFlowTests: 15 passed
 - GravitasInvariants: 2 passed
+- GravitasLibearaIntegrationTests: 6 passed
+- GravitasPolicyRegistryMultisigTests: 3 passed
+- PausableTests: 5 passed
 ```
 
 ---
 
 ## Conclusion
 
-The Gravitas Protocol smart contracts demonstrate **institutional-grade security** suitable for Series-A due diligence. The codebase follows best practices for:
+The Gravitas Protocol smart contracts demonstrate **institutional-grade security** suitable for Pre-Seed due diligence. The codebase follows best practices for:
 
 - ✅ Reentrancy protection
 - ✅ Access control
@@ -183,4 +186,4 @@ The Gravitas Protocol smart contracts demonstrate **institutional-grade security
 ---
 
 **Prepared by**: Internal Security Review Team  
-**Classification**: Bank-Grade MVP - Series-A Ready
+**Classification**: Bank-Grade MVP - Pre-Seed Ready
