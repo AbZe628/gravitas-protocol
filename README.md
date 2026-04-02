@@ -33,6 +33,12 @@ The protocol is live and verified on the Arbitrum Sepolia testnet. All contract 
 
 ---
 
+## Mainnet Governance & Security Note
+
+> **Mainnet Readiness Notice: Prior to production deployment, ownership of the `GravitasPolicyRegistry` will be formally transferred to the `GravitasTimelock` controller, enforcing a mandatory 48-hour delay for all compliance policy updates as per institutional security standards.**
+
+---
+
 ## Quick Links
 
 | Link | Description |

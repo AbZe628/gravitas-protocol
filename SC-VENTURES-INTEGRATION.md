@@ -88,6 +88,12 @@ function _beforeMint(address subscriber, address subscriptionToken) internal vie
 }
 ```
 
+## Mainnet Governance & Security Note
+
+> **Mainnet Readiness Notice: Prior to production deployment, ownership of the `GravitasPolicyRegistry` will be formally transferred to the `GravitasTimelock` controller, enforcing a mandatory 48-hour delay for all compliance policy updates as per institutional security standards.**
+
+---
+
 ## Market Traction & Institutional Validation
 
 Gravitas Protocol has secured three signed Letters of Intent from key 
