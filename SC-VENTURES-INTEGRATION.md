@@ -70,6 +70,24 @@ contract UltraManager is Ownable {
 }
 ```
 This integration requires **no architectural changes** to Libeara\'s core platform. A single import statement and one `view` call — both added to the existing `_beforeMint` hook — are the only modifications needed. Libeara\'s trust model, custodial structure, KYC pipeline, and NAV mechanics remain entirely unchanged. The `checkSubscriptionCompliance` function is a view call that takes `subscriber` and `subscriptionToken` as arguments.
+### Conditional Enforcement for Libeara Products
+
+Libeara can selectively apply Shariah compliance checks only to specific products (e.g., Islamic funds) by conditionally calling the `gravitasPolicyChecker` based on the `subscriptionToken` address. This allows Libeara to maintain a unified `UltraManager` for all products while ensuring Shariah adherence where required.
+
+```solidity
+function _beforeMint(address subscriber, address subscriptionToken) internal view {
+    // Existing Libeara KYC/AML checks
+
+    // Example: Apply Shariah compliance only to specific Islamic token addresses
+    if (subscriptionToken == ISLAMIC_FUND_TOKEN_ADDRESS_1 || subscriptionToken == ISLAMIC_FUND_TOKEN_ADDRESS_2) {
+        uint256 policyVersion = gravitasPolicyChecker.checkSubscriptionCompliance(subscriber, subscriptionToken);
+        require(policyVersion > 0, "UltraManager: Shariah compliance check failed for Islamic product");
+    }
+
+    // Continue with minting logic for all products
+}
+```
+
 ## Market Traction & Institutional Validation
 
 Gravitas Protocol has secured three signed Letters of Intent from key 

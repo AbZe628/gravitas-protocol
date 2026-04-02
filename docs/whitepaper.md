@@ -128,7 +128,7 @@ Proof: EIP-712 typed data prevents signature reuse. Nonce increments per migrati
 | GravitasPolicyRegistry | 90% | 15 | ✅ Passing |
 | TeleportV2 | 90.7% | 21 | ✅ Passing |
 | TeleportV3 | 90% | 19 | ✅ Passing |
-| **Total** | **90.2%** | **55** | **✅ Passing** |
+| **Total** | **90.2%** | **60** | **✅ Passing** |
 
 ### 2.3 Gas Optimization
 

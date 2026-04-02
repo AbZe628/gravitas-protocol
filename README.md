@@ -108,7 +108,7 @@ This project is a monorepo managed with `pnpm` workspaces.
 
 Two primary GitHub Actions workflows ensure code quality and deployment:
 
-1.  **`ci.yml`**: Triggered on pushes to `main`. Runs Foundry tests for all smart contracts to ensure correctness and security. (55 passing tests)
+1.  **`ci.yml`**: Triggered on pushes to `main`. Runs Foundry tests for all smart contracts to ensure correctness and security. (60 passing tests)
 2.  **`deploy-frontend.yml`**: Triggered on pushes to `apps/web`. Builds the React application and deploys it to GitHub Pages.
 
 ---

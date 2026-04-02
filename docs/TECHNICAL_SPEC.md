@@ -1,4 +1,4 @@
-# Gravitas Protocol: Technical Specification (Series-A Ready)
+# Gravitas Protocol: Technical Specification (Institutional Pre-Seed Ready)
 
 **Document Version:** 1.0.0
 **Author:** Distinguished Smart Contract Engineer
