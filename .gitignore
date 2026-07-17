@@ -39,3 +39,9 @@ Thumbs.db
 *.bak
 *.backup
 *.orig
+
+# Integration kit
+integration-kit/mock-server/node_modules/
+integration-kit/sdk-examples/node_modules/
+integration-kit/mock-server/audit.log.jsonl
+integration-kit/**/*.log

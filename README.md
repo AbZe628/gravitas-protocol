@@ -152,6 +152,26 @@ pnpm --filter contracts test
 
 ---
 
+## Partner Integration Kit
+
+The [`/integration-kit`](./integration-kit) directory contains everything an integrating
+engineering team needs to evaluate the Gravitas Compliance API — OpenAPI spec, a
+runnable mock sandbox, TypeScript client examples, policy fixtures, and the full
+PoC scenario set — with no meetings and no external dependencies.
+
+```bash
+# Terminal 1 — start the mock sandbox
+cd integration-kit/mock-server && npm install && npm start   # → http://localhost:8787
+
+# Terminal 2 — run the six Annex-A PoC scenarios (expect: 6/6 passed)
+cd integration-kit/sdk-examples && npm install && npm run verify
+```
+
+See [`/integration-kit/README.md`](./integration-kit/README.md) for the full quickstart,
+OpenAPI contract, on-chain verification example, and PoC scope.
+
+---
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
