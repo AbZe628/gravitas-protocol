@@ -45,4 +45,4 @@ npm install @gravitas/sdk viem zod
 ```
 
 ## ⚖️ License
-MIT © Gravitas Protocol Labs
+Licensed under BUSL-1.1 — see repository LICENSE. © Gravitas Protocol Labs

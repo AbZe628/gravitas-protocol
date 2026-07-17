@@ -230,7 +230,7 @@ See [CONTRIBUTING.md](../../CONTRIBUTING.md) for development guidelines.
 
 ## 📄 License
 
-MIT License - see [LICENSE](../../LICENSE) for details.
+Licensed under BUSL-1.1 — see [LICENSE](../../LICENSE) for details.
 
 ## 🔗 Links
 
