@@ -36,6 +36,7 @@ cd mock-server && npm install && npm start        # → http://localhost:8787
 cd sdk-examples && npm install && npm run verify  # expect: 6/6 passed
 
 # Optional — trustless on-chain read of the live registry (testnet)
+# (Works out-of-the-box via Sourcify; set ARBISCAN_API_KEY to use Etherscan)
 cd sdk-examples && npm run onchain
 ```
 

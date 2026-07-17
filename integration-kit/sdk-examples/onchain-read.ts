@@ -7,48 +7,58 @@
  *
  *   npm install && npm run onchain
  *
- * Requires outbound access to an Arbitrum Sepolia RPC and either:
- *   - Etherscan API V2 (set ARBISCAN_API_KEY env var), or
- *   - Sourcify (public, no key needed) as automatic fallback.
- * Both paths fetch the independently-verified ABI — the same
- * source any external reviewer would use.
+ * Requires outbound access to an Arbitrum Sepolia RPC.
+ * Fetches verified ABI via:
+ *   1. Sourcify (primary, decentralized, keyless)
+ *   2. Etherscan V2 (secondary, optional, set ARBISCAN_API_KEY)
  */
 import { ethers, type InterfaceAbi } from "ethers";
 
 const REGISTRY = "0xbcaE3069362B0f0b80f44139052f159456C84679";
 const RPC = process.env.ARB_SEPOLIA_RPC || "https://sepolia-rollup.arbitrum.io/rpc";
 
-// Etherscan API V2 — requires an API key (free tier sufficient).
-// Set ARBISCAN_API_KEY to use this path; falls back to Sourcify otherwise.
-const ETHERSCAN_V2_ENDPOINT =
-  `https://api.etherscan.io/v2/api?chainid=421614&module=contract&action=getabi` +
-  `&address=${REGISTRY}&apikey=${process.env.ARBISCAN_API_KEY ?? ""}`;
-
 // Sourcify V2 — public, no key required, decentralised verification.
 const SOURCIFY_ENDPOINT =
   `https://sourcify.dev/server/v2/contract/421614/${REGISTRY}?fields=abi`;
 
+// Etherscan API V2 — requires an API key (free tier sufficient).
+const ETHERSCAN_V2_ENDPOINT =
+  `https://api.etherscan.io/v2/api?chainid=421614&module=contract&action=getabi` +
+  `&address=${REGISTRY}&apikey=${process.env.ARBISCAN_API_KEY ?? ""}`;
+
 async function fetchAbi(): Promise<InterfaceAbi> {
-  const apiKey = process.env.ARBISCAN_API_KEY;
-  if (apiKey) {
-    // Try Etherscan V2 first when a key is available.
-    const res = await fetch(ETHERSCAN_V2_ENDPOINT);
-    const json = (await res.json()) as { status: string; result: string };
-    if (json.status === "1") {
-      console.log("ABI source   : Etherscan API V2 (verified source)");
-      return JSON.parse(json.result) as InterfaceAbi;
+  // 1. Try Sourcify first (keyless, decentralized).
+  try {
+    const res = await fetch(SOURCIFY_ENDPOINT);
+    const json = (await res.json()) as { abi?: InterfaceAbi };
+    if (json.abi && json.abi.length > 0) {
+      console.log("ABI source   : Sourcify (decentralised verified source)");
+      return json.abi;
     }
-    console.warn(`Etherscan V2 returned status ${json.status}: ${json.result} — falling back to Sourcify`);
+  } catch {
+    console.warn("Sourcify fetch failed, trying Etherscan fallback...");
   }
 
-  // Sourcify fallback (or primary path when no API key is set).
-  const res = await fetch(SOURCIFY_ENDPOINT);
-  const json = (await res.json()) as { abi?: InterfaceAbi };
-  if (!json.abi || json.abi.length === 0) {
-    throw new Error("Sourcify ABI fetch returned empty result");
+  // 2. Try Etherscan V2 if API key is provided.
+  const apiKey = process.env.ARBISCAN_API_KEY;
+  if (apiKey) {
+    try {
+      const res = await fetch(ETHERSCAN_V2_ENDPOINT);
+      const json = (await res.json()) as { status: string; result: string };
+      if (json.status === "1") {
+        console.log("ABI source   : Etherscan API V2 (verified source)");
+        return JSON.parse(json.result) as InterfaceAbi;
+      }
+    } catch {
+      console.warn("Etherscan fetch failed.");
+    }
   }
-  console.log("ABI source   : Sourcify (decentralised verified source)");
-  return json.abi;
+
+  // 3. Final failure — print manual retrieval instructions.
+  const explorerUrl = `https://sepolia.arbiscan.io/address/${REGISTRY}#code`;
+  console.error(`\nERROR: Could not fetch verified ABI from Sourcify or Etherscan.`);
+  console.error(`Please retrieve the ABI manually from: ${explorerUrl}`);
+  process.exit(1);
 }
 
 type AbiEntry = { type?: string; stateMutability?: string; inputs?: unknown[]; name: string };
@@ -99,4 +109,7 @@ async function main(): Promise<void> {
   console.log("\nEvery policy decision returned by the API can be cross-checked against this contract.");
 }
 
-main().catch((e) => { console.error(e); process.exit(1); });
+main().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});
