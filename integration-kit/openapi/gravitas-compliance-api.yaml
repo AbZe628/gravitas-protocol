@@ -1,0 +1,135 @@
+openapi: 3.0.3
+info:
+  title: Gravitas Compliance API (Sandbox)
+  version: 1.0.0-sandbox
+  description: |
+    Pre-execution Shariah-compliance verification for digital-asset transactions.
+
+    **Integration contract for the Transactli PoC** (see partnership proposal, Annex A).
+    A transaction is verified BEFORE routing. If the active policy set does not allow it,
+    the response is DENY with a machine-readable reason — the orchestrator must not route it.
+
+    Status: SANDBOX / TESTNET. Production keys are issued after the tier-1 security audit.
+    On-chain policy source of truth: GravitasPolicyRegistry on Arbitrum Sepolia
+    (0xbcaE3069362B0f0b80f44139052f159456C84679, source-verified).
+servers:
+  - url: http://localhost:8787
+    description: Local mock sandbox (this directory, /mock-server)
+  - url: https://sandbox.api.gravitasprotocol.xyz
+    description: Hosted sandbox — API key issued on request under Phase 0 (NDA)
+paths:
+  /v1/verify:
+    post:
+      operationId: verifyTransaction
+      summary: Verify a transaction against the active policy set (pre-routing)
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyRequest'
+            examples:
+              allow-stable:
+                summary: Approved asset (expected ALLOW)
+                value:
+                  asset: { symbol: "USDC", address: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831" }
+                  amount: "25000.00"
+                  context: { channel: "transactli-orchestrator", merchantId: "M-1001", direction: "settlement" }
+              deny-interest:
+                summary: Interest-bearing instrument (expected DENY, R-RIBA-01)
+                value:
+                  asset: { symbol: "yUSD-INT", category: "interest-bearing" }
+                  amount: "10000.00"
+                  context: { channel: "transactli-orchestrator", merchantId: "M-1001", direction: "payout" }
+      responses:
+        '200':
+          description: Verification decision (always 200 — decision is in the body)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifyResponse'
+        '401':
+          description: Missing or invalid API key
+        '422':
+          description: Malformed request (schema violation)
+  /v1/policies:
+    get:
+      operationId: listPolicies
+      summary: List the active policy set (read-only, for cache warm-up and audit)
+      security:
+        - ApiKeyAuth: []
+      responses:
+        '200':
+          description: Active policy set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PolicySet'
+        '401':
+          description: Missing or invalid API key
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-Gravitas-Key
+  schemas:
+    VerifyRequest:
+      type: object
+      required: [asset, amount, context]
+      properties:
+        asset:
+          type: object
+          description: Identify by on-chain address when available; category is used for off-chain instruments.
+          properties:
+            symbol:  { type: string, example: "USDC" }
+            address: { type: string, description: "EVM address (checksummed)", example: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831" }
+            category: { type: string, description: "Instrument category when no address exists", example: "interest-bearing" }
+        amount:
+          type: string
+          description: Decimal string to avoid float precision loss
+          example: "25000.00"
+        counterparty:
+          type: object
+          properties:
+            id:   { type: string, example: "M-2044" }
+            type: { type: string, enum: [merchant, institution, individual] }
+        context:
+          type: object
+          required: [channel]
+          properties:
+            channel:    { type: string, example: "transactli-orchestrator" }
+            merchantId: { type: string, example: "M-1001" }
+            direction:  { type: string, enum: [payment, payout, settlement, swap] }
+            requestId:  { type: string, description: "Caller-side idempotency / correlation id" }
+    VerifyResponse:
+      type: object
+      required: [decision, policySetId, timestamp]
+      properties:
+        decision: { type: string, enum: [ALLOW, DENY] }
+        reason:
+          type: string
+          description: Present on DENY — machine-readable rule id + human-readable text
+          example: "R-RIBA-01: Interest-bearing instrument (riba)"
+        ruleId:      { type: string, example: "R-RIBA-01" }
+        policyId:    { type: string, example: "POL-002" }
+        policySetId: { type: string, example: "SANDBOX-2026-07" }
+        timestamp:   { type: string, format: date-time }
+        onchainRef:
+          type: object
+          description: Pointer for optional trustless verification against the public registry
+          properties:
+            network:  { type: string, example: "arbitrum-sepolia" }
+            registry: { type: string, example: "0xbcaE3069362B0f0b80f44139052f159456C84679" }
+    PolicySet:
+      type: object
+      properties:
+        policySetId: { type: string }
+        version:     { type: string }
+        network:     { type: string }
+        registry:    { type: string }
+        policies:
+          type: array
+          items: { type: object }

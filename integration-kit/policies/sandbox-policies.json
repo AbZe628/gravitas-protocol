@@ -1,0 +1,35 @@
+{
+  "policySetId": "SANDBOX-2026-07",
+  "version": "1.0.0",
+  "network": "arbitrum-sepolia",
+  "registry": "0xbcaE3069362B0f0b80f44139052f159456C84679",
+  "policies": [
+    {
+      "policyId": "POL-001",
+      "name": "Approved stable assets",
+      "status": "active",
+      "assets": [
+        { "symbol": "USDC", "address": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831", "classification": "asset-backed-stable", "decision": "ALLOW" },
+        { "symbol": "WETH", "address": "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1", "classification": "utility-asset", "decision": "ALLOW" }
+      ]
+    },
+    {
+      "policyId": "POL-002",
+      "name": "Prohibited categories",
+      "status": "active",
+      "rules": [
+        { "ruleId": "R-RIBA-01", "category": "interest-bearing", "decision": "DENY", "reason": "Interest-bearing instrument (riba)" },
+        { "ruleId": "R-GHARAR-01", "category": "excessive-uncertainty", "decision": "DENY", "reason": "Excessive uncertainty in underlying (gharar)" },
+        { "ruleId": "R-MAYSIR-01", "category": "speculative-gaming", "decision": "DENY", "reason": "Speculative / gambling-like instrument (maysir)" }
+      ]
+    },
+    {
+      "policyId": "POL-003",
+      "name": "Expired policy example",
+      "status": "inactive",
+      "assets": [
+        { "symbol": "LEGACY", "address": "0x0000000000000000000000000000000000000001", "classification": "utility-asset", "decision": "DENY", "reason": "Policy inactive - re-certification required" }
+      ]
+    }
+  ]
+}
