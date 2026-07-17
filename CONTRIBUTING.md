@@ -25,8 +25,8 @@
 ### Prerequisites
 
 - **Foundry**: Latest version ([installation guide](https://book.getfoundry.sh/getting-started/installation))
-- **Node.js**: v18 or higher
-- **pnpm**: v8 or higher
+- **Node.js**: v22 or higher
+- **pnpm**: v10 or higher
 
 ### Installation
 

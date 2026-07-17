@@ -10,7 +10,7 @@ All notable changes to Gravitas Protocol are documented here.
 - `TeleportV2` — atomic V2 liquidity migration engine with cooldown and slippage protection
 - TypeScript SDK (`@gravitas/sdk`) with Stripe-like developer experience
 - React/TypeScript frontend deployed at gravitasprotocol.xyz
-- 46-test Foundry test suite with 90%+ coverage
+- 60-test Foundry test suite with 90%+ coverage
 - Full monorepo structure with pnpm workspaces
 - GitHub Actions CI/CD pipeline
 - Whitepaper, technical specification, and investor documentation

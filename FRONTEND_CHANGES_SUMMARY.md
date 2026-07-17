@@ -558,8 +558,8 @@ apps/web/client/src/
 
 ### Prerequisites
 ```bash
-Node.js 18+
-pnpm 8+
+Node.js 22+
+pnpm 10+
 ```
 
 ### Build
