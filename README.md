@@ -11,7 +11,7 @@
 <p align="center">
   <a href="https://github.com/AbZe628/gravitas-protocol/actions/workflows/ci.yml"><img src="https://github.com/AbZe628/gravitas-protocol/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
 
-  <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
+  <a href="./LICENSE"><img src="https://img.shields.io/badge/License-BUSL--1.1-yellow.svg" alt="License: BUSL-1.1"></a>
   <a href="https://soliditylang.org/"><img src="https://img.shields.io/badge/Solidity-0.8.24-blue.svg" alt="Solidity"></a>
   <a href="./proof-of-quality/INTERNAL_REVIEW.md"><img src="https://img.shields.io/badge/Audit-Internal%20Passed-blueviolet.svg" alt="Audit: Internal Passed"></a>
 </p>
@@ -174,7 +174,7 @@ OpenAPI contract, on-chain verification example, and PoC scope.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the Business Source License 1.1 (BUSL-1.1) — see the [LICENSE](LICENSE) file for details.
 
 ---
 <p align="center">

@@ -2,6 +2,7 @@
   "name": "gravitas-sdk-examples",
   "version": "1.0.0",
   "private": true,
+  "license": "BUSL-1.1",
   "description": "TypeScript examples: REST verify client + on-chain PolicyRegistry read",
   "scripts": {
     "verify": "tsx verify-client.ts",

@@ -42,7 +42,7 @@
     "sdk"
   ],
   "author": "Gravitas Protocol Labs",
-  "license": "MIT",
+  "license": "BUSL-1.1",
   "engines": {
     "node": ">=18"
   },

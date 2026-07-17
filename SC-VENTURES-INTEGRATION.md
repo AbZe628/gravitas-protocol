@@ -38,7 +38,7 @@ Gravitas Protocol introduces an `IShariahPolicyChecker` interface, which acts as
 Below is an example of how Libeara\'s `UltraManager` contract could integrate the `getPolicyVersion` hook. This snippet demonstrates the simplicity and non-disruptive nature of the integration.
 
 ```solidity
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.24;
 
 import "@openzeppelin/contracts/access/Ownable.sol"; // Assuming UltraManager uses Ownable or similar access control

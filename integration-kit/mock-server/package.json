@@ -2,6 +2,7 @@
   "name": "gravitas-mock-sandbox",
   "version": "1.0.0",
   "private": true,
+  "license": "BUSL-1.1",
   "description": "Local mock of the Gravitas Compliance API sandbox for PoC evaluation",
   "main": "server.js",
   "scripts": {

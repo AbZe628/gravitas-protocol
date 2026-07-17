@@ -77,4 +77,5 @@ explorer at runtime — the same path any independent reviewer would take.
 ---
 
 **Gravitas Protocol** — compliance enforced by code.
+Licensed under BUSL-1.1 — see the repository LICENSE.
 Contact: abdusamed@gravitasprotocol.xyz · www.gravitasprotocol.xyz
