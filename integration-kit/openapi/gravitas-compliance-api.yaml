@@ -5,7 +5,7 @@ info:
   description: |
     Pre-execution Shariah-compliance verification for digital-asset transactions.
 
-    **Integration contract for the Transactli PoC** (see partnership proposal, Annex A).
+    **Integration contract for institutional PoC evaluations** (see partnership proposal, Annex A).
     A transaction is verified BEFORE routing. If the active policy set does not allow it,
     the response is DENY with a machine-readable reason — the orchestrator must not route it.
 
@@ -36,13 +36,13 @@ paths:
                 value:
                   asset: { symbol: "USDC", address: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831" }
                   amount: "25000.00"
-                  context: { channel: "transactli-orchestrator", merchantId: "M-1001", direction: "settlement" }
+                  context: { channel: "orchestrator", merchantId: "M-1001", direction: "settlement" }
               deny-interest:
                 summary: Interest-bearing instrument (expected DENY, R-RIBA-01)
                 value:
                   asset: { symbol: "yUSD-INT", category: "interest-bearing" }
                   amount: "10000.00"
-                  context: { channel: "transactli-orchestrator", merchantId: "M-1001", direction: "payout" }
+                  context: { channel: "orchestrator", merchantId: "M-1001", direction: "payout" }
       responses:
         '200':
           description: Verification decision (always 200 — decision is in the body)
@@ -100,7 +100,7 @@ components:
           type: object
           required: [channel]
           properties:
-            channel:    { type: string, example: "transactli-orchestrator" }
+            channel:    { type: string, example: "orchestrator" }
             merchantId: { type: string, example: "M-1001" }
             direction:  { type: string, enum: [payment, payout, settlement, swap] }
             requestId:  { type: string, description: "Caller-side idempotency / correlation id" }

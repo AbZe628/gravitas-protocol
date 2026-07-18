@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.24;
 
 // Minimal Uniswap V2 pair interface needed for manual burn/mint

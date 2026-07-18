@@ -2,7 +2,7 @@
  * Gravitas Compliance API — local mock sandbox
  * ------------------------------------------------------------
  * Implements the OpenAPI contract in /openapi so an integrating
- * team (e.g. a payment orchestrator) can run the full PoC flow
+ * team (any payment / settlement orchestrator) can run the full PoC flow
  * locally, with zero external dependencies.
  *
  * Decisions are driven by /policies/sandbox-policies.json —
@@ -85,7 +85,7 @@ app.post("/v1/verify", (req, res) => {
     onchainRef: { network: policySet.network, registry: policySet.registry },
   };
 
-  // Audit trail — JSON lines, Transactli-reporting friendly (Annex A requirement).
+  // Audit trail — JSON lines, reporting-friendly (Annex A requirement).
   const audit = {
     ts: response.timestamp,
     requestId: req.body.context?.requestId || null,

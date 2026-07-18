@@ -31,6 +31,8 @@ The protocol is live and verified on the Arbitrum Sepolia testnet. All contract 
 | **GravitasPolicyRegistry** | `0xbcaE3069362B0f0b80f44139052f159456C84679` | [View on Arbiscan](https://sepolia.arbiscan.io/address/0xbcaE3069362B0f0b80f44139052f159456C84679) |
 | **TeleportV3** | `0x5D423f8d01539B92D3f3953b91682D9884D1E993` | [View on Arbiscan](https://sepolia.arbiscan.io/address/0x5D423f8d01539B92D3f3953b91682D9884D1E993) |
 
+> **Note:** These addresses point to the pre-`0.1.2` bytecode. The contracts are being redeployed to Arbitrum Sepolia with the `0.1.2` security hardening (see `CHANGELOG.md`), and the addresses above will be updated once the new source-verified deployment is live.
+
 ---
 
 ## Mainnet Governance & Security Note
@@ -168,7 +170,10 @@ cd integration-kit/sdk-examples && npm install && npm run verify
 ```
 
 See [`/integration-kit/README.md`](./integration-kit/README.md) for the full quickstart,
-OpenAPI contract, on-chain verification example, and PoC scope.
+OpenAPI contract, on-chain verification example, and PoC scope, and
+[`/integration-kit/PROTOCOL-TESTING.md`](./integration-kit/PROTOCOL-TESTING.md) for the
+protocol trust/custody model (who signs, who executes, what Gravitas controls) and how
+to verify every security property end-to-end.
 
 ---
 

@@ -13,7 +13,7 @@ PoC scope — with no meetings and no external dependencies.
 
 ```mermaid
 sequenceDiagram
-    participant O as Orchestrator (e.g. Transactli)
+    participant O as Orchestrator (your payment / settlement system)
     participant G as Gravitas Compliance API
     participant R as PolicyRegistry (on-chain)
     O->>G: POST /v1/verify {asset, amount, context}
@@ -25,6 +25,12 @@ sequenceDiagram
 
 One synchronous call before routing. Default posture is **DENY** — anything not
 explicitly approved by the active policy set is blocked.
+
+> **Reviewing the protocol itself (not just the compliance API)?** See
+> [`PROTOCOL-TESTING.md`](PROTOCOL-TESTING.md) for the trust/custody model — who signs,
+> who executes, what Gravitas controls — the atomic settlement flow, and how to verify
+> every security property yourself. It answers the questions institutional CTOs ask
+> first, so an integration review needs no live call to get started.
 
 ## 10-minute quickstart
 
@@ -47,6 +53,7 @@ trail format referenced in Annex A.
 
 | Path | What it is |
 |------|-----------|
+| `PROTOCOL-TESTING.md` | **Reviewer guide** — trust/custody model (who signs, who executes, what Gravitas controls), the atomic settlement flow, security properties + how to reproduce each, and how to test the protocol end-to-end |
 | `openapi/gravitas-compliance-api.yaml` | The integration contract — request/response schemas, examples, error semantics |
 | `mock-server/` | Local implementation of the contract; decisions driven by the sandbox policy set |
 | `policies/sandbox-policies.json` | Example policy set: approved assets, prohibited categories (riba / gharar / maysir), inactive-policy case |

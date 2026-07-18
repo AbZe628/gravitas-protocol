@@ -1217,9 +1217,9 @@ export default function Home() {
             </div>
           </div>
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6 border-t border-[#D4AF37]/10">
-            <p className="text-xs text-white/20">© 2026 Gravitas Protocol. MIT License. Testnet only — no mainnet deployment.</p>
+            <p className="text-xs text-white/20">© 2026 Gravitas Protocol. Licensed under BUSL-1.1. Testnet only — no mainnet deployment.</p>
             <div className="flex items-center gap-4 text-xs text-white/20">
-              <a href="https://github.com/AbZe628/gravitas-protocol/blob/main/LICENSE" target="_blank" rel="noopener noreferrer" className="hover:text-[#D4AF37] transition-colors">MIT License</a>
+              <a href="https://github.com/AbZe628/gravitas-protocol/blob/main/LICENSE" target="_blank" rel="noopener noreferrer" className="hover:text-[#D4AF37] transition-colors">License (BUSL-1.1)</a>
               <span>·</span>
               <a href="https://github.com/AbZe628/gravitas-protocol/blob/main/SECURITY.md" target="_blank" rel="noopener noreferrer" className="hover:text-[#D4AF37] transition-colors">Security Policy</a>
             </div>

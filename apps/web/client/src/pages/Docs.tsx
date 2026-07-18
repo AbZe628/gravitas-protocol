@@ -288,7 +288,7 @@ console.log('Estimated gas:', result.gasEstimate);`} language="typescript" />
             © 2026 Gravitas Protocol. Built for institutional DeFi.
           </p>
           <div className="flex items-center gap-4 text-xs text-white/30">
-            <span>MIT License</span>
+            <span>BUSL-1.1</span>
             <span>·</span>
             <a href="https://github.com/AbZe628/gravitas-protocol" target="_blank" rel="noopener noreferrer" className="hover:text-[#D4AF37] transition-colors">GitHub</a>
           </div>

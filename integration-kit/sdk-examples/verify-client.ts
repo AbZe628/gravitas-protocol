@@ -19,7 +19,7 @@ interface Scenario {
 }
 
 const ctx = (requestId: string) => ({
-  channel: "transactli-orchestrator",
+  channel: "orchestrator",
   merchantId: "M-1001",
   direction: "settlement",
   requestId,
