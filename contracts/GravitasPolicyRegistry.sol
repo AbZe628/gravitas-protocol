@@ -85,20 +85,30 @@ contract GravitasPolicyRegistry is Ownable2Step, Pausable, IShariahPolicyChecker
     // ═══════════════════════════════════════════════════════════════════════════════════
     //                           COMPLIANCE VERIFICATION
     // ═══════════════════════════════════════════════════════════════════════════════════
+    //
+    // SECURITY: Every verification entry point is gated by whenNotPaused. Pausing the
+    // registry is therefore a real, system-wide compliance kill switch: it fails every
+    // integrator that routes through this API (TeleportV2/V3 and any external caller such
+    // as Libeara's UltraManager) closed, not open. `whenNotPaused` reverts with
+    // EnforcedPause() rather than returning false, so a paused registry can never be
+    // misread as "all assets non-compliant but calls still succeed". The raw storage
+    // getters (isAssetCompliant / isRouterAuthorized / isExecutor mappings) remain
+    // ungated by design — they are direct state reads, not the enforcement API, and the
+    // enforcement path (verify*/check*) always flows through the guarded functions below.
 
-    function areTokensCompliant(address tokenA, address tokenB) external view returns (bool compliant) {
+    function areTokensCompliant(address tokenA, address tokenB) external view whenNotPaused returns (bool compliant) {
         compliant = isAssetCompliant[tokenA] && isAssetCompliant[tokenB];
     }
 
-    function verifyAssetCompliance(address asset) external view returns (bool compliant) {
+    function verifyAssetCompliance(address asset) external view whenNotPaused returns (bool compliant) {
         compliant = isAssetCompliant[asset];
     }
 
-    function verifyRouterAuthorization(address router) external view returns (bool authorized) {
+    function verifyRouterAuthorization(address router) external view whenNotPaused returns (bool authorized) {
         authorized = isRouterAuthorized[router];
     }
 
-    function verifyExecutorStatus(address executor) external view returns (bool authorized) {
+    function verifyExecutorStatus(address executor) external view whenNotPaused returns (bool authorized) {
         authorized = isExecutor[executor];
     }
 
@@ -116,6 +126,7 @@ contract GravitasPolicyRegistry is Ownable2Step, Pausable, IShariahPolicyChecker
     function checkSubscriptionCompliance(address subscriber, address subscriptionToken)
         external
         view
+        whenNotPaused
         returns (uint256 policyVersion)
     {
         require(isAssetCompliant[subscriptionToken], "GPR: Asset not Shariah-compliant");

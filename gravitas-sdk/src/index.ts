@@ -6,6 +6,7 @@ import { MigrationBuilder } from './teleport.js';
 export * from './types.js';
 export * from './compliance.js';
 export * from './teleport.js';
+export * from './eip712.js';
 
 /**
  * @title GravitasClient

@@ -1,6 +1,6 @@
 # Gravitas Protocol: Security Audit Preparation Report
 
-**Document Version:** 1.0.0
+**Document Version:** 1.1.0
 **Lead Auditor:** Distinguished Smart Contract Engineer
 **Status:** Audit-Ready (Pre-Seed Standards)
 
@@ -45,3 +45,27 @@ The repository utilizes GitHub Actions for continuous integration, including com
 ## 4. Auditor Notes for Pre-Seed Review
 
 The codebase has been refactored to prioritize **readability** and **deterministic outcomes**. We have moved away from complex, multi-contract inheritance in favor of a clean "Hub-and-Spoke" model with the `GravitasPolicyRegistry` at the center. This reduces the attack surface and simplifies the formal verification process for third-party auditors.
+
+---
+
+## 5. Recently Hardened (Pre-Institutional-Sharing)
+
+Two issues were identified during internal review and **resolved before this repository was shared for institutional due diligence**. Both are covered by dedicated regression tests so a reviewer can independently confirm the fix.
+
+### 5.1 Migration intent now binds every economic parameter (High)
+
+**Issue.** The EIP-712 `MigrationIntent` signed by the position owner previously covered only `tokenId, newFee, newTickLower, newTickUpper, deadline, nonce`. The slippage bounds (`amount0MinMint`, `amount1MinMint`, `amount0MinDecrease`, `amount1MinDecrease`) and the rebalancing-swap configuration (`executeSwap`, `zeroForOne`, `swapAmountIn`, `swapAmountOutMin`, `swapFeeTier`) were **not** part of the signed digest. An authorized executor could therefore take a user's valid signature and submit it with weakened economics — e.g. `swapAmountOutMin = 0` — exposing the owner to unbounded slippage / MEV.
+
+**Fix.** `MIGRATION_TYPEHASH` and `_verifyIntent` in `TeleportV3.sol` now bind all 15 fields (14 struct fields + nonce). The off-chain signers (SDK `buildMigrationTypedData()` and the web app) were updated in lockstep.
+
+**Evidence.** `test_V3_SignatureBindsSwapMinOut`, `test_V3_SignatureBindsMintSlippage` (tamper an economic field after signing → `TV3: Invalid signature`), plus the pre-existing `test_V3_ModifiedParams`, `test_V3_WrongSigner`, and `test_V3_NonceReplayProtection`.
+
+### 5.2 Registry pause is now a real system-wide compliance kill switch (Medium)
+
+**Issue.** `GravitasPolicyRegistry` inherited `Pausable`, but `whenNotPaused` guarded only `pause()`/`unpause()`. The compliance-verification functions were ungated, so pausing the registry had no effect on the enforcement path — the "kill switch" did nothing.
+
+**Fix.** `whenNotPaused` now gates every verification entry point: `verifyAssetCompliance`, `areTokensCompliant`, `verifyRouterAuthorization`, `verifyExecutorStatus`, and the `checkSubscriptionCompliance` gate. When paused they revert `EnforcedPause()` (fail-closed) rather than returning a value, so the pause propagates to every integrator (TeleportV2/V3 and external callers such as Libeara's UltraManager). `TeleportV3.onlyAuthorized` was reordered so the protocol owner short-circuits before the (now pause-gated) registry call and cannot be locked out of the authorization gate by a registry pause, while the in-body asset-compliance check still enforces the halt.
+
+**Evidence.** `test_Registry_VerifyFunctionsRevertWhenPaused`, `test_Registry_PauseHaltsExecutorAuthorizationSystemWide`, `test_Registry_UnpauseRestoresVerification`, `test_Registry_OwnerNotLockedOutOfAuthGateByRegistryPause`.
+
+> Note on the raw storage getters: the public mappings (`isAssetCompliant`, `isRouterAuthorized`, `isExecutor`) remain ungated by design — they are direct state reads, not the enforcement API. All enforcement flows through the guarded `verify*`/`check*` functions above.

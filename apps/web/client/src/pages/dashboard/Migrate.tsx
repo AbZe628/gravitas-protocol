@@ -123,13 +123,26 @@ const EIP712_DOMAIN = {
   verifyingContract: CONTRACTS.TELEPORT_V3 as `0x${string}`,
 } as const;
 
+// NOTE: This MUST match TeleportV3.MIGRATION_TYPEHASH exactly (field names, types, and
+// order). The signed intent binds every execution parameter — all slippage bounds and the
+// full rebalancing-swap configuration — so an executor cannot re-run a user's signature with
+// weakened economics. Keep in lockstep with the contract and the SDK's buildMigrationTypedData.
 const EIP712_TYPES = {
   MigrationIntent: [
     { name: "tokenId", type: "uint256" },
     { name: "newFee", type: "uint24" },
     { name: "newTickLower", type: "int24" },
     { name: "newTickUpper", type: "int24" },
+    { name: "amount0MinMint", type: "uint256" },
+    { name: "amount1MinMint", type: "uint256" },
+    { name: "amount0MinDecrease", type: "uint256" },
+    { name: "amount1MinDecrease", type: "uint256" },
     { name: "deadline", type: "uint256" },
+    { name: "executeSwap", type: "bool" },
+    { name: "zeroForOne", type: "bool" },
+    { name: "swapAmountIn", type: "uint256" },
+    { name: "swapAmountOutMin", type: "uint256" },
+    { name: "swapFeeTier", type: "uint24" },
     { name: "nonce", type: "uint256" },
   ],
 } as const;
@@ -348,12 +361,23 @@ export default function Migrate() {
         domain: EIP712_DOMAIN,
         types: EIP712_TYPES,
         primaryType: "MigrationIntent",
+        // These values MUST be identical to the params submitted in handleV3Execute,
+        // otherwise on-chain signature verification will reject the migration.
         message: {
           tokenId: BigInt(v3Form.tokenId),
           newFee: parseInt(v3Form.newFee) as 500 | 3000 | 10000,
           newTickLower: parseInt(v3Form.tickLower),
           newTickUpper: parseInt(v3Form.tickUpper),
+          amount0MinMint: BigInt(v3Form.amount0MinMint || "1"),
+          amount1MinMint: BigInt(v3Form.amount1MinMint || "1"),
+          amount0MinDecrease: BigInt(v3Form.amount0MinDecrease || "0"),
+          amount1MinDecrease: BigInt(v3Form.amount1MinDecrease || "0"),
           deadline,
+          executeSwap: false,
+          zeroForOne: false,
+          swapAmountIn: BigInt(0),
+          swapAmountOutMin: BigInt(0),
+          swapFeeTier: 3000,
           nonce: userNonce ?? BigInt(0),
         },
       });

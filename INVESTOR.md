@@ -11,7 +11,7 @@ Crucially, the protocol is architected with **Shariah compliance** as a foundati
 | **Problem** | **Gravitas Solution** |
 | :--- | :--- |
 | High transaction costs and gas fees | Atomic, single-transaction migrations |
-| Risk of slippage and MEV exploitation | Deterministic execution with guaranteed outcomes |
+| Risk of slippage and MEV exploitation | Deterministic, atomic execution with owner-signed slippage bounds enforced on-chain |
 | Manual, insecure, and opaque processes | Automated, policy-constrained, and auditable routing |
 | Lack of Shariah-compliant infrastructure | Built-in governance to filter non-compliant assets and activities |
 

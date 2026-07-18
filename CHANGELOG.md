@@ -21,6 +21,48 @@ All notable changes to Gravitas Protocol are documented here.
 
 ---
 
+## [0.1.2] — 2026-07 — Security Hardening (Pre-Institutional-Sharing)
+
+### Security
+- `TeleportV3`: the EIP-712 `MigrationIntent` now binds **all** economic parameters — every
+  slippage bound (`amount0MinMint`, `amount1MinMint`, `amount0MinDecrease`, `amount1MinDecrease`)
+  and the full rebalancing-swap configuration (`executeSwap`, `zeroForOne`, `swapAmountIn`,
+  `swapAmountOutMin`, `swapFeeTier`) — in addition to the position/tick/deadline/nonce fields.
+  Previously these were unsigned, allowing an authorized executor to replay a valid owner
+  signature with weakened economics (e.g. `swapAmountOutMin = 0`). `MIGRATION_TYPEHASH` and
+  `_verifyIntent` updated accordingly.
+- `GravitasPolicyRegistry`: `whenNotPaused` now gates every compliance-verification function
+  (`verifyAssetCompliance`, `areTokensCompliant`, `verifyRouterAuthorization`,
+  `verifyExecutorStatus`, `checkSubscriptionCompliance`). Pausing the registry is now a real,
+  system-wide compliance kill switch that fails all integrators closed; previously the modifier
+  guarded only `pause()`/`unpause()` and had no effect on enforcement.
+- `TeleportV3.onlyAuthorized`: reordered so the protocol owner short-circuits before the
+  (now pause-gated) registry call, preventing owner lockout at the authorization gate while
+  keeping non-owner executors fail-closed under a registry pause.
+
+### Changed
+- SDK: added `buildMigrationTypedData()` / `MIGRATION_INTENT_TYPES` (`gravitas-sdk/src/eip712.ts`)
+  so integrators sign the exact field set the on-chain verifier expects.
+- Web app (`Migrate.tsx`): EIP-712 type and signed message expanded to the full parameter set,
+  kept in lockstep with the contract.
+- Docs: clarified "guaranteed outcomes" language to "atomic execution within owner-signed
+  slippage bounds"; corrected the whitepaper readiness checklist to distinguish the completed
+  internal review from the pending independent external audit.
+
+### Tests
+- Added `test_V3_SignatureBindsSwapMinOut`, `test_V3_SignatureBindsMintSlippage`,
+  `test_Registry_VerifyFunctionsRevertWhenPaused`,
+  `test_Registry_PauseHaltsExecutorAuthorizationSystemWide`,
+  `test_Registry_UnpauseRestoresVerification`,
+  `test_Registry_OwnerNotLockedOutOfAuthGateByRegistryPause`.
+- Foundry suite: **66 tests passing** (up from 60), 0 failing.
+
+### Contracts (Arbitrum Sepolia Testnet)
+- Addresses unchanged from 0.1.0. **Redeployment required before these fixes take effect
+  on-chain** — the currently deployed testnet bytecode predates this hardening.
+
+---
+
 ## [0.1.1] — 2026-03 — Governance Upgrade
 
 ### Changed
@@ -37,8 +79,9 @@ All notable changes to Gravitas Protocol are documented here.
 
 ## Upcoming
 
-### [0.2.0] — Planned Q2 2026
-- Tier-2 smart contract audit (Hacken or Certik)
+### [0.2.0] — Next milestone (pre-mainnet)
+- Independent external smart-contract audit (e.g. Hacken / Certik) — engagement pending
+- Redeploy hardened contracts (0.1.2) to Arbitrum Sepolia, then Arbitrum One
 - Shariah certification — Mufti Billal Omarjee (AmanX Advisory)
 - Multisig governance for GravitasPolicyRegistry
 - Mainnet deployment on Arbitrum One

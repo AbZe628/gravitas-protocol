@@ -157,15 +157,15 @@ assembly {
 
 ```
 Test Suites: 8 passed
-Tests: 60 passed
+Tests: 66 passed
 - TeleportFlowTests: 1 passed
 - TeleportTests: 18 passed
 - TeleportV2FullFlowTests: 10 passed
-- TeleportV3FullFlowTests: 15 passed
+- TeleportV3FullFlowTests: 17 passed
 - GravitasInvariants: 2 passed
 - GravitasLibearaIntegrationTests: 6 passed
 - GravitasPolicyRegistryMultisigTests: 3 passed
-- PausableTests: 5 passed
+- PausableTests: 9 passed
 ```
 
 ---

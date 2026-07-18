@@ -196,7 +196,7 @@ contract TeleportV3FullFlowTests is Test {
     uint256 userPrivateKey = 0x12345;
 
     bytes32 private constant MIGRATION_TYPEHASH = keccak256(
-        "MigrationIntent(uint256 tokenId,uint24 newFee,int24 newTickLower,int24 newTickUpper,uint256 deadline,uint256 nonce)"
+        "MigrationIntent(uint256 tokenId,uint24 newFee,int24 newTickLower,int24 newTickUpper,uint256 amount0MinMint,uint256 amount1MinMint,uint256 amount0MinDecrease,uint256 amount1MinDecrease,uint256 deadline,bool executeSwap,bool zeroForOne,uint256 swapAmountIn,uint256 swapAmountOutMin,uint24 swapFeeTier,uint256 nonce)"
     );
 
     function setUp() public {
@@ -273,34 +273,74 @@ contract TeleportV3FullFlowTests is Test {
     }
 
     /**
-     * @notice Helper to sign migration intent
+     * @notice Computes the EIP-712 MigrationIntent struct hash for the full parameter set.
+     * @dev Mirrors TeleportV3._verifyIntent exactly: all 15 fields, two-chunk encoding.
      */
-    function _signMigration(
+    function _structHash(TeleportV3.AtomicMigrationParams memory params, uint256 nonce)
+        internal
+        pure
+        returns (bytes32)
+    {
+        return keccak256(
+            bytes.concat(
+                abi.encode(
+                    MIGRATION_TYPEHASH,
+                    params.tokenId,
+                    params.newFee,
+                    params.newTickLower,
+                    params.newTickUpper,
+                    params.amount0MinMint,
+                    params.amount1MinMint,
+                    params.amount0MinDecrease
+                ),
+                abi.encode(
+                    params.amount1MinDecrease,
+                    params.deadline,
+                    params.executeSwap,
+                    params.zeroForOne,
+                    params.swapAmountIn,
+                    params.swapAmountOutMin,
+                    params.swapFeeTier,
+                    nonce
+                )
+            )
+        );
+    }
+
+    /**
+     * @notice Helper to sign a migration intent against a given verifying contract.
+     * @dev Binds the entire AtomicMigrationParams struct — including all slippage and
+     *      swap fields — matching the on-chain typehash.
+     */
+    function _signMigrationFor(
         uint256 privateKey,
-        uint256 tokenId,
-        uint24 newFee,
-        int24 newTickLower,
-        int24 newTickUpper,
-        uint256 deadline,
+        address verifyingContract,
+        TeleportV3.AtomicMigrationParams memory params,
         uint256 nonce
     ) internal view returns (bytes memory) {
-        bytes32 structHash = keccak256(
-            abi.encode(MIGRATION_TYPEHASH, tokenId, newFee, newTickLower, newTickUpper, deadline, nonce)
-        );
-
         bytes32 domainSeparator = keccak256(
             abi.encode(
                 keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"),
                 keccak256(bytes("GravitasTeleportV3")),
                 keccak256(bytes("1")),
                 block.chainid,
-                address(teleportV3)
+                verifyingContract
             )
         );
-        bytes32 digest = keccak256(abi.encodePacked("\x19\x01", domainSeparator, structHash));
-
+        bytes32 digest = keccak256(abi.encodePacked("\x19\x01", domainSeparator, _structHash(params, nonce)));
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(privateKey, digest);
         return abi.encodePacked(r, s, v);
+    }
+
+    /**
+     * @notice Convenience wrapper: sign against the default teleportV3 instance.
+     */
+    function _signMigration(uint256 privateKey, TeleportV3.AtomicMigrationParams memory params, uint256 nonce)
+        internal
+        view
+        returns (bytes memory)
+    {
+        return _signMigrationFor(privateKey, address(teleportV3), params, nonce);
     }
 
     /**
@@ -326,9 +366,7 @@ contract TeleportV3FullFlowTests is Test {
             swapFeeTier: 500
         });
 
-        bytes memory signature = _signMigration(
-            userPrivateKey, tokenId, params.newFee, params.newTickLower, params.newTickUpper, params.deadline, 0
-        );
+        bytes memory signature = _signMigration(userPrivateKey, params, 0);
 
         vm.prank(user);
         positionManager.approve(address(teleportV3), tokenId);
@@ -365,9 +403,7 @@ contract TeleportV3FullFlowTests is Test {
             swapFeeTier: 500
         });
 
-        bytes memory signature = _signMigration(
-            userPrivateKey, tokenId, params.newFee, params.newTickLower, params.newTickUpper, params.deadline, 0
-        );
+        bytes memory signature = _signMigration(userPrivateKey, params, 0);
 
         vm.prank(user);
         positionManager.approve(address(teleportV3), tokenId);
@@ -402,9 +438,7 @@ contract TeleportV3FullFlowTests is Test {
             swapFeeTier: 500
         });
 
-        bytes memory signature = _signMigration(
-            userPrivateKey, tokenId, params.newFee, params.newTickLower, params.newTickUpper, params.deadline, 0
-        );
+        bytes memory signature = _signMigration(userPrivateKey, params, 0);
 
         vm.prank(user);
         positionManager.approve(address(teleportV3), tokenId);
@@ -452,9 +486,7 @@ contract TeleportV3FullFlowTests is Test {
 
         // Sign with wrong private key
         uint256 wrongPrivateKey = 0x99999;
-        bytes memory wrongSignature = _signMigration(
-            wrongPrivateKey, tokenId, params.newFee, params.newTickLower, params.newTickUpper, params.deadline, 0
-        );
+        bytes memory wrongSignature = _signMigration(wrongPrivateKey, params, 0);
 
         vm.prank(user);
         positionManager.approve(address(teleportV3), tokenId);
@@ -487,9 +519,7 @@ contract TeleportV3FullFlowTests is Test {
             swapFeeTier: 500
         });
 
-        bytes memory signature = _signMigration(
-            userPrivateKey, tokenId, params.newFee, params.newTickLower, params.newTickUpper, params.deadline, 0
-        );
+        bytes memory signature = _signMigration(userPrivateKey, params, 0);
 
         // Modify ticks after signing (keeping fee valid to pass tick spacing check)
         params.newTickLower = -20; // Changed!
@@ -530,9 +560,7 @@ contract TeleportV3FullFlowTests is Test {
                 swapFeeTier: validFees[i]
             });
 
-            bytes memory signature = _signMigration(
-                userPrivateKey, tokenId, params.newFee, params.newTickLower, params.newTickUpper, params.deadline, i
-            );
+            bytes memory signature = _signMigration(userPrivateKey, params, i);
 
             vm.prank(user);
             positionManager.approve(address(teleportV3), tokenId);
@@ -568,9 +596,7 @@ contract TeleportV3FullFlowTests is Test {
             swapFeeTier: 500
         });
 
-        bytes memory signature = _signMigration(
-            userPrivateKey, tokenId, params.newFee, params.newTickLower, params.newTickUpper, params.deadline, 0
-        );
+        bytes memory signature = _signMigration(userPrivateKey, params, 0);
 
         vm.prank(user);
         positionManager.approve(address(teleportV3), tokenId);
@@ -606,9 +632,7 @@ contract TeleportV3FullFlowTests is Test {
             swapFeeTier: 500
         });
 
-        bytes memory signature = _signMigration(
-            userPrivateKey, tokenId, params.newFee, params.newTickLower, params.newTickUpper, params.deadline, 0
-        );
+        bytes memory signature = _signMigration(userPrivateKey, params, 0);
 
         vm.prank(user);
         positionManager.approve(address(teleportV3), tokenId);
@@ -650,9 +674,7 @@ contract TeleportV3FullFlowTests is Test {
             swapFeeTier: 500
         });
 
-        bytes memory signature = _signMigration(
-            userPrivateKey, tokenId, params.newFee, params.newTickLower, params.newTickUpper, params.deadline, 0
-        );
+        bytes memory signature = _signMigration(userPrivateKey, params, 0);
 
         vm.prank(user);
         positionManager.approve(address(teleportV3), tokenId);
@@ -685,9 +707,7 @@ contract TeleportV3FullFlowTests is Test {
             swapFeeTier: 500
         });
 
-        bytes memory signature = _signMigration(
-            userPrivateKey, tokenId, params.newFee, params.newTickLower, params.newTickUpper, params.deadline, 0
-        );
+        bytes memory signature = _signMigration(userPrivateKey, params, 0);
 
         vm.prank(user);
         positionManager.approve(address(teleportV3), tokenId);
@@ -728,9 +748,7 @@ contract TeleportV3FullFlowTests is Test {
             swapFeeTier: 500
         });
 
-        bytes memory signature = _signMigration(
-            userPrivateKey, tokenId, params.newFee, params.newTickLower, params.newTickUpper, params.deadline, 0
-        );
+        bytes memory signature = _signMigration(userPrivateKey, params, 0);
 
         vm.prank(user);
         positionManager.approve(address(teleportV3), tokenId);
@@ -800,30 +818,8 @@ contract TeleportV3FullFlowTests is Test {
             swapFeeTier: 500
         });
 
-        // Sign with the dustTeleport address as verifying contract
-        bytes32 structHash = keccak256(
-            abi.encode(
-                MIGRATION_TYPEHASH,
-                tokenId,
-                params.newFee,
-                params.newTickLower,
-                params.newTickUpper,
-                params.deadline,
-                uint256(0)
-            )
-        );
-        bytes32 domainSeparator = keccak256(
-            abi.encode(
-                keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"),
-                keccak256(bytes("GravitasTeleportV3")),
-                keccak256(bytes("1")),
-                block.chainid,
-                address(dustTeleport)
-            )
-        );
-        bytes32 digest = keccak256(abi.encodePacked("\x19\x01", domainSeparator, structHash));
-        (uint8 v, bytes32 r, bytes32 s) = vm.sign(userPrivateKey, digest);
-        bytes memory signature = abi.encodePacked(r, s, v);
+        // Sign with the dustTeleport address as verifying contract (full-struct binding).
+        bytes memory signature = _signMigrationFor(userPrivateKey, address(dustTeleport), params, 0);
 
         vm.prank(user);
         dustPM.approve(address(dustTeleport), tokenId);
@@ -862,15 +858,92 @@ contract TeleportV3FullFlowTests is Test {
             swapFeeTier: 500
         });
 
-        bytes memory signature = _signMigration(
-            userPrivateKey, tokenId, params.newFee, params.newTickLower, params.newTickUpper, params.deadline, 0
-        );
+        bytes memory signature = _signMigration(userPrivateKey, params, 0);
 
         vm.prank(user);
         positionManager.approve(address(teleportV3), tokenId);
 
         vm.prank(executor);
         vm.expectRevert("TV3: Invalid fee tier");
+        teleportV3.executeAtomicMigration(params, signature);
+    }
+
+    /**
+     * @notice REGRESSION (economic-parameter binding): tampering swapAmountOutMin after
+     *         signing must invalidate the signature.
+     * @dev Before the typehash fix, swapAmountOutMin was NOT part of the signed intent, so
+     *      an authorized executor could take a user's valid signature and re-execute it with
+     *      swapAmountOutMin = 0, exposing the position owner to unbounded slippage / MEV.
+     *      This test proves the signed intent now binds the swap output floor.
+     */
+    function test_V3_SignatureBindsSwapMinOut() public {
+        uint256 tokenId = _createPosition(user, 100 ether, 50 ether, 3000, -600, 600);
+
+        TeleportV3.AtomicMigrationParams memory params = TeleportV3.AtomicMigrationParams({
+            tokenId: tokenId,
+            newFee: 500,
+            newTickLower: -10,
+            newTickUpper: 10,
+            amount0MinMint: 1,
+            amount1MinMint: 1,
+            amount0MinDecrease: 1,
+            amount1MinDecrease: 1,
+            deadline: block.timestamp + 1 hours,
+            executeSwap: true,
+            zeroForOne: true,
+            swapAmountIn: 10 ether,
+            swapAmountOutMin: 9 ether, // user signs a protective output floor
+            swapFeeTier: 500
+        });
+
+        bytes memory signature = _signMigration(userPrivateKey, params, 0);
+
+        // Malicious executor strips the slippage floor after the user signed.
+        params.swapAmountOutMin = 0;
+
+        vm.prank(user);
+        positionManager.approve(address(teleportV3), tokenId);
+
+        vm.prank(executor);
+        vm.expectRevert("TV3: Invalid signature");
+        teleportV3.executeAtomicMigration(params, signature);
+    }
+
+    /**
+     * @notice REGRESSION (economic-parameter binding): tampering a mint slippage bound
+     *         after signing must invalidate the signature.
+     */
+    function test_V3_SignatureBindsMintSlippage() public {
+        uint256 tokenId = _createPosition(user, 100 ether, 100 ether, 3000, -600, 600);
+
+        TeleportV3.AtomicMigrationParams memory params = TeleportV3.AtomicMigrationParams({
+            tokenId: tokenId,
+            newFee: 500,
+            newTickLower: -10,
+            newTickUpper: 10,
+            amount0MinMint: 50 ether, // user signs a protective mint floor
+            amount1MinMint: 50 ether,
+            amount0MinDecrease: 1,
+            amount1MinDecrease: 1,
+            deadline: block.timestamp + 1 hours,
+            executeSwap: false,
+            zeroForOne: false,
+            swapAmountIn: 0,
+            swapAmountOutMin: 0,
+            swapFeeTier: 500
+        });
+
+        bytes memory signature = _signMigration(userPrivateKey, params, 0);
+
+        // Executor weakens the mint floor after signing.
+        params.amount0MinMint = 1;
+        params.amount1MinMint = 1;
+
+        vm.prank(user);
+        positionManager.approve(address(teleportV3), tokenId);
+
+        vm.prank(executor);
+        vm.expectRevert("TV3: Invalid signature");
         teleportV3.executeAtomicMigration(params, signature);
     }
 

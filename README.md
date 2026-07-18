@@ -62,7 +62,7 @@ Currently, liquidity in DeFi is siloed. Moving capital from one protocol to anot
 
 ## The Solution: Deterministic Liquidity Routing
 
-Gravitas acts as the middleware layer enabling "Deterministic Liquidity Routing." Users or institutions define an intent, and Gravitas executes the migration **atomically with guaranteed outcomes**.
+Gravitas acts as the middleware layer enabling "Deterministic Liquidity Routing." Users or institutions define an intent, and Gravitas executes the migration **atomically, with outcomes bounded by the slippage limits the owner signs** — all-or-nothing execution with no partial fills, not a price or yield guarantee.
 
 ![Gravitas Protocol Architecture](./docs/architecture.png)
 

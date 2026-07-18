@@ -155,11 +155,11 @@ Proof: EIP-712 typed data prevents signature reuse. Nonce increments per migrati
 ### 3.2 Mainnet Readiness
 
 **Checklist:**
-- ✅ Smart contracts audited (internal review complete)
+- ✅ Internal security review complete (independent external audit pending)
 - ✅ Test coverage ≥90% on all core contracts
 - ✅ Frontend tested on Arbitrum Sepolia
 - ✅ Documentation complete and audit-ready
-- ⏳ External security audit (Q2 2026)
+- ⏳ Independent external security audit (engagement pending; scheduled before mainnet)
 - ⏳ Shariah Advisory Board certification
 - ⏳ Mainnet deployment
 
@@ -303,7 +303,7 @@ Gravitas Protocol adheres to **AAOIFI (Accounting and Auditing Organization for 
 
 Gravitas Protocol represents a significant advancement in institutional-grade DeFi infrastructure. By combining Shariah compliance, atomic execution guarantees, and sustainable revenue models, it addresses a $3T+ market opportunity in Islamic Finance.
 
-The protocol is audit-ready and positioned for mainnet deployment in Q3 2026.
+The protocol is audit-ready; mainnet deployment follows successful completion of an independent external security audit and Shariah Advisory Board certification.
 
 ---
 

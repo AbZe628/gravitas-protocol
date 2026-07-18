@@ -60,7 +60,12 @@ contract TeleportV2 is ReentrancyGuard, Ownable {
      * @dev Modifier to ensure the caller is either the contract owner or an authorized executor in the Policy Registry.
      */
     modifier onlyAuthorized() {
-        require(registry.verifyExecutorStatus(msg.sender) || msg.sender == owner(), "Teleport: not authorized");
+        // Owner is checked first and short-circuits: registry.verifyExecutorStatus reverts
+        // when the registry is paused, so evaluating owner() first prevents the protocol
+        // owner from being locked out of the authorization gate by a registry pause. A
+        // non-owner executor remains fail-closed under pause, and the in-body asset
+        // compliance check still enforces the halt for everyone.
+        require(msg.sender == owner() || registry.verifyExecutorStatus(msg.sender), "Teleport: not authorized");
         _;
     }
 

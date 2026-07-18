@@ -138,9 +138,10 @@ export class MigrationBuilder {
    *
    * @param account The address that will execute the migration.
    * @param signature EIP-712 signature from the position owner.
-   *        Obtain via: wallet.signTypedData(EIP712_DOMAIN, EIP712_TYPES, message)
+   *        Obtain via buildMigrationTypedData() from this SDK (see './eip712'), which
+   *        produces the exact EIP-712 domain, types, and message the on-chain verifier expects.
    *        Note: For simulation/pre-flight only, you may pass a dummy 65-byte signature.
-   *        For on-chain execution, a valid owner signature is required.
+   *        For on-chain execution, a valid owner signature over the FULL parameter set is required.
    * @returns Simulation result with expected outcomes.
    * @throws {ShariahViolationError} If tokens are not Shariah-compliant.
    */
@@ -179,9 +180,10 @@ export class MigrationBuilder {
    * @notice Encodes the migration calldata for manual transaction submission.
    * @dev Useful for integrations that need raw calldata (e.g., multisig wallets).
    * @param signature EIP-712 signature from the position owner.
-   *        Obtain via: wallet.signTypedData(EIP712_DOMAIN, EIP712_TYPES, message)
+   *        Obtain via buildMigrationTypedData() from this SDK (see './eip712'), which
+   *        produces the exact EIP-712 domain, types, and message the on-chain verifier expects.
    *        Note: For simulation/pre-flight only, you may pass a dummy 65-byte signature.
-   *        For on-chain execution, a valid owner signature is required.
+   *        For on-chain execution, a valid owner signature over the FULL parameter set is required.
    * @returns Encoded function calldata.
    */
   encodeCalldata(signature: `0x${string}`): `0x${string}` {

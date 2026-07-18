@@ -98,8 +98,15 @@ contract TeleportV3 is ReentrancyGuard, Pausable, Ownable, IERC721Receiver, EIP7
     IShariahPolicyChecker public immutable registry;
 
     // --- Signature Verification ---
+    // SECURITY: The signed intent binds EVERY execution parameter, including all
+    // slippage bounds (amount*Min*) and the full rebalancing-swap configuration
+    // (executeSwap, zeroForOne, swapAmountIn, swapAmountOutMin, swapFeeTier).
+    // This prevents an authorized executor from taking a user's valid signature
+    // and re-executing it with weakened economics (e.g. swapAmountOutMin = 0),
+    // which would expose the position owner to unbounded slippage / MEV. Any field
+    // added to AtomicMigrationParams MUST also be added here and in _verifyIntent.
     bytes32 private constant MIGRATION_TYPEHASH = keccak256(
-        "MigrationIntent(uint256 tokenId,uint24 newFee,int24 newTickLower,int24 newTickUpper,uint256 deadline,uint256 nonce)"
+        "MigrationIntent(uint256 tokenId,uint24 newFee,int24 newTickLower,int24 newTickUpper,uint256 amount0MinMint,uint256 amount1MinMint,uint256 amount0MinDecrease,uint256 amount1MinDecrease,uint256 deadline,bool executeSwap,bool zeroForOne,uint256 swapAmountIn,uint256 swapAmountOutMin,uint24 swapFeeTier,uint256 nonce)"
     );
     mapping(address => uint256) public nonces;
 
@@ -126,7 +133,14 @@ contract TeleportV3 is ReentrancyGuard, Pausable, Ownable, IERC721Receiver, EIP7
     }
 
     modifier onlyAuthorized() {
-        require(registry.verifyExecutorStatus(msg.sender) || msg.sender == owner(), "TV3: Not authorized executor");
+        // Owner is checked first and short-circuits: once the registry gates its
+        // verification functions behind whenNotPaused, calling verifyExecutorStatus
+        // while the registry is paused reverts. Evaluating owner() first ensures the
+        // protocol owner is never locked out of TeleportV3 by a registry pause, while
+        // a non-owner executor is still fail-closed (the registry call reverts under
+        // pause). The in-body verifyAssetCompliance check independently enforces the
+        // compliance halt, so the owner cannot bypass a paused registry either.
+        require(msg.sender == owner() || registry.verifyExecutorStatus(msg.sender), "TV3: Not authorized executor");
         _;
     }
 
@@ -227,15 +241,36 @@ contract TeleportV3 is ReentrancyGuard, Pausable, Ownable, IERC721Receiver, EIP7
     }
 
     function _verifyIntent(AtomicMigrationParams calldata params, address owner, bytes calldata signature) internal {
+        // Consume the nonce exactly once (replay protection).
+        uint256 currentNonce = nonces[owner]++;
+
+        // Field order MUST match MIGRATION_TYPEHASH exactly. All 15 fields are static
+        // value types, so encoding them in two chunks and concatenating produces bytes
+        // identical to a single abi.encode(...) of all fields — the EIP-712 struct hash
+        // is unchanged. This two-chunk form is required to avoid a Yul "stack too deep"
+        // error that a single 16-argument abi.encode triggers under via_ir.
         bytes32 structHash = keccak256(
-            abi.encode(
-                MIGRATION_TYPEHASH,
-                params.tokenId,
-                params.newFee,
-                params.newTickLower,
-                params.newTickUpper,
-                params.deadline,
-                nonces[owner]++
+            bytes.concat(
+                abi.encode(
+                    MIGRATION_TYPEHASH,
+                    params.tokenId,
+                    params.newFee,
+                    params.newTickLower,
+                    params.newTickUpper,
+                    params.amount0MinMint,
+                    params.amount1MinMint,
+                    params.amount0MinDecrease
+                ),
+                abi.encode(
+                    params.amount1MinDecrease,
+                    params.deadline,
+                    params.executeSwap,
+                    params.zeroForOne,
+                    params.swapAmountIn,
+                    params.swapAmountOutMin,
+                    params.swapFeeTier,
+                    currentNonce
+                )
             )
         );
         bytes32 hash = _hashTypedDataV4(structHash);
