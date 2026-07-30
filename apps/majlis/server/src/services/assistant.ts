@@ -1,4 +1,4 @@
-import { OpenAI } from 'openai';
+import Anthropic from '@anthropic-ai/sdk';
 import { randomUUID } from 'node:crypto';
 import type { AssistantExchange, SourceRef } from '../types.js';
 
@@ -93,18 +93,17 @@ export function seeksRuling(question: string): boolean {
 
 export async function seeksRulingSemantic(
   question: string,
-  client: OpenAI,
+  client: Anthropic,
 ): Promise<{ seeks: boolean; reachable: boolean }> {
   try {
-    const res = await client.chat.completions.create({
+    const res = await client.messages.create({
       model: CLASSIFIER_MODEL,
       max_tokens: 5,
       messages: [
-        { role: 'system', content: CLASSIFIER_PROMPT },
-        { role: 'user', content: question }
+        { role: 'user', content: `${CLASSIFIER_PROMPT}\n\nQuestion: ${question}` }
       ],
     });
-    const verdict = (res.choices[0].message.content || '').trim().toUpperCase();
+    const verdict = (res.content[0].type === 'text' ? res.content[0].text : '').trim().toUpperCase();
     return { seeks: !verdict.startsWith('NO'), reachable: true };
   } catch (err) {
     console.error('Classifier error:', err);
@@ -203,9 +202,8 @@ export async function ask(opts: AskOptions): Promise<AskResult> {
     };
   }
 
-  const client = opts.client ?? new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-    baseURL: process.env.OPENAI_API_BASE
+  const client = opts.client ?? new Anthropic({
+    apiKey: process.env.ANTHROPIC_API_KEY,
   });
 
   if (!opts.skipSemanticGate) {
@@ -225,20 +223,17 @@ export async function ask(opts: AskOptions): Promise<AskResult> {
     ? `Context the scholar is currently reading:\n\n${opts.context}\n\n---\n\nQuestion: ${opts.question}`
     : opts.question;
 
-  const response = await client.chat.completions.create({
+  const response = await client.messages.create({
     model: ASSISTANT_MODEL,
     max_tokens: 1400,
+    system: SYSTEM_PROMPT,
     messages: [
-      { role: 'system', content: SYSTEM_PROMPT },
       { role: 'user', content: userContent }
     ],
-    // Handle thinking budget for Claude models via extra_body
-    extra_body: {
-      thinking: { type: 'enabled', budget_tokens: 1024 }
-    }
-  } as any);
+    thinking: { type: 'enabled', budget_tokens: 1024 }
+  });
 
-  const answer = response.choices[0].message.content || '';
+  const answer = response.content[0].type === 'text' ? response.content[0].text : '';
 
   if (outputBreachesConstraint(answer)) {
     return {
