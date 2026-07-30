@@ -120,12 +120,10 @@ describe('assistant: refuses to give rulings', () => {
   it('declines deterministically without calling the model', async () => {
     let called = false;
     const spy = {
-      chat: {
-        completions: {
-          create: async () => {
-            called = true;
-            return { choices: [{ message: { content: 'should never run' } }] };
-          },
+      messages: {
+        create: async () => {
+          called = true;
+          return { content: [{ type: 'text', text: 'should never run' }] };
         },
       },
     } as any;
@@ -157,10 +155,10 @@ describe('assistant: refuses to give rulings', () => {
 
   it('semantic gate answers from the classifier', async () => {
     const yes = {
-      chat: { completions: { create: async () => ({ choices: [{ message: { content: 'YES' } }] }) } },
+      messages: { create: async () => ({ content: [{ type: 'text', text: 'YES' }] }) },
     } as any;
     const no = {
-      chat: { completions: { create: async () => ({ choices: [{ message: { content: 'NO' } }] }) } },
+      messages: { create: async () => ({ content: [{ type: 'text', text: 'NO' }] }) },
     } as any;
 
     expect((await seeksRulingSemantic('anything', yes)).seeks).toBe(true);
@@ -169,10 +167,8 @@ describe('assistant: refuses to give rulings', () => {
 
   it('semantic gate treats an ambiguous classifier reply as a ruling request', async () => {
     const vague = {
-      chat: {
-        completions: {
-          create: async () => ({ choices: [{ message: { content: 'It depends on context.' } }] }),
-        },
+      messages: {
+        create: async () => ({ content: [{ type: 'text', text: 'It depends on context.' }] }),
       },
     } as any;
     expect((await seeksRulingSemantic('anything', vague)).seeks).toBe(true);
@@ -180,11 +176,9 @@ describe('assistant: refuses to give rulings', () => {
 
   it('semantic gate fails closed when the classifier is unreachable', async () => {
     const broken = {
-      chat: {
-        completions: {
-          create: async () => {
-            throw new Error('network');
-          },
+      messages: {
+        create: async () => {
+          throw new Error('network');
         },
       },
     } as any;
@@ -196,12 +190,10 @@ describe('assistant: refuses to give rulings', () => {
   it('refuses honestly when the classifier cannot be reached', async () => {
     let calls = 0;
     const broken = {
-      chat: {
-        completions: {
-          create: async () => {
-            calls += 1;
-            throw new Error('network');
-          },
+      messages: {
+        create: async () => {
+          calls += 1;
+          throw new Error('network');
         },
       },
     } as any;
@@ -216,15 +208,13 @@ describe('assistant: refuses to give rulings', () => {
   it('semantic gate blocks a lexically innocent question the classifier flags', async () => {
     let mainModelCalled = false;
     const spy = {
-      chat: {
-        completions: {
-          create: async (args: { model: string }) => {
-            if (args.model.includes('haiku')) {
-              return { choices: [{ message: { content: 'YES' } }] };
-            }
-            mainModelCalled = true;
-            return { choices: [{ message: { content: 'an answer' } }] };
-          },
+      messages: {
+        create: async (args: { model: string }) => {
+          if (args.model.includes('haiku')) {
+            return { content: [{ type: 'text', text: 'YES' }] };
+          }
+          mainModelCalled = true;
+          return { content: [{ type: 'text', text: 'an answer' }] };
         },
       },
     } as any;
@@ -239,18 +229,15 @@ describe('assistant: refuses to give rulings', () => {
 
   it('discards an answer that contains a ruling even if the model produced one', async () => {
     const spy = {
-      chat: {
-        completions: {
-          create: async () => ({
-            choices: [
-              {
-                message: {
-                  content: 'The mechanism settles atomically. This is halal and the board may approve it.',
-                },
-              },
-            ],
-          }),
-        },
+      messages: {
+        create: async () => ({
+          content: [
+            {
+              type: 'text',
+              text: 'The mechanism settles atomically. This is halal and the board may approve it.',
+            },
+          ],
+        }),
       },
     } as any;
 
@@ -266,20 +253,17 @@ describe('assistant: refuses to give rulings', () => {
 
   it('passes a clean mechanical answer through and extracts its sources', async () => {
     const spy = {
-      chat: {
-        completions: {
-          create: async () => ({
-            choices: [
-              {
-                message: {
-                  content:
-                    'The migration executes in one transaction. See contracts/TeleportV3.sol and the case in ' +
-                    'test/TeleportV3.atomicity.t.sol which asserts a full revert on any failed step.',
-                },
-              },
-            ],
-          }),
-        },
+      messages: {
+        create: async () => ({
+          content: [
+            {
+              type: 'text',
+              text:
+                'The migration executes in one transaction. See contracts/TeleportV3.sol and the case in ' +
+                'test/TeleportV3.atomicity.t.sol which asserts a full revert on any failed step.',
+            },
+          ],
+        }),
       },
     } as any;
 
