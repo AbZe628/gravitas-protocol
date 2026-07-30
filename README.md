@@ -75,6 +75,7 @@ Gravitas acts as the middleware layer enabling "Deterministic Liquidity Routing.
 | **GravitasPolicyRegistry** | **Risk & Compliance Oracle.** Validates assets, routers, and executors against Shariah parameters before every transaction. |
 | **TeleportV2** | **V2 Migration Engine.** Atomic migrations for Uniswap V2 LP positions with cooldown and slippage protection. |
 | **TeleportV3** | **V3 Migration Engine.** EIP-712 signed migrations for Uniswap V3 NFT positions with Yul-optimized gas savings. |
+| **Gravitas Majlis** | **Governance Transparency Portal.** Immutable record of Shariah rulings, briefings, and mechanical explanations with multi-lingual support. |
 
 Gravitas Protocol treats Shariah compliance as a **technical requirement**, not a marketing label. The `GravitasPolicyRegistry` contract programmatically enforces the core principles of Islamic Finance.
 
@@ -109,6 +110,7 @@ The `GravitasPolicyRegistry` is architectured as a **jurisdiction-agnostic compl
 This project is a monorepo managed with `pnpm` workspaces.
 
 - `apps/web`: The React frontend application.
+- `apps/majlis`: The Majlis governance transparency portal.
 - `contracts/`: Solidity smart contracts.
 - `gravitas-sdk/`: TypeScript SDK.
 

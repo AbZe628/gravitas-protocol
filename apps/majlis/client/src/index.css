@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-ink text-paper antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  /* Extended reading by readers who are not twenty-five. */
+  p, li {
+    @apply text-[15px] leading-[1.7];
+  }
+  [dir='rtl'] {
+    letter-spacing: 0;
+  }
+  ::selection {
+    @apply bg-gold/30;
+  }
+}
