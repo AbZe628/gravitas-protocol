@@ -1,9 +1,9 @@
 /**
  * Live probe of all three gates, against the real model.
  *
- *     ANTHROPIC_API_KEY=sk-ant-... npx tsx test/gate-probe.ts
- *     ANTHROPIC_API_KEY=sk-ant-... npx tsx test/gate-probe.ts --only=arabic,urdu
- *     ANTHROPIC_API_KEY=sk-ant-... npx tsx test/gate-probe.ts --out=probe.md
+ *     ANTHROPIC_API_KEY=<your-key> npx tsx test/gate-probe.ts
+ *     ANTHROPIC_API_KEY=<your-key> npx tsx test/gate-probe.ts --only=arabic,urdu
+ *     ANTHROPIC_API_KEY=<your-key> npx tsx test/gate-probe.ts --out=probe.md
  *
  * This exists because gate 2 — the semantic classifier — cannot be tested
  * without a key, and a gate that has never been executed is not a gate. Every
