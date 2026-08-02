@@ -1,16 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Github, ChevronDown, ExternalLink } from "lucide-react";
+import { Menu, X, ChevronDown, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
 
 const protocolItems = [
   {
@@ -51,7 +43,17 @@ const devItems = [
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [location] = useLocation();
+
+  // Handle scroll lock for mobile menu
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+  }, [mobileMenuOpen]);
 
   const scrollToSection = (id: string) => {
     setMobileMenuOpen(false);
@@ -69,116 +71,100 @@ export default function Header() {
     }, 100);
   };
 
+  const NavItem = ({ title, items }: { title: string, items: any[] }) => (
+    <div 
+      className="relative group"
+      onMouseEnter={() => setActiveDropdown(title)}
+      onMouseLeave={() => setActiveDropdown(null)}
+    >
+      <button className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-muted hover:text-paper transition-colors duration-150">
+        {title} <ChevronDown size={14} className={`transition-transform duration-280 ${activeDropdown === title ? 'rotate-180' : ''}`} />
+      </button>
+      
+      <AnimatePresence>
+        {activeDropdown === title && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+            className="absolute top-full left-0 w-80 pt-2 z-50"
+          >
+            <div className="bg-surface border border-line rounded-xl p-3 shadow-2xl overflow-hidden">
+              {items.map((item, i) => (
+                <motion.div
+                  key={item.title}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.03 }}
+                >
+                  {item.external ? (
+                    <a
+                      href={item.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block p-3 rounded-lg hover:bg-ink group transition-colors"
+                    >
+                      <div className="text-sm font-bold text-paper group-hover:text-gold transition-colors flex items-center gap-2">
+                        {item.title} <ExternalLink size={12} className="opacity-50" />
+                      </div>
+                      <div className="text-xs text-muted mt-1">{item.description}</div>
+                    </a>
+                  ) : (
+                    <Link
+                      href={item.href}
+                      onClick={(e) => {
+                        if (item.href.startsWith('/#') && location === '/') {
+                          e.preventDefault();
+                          scrollToSection(item.href.slice(2));
+                          setActiveDropdown(null);
+                        }
+                      }}
+                      className="block p-3 rounded-lg hover:bg-ink group transition-colors"
+                    >
+                      <div className="text-sm font-bold text-paper group-hover:text-gold transition-colors">
+                        {item.title}
+                      </div>
+                      <div className="text-xs text-muted mt-1">{item.description}</div>
+                    </Link>
+                  )}
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 border-b border-[var(--g-line)] bg-[var(--g-navy)]/90 backdrop-blur-xl" role="banner">
-      <div className="container flex h-16 items-center justify-between px-4 md:px-6 mx-auto max-w-7xl">
-        <Link href="/" className="flex items-center gap-2 cursor-pointer group hover:opacity-80 transition-opacity">
-          <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-[var(--g-gold)] to-[var(--g-gold-soft)] flex items-center justify-center shadow-lg shadow-[var(--g-gold)]/20 group-hover:shadow-[var(--g-gold)]/40 transition-shadow">
-            <span className="text-[var(--g-navy)] font-black text-sm">G</span>
+    <header className="fixed top-0 left-0 right-0 z-50 border-b border-line bg-ink/80 backdrop-blur-xl" role="banner">
+      <div className="container flex h-20 items-center justify-between">
+        <Link href="/" className="flex items-center gap-3 group">
+          <div className="h-10 w-10 rounded-xl bg-gold flex items-center justify-center shadow-lg shadow-gold/10 group-hover:shadow-gold/30 transition-all duration-280">
+            <span className="text-ink font-black text-lg">G</span>
           </div>
-          <span className="font-bold text-[var(--g-paper)] hidden sm:block">Gravitas Protocol</span>
-          <span className="font-bold text-[var(--g-paper)] sm:hidden">Gravitas</span>
+          <span className="font-display text-xl font-bold tracking-tight text-paper group-hover:text-gold transition-colors duration-280">
+            Gravitas Protocol
+          </span>
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden lg:flex items-center gap-1" aria-label="Main navigation">
-          <NavigationMenu>
-            <NavigationMenuList>
-              <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent text-[var(--g-paper-dim)] hover:text-[var(--g-paper)] hover:bg-[var(--g-surface)] transition-colors">
-                  Protocol
-                </NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] bg-[var(--g-surface)] border border-[var(--g-line)] shadow-xl">
-                    {protocolItems.map((item) => (
-                      <li key={item.title}>
-                        <NavigationMenuLink asChild>
-                          {item.href.startsWith('/#') ? (
-                            <a
-                              href={item.href}
-                              onClick={(e) => {
-                                if (location === '/') {
-                                  e.preventDefault();
-                                  scrollToSection(item.href.slice(2));
-                                }
-                              }}
-                              className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-[var(--g-line)] hover:text-[var(--g-paper)]"
-                            >
-                              <div className="text-sm font-medium leading-none text-[var(--g-paper)]">{item.title}</div>
-                              <p className="line-clamp-2 text-xs leading-snug text-[var(--g-muted)]">
-                                {item.description}
-                              </p>
-                            </a>
-                          ) : (
-                            <Link
-                              href={item.href}
-                              className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-[var(--g-line)] hover:text-[var(--g-paper)]"
-                            >
-                              <div className="text-sm font-medium leading-none text-[var(--g-paper)]">{item.title}</div>
-                              <p className="line-clamp-2 text-xs leading-snug text-[var(--g-muted)]">
-                                {item.description}
-                              </p>
-                            </Link>
-                          )}
-                        </NavigationMenuLink>
-                      </li>
-                    ))}
-                  </ul>
-                </NavigationMenuContent>
-              </NavigationMenuItem>
-              <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent text-[var(--g-paper-dim)] hover:text-[var(--g-paper)] hover:bg-[var(--g-surface)] transition-colors">
-                  Developers
-                </NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] bg-[var(--g-surface)] border border-[var(--g-line)] shadow-xl">
-                    {devItems.map((item) => (
-                      <li key={item.title}>
-                        <NavigationMenuLink asChild>
-                          {item.external ? (
-                            <a
-                              href={item.href}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-[var(--g-line)] hover:text-[var(--g-paper)]"
-                            >
-                              <div className="flex items-center gap-1.5 text-sm font-medium leading-none text-[var(--g-paper)]">
-                                {item.title}
-                                <ExternalLink className="h-3 w-3 opacity-50" />
-                              </div>
-                              <p className="line-clamp-2 text-xs leading-snug text-[var(--g-muted)]">
-                                {item.description}
-                              </p>
-                            </a>
-                          ) : (
-                            <Link
-                              href={item.href}
-                              className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-[var(--g-line)] hover:text-[var(--g-paper)]"
-                            >
-                              <div className="text-sm font-medium leading-none text-[var(--g-paper)]">{item.title}</div>
-                              <p className="line-clamp-2 text-xs leading-snug text-[var(--g-muted)]">
-                                {item.description}
-                              </p>
-                            </Link>
-                          )}
-                        </NavigationMenuLink>
-                      </li>
-                    ))}
-                  </ul>
-                </NavigationMenuContent>
-              </NavigationMenuItem>
-            </NavigationMenuList>
-          </NavigationMenu>
-          <a href="/#roadmap" onClick={(e) => { if (location === '/') { e.preventDefault(); scrollToSection('roadmap'); } }} className="px-3 py-2 text-sm text-[var(--g-paper-dim)] hover:text-[var(--g-paper)] transition-colors rounded-lg hover:bg-[var(--g-surface)]">Roadmap</a>
+        <nav className="hidden lg:flex items-center gap-2">
+          <NavItem title="Protocol" items={protocolItems} />
+          <NavItem title="Developers" items={devItems} />
+          <a 
+            href="/#roadmap" 
+            onClick={(e) => { if (location === '/') { e.preventDefault(); scrollToSection('roadmap'); } }} 
+            className="px-4 py-2 text-sm font-medium text-muted hover:text-paper transition-colors duration-150"
+          >
+            Roadmap
+          </a>
         </nav>
 
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-4">
           <Link href="/dashboard" className="hidden sm:block">
-            <Button
-              variant="outline"
-              size="sm"
-              className="border-[var(--g-line)] text-[var(--g-paper-dim)] hover:text-[var(--g-paper)] hover:bg-[var(--g-surface)] text-xs sm:text-sm px-3 sm:px-4"
-            >
+            <Button variant="ghost" className="text-muted hover:text-paper hover:bg-surface font-bold text-sm">
               Launch App
             </Button>
           </Link>
@@ -187,23 +173,19 @@ export default function Header() {
             href="https://majlis.gravitasprotocol.xyz"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex"
+            className="hidden sm:flex"
           >
-            <Button
-              size="sm"
-              className="bg-[var(--g-gold)] text-[var(--g-navy)] hover:bg-[var(--g-gold-soft)] font-semibold shadow-lg shadow-[var(--g-gold)]/20 text-xs sm:text-sm px-3 sm:px-4 border border-[var(--g-gold-soft)]"
-            >
+            <Button className="bg-transparent border border-gold text-gold hover:bg-gold/10 font-bold px-6 py-2 rounded-sm shadow-xl shadow-gold/5">
               Majlis
             </Button>
           </a>
 
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 text-[var(--g-paper-dim)] hover:text-[var(--g-paper)] transition-colors rounded-lg hover:bg-[var(--g-surface)]"
+            className="lg:hidden p-2 text-paper hover:bg-surface rounded-lg transition-colors"
             aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
-            aria-expanded={mobileMenuOpen}
           >
-            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
       </div>
@@ -212,90 +194,82 @@ export default function Header() {
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.2 }}
-            className="lg:hidden border-t border-[var(--g-line)] bg-[var(--g-navy)]/98 backdrop-blur-xl overflow-hidden"
+            initial={{ opacity: 0, y: "-100%" }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: "-100%" }}
+            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            className="fixed inset-0 top-20 z-40 bg-ink lg:hidden overflow-hidden"
           >
-            <nav className="container px-4 py-6 flex flex-col gap-6 max-w-7xl mx-auto">
-              <div>
-                <div className="text-[var(--g-muted)] text-[10px] uppercase tracking-widest mb-3 px-4">Protocol</div>
-                <div className="flex flex-col gap-1">
-                  {protocolItems.map((item) => (
-                    item.href.startsWith('/#') ? (
-                      <a
-                        key={item.title}
+            <div className="container py-12 flex flex-col gap-12 h-full">
+              <nav className="flex flex-col gap-8">
+                <div className="space-y-4">
+                  <p className="text-[10px] uppercase tracking-widest text-muted px-4">Protocol</p>
+                  {protocolItems.map((item, i) => (
+                    <motion.div
+                      key={item.title}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: i * 0.05 + 0.2 }}
+                    >
+                      <Link
                         href={item.href}
                         onClick={(e) => {
-                          if (location === '/') {
+                          if (item.href.startsWith('/#') && location === '/') {
                             e.preventDefault();
                             scrollToSection(item.href.slice(2));
+                          } else {
+                            setMobileMenuOpen(false);
                           }
                         }}
-                        className="px-4 py-3 text-sm text-[var(--g-paper-dim)] hover:text-[var(--g-paper)] hover:bg-[var(--g-surface)] rounded-lg transition-colors"
-                      >
-                        {item.title}
-                      </a>
-                    ) : (
-                      <Link
-                        key={item.title}
-                        href={item.href}
-                        onClick={() => setMobileMenuOpen(false)}
-                        className="px-4 py-3 text-sm text-[var(--g-paper-dim)] hover:text-[var(--g-paper)] hover:bg-[var(--g-surface)] rounded-lg transition-colors"
+                        className="block px-4 py-3 text-2xl font-display text-paper hover:text-gold transition-colors"
                       >
                         {item.title}
                       </Link>
-                    )
+                    </motion.div>
                   ))}
                 </div>
-              </div>
 
-              <div>
-                <div className="text-[var(--g-muted)] text-[10px] uppercase tracking-widest mb-3 px-4">Developers</div>
-                <div className="flex flex-col gap-1">
-                  {devItems.map((item) => (
-                    item.external ? (
+                <div className="space-y-4">
+                  <p className="text-[10px] uppercase tracking-widest text-muted px-4">Developers</p>
+                  {devItems.map((item, i) => (
+                    <motion.div
+                      key={item.title}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: i * 0.05 + 0.4 }}
+                    >
                       <a
-                        key={item.title}
                         href={item.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center justify-between px-4 py-3 text-sm text-[var(--g-paper-dim)] hover:text-[var(--g-paper)] hover:bg-[var(--g-surface)] rounded-lg transition-colors"
+                        target={item.external ? "_blank" : undefined}
+                        rel={item.external ? "noopener noreferrer" : undefined}
+                        onClick={() => !item.external && setMobileMenuOpen(false)}
+                        className="block px-4 py-3 text-2xl font-display text-paper hover:text-gold transition-colors"
                       >
                         {item.title}
-                        <ExternalLink className="h-4 w-4 opacity-50" />
                       </a>
-                    ) : (
-                      <Link
-                        key={item.title}
-                        href={item.href}
-                        onClick={() => setMobileMenuOpen(false)}
-                        className="px-4 py-3 text-sm text-[var(--g-paper-dim)] hover:text-[var(--g-paper)] hover:bg-[var(--g-surface)] rounded-lg transition-colors"
-                      >
-                        {item.title}
-                      </Link>
-                    )
+                    </motion.div>
                   ))}
                 </div>
-              </div>
+              </nav>
 
-              <div className="border-t border-[var(--g-line)] pt-6 flex flex-col gap-3">
+              <div className="mt-auto pb-12 border-t border-line pt-8 space-y-4">
                 <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>
-                  <Button variant="outline" className="w-full border-[var(--g-line)] text-[var(--g-paper)]">Launch App</Button>
+                  <Button className="w-full bg-surface border border-line text-paper h-14 text-lg font-bold">
+                    Launch App
+                  </Button>
                 </Link>
                 <a
                   href="https://majlis.gravitasprotocol.xyz"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full"
+                  className="block"
                 >
-                  <Button className="w-full bg-[var(--g-gold)] text-[var(--g-navy)] hover:bg-[var(--g-gold-soft)] font-semibold border border-[var(--g-gold-soft)]">
+                  <Button className="w-full bg-gold text-ink h-14 text-lg font-bold rounded-sm">
                     Majlis
                   </Button>
                 </a>
               </div>
-            </nav>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

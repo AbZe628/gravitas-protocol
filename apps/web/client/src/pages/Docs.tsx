@@ -6,7 +6,9 @@ import {
   ExternalLink, Terminal, Package, FileCode, Lock
 } from "lucide-react";
 import Header from "@/components/Header";
-import ParametricField from "@/design/ParametricField";
+import Footer from "@/components/Footer";
+import GeometryBackground from "@/components/GeometryBackground";
+import BytecodeNotice from "@/components/BytecodeNotice";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -26,18 +28,18 @@ function CodeBlock({ code, language = "bash" }: { code: string; language?: strin
     setTimeout(() => setCopied(false), 2000);
   };
   return (
-    <div className="relative group rounded-[var(--g-radius)] border border-[var(--g-line)] bg-[var(--g-navy)] overflow-hidden">
-      <div className="flex items-center justify-between px-4 py-2 border-b border-[var(--g-line)] bg-[var(--g-surface)]">
-        <span className="text-[10px] text-[var(--g-muted)] font-mono uppercase tracking-widest">{language}</span>
+    <div className="relative group rounded-xl border border-line bg-ink overflow-hidden">
+      <div className="flex items-center justify-between px-6 py-3 border-b border-line bg-surface/50">
+        <span className="text-[10px] text-muted font-mono uppercase tracking-widest font-bold">{language}</span>
         <button
           onClick={copy}
-          className="p-1 text-[var(--g-muted)] hover:text-[var(--g-gold-soft)] transition-colors"
+          className="p-2 text-muted hover:text-goldsoft transition-colors"
         >
-          {copied ? <CheckCheck className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+          {copied ? <CheckCheck size={14} className="text-green-400" /> : <Copy size={14} />}
         </button>
       </div>
-      <pre className="p-4 text-xs sm:text-sm overflow-x-auto scrollbar-thin">
-        <code className="text-[var(--g-gold-soft)] font-mono">{code}</code>
+      <pre className="p-6 text-xs sm:text-sm overflow-x-auto scrollbar-thin leading-relaxed">
+        <code className="text-goldsoft font-mono">{code}</code>
       </pre>
     </div>
   );
@@ -55,15 +57,15 @@ export default function Docs() {
   const [activeSection, setActiveSection] = useState("overview");
 
   return (
-    <div className="min-h-screen bg-[var(--g-navy)] text-[var(--g-paper)]">
+    <div className="min-h-screen bg-ink text-paper selection:bg-gold/30 selection:text-goldsoft">
       <Header />
 
-      <div className="flex flex-col lg:flex-row pt-16">
+      <div className="flex flex-col lg:flex-row pt-20">
         {/* Sidebar */}
-        <aside className="hidden lg:block w-72 fixed left-0 top-16 bottom-0 border-r border-[var(--g-line)] bg-[var(--g-navy)]/80 backdrop-blur-xl overflow-y-auto">
-          <div className="p-8">
-            <p className="g-label mb-6">Documentation</p>
-            <nav className="space-y-2">
+        <aside className="hidden lg:block w-80 fixed left-0 top-20 bottom-0 border-r border-line bg-ink/40 backdrop-blur-xl overflow-y-auto">
+          <div className="p-10">
+            <p className="text-[10px] uppercase tracking-widest text-gold font-bold mb-10">Documentation</p>
+            <nav className="space-y-3">
               {sections.map((s) => (
                 <button
                   key={s.id}
@@ -71,13 +73,13 @@ export default function Docs() {
                     setActiveSection(s.id);
                     document.getElementById(s.id)?.scrollIntoView({ behavior: 'smooth' });
                   }}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-[var(--g-radius)] text-sm transition-all text-left ${
+                  className={`w-full flex items-center gap-4 px-5 py-4 rounded-xl text-sm transition-all duration-200 text-left border ${
                     activeSection === s.id
-                      ? "bg-[var(--g-gold-wash)] text-[var(--g-gold-soft)] border border-[var(--g-gold)]/20"
-                      : "text-[var(--g-muted)] hover:text-[var(--g-paper)] hover:bg-[var(--g-surface)]"
+                      ? "bg-gold/5 text-gold border-gold/20 font-bold"
+                      : "text-muted hover:text-paper hover:bg-surface border-transparent"
                   }`}
                 >
-                  <s.icon className="h-4 w-4 shrink-0" />
+                  <s.icon size={16} className={activeSection === s.id ? "text-gold" : "text-muted"} />
                   {s.label}
                 </button>
               ))}
@@ -86,51 +88,54 @@ export default function Docs() {
         </aside>
 
         {/* Main content */}
-        <main className="flex-1 lg:ml-72 min-h-screen relative overflow-hidden">
-          <ParametricField 
-            className="absolute top-0 right-0 w-[800px] h-[800px] pointer-events-none opacity-20" 
-            anchor={{ x: 0.8, y: 0.2 }}
-            scale={0.8}
-            shells={6}
-          />
+        <main className="flex-1 lg:ml-80 min-h-screen relative overflow-hidden">
+          <GeometryBackground variant="simple" className="opacity-20 -top-40 -right-40 scale-150" />
           
-          <div className="max-w-4xl mx-auto px-6 md:px-12 py-24 relative z-10">
-            <motion.div variants={stagger} initial="hidden" animate="visible" className="space-y-32">
+          <div className="max-w-4xl mx-auto px-8 md:px-16 py-32 relative z-10">
+            <motion.div variants={stagger} initial="hidden" animate="visible" className="space-y-48">
 
               {/* Overview */}
-              <motion.section variants={fadeUp} id="overview" className="scroll-mt-32">
-                <span className="g-label mb-4 block">Introduction</span>
-                <h1 className="g-display mb-8">Protocol Documentation</h1>
-                <p className="g-prose text-[var(--g-text-lg)] text-[var(--g-paper-dim)] mb-12">
+              <motion.section variants={fadeUp} id="overview" className="scroll-mt-40">
+                <span className="text-[10px] uppercase tracking-[0.2em] text-gold font-bold mb-6 block">Introduction</span>
+                <h1 className="display-xl mb-10">Protocol Documentation</h1>
+                <p className="prose-institutional text-lg md:text-xl mb-16 text-sand/80">
                   Gravitas Protocol is an institutional-grade, Shariah-compliant liquidity infrastructure built on Arbitrum. This documentation covers everything you need to integrate with the protocol — from the TypeScript SDK to direct contract interactions.
                 </p>
-                <div className="grid md:grid-cols-2 gap-6">
-                  <a href="/sdk" className="g-panel p-6 hover:bg-[var(--g-surface-raised)] transition-colors group">
-                    <Package className="h-6 w-6 text-[var(--g-gold)] mb-4" />
-                    <h3 className="font-bold text-[var(--g-paper)] group-hover:text-[var(--g-gold-soft)] transition-colors mb-2">SDK Reference</h3>
-                    <p className="text-[var(--g-text-sm)] text-[var(--g-muted)]">Full TypeScript SDK documentation and usage guides.</p>
+                <div className="grid md:grid-cols-2 gap-8">
+                  <a href="/sdk" className="g-panel p-8 bg-surface/30 hover:bg-surface/50 group transition-all">
+                    <Package className="h-8 w-8 text-gold mb-6" />
+                    <h3 className="text-xl font-bold text-paper group-hover:text-goldsoft transition-colors mb-4">SDK Reference</h3>
+                    <p className="text-sm text-muted leading-relaxed">Full TypeScript SDK documentation and usage guides.</p>
                   </a>
-                  <a href="/compliance" className="g-panel p-6 hover:bg-[var(--g-surface-raised)] transition-colors group">
-                    <Shield className="h-6 w-6 text-[var(--g-gold)] mb-4" />
-                    <h3 className="font-bold text-[var(--g-paper)] group-hover:text-[var(--g-gold-soft)] transition-colors mb-2">Compliance API</h3>
-                    <p className="text-[var(--g-text-sm)] text-[var(--g-muted)]">Policy registry integration guide and on-chain validation.</p>
+                  <a href="/compliance" className="g-panel p-8 bg-surface/30 hover:bg-surface/50 group transition-all">
+                    <Shield className="h-8 w-8 text-gold mb-6" />
+                    <h3 className="text-xl font-bold text-paper group-hover:text-goldsoft transition-colors mb-4">Compliance API</h3>
+                    <p className="text-sm text-muted leading-relaxed">Policy registry integration guide and on-chain validation.</p>
                   </a>
                 </div>
               </motion.section>
 
               {/* Quick Start */}
-              <motion.section variants={fadeUp} id="quickstart" className="scroll-mt-32">
-                <div className="flex items-center gap-3 mb-8">
-                  <Terminal className="h-6 w-6 text-[var(--g-gold)]" />
-                  <h2 className="text-[var(--g-text-xl)] font-bold">Quick Start</h2>
+              <motion.section variants={fadeUp} id="quickstart" className="scroll-mt-40">
+                <div className="flex items-center gap-4 mb-12">
+                  <div className="h-12 w-12 rounded-xl bg-gold/5 border border-gold/20 flex items-center justify-center">
+                    <Terminal className="h-6 w-6 text-gold" />
+                  </div>
+                  <h2 className="text-3xl md:text-4xl font-display">Quick Start</h2>
                 </div>
-                <div className="space-y-12">
+                <div className="space-y-16">
                   <div>
-                    <h3 className="text-[var(--g-text-base)] font-bold mb-4 text-[var(--g-paper)]">1. Install the SDK</h3>
+                    <h3 className="text-lg font-bold mb-6 text-paper flex items-center gap-3">
+                      <span className="h-6 w-6 rounded-full bg-gold/10 text-gold flex items-center justify-center text-[10px] font-bold">1</span>
+                      Install the SDK
+                    </h3>
                     <CodeBlock code="npm install @gravitas/sdk" language="bash" />
                   </div>
                   <div>
-                    <h3 className="text-[var(--g-text-base)] font-bold mb-4 text-[var(--g-paper)]">2. Initialize the client</h3>
+                    <h3 className="text-lg font-bold mb-6 text-paper flex items-center gap-3">
+                      <span className="h-6 w-6 rounded-full bg-gold/10 text-gold flex items-center justify-center text-[10px] font-bold">2</span>
+                      Initialize the client
+                    </h3>
                     <CodeBlock code={`import { GravitasClient } from '@gravitas/sdk';
 
 const client = new GravitasClient({
@@ -144,14 +149,16 @@ const client = new GravitasClient({
               </motion.section>
 
               {/* Contract Addresses */}
-              <motion.section variants={fadeUp} id="contracts" className="scroll-mt-32">
-                <div className="flex items-center gap-3 mb-8">
-                  <FileCode className="h-6 w-6 text-[var(--g-gold)]" />
-                  <h2 className="text-[var(--g-text-xl)] font-bold">Contract Addresses</h2>
+              <motion.section variants={fadeUp} id="contracts" className="scroll-mt-40">
+                <div className="flex items-center gap-4 mb-12">
+                  <div className="h-12 w-12 rounded-xl bg-gold/5 border border-gold/20 flex items-center justify-center">
+                    <FileCode className="h-6 w-6 text-gold" />
+                  </div>
+                  <h2 className="text-3xl md:text-4xl font-display">Contract Addresses</h2>
                 </div>
-                <p className="g-prose text-[var(--g-paper-dim)] mb-10">All contracts are deployed and verified on Arbitrum Sepolia (Chain ID: 421614).</p>
+                <p className="prose-institutional text-lg mb-16 text-sand/70">All contracts are deployed and verified on Arbitrum Sepolia (Chain ID: 421614).</p>
 
-                <div className="space-y-6">
+                <div className="space-y-8">
                   {[
                     {
                       name: "GravitasPolicyRegistry",
@@ -166,27 +173,31 @@ const client = new GravitasClient({
                       link: "https://sepolia.arbiscan.io/address/0x5D423f8d01539B92D3f3953b91682D9884D1E993",
                     },
                   ].map((contract, i) => (
-                    <div key={i} className="g-panel p-6">
-                      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                    <div key={i} className="g-panel-raised p-8 bg-surface/30">
+                      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-10">
                         <div className="flex-1">
-                          <h4 className="font-bold text-[var(--g-paper)] mb-2">{contract.name}</h4>
-                          <p className="text-[var(--g-text-sm)] text-[var(--g-muted)] mb-4">{contract.desc}</p>
-                          <div className="flex items-center gap-2">
-                            <Lock className="h-3.5 w-3.5 text-[var(--g-gold)] opacity-40" />
-                            <code className="text-xs font-mono text-[var(--g-gold-soft)] g-numeric bg-[var(--g-navy)] px-3 py-1 rounded border border-[var(--g-line)] break-all">
+                          <h4 className="text-xl font-bold text-paper mb-4">{contract.name}</h4>
+                          <p className="text-sm text-muted mb-8 leading-relaxed max-w-lg">{contract.desc}</p>
+                          <div className="flex items-center gap-3 p-3 bg-ink rounded-xl border border-line">
+                            <Lock className="h-4 w-4 text-gold opacity-40" />
+                            <code className="text-xs font-mono text-goldsoft g-numeric break-all">
                               {contract.address}
                             </code>
                           </div>
                         </div>
-                        <a href={contract.link} target="_blank" rel="noopener noreferrer">
-                          <Button size="sm" variant="outline" className="border-[var(--g-line)] text-[var(--g-muted)] hover:text-[var(--g-paper)]">
-                            <ExternalLink className="h-3.5 w-3.5 mr-2" />
+                        <a href={contract.link} target="_blank" rel="noopener noreferrer" className="shrink-0">
+                          <Button variant="outline" className="border-line text-muted hover:text-paper hover:bg-surface h-12 px-6">
+                            <ExternalLink size={16} className="mr-3" />
                             Arbiscan
                           </Button>
                         </a>
                       </div>
                     </div>
                   ))}
+                  
+                  <div className="mt-12">
+                    <BytecodeNotice />
+                  </div>
                 </div>
               </motion.section>
 
@@ -195,17 +206,7 @@ const client = new GravitasClient({
         </main>
       </div>
 
-      <footer className="bg-[var(--g-navy)] border-t border-[var(--g-line)] py-12 lg:ml-72">
-        <div className="container px-6 mx-auto max-w-7xl flex flex-col sm:flex-row justify-between items-center gap-6">
-          <div className="text-[var(--g-text-xs)] text-[var(--g-muted)]">
-            © 2026 Gravitas Protocol. Institutional-grade DeFi.
-          </div>
-          <div className="flex gap-6 text-[var(--g-text-xs)] text-[var(--g-muted)]">
-            <a href="https://github.com/AbZe628/gravitas-protocol" className="hover:text-[var(--g-paper)] transition-colors">GitHub</a>
-            <a href="/sdk" className="hover:text-[var(--g-paper)] transition-colors">SDK</a>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

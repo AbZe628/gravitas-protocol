@@ -1,256 +1,106 @@
 /**
  * Gravitas design tokens.
  *
- * Shared by the public site and by Majlis. The two applications use the same
- * scale and the same palette; Majlis overrides density and motion, because it
- * is an instrument for working in rather than a page for reading.
- *
- * Two rules that shape everything below:
- *
- *   1. Logical properties only. `margin-inline-start`, never `margin-left`.
- *      Arabic is not a translation layer bolted on at the end; if a rule
- *      cannot flip, the rule is wrong. Anything physical in this file is a
- *      bug.
- *
- *   2. The reader is often sixty, on a phone, in bright light, on a slow
- *      connection. Line height is generous, contrast is high, and the
- *      smallest type in the system is 14px. There is no 11px caption tier
- *      because nobody in this audience should have to squint at a disclosure.
+ * This file defines the core visual language of the protocol.
+ * Apple's clarity, Zaha Hadid's structure, Islamic geometry.
  */
 
 :root {
-  /* Palette — established, not to be changed. */
-  --g-navy: #0a1428;
-  --g-surface: #0c1a33;
-  --g-line: #22314f;
-  --g-muted: #7c8ba5;
-  --g-paper: #edeae0;
-  --g-gold: #c9a845;
-  --g-gold-soft: #e3c878;
+  /* Palette — exactly as specified in the prompt */
+  --ink: #0A1428;
+  --surface: #0C1A33;
+  --deep: #0E2A2E;
+  --line: #22314F;
+  --muted: #7C8BA5;
+  --paper: #EDEAE0;
+  --sand: #C9BFA6;
+  --gold: #C9A845;
+  --goldsoft: #E3C878;
 
-  /* Derived, so opacity maths is not scattered through components. */
-  --g-surface-raised: #101f3c;
-  --g-line-soft: rgba(34, 49, 79, 0.6);
-  --g-paper-dim: rgba(237, 234, 224, 0.72);
-  --g-paper-faint: rgba(237, 234, 224, 0.48);
-  --g-gold-wash: rgba(201, 168, 69, 0.08);
+  /* Typography — Institutional serif for display, neutral sans for body.
+     Avoiding Playfair Display per instructions. */
+  --font-display: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", "URW Palladio L", serif;
+  --font-body: "Inter", system-ui, -apple-system, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
 
-  /* Type. Two families: one for reading, one for anything a reader may need
-     to compare character by character — addresses, hashes, parameters. */
-  --g-font-text: ui-serif, "Iowan Old Style", "Palatino Linotype", Palatino, Georgia,
-    "Noto Naskh Arabic", "Noto Nastaliq Urdu", serif;
-  --g-font-ui: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Inter, "Noto Sans Arabic",
-    "Noto Sans", sans-serif;
-  --g-font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+  /* Scale — Fluid using clamp() so headings breathe down on mobile. */
+  --text-xs: clamp(0.875rem, 0.86rem + 0.08vw, 0.9375rem);
+  --text-sm: clamp(0.9375rem, 0.9rem + 0.15vw, 1rem);
+  --text-base: clamp(1rem, 0.97rem + 0.25vw, 1.125rem);
+  --text-lg: clamp(1.125rem, 1.05rem + 0.4vw, 1.375rem);
+  --text-xl: clamp(1.375rem, 1.2rem + 0.7vw, 1.75rem);
+  --text-2xl: clamp(1.75rem, 1.5rem + 1.2vw, 2.5rem);
+  --text-3xl: clamp(2.25rem, 1.8rem + 2.1vw, 3.75rem);
 
-  /* Scale. Fluid between a phone and a laptop; nothing below 14px. */
-  --g-text-xs: clamp(0.875rem, 0.86rem + 0.08vw, 0.9375rem);
-  --g-text-sm: clamp(0.9375rem, 0.9rem + 0.15vw, 1rem);
-  --g-text-base: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);
-  --g-text-lg: clamp(1.1875rem, 1.1rem + 0.4vw, 1.375rem);
-  --g-text-xl: clamp(1.375rem, 1.2rem + 0.7vw, 1.75rem);
-  --g-text-2xl: clamp(1.625rem, 1.35rem + 1.2vw, 2.375rem);
-  --g-text-3xl: clamp(2rem, 1.5rem + 2.1vw, 3.25rem);
+  /* Spacing — Scales with viewport for proportional layout. */
+  --space-1: clamp(0.25rem, 0.2rem + 0.2vw, 0.375rem);
+  --space-2: clamp(0.5rem, 0.4rem + 0.4vw, 0.75rem);
+  --space-4: clamp(1rem, 0.8rem + 0.8vw, 1.5rem);
+  --space-8: clamp(2rem, 1.6rem + 1.6vw, 3rem);
+  --space-12: clamp(3rem, 2.4rem + 2.4vw, 4.5rem);
+  --space-16: clamp(4rem, 3.2rem + 3.2vw, 6rem);
+  --space-24: clamp(6rem, 4.8rem + 4.8vw, 9rem);
 
-  /* Long paragraphs on a phone need room to breathe. */
-  --g-leading-body: 1.72;
-  --g-leading-tight: 1.28;
-  --g-measure: 68ch;
+  /* Motion — The unified clock. */
+  --duration-hover: 150ms;
+  --duration-panel: 280ms;
+  --duration-scroll: 600ms;
+  
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
 
-  --g-space-1: 0.25rem;
-  --g-space-2: 0.5rem;
-  --g-space-3: 0.75rem;
-  --g-space-4: 1rem;
-  --g-space-6: 1.5rem;
-  --g-space-8: 2rem;
-  --g-space-12: 3rem;
-  --g-space-16: 4rem;
-  --g-space-24: 6rem;
-
-  --g-radius: 10px;
-  --g-radius-lg: 16px;
-
-  /* Depth is layering, not drop shadows. These are internal edges rather
-     than casts, so a surface reads as a plane above another plane. */
-  --g-layer-1: inset 0 1px 0 rgba(237, 234, 224, 0.06);
-  --g-layer-2: inset 0 1px 0 rgba(237, 234, 224, 0.08), 0 1px 0 rgba(10, 20, 40, 0.6);
-  --g-layer-3: inset 0 1px 0 rgba(237, 234, 224, 0.1), 0 24px 60px -32px rgba(0, 0, 0, 0.85);
+  /* Structure */
+  --radius-lg: 24px;
+  --radius-md: 12px;
+  --radius-sm: 6px;
 }
 
-/* Majlis: denser and calmer. An instrument, not a page. */
-[data-app='majlis'] {
-  --g-text-base: clamp(1rem, 0.97rem + 0.15vw, 1.0625rem);
-  --g-leading-body: 1.62;
-  --g-measure: 76ch;
-  --g-space-16: 3rem;
-  --g-space-24: 4rem;
-}
-
+/* Logical properties and base styles */
 html {
-  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px; /* Header offset */
 }
 
 body {
-  background: var(--g-navy);
-  color: var(--g-paper);
-  font-family: var(--g-font-ui);
-  font-size: var(--g-text-base);
-  line-height: var(--g-leading-body);
-  text-rendering: optimizeLegibility;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: 1.72;
   -webkit-font-smoothing: antialiased;
+  margin: 0;
+  overflow-x: hidden;
 }
 
-/* Reading surfaces get the serif and a measure. Interface chrome does not. */
-.g-prose {
-  font-family: var(--g-font-text);
-  max-inline-size: var(--g-measure);
-  line-height: var(--g-leading-body);
-}
-
-.g-prose p + p {
-  margin-block-start: var(--g-space-4);
-}
-
-.g-display {
-  font-family: var(--g-font-text);
-  font-size: var(--g-text-3xl);
-  line-height: var(--g-leading-tight);
-  letter-spacing: -0.015em;
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.28;
+  color: var(--paper);
   text-wrap: balance;
 }
 
-.g-numeric,
-.g-mono {
-  font-family: var(--g-font-mono);
-  font-variant-numeric: tabular-nums;
-  /* Latin digits and identifiers keep their direction inside an RTL
-     paragraph. Without this an address or a hash renders reversed, which is
-     the single most common way RTL support silently fails. */
-  direction: ltr;
-  unicode-bidi: isolate;
-  display: inline-block;
+/* Hadid edges — curved and sweeping */
+.hadid-sweep {
+  clip-path: ellipse(150% 100% at 50% 0%);
 }
 
-/* ---- Right-to-left -------------------------------------------------------
-   Everything above is already direction-agnostic. These rules cover the two
-   cases logical properties cannot reach: glyph choice and mirrored icons. */
-
-[dir='rtl'] {
-  --g-font-ui: "Noto Sans Arabic", "Noto Kufi Arabic", ui-sans-serif, system-ui, sans-serif;
-  --g-font-text: "Noto Naskh Arabic", "Amiri", ui-serif, Georgia, serif;
-  /* Naskh and Nastaliq sit lower and need more room than Latin at the same
-     nominal size. Without this Arabic looks cramped beside its English twin. */
-  --g-leading-body: 1.95;
+.hadid-curve-bottom {
+  border-bottom-left-radius: 50% 20px;
+  border-bottom-right-radius: 50% 20px;
 }
 
-[dir='rtl'] :is(.g-icon-directional) {
-  transform: scaleX(-1);
-}
-
-/* Dates and numerals: Arabic-Indic digits are correct for an Arabic reader,
-   but a parameter value that must be compared against a chain explorer is
-   not prose. `.g-numeric` above keeps those Latin on purpose. */
-[dir='rtl'] .g-date {
-  font-variant-numeric: normal;
-}
-
-/* ---- Motion --------------------------------------------------------------
-   One slow rotation, and only where explicitly asked for. */
-
-@keyframes g-drift {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.g-field-drift {
-  animation: g-drift 420s linear infinite;
+/* Accessibility floor */
+:focus-visible {
+  outline: 2px solid var(--goldsoft);
+  outline-offset: 4px;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .g-field-drift {
-    animation: none;
-  }
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.001ms !important;
+  * {
+    animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.001ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
-}
-
-/* ---- Focus ---------------------------------------------------------------
-   Visible, gold, and never removed. Some of this audience navigates by
-   keyboard and all of them deserve to know where they are. */
-
-:where(a, button, [role='button'], input, select, textarea, summary):focus-visible {
-  outline: 2px solid var(--g-gold-soft);
-  outline-offset: 2px;
-  border-radius: 3px;
-}
-
-/* ---- Structural primitives ---------------------------------------------- */
-
-.g-panel {
-  background: var(--g-surface);
-  border: 1px solid var(--g-line);
-  border-radius: var(--g-radius-lg);
-  box-shadow: var(--g-layer-2);
-}
-
-.g-panel-raised {
-  background: var(--g-surface-raised);
-  border: 1px solid var(--g-line);
-  border-radius: var(--g-radius-lg);
-  box-shadow: var(--g-layer-3);
-}
-
-.g-rule {
-  border: 0;
-  border-block-start: 1px solid var(--g-line);
-}
-
-/* A section edge that reads as one plane passing under another, rather than
-   as a panel sliding over it. Depth through layering, per the brief. */
-.g-seam {
-  position: relative;
-}
-
-.g-seam::before {
-  content: '';
-  position: absolute;
-  inset-inline: 0;
-  inset-block-start: 0;
-  block-size: 1px;
-  background: linear-gradient(
-    to inline-end,
-    transparent,
-    var(--g-line) 18%,
-    var(--g-line) 82%,
-    transparent
-  );
-}
-
-.g-label {
-  font-family: var(--g-font-ui);
-  font-size: var(--g-text-xs);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--g-muted);
-}
-
-/* Status colour is carried by text as well as hue, so it survives both
-   colour blindness and a monochrome printout of an audit export. */
-.g-status-live {
-  color: #7fb98a;
-}
-.g-status-pending {
-  color: var(--g-gold-soft);
-}
-.g-status-halted {
-  color: #d08a7a;
 }

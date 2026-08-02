@@ -10,15 +10,14 @@ import {
   History,
   Menu,
   ExternalLink,
-  X,
   Settings,
   Wallet,
-  Cpu
+  ArrowLeft
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { useAccount, useDisconnect, useSwitchChain } from "wagmi";
 import { arbitrumSepolia } from "wagmi/chains";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { WalletModal, ConnectedWallet } from "./WalletModal";
 
 interface DashboardLayoutProps {
@@ -56,26 +55,26 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--g-navy)] text-[var(--g-paper)] flex flex-col lg:flex-row overflow-hidden">
+    <div className="min-h-screen bg-ink text-paper flex flex-col lg:flex-row overflow-hidden selection:bg-gold/30 selection:text-goldsoft">
       {/* Mobile Header */}
-      <header className="lg:hidden sticky top-0 z-50 w-full border-b border-[var(--g-line)] bg-[var(--g-navy)]/95 backdrop-blur-xl">
-        <div className="flex h-16 items-center justify-between px-4">
+      <header className="lg:hidden sticky top-0 z-50 w-full border-b border-line bg-ink/95 backdrop-blur-xl">
+        <div className="flex h-20 items-center justify-between px-6">
           <button
             onClick={() => navigate("/")}
-            className="flex items-center gap-2 shrink-0 hover:opacity-80 transition-opacity"
+            className="flex items-center gap-3 shrink-0 group"
           >
-            <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-[var(--g-gold)] to-[var(--g-gold-soft)] flex items-center justify-center">
-              <span className="text-[var(--g-navy)] font-bold text-sm">G</span>
+            <div className="h-10 w-10 rounded-xl bg-gold flex items-center justify-center group-hover:shadow-lg group-hover:shadow-gold/20 transition-all">
+              <span className="text-ink font-black text-lg">G</span>
             </div>
-            <span className="font-bold text-[var(--g-paper)]">Gravitas</span>
+            <span className="font-display font-bold text-xl text-paper group-hover:text-gold transition-colors">Gravitas</span>
           </button>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-4">
             {!isConnected && (
               <Button
                 size="sm"
                 onClick={() => setWalletModalOpen(true)}
-                className="bg-[var(--g-gold)] text-[var(--g-navy)] hover:bg-[var(--g-gold-soft)] font-bold h-8 px-3 text-xs"
+                className="bg-gold text-ink hover:bg-goldsoft font-bold h-10 px-4 rounded-sm"
               >
                 Connect
               </Button>
@@ -86,38 +85,58 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="text-[var(--g-paper-dim)] hover:bg-[var(--g-surface)]"
+                  className="text-paper hover:bg-surface h-12 w-12"
                 >
-                  <Menu className="h-5 w-5" />
+                  <Menu className="h-6 w-6" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[280px] bg-[var(--g-navy)] border-[var(--g-line)] p-0">
-                <nav className="flex flex-col gap-1 pt-8 px-4">
-                  <Button
-                    variant="ghost"
-                    onClick={() => { navigate("/"); setMobileMenuOpen(false); }}
-                    className="justify-start text-[var(--g-paper-dim)] hover:text-[var(--g-paper)] hover:bg-[var(--g-surface)] h-12"
-                  >
-                    <Home className="h-4 w-4 mr-3" />
-                    Home
-                  </Button>
-                  <Separator className="bg-[var(--g-line)] my-2" />
-                  {navItems.map((item) => (
-                    <Button
-                      key={item.path}
-                      variant="ghost"
-                      onClick={() => { navigate(item.path); setMobileMenuOpen(false); }}
-                      className={`justify-start h-12 ${
-                        isActive(item.path)
-                          ? "bg-[var(--g-gold-wash)] text-[var(--g-gold-soft)] border border-[var(--g-gold)]/20"
-                          : "text-[var(--g-paper-dim)] hover:text-[var(--g-paper)] hover:bg-[var(--g-surface)]"
-                      }`}
-                    >
-                      <item.icon className="h-4 w-4 mr-3" />
-                      {item.label}
+              <SheetContent side="right" className="w-full bg-ink border-line p-0">
+                <div className="flex flex-col h-full">
+                  <div className="p-8 border-b border-line flex justify-between items-center">
+                    <span className="font-display font-bold text-2xl">Menu</span>
+                    <Button variant="ghost" onClick={() => setMobileMenuOpen(false)}>
+                      <ArrowLeft className="mr-2 h-4 w-4" /> Back
                     </Button>
-                  ))}
-                </nav>
+                  </div>
+                  <nav className="flex-1 p-6 space-y-4">
+                    <Button
+                      variant="ghost"
+                      onClick={() => { navigate("/"); setMobileMenuOpen(false); }}
+                      className="w-full justify-start text-muted hover:text-paper hover:bg-surface h-16 text-xl font-display"
+                    >
+                      <Home className="h-6 w-6 mr-4 text-gold" />
+                      Home
+                    </Button>
+                    <Separator className="bg-line my-6" />
+                    {navItems.map((item) => (
+                      <Button
+                        key={item.path}
+                        variant="ghost"
+                        onClick={() => { navigate(item.path); setMobileMenuOpen(false); }}
+                        className={`w-full justify-start h-16 text-xl font-display transition-all ${
+                          isActive(item.path)
+                            ? "bg-gold/5 text-gold border border-gold/20 font-bold"
+                            : "text-muted hover:text-paper hover:bg-surface"
+                        }`}
+                      >
+                        <item.icon className="h-6 w-6 mr-4" />
+                        {item.label}
+                      </Button>
+                    ))}
+                  </nav>
+                  <div className="p-8 border-t border-line bg-surface/20">
+                    <a
+                      href="https://majlis.gravitasprotocol.xyz"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block w-full"
+                    >
+                      <Button className="w-full bg-gold text-ink h-16 text-xl font-bold rounded-sm">
+                        Majlis
+                      </Button>
+                    </a>
+                  </div>
+                </div>
               </SheetContent>
             </Sheet>
           </div>
@@ -125,50 +144,50 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       </header>
 
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex w-72 border-r border-[var(--g-line)] bg-[var(--g-navy)] flex-col overflow-y-auto relative z-20">
+      <aside className="hidden lg:flex w-80 border-r border-line bg-ink flex-col overflow-y-auto relative z-20">
         <button
           onClick={() => navigate("/")}
-          className="p-8 border-b border-[var(--g-line)] hover:bg-[var(--g-surface)] transition-colors text-left group"
+          className="p-10 border-b border-line hover:bg-surface/50 transition-all text-left group"
         >
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-[var(--g-gold)] to-[var(--g-gold-soft)] flex items-center justify-center shadow-lg shadow-[var(--g-gold)]/10 group-hover:shadow-[var(--g-gold)]/30 transition-all">
-              <span className="text-[var(--g-navy)] font-bold text-xl">G</span>
+          <div className="flex items-center gap-4">
+            <div className="h-12 w-12 rounded-xl bg-gold flex items-center justify-center shadow-lg shadow-gold/10 group-hover:shadow-gold/30 transition-all">
+              <span className="text-ink font-black text-xl">G</span>
             </div>
             <div>
-              <h1 className="text-lg font-bold text-[var(--g-paper)]">Gravitas</h1>
-              <p className="g-label text-[10px] text-[var(--g-muted)]">Dashboard</p>
+              <h1 className="text-xl font-display font-bold text-paper group-hover:text-gold transition-colors">Gravitas</h1>
+              <p className="text-[10px] uppercase tracking-widest text-muted font-bold mt-1">Institutional App</p>
             </div>
           </div>
         </button>
 
-        <nav className="flex-1 p-6 space-y-2">
+        <nav className="flex-1 p-8 space-y-3">
           <Button
             variant="ghost"
             onClick={() => navigate("/")}
-            className="w-full justify-start text-[var(--g-paper-dim)] hover:text-[var(--g-paper)] hover:bg-[var(--g-surface)] h-11"
+            className="w-full justify-start text-muted hover:text-paper hover:bg-surface h-12 font-medium transition-all group"
           >
-            <Home className="h-4 w-4 mr-3" />
+            <Home className="h-4 w-4 mr-4 text-gold/60 group-hover:text-gold transition-colors" />
             Home
           </Button>
-          <Separator className="bg-[var(--g-line)] my-4" />
+          <Separator className="bg-line my-6" />
           {navItems.map((item) => (
             <Button
               key={item.path}
               variant="ghost"
               onClick={() => navigate(item.path)}
-              className={`w-full justify-start h-11 transition-all ${
+              className={`w-full justify-start h-12 transition-all font-medium ${
                 isActive(item.path)
-                  ? "bg-[var(--g-gold-wash)] text-[var(--g-gold-soft)] border border-[var(--g-gold)]/20"
-                  : "text-[var(--g-paper-dim)] hover:text-[var(--g-paper)] hover:bg-[var(--g-surface)]"
+                  ? "bg-gold/5 text-gold border border-gold/20 font-bold shadow-xl shadow-gold/5"
+                  : "text-muted hover:text-paper hover:bg-surface"
               }`}
             >
-              <item.icon className="h-4 w-4 mr-3" />
+              <item.icon className="h-4 w-4 mr-4" />
               {item.label}
             </Button>
           ))}
         </nav>
 
-        <div className="p-6 border-t border-[var(--g-line)] bg-[var(--g-surface)]/30">
+        <div className="p-8 border-t border-line bg-surface/20 backdrop-blur-xl">
           {isConnected && address ? (
             <ConnectedWallet
               address={address}
@@ -178,9 +197,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           ) : (
             <Button
               onClick={() => setWalletModalOpen(true)}
-              className="w-full bg-[var(--g-gold)] text-[var(--g-navy)] hover:bg-[var(--g-gold-soft)] h-11 font-bold"
+              className="w-full bg-gold text-ink hover:bg-goldsoft h-12 font-bold rounded-sm shadow-xl shadow-gold/10"
             >
-              <Wallet className="h-4 w-4 mr-2" />
+              <Wallet className="h-4 w-4 mr-3" />
               Connect Wallet
             </Button>
           )}
@@ -188,51 +207,58 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       </aside>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col overflow-hidden relative">
+      <div className="flex-1 flex flex-col overflow-hidden relative bg-ink">
         {/* Header Bar */}
-        <header className="h-16 border-b border-[var(--g-line)] bg-[var(--g-navy)]/50 backdrop-blur-xl flex items-center justify-between px-8 shrink-0 relative z-10">
-          <div className="flex items-center gap-4">
-            <h2 className="text-[var(--g-text-base)] font-bold text-[var(--g-paper)]">
+        <header className="h-20 border-b border-line bg-ink/50 backdrop-blur-xl flex items-center justify-between px-10 shrink-0 relative z-10">
+          <div className="flex items-center gap-6">
+            <h2 className="text-xl font-display font-bold text-paper">
               {navItems.find((item) => isActive(item.path))?.label || "Dashboard"}
             </h2>
-            {chain?.id !== arbitrumSepolia.id && isConnected && (
-              <span 
-                className="text-[10px] font-bold text-amber-400 bg-amber-400/10 border border-amber-400/20 px-2 py-0.5 rounded cursor-pointer"
-                onClick={() => switchChain({ chainId: arbitrumSepolia.id })}
-              >
-                Wrong Network
-              </span>
-            )}
+            <AnimatePresence>
+              {chain?.id !== arbitrumSepolia.id && isConnected && (
+                <motion.span 
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -10 }}
+                  className="text-[10px] font-bold text-amber-400 bg-amber-400/10 border border-amber-400/20 px-3 py-1 rounded-full cursor-pointer hover:bg-amber-400/20 transition-colors uppercase tracking-widest"
+                  onClick={() => switchChain({ chainId: arbitrumSepolia.id })}
+                >
+                  Wrong Network
+                </motion.span>
+              )}
+            </AnimatePresence>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-6">
             <a
               href="https://majlis.gravitasprotocol.xyz"
               target="_blank"
               rel="noopener noreferrer"
             >
-              <Button size="sm" className="bg-[var(--g-gold-wash)] text-[var(--g-gold-soft)] border border-[var(--g-gold)]/20 hover:bg-[var(--g-gold-wash)]/80 h-8 text-[10px] uppercase tracking-widest font-bold">
+              <Button size="sm" className="bg-gold/5 text-gold border border-gold/20 hover:bg-gold/10 h-10 px-6 text-[10px] uppercase tracking-[0.2em] font-bold rounded-sm transition-all">
                 Majlis
               </Button>
             </a>
+            <div className="h-8 w-px bg-line" />
             <a
               href="https://sepolia.arbiscan.io/address/0x5D423f8d01539B92D3f3953b91682D9884D1E993"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[var(--g-muted)] hover:text-[var(--g-paper)] transition-colors"
+              className="text-muted hover:text-gold transition-colors p-2 hover:bg-surface rounded-lg"
+              title="View Protocol on Arbiscan"
             >
-              <ExternalLink className="h-4 w-4" />
+              <ExternalLink className="h-5 w-5" />
             </a>
           </div>
         </header>
 
         {/* Scrollable Content */}
-        <main className="flex-1 overflow-y-auto relative">
+        <main className="flex-1 overflow-y-auto relative custom-scrollbar">
           <motion.div
             key={location}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            className="p-8 lg:p-12"
+            className="p-10 lg:p-16 max-w-6xl"
           >
             {children}
           </motion.div>

@@ -1,49 +1,48 @@
-import { Button } from "@/components/ui/button";
-import { AlertCircle, Home, ArrowLeft } from "lucide-react";
+import { motion } from "framer-motion";
 import { useLocation } from "wouter";
-import ParametricField from "@/design/ParametricField";
+import { ArrowLeft, AlertCircle, Home } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import GeometryBackground from "@/components/GeometryBackground";
 
 export default function NotFound() {
   const [, setLocation] = useLocation();
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-[var(--g-navy)] px-4 relative overflow-hidden">
-      <ParametricField 
-        className="absolute inset-0 w-full h-full pointer-events-none opacity-20" 
-        anchor={{ x: 0.5, y: 0.5 }}
-        scale={0.6}
-        shells={3}
-      />
+    <div className="min-h-screen bg-ink text-paper flex items-center justify-center p-6 relative overflow-hidden selection:bg-gold/30 selection:text-goldsoft">
+      <GeometryBackground variant="simple" className="opacity-20 scale-150" />
       
-      <div className="text-center max-w-md relative z-10">
-        <div className="flex justify-center mb-8">
-          <div className="h-20 w-20 rounded-2xl bg-[var(--g-surface)] border border-[var(--g-line)] flex items-center justify-center shadow-2xl">
-            <AlertCircle className="h-10 w-10 text-[var(--g-gold)]" />
-          </div>
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        className="max-w-md w-full text-center relative z-10"
+      >
+        <div className="h-24 w-24 rounded-3xl bg-gold/5 border border-gold/20 flex items-center justify-center mx-auto mb-10 shadow-2xl">
+          <AlertCircle className="h-12 w-12 text-gold opacity-40" />
         </div>
-        <h1 className="g-display text-6xl mb-2 text-[var(--g-gold)]">404</h1>
-        <h2 className="text-xl font-bold text-[var(--g-paper)] mb-4">Intent Not Found</h2>
-        <p className="text-[var(--g-text-sm)] text-[var(--g-muted)] mb-10 leading-relaxed">
-          The requested protocol endpoint does not exist or has been moved to a different coordinate.
+        
+        <h1 className="text-6xl font-display font-bold text-paper mb-6">404</h1>
+        <h2 className="text-2xl font-display font-bold text-paper mb-4">Intent Not Found</h2>
+        <p className="text-muted mb-12 leading-relaxed">
+          The requested protocol endpoint does not exist or has been moved to a different coordinate within the Gravitas Protocol infrastructure.
         </p>
+        
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Button
             onClick={() => setLocation("/")}
-            className="bg-[var(--g-gold)] text-[var(--g-navy)] hover:bg-[var(--g-gold-soft)] font-bold gap-2 px-6"
+            className="flex-1 bg-gold text-ink hover:bg-goldsoft h-14 rounded-sm font-bold text-lg shadow-xl shadow-gold/10 transition-all"
           >
-            <Home className="h-4 w-4" />
-            Return Home
+            <Home className="mr-3 h-5 w-5" /> Return Home
           </Button>
           <Button
             onClick={() => window.history.back()}
             variant="outline"
-            className="border-[var(--g-line)] text-[var(--g-paper)] hover:bg-[var(--g-surface)] gap-2 px-6"
+            className="flex-1 border-line text-muted hover:text-paper h-14 rounded-sm font-bold text-lg transition-all"
           >
-            <ArrowLeft className="h-4 w-4" />
-            Previous Node
+            <ArrowLeft className="mr-3 h-5 w-5" /> Previous Node
           </Button>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
