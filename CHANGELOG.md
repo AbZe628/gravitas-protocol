@@ -10,7 +10,7 @@ All notable changes to Gravitas Protocol are documented here.
 - `TeleportV2` — atomic V2 liquidity migration engine with cooldown and slippage protection
 - TypeScript SDK (`@gravitas/sdk`) with Stripe-like developer experience
 - React/TypeScript frontend deployed at gravitasprotocol.xyz
-- 60-test Foundry test suite with 90%+ coverage
+- 60-test Foundry test suite with 90%+ coverage *(66 as of 0.1.2)*
 - Full monorepo structure with pnpm workspaces
 - GitHub Actions CI/CD pipeline
 - Whitepaper, technical specification, and investor documentation
@@ -82,6 +82,6 @@ All notable changes to Gravitas Protocol are documented here.
 ### [0.2.0] — Next milestone (pre-mainnet)
 - Independent external smart-contract audit (e.g. Hacken / Certik) — engagement pending
 - Redeploy hardened contracts (0.1.2) to Arbitrum Sepolia, then Arbitrum One
-- Shariah certification — Mufti Billal Omarjee (AmanX Advisory)
+- Shariah certification — in progress through AmanX Advisory (not complete)
 - Multisig governance for GravitasPolicyRegistry
 - Mainnet deployment on Arbitrum One

@@ -43,7 +43,7 @@ We encourage security researchers to review our contracts and report any potenti
 ## 5. Audit Status
 
 - **Internal Review:** Completed. See `proof-of-quality/INTERNAL_REVIEW.md`.
-- **External Audit:** Planned for Q2 2026. This document will be updated with a link to the final report upon completion.
+- **External Audit:** Planned for pending (no date claimed). This document will be updated with a link to the final report upon completion.
 
 We do **not** claim that the protocol is "fully audited" by a third party at this time. The security of the protocol is our highest priority, and we are committed to a transparent and continuous audit process.
 

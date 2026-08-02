@@ -105,7 +105,7 @@ export const rules: Rule[] = [
       { kind: 'test', label: 'ratio boundary at exactly 5100 bps', ref: 'test/PolicyRegistry.ratio.t.sol' },
       {
         kind: 'document',
-        label: 'AAOIFI mixed-portfolio tradability principles',
+        label: 'Illustrative tradability principles (fabricated demonstration source)',
         ref: 'docs/references/mixed-portfolio.md',
       },
     ],

@@ -90,17 +90,16 @@ Gravitas Protocol treats Shariah compliance as a **technical requirement**, not 
 
 | Phase | Status | Description |
 |---|---|---|
-| **Phase 1: Self-Regulation** | ✅ **Completed** | Internal AAOIFI standards adherence; `GravitasPolicyRegistry` is live. |
-| **Phase 2: Advisory Board** | 🔄 **In Progress (Q2 2026)** | Final certification stage with Mufti Billal Omarjee (AmanX Advisory). |
-| **Phase 3: Formal Certification** | 📋 **Planned (2027)** | Obtain a formal Shariah Seal for GCC market integration. |
+| **Phase 1: Self-Regulation** | ✅ **Completed** | Compliance rules are enforced as written into the registry by its owner; `GravitasPolicyRegistry` is live on testnet. |
+| **Phase 2: Advisory Board** | 🔄 **In Progress** | Shariah certification is in progress through AmanX Advisory. Not complete, and no date is claimed. |
+| **Phase 3: Formal Certification** | 📋 **Planned** | Obtain formal Shariah certification for GCC market integration. Follows Phase 2; no date is claimed. |
 
 ---
 
-## Institutional Integration: Libeara & Tokenized Fund Compliance
+## Institutional Integration: Tokenised Fund Compliance
 
-The `GravitasPolicyRegistry` is architectured as a **jurisdiction-agnostic compliance oracle** — deployable as middleware for any tokenization platform requiring on-chain policy enforcement. The `IShariahPolicyChecker` interface (`contracts/interfaces/`) allows external protocols to integrate a single `view` call without architectural changes.
+The `GravitasPolicyRegistry` is architected as a **jurisdiction-agnostic compliance oracle** — deployable as middleware for any tokenisation platform requiring on-chain policy enforcement. The `IShariahPolicyChecker` interface (`contracts/interfaces/`) allows an external protocol to integrate a single `view` call without architectural changes.
 
-**Reference integration:** [`SC-VENTURES-INTEGRATION.md`](./SC-VENTURES-INTEGRATION.md)  
 **Interface file:** [`contracts/interfaces/IShariahPolicyChecker.sol`](./contracts/interfaces/IShariahPolicyChecker.sol)
 
 ---
@@ -118,8 +117,8 @@ This project is a monorepo managed with `pnpm` workspaces.
 
 Two primary GitHub Actions workflows ensure code quality and deployment:
 
-1.  **`ci.yml`**: Triggered on pushes to `main`. Runs Foundry tests for all smart contracts to ensure correctness and security. (60 passing tests)
-2.  **`deploy-frontend.yml`**: Triggered on pushes to `apps/web`. Builds the React application and deploys it to GitHub Pages.
+1.  **`ci.yml`**: Triggered on pushes to `main`. Runs Foundry tests for all smart contracts to ensure correctness and security. (66 passing tests)
+2.  **`deploy-frontend.yml`**: Triggered on pushes touching `apps/web`. Builds the React application and publishes it to GitHub Pages. Note that until this workflow was added, the live site was served from the committed `apps/web/dist/` output, so source changes did not reach production on their own — see `DEPLOY.md` section 8.
 
 ---
 

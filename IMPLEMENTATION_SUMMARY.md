@@ -80,7 +80,7 @@ All mocks are located in `contracts/mocks/` and provide deterministic, CI-stable
    - Security best practices and mitigations
    - **Key rotation policy** (mandatory annual rotation)
    - **Responsible disclosure policy** with reporting instructions
-   - Audit status (internal complete, external planned Q2 2026)
+   - Audit status (internal complete, external planned pending (no date claimed))
    - Secret management guidelines
 
 3. **docs/testnet-evidence.md** - Documents:

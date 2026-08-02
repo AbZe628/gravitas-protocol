@@ -34,8 +34,8 @@ Gravitas has achieved significant technical milestones and is on a clear path to
 | Phase | Status | Key Deliverables |
 | :--- | :--- | :--- |
 | **Phase 1: Technical Validation** | ✅ **Completed** | Contracts deployed and verified on Arbitrum Sepolia. 46 passing deterministic tests with >90% coverage. Internal security review completed. |
-| **Phase 2: Market & Governance** | 🔄 **In Progress** | Final certification with Mufti Billal Omarjee (AmanX Advisory) — Q2 2026. External audit planned (Hacken or Certik, Q2 2026). Mainnet launch on Arbitrum or Base. |
-| **Phase 3: Ecosystem Integration** | 📋 **Planned** | Formal Shariah certification for GCC integration (2027). Partnerships with institutional asset managers. Compliance API as standalone revenue stream. |
+| **Phase 2: Market & Governance** | 🔄 **In Progress** | Shariah certification in progress through AmanX Advisory; not complete, no date claimed. External audit not yet commissioned — funded by a round that has not closed. Mainnet follows both. |
+| **Phase 3: Ecosystem Integration** | 📋 **Planned** | Formal Shariah certification for GCC integration; conditional on Phase 2, no date claimed. Engagement with institutional asset managers. Compliance API as a potential revenue stream — none realised to date. |
 
 ## 4. Security & Risk Mitigation
 
@@ -43,7 +43,7 @@ Security is the bedrock of the Gravitas Protocol. Our security posture is multi-
 
 - **Internal Security Review:** A comprehensive internal audit has been completed, with all findings addressed. The report is available in the repository at `proof-of-quality/INTERNAL_REVIEW.md`.
 - **High Test Coverage:** The protocol's core contracts have achieved **>90% line coverage** through deterministic, mock-based testing, ensuring that all critical paths, including complex swap logic, are thoroughly validated.
-- **External Audit Planned:** An external audit with a tier-2 firm (Hacken or Certik) is planned for Q2 2026, budgeted as part of the pre-seed funding round.
+- **External Audit Not Yet Commissioned:** An external audit with a tier-2 firm (e.g. Hacken or Certik) is budgeted as part of the pre-seed round. That round has not closed, so the audit has not been commissioned and no date is claimed.
 - **Operational Controls:** We strongly recommend that the protocol's ownership and administrative functions be managed by a **multi-signature wallet (e.g., 3-of-5)** to prevent single points of failure. Furthermore, all critical policy changes should be executed through a **timelock contract**, providing a delay that allows users and stakeholders to review and react to upcoming changes.
 
 ## 5. Shariah Compliance Framework

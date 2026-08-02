@@ -1,7 +1,10 @@
 import 'dotenv/config';
 import { createApp } from './app.js';
+import { assertConfiguredForProduction } from './middleware/basicAuth.js';
 
 const port = Number(process.env.PORT ?? 4000);
+assertConfiguredForProduction();
+
 const app = createApp();
 
 app.listen(port, () => {

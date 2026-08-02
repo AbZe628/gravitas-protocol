@@ -1,3 +1,5 @@
+@import "./design/tokens.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -10,9 +12,11 @@
     @apply bg-ink text-paper antialiased;
     text-rendering: optimizeLegibility;
   }
-  /* Extended reading by readers who are not twenty-five. */
+  /* Extended reading by readers who are not twenty-five. Sizes come from the
+     shared token scale so the two applications stay in step. */
   p, li {
-    @apply text-[15px] leading-[1.7];
+    font-size: var(--g-text-base);
+    line-height: var(--g-leading-body);
   }
   [dir='rtl'] {
     letter-spacing: 0;

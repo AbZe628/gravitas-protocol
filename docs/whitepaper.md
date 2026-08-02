@@ -42,7 +42,7 @@ DeFi liquidity remains fragmented across multiple DEXs and chains. Users face:
 The Gravitas Protocol consists of three core smart contracts: `GravitasPolicyRegistry`, `TeleportV2.sol`, and `TeleportV3.sol`.
 
 #### **GravitasPolicyRegistry**
-- Maintains whitelist of Shariah-compliant assets (AAOIFI standards)
+- Maintains a whitelist of assets a supervising Shariah board has approved
 - Manages router authorization for atomic migrations
 - Enforces compliance rules before execution
 - Owner-controlled (upgradeable via timelock)
@@ -179,7 +179,7 @@ Proof: EIP-712 typed data prevents signature reuse. Nonce increments per migrati
 
 | Risk | Mitigation | Status |
 | :--- | :--- | :--- |
-| Smart contract bugs | Internal audit complete + fuzzing; external audit scheduled Q2 2026 | 🔄 In Progress |
+| Smart contract bugs | Internal review complete + fuzzing; external audit not yet commissioned | 🔄 In Progress |
 | Replay attacks | EIP-712 domain separation | ✅ Implemented |
 | Sandwich attacks | Cooldown + max-move limits | ✅ Implemented |
 | Market volatility | Slippage protection + deadline | ✅ Implemented |
@@ -248,7 +248,7 @@ Proof: EIP-712 typed data prevents signature reuse. Nonce increments per migrati
 
 ### 7.1 Shariah Compliance
 
-Gravitas Protocol adheres to **AAOIFI (Accounting and Auditing Organization for Islamic Financial Institutions)** standards:
+Gravitas Protocol enforces the rules a supervising Shariah board writes into the registry. It does not implement, adhere to, or certify against any external standards body. The categories below describe what the registry is capable of expressing, not an endorsement by any body:
 
 - **No Riba** — No interest-bearing transactions
 - **No Gharar** — No excessive uncertainty in contracts
@@ -280,12 +280,12 @@ Gravitas Protocol adheres to **AAOIFI (Accounting and Auditing Organization for 
 
 | Quarter | Milestone | Status |
 | :--- | :--- | :--- |
-| **Q1 2026** | Core contracts + frontend | ✅ Complete |
-| **Q2 2026** | External security audit | ⏳ Scheduled |
-| **Q2 2026** | Shariah certification | ⏳ Final certification stage with Mufti Billal Omarjee, AmanX Advisory |
-| **Q3 2026** | Mainnet launch (Arbitrum One) | 📅 Planned |
-| **Q4 2026** | L2 expansion (Optimism, Polygon) | 📅 Planned |
-| **Q1 2027** | DAO governance launch | 📅 Planned |
+| **Done** | Core contracts + frontend (testnet) | ✅ Complete |
+| **Next** | Redeploy 0.1.2 hardening, then external security audit | ⏳ Conditional on the funding round closing; no date claimed |
+| **Next** | Shariah certification | ⏳ In progress through AmanX Advisory. Not complete; no date claimed |
+| **After audit + certification** | Mainnet launch (Arbitrum One) | 📅 Conditional; no date claimed |
+| **Later** | L2 expansion (Optimism, Polygon) | 📅 Planned |
+| **Later** | DAO governance launch | 📅 Planned |
 
 ---
 
@@ -294,7 +294,6 @@ Gravitas Protocol adheres to **AAOIFI (Accounting and Auditing Organization for 
 - **GitHub Repository:** https://github.com/AbZe628/gravitas-protocol
 - **Live Dashboard:** https://gravitas-protocol.manus.space
 - **Implementation Status:** https://gravitas-results.manus.space
-- **AAOIFI Standards:** https://aaoifi.com/
 - **EIP-712 Specification:** https://eips.ethereum.org/EIPS/eip-712
 
 ---
