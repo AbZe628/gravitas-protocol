@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import request from 'supertest';
 import { createApp } from '../src/app.js';
-import { hashParameters, canonicalise, verifyParameters } from '../src/services/hash.js';
+import { hashParameters, canonicalise, verifyParameters, HASH_VERSION } from '../src/services/hash.js';
 import {
   seeksRuling,
   seeksRulingSemantic,
@@ -63,8 +63,51 @@ describe('parameter hashing', () => {
     expect(() => hashParameters([{ key: 'a\u001fb', value: '1', meaning: 'x' }])).toThrow(/illegal/i);
   });
 
-  it('is version tagged so the scheme can change without silent mismatch', () => {
-    expect(canonicalise(params).startsWith('v1')).toBe(true);
+  it('is domain-separated and version tagged so the scheme can change without silent mismatch', () => {
+    const c = canonicalise(params);
+    expect(c.startsWith('gravitas.majlis.rule-parameters')).toBe(true);
+    expect(c).toContain(`v${HASH_VERSION}`);
+  });
+
+  it('rejects separator characters in VALUES, not only in keys', () => {
+    // Under v1 this collided with [{a,1},{b,2}] and produced an identical hash.
+    expect(() =>
+      hashParameters([{ key: 'a', value: '1\u001eb\u001f2', meaning: 'x' }]),
+    ).toThrow(/illegal control character/i);
+  });
+
+  it('two different parameter sets cannot share a hash via separator injection', () => {
+    const clean = hashParameters([
+      { key: 'a', value: '1', meaning: 'x' },
+      { key: 'b', value: '2', meaning: 'y' },
+    ]);
+    let injected: string | null = null;
+    try {
+      injected = hashParameters([{ key: 'a', value: '1\u001eb\u001f2', meaning: 'x' }]);
+    } catch {
+      injected = null;
+    }
+    expect(injected).not.toBe(clean);
+  });
+
+  it('normalises Unicode so visually identical parameters hash identically', () => {
+    const composed = hashParameters([{ key: 'ratio', value: '\u00e9', meaning: 'e-acute' }]);
+    const decomposed = hashParameters([{ key: 'ratio', value: 'e\u0301', meaning: 'e-acute' }]);
+    expect(composed).toBe(decomposed);
+  });
+
+  it('sorts by UTF-8 byte order, as documented', () => {
+    const a = hashParameters([
+      { key: 'z', value: '1', meaning: '' },
+      { key: 'a', value: '2', meaning: '' },
+      { key: '\u00e9', value: '3', meaning: '' },
+    ]);
+    const b = hashParameters([
+      { key: '\u00e9', value: '3', meaning: '' },
+      { key: 'z', value: '1', meaning: '' },
+      { key: 'a', value: '2', meaning: '' },
+    ]);
+    expect(a).toBe(b);
   });
 
   it('verifies a claimed hash', () => {
@@ -199,10 +242,16 @@ describe('assistant: refuses to give rulings', () => {
     } as any;
 
     const result = await ask({ question: 'Describe the settlement sequence.', client: broken });
+    // Non-transient errors are not retried: one attempt, then refuse.
     expect(calls).toBe(1);
-    expect(result.answer).toMatch(/could not complete the check/i);
+    expect(result.answer).toMatch(/could not reach the check/i);
     expect(result.declinedAsRuling).toBe(false);
     expect(result.escalated).toBe(true);
+    // A transport failure must be distinguishable from a declined ruling,
+    // otherwise the interface cannot offer a try-again for one and not the other.
+    expect(result.failure).toBe('transport');
+    expect(result.retryable).toBe(true);
+    expect(result.detail).toMatch(/declines instead of proceeding/i);
   });
 
   it('semantic gate blocks a lexically innocent question the classifier flags', async () => {
@@ -378,12 +427,39 @@ describe('api', () => {
     }
   });
 
-  it('exposes no route that writes a rule', async () => {
+  it('exposes no mutating route beyond the explicit allowlist', async () => {
+    // Introspect the router rather than probing five URLs someone already knew
+    // did not exist. A test that asserts `POST /api/rules` 404s cannot fail when
+    // `PATCH /api/matters/:id` is added tomorrow. This one enumerates what is
+    // actually registered, so any new mutating route fails here until it is
+    // added to the allowlist deliberately.
+    const ALLOWED = new Set(['POST /api/assistant/ask']);
+
+    const stack =
+      (app as any)._router?.stack ?? (app as any).router?.stack ?? [];
+    const mutating: string[] = [];
+    for (const layer of stack) {
+      if (!layer.route) continue;
+      const path = layer.route.path;
+      const methods = Object.keys(layer.route.methods ?? {});
+      for (const m of methods) {
+        const verb = m.toUpperCase();
+        if (verb === 'GET' || verb === 'HEAD' || verb === 'OPTIONS') continue;
+        mutating.push(`${verb} ${path}`);
+      }
+    }
+
+    expect(stack.length).toBeGreaterThan(0); // guard: introspection actually worked
+    expect(mutating.sort()).toEqual([...ALLOWED].sort());
+  });
+
+  it('still 404s the obvious governance write paths', async () => {
     const attempts = [
       request(app).post('/api/rules').send({ id: 'x' }),
       request(app).post('/api/matters').send({ id: 'x' }),
       request(app).post('/api/matters/matter-2026-07-03/vote').send({ position: 'for' }),
       request(app).put('/api/rules/rule-tangible-ratio').send({}),
+      request(app).patch('/api/matters/matter-2026-07-03').send({}),
       request(app).delete('/api/rules/rule-tangible-ratio'),
     ];
     for (const a of attempts) {

@@ -54,7 +54,7 @@ const faqSections = [
     questions: [
       {
         q: "Has the protocol been audited?",
-        a: "An internal security review has been completed and is available in the repository at proof-of-quality/INTERNAL_REVIEW.md. A formal external audit by a recognized third-party firm is scheduled for Q2 2026. The protocol will not deploy to mainnet until this audit is complete and all findings are resolved.",
+        a: "An internal security review has been completed and is available in the repository at proof-of-quality/INTERNAL_REVIEW.md. A formal external audit by a recognised third-party firm has not been commissioned. It is funded by a round that has not closed, so no date is claimed. The protocol will not deploy to mainnet until that audit is complete and all findings are resolved.",
       },
       {
         q: "How does the protocol prevent replay attacks?",
@@ -84,7 +84,7 @@ const faqSections = [
       },
       {
         q: "Is there a formal Shariah certification?",
-        a: "Not yet. Phase 1 (self-regulation with AAOIFI standards adherence) is complete. Phase 2 involves formal engagement with recognized Shariah scholars for an advisory board, planned for Q3 2026. Phase 3 targets a formal Shariah Seal for GCC market integration, planned for 2027. We do not claim certification that has not been obtained.",
+        a: "No. Shariah certification is in progress through AmanX Advisory and is not complete. The protocol does not enforce any external body’s standards: it enforces the rules a board writes into the registry. No date is claimed for certification, because it follows work that has not concluded. We do not claim certification that has not been obtained.",
       },
       {
         q: "Who controls the compliance whitelist?",
@@ -417,7 +417,7 @@ export default function Home() {
               {[
                 { label: "Test Coverage", value: "90%+", icon: CheckCircle, link: "https://github.com/AbZe628/gravitas-protocol", note: "Foundry" },
                 { label: "Atomic Execution", value: "Single TX", icon: Zap, link: "https://sepolia.arbiscan.io/address/0x5D423f8d01539B92D3f3953b91682D9884D1E993", note: "All-or-nothing" },
-                { label: "Live Contracts", value: "3 on Sepolia", icon: Database, link: "https://sepolia.arbiscan.io", note: "Verified" },
+                { label: "Live Contracts", value: "2 on Sepolia", icon: Database, link: "https://sepolia.arbiscan.io", note: "Pre-0.1.2 bytecode" },
                 { label: "Islamic Finance", value: "$3T+ Market", icon: TrendingUp, note: "Addressable" },
               ].map((stat, i) => {
                 const content = (
@@ -654,7 +654,7 @@ export default function Home() {
             <Badge className="mb-4 bg-[#D4AF37]/10 border-[#D4AF37]/30 text-[#D4AF37]">Trust Model</Badge>
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Non-Custodial by Design</h2>
             <p className="text-sm md:text-base text-white/50 max-w-2xl mx-auto">
-              The protocol never holds user funds. Every invariant is mathematically enforced on-chain.
+              The protocol never holds user funds or keys, at any point. Every invariant is enforced on-chain.
             </p>
           </div>
 
@@ -781,9 +781,9 @@ export default function Home() {
             <CardContent>
               <div className="grid sm:grid-cols-3 gap-4">
                 {[
-                  { phase: "Phase 1", title: "Self-Regulation", status: "Completed", statusColor: "text-green-400", statusBg: "bg-green-500/10 border-green-500/20", desc: "Internal AAOIFI standards adherence. GravitasPolicyRegistry deployed and live." },
-                  { phase: "Phase 2", title: "Advisory Board", status: "Planned Q3 2026", statusColor: "text-amber-400", statusBg: "bg-amber-500/10 border-amber-500/20", desc: "Engagement with recognized Shariah scholars for formal advisory board formation." },
-                  { phase: "Phase 3", title: "Formal Certification", status: "Planned 2027", statusColor: "text-white/40", statusBg: "bg-white/5 border-white/10", desc: "Obtain a formal Shariah Seal for GCC market integration and institutional adoption." },
+                  { phase: "Phase 1", title: "Self-Regulation", status: "Completed", statusColor: "text-green-400", statusBg: "bg-green-500/10 border-green-500/20", desc: "Compliance rules enforced as written into the registry by its owner. GravitasPolicyRegistry deployed on testnet." },
+                  { phase: "Phase 2", title: "Advisory Board", status: "In progress", statusColor: "text-amber-400", statusBg: "bg-amber-500/10 border-amber-500/20", desc: "Shariah certification in progress through AmanX Advisory. Not complete. No date claimed." },
+                  { phase: "Phase 3", title: "Formal Certification", status: "Follows Phase 2", statusColor: "text-white/40", statusBg: "bg-white/5 border-white/10", desc: "Formal Shariah certification for GCC market integration. Conditional on Phase 2 concluding. No date claimed." },
                 ].map((item, i) => (
                   <div key={i} className="p-4 rounded-xl bg-[#060E1A]/60 border border-[#D4AF37]/8">
                     <div className="flex items-center justify-between mb-3">
@@ -815,7 +815,7 @@ export default function Home() {
             {[
               { label: "Test Coverage", value: "90.2%", sub: "Line coverage", icon: BarChart3, color: "text-green-400" },
               { label: "Critical Issues", value: "0", sub: "All-time", icon: AlertCircle, color: "text-green-400" },
-              { label: "External Audit", value: "Q2 2026", sub: "Scheduled", icon: ShieldCheck, color: "text-amber-400" },
+              { label: "External Audit", value: "Pending", sub: "Not yet commissioned", icon: ShieldCheck, color: "text-amber-400" },
               { label: "Invariant Tests", value: "Passing", sub: "Foundry fuzzing", icon: CheckCircle, color: "text-green-400" },
             ].map((stat, i) => (
               <Card key={i} className="border-[#D4AF37]/10 bg-[#0A1628]/40">
@@ -847,7 +847,7 @@ export default function Home() {
                   { label: "Foundry Test Suite (90%+ coverage)", status: "Complete", link: "https://github.com/AbZe628/gravitas-protocol/blob/main/proof-of-quality/test_results.txt" },
                   { label: "Invariant & Fuzz Testing", status: "Complete", link: null },
                   { label: "EIP-712 Replay Protection", status: "Complete", link: null },
-                  { label: "External Audit (OpenZeppelin-class)", status: "Q2 2026", link: null },
+                  { label: "External Audit (OpenZeppelin-class)", status: "Pending", link: null },
                   { label: "Multi-sig Governance Deployment", status: "Mainnet", link: null },
                   { label: "Timelock for Policy Changes", status: "Mainnet", link: null },
                 ].map((item, i) => (
@@ -857,7 +857,7 @@ export default function Home() {
                       <span className="text-sm text-white/70 truncate">{item.label}</span>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
-                      <Badge className={`text-[10px] ${item.status === "Complete" ? "bg-green-500/10 border-green-500/20 text-green-400" : item.status === "Q2 2026" ? "bg-amber-500/10 border-amber-500/20 text-amber-400" : "bg-white/5 border-white/10 text-white/30"}`}>
+                      <Badge className={`text-[10px] ${item.status === "Complete" ? "bg-green-500/10 border-green-500/20 text-green-400" : item.status === "Pending" ? "bg-amber-500/10 border-amber-500/20 text-amber-400" : "bg-white/5 border-white/10 text-white/30"}`}>
                         {item.status}
                       </Badge>
                       {item.link && (
@@ -959,11 +959,11 @@ export default function Home() {
 
           <div className="max-w-3xl mx-auto space-y-4">
             {[
-              { quarter: "Q1 2026", milestone: "Core contracts + frontend", status: "Complete", statusColor: "text-green-400", statusBg: "bg-green-500/10 border-green-500/20", items: ["GravitasPolicyRegistry deployed and verified", "TeleportV3 deployed and verified", "90%+ test coverage achieved", "Frontend launched on Arbitrum Sepolia"] },
-              { quarter: "Q2 2026", milestone: "External security audit", status: "Scheduled", statusColor: "text-amber-400", statusBg: "bg-amber-500/10 border-amber-500/20", items: ["Formal audit by recognized third-party firm", "All findings addressed and published", "Shariah certification process initiated"] },
-              { quarter: "Q3 2026", milestone: "Mainnet launch (Arbitrum One)", status: "Planned", statusColor: "text-white/40", statusBg: "bg-white/5 border-white/10", items: ["Multi-sig governance deployment", "Timelock for policy changes", "Conservative TVL caps at launch", "Shariah Advisory Board engagement"] },
-              { quarter: "Q4 2026", milestone: "L2 expansion", status: "Planned", statusColor: "text-white/40", statusBg: "bg-white/5 border-white/10", items: ["Optimism deployment", "Polygon deployment", "Cross-chain compliance registry"] },
-              { quarter: "Q1 2027", milestone: "DAO governance + certification", status: "Planned", statusColor: "text-white/40", statusBg: "bg-white/5 border-white/10", items: ["DAO governance launch", "Formal Shariah certification", "GCC institutional partnerships"] },
+              { quarter: "Done", milestone: "Core contracts + frontend", status: "Complete", statusColor: "text-green-400", statusBg: "bg-green-500/10 border-green-500/20", items: ["GravitasPolicyRegistry deployed and verified on testnet", "TeleportV3 deployed and verified on testnet", "90%+ test coverage achieved", "Frontend launched on Arbitrum Sepolia"] },
+              { quarter: "Next", milestone: "External security audit", status: "Funding pending", statusColor: "text-amber-400", statusBg: "bg-amber-500/10 border-amber-500/20", items: ["Redeploy the 0.1.2 hardening to testnet", "Formal audit by recognised third-party firm", "All findings addressed and published", "Conditional on the funding round closing"] },
+              { quarter: "After audit", milestone: "Mainnet launch (Arbitrum One)", status: "Conditional", statusColor: "text-white/40", statusBg: "bg-white/5 border-white/10", items: ["Requires the independent audit to be complete", "Requires formal Shariah certification", "Multi-sig governance deployment", "Timelock for policy changes", "Conservative TVL caps at launch"] },
+              { quarter: "Later", milestone: "L2 expansion", status: "Planned", statusColor: "text-white/40", statusBg: "bg-white/5 border-white/10", items: ["Optimism deployment", "Polygon deployment", "Cross-chain compliance registry"] },
+              { quarter: "Later", milestone: "DAO governance", status: "Planned", statusColor: "text-white/40", statusBg: "bg-white/5 border-white/10", items: ["DAO governance launch", "GCC institutional engagement"] },
             ].map((item, i) => (
               <motion.div key={i} variants={fadeUp} initial="hidden" whileInView="visible" viewport={{ once: true }}>
                 <Card className="border-[#D4AF37]/10 bg-[#0A1628]/40">
@@ -1009,7 +1009,7 @@ export default function Home() {
             {[
               { title: "Testnet Only", desc: "No mainnet deployment has occurred. All dashboard metrics are demo/simulation data. No real funds are at risk on testnet, but testnet behavior may differ from mainnet." },
               { title: "No External Audit", desc: "A formal third-party security audit has not yet been completed. An internal review is available in the repository. Do not use with significant funds until an external audit is complete." },
-              { title: "No Shariah Certification", desc: "Formal Shariah certification has not been obtained. The protocol adheres to AAOIFI standards internally, but this is not equivalent to a formal fatwa or Shariah Seal." },
+              { title: "No Shariah Certification", desc: "Formal Shariah certification has not been obtained. Certification is in progress through AmanX Advisory and is not complete. The protocol enforces the rules a board writes into the registry; it does not implement or enforce any external standards body’s standards." },
               { title: "Centralized Admin", desc: "The PolicyRegistry owner currently controls the compliance whitelist. For mainnet, this will be transferred to a multi-sig with timelock, but this governance upgrade has not yet occurred." },
               { title: "Smart Contract Risk", desc: "All smart contract code carries inherent risk. Despite 90%+ test coverage and internal review, undiscovered vulnerabilities may exist. Use only amounts you can afford to lose on testnet." },
               { title: "No Formal Governance", desc: "DAO governance is planned for post-mainnet launch. Currently, protocol parameters can be changed by the owner address. All changes are on-chain and auditable." },
@@ -1095,8 +1095,44 @@ export default function Home() {
             <Badge className="mb-4 bg-[#D4AF37]/10 border-[#D4AF37]/30 text-[#D4AF37]">Proof & Trust</Badge>
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Verify Everything On-Chain</h2>
             <p className="text-sm md:text-base text-white/50 max-w-2xl mx-auto">
-              No trust required. Every contract is deployed, verified, and inspectable on Arbiscan.
+              Every contract is deployed and its source is verified on Arbiscan. Read the note below before relying on what you find there — the deployed bytecode is not the current source.
             </p>
+          </div>
+
+          {/* The deployed bytecode predates the 0.1.2 hardening. This notice must remain
+              until both contracts are redeployed and re-verified, and the new addresses
+              published. See CHANGELOG.md, entry 0.1.2. */}
+          <div className="max-w-3xl mx-auto mb-10 rounded-lg border border-amber-500/30 bg-amber-500/[0.06] p-5 md:p-6">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="h-5 w-5 text-amber-400 shrink-0 mt-0.5" aria-hidden="true" />
+              <div className="space-y-2.5">
+                <h3 className="text-sm font-semibold text-amber-300">
+                  The deployed bytecode is older than the source in this repository
+                </h3>
+                <p className="text-xs md:text-sm text-white/60 leading-relaxed">
+                  The contracts at the addresses below were deployed at version 0.1.0. Two security
+                  fixes released in 0.1.2 are present in the repository and are{" "}
+                  <strong className="text-white/85">not yet on chain</strong>:
+                </p>
+                <ul className="text-xs md:text-sm text-white/60 leading-relaxed space-y-1.5 list-disc pl-4">
+                  <li>
+                    <code className="text-[#D4AF37]">MIGRATION_TYPEHASH</code> in the deployed TeleportV3
+                    does not bind every economic parameter, so an authorised executor could replay a
+                    valid owner signature with weakened slippage bounds.
+                  </li>
+                  <li>
+                    The <code className="text-[#D4AF37]">Pausable</code> mechanism in the deployed
+                    PolicyRegistry compiles but does not gate the verification functions, so pausing the
+                    registry does not halt enforcement.
+                  </li>
+                </ul>
+                <p className="text-xs md:text-sm text-white/60 leading-relaxed">
+                  If you read the verified source on Arbiscan you will see the older code, and it will
+                  not match this repository. Redeployment is required before these fixes take effect on
+                  chain. This notice will be removed once that has happened.
+                </p>
+              </div>
+            </div>
           </div>
           <Card className="mb-8 border-[#D4AF37]/20 bg-[#0A1628]/60">
             <CardContent className="py-4 px-6">

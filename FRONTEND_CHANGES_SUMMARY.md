@@ -92,7 +92,7 @@ The CSS foundation has been completely revamped with:
 - Stats row: 4 metrics with links
   - Test Coverage: 90%+ (links to GitHub)
   - Atomic Execution: Single TX (links to Arbiscan)
-  - Live Contracts: 3 on Sepolia (links to explorer)
+  - Live Contracts: 2 on Sepolia (links to explorer)
   - Islamic Finance: $3T+ Market
 
 ### Testnet Warning Banner

@@ -210,6 +210,21 @@ export interface AssistantExchange {
   /** Set when the assistant was not confident and referred the question on. */
   escalated: boolean;
   model: string;
+  /**
+   * Why no answer was given, when none was. `ruling` and `transport` read
+   * identically to a user unless they are distinguished here: one means the
+   * question was declined on its merits, the other means the check could not
+   * be run. Only the second is worth retrying.
+   */
+  failure?: 'ruling' | 'transport' | 'empty' | null;
+  /** Whether retrying is likely to help. Drives the try-again affordance. */
+  retryable?: boolean;
+  /**
+   * The longer explanation. Kept out of `answer` so the interface can show one
+   * line and put the reasoning behind a disclosure, rather than confronting a
+   * scholar with five lines of policy every time a connection drops.
+   */
+  detail?: string;
 }
 
 /** Read from the deployed Policy Registry contract. */

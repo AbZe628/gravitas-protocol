@@ -6,7 +6,7 @@ Ran 2 tests for test/foundry/GravitasInvariants.t.sol:GravitasInvariants
 [PASS] testFuzz_ComplianceInvariant(address) (runs: 256, μ: 46129, ~: 46129)
 [PASS] test_AssetIntegrityInvariant() (gas: 17452)
 Suite result: ok. 2 passed; 0 failed; 0 skipped; finished in 15.35ms (14.77ms CPU time)
-Ran 6 tests for test/GravitasLibearaIntegration.t.sol:GravitasLibearaIntegrationTest
+Ran 6 tests for test/GravitasSubscriptionIntegration.t.sol:GravitasSubscriptionIntegrationTest
 [PASS] test_AreTokensCompliant() (gas: 76917)
 [PASS] test_CheckSubscriptionCompliance_RevertOnNonCompliantAsset() (gas: 18106)
 [PASS] test_CheckSubscriptionCompliance_RevertOnUnauthorizedExecutor() (gas: 22583)

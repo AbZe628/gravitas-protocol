@@ -4,7 +4,7 @@ pragma solidity ^0.8.24;
 import "forge-std/Test.sol";
 import "../contracts/GravitasPolicyRegistry.sol";
 
-contract GravitasLibearaIntegrationTest is Test {
+contract GravitasSubscriptionIntegrationTest is Test {
     GravitasPolicyRegistry registry;
     address owner = address(0x1);
     address asset = address(0x100);

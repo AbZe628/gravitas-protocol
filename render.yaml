@@ -1,0 +1,57 @@
+# Render blueprint for Majlis.
+#
+# Single instance, deliberately. The rate limiter and the daily spend cap in
+# apps/majlis/server/src/services/limits.ts are in-process: two instances keep
+# two independent counters and the effective cap doubles, silently. Do not add
+# autoscaling without first moving those counters to a shared store.
+#
+# Secrets are marked sync:false so Render prompts for them rather than reading
+# them from this file. Nothing secret belongs in a public repository.
+services:
+  - type: web
+    name: gravitas-majlis
+    runtime: node
+    plan: starter            # not "free": cold starts make a poor first impression
+    region: frankfurt
+    branch: main
+    rootDir: apps/majlis
+    numInstances: 1          # see the note above before changing this
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 4000
+
+      # --- secrets: entered in the Render dashboard, never committed --------
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: BASIC_AUTH_USER
+        sync: false
+      - key: BASIC_AUTH_PASSWORD
+        sync: false
+
+      # --- limits: the only thing between an open endpoint and the budget ---
+      - key: RATE_LIMIT_PER_IP
+        value: 10
+      - key: RATE_LIMIT_WINDOW_MS
+        value: 60000
+      - key: RATE_LIMIT_GLOBAL_PER_DAY
+        value: 2000
+      - key: ASSISTANT_DAILY_USD_CAP
+        value: 5
+      - key: ASSISTANT_USD_PER_QUESTION
+        value: 0.02
+
+      # --- chain ------------------------------------------------------------
+      - key: RPC_URL
+        value: https://sepolia-rollup.arbitrum.io/rpc
+      # Deployed bytecode is 0.1.0 and predates the 0.1.2 hardening.
+      # See docs/DEPLOYMENTS.md before treating these as current.
+      - key: POLICY_REGISTRY_ADDRESS
+        value: "0xbcaE3069362B0f0b80f44139052f159456C84679"
+      - key: TELEPORT_V3_ADDRESS
+        value: "0x5D423f8d01539B92D3f3953b91682D9884D1E993"

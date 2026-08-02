@@ -6,6 +6,8 @@ import { ask } from './services/assistant.js';
 import { readRegistry, configFromEnv } from './services/registry.js';
 import { buildAuditExport } from './services/export.js';
 import { verifyParameters } from './services/hash.js';
+import { Limiter, REFUSAL_MESSAGES } from './services/limits.js';
+import { basicAuth, configFromEnv as basicAuthFromEnv } from './middleware/basicAuth.js';
 import type { AssistantExchange } from './types.js';
 
 /**
@@ -16,8 +18,18 @@ import type { AssistantExchange } from './types.js';
  * decision recorded in one place and executed by someone else in another.
  */
 
-/** Everything the assistant is asked is retained. */
+/**
+ * Everything the assistant is asked is retained.
+ *
+ * Bounded, because an unbounded array in a long-running process is a leak, and
+ * because the log is part of the record rather than the record itself. Stage
+ * Two moves this to the store; until then the cap keeps a public deployment
+ * from growing until it falls over.
+ */
+const ASSISTANT_LOG_MAX = 1000;
 const assistantLog: AssistantExchange[] = [];
+
+const limiter = new Limiter();
 
 export function getAssistantLog(): readonly AssistantExchange[] {
   return assistantLog;
@@ -28,8 +40,24 @@ export function createApp(): Express {
   app.use(cors());
   app.use(express.json({ limit: '256kb' }));
 
+  app.set('trust proxy', 1);
+
+  // Everything except /api/health sits behind basic auth. Stage Two replaces
+  // this with real roles; until then a shared credential is the difference
+  // between "internal" and "on the open internet".
+  app.use(basicAuth(basicAuthFromEnv()));
+
   app.get('/api/health', (_req: Request, res: Response) => {
-    res.json({ ok: true, stage: 1, readOnly: true });
+    res.json({
+      ok: true,
+      stage: 1,
+      // No governance write route exists. The assistant endpoint accepts POST
+      // because asking a question is an action, but nothing it does changes a
+      // rule, a vote or the record of either.
+      readOnly: true,
+      governanceWrites: false,
+      assistant: limiter.status(),
+    });
   });
 
   // ---- boards ----------------------------------------------------------
@@ -135,6 +163,20 @@ export function createApp(): Express {
     if (!parsed.success) {
       return res.status(400).json({ error: 'invalid request', detail: parsed.error.issues });
     }
+
+    // Checked before any paid work, never after.
+    const ip = req.ip ?? 'unknown';
+    const decision = limiter.check(ip);
+    if (!decision.allowed) {
+      res.setHeader('Retry-After', String(decision.retryAfterSeconds));
+      return res.status(429).json({
+        error: 'rate limited',
+        reason: decision.reason,
+        message: REFUSAL_MESSAGES[decision.reason],
+        retryAfterSeconds: decision.retryAfterSeconds,
+      });
+    }
+
     try {
       const result = await ask({
         question: parsed.data.question,
@@ -142,16 +184,30 @@ export function createApp(): Express {
         context: parsed.data.context,
       });
       assistantLog.push(result);
+      if (assistantLog.length > ASSISTANT_LOG_MAX) {
+        assistantLog.splice(0, assistantLog.length - ASSISTANT_LOG_MAX);
+      }
       res.json(result);
     } catch (err) {
-      res.status(502).json({
-        error: 'assistant unavailable',
-        detail: err instanceof Error ? err.message : String(err),
-      });
+      // The detail is for the operator, not the caller: it can carry request
+      // ids and model identifiers that do not belong in a public response.
+      console.error('assistant error:', err);
+      res.status(502).json({ error: 'assistant unavailable' });
     }
   });
 
-  /** Everything the assistant said is part of the permanent record. */
+  /**
+   * Everything the assistant said is part of the permanent record.
+   *
+   * The questions a board asks disclose the direction of its deliberation
+   * before it has decided anything, so this is not public. It sits behind the
+   * same basic auth as the rest of the application.
+   *
+   * That means everyone holding the board credential can read every scholar's
+   * questions, which is a real limitation and not a control. Stage Two's roles
+   * are what actually fix it. A second shared secret in front of this route
+   * would look like defence in depth without being any.
+   */
   app.get('/api/assistant/log', (_req, res) => {
     res.json(assistantLog);
   });
