@@ -1,0 +1,565 @@
+🏗️ Contracts (Foundry)	Set up job	﻿2026-08-02T16:47:02.1107735Z Current runner version: '2.336.0'
+🏗️ Contracts (Foundry)	Set up job	2026-08-02T16:47:02.1129134Z ##[group]Runner Image Provisioner
+🏗️ Contracts (Foundry)	Set up job	2026-08-02T16:47:02.1129906Z Hosted Compute Agent
+🏗️ Contracts (Foundry)	Set up job	2026-08-02T16:47:02.1130405Z Version: 20260707.563
+🏗️ Contracts (Foundry)	Set up job	2026-08-02T16:47:02.1130916Z Commit: 02667638d2b423fbc733a8e32a88b44996a3ba6e
+🏗️ Contracts (Foundry)	Set up job	2026-08-02T16:47:02.1131537Z Build Date: 2026-07-07T19:33:50Z
+🏗️ Contracts (Foundry)	Set up job	2026-08-02T16:47:02.1132082Z Worker ID: {f66b45c2-f3a8-497c-9751-669a9c3b7bf9}
+🏗️ Contracts (Foundry)	Set up job	2026-08-02T16:47:02.1132676Z Azure Region: westus3
+🏗️ Contracts (Foundry)	Set up job	2026-08-02T16:47:02.1133208Z ##[endgroup]
+🏗️ Contracts (Foundry)	Set up job	2026-08-02T16:47:02.1134271Z ##[group]Operating System
+🏗️ Contracts (Foundry)	Set up job	2026-08-02T16:47:02.1134872Z Ubuntu
+🏗️ Contracts (Foundry)	Set up job	2026-08-02T16:47:02.1135329Z 24.04.4
+🏗️ Contracts (Foundry)	Set up job	2026-08-02T16:47:02.1135710Z LTS
+🏗️ Contracts (Foundry)	Set up job	2026-08-02T16:47:02.1136418Z ##[endgroup]
+🏗️ Contracts (Foundry)	Set up job	2026-08-02T16:47:02.1136911Z ##[group]Runner Image
+🏗️ Contracts (Foundry)	Set up job	2026-08-02T16:47:02.1137470Z Image: ubuntu-24.04
+🏗️ Contracts (Foundry)	Set up job	2026-08-02T16:47:02.1137946Z Version: 20260720.247.2
+🏗️ Contracts (Foundry)	Set up job	2026-08-02T16:47:02.1138819Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260720.247/images/ubuntu/Ubuntu2404-Readme.md
+🏗️ Contracts (Foundry)	Set up job	2026-08-02T16:47:02.1140195Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260720.247
+🏗️ Contracts (Foundry)	Set up job	2026-08-02T16:47:02.1140930Z ##[endgroup]
+🏗️ Contracts (Foundry)	Set up job	2026-08-02T16:47:02.1141887Z ##[group]GITHUB_TOKEN Permissions
+🏗️ Contracts (Foundry)	Set up job	2026-08-02T16:47:02.1143350Z Contents: read
+🏗️ Contracts (Foundry)	Set up job	2026-08-02T16:47:02.1143925Z Metadata: read
+🏗️ Contracts (Foundry)	Set up job	2026-08-02T16:47:02.1144374Z ##[endgroup]
+🏗️ Contracts (Foundry)	Set up job	2026-08-02T16:47:02.1146067Z Secret source: Actions
+🏗️ Contracts (Foundry)	Set up job	2026-08-02T16:47:02.1147374Z Prepare workflow directory
+🏗️ Contracts (Foundry)	Set up job	2026-08-02T16:47:02.1452987Z Prepare all required actions
+🏗️ Contracts (Foundry)	Set up job	2026-08-02T16:47:02.1506284Z Getting action download info
+🏗️ Contracts (Foundry)	Set up job	2026-08-02T16:47:02.4371996Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+🏗️ Contracts (Foundry)	Set up job	2026-08-02T16:47:03.1369978Z Download action repository 'foundry-rs/foundry-toolchain@v1' (SHA:908c540300062bd5a7e473851cdb4282204cee09)
+🏗️ Contracts (Foundry)	Set up job	2026-08-02T16:47:04.1956800Z Complete job name: 🏗️ Contracts (Foundry)
+🏗️ Contracts (Foundry)	Checkout	﻿2026-08-02T16:47:04.2544789Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.2551319Z ##[group]Run actions/checkout@v4
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.2551793Z with:
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.2552069Z   submodules: recursive
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.2552365Z   fetch-depth: 0
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.2552661Z   repository: AbZe628/gravitas-protocol
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.2554781Z   token: ***
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.2555063Z   ssh-strict: true
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.2555335Z   ssh-user: git
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.2555621Z   persist-credentials: true
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.2555925Z   clean: true
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.2556352Z   sparse-checkout-cone-mode: true
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.2556667Z   fetch-tags: false
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.2556962Z   show-progress: true
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.2557239Z   lfs: false
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.2557556Z   set-safe-directory: true
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.2557870Z   allow-unsafe-pr-checkout: false
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.2558356Z env:
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.2558624Z   FOUNDRY_PROFILE: default
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.2558917Z   CORE_COVERAGE_MIN: 80
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.2559194Z ##[endgroup]
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.3362454Z Syncing repository: AbZe628/gravitas-protocol
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.3364147Z ##[group]Getting Git version info
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.3364883Z Working directory is '/home/runner/work/gravitas-protocol/gravitas-protocol'
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.3365892Z [command]/usr/bin/git version
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.3750880Z git version 2.54.0
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.3767632Z ##[endgroup]
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.3780229Z Temporarily overriding HOME='/home/runner/work/_temp/ac37d1bb-4234-4d2d-8497-c48354101f54' before making global git config changes
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.3781565Z Adding repository directory to the temporary git global config as a safe directory
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.3784357Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/gravitas-protocol/gravitas-protocol
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.3824849Z Deleting the contents of '/home/runner/work/gravitas-protocol/gravitas-protocol'
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.3826582Z ##[group]Initializing the repository
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.3827236Z [command]/usr/bin/git init /home/runner/work/gravitas-protocol/gravitas-protocol
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.3895617Z hint: Using 'master' as the name for the initial branch. This default branch name
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.3897005Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.3898005Z hint: to use in all of your new repositories, which will suppress this warning,
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.3898817Z hint: call:
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.3899380Z hint:
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.3900224Z hint: 	git config --global init.defaultBranch <name>
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.3901084Z hint:
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.3901893Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.3902964Z hint: 'development'. The just-created branch can be renamed via this command:
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.3903879Z hint:
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.3905128Z hint: 	git branch -m <name>
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.3905745Z hint:
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.3906726Z hint: Disable this message with "git config set advice.defaultBranchName false"
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.3907830Z Initialized empty Git repository in /home/runner/work/gravitas-protocol/gravitas-protocol/.git/
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.3909970Z [command]/usr/bin/git remote add origin https://github.com/AbZe628/gravitas-protocol
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.3933811Z ##[endgroup]
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.3934584Z ##[group]Disabling automatic garbage collection
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.3937931Z [command]/usr/bin/git config --local gc.auto 0
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.3965215Z ##[endgroup]
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.3965977Z ##[group]Setting up auth
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.3970949Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.3999085Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.4248515Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.4278829Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.4466247Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.4495870Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.4683257Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.4714642Z ##[endgroup]
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.4715420Z ##[group]Fetching the repository
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:04.4723281Z [command]/usr/bin/git -c protocol.version=2 fetch --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/* +706502a8bf119af56486a78571e9a0e890a393a7:refs/remotes/pull/6/merge
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:06.1680337Z From https://github.com/AbZe628/gravitas-protocol
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:06.1681172Z  * [new branch]      backup-prije-cowork                      -> origin/backup-prije-cowork
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:06.1681906Z  * [new branch]      cowork-redesign                          -> origin/cowork-redesign
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:06.1682677Z  * [new branch]      feature/bank-grade-mvp-v2                -> origin/feature/bank-grade-mvp-v2
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:06.1683366Z  * [new branch]      final-audit-prep                         -> origin/final-audit-prep
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:06.1683983Z  * [new branch]      gh-pages                                 -> origin/gh-pages
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:06.1684638Z  * [new branch]      institutional-refactor                   -> origin/institutional-refactor
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:06.1685319Z  * [new branch]      main                                     -> origin/main
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:06.1686363Z  * [new branch]      series-a-finalization                    -> origin/series-a-finalization
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:06.1687046Z  * [new ref]         706502a8bf119af56486a78571e9a0e890a393a7 -> pull/6/merge
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:06.1707258Z ##[endgroup]
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:06.1707967Z ##[group]Determining the checkout info
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:06.1708528Z ##[endgroup]
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:06.1727141Z [command]/usr/bin/git sparse-checkout disable
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:06.1752199Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:06.1783827Z ##[group]Checking out the ref
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:06.1787674Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/6/merge
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:06.2213406Z Note: switching to 'refs/remotes/pull/6/merge'.
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:06.2213981Z 
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:06.2214523Z You are in 'detached HEAD' state. You can look around, make experimental
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:06.2215163Z changes and commit them, and you can discard any commits you make in this
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:06.2215749Z state without impacting any branches by switching back to a branch.
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:06.2215972Z 
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:06.2216277Z If you want to create a new branch to retain commits you create, you may
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:06.2216782Z do so (now or later) by using -c with the switch command. Example:
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:06.2217067Z 
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:06.2217179Z   git switch -c <new-branch-name>
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:06.2217378Z 
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:06.2217487Z Or undo this operation with:
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:06.2217717Z 
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:06.2217843Z   git switch -
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:06.2217997Z 
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:06.2218243Z Turn off this advice by setting config variable advice.detachedHead to false
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:06.2218661Z 
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:06.2219065Z HEAD is now at 706502a Merge b22758dfe313555e412ca69fa539799aa27dd35c into 45570966a5da2dd5e870f1fcd963ec927b5df215
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:06.2224026Z ##[endgroup]
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:06.2224517Z ##[group]Setting up auth for fetching submodules
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:06.2229570Z [command]/usr/bin/git config --global http.https://github.com/.extraheader AUTHORIZATION: basic ***
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:06.2265712Z [command]/usr/bin/git config --global --unset-all url.https://github.com/.insteadOf
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:06.2293474Z [command]/usr/bin/git config --global --add url.https://github.com/.insteadOf git@github.com:
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:06.2320554Z [command]/usr/bin/git config --global --add url.https://github.com/.insteadOf org-215593336@github.com:
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:06.2346947Z ##[endgroup]
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:06.2347412Z ##[group]Fetching submodules
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:06.2348452Z [command]/usr/bin/git submodule sync --recursive
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:06.2535498Z [command]/usr/bin/git -c protocol.version=2 submodule update --init --force --recursive
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:06.2723168Z [command]/usr/bin/git submodule foreach --recursive git config --local gc.auto 0
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:06.2907248Z ##[endgroup]
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:06.2907606Z ##[group]Persisting credentials for submodules
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:06.2914080Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'url\.https\:\/\/github\.com\/\.insteadOf' && git config --local --unset-all 'url.https://github.com/.insteadOf' || :"
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:06.3101345Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local 'http.https://github.com/.extraheader' 'AUTHORIZATION: basic ***' && git config --local --show-origin --name-only --get-regexp remote.origin.url"
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:06.3289553Z [command]/usr/bin/git submodule foreach --recursive git config --local --add 'url.https://github.com/.insteadOf' 'git@github.com:'
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:06.3476905Z [command]/usr/bin/git submodule foreach --recursive git config --local --add 'url.https://github.com/.insteadOf' 'org-215593336@github.com:'
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:06.3660850Z ##[endgroup]
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:06.3697969Z [command]/usr/bin/git log -1 --format=%H
+🏗️ Contracts (Foundry)	Checkout	2026-08-02T16:47:06.3721905Z 706502a8bf119af56486a78571e9a0e890a393a7
+🏗️ Contracts (Foundry)	Install Foundry (stable)	﻿2026-08-02T16:47:06.3987254Z ##[group]Run foundry-rs/foundry-toolchain@v1
+🏗️ Contracts (Foundry)	Install Foundry (stable)	2026-08-02T16:47:06.3987511Z with:
+🏗️ Contracts (Foundry)	Install Foundry (stable)	2026-08-02T16:47:06.3987674Z   version: stable
+🏗️ Contracts (Foundry)	Install Foundry (stable)	2026-08-02T16:47:06.3987841Z   network: ethereum
+🏗️ Contracts (Foundry)	Install Foundry (stable)	2026-08-02T16:47:06.3988005Z   cache: true
+🏗️ Contracts (Foundry)	Install Foundry (stable)	2026-08-02T16:47:06.3988224Z   cache-key: contracts-706502a8bf119af56486a78571e9a0e890a393a7
+🏗️ Contracts (Foundry)	Install Foundry (stable)	2026-08-02T16:47:06.3988499Z   cache-restore-keys: contracts-
+🏗️ Contracts (Foundry)	Install Foundry (stable)	2026-08-02T16:47:06.3988685Z env:
+🏗️ Contracts (Foundry)	Install Foundry (stable)	2026-08-02T16:47:06.3988833Z   FOUNDRY_PROFILE: default
+🏗️ Contracts (Foundry)	Install Foundry (stable)	2026-08-02T16:47:06.3989029Z   CORE_COVERAGE_MIN: 80
+🏗️ Contracts (Foundry)	Install Foundry (stable)	2026-08-02T16:47:06.3989198Z ##[endgroup]
+🏗️ Contracts (Foundry)	Install Foundry (stable)	2026-08-02T16:47:06.4963803Z Installing Foundry (version: stable)
+🏗️ Contracts (Foundry)	Install Foundry (stable)	2026-08-02T16:47:06.4965929Z Downloading foundryup installer from foundry-rs/foundryup@a27902ef04dcb43061fabf343365cb5afc95fc48...
+🏗️ Contracts (Foundry)	Install Foundry (stable)	2026-08-02T16:47:06.5466823Z Running foundryup installer...
+🏗️ Contracts (Foundry)	Install Foundry (stable)	2026-08-02T16:47:07.5042132Z Running: foundryup 
+🏗️ Contracts (Foundry)	Install Foundry (stable)	2026-08-02T16:47:09.4311618Z Added /home/runner/.foundry/bin to PATH
+🏗️ Contracts (Foundry)	Install Foundry (stable)	2026-08-02T16:47:09.4312648Z Primary key: linux-foundry-chain-fork-contracts-706502a8bf119af56486a78571e9a0e890a393a7
+🏗️ Contracts (Foundry)	Install Foundry (stable)	2026-08-02T16:47:09.4318677Z Restore keys: linux-foundry-chain-fork-contracts-
+🏗️ Contracts (Foundry)	Install Foundry (stable)	2026-08-02T16:47:09.6462341Z Cache hit for restore-key: linux-foundry-chain-fork-contracts-45570966a5da2dd5e870f1fcd963ec927b5df215
+🏗️ Contracts (Foundry)	Install Foundry (stable)	2026-08-02T16:47:10.1654426Z Received 14870 of 14870 (100.0%), 0.1 MBs/sec
+🏗️ Contracts (Foundry)	Install Foundry (stable)	2026-08-02T16:47:10.1654892Z Cache Size: ~0 MB (14870 B)
+🏗️ Contracts (Foundry)	Install Foundry (stable)	2026-08-02T16:47:10.1679238Z [command]/usr/bin/tar -xf /home/runner/work/_temp/46a1ed4b-8b49-4b78-bb50-e735b55172bc/cache.tzst -P -C /home/runner/work/gravitas-protocol/gravitas-protocol --use-compress-program unzstd
+🏗️ Contracts (Foundry)	Install Foundry (stable)	2026-08-02T16:47:10.1726346Z Cache restored successfully
+🏗️ Contracts (Foundry)	Install Foundry (stable)	2026-08-02T16:47:10.1729523Z Cache restored from key: linux-foundry-chain-fork-contracts-45570966a5da2dd5e870f1fcd963ec927b5df215
+🏗️ Contracts (Foundry)	Install Foundry (stable)	2026-08-02T16:47:10.1730488Z Running: forge --version
+🏗️ Contracts (Foundry)	Install Foundry (stable)	2026-08-02T16:47:10.1774540Z forge Version: 1.7.1
+🏗️ Contracts (Foundry)	Install Foundry (stable)	2026-08-02T16:47:10.1774890Z Commit SHA: 4072e48705af9d93e3c0f6e29e93b5e9a40caed8
+🏗️ Contracts (Foundry)	Install Foundry (stable)	2026-08-02T16:47:10.1775222Z Build Timestamp: 2026-05-08T07:50:55.527285345Z (1778226655)
+🏗️ Contracts (Foundry)	Install Foundry (stable)	2026-08-02T16:47:10.1775505Z Build Profile: dist
+🏗️ Contracts (Foundry)	Install Foundry (stable)	2026-08-02T16:47:10.1779480Z Running: cast --version
+🏗️ Contracts (Foundry)	Install Foundry (stable)	2026-08-02T16:47:10.1827128Z cast Version: 1.7.1
+🏗️ Contracts (Foundry)	Install Foundry (stable)	2026-08-02T16:47:10.1827431Z Commit SHA: 4072e48705af9d93e3c0f6e29e93b5e9a40caed8
+🏗️ Contracts (Foundry)	Install Foundry (stable)	2026-08-02T16:47:10.1827834Z Build Timestamp: 2026-05-08T07:50:55.527285345Z (1778226655)
+🏗️ Contracts (Foundry)	Install Foundry (stable)	2026-08-02T16:47:10.1828204Z Build Profile: dist
+🏗️ Contracts (Foundry)	Install Foundry (stable)	2026-08-02T16:47:10.1831975Z Running: anvil --version
+🏗️ Contracts (Foundry)	Install Foundry (stable)	2026-08-02T16:47:10.1868192Z anvil Version: 1.7.1
+🏗️ Contracts (Foundry)	Install Foundry (stable)	2026-08-02T16:47:10.1868554Z Commit SHA: 4072e48705af9d93e3c0f6e29e93b5e9a40caed8
+🏗️ Contracts (Foundry)	Install Foundry (stable)	2026-08-02T16:47:10.1869007Z Build Timestamp: 2026-05-08T07:50:55.527285345Z (1778226655)
+🏗️ Contracts (Foundry)	Install Foundry (stable)	2026-08-02T16:47:10.1869309Z Build Profile: dist
+🏗️ Contracts (Foundry)	Install Foundry (stable)	2026-08-02T16:47:10.1871402Z Running: chisel --version
+🏗️ Contracts (Foundry)	Install Foundry (stable)	2026-08-02T16:47:10.1904038Z chisel Version: 1.7.1
+🏗️ Contracts (Foundry)	Install Foundry (stable)	2026-08-02T16:47:10.1904386Z Commit SHA: 4072e48705af9d93e3c0f6e29e93b5e9a40caed8
+🏗️ Contracts (Foundry)	Install Foundry (stable)	2026-08-02T16:47:10.1904833Z Build Timestamp: 2026-05-08T07:50:55.527285345Z (1778226655)
+🏗️ Contracts (Foundry)	Install Foundry (stable)	2026-08-02T16:47:10.1905144Z Build Profile: dist
+🏗️ Contracts (Foundry)	Format check	﻿2026-08-02T16:47:10.2012188Z ##[group]Run forge fmt --check
+🏗️ Contracts (Foundry)	Format check	2026-08-02T16:47:10.2012489Z ^[[36;1mforge fmt --check^[[0m
+🏗️ Contracts (Foundry)	Format check	2026-08-02T16:47:10.2055655Z shell: /usr/bin/bash -e {0}
+🏗️ Contracts (Foundry)	Format check	2026-08-02T16:47:10.2055883Z env:
+🏗️ Contracts (Foundry)	Format check	2026-08-02T16:47:10.2056048Z   FOUNDRY_PROFILE: default
+🏗️ Contracts (Foundry)	Format check	2026-08-02T16:47:10.2056467Z   CORE_COVERAGE_MIN: 80
+🏗️ Contracts (Foundry)	Format check	2026-08-02T16:47:10.2056657Z ##[endgroup]
+🏗️ Contracts (Foundry)	Build	﻿2026-08-02T16:47:10.2264162Z ##[group]Run forge build --sizes
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.2264436Z ^[[36;1mforge build --sizes^[[0m
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.2302239Z shell: /usr/bin/bash -e {0}
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.2302473Z env:
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.2302654Z   FOUNDRY_PROFILE: default
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.2302849Z   CORE_COVERAGE_MIN: 80
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.2303031Z ##[endgroup]
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.2601974Z Warning: Dependency 'lib/openzeppelin-contracts' not found at expected path
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.7983405Z ^[[2m2026-08-02T16:47:10.797497Z^[[0m ^[[31mERROR^[[0m ^[[2mfoundry_compilers_artifacts_solc::sources^[[0m^[[2m:^[[0m ^[[3merror^[[0m^[[2m=^[[0m"/home/runner/work/gravitas-protocol/gravitas-protocol/lib/openzeppelin-contracts/contracts/access/Ownable2Step.sol": No such file or directory (os error 2)
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.7985714Z ^[[2m2026-08-02T16:47:10.797528Z^[[0m ^[[31mERROR^[[0m ^[[2mfoundry_compilers_artifacts_solc::sources^[[0m^[[2m:^[[0m ^[[3merror^[[0m^[[2m=^[[0m"/home/runner/work/gravitas-protocol/gravitas-protocol/lib/openzeppelin-contracts/contracts/utils/Pausable.sol": No such file or directory (os error 2)
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.7987565Z ^[[2m2026-08-02T16:47:10.797550Z^[[0m ^[[31mERROR^[[0m ^[[2mfoundry_compilers_artifacts_solc::sources^[[0m^[[2m:^[[0m ^[[3merror^[[0m^[[2m=^[[0m"/home/runner/work/gravitas-protocol/gravitas-protocol/lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol": No such file or directory (os error 2)
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.7989112Z ^[[2m2026-08-02T16:47:10.797560Z^[[0m ^[[31mERROR^[[0m ^[[2mfoundry_compilers_artifacts_solc::sources^[[0m^[[2m:^[[0m ^[[3merror^[[0m^[[2m=^[[0m"/home/runner/work/gravitas-protocol/gravitas-protocol/lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol": No such file or directory (os error 2)
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.7990700Z ^[[2m2026-08-02T16:47:10.797569Z^[[0m ^[[31mERROR^[[0m ^[[2mfoundry_compilers_artifacts_solc::sources^[[0m^[[2m:^[[0m ^[[3merror^[[0m^[[2m=^[[0m"/home/runner/work/gravitas-protocol/gravitas-protocol/lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol": No such file or directory (os error 2)
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.7992876Z ^[[2m2026-08-02T16:47:10.797579Z^[[0m ^[[31mERROR^[[0m ^[[2mfoundry_compilers_artifacts_solc::sources^[[0m^[[2m:^[[0m ^[[3merror^[[0m^[[2m=^[[0m"/home/runner/work/gravitas-protocol/gravitas-protocol/lib/openzeppelin-contracts/contracts/utils/ReentrancyGuard.sol": No such file or directory (os error 2)
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.7995604Z ^[[2m2026-08-02T16:47:10.797593Z^[[0m ^[[31mERROR^[[0m ^[[2mfoundry_compilers_artifacts_solc::sources^[[0m^[[2m:^[[0m ^[[3merror^[[0m^[[2m=^[[0m"/home/runner/work/gravitas-protocol/gravitas-protocol/lib/openzeppelin-contracts/contracts/access/Ownable.sol": No such file or directory (os error 2)
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.7998536Z ^[[2m2026-08-02T16:47:10.797630Z^[[0m ^[[31mERROR^[[0m ^[[2mfoundry_compilers_artifacts_solc::sources^[[0m^[[2m:^[[0m ^[[3merror^[[0m^[[2m=^[[0m"/home/runner/work/gravitas-protocol/gravitas-protocol/lib/openzeppelin-contracts/contracts/token/ERC721/IERC721Receiver.sol": No such file or directory (os error 2)
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8001350Z ^[[2m2026-08-02T16:47:10.797649Z^[[0m ^[[31mERROR^[[0m ^[[2mfoundry_compilers_artifacts_solc::sources^[[0m^[[2m:^[[0m ^[[3merror^[[0m^[[2m=^[[0m"/home/runner/work/gravitas-protocol/gravitas-protocol/lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol": No such file or directory (os error 2)
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8004084Z ^[[2m2026-08-02T16:47:10.797660Z^[[0m ^[[31mERROR^[[0m ^[[2mfoundry_compilers_artifacts_solc::sources^[[0m^[[2m:^[[0m ^[[3merror^[[0m^[[2m=^[[0m"/home/runner/work/gravitas-protocol/gravitas-protocol/lib/openzeppelin-contracts/contracts/utils/ReentrancyGuard.sol": No such file or directory (os error 2)
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8006959Z ^[[2m2026-08-02T16:47:10.797671Z^[[0m ^[[31mERROR^[[0m ^[[2mfoundry_compilers_artifacts_solc::sources^[[0m^[[2m:^[[0m ^[[3merror^[[0m^[[2m=^[[0m"/home/runner/work/gravitas-protocol/gravitas-protocol/lib/openzeppelin-contracts/contracts/access/Ownable.sol": No such file or directory (os error 2)
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8009607Z ^[[2m2026-08-02T16:47:10.797682Z^[[0m ^[[31mERROR^[[0m ^[[2mfoundry_compilers_artifacts_solc::sources^[[0m^[[2m:^[[0m ^[[3merror^[[0m^[[2m=^[[0m"/home/runner/work/gravitas-protocol/gravitas-protocol/lib/openzeppelin-contracts/contracts/utils/Pausable.sol": No such file or directory (os error 2)
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8012623Z ^[[2m2026-08-02T16:47:10.797694Z^[[0m ^[[31mERROR^[[0m ^[[2mfoundry_compilers_artifacts_solc::sources^[[0m^[[2m:^[[0m ^[[3merror^[[0m^[[2m=^[[0m"/home/runner/work/gravitas-protocol/gravitas-protocol/lib/openzeppelin-contracts/contracts/utils/cryptography/ECDSA.sol": No such file or directory (os error 2)
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8015377Z ^[[2m2026-08-02T16:47:10.797705Z^[[0m ^[[31mERROR^[[0m ^[[2mfoundry_compilers_artifacts_solc::sources^[[0m^[[2m:^[[0m ^[[3merror^[[0m^[[2m=^[[0m"/home/runner/work/gravitas-protocol/gravitas-protocol/lib/openzeppelin-contracts/contracts/utils/cryptography/EIP712.sol": No such file or directory (os error 2)
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8018405Z ^[[2m2026-08-02T16:47:10.797721Z^[[0m ^[[31mERROR^[[0m ^[[2mfoundry_compilers_artifacts_solc::sources^[[0m^[[2m:^[[0m ^[[3merror^[[0m^[[2m=^[[0m"/home/runner/work/gravitas-protocol/gravitas-protocol/lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol": No such file or directory (os error 2)
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8021066Z ^[[2m2026-08-02T16:47:10.797736Z^[[0m ^[[31mERROR^[[0m ^[[2mfoundry_compilers_artifacts_solc::sources^[[0m^[[2m:^[[0m ^[[3merror^[[0m^[[2m=^[[0m"/home/runner/work/gravitas-protocol/gravitas-protocol/lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol": No such file or directory (os error 2)
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8023694Z ^[[2m2026-08-02T16:47:10.797760Z^[[0m ^[[31mERROR^[[0m ^[[2mfoundry_compilers_artifacts_solc::sources^[[0m^[[2m:^[[0m ^[[3merror^[[0m^[[2m=^[[0m"/home/runner/work/gravitas-protocol/gravitas-protocol/lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol": No such file or directory (os error 2)
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8026554Z ^[[2m2026-08-02T16:47:10.797772Z^[[0m ^[[31mERROR^[[0m ^[[2mfoundry_compilers_artifacts_solc::sources^[[0m^[[2m:^[[0m ^[[3merror^[[0m^[[2m=^[[0m"/home/runner/work/gravitas-protocol/gravitas-protocol/lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol": No such file or directory (os error 2)
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8029486Z ^[[2m2026-08-02T16:47:10.797784Z^[[0m ^[[31mERROR^[[0m ^[[2mfoundry_compilers_artifacts_solc::sources^[[0m^[[2m:^[[0m ^[[3merror^[[0m^[[2m=^[[0m"/home/runner/work/gravitas-protocol/gravitas-protocol/lib/openzeppelin-contracts/contracts/governance/TimelockController.sol": No such file or directory (os error 2)
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8032321Z ^[[2m2026-08-02T16:47:10.797801Z^[[0m ^[[31mERROR^[[0m ^[[2mfoundry_compilers_artifacts_solc::sources^[[0m^[[2m:^[[0m ^[[3merror^[[0m^[[2m=^[[0m"/home/runner/work/gravitas-protocol/gravitas-protocol/lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol": No such file or directory (os error 2)
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8035062Z ^[[2m2026-08-02T16:47:10.797812Z^[[0m ^[[31mERROR^[[0m ^[[2mfoundry_compilers_artifacts_solc::sources^[[0m^[[2m:^[[0m ^[[3merror^[[0m^[[2m=^[[0m"/home/runner/work/gravitas-protocol/gravitas-protocol/lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol": No such file or directory (os error 2)
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8037998Z ^[[2m2026-08-02T16:47:10.797823Z^[[0m ^[[31mERROR^[[0m ^[[2mfoundry_compilers_artifacts_solc::sources^[[0m^[[2m:^[[0m ^[[3merror^[[0m^[[2m=^[[0m"/home/runner/work/gravitas-protocol/gravitas-protocol/lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol": No such file or directory (os error 2)
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8040713Z ^[[2m2026-08-02T16:47:10.797836Z^[[0m ^[[31mERROR^[[0m ^[[2mfoundry_compilers_artifacts_solc::sources^[[0m^[[2m:^[[0m ^[[3merror^[[0m^[[2m=^[[0m"/home/runner/work/gravitas-protocol/gravitas-protocol/lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol": No such file or directory (os error 2)
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8043483Z ^[[2m2026-08-02T16:47:10.797847Z^[[0m ^[[31mERROR^[[0m ^[[2mfoundry_compilers_artifacts_solc::sources^[[0m^[[2m:^[[0m ^[[3merror^[[0m^[[2m=^[[0m"/home/runner/work/gravitas-protocol/gravitas-protocol/lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol": No such file or directory (os error 2)
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8046306Z ^[[2m2026-08-02T16:47:10.797867Z^[[0m ^[[31mERROR^[[0m ^[[2mfoundry_compilers_artifacts_solc::sources^[[0m^[[2m:^[[0m ^[[3merror^[[0m^[[2m=^[[0m"/home/runner/work/gravitas-protocol/gravitas-protocol/lib/openzeppelin-contracts/contracts/token/ERC721/ERC721.sol": No such file or directory (os error 2)
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8049165Z ^[[2m2026-08-02T16:47:10.797878Z^[[0m ^[[31mERROR^[[0m ^[[2mfoundry_compilers_artifacts_solc::sources^[[0m^[[2m:^[[0m ^[[3merror^[[0m^[[2m=^[[0m"/home/runner/work/gravitas-protocol/gravitas-protocol/lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol": No such file or directory (os error 2)
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8051958Z ^[[2m2026-08-02T16:47:10.797890Z^[[0m ^[[31mERROR^[[0m ^[[2mfoundry_compilers_artifacts_solc::sources^[[0m^[[2m:^[[0m ^[[3merror^[[0m^[[2m=^[[0m"/home/runner/work/gravitas-protocol/gravitas-protocol/lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol": No such file or directory (os error 2)
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8054617Z ^[[2m2026-08-02T16:47:10.797901Z^[[0m ^[[31mERROR^[[0m ^[[2mfoundry_compilers_artifacts_solc::sources^[[0m^[[2m:^[[0m ^[[3merror^[[0m^[[2m=^[[0m"/home/runner/work/gravitas-protocol/gravitas-protocol/lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol": No such file or directory (os error 2)
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8057586Z ^[[2m2026-08-02T16:47:10.797912Z^[[0m ^[[31mERROR^[[0m ^[[2mfoundry_compilers_artifacts_solc::sources^[[0m^[[2m:^[[0m ^[[3merror^[[0m^[[2m=^[[0m"/home/runner/work/gravitas-protocol/gravitas-protocol/lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol": No such file or directory (os error 2)
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8060264Z ^[[2m2026-08-02T16:47:10.798152Z^[[0m ^[[31mERROR^[[0m ^[[2mfoundry_compilers_artifacts_solc::sources^[[0m^[[2m:^[[0m ^[[3merror^[[0m^[[2m=^[[0m"/home/runner/work/gravitas-protocol/gravitas-protocol/lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol": No such file or directory (os error 2)
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8062992Z ^[[2m2026-08-02T16:47:10.798197Z^[[0m ^[[31mERROR^[[0m ^[[2mfoundry_compilers_artifacts_solc::sources^[[0m^[[2m:^[[0m ^[[3merror^[[0m^[[2m=^[[0m"/home/runner/work/gravitas-protocol/gravitas-protocol/lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol": No such file or directory (os error 2)
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8065699Z ^[[2m2026-08-02T16:47:10.798226Z^[[0m ^[[31mERROR^[[0m ^[[2mfoundry_compilers_artifacts_solc::sources^[[0m^[[2m:^[[0m ^[[3merror^[[0m^[[2m=^[[0m"/home/runner/work/gravitas-protocol/gravitas-protocol/lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol": No such file or directory (os error 2)
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8068544Z ^[[2m2026-08-02T16:47:10.798260Z^[[0m ^[[31mERROR^[[0m ^[[2mfoundry_compilers_artifacts_solc::sources^[[0m^[[2m:^[[0m ^[[3merror^[[0m^[[2m=^[[0m"/home/runner/work/gravitas-protocol/gravitas-protocol/lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol": No such file or directory (os error 2)
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8071277Z ^[[2m2026-08-02T16:47:10.798290Z^[[0m ^[[31mERROR^[[0m ^[[2mfoundry_compilers_artifacts_solc::sources^[[0m^[[2m:^[[0m ^[[3merror^[[0m^[[2m=^[[0m"/home/runner/work/gravitas-protocol/gravitas-protocol/lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol": No such file or directory (os error 2)
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8074008Z ^[[2m2026-08-02T16:47:10.798301Z^[[0m ^[[31mERROR^[[0m ^[[2mfoundry_compilers_artifacts_solc::sources^[[0m^[[2m:^[[0m ^[[3merror^[[0m^[[2m=^[[0m"/home/runner/work/gravitas-protocol/gravitas-protocol/lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol": No such file or directory (os error 2)
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8076945Z ^[[2m2026-08-02T16:47:10.798313Z^[[0m ^[[31mERROR^[[0m ^[[2mfoundry_compilers_artifacts_solc::sources^[[0m^[[2m:^[[0m ^[[3merror^[[0m^[[2m=^[[0m"/home/runner/work/gravitas-protocol/gravitas-protocol/lib/openzeppelin-contracts/contracts/token/ERC721/ERC721.sol": No such file or directory (os error 2)
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8079631Z ^[[2m2026-08-02T16:47:10.798324Z^[[0m ^[[31mERROR^[[0m ^[[2mfoundry_compilers_artifacts_solc::sources^[[0m^[[2m:^[[0m ^[[3merror^[[0m^[[2m=^[[0m"/home/runner/work/gravitas-protocol/gravitas-protocol/lib/openzeppelin-contracts/contracts/utils/cryptography/ECDSA.sol": No such file or directory (os error 2)
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8087905Z Unable to resolve imports:
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8088542Z       "@openzeppelin/contracts/token/ERC20/IERC20.sol" in "/home/runner/work/gravitas-protocol/gravitas-protocol/contracts/mocks/MockUniswapV3SwapRouter.sol"
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8089419Z       "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol" in "/home/runner/work/gravitas-protocol/gravitas-protocol/contracts/mocks/MockUniswapV3SwapRouter.sol"
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8090214Z       "@openzeppelin/contracts/token/ERC20/ERC20.sol" in "/home/runner/work/gravitas-protocol/gravitas-protocol/test/foundry/TeleportV2FullFlow.t.sol"
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8091146Z       "@openzeppelin/contracts/utils/ReentrancyGuard.sol" in "/home/runner/work/gravitas-protocol/gravitas-protocol/contracts/TeleportV2.sol"
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8091844Z       "@openzeppelin/contracts/access/Ownable.sol" in "/home/runner/work/gravitas-protocol/gravitas-protocol/contracts/TeleportV3.sol"
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8092578Z       "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol" in "/home/runner/work/gravitas-protocol/gravitas-protocol/contracts/mocks/MockUniswapV2Router.sol"
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8093377Z       "@openzeppelin/contracts/utils/cryptography/ECDSA.sol" in "/home/runner/work/gravitas-protocol/gravitas-protocol/test/foundry/TeleportV3FullFlow.t.sol"
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8094215Z       "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol" in "/home/runner/work/gravitas-protocol/gravitas-protocol/contracts/mocks/MockUniswapV3PositionManager.sol"
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8094962Z       "@openzeppelin/contracts/token/ERC20/ERC20.sol" in "/home/runner/work/gravitas-protocol/gravitas-protocol/contracts/TokenA.sol"
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8095675Z       "@openzeppelin/contracts/access/Ownable2Step.sol" in "/home/runner/work/gravitas-protocol/gravitas-protocol/contracts/GravitasPolicyRegistry.sol"
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8096615Z       "@openzeppelin/contracts/token/ERC20/IERC20.sol" in "/home/runner/work/gravitas-protocol/gravitas-protocol/contracts/mocks/MockUniswapV2Router.sol"
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8097398Z       "@openzeppelin/contracts/token/ERC20/ERC20.sol" in "/home/runner/work/gravitas-protocol/gravitas-protocol/test/foundry/TeleportTests.t.sol"
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8098108Z       "@openzeppelin/contracts/utils/ReentrancyGuard.sol" in "/home/runner/work/gravitas-protocol/gravitas-protocol/contracts/TeleportV3.sol"
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8098774Z       "@openzeppelin/contracts/token/ERC20/ERC20.sol" in "/home/runner/work/gravitas-protocol/gravitas-protocol/contracts/TokenB.sol"
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8099430Z       "@openzeppelin/contracts/token/ERC20/IERC20.sol" in "/home/runner/work/gravitas-protocol/gravitas-protocol/contracts/TeleportV2.sol"
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8100280Z       "@openzeppelin/contracts/access/Ownable.sol" in "/home/runner/work/gravitas-protocol/gravitas-protocol/contracts/TeleportV2.sol"
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8101232Z       "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol" in "/home/runner/work/gravitas-protocol/gravitas-protocol/contracts/TeleportV2.sol"
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8102263Z       "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol" in "/home/runner/work/gravitas-protocol/gravitas-protocol/contracts/TeleportV3.sol"
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8103471Z       "@openzeppelin/contracts/utils/Pausable.sol" in "/home/runner/work/gravitas-protocol/gravitas-protocol/contracts/TeleportV3.sol"
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8104219Z       "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol" in "/home/runner/work/gravitas-protocol/gravitas-protocol/contracts/UniV2Adapter.sol"
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8104946Z       "@openzeppelin/contracts/utils/cryptography/EIP712.sol" in "/home/runner/work/gravitas-protocol/gravitas-protocol/contracts/TeleportV3.sol"
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8105643Z       "@openzeppelin/contracts/token/ERC20/IERC20.sol" in "/home/runner/work/gravitas-protocol/gravitas-protocol/contracts/UniV2Adapter.sol"
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8106767Z       "@openzeppelin/contracts/governance/TimelockController.sol" in "/home/runner/work/gravitas-protocol/gravitas-protocol/contracts/governance/GravitasTimelock.sol"
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8108321Z       "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol" in "/home/runner/work/gravitas-protocol/gravitas-protocol/contracts/mocks/MockUniswapV2Pair.sol"
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8109666Z       "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol" in "/home/runner/work/gravitas-protocol/gravitas-protocol/test/foundry/TeleportV3FullFlow.t.sol"
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8110505Z       "@openzeppelin/contracts/token/ERC721/ERC721.sol" in "/home/runner/work/gravitas-protocol/gravitas-protocol/contracts/mocks/MockUniswapV3PositionManager.sol"
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8111471Z       "@openzeppelin/contracts/token/ERC20/ERC20.sol" in "/home/runner/work/gravitas-protocol/gravitas-protocol/test/foundry/GravitasInvariants.t.sol"
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8112730Z       "@openzeppelin/contracts/utils/Pausable.sol" in "/home/runner/work/gravitas-protocol/gravitas-protocol/contracts/GravitasPolicyRegistry.sol"
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8113739Z       "@openzeppelin/contracts/token/ERC20/IERC20.sol" in "/home/runner/work/gravitas-protocol/gravitas-protocol/contracts/mocks/MockUniswapV2Pair.sol"
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8114711Z       "@openzeppelin/contracts/utils/cryptography/ECDSA.sol" in "/home/runner/work/gravitas-protocol/gravitas-protocol/contracts/TeleportV3.sol"
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8115605Z       "@openzeppelin/contracts/token/ERC20/ERC20.sol" in "/home/runner/work/gravitas-protocol/gravitas-protocol/contracts/MockERC20.sol"
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8116913Z       "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol" in "/home/runner/work/gravitas-protocol/gravitas-protocol/contracts/TeleportV3.sol"
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8117693Z       "@openzeppelin/contracts/token/ERC20/ERC20.sol" in "/home/runner/work/gravitas-protocol/gravitas-protocol/test/foundry/TeleportV3FullFlow.t.sol"
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8118420Z       "@openzeppelin/contracts/token/ERC20/ERC20.sol" in "/home/runner/work/gravitas-protocol/gravitas-protocol/test/foundry/TeleportFlow.t.sol"
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8119178Z       "@openzeppelin/contracts/token/ERC20/IERC20.sol" in "/home/runner/work/gravitas-protocol/gravitas-protocol/contracts/mocks/MockUniswapV3PositionManager.sol"
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8119965Z       "@openzeppelin/contracts/token/ERC20/ERC20.sol" in "/home/runner/work/gravitas-protocol/gravitas-protocol/contracts/mocks/MockUniswapV2Pair.sol"
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8120701Z       "@openzeppelin/contracts/token/ERC721/ERC721.sol" in "/home/runner/work/gravitas-protocol/gravitas-protocol/test/foundry/TeleportV3FullFlow.t.sol"
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8121181Z with remappings:
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8121586Z       @openzeppelin/contracts/=/home/runner/work/gravitas-protocol/gravitas-protocol/lib/openzeppelin-contracts/contracts/
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8122133Z       forge-std/=/home/runner/work/gravitas-protocol/gravitas-protocol/lib/forge-std/src/
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8122476Z Compiling 48 files with Solc 0.8.24
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8771031Z Solc 0.8.24 finished in 65.66ms
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8796724Z Error: Compiler run failed:
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8797756Z Error (6275): Source "lib/openzeppelin-contracts/contracts/access/Ownable2Step.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8798820Z ParserError: Source "lib/openzeppelin-contracts/contracts/access/Ownable2Step.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8799846Z  --> contracts/GravitasPolicyRegistry.sol:4:1:
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8800201Z   |
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8800504Z 4 | import "@openzeppelin/contracts/access/Ownable2Step.sol";
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8800945Z   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8801186Z 
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8801727Z Error (6275): Source "lib/openzeppelin-contracts/contracts/utils/Pausable.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8802700Z ParserError: Source "lib/openzeppelin-contracts/contracts/utils/Pausable.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8803707Z  --> contracts/GravitasPolicyRegistry.sol:5:1:
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8803943Z   |
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8804144Z 5 | import "@openzeppelin/contracts/utils/Pausable.sol";
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8804400Z   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8804548Z 
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8804997Z Error (6275): Source "lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8806064Z ParserError: Source "lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8807209Z  --> contracts/MockERC20.sol:4:1:
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8807510Z   |
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8807824Z 4 | import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8808241Z   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8808480Z 
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8809237Z Error (6275): Source "lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8810896Z ParserError: Source "lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8811909Z  --> contracts/TeleportV2.sol:4:1:
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8812190Z   |
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8812531Z 4 | import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8812967Z   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8813221Z 
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8814072Z Error (6275): Source "lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8815853Z ParserError: Source "lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8817103Z  --> contracts/TeleportV2.sol:5:1:
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8817421Z   |
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8817766Z 5 | import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8818243Z   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8818495Z 
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8819258Z Error (6275): Source "lib/openzeppelin-contracts/contracts/utils/ReentrancyGuard.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8820262Z ParserError: Source "lib/openzeppelin-contracts/contracts/utils/ReentrancyGuard.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8820881Z  --> contracts/TeleportV2.sol:6:1:
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8821121Z   |
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8821469Z 6 | import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8821912Z   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8822145Z 
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8822879Z Error (6275): Source "lib/openzeppelin-contracts/contracts/access/Ownable.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8824044Z ParserError: Source "lib/openzeppelin-contracts/contracts/access/Ownable.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8824675Z  --> contracts/TeleportV2.sol:7:1:
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8825022Z   |
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8825223Z 7 | import "@openzeppelin/contracts/access/Ownable.sol";
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8825482Z   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8825627Z 
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8826456Z Error (6275): Source "lib/openzeppelin-contracts/contracts/token/ERC721/IERC721Receiver.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8827553Z ParserError: Source "lib/openzeppelin-contracts/contracts/token/ERC721/IERC721Receiver.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8828311Z  --> contracts/TeleportV3.sol:4:1:
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8828512Z   |
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8828740Z 4 | import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8829050Z   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8829210Z 
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8829697Z Error (6275): Source "lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8830708Z ParserError: Source "lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8831339Z  --> contracts/TeleportV3.sol:5:1:
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8831545Z   |
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8831764Z 5 | import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8832060Z   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8832211Z 
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8832679Z Error (6275): Source "lib/openzeppelin-contracts/contracts/utils/ReentrancyGuard.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8833662Z ParserError: Source "lib/openzeppelin-contracts/contracts/utils/ReentrancyGuard.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8834274Z  --> contracts/TeleportV3.sol:6:1:
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8834467Z   |
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8834672Z 6 | import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8834951Z   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8835108Z 
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8835542Z Error (6275): Source "lib/openzeppelin-contracts/contracts/access/Ownable.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8836645Z ParserError: Source "lib/openzeppelin-contracts/contracts/access/Ownable.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8837266Z  --> contracts/TeleportV3.sol:7:1:
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8837464Z   |
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8837657Z 7 | import "@openzeppelin/contracts/access/Ownable.sol";
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8837911Z   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8838060Z 
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8838496Z Error (6275): Source "lib/openzeppelin-contracts/contracts/utils/Pausable.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8839437Z ParserError: Source "lib/openzeppelin-contracts/contracts/utils/Pausable.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8840022Z  --> contracts/TeleportV3.sol:8:1:
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8840219Z   |
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8840409Z 8 | import "@openzeppelin/contracts/utils/Pausable.sol";
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8840660Z   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8840920Z 
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8841395Z Error (6275): Source "lib/openzeppelin-contracts/contracts/utils/cryptography/ECDSA.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8842399Z ParserError: Source "lib/openzeppelin-contracts/contracts/utils/cryptography/ECDSA.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8843123Z  --> contracts/TeleportV3.sol:9:1:
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8843320Z   |
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8843527Z 9 | import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8843813Z   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8843971Z 
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8844446Z Error (6275): Source "lib/openzeppelin-contracts/contracts/utils/cryptography/EIP712.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8845442Z ParserError: Source "lib/openzeppelin-contracts/contracts/utils/cryptography/EIP712.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8846050Z   --> contracts/TeleportV3.sol:10:1:
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8846405Z    |
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8846623Z 10 | import "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8846918Z    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8847079Z 
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8847527Z Error (6275): Source "lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8848472Z ParserError: Source "lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8849062Z  --> contracts/TokenA.sol:4:1:
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8849252Z   |
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8849453Z 4 | import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8849717Z   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8849859Z 
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8850304Z Error (6275): Source "lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8851244Z ParserError: Source "lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8851832Z  --> contracts/TokenB.sol:4:1:
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8852026Z   |
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8852217Z 4 | import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8852474Z   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8852618Z 
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8853068Z Error (6275): Source "lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8854013Z ParserError: Source "lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8854626Z  --> contracts/UniV2Adapter.sol:8:1:
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8854826Z   |
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8855023Z 8 | import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8855285Z   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8855436Z 
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8855909Z Error (6275): Source "lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8857426Z ParserError: Source "lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8858085Z  --> contracts/UniV2Adapter.sol:9:1:
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8858293Z   |
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8858511Z 9 | import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8858811Z   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8859082Z 
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8859580Z Error (6275): Source "lib/openzeppelin-contracts/contracts/governance/TimelockController.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8860626Z ParserError: Source "lib/openzeppelin-contracts/contracts/governance/TimelockController.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8861302Z  --> contracts/governance/GravitasTimelock.sol:4:1:
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8861551Z   |
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8861832Z 4 | import "@openzeppelin/contracts/governance/TimelockController.sol";
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8862150Z   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8862305Z 
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8862783Z Error (6275): Source "lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8863747Z ParserError: Source "lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8864362Z  --> contracts/mocks/MockUniswapV2Pair.sol:4:1:
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8864590Z   |
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8864791Z 4 | import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8865055Z   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8865196Z 
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8865651Z Error (6275): Source "lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8866792Z ParserError: Source "lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8867424Z  --> contracts/mocks/MockUniswapV2Pair.sol:5:1:
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8867649Z   |
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8867852Z 5 | import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8868119Z   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8868267Z 
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8868740Z Error (6275): Source "lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8869748Z ParserError: Source "lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8870380Z  --> contracts/mocks/MockUniswapV2Pair.sol:6:1:
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8870602Z   |
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8870820Z 6 | import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8871110Z   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8871269Z 
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8871710Z Error (6275): Source "lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8872661Z ParserError: Source "lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8873433Z  --> contracts/mocks/MockUniswapV2Router.sol:4:1:
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8873664Z   |
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8873858Z 4 | import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8874126Z   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8874278Z 
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8874771Z Error (6275): Source "lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8875949Z ParserError: Source "lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8876833Z  --> contracts/mocks/MockUniswapV2Router.sol:5:1:
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8877069Z   |
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8877288Z 5 | import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8877583Z   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8877733Z 
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8878195Z Error (6275): Source "lib/openzeppelin-contracts/contracts/token/ERC721/ERC721.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8879169Z ParserError: Source "lib/openzeppelin-contracts/contracts/token/ERC721/ERC721.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8879814Z  --> contracts/mocks/MockUniswapV3PositionManager.sol:4:1:
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8880068Z   |
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8880272Z 4 | import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8880534Z   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8880679Z 
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8881137Z Error (6275): Source "lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8882089Z ParserError: Source "lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8882722Z  --> contracts/mocks/MockUniswapV3PositionManager.sol:5:1:
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8882977Z   |
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8883164Z 5 | import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8883422Z   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8883562Z 
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8884036Z Error (6275): Source "lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8885036Z ParserError: Source "lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8885701Z  --> contracts/mocks/MockUniswapV3PositionManager.sol:6:1:
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8885942Z   |
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8886298Z 6 | import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8886603Z   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8886765Z 
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8887206Z Error (6275): Source "lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8888165Z ParserError: Source "lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8888899Z  --> contracts/mocks/MockUniswapV3SwapRouter.sol:4:1:
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8889137Z   |
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8889325Z 4 | import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8889580Z   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8889732Z 
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8890195Z Error (6275): Source "lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8891331Z ParserError: Source "lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8891982Z  --> contracts/mocks/MockUniswapV3SwapRouter.sol:5:1:
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8892213Z   |
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8892425Z 5 | import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8892712Z   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8892870Z 
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8893328Z Error (6275): Source "lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8894274Z ParserError: Source "lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8894886Z  --> test/foundry/GravitasInvariants.t.sol:7:1:
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8895107Z   |
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8895298Z 7 | import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8895566Z   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8895704Z 
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8896312Z Error (6275): Source "lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8897300Z ParserError: Source "lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8897900Z  --> test/foundry/TeleportFlow.t.sol:7:1:
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8898107Z   |
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8898303Z 7 | import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8898555Z   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8898721Z 
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8899172Z Error (6275): Source "lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8900116Z ParserError: Source "lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8900729Z  --> test/foundry/TeleportTests.t.sol:8:1:
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8900947Z   |
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8901139Z 8 | import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8901396Z   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8901538Z 
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8901980Z Error (6275): Source "lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8902921Z ParserError: Source "lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8903537Z   --> test/foundry/TeleportV2FullFlow.t.sol:10:1:
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8903881Z    |
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8904079Z 10 | import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8904344Z    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8904494Z 
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8904934Z Error (6275): Source "lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8905892Z ParserError: Source "lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8906784Z  --> test/foundry/TeleportV3FullFlow.t.sol:9:1:
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8907009Z   |
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8907202Z 9 | import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8907455Z   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8907606Z 
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8908077Z Error (6275): Source "lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8909083Z ParserError: Source "lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8909730Z   --> test/foundry/TeleportV3FullFlow.t.sol:10:1:
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8909962Z    |
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8910179Z 10 | import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8910472Z    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8910632Z 
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8911084Z Error (6275): Source "lib/openzeppelin-contracts/contracts/token/ERC721/ERC721.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8912044Z ParserError: Source "lib/openzeppelin-contracts/contracts/token/ERC721/ERC721.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8912670Z   --> test/foundry/TeleportV3FullFlow.t.sol:11:1:
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8912894Z    |
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8913092Z 11 | import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8913359Z    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8913515Z 
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8913991Z Error (6275): Source "lib/openzeppelin-contracts/contracts/utils/cryptography/ECDSA.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8914989Z ParserError: Source "lib/openzeppelin-contracts/contracts/utils/cryptography/ECDSA.sol" not found: File not found. Searched the following locations: "/home/runner/work/gravitas-protocol/gravitas-protocol".
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8915617Z   --> test/foundry/TeleportV3FullFlow.t.sol:12:1:
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8915836Z    |
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8916055Z 12 | import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8916539Z    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+🏗️ Contracts (Foundry)	Build	2026-08-02T16:47:10.8925920Z ##[error]Process completed with exit code 1.
+🏗️ Contracts (Foundry)	Post Checkout	﻿2026-08-02T16:47:10.9061570Z Node 20 is being deprecated. This workflow is running with Node 24 by default. If you need to temporarily use Node 20, you can set the ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true environment variable. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+🏗️ Contracts (Foundry)	Post Checkout	2026-08-02T16:47:10.9062539Z Post job cleanup.
+🏗️ Contracts (Foundry)	Post Checkout	2026-08-02T16:47:10.9726575Z [command]/usr/bin/git version
+🏗️ Contracts (Foundry)	Post Checkout	2026-08-02T16:47:10.9760160Z git version 2.54.0
+🏗️ Contracts (Foundry)	Post Checkout	2026-08-02T16:47:10.9788734Z Temporarily overriding HOME='/home/runner/work/_temp/af1f8736-ca2d-4df8-929c-f59eef7449e8' before making global git config changes
+🏗️ Contracts (Foundry)	Post Checkout	2026-08-02T16:47:10.9789734Z Adding repository directory to the temporary git global config as a safe directory
+🏗️ Contracts (Foundry)	Post Checkout	2026-08-02T16:47:10.9793638Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/gravitas-protocol/gravitas-protocol
+🏗️ Contracts (Foundry)	Post Checkout	2026-08-02T16:47:10.9825091Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+🏗️ Contracts (Foundry)	Post Checkout	2026-08-02T16:47:10.9853190Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+🏗️ Contracts (Foundry)	Post Checkout	2026-08-02T16:47:11.0064754Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+🏗️ Contracts (Foundry)	Post Checkout	2026-08-02T16:47:11.0083324Z http.https://github.com/.extraheader
+🏗️ Contracts (Foundry)	Post Checkout	2026-08-02T16:47:11.0093644Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+🏗️ Contracts (Foundry)	Post Checkout	2026-08-02T16:47:11.0122157Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+🏗️ Contracts (Foundry)	Post Checkout	2026-08-02T16:47:11.0329906Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+🏗️ Contracts (Foundry)	Post Checkout	2026-08-02T16:47:11.0366984Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+🏗️ Contracts (Foundry)	Complete job	﻿2026-08-02T16:47:11.0721044Z Cleaning up orphan processes
+🏗️ Contracts (Foundry)	Complete job	2026-08-02T16:47:11.0950708Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

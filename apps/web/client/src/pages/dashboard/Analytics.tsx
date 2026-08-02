@@ -1,4 +1,3 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
 import {
@@ -8,13 +7,9 @@ import {
 } from "recharts";
 import { TrendingUp, Activity, Users, Zap, DollarSign, Shield } from "lucide-react";
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
-};
 const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0 },
+  hidden: { opacity: 0, y: 10 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
 };
 
 const monthlyData = [
@@ -61,225 +56,176 @@ const topPairs = [
 ];
 
 const tooltipStyle = {
-  contentStyle: {
-    backgroundColor: "#0F1E35",
-    border: "1px solid rgba(212,175,55,0.2)",
-    borderRadius: "8px",
-    color: "#fff",
-  },
-  labelStyle: { color: "#fff" },
+  contentStyle: { backgroundColor: "var(--g-navy)", border: "1px solid var(--g-line)", borderRadius: "var(--g-radius)" },
+  labelStyle: { color: "var(--g-paper)", fontWeight: 700 },
+  itemStyle: { color: "var(--g-gold-soft)" },
 };
 
 export default function Analytics() {
   const kpis = [
-    { label: "Total Migrations", value: "1,247", change: "+23.1%", icon: Zap, color: "text-[#D4AF37]" },
-    { label: "Total Volume", value: "$2.4M", change: "+18.4%", icon: DollarSign, color: "text-green-400" },
-    { label: "Unique Users", value: "342", change: "+15.2%", icon: Users, color: "text-blue-400" },
-    { label: "Gas Saved/Tx", value: "~2,000", change: "Yul inline", icon: Activity, color: "text-purple-400" },
-    { label: "Compliance Rate", value: "100%", change: "All-time", icon: Shield, color: "text-[#D4AF37]" },
-    { label: "Protocol Revenue", value: "$1,847", change: "+31.2%", icon: TrendingUp, color: "text-green-400" },
+    { label: "Total Migrations", value: "1,247", change: "+23.1%", icon: Zap },
+    { label: "Total Volume", value: "$2.4M", change: "+18.4%", icon: DollarSign },
+    { label: "Unique Users", value: "342", change: "+15.2%", icon: Users },
+    { label: "Gas Saved/Tx", value: "~2,000", change: "Yul inline", icon: Activity },
+    { label: "Compliance Rate", value: "100%", change: "All-time", icon: Shield },
+    { label: "Protocol Revenue", value: "$1,847", change: "+31.2%", icon: TrendingUp },
   ];
 
   return (
-    <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-6">
+    <div className="space-y-8">
       {/* KPI Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         {kpis.map((kpi, i) => (
-          <motion.div key={i} variants={itemVariants}>
-            <Card className="border-[#D4AF37]/20 bg-[#0F1E35]/50 backdrop-blur">
-              <CardContent className="pt-4 pb-4">
-                <kpi.icon className={`h-4 w-4 ${kpi.color} mb-2`} />
-                <p className="text-xl font-bold text-white">{kpi.value}</p>
-                <p className="text-xs text-white/40 mt-0.5">{kpi.label}</p>
-                <Badge className="mt-1 bg-transparent border-white/10 text-white/40 text-xs px-1">{kpi.change}</Badge>
-              </CardContent>
-            </Card>
+          <motion.div key={i} variants={itemVariants} initial="hidden" animate="visible">
+            <div className="g-panel p-6">
+              <kpi.icon className="h-4 w-4 text-[var(--g-gold)] mb-4 opacity-50" />
+              <p className="text-xl font-bold text-[var(--g-paper)] g-numeric mb-1">{kpi.value}</p>
+              <p className="g-label text-[10px] text-[var(--g-muted)]">{kpi.label}</p>
+            </div>
           </motion.div>
         ))}
       </div>
 
       {/* TVL & Volume */}
-      <motion.div variants={itemVariants}>
-        <Card className="border-[#D4AF37]/20 bg-[#0F1E35]/50 backdrop-blur">
-          <CardHeader>
-            <CardTitle className="text-white">TVL & Volume Growth</CardTitle>
-            <CardDescription className="text-white/70">6-month protocol performance</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <AreaChart data={monthlyData}>
-                <defs>
-                  <linearGradient id="colorTvl" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#D4AF37" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#D4AF37" stopOpacity={0} />
-                  </linearGradient>
-                  <linearGradient id="colorVol" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#60a5fa" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#60a5fa" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#D4AF37" opacity={0.1} />
-                <XAxis dataKey="month" stroke="#fff" opacity={0.5} tick={{ fontSize: 12 }} />
-                <YAxis yAxisId="left" stroke="#fff" opacity={0.5} tick={{ fontSize: 12 }} tickFormatter={(v) => `$${(v/1000000).toFixed(1)}M`} />
-                <YAxis yAxisId="right" orientation="right" stroke="#fff" opacity={0.5} tick={{ fontSize: 12 }} tickFormatter={(v) => `$${(v/1000).toFixed(0)}K`} />
-                <Tooltip {...tooltipStyle} formatter={(v: number, name: string) => [
-                  name === "tvl" ? `$${(v/1000000).toFixed(2)}M` : `$${(v/1000).toFixed(0)}K`,
-                  name === "tvl" ? "TVL" : "Volume"
-                ]} />
-                <Legend formatter={(v) => v === "tvl" ? "TVL" : "Volume"} />
-                <Area yAxisId="left" type="monotone" dataKey="tvl" stroke="#D4AF37" strokeWidth={2} fill="url(#colorTvl)" />
-                <Area yAxisId="right" type="monotone" dataKey="volume" stroke="#60a5fa" strokeWidth={2} fill="url(#colorVol)" />
-              </AreaChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+      <motion.div variants={itemVariants} initial="hidden" animate="visible">
+        <div className="g-panel p-8">
+          <div className="mb-8">
+            <h3 className="text-[var(--g-text-base)] font-bold text-[var(--g-paper)]">Protocol Performance</h3>
+            <p className="text-[var(--g-text-xs)] text-[var(--g-muted)]">TVL and Volume growth trajectory</p>
+          </div>
+          <ResponsiveContainer width="100%" height={300}>
+            <AreaChart data={monthlyData}>
+              <defs>
+                <linearGradient id="colorTvl" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#D4AF37" stopOpacity={0.2} />
+                  <stop offset="95%" stopColor="#D4AF37" stopOpacity={0} />
+                </linearGradient>
+                <linearGradient id="colorVol" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#60a5fa" stopOpacity={0.2} />
+                  <stop offset="95%" stopColor="#60a5fa" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#D4AF37" opacity={0.05} vertical={false} />
+              <XAxis dataKey="month" stroke="var(--g-muted)" opacity={0.5} tick={{ fontSize: 10, fontWeight: 700 }} axisLine={false} tickLine={false} />
+              <YAxis yAxisId="left" stroke="var(--g-muted)" opacity={0.5} tick={{ fontSize: 10, fontWeight: 700 }} tickFormatter={(v) => `$${(v/1000000).toFixed(1)}M`} axisLine={false} tickLine={false} />
+              <YAxis yAxisId="right" orientation="right" stroke="var(--g-muted)" opacity={0.5} tick={{ fontSize: 10, fontWeight: 700 }} tickFormatter={(v) => `$${(v/1000).toFixed(0)}K`} axisLine={false} tickLine={false} />
+              <Tooltip {...tooltipStyle} formatter={(v: number, name: string) => [
+                name === "tvl" ? `$${(v/1000000).toFixed(2)}M` : `$${(v/1000).toFixed(0)}K`,
+                name === "tvl" ? "TVL" : "Volume"
+              ]} />
+              <Legend verticalAlign="top" align="right" height={36} iconType="circle" />
+              <Area yAxisId="left" type="monotone" dataKey="tvl" stroke="var(--g-gold)" strokeWidth={2} fill="url(#colorTvl)" />
+              <Area yAxisId="right" type="monotone" dataKey="volume" stroke="#60a5fa" strokeWidth={2} fill="url(#colorVol)" />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
       </motion.div>
 
       {/* Daily Migrations & Fee Distribution */}
-      <div className="grid lg:grid-cols-2 gap-6">
-        <motion.div variants={itemVariants}>
-          <Card className="border-[#D4AF37]/20 bg-[#0F1E35]/50 backdrop-blur">
-            <CardHeader>
-              <CardTitle className="text-white">Daily Migrations by Type</CardTitle>
-              <CardDescription className="text-white/70">V2 vs V3 migration volume</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={250}>
-                <BarChart data={dailyMigrations}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#D4AF37" opacity={0.1} />
-                  <XAxis dataKey="day" stroke="#fff" opacity={0.5} tick={{ fontSize: 12 }} />
-                  <YAxis stroke="#fff" opacity={0.5} tick={{ fontSize: 12 }} />
-                  <Tooltip {...tooltipStyle} />
-                  <Legend />
-                  <Bar dataKey="v2" name="V2 Migrations" fill="#D4AF37" opacity={0.8} radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="v3" name="V3 Migrations" fill="#60a5fa" opacity={0.8} radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
+      <div className="grid lg:grid-cols-2 gap-8">
+        <motion.div variants={itemVariants} initial="hidden" animate="visible">
+          <div className="g-panel p-8">
+            <div className="mb-8">
+              <h3 className="text-[var(--g-text-base)] font-bold text-[var(--g-paper)]">Migration Activity</h3>
+              <p className="text-[var(--g-text-xs)] text-[var(--g-muted)]">V2 to V3 engine utilization</p>
+            </div>
+            <ResponsiveContainer width="100%" height={250}>
+              <BarChart data={dailyMigrations}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#D4AF37" opacity={0.05} vertical={false} />
+                <XAxis dataKey="day" stroke="var(--g-muted)" opacity={0.5} tick={{ fontSize: 10, fontWeight: 700 }} axisLine={false} tickLine={false} />
+                <YAxis stroke="var(--g-muted)" opacity={0.5} tick={{ fontSize: 10, fontWeight: 700 }} axisLine={false} tickLine={false} />
+                <Tooltip {...tooltipStyle} />
+                <Bar dataKey="v2" name="V2 Migrations" fill="var(--g-gold)" opacity={0.6} radius={[2, 2, 0, 0]} />
+                <Bar dataKey="v3" name="V3 Migrations" fill="#60a5fa" opacity={0.6} radius={[2, 2, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </motion.div>
 
-        <motion.div variants={itemVariants}>
-          <Card className="border-[#D4AF37]/20 bg-[#0F1E35]/50 backdrop-blur">
-            <CardHeader>
-              <CardTitle className="text-white">Fee Tier Distribution</CardTitle>
-              <CardDescription className="text-white/70">Migration target fee tiers</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center gap-6">
-                <ResponsiveContainer width="60%" height={220}>
-                  <PieChart>
-                    <Pie data={feeDistribution} cx="50%" cy="50%" innerRadius={55} outerRadius={90} paddingAngle={3} dataKey="value">
-                      {feeDistribution.map((entry, index) => (
-                        <Cell key={index} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip {...tooltipStyle} formatter={(v: number) => [`${v}%`, "Share"]} />
-                  </PieChart>
-                </ResponsiveContainer>
-                <div className="space-y-3 flex-1">
-                  {feeDistribution.map((item, i) => (
-                    <div key={i} className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <div className="h-3 w-3 rounded-full" style={{ backgroundColor: item.color }} />
-                        <span className="text-sm text-white/70">{item.name}</span>
-                      </div>
-                      <span className="text-sm font-semibold text-white">{item.value}%</span>
+        <motion.div variants={itemVariants} initial="hidden" animate="visible">
+          <div className="g-panel p-8">
+            <div className="mb-8">
+              <h3 className="text-[var(--g-text-base)] font-bold text-[var(--g-paper)]">Target Fee Distribution</h3>
+              <p className="text-[var(--g-text-xs)] text-[var(--g-muted)]">Preferred liquidity fee tiers</p>
+            </div>
+            <div className="flex flex-col sm:flex-row items-center gap-8">
+              <ResponsiveContainer width="100%" height={200}>
+                <PieChart>
+                  <Pie data={feeDistribution} cx="50%" cy="50%" innerRadius={60} outerRadius={80} paddingAngle={4} dataKey="value">
+                    {feeDistribution.map((entry, index) => (
+                      <Cell key={index} fill={entry.color} stroke="none" />
+                    ))}
+                  </Pie>
+                  <Tooltip {...tooltipStyle} formatter={(v: number) => [`${v}%`, "Share"]} />
+                </PieChart>
+              </ResponsiveContainer>
+              <div className="w-full space-y-3">
+                {feeDistribution.map((item, i) => (
+                  <div key={i} className="flex items-center justify-between p-2 bg-[var(--g-surface)] rounded border border-[var(--g-line)]">
+                    <div className="flex items-center gap-2">
+                      <div className="h-2 w-2 rounded-full" style={{ backgroundColor: item.color }} />
+                      <span className="text-[10px] font-bold text-[var(--g-paper)]">{item.name}</span>
                     </div>
-                  ))}
-                </div>
+                    <span className="text-[10px] font-bold text-[var(--g-gold-soft)] g-numeric">{item.value}%</span>
+                  </div>
+                ))}
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </motion.div>
       </div>
 
       {/* Gas Optimization */}
-      <motion.div variants={itemVariants}>
-        <Card className="border-[#D4AF37]/20 bg-[#0F1E35]/50 backdrop-blur">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="text-white">Gas Optimization (Yul Inline Assembly)</CardTitle>
-                <CardDescription className="text-white/70">Avg gas cost vs savings from Yul-optimized dust refunds</CardDescription>
-              </div>
-              <Badge className="bg-green-500/10 border-green-500/20 text-green-400">~2,000 gas saved/tx</Badge>
+      <motion.div variants={itemVariants} initial="hidden" animate="visible">
+        <div className="g-panel p-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+            <div>
+              <h3 className="text-[var(--g-text-base)] font-bold text-[var(--g-paper)]">Gas Efficiency</h3>
+              <p className="text-[var(--g-text-xs)] text-[var(--g-muted)]">Yul-optimized assembly performance</p>
             </div>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={220}>
-              <LineChart data={gasData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#D4AF37" opacity={0.1} />
-                <XAxis dataKey="week" stroke="#fff" opacity={0.5} tick={{ fontSize: 12 }} />
-                <YAxis stroke="#fff" opacity={0.5} tick={{ fontSize: 12 }} tickFormatter={(v) => `${v.toFixed(4)}`} />
-                <Tooltip {...tooltipStyle} formatter={(v: number) => [`${v.toFixed(4)} ETH`, ""]} />
-                <Legend />
-                <Line type="monotone" dataKey="avgGas" name="Avg Gas Cost" stroke="#D4AF37" strokeWidth={2} dot={{ fill: "#D4AF37", r: 4 }} />
-                <Line type="monotone" dataKey="savings" name="Gas Saved (Yul)" stroke="#4ade80" strokeWidth={2} strokeDasharray="5 5" dot={{ fill: "#4ade80", r: 4 }} />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+            <div className="text-[10px] font-bold text-green-400 bg-green-400/10 px-3 py-1 rounded-full border border-green-400/20 uppercase tracking-widest">
+              ~2,000 GAS SAVED / TX
+            </div>
+          </div>
+          <ResponsiveContainer width="100%" height={220}>
+            <LineChart data={gasData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#D4AF37" opacity={0.05} vertical={false} />
+              <XAxis dataKey="week" stroke="var(--g-muted)" opacity={0.5} tick={{ fontSize: 10, fontWeight: 700 }} axisLine={false} tickLine={false} />
+              <YAxis stroke="var(--g-muted)" opacity={0.5} tick={{ fontSize: 10, fontWeight: 700 }} tickFormatter={(v) => `${v.toFixed(4)}`} axisLine={false} tickLine={false} />
+              <Tooltip {...tooltipStyle} formatter={(v: number) => [`${v.toFixed(4)} ETH`, ""]} />
+              <Line type="monotone" dataKey="avgGas" name="Avg Gas Cost" stroke="var(--g-gold)" strokeWidth={2} dot={false} />
+              <Line type="monotone" dataKey="savings" name="Gas Saved (Yul)" stroke="#4ade80" strokeWidth={2} strokeDasharray="4 4" dot={false} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
       </motion.div>
 
       {/* Top Pairs */}
-      <motion.div variants={itemVariants}>
-        <Card className="border-[#D4AF37]/20 bg-[#0F1E35]/50 backdrop-blur">
-          <CardHeader>
-            <CardTitle className="text-white">Top Trading Pairs</CardTitle>
-            <CardDescription className="text-white/70">Most migrated liquidity pairs</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {topPairs.map((pair, index) => (
-                <div key={index} className="flex items-center justify-between p-4 rounded-lg bg-[#0A1628]/50 border border-[#D4AF37]/20">
-                  <div className="flex items-center gap-4">
-                    <div className="h-8 w-8 rounded-full bg-[#D4AF37] flex items-center justify-center text-[#0A1628] font-bold text-sm">
-                      {index + 1}
-                    </div>
-                    <div>
-                      <p className="font-medium text-white">{pair.pair}</p>
-                      <p className="text-sm text-white/50">{pair.migrations} migrations</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-bold text-white">{pair.volume}</p>
-                    <p className="text-sm text-white/50">Total Volume</p>
+      <motion.div variants={itemVariants} initial="hidden" animate="visible">
+        <div className="g-panel p-8">
+          <div className="mb-8">
+            <h3 className="text-[var(--g-text-base)] font-bold text-[var(--g-paper)]">Institutional Pairs</h3>
+            <p className="text-[var(--g-text-xs)] text-[var(--g-muted)]">Top liquidity migration targets</p>
+          </div>
+          <div className="space-y-4">
+            {topPairs.map((pair, index) => (
+              <div key={index} className="flex items-center justify-between p-4 bg-[var(--g-surface)] rounded-[var(--g-radius)] border border-[var(--g-line)] group hover:border-[var(--g-gold)]/30 transition-all">
+                <div className="flex items-center gap-6">
+                  <span className="text-xs font-bold text-[var(--g-gold)] opacity-40 group-hover:opacity-100 transition-opacity g-numeric">0{index + 1}</span>
+                  <div>
+                    <p className="text-sm font-bold text-[var(--g-paper)]">{pair.pair}</p>
+                    <p className="text-[10px] text-[var(--g-muted)] uppercase tracking-widest">{pair.migrations} migrations</p>
                   </div>
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
-
-      {/* Protocol Health */}
-      <motion.div variants={itemVariants}>
-        <Card className="border-[#D4AF37]/20 bg-[#0F1E35]/50 backdrop-blur">
-          <CardHeader>
-            <CardTitle className="text-white flex items-center gap-2">
-              <Shield className="h-5 w-5 text-[#D4AF37]" />
-              Protocol Health
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid md:grid-cols-4 gap-4">
-              {[
-                { label: "Compliance Rate", value: "100%", status: "excellent", desc: "All migrations Shariah-compliant" },
-                { label: "Revert Rate", value: "0.8%", status: "good", desc: "Low failed transaction rate" },
-                { label: "Avg Slippage", value: "0.12%", status: "excellent", desc: "Well within tolerance" },
-                { label: "Uptime", value: "99.9%", status: "excellent", desc: "Arbitrum Sepolia reliability" },
-              ].map((item, i) => (
-                <div key={i} className="p-4 rounded-xl border border-[#D4AF37]/10 bg-[#0A1628]/40">
-                  <p className="text-xs text-white/40 mb-2 uppercase tracking-wider">{item.label}</p>
-                  <p className={`text-2xl font-bold mb-1 ${item.status === "excellent" ? "text-green-400" : "text-[#D4AF37]"}`}>{item.value}</p>
-                  <p className="text-xs text-white/40">{item.desc}</p>
+                <div className="text-right">
+                  <p className="text-sm font-bold text-[var(--g-paper)] g-numeric">{pair.volume}</p>
+                  <p className="text-[10px] text-[var(--g-muted)] uppercase tracking-widest">24h Volume</p>
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+              </div>
+            ))}
+          </div>
+        </div>
       </motion.div>
-    </motion.div>
+    </div>
   );
 }

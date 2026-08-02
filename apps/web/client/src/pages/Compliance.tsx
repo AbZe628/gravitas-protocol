@@ -1,20 +1,20 @@
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Link } from "wouter";
 import { motion } from "framer-motion";
 import { useReadContract } from "wagmi";
 import { CONTRACTS } from "@/lib/wagmi";
 import {
   Shield, CheckCircle, XCircle, Search, ExternalLink,
-  ChevronRight, Home, AlertTriangle, Menu, X
+  AlertTriangle, Cpu, Scale, Lock
 } from "lucide-react";
+import Header from "@/components/Header";
+import ParametricField from "@/design/ParametricField";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } },
 };
 
 const stagger = {
@@ -76,39 +76,44 @@ function AddressChecker({
   };
 
   return (
-    <Card className="border border-[#D4AF37]/10 bg-[#0A1628]/60 backdrop-blur">
-      <CardHeader>
-        <CardTitle className="text-white text-lg">{title}</CardTitle>
-        <CardDescription className="text-white/50">{description}</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <div className="g-panel-raised p-6">
+      <div className="mb-6">
+        <h3 className="text-[var(--g-text-lg)] font-bold text-[var(--g-paper)] mb-2">{title}</h3>
+        <p className="text-[var(--g-text-sm)] text-[var(--g-muted)]">{description}</p>
+      </div>
+      
+      <div className="space-y-4">
         <div className="flex flex-col sm:flex-row gap-2">
           <Input
             placeholder={placeholder}
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            className="bg-[#060E1A] border-[#D4AF37]/20 text-white font-mono text-sm"
+            className="bg-[var(--g-navy)] border-[var(--g-line)] text-[var(--g-paper)] font-mono text-sm focus:border-[var(--g-gold)] transition-colors"
             onKeyDown={(e) => e.key === "Enter" && handleCheck()}
           />
           <Button
             onClick={handleCheck}
-            className="bg-[#D4AF37] text-[#060E1A] hover:bg-[#D4AF37]/90 shrink-0"
+            className="bg-[var(--g-gold)] text-[var(--g-navy)] hover:bg-[var(--g-gold-soft)] shrink-0 font-bold"
             disabled={isLoading}
           >
-            <Search className="h-4 w-4" />
+            {isLoading ? <div className="h-4 w-4 border-2 border-[var(--g-navy)] border-t-transparent rounded-full animate-spin" /> : <Search className="h-4 w-4" />}
           </Button>
         </div>
 
         {address && (
-          <div className={`p-4 rounded-xl border ${
-            isLoading ? "border-white/10 bg-white/5" :
-            isError ? "border-red-500/20 bg-red-500/5" :
-            data ? "border-green-500/20 bg-green-500/5" : "border-red-500/20 bg-red-500/5"
-          }`}>
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className={`p-4 rounded-[var(--g-radius)] border ${
+              isLoading ? "border-[var(--g-line)] bg-[var(--g-surface)]" :
+              isError ? "border-red-500/20 bg-red-500/5" :
+              data ? "border-green-500/20 bg-green-500/5" : "border-red-500/20 bg-red-500/5"
+            }`}
+          >
             {isLoading ? (
-              <div className="flex items-center gap-2 text-white/50">
-                <div className="h-4 w-4 border-2 border-[#D4AF37] border-t-transparent rounded-full animate-spin" />
-                <span className="text-sm">Querying on-chain...</span>
+              <div className="flex items-center gap-2 text-[var(--g-muted)]">
+                <div className="h-4 w-4 border-2 border-[var(--g-gold)] border-t-transparent rounded-full animate-spin" />
+                <span className="text-sm">Querying on-chain registry...</span>
               </div>
             ) : isError ? (
               <div className="flex items-center gap-2 text-red-400">
@@ -116,32 +121,30 @@ function AddressChecker({
                 <span className="text-sm">Error querying contract</span>
               </div>
             ) : data ? (
-              <div className="flex items-center gap-2 text-green-400">
-                <CheckCircle className="h-5 w-5" />
+              <div className="flex items-center gap-3 text-green-400">
+                <CheckCircle className="h-5 w-5 shrink-0" />
                 <div>
-                  <p className="font-semibold">Compliant ✓</p>
-                  <p className="text-xs text-green-400/70">This address passes Shariah compliance checks</p>
+                  <p className="font-bold">Compliant ✓</p>
+                  <p className="text-xs opacity-70">This address passes Shariah compliance checks</p>
                 </div>
               </div>
             ) : (
-              <div className="flex items-center gap-2 text-red-400">
-                <XCircle className="h-5 w-5" />
+              <div className="flex items-center gap-3 text-red-400">
+                <XCircle className="h-5 w-5 shrink-0" />
                 <div>
-                  <p className="font-semibold">Not Compliant ✗</p>
-                  <p className="text-xs text-red-400/70">This address is not on the compliance whitelist</p>
+                  <p className="font-bold">Not Compliant ✗</p>
+                  <p className="text-xs opacity-70">This address is not on the compliance whitelist</p>
                 </div>
               </div>
             )}
-          </div>
+          </motion.div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
 
 export default function Compliance() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  
   const { data: policyVersion } = useReadContract({
     address: CONTRACTS.POLICY_REGISTRY as `0x${string}`,
     abi: POLICY_REGISTRY_ABI,
@@ -150,164 +153,164 @@ export default function Compliance() {
   });
 
   return (
-    <div className="min-h-screen bg-[#060E1A] text-white">
-      {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-[#D4AF37]/10 bg-[#060E1A]/80 backdrop-blur-xl">
-        <div className="container flex h-16 items-center justify-between px-4 md:px-6">
-          <div className="flex items-center gap-3">
-            <Link href="/">
-              <div className="flex items-center gap-2 cursor-pointer">
-                <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-[#D4AF37] to-[#B8941F] flex items-center justify-center">
-                  <span className="text-[#060E1A] font-black">G</span>
-                </div>
-                <span className="font-bold text-white hidden sm:inline">Gravitas</span>
-              </div>
-            </Link>
-            <ChevronRight className="h-4 w-4 text-white/30" />
-            <span className="text-white/60 text-sm">Compliance</span>
-          </div>
-          <div className="hidden md:flex items-center gap-3">
-            <Button asChild variant="ghost" size="sm" className="text-white/60 hover:text-white">
-              <Link href="/"><Home className="h-4 w-4 mr-2" />Home</Link>
-            </Button>
-            <Button asChild size="sm" className="bg-[#D4AF37] text-[#060E1A] hover:bg-[#D4AF37]/90 font-semibold">
-              <Link href="/dashboard">Launch App</Link>
-            </Button>
-          </div>
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 text-white/60 hover:text-[#D4AF37] transition-colors"
-          >
-            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </button>
-        </div>
+    <div className="min-h-screen bg-[var(--g-navy)] text-[var(--g-paper)]">
+      <Header />
 
-        {/* Mobile Menu */}
-        {mobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="md:hidden border-t border-[#D4AF37]/10 bg-[#0A1628]/95 backdrop-blur"
-          >
-            <div className="px-4 py-4 space-y-3">
-              <Link href="/" onClick={() => setMobileMenuOpen(false)} className="block px-4 py-2 text-white/60 hover:text-[#D4AF37] hover:bg-[#D4AF37]/10 rounded-lg transition-colors">Home</Link>
-              <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} className="block px-4 py-2 text-white/60 hover:text-[#D4AF37] hover:bg-[#D4AF37]/10 rounded-lg transition-colors">Dashboard</Link>
-            </div>
-          </motion.div>
-        )}
-      </nav>
-
-      <div className="pt-16">
-        {/* Hero */}
-        <section className="relative py-16 md:py-24 border-b border-[#D4AF37]/10">
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,#D4AF3706_1px,transparent_1px),linear-gradient(to_bottom,#D4AF3706_1px,transparent_1px)] bg-[size:48px_48px]" />
-          <div className="container relative z-10 px-4 md:px-6">
+      <main className="pt-24">
+        {/* HERO */}
+        <section className="relative py-24 md:py-32 overflow-hidden">
+          <ParametricField 
+            className="absolute inset-0 w-full h-full pointer-events-none opacity-30" 
+            anchor={{ x: 0.1, y: 0.5 }}
+            scale={0.6}
+            shells={6}
+          />
+          <div className="container relative z-10 px-6 mx-auto max-w-7xl">
             <motion.div variants={stagger} initial="hidden" animate="visible" className="max-w-3xl">
-              <motion.div variants={fadeUp}>
-                <Badge className="mb-4 bg-[#D4AF37]/10 border-[#D4AF37]/30 text-[#D4AF37]">
-                  <Shield className="h-3 w-3 mr-2" />
-                  Shariah Compliance Framework
-                </Badge>
+              <motion.div variants={fadeUp} className="mb-6">
+                <span className="g-label px-3 py-1 rounded-full bg-[var(--g-gold-wash)] border border-[var(--g-gold)]/20 text-[var(--g-gold-soft)]">
+                  <Shield className="h-3 w-3 inline mr-2 mb-0.5" />
+                  Policy Registry v1.0
+                </span>
               </motion.div>
-              <motion.h1 variants={fadeUp} className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
+              <motion.h1 variants={fadeUp} className="g-display mb-6">
                 Compliance by Design
               </motion.h1>
-              <motion.p variants={fadeUp} className="text-base md:text-lg lg:text-xl text-white/50 leading-relaxed">
-                Gravitas Protocol treats Shariah compliance as a technical requirement, not a marketing label.
-                Every migration is validated against the on-chain GravitasPolicyRegistry before execution.
+              <motion.p variants={fadeUp} className="g-prose text-[var(--g-text-lg)] text-[var(--g-paper-dim)]">
+                Gravitas Protocol treats Shariah compliance as a technical requirement. Every migration is validated against the on-chain Policy Registry before execution.
               </motion.p>
             </motion.div>
           </div>
         </section>
 
-        {/* Policy Registry Status */}
-        <section className="py-12 md:py-16">
-          <div className="container px-4 md:px-6">
+        {/* REGISTRY STATUS */}
+        <section className="g-seam py-20 bg-[var(--g-surface)]">
+          <div className="container px-6 mx-auto max-w-7xl">
             <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }}>
-              <motion.h2 variants={fadeUp} className="text-2xl md:text-3xl font-bold mb-8">
-                Live Policy Registry
-              </motion.h2>
-
-              <div className="grid md:grid-cols-3 gap-6 mb-12">
-                <motion.div variants={fadeUp}>
-                  <Card className="border border-[#D4AF37]/20 bg-[#0A1628]/60">
-                    <CardContent className="pt-6">
-                      <p className="text-sm text-white/40 mb-1">Policy Version</p>
-                      <p className="text-2xl md:text-3xl font-bold text-[#D4AF37]">
-                        {policyVersion !== undefined ? `v${policyVersion.toString()}` : "—"}
-                      </p>
-                      <p className="text-xs text-white/30 mt-1">On-chain governance version</p>
-                    </CardContent>
-                  </Card>
+              <div className="grid md:grid-cols-3 gap-6 mb-20">
+                <motion.div variants={fadeUp} className="g-panel p-6">
+                  <p className="g-label mb-2">Policy Version</p>
+                  <p className="text-3xl font-bold text-[var(--g-gold-soft)] g-numeric">
+                    {policyVersion !== undefined ? `v${policyVersion.toString()}` : "—"}
+                  </p>
+                  <p className="text-[var(--g-text-xs)] text-[var(--g-muted)] mt-2">Active governance version</p>
                 </motion.div>
-                <motion.div variants={fadeUp}>
-                  <Card className="border border-green-500/20 bg-green-500/5">
-                    <CardContent className="pt-6">
-                      <p className="text-sm text-white/40 mb-1">Registry Status</p>
-                      <div className="flex items-center gap-2">
-                        <div className="h-2 w-2 rounded-full bg-green-400 animate-pulse" />
-                        <p className="text-2xl md:text-3xl font-bold text-green-400">Active</p>
-                      </div>
-                      <p className="text-xs text-white/30 mt-1">Arbitrum Sepolia</p>
-                    </CardContent>
-                  </Card>
+                <motion.div variants={fadeUp} className="g-panel p-6">
+                  <p className="g-label mb-2">Registry Status</p>
+                  <div className="flex items-center gap-2">
+                    <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                    <p className="text-3xl font-bold text-green-500">Active</p>
+                  </div>
+                  <p className="text-[var(--g-text-xs)] text-[var(--g-muted)] mt-2">Arbitrum Sepolia Testnet</p>
                 </motion.div>
-                <motion.div variants={fadeUp}>
-                  <Card className="border border-[#D4AF37]/20 bg-[#0A1628]/60">
-                    <CardContent className="pt-6">
-                      <p className="text-sm text-white/40 mb-1">Contract Address</p>
-                      <code className="text-xs md:text-sm font-mono text-[#D4AF37] break-all">0xbcaE...4679</code>
-                      <div className="mt-2">
-                        <a
-                          href="https://sepolia.arbiscan.io/address/0xbcaE3069362B0f0b80f44139052f159456C84679"
-                          target="_blank" rel="noopener noreferrer"
-                        >
-                          <Button size="sm" variant="ghost" className="h-6 px-2 text-white/40 hover:text-[#D4AF37] text-xs">
-                            <ExternalLink className="h-3 w-3 mr-1" />
-                            View on Arbiscan
-                          </Button>
-                        </a>
-                      </div>
-                    </CardContent>
-                  </Card>
+                <motion.div variants={fadeUp} className="g-panel p-6">
+                  <p className="g-label mb-2">Contract Address</p>
+                  <div className="flex items-center gap-2">
+                    <Lock className="h-4 w-4 text-[var(--g-gold)] opacity-50" />
+                    <code className="text-sm font-mono text-[var(--g-gold-soft)] g-numeric">0xbcaE...4679</code>
+                  </div>
+                  <div className="mt-4">
+                    <a
+                      href="https://sepolia.arbiscan.io/address/0xbcaE3069362B0f0b80f44139052f159456C84679"
+                      target="_blank" rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 text-[var(--g-text-xs)] text-[var(--g-muted)] hover:text-[var(--g-paper)] transition-colors"
+                    >
+                      <ExternalLink className="h-3 w-3" />
+                      View on Arbiscan
+                    </a>
+                  </div>
                 </motion.div>
               </div>
 
-              {/* Compliance Checkers */}
-              <motion.h3 variants={fadeUp} className="text-xl md:text-2xl font-bold mb-6">On-Chain Compliance Checker</motion.h3>
-              <div className="grid md:grid-cols-2 gap-6 mb-12">
+              {/* CHECKERS */}
+              <motion.div variants={fadeUp} className="mb-10">
+                <h2 className="g-display text-[var(--g-text-xl)] mb-4">On-Chain Verification</h2>
+                <p className="g-prose text-[var(--g-muted)]">Direct query interface for the GravitasPolicyRegistry smart contract.</p>
+              </motion.div>
+              
+              <div className="grid md:grid-cols-2 gap-8">
                 <motion.div variants={fadeUp}>
                   <AddressChecker
-                    title="Asset Compliance Check"
+                    title="Asset Compliance"
                     placeholder="0x... (token address)"
                     functionName="isAssetCompliant"
-                    description="Verify if a token is on the Shariah-compliant whitelist"
+                    description="Verify if a token is on the Shariah-compliant whitelist."
                   />
                 </motion.div>
                 <motion.div variants={fadeUp}>
                   <AddressChecker
-                    title="Executor Authorization Check"
+                    title="Executor Authorization"
                     placeholder="0x... (executor address)"
                     functionName="isExecutor"
-                    description="Verify if an executor is authorized to perform migrations"
+                    description="Verify if an address is authorized to execute migrations."
                   />
                 </motion.div>
               </div>
             </motion.div>
           </div>
         </section>
-      </div>
 
-      {/* Footer */}
-      <footer className="border-t border-[#D4AF37]/10 py-8 bg-[#060E1A]">
-        <div className="container px-4 md:px-6 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-white/30">
-            © 2026 Gravitas Protocol. Built for institutional DeFi.
-          </p>
-          <div className="flex items-center gap-4 text-xs text-white/30">
-            <span>BUSL-1.1</span>
-            <span>·</span>
-            <a href="https://github.com/AbZe628/gravitas-protocol" target="_blank" rel="noopener noreferrer" className="hover:text-[#D4AF37] transition-colors">GitHub</a>
+        {/* DETAILS */}
+        <section className="py-32 bg-[var(--g-navy)]">
+          <div className="container px-6 mx-auto max-w-7xl">
+            <div className="grid lg:grid-cols-2 gap-20">
+              <div>
+                <h2 className="g-display text-[var(--g-text-xl)] mb-8">Registry Governance</h2>
+                <div className="g-prose text-[var(--g-paper-dim)] space-y-6">
+                  <p>
+                    The GravitasPolicyRegistry is a permissioned whitelist that acts as the source of truth for all protocol executions. For a migration to proceed, both the source and target tokens must be whitelisted.
+                  </p>
+                  <ul className="space-y-4">
+                    <li className="flex gap-4">
+                      <Scale className="h-6 w-6 text-[var(--g-gold)] shrink-0" />
+                      <div>
+                        <h4 className="font-bold text-[var(--g-paper)]">Advisory Oversight</h4>
+                        <p className="text-[var(--g-text-sm)]">Policy decisions are guided by a board of Shariah scholars and institutional risk officers.</p>
+                      </div>
+                    </li>
+                    <li className="flex gap-4">
+                      <Building2 className="h-6 w-6 text-[var(--g-gold)] shrink-0" />
+                      <div>
+                        <h4 className="font-bold text-[var(--g-paper)]">Institutional Control</h4>
+                        <p className="text-[var(--g-text-sm)]">Registry ownership will be transferred to a multi-signature wallet with timelock governance.</p>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <div className="g-panel p-8">
+                <h3 className="g-label mb-6">Technical Specification</h3>
+                <div className="space-y-6">
+                  <div className="border-b border-[var(--g-line)] pb-4">
+                    <p className="text-[var(--g-text-xs)] text-[var(--g-muted)] uppercase mb-2">Function: areTokensCompliant</p>
+                    <code className="text-xs text-[var(--g-paper)] block bg-[var(--g-navy)] p-3 rounded border border-[var(--g-line)]">
+                      function areTokensCompliant(address tokenA, address tokenB) external view returns (bool)
+                    </code>
+                  </div>
+                  <div>
+                    <p className="text-[var(--g-text-xs)] text-[var(--g-muted)] uppercase mb-2">Execution Flow</p>
+                    <ol className="text-[var(--g-text-sm)] text-[var(--g-paper-dim)] space-y-3 list-decimal list-inside">
+                      <li>TeleportV3 receives migration intent.</li>
+                      <li>Contract calls PolicyRegistry.areTokensCompliant().</li>
+                      <li>If false, transaction reverts immediately.</li>
+                      <li>If true, atomic migration proceeds.</li>
+                    </ol>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer className="bg-[var(--g-navy)] border-t border-[var(--g-line)] py-12">
+        <div className="container px-6 mx-auto max-w-7xl flex flex-col sm:flex-row justify-between items-center gap-6">
+          <div className="text-[var(--g-text-xs)] text-[var(--g-muted)]">
+            © 2026 Gravitas Protocol. All policy changes are emitted as on-chain events.
+          </div>
+          <div className="flex gap-6 text-[var(--g-text-xs)] text-[var(--g-muted)]">
+            <a href="https://github.com/AbZe628/gravitas-protocol" className="hover:text-[var(--g-paper)] transition-colors">GitHub</a>
+            <a href="/docs" className="hover:text-[var(--g-paper)] transition-colors">Documentation</a>
           </div>
         </div>
       </footer>
