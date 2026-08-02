@@ -1,17 +1,16 @@
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Link } from "wouter";
 import { motion } from "framer-motion";
 import {
-  Code2, Package, Copy, CheckCheck, ChevronRight, Home,
-  Terminal, Zap, Shield, ArrowRight, ExternalLink, BookOpen
+  Code2, Package, Copy, CheckCheck,
+  Terminal, Zap, Shield, ExternalLink, BookOpen
 } from "lucide-react";
+import Header from "@/components/Header";
+import ParametricField from "@/design/ParametricField";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } },
 };
 
 const stagger = {
@@ -27,15 +26,15 @@ function CodeBlock({ code, language = "typescript", title }: { code: string; lan
     setTimeout(() => setCopied(false), 2000);
   };
   return (
-    <div className="rounded-xl border border-[#D4AF37]/10 bg-[#060E1A] overflow-hidden">
-      <div className="flex items-center justify-between px-4 py-2 border-b border-[#D4AF37]/10 bg-[#0A1628]/50">
-        <span className="text-xs text-white/40 font-mono">{title || language}</span>
-        <Button size="sm" variant="ghost" onClick={copy} className="h-6 px-2 text-white/30 hover:text-[#D4AF37]">
-          {copied ? <CheckCheck className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
-        </Button>
+    <div className="rounded-[var(--g-radius)] border border-[var(--g-line)] bg-[var(--g-navy)] overflow-hidden">
+      <div className="flex items-center justify-between px-4 py-2 border-b border-[var(--g-line)] bg-[var(--g-surface)]">
+        <span className="text-[10px] text-[var(--g-muted)] font-mono uppercase tracking-widest">{title || language}</span>
+        <button onClick={copy} className="p-1 text-[var(--g-muted)] hover:text-[var(--g-gold-soft)] transition-colors">
+          {copied ? <CheckCheck className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+        </button>
       </div>
-      <pre className="p-4 overflow-x-auto text-sm leading-relaxed">
-        <code className="text-[#D4AF37]/90 font-mono">{code}</code>
+      <pre className="p-4 overflow-x-auto text-sm leading-relaxed scrollbar-thin">
+        <code className="text-[var(--g-gold-soft)] font-mono">{code}</code>
       </pre>
     </div>
   );
@@ -43,93 +42,97 @@ function CodeBlock({ code, language = "typescript", title }: { code: string; lan
 
 export default function SDK() {
   return (
-    <div className="min-h-screen bg-[#060E1A] text-white">
-      {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-[#D4AF37]/10 bg-[#060E1A]/90 backdrop-blur-xl" role="navigation">
-        <div className="container flex h-16 items-center justify-between px-4 md:px-6 mx-auto max-w-7xl">
-          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-            <Link href="/">
-              <div className="flex items-center gap-2 cursor-pointer shrink-0">
-                <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-[#D4AF37] to-[#B8941F] flex items-center justify-center">
-                  <span className="text-[#060E1A] font-black text-sm">G</span>
-                </div>
-                <span className="font-bold text-white hidden sm:block">Gravitas</span>
-              </div>
-            </Link>
-            <ChevronRight className="h-4 w-4 text-white/30 shrink-0" />
-            <span className="text-white/60 text-sm truncate">SDK Reference</span>
-          </div>
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            <Button asChild variant="ghost" size="sm" className="text-white/60 hover:text-white hidden sm:flex">
-              <Link href="/"><Home className="h-4 w-4 mr-2" />Home</Link>
-            </Button>
-            <Button asChild size="sm" className="bg-[#D4AF37] text-[#060E1A] hover:bg-[#D4AF37]/90 font-semibold text-xs sm:text-sm px-3 sm:px-4">
-              <Link href="/dashboard">Launch App</Link>
-            </Button>
-          </div>
-        </div>
-      </nav>
+    <div className="min-h-screen bg-[var(--g-navy)] text-[var(--g-paper)]">
+      <Header />
 
-      <div className="pt-16">
-        {/* Hero */}
-        <section className="relative py-24 border-b border-[#D4AF37]/10">
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,#D4AF3706_1px,transparent_1px),linear-gradient(to_bottom,#D4AF3706_1px,transparent_1px)] bg-[size:48px_48px]" />
-          <div className="container relative z-10">
+      <main className="pt-24">
+        {/* HERO */}
+        <section className="relative py-24 md:py-32 overflow-hidden">
+          <ParametricField 
+            className="absolute inset-0 w-full h-full pointer-events-none opacity-30" 
+            anchor={{ x: 0.9, y: 0.4 }}
+            scale={0.7}
+            shells={8}
+            motion={true}
+          />
+          <div className="container relative z-10 px-6 mx-auto max-w-7xl">
             <motion.div variants={stagger} initial="hidden" animate="visible" className="max-w-3xl">
-              <motion.div variants={fadeUp}>
-                <Badge className="mb-4 bg-[#D4AF37]/10 border-[#D4AF37]/30 text-[#D4AF37]">
-                  <Package className="h-3 w-3 mr-2" />
-                  TypeScript SDK
-                </Badge>
+              <motion.div variants={fadeUp} className="mb-6">
+                <span className="g-label px-3 py-1 rounded-full bg-[var(--g-gold-wash)] border border-[var(--g-gold)]/20 text-[var(--g-gold-soft)]">
+                  <Package className="h-3 w-3 inline mr-2 mb-0.5" />
+                  v1.0.0 Stable
+                </span>
               </motion.div>
-              <motion.h1 variants={fadeUp} className="text-5xl font-bold mb-4">
+              <motion.h1 variants={fadeUp} className="g-display mb-6">
                 Gravitas SDK
               </motion.h1>
-              <motion.p variants={fadeUp} className="text-xl text-white/50 leading-relaxed mb-6">
-                A Stripe-like developer experience for institutional DeFi integrations.
-                Fully typed, pre-flight compliance checks, and a fluent builder API.
+              <motion.p variants={fadeUp} className="g-prose text-[var(--g-text-lg)] text-[var(--g-paper-dim)] mb-8">
+                A Stripe-like developer experience for institutional DeFi. Fully typed, pre-flight compliance checks, and a fluent builder API for atomic migrations.
               </motion.p>
-              <motion.div variants={fadeUp} className="flex gap-3">
-                <Badge className="bg-white/5 border-white/10 text-white/60">v1.0.0</Badge>
-                <Badge className="bg-white/5 border-white/10 text-white/60">TypeScript</Badge>
-                <Badge className="bg-white/5 border-white/10 text-white/60">ESM + CJS</Badge>
-                <Badge className="bg-green-500/10 border-green-500/20 text-green-400">Stable</Badge>
+              <motion.div variants={fadeUp} className="flex flex-wrap gap-3">
+                <span className="px-3 py-1 bg-[var(--g-surface)] border border-[var(--g-line)] rounded-md text-[var(--g-text-xs)] text-[var(--g-muted)]">TypeScript</span>
+                <span className="px-3 py-1 bg-[var(--g-surface)] border border-[var(--g-line)] rounded-md text-[var(--g-text-xs)] text-[var(--g-muted)]">ESM + CJS</span>
+                <span className="px-3 py-1 bg-[var(--g-surface)] border border-[var(--g-line)] rounded-md text-[var(--g-text-xs)] text-[var(--g-muted)]">Ethers v6</span>
               </motion.div>
             </motion.div>
           </div>
         </section>
 
-        <div className="container py-16 max-w-5xl mx-auto">
-          <motion.div variants={stagger} initial="hidden" animate="visible" className="space-y-16">
-
-            {/* Installation */}
-            <motion.section variants={fadeUp}>
-              <div className="flex items-center gap-3 mb-6">
-                <Terminal className="h-6 w-6 text-[#D4AF37]" />
-                <h2 className="text-2xl font-bold">Installation</h2>
+        <div className="container px-6 py-16 max-w-7xl mx-auto">
+          <div className="grid lg:grid-cols-12 gap-16">
+            {/* Sidebar / Quick Links */}
+            <aside className="lg:col-span-3 hidden lg:block">
+              <div className="sticky top-32 space-y-8">
+                <div>
+                  <h3 className="g-label mb-4">Quick Start</h3>
+                  <ul className="space-y-3 text-[var(--g-text-sm)]">
+                    <li><a href="#installation" className="text-[var(--g-muted)] hover:text-[var(--g-paper)] transition-colors">Installation</a></li>
+                    <li><a href="#initialization" className="text-[var(--g-muted)] hover:text-[var(--g-paper)] transition-colors">Initialization</a></li>
+                    <li><a href="#compliance" className="text-[var(--g-muted)] hover:text-[var(--g-paper)] transition-colors">Compliance API</a></li>
+                    <li><a href="#migration" className="text-[var(--g-muted)] hover:text-[var(--g-paper)] transition-colors">Migration Builder</a></li>
+                  </ul>
+                </div>
+                <div>
+                  <h3 className="g-label mb-4">Resources</h3>
+                  <ul className="space-y-3 text-[var(--g-text-sm)]">
+                    <li className="flex items-center gap-2">
+                      <BookOpen className="h-4 w-4 text-[var(--g-gold)]" />
+                      <a href="/docs" className="text-[var(--g-muted)] hover:text-[var(--g-paper)] transition-colors">Documentation</a>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Github className="h-4 w-4 text-[var(--g-gold)]" />
+                      <a href="https://github.com/AbZe628/gravitas-protocol" className="text-[var(--g-muted)] hover:text-[var(--g-paper)] transition-colors">GitHub Repository</a>
+                    </li>
+                  </ul>
+                </div>
               </div>
-              <div className="grid md:grid-cols-3 gap-4 mb-6">
-                {[
-                  { pm: "npm", cmd: "npm install @gravitas/sdk" },
-                  { pm: "yarn", cmd: "yarn add @gravitas/sdk" },
-                  { pm: "pnpm", cmd: "pnpm add @gravitas/sdk" },
-                ].map((item, i) => (
-                  <CodeBlock key={i} code={item.cmd} language={item.pm} />
-                ))}
-              </div>
-            </motion.section>
+            </aside>
 
-            {/* GravitasClient */}
-            <motion.section variants={fadeUp}>
-              <div className="flex items-center gap-3 mb-2">
-                <Code2 className="h-6 w-6 text-[#D4AF37]" />
-                <h2 className="text-2xl font-bold">GravitasClient</h2>
-              </div>
-              <p className="text-white/50 mb-6">The main entry point for all SDK interactions.</p>
+            {/* Main Content */}
+            <div className="lg:col-span-9 space-y-24">
+              {/* Installation */}
+              <section id="installation" className="scroll-mt-32">
+                <div className="flex items-center gap-3 mb-8">
+                  <Terminal className="h-6 w-6 text-[var(--g-gold)]" />
+                  <h2 className="text-[var(--g-text-xl)] font-bold">Installation</h2>
+                </div>
+                <div className="grid sm:grid-cols-3 gap-4">
+                  <CodeBlock code="npm install @gravitas/sdk" language="npm" />
+                  <CodeBlock code="yarn add @gravitas/sdk" language="yarn" />
+                  <CodeBlock code="pnpm add @gravitas/sdk" language="pnpm" />
+                </div>
+              </section>
 
-              <CodeBlock
-                title="Initialize client"
-                code={`import { GravitasClient } from '@gravitas/sdk';
+              {/* Initialization */}
+              <section id="initialization" className="scroll-mt-32">
+                <div className="flex items-center gap-3 mb-4">
+                  <Code2 className="h-6 w-6 text-[var(--g-gold)]" />
+                  <h2 className="text-[var(--g-text-xl)] font-bold">GravitasClient</h2>
+                </div>
+                <p className="g-prose text-[var(--g-paper-dim)] mb-8">The main entry point for all SDK interactions. Requires RPC and registry configuration.</p>
+                <CodeBlock
+                  title="Initialize client"
+                  code={`import { GravitasClient } from '@gravitas/sdk';
 
 const client = new GravitasClient({
   rpcUrl: 'https://sepolia-rollup.arbitrum.io/rpc',
@@ -137,237 +140,74 @@ const client = new GravitasClient({
   registryAddress: '0xbcaE3069362B0f0b80f44139052f159456C84679',
   teleportV3Address: '0x5D423f8d01539B92D3f3953b91682D9884D1E993',
 });`}
-              />
+                />
+              </section>
 
-              <div className="mt-6 grid md:grid-cols-3 gap-4">
-                {[
-                  { prop: "rpcUrl", type: "string", desc: "Arbitrum Sepolia RPC endpoint" },
-                  { prop: "chainId", type: "number", desc: "Chain ID (421614 for Arbitrum Sepolia)" },
-                  { prop: "registryAddress", type: "`0x${string}`", desc: "GravitasPolicyRegistry contract address" },
-                  { prop: "teleportV3Address", type: "`0x${string}`", desc: "TeleportV3 contract address" },
-                  { prop: "signer", type: "Signer (optional)", desc: "Ethers.js signer for write operations" },
-                  { prop: "timeout", type: "number (optional)", desc: "Request timeout in milliseconds" },
-                ].map((prop, i) => (
-                  <div key={i} className="p-3 rounded-lg border border-[#D4AF37]/10 bg-[#0A1628]/40">
-                    <code className="text-sm font-mono text-[#D4AF37]">{prop.prop}</code>
-                    <p className="text-xs text-white/30 mt-0.5">{prop.type}</p>
-                    <p className="text-xs text-white/50 mt-1">{prop.desc}</p>
-                  </div>
-                ))}
-              </div>
-            </motion.section>
-
-            {/* Compliance API */}
-            <motion.section variants={fadeUp}>
-              <div className="flex items-center gap-3 mb-2">
-                <Shield className="h-6 w-6 text-[#D4AF37]" />
-                <h2 className="text-2xl font-bold">Compliance API</h2>
-              </div>
-              <p className="text-white/50 mb-6">Pre-flight Shariah compliance checks before any migration.</p>
-
-              <CodeBlock
-                title="compliance.ts"
-                code={`const compliance = client.compliance();
+              {/* Compliance API */}
+              <section id="compliance" className="scroll-mt-32">
+                <div className="flex items-center gap-3 mb-4">
+                  <Shield className="h-6 w-6 text-[var(--g-gold)]" />
+                  <h2 className="text-[var(--g-text-xl)] font-bold">Compliance API</h2>
+                </div>
+                <p className="g-prose text-[var(--g-paper-dim)] mb-8">Pre-flight Shariah compliance checks before any migration execution.</p>
+                <CodeBlock
+                  title="compliance.ts"
+                  code={`const compliance = client.compliance();
 
 // Check if an asset is Shariah-compliant
 const isCompliant = await compliance.isAssetCompliant(
   '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48' // USDC
 );
 
-// Check if an executor is authorized
-const isAuthorized = await compliance.isExecutorAuthorized(
-  '0x...' // executor address
-);
-
-// Get current policy version
-const version = await compliance.getPolicyVersion();
-
-// Run full pre-flight check (throws if any check fails)
+// Run full pre-flight check
 await compliance.preflight({
   tokenA: '0x...',
   tokenB: '0x...',
   executor: '0x...',
 });`}
-              />
-            </motion.section>
-
-            {/* Migration Builder */}
-            <motion.section variants={fadeUp}>
-              <div className="flex items-center gap-3 mb-2">
-                <Zap className="h-6 w-6 text-[#D4AF37]" />
-                <h2 className="text-2xl font-bold">Migration Builder</h2>
-              </div>
-              <p className="text-white/50 mb-6">Fluent builder API for constructing and executing migrations.</p>
-
-              <div className="space-y-6">
-                <CodeBlock
-                  title="V3 Migration (simulate)"
-                  code={`const result = await client.migration()
-  .tokenId(123n)                    // Uniswap V3 NFT position ID
-  .newFee(3000)                     // Target fee tier (500, 3000, 10000)
-  .ticks(-887220, 887220)           // tickLower, tickUpper
-  .slippage(0n, 0n, 0n, 0n)        // amount0Min/Max for decrease/mint
-  .deadline(BigInt(Math.floor(Date.now() / 1000) + 3600))
-  .simulate(userAddress);
-
-console.log('Gas estimate:', result.gasEstimate);
-console.log('Expected output:', result.expectedAmounts);`}
                 />
+              </section>
 
-                <CodeBlock
-                  title="V3 Migration (execute with EIP-712)"
-                  code={`// Step 1: Build migration params
-const migration = client.migration()
+              {/* Migration Builder */}
+              <section id="migration" className="scroll-mt-32">
+                <div className="flex items-center gap-3 mb-4">
+                  <Zap className="h-6 w-6 text-[var(--g-gold)]" />
+                  <h2 className="text-[var(--g-text-xl)] font-bold">Migration Builder</h2>
+                </div>
+                <p className="g-prose text-[var(--g-paper-dim)] mb-8">Fluent builder API for constructing and executing atomic migrations with EIP-712 signatures.</p>
+                <div className="space-y-6">
+                  <CodeBlock
+                    title="V3 Migration Flow"
+                    code={`const migration = client.migration()
   .tokenId(123n)
   .newFee(3000)
   .ticks(-887220, 887220)
   .slippage(0n, 0n, 0n, 0n)
   .deadline(BigInt(Math.floor(Date.now() / 1000) + 3600));
 
-// Step 2: Get current nonce
+// Sign and execute
 const nonce = await migration.getNonce(userAddress);
-
-// Step 3: Sign with EIP-712
 const signature = await migration.sign(signer, nonce);
-
-// Step 4: Execute atomically
-const tx = await migration.execute(signature);
-const receipt = await tx.wait();
-
-console.log('Migration successful:', receipt.transactionHash);`}
-                />
-
-                <CodeBlock
-                  title="V2 Migration"
-                  code={`const tx = await client.migrationV2()
-  .pair('0x...')                    // Uniswap V2 pair address
-  .lpAmount(BigInt('1000000000000000000')) // LP token amount (1 LP)
-  .routerTo('0x...')                // Destination router
-  .deadline(BigInt(Math.floor(Date.now() / 1000) + 3600))
-  .execute();
-
-const receipt = await tx.wait();`}
-                />
-              </div>
-            </motion.section>
-
-            {/* SDK Snippet Generator */}
-            <motion.section variants={fadeUp}>
-              <div className="flex items-center gap-3 mb-2">
-                <Code2 className="h-6 w-6 text-[#D4AF37]" />
-                <h2 className="text-2xl font-bold">SDK Snippet Generator</h2>
-              </div>
-              <p className="text-white/50 mb-6">Generate ready-to-use code snippets for your integration.</p>
-
-              <Card className="border border-[#D4AF37]/10 bg-[#0A1628]/60">
-                <CardHeader>
-                  <CardTitle className="text-white text-base">Example Integration</CardTitle>
-                  <CardDescription className="text-white/50">Copy this snippet to get started immediately</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <CodeBlock
-                    title="Full integration example"
-                    code={`import { GravitasClient } from '@gravitas/sdk';
-import { ethers } from 'ethers';
-
-async function migratePosition(tokenId: bigint) {
-  // Initialize provider and signer
-  const provider = new ethers.JsonRpcProvider(
-    'https://sepolia-rollup.arbitrum.io/rpc'
-  );
-  const signer = new ethers.Wallet(process.env.WALLET_SIGNER_KEY!, provider);
-
-  // Initialize Gravitas client
-  const client = new GravitasClient({
-    rpcUrl: 'https://sepolia-rollup.arbitrum.io/rpc',
-    chainId: 421614,
-    registryAddress: '0xbcaE3069362B0f0b80f44139052f159456C84679',
-    teleportV3Address: '0x5D423f8d01539B92D3f3953b91682D9884D1E993',
-    signer,
-  });
-
-  // Pre-flight compliance check
-  await client.compliance().preflight({
-    tokenA: '0x...', // your token addresses
-    tokenB: '0x...',
-    executor: await signer.getAddress(),
-  });
-
-  // Build and execute migration
-  const migration = client.migration()
-    .tokenId(tokenId)
-    .newFee(3000)
-    .ticks(-887220, 887220)
-    .slippage(0n, 0n, 0n, 0n)
-    .deadline(BigInt(Math.floor(Date.now() / 1000) + 3600));
-
-  const nonce = await migration.getNonce(await signer.getAddress());
-  const signature = await migration.sign(signer, nonce);
-  const tx = await migration.execute(signature);
-
-  console.log('Migration tx:', tx.hash);
-  return await tx.wait();
-}`}
+const tx = await migration.execute(signature);`}
                   />
-                </CardContent>
-              </Card>
-            </motion.section>
-
-            {/* Resources */}
-            <motion.section variants={fadeUp}>
-              <h2 className="text-2xl font-bold mb-6">Resources</h2>
-              <div className="grid md:grid-cols-3 gap-4">
-                {[
-                  { icon: BookOpen, title: "Documentation", desc: "Full API reference and guides", href: "/docs", external: false },
-                  { icon: Shield, title: "Compliance API", desc: "Shariah compliance integration", href: "/compliance", external: false },
-                  { icon: ExternalLink, title: "GitHub", desc: "Source code and examples", href: "https://github.com/AbZe628/gravitas-protocol", external: true },
-                ].map((item, i) => (
-                  <div key={i}>
-                    {item.external ? (
-                      <a href={item.href} target="_blank" rel="noopener noreferrer">
-                        <Card className="border border-[#D4AF37]/10 bg-[#0A1628]/60 hover:border-[#D4AF37]/30 transition-all cursor-pointer group h-full">
-                          <CardHeader className="pb-3">
-                            <item.icon className="h-5 w-5 text-[#D4AF37] mb-2" />
-                            <CardTitle className="text-white text-sm group-hover:text-[#D4AF37] transition-colors">{item.title}</CardTitle>
-                            <p className="text-xs text-white/40">{item.desc}</p>
-                          </CardHeader>
-                        </Card>
-                      </a>
-                    ) : (
-                      <Link href={item.href}>
-                        <Card className="border border-[#D4AF37]/10 bg-[#0A1628]/60 hover:border-[#D4AF37]/30 transition-all cursor-pointer group h-full">
-                          <CardHeader className="pb-3">
-                            <item.icon className="h-5 w-5 text-[#D4AF37] mb-2" />
-                            <CardTitle className="text-white text-sm group-hover:text-[#D4AF37] transition-colors">{item.title}</CardTitle>
-                            <p className="text-xs text-white/40">{item.desc}</p>
-                          </CardHeader>
-                        </Card>
-                      </Link>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </motion.section>
-
-            {/* CTA */}
-            <motion.div variants={fadeUp} className="border border-[#D4AF37]/20 rounded-2xl p-8 bg-gradient-to-br from-[#D4AF37]/5 to-transparent text-center">
-              <h3 className="text-2xl font-bold mb-2">Ready to build?</h3>
-              <p className="text-white/50 mb-6">Launch the dashboard or explore the full documentation.</p>
-              <div className="flex gap-4 justify-center">
-                <Button asChild className="bg-[#D4AF37] text-[#060E1A] hover:bg-[#D4AF37]/90 font-semibold gap-2">
-                  <Link href="/dashboard">Launch App <ArrowRight className="h-4 w-4" /></Link>
-                </Button>
-                <Button asChild variant="outline" className="border-[#D4AF37]/30 text-white hover:bg-[#D4AF37]/10 gap-2">
-                  <a href="https://github.com/AbZe628/gravitas-protocol" target="_blank" rel="noopener noreferrer">
-                    GitHub <ExternalLink className="h-4 w-4" />
-                  </a>
-                </Button>
-              </div>
-            </motion.div>
-
-          </motion.div>
+                </div>
+              </section>
+            </div>
+          </div>
         </div>
-      </div>
+      </main>
+
+      <footer className="bg-[var(--g-navy)] border-t border-[var(--g-line)] py-12 mt-20">
+        <div className="container px-6 mx-auto max-w-7xl flex flex-col sm:flex-row justify-between items-center gap-6">
+          <div className="text-[var(--g-text-xs)] text-[var(--g-muted)]">
+            © 2026 Gravitas Protocol. Type-safe institutional DeFi.
+          </div>
+          <div className="flex gap-6 text-[var(--g-text-xs)] text-[var(--g-muted)]">
+            <a href="https://github.com/AbZe628/gravitas-protocol" className="hover:text-[var(--g-paper)] transition-colors">GitHub</a>
+            <a href="/docs" className="hover:text-[var(--g-paper)] transition-colors">Documentation</a>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
