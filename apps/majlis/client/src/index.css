@@ -12,16 +12,24 @@
     @apply bg-ink text-paper antialiased;
     text-rendering: optimizeLegibility;
   }
-  /* Extended reading by readers who are not twenty-five. Sizes come from the
-     shared token scale so the two applications stay in step. */
   p, li {
-    font-size: var(--g-text-base);
-    line-height: var(--g-leading-body);
+    font-size: var(--text-base);
+    line-height: 1.62;
   }
   [dir='rtl'] {
     letter-spacing: 0;
   }
   ::selection {
     @apply bg-gold/30;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-surface border border-line rounded-lg p-4;
+  }
+  
+  .btn-gold {
+    @apply inline-flex items-center px-4 py-2 border border-gold text-gold hover:bg-gold/10 transition-colors duration-200 rounded-sm text-sm;
   }
 }
