@@ -1,0 +1,49 @@
+@import "./design/tokens.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  * {
+    @apply border-line;
+  }
+  body {
+    @apply bg-ink text-paper font-body antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  p, li {
+    font-size: var(--g-text-base);
+    line-height: var(--g-leading-body);
+  }
+  [dir='rtl'] {
+    letter-spacing: 0;
+  }
+  ::selection {
+    @apply bg-gold/30;
+  }
+}
+
+@layer components {
+  .btn-action {
+    @apply inline-flex items-center justify-center px-4 py-2 bg-gold text-ink font-bold rounded-sm
+           hover:bg-goldsoft transition-all duration-150 active:scale-95 text-sm;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center px-4 py-2 text-muted hover:text-paper hover:bg-surface transition-all text-sm;
+  }
+
+  .card-matter {
+    @apply g-panel p-6 hover:border-gold/30 transition-colors cursor-pointer;
+  }
+}
+
+@layer utilities {
+  .rtl-flip {
+    @apply rtl:-scale-x-100;
+  }
+}

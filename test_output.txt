@@ -18,7 +18,7 @@ Ran 1 test for test/foundry/TeleportFlow.t.sol:TeleportFlowTests
 [PASS] test_V2_RescueTokens() (gas: 72244)
 Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 761.50µs (79.72µs CPU time)
 
-Ran 6 tests for test/GravitasLibearaIntegration.t.sol:GravitasLibearaIntegrationTest
+Ran 6 tests for test/GravitasSubscriptionIntegration.t.sol:GravitasSubscriptionIntegrationTest
 [PASS] test_AreTokensCompliant() (gas: 74619)
 [PASS] test_CheckSubscriptionCompliance_RevertOnNonCompliantAsset() (gas: 15956)
 [PASS] test_CheckSubscriptionCompliance_RevertOnUnauthorizedExecutor() (gas: 20433)

@@ -45,3 +45,7 @@ integration-kit/mock-server/node_modules/
 integration-kit/sdk-examples/node_modules/
 integration-kit/mock-server/audit.log.jsonl
 integration-kit/**/*.log
+
+*.log
+REPORT.md
+SESSION-REPORT.md

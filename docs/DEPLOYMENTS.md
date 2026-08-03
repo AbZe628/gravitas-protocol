@@ -1,5 +1,15 @@
 # Gravitas Protocol Deployments
 
+> **The deployed bytecode is version 0.1.0 and predates the 0.1.2 security hardening.**
+>
+> Two fixes are present in this repository and are **not yet on chain**:
+> `MIGRATION_TYPEHASH` in the deployed `TeleportV3` does not bind every economic parameter,
+> and the `Pausable` mechanism in the deployed `GravitasPolicyRegistry` does not gate the
+> verification functions. The verified source on Arbiscan will therefore not match this
+> repository. Redeployment is required before these fixes take effect. See `CHANGELOG.md`,
+> entry 0.1.2.
+
+
 ## Arbitrum Sepolia (Testnet)
 
 ### Contract Addresses
@@ -72,7 +82,7 @@ forge verify-contract \
 
 ### Planned Deployment
 
-- **Target Date**: Q2 2026 (after external audit)
+- **Target Date**: pending (no date claimed) (after external audit)
 - **Prerequisites**:
   - External security audit completion
   - Shariah Advisory Board certification

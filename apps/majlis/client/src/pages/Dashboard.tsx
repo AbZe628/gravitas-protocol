@@ -1,0 +1,107 @@
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { api, type MatterSummary, type RegistrySnapshot } from '../lib/api.js';
+import { useI18n } from '../lib/i18n.js';
+import { Card, DateText, ErrorText, Loading, Tag } from '../components/ui.js';
+
+export default function Dashboard() {
+  const { t } = useI18n();
+  const [matters, setMatters] = useState<MatterSummary[] | null>(null);
+  const [registry, setRegistry] = useState<RegistrySnapshot | null>(null);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    api.matters().then(setMatters).catch(() => setFailed(true));
+    api.registry().then(setRegistry).catch(() => setRegistry(null));
+  }, []);
+
+  if (failed) return <ErrorText />;
+  if (!matters) return <Loading />;
+
+  const open = matters.filter((m) => m.status !== 'in_force' && m.status !== 'lapsed');
+  const settled = matters.filter((m) => m.status === 'in_force' || m.status === 'lapsed');
+
+  return (
+    <div>
+      <div className="mb-5 rounded-lg border border-line bg-surface/60 px-4 py-3 text-[13px] text-muted">
+        {t('dash.readOnlyNotice')}
+      </div>
+
+      <h1 className="mb-4 text-[19px] font-semibold">{t('dash.title')}</h1>
+
+      {open.length === 0 ? (
+        <p className="text-muted text-sm">{t('dash.none')}</p>
+      ) : (
+        <ul className="space-y-3">
+          {open.map((m) => (
+            <li key={m.id}>
+              <Link to={`/matters/${m.id}`} className="block">
+                <Card accent={m.direction === 'restrict'}>
+                  <div className="mb-2 flex flex-wrap items-center gap-2">
+                    <Tag tone={m.direction === 'restrict' ? 'warn' : 'gold'}>
+                      {t(`matter.direction.${m.direction}`)}
+                    </Tag>
+                    <Tag>{t(`matter.status.${m.status}`)}</Tag>
+                  </div>
+                  <div className="text-[15px] font-medium leading-snug">{m.title}</div>
+                  <div className="mt-2 text-[12px] text-muted">
+                    {t(`matter.origin.${m.origin}`)}
+                    <span className="mx-1.5 opacity-40">·</span>
+                    {t('common.opened')} <DateText iso={m.openedAt} />
+                    {m.affected !== null && (
+                      <>
+                        <span className="mx-1.5 opacity-40">·</span>
+                        <span className="text-goldsoft">
+                          {m.affected} {t('sim.affected')}
+                        </span>
+                      </>
+                    )}
+                  </div>
+                </Card>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {settled.length > 0 && (
+        <>
+          <h2 className="mb-3 mt-8 text-[13px] font-semibold uppercase tracking-[0.14em] text-muted">
+            {t('matter.status.in_force')}
+          </h2>
+          <ul className="space-y-2">
+            {settled.map((m) => (
+              <li key={m.id}>
+                <Link
+                  to={`/matters/${m.id}`}
+                  className="block rounded-lg border border-line px-4 py-3 hover:border-muted"
+                >
+                  <div className="text-[14px] leading-snug">{m.title}</div>
+                  <div className="mt-1 text-[12px] text-muted">
+                    <DateText iso={m.openedAt} />
+                  </div>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+
+      {registry && (
+        <div className="mt-9 rounded-lg border border-line px-4 py-3">
+          <div className="text-[11px] uppercase tracking-wider text-muted">
+            {t('dash.registry')}
+          </div>
+          <div className="mt-1 font-mono text-[11px] break-all text-muted">{registry.address}</div>
+          <div className="mt-2">
+            {registry.reachable ? (
+              <Tag tone="ok">{t('dash.registryReachable')}</Tag>
+            ) : (
+              <Tag tone="warn">{t('dash.registryUnreachable')}</Tag>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

@@ -3,8 +3,8 @@ pragma solidity ^0.8.24;
 
 /**
  * @title IShariahPolicyChecker
- * @notice Interface for Libeara to integrate Gravitas Shariah-compliance middleware.
- * @dev This interface allows Libeara's UltraManager or KYC contracts to verify
+ * @notice Interface for a tokenisation platform to integrate Gravitas Shariah-compliance middleware.
+ * @dev This interface allows an integrating platform's manager or KYC contracts to verify
  *      compliance before executing financial operations like minting or subscribing.
  */
 interface IShariahPolicyChecker {
@@ -31,10 +31,10 @@ interface IShariahPolicyChecker {
     function verifyExecutorStatus(address executor) external view returns (bool authorized);
 
     /**
-     * @notice Single-call compliance gate for Libeara's UltraManager subscription flow.
+     * @notice Single-call compliance gate for an integrating platform's subscription flow.
      * @dev Checks two conditions atomically:
      *      1. subscriptionToken is Shariah-compliant (asset whitelist)
-     *      2. msg.sender (the calling contract, e.g. Libeara's UltraManager) is an
+     *      2. msg.sender (the calling contract, e.g. an integrating fund manager) is an
      *         authorized institutional executor — NOT the end subscriber.
      *         The subscriber parameter is reserved for future per-investor policy logic.
      * @param subscriber The end-investor address (reserved for future use; not checked in v1).

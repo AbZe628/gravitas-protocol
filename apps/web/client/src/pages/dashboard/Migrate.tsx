@@ -1,31 +1,39 @@
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import {
-  ArrowRight, AlertCircle, Loader2, CheckCircle2, Shield,
-  Zap, Info, ExternalLink, Search
+import { 
+  ArrowRightLeft, 
+  ShieldCheck, 
+  Zap, 
+  AlertCircle, 
+  Loader2, 
+  CheckCircle2, 
+  ExternalLink,
+  Search,
+  Lock,
+  ArrowRight,
+  Info,
+  ArrowLeft
 } from "lucide-react";
-import { WalletButton } from "@/components/WalletModal";
-import {
-  useAccount,
-  useReadContract,
-  useWriteContract,
-  useWaitForTransactionReceipt,
-  useSignTypedData,
+import { 
+  useAccount, 
+  useReadContract, 
+  useWriteContract, 
+  useWaitForTransactionReceipt, 
+  useSignTypedData 
 } from "wagmi";
 import { arbitrumSepolia } from "wagmi/chains";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { CONTRACTS } from "@/lib/wagmi";
 import { decodeContractError } from "@/lib/errorDecoder";
+import { WalletButton } from "@/components/WalletModal";
 
-// ─── ABIs ─────────────────────────────────────────────────────────────────────
+// ABIs
 const POLICY_REGISTRY_ABI = [
   {
     inputs: [{ name: "asset", type: "address" }],
@@ -112,10 +120,8 @@ const TELEPORT_V2_ABI = [
   },
 ] as const;
 
-// TeleportV2 contract address — update when deployed to mainnet
 const TELEPORT_V2_ADDRESS = "0x0000000000000000000000000000000000000000" as const;
 
-// ─── EIP-712 Domain & Types ────────────────────────────────────────────────────
 const EIP712_DOMAIN = {
   name: "GravitasTeleportV3",
   version: "1",
@@ -123,10 +129,6 @@ const EIP712_DOMAIN = {
   verifyingContract: CONTRACTS.TELEPORT_V3 as `0x${string}`,
 } as const;
 
-// NOTE: This MUST match TeleportV3.MIGRATION_TYPEHASH exactly (field names, types, and
-// order). The signed intent binds every execution parameter — all slippage bounds and the
-// full rebalancing-swap configuration — so an executor cannot re-run a user's signature with
-// weakened economics. Keep in lockstep with the contract and the SDK's buildMigrationTypedData.
 const EIP712_TYPES = {
   MigrationIntent: [
     { name: "tokenId", type: "uint256" },
@@ -147,7 +149,11 @@ const EIP712_TYPES = {
   ],
 } as const;
 
-// ─── Compliance Checker ────────────────────────────────────────────────────────
+const fadeUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } },
+};
+
 function ComplianceChecker() {
   const [tokenAddress, setTokenAddress] = useState("");
   const [checkAddress, setCheckAddress] = useState<`0x${string}` | undefined>(undefined);
@@ -170,130 +176,58 @@ function ComplianceChecker() {
   };
 
   return (
-    <Card className="border-[#D4AF37]/20 bg-[#0F1E35]/50 backdrop-blur">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-white text-base flex items-center gap-2">
-          <Shield className="h-4 w-4 text-[#D4AF37]" />
-          Shariah Compliance Checker
-        </CardTitle>
-        <CardDescription className="text-white/50 text-xs">
-          Verify if a token is on the Shariah-compliant whitelist before migrating
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        <div className="flex gap-2">
+    <div className="g-panel p-8 bg-surface/30">
+      <div className="flex items-center gap-4 mb-8">
+        <div className="h-10 w-10 rounded-xl bg-gold/5 border border-gold/20 flex items-center justify-center">
+          <ShieldCheck className="text-gold" size={20} />
+        </div>
+        <div>
+          <h3 className="text-sm font-bold text-paper uppercase tracking-widest">Compliance Verification</h3>
+        </div>
+      </div>
+      
+      <div className="space-y-6">
+        <div className="flex gap-3">
           <Input
-            placeholder="Token address (0x...)"
+            placeholder="Asset address (0x...)"
             value={tokenAddress}
             onChange={(e) => setTokenAddress(e.target.value)}
-            className="bg-[#0A1628]/50 border-[#D4AF37]/20 text-white font-mono text-sm"
+            className="bg-ink border-line text-paper font-mono text-sm h-12 focus:border-gold"
             onKeyDown={(e) => e.key === "Enter" && handleCheck()}
           />
-          <Button
-            onClick={handleCheck}
-            size="sm"
-            className="bg-[#D4AF37] text-[#0A1628] hover:bg-[#D4AF37]/90 shrink-0"
-            disabled={isLoading}
-          >
-            {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+          <Button onClick={handleCheck} className="bg-gold text-ink hover:bg-goldsoft h-12 px-6 rounded-sm font-bold">
+            {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search size={18} />}
           </Button>
         </div>
-        {checkAddress && !isLoading && (
-          <div
-            className={`p-3 rounded-lg border text-sm flex items-center gap-2 ${
-              isCompliant
-                ? "border-green-500/20 bg-green-500/5 text-green-400"
-                : "border-red-500/20 bg-red-500/5 text-red-400"
-            }`}
-          >
-            {isCompliant ? (
-              <><CheckCircle2 className="h-4 w-4 shrink-0" /> Asset is Shariah-compliant ✓</>
-            ) : (
-              <><AlertCircle className="h-4 w-4 shrink-0" /> Asset is NOT on the compliance whitelist</>
-            )}
-          </div>
-        )}
-      </CardContent>
-    </Card>
-  );
-}
 
-// ─── Contract Stats ────────────────────────────────────────────────────────────
-function ContractStats({ address }: { address?: string }) {
-  const { data: nonce } = useReadContract({
-    address: CONTRACTS.TELEPORT_V3 as `0x${string}`,
-    abi: TELEPORT_V3_ABI,
-    functionName: "nonces",
-    args: address ? [address as `0x${string}`] : undefined,
-    query: { enabled: !!address },
-    chainId: 421614,
-  });
-  const { data: cooldown } = useReadContract({
-    address: CONTRACTS.TELEPORT_V3 as `0x${string}`,
-    abi: TELEPORT_V3_ABI,
-    functionName: "cooldownPeriod",
-    chainId: 421614,
-  });
-  const { data: maxMove } = useReadContract({
-    address: CONTRACTS.TELEPORT_V3 as `0x${string}`,
-    abi: TELEPORT_V3_ABI,
-    functionName: "maxMoveBps",
-    chainId: 421614,
-  });
-
-  if (!address) return null;
-
-  return (
-    <div className="grid grid-cols-3 gap-3">
-      <div className="p-3 rounded-lg bg-[#0A1628]/50 border border-[#D4AF37]/10 text-center">
-        <p className="text-xs text-white/40 mb-1">Your Nonce</p>
-        <p className="text-lg font-bold text-white">{nonce?.toString() ?? "—"}</p>
-      </div>
-      <div className="p-3 rounded-lg bg-[#0A1628]/50 border border-[#D4AF37]/10 text-center">
-        <p className="text-xs text-white/40 mb-1">Cooldown</p>
-        <p className="text-lg font-bold text-white">{cooldown ? `${Number(cooldown) / 60}m` : "—"}</p>
-      </div>
-      <div className="p-3 rounded-lg bg-[#0A1628]/50 border border-[#D4AF37]/10 text-center">
-        <p className="text-xs text-white/40 mb-1">Max Move</p>
-        <p className="text-lg font-bold text-white">{maxMove ? `${Number(maxMove) / 100}%` : "—"}</p>
+        <AnimatePresence mode="wait">
+          {checkAddress && !isLoading && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              className={`p-5 rounded-xl border text-xs font-bold uppercase tracking-widest flex items-center gap-3 ${
+                isCompliant ? "border-green-500/20 bg-green-500/5 text-green-400" : "border-red-500/20 bg-red-500/5 text-red-400"
+              }`}
+            >
+              {isCompliant ? <CheckCircle2 className="h-5 w-5" /> : <AlertCircle className="h-5 w-5" />}
+              {isCompliant ? "Asset is Shariah-compliant" : "Asset not whitelisted"}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
 }
 
-// ─── Main Migrate Component ────────────────────────────────────────────────────
 export default function Migrate() {
   const { isConnected, address } = useAccount();
-
-  // V2 form state
-  const [v2Form, setV2Form] = useState({
-    factoryFrom: "",
-    routerTo: "",
-    tokenA: "",
-    tokenB: "",
-    amountLiquidity: "",
-    amountAMin: "0",
-    amountBMin: "0",
-  });
-
-  // V3 form state
-  const [v3Form, setV3Form] = useState({
-    tokenId: "",
-    newFee: "3000",
-    tickLower: "-887220",
-    tickUpper: "887220",
-    amount0MinMint: "1",
-    amount1MinMint: "1",
-    amount0MinDecrease: "0",
-    amount1MinDecrease: "0",
-  });
-
-  // V3 multi-step state
+  const [v2Form, setV2Form] = useState({ factoryFrom: "", routerTo: "", tokenA: "", tokenB: "", amountLiquidity: "", amountAMin: "0", amountBMin: "0" });
+  const [v3Form, setV3Form] = useState({ tokenId: "", newFee: "3000", tickLower: "-887220", tickUpper: "887220", amount0MinMint: "1", amount1MinMint: "1", amount0MinDecrease: "0", amount1MinDecrease: "0" });
   const [step, setStep] = useState<"form" | "execute">("form");
   const [v3Signature, setV3Signature] = useState<`0x${string}` | undefined>(undefined);
   const [v3Deadline, setV3Deadline] = useState<bigint>(BigInt(0));
 
-  // Nonce for EIP-712
   const { data: userNonce } = useReadContract({
     address: CONTRACTS.TELEPORT_V3 as `0x${string}`,
     abi: TELEPORT_V3_ABI,
@@ -303,57 +237,32 @@ export default function Migrate() {
     chainId: 421614,
   });
 
-  // V2 write contract
   const { writeContractAsync: writeV2, isPending: v2Pending } = useWriteContract();
   const [v2TxHash, setV2TxHash] = useState<`0x${string}` | undefined>(undefined);
   const { isLoading: v2Confirming, isSuccess: v2Confirmed } = useWaitForTransactionReceipt({ hash: v2TxHash });
 
-  // V3 EIP-712 sign
   const { signTypedDataAsync, isPending: v3Signing } = useSignTypedData();
-
-  // V3 execute write contract
   const { writeContractAsync: writeV3, isPending: v3Executing } = useWriteContract();
   const [v3TxHash, setV3TxHash] = useState<`0x${string}` | undefined>(undefined);
   const { isLoading: v3Confirming, isSuccess: v3Confirmed } = useWaitForTransactionReceipt({ hash: v3TxHash });
 
-  // V2 Migration Handler
   const handleV2Migrate = async () => {
-    if (!isConnected || !address) { toast.error("Please connect your wallet"); return; }
-    const { factoryFrom, routerTo, tokenA, tokenB, amountLiquidity, amountAMin, amountBMin } = v2Form;
-    if (!factoryFrom || !routerTo || !tokenA || !tokenB || !amountLiquidity) {
-      toast.error("Please fill in all required fields");
-      return;
-    }
+    if (!isConnected || !address) { toast.error("Connect wallet"); return; }
     const deadline = BigInt(Math.floor(Date.now() / 1000) + 1800);
     try {
       const hash = await writeV2({
         address: TELEPORT_V2_ADDRESS,
         abi: TELEPORT_V2_ABI,
         functionName: "migrateLiquidityV2",
-        args: [
-          factoryFrom as `0x${string}`,
-          routerTo as `0x${string}`,
-          tokenA as `0x${string}`,
-          tokenB as `0x${string}`,
-          BigInt(amountLiquidity),
-          BigInt(amountAMin || "0"),
-          BigInt(amountBMin || "0"),
-          deadline,
-          address as `0x${string}`,
-        ],
+        args: [v2Form.factoryFrom as `0x${string}`, v2Form.routerTo as `0x${string}`, v2Form.tokenA as `0x${string}`, v2Form.tokenB as `0x${string}`, BigInt(v2Form.amountLiquidity), BigInt(v2Form.amountAMin), BigInt(v2Form.amountBMin), deadline, address as `0x${string}`],
         chainId: arbitrumSepolia.id,
       });
       setV2TxHash(hash);
-      toast.info(`V2 migration submitted: ${hash.slice(0, 10)}...`);
-    } catch (err: unknown) {
-      toast.error(decodeContractError(err));
-    }
+    } catch (err: unknown) { toast.error(decodeContractError(err)); }
   };
 
-  // V3 EIP-712 Sign Handler
   const handleV3Sign = async () => {
-    if (!isConnected || !address) { toast.error("Please connect your wallet"); return; }
-    if (!v3Form.tokenId) { toast.error("Please enter a Token ID"); return; }
+    if (!isConnected || !address) { toast.error("Connect wallet"); return; }
     const deadline = BigInt(Math.floor(Date.now() / 1000) + 1800);
     setV3Deadline(deadline);
     try {
@@ -361,433 +270,261 @@ export default function Migrate() {
         domain: EIP712_DOMAIN,
         types: EIP712_TYPES,
         primaryType: "MigrationIntent",
-        // These values MUST be identical to the params submitted in handleV3Execute,
-        // otherwise on-chain signature verification will reject the migration.
-        message: {
-          tokenId: BigInt(v3Form.tokenId),
-          newFee: parseInt(v3Form.newFee) as 500 | 3000 | 10000,
-          newTickLower: parseInt(v3Form.tickLower),
-          newTickUpper: parseInt(v3Form.tickUpper),
-          amount0MinMint: BigInt(v3Form.amount0MinMint || "1"),
-          amount1MinMint: BigInt(v3Form.amount1MinMint || "1"),
-          amount0MinDecrease: BigInt(v3Form.amount0MinDecrease || "0"),
-          amount1MinDecrease: BigInt(v3Form.amount1MinDecrease || "0"),
-          deadline,
-          executeSwap: false,
-          zeroForOne: false,
-          swapAmountIn: BigInt(0),
-          swapAmountOutMin: BigInt(0),
-          swapFeeTier: 3000,
-          nonce: userNonce ?? BigInt(0),
+        message: { 
+          tokenId: BigInt(v3Form.tokenId), 
+          newFee: parseInt(v3Form.newFee) as 500 | 3000 | 10000, 
+          newTickLower: parseInt(v3Form.tickLower), 
+          newTickUpper: parseInt(v3Form.tickUpper), 
+          amount0MinMint: BigInt(v3Form.amount0MinMint), 
+          amount1MinMint: BigInt(v3Form.amount1MinMint), 
+          amount0MinDecrease: BigInt(v3Form.amount0MinDecrease), 
+          amount1MinDecrease: BigInt(v3Form.amount1MinDecrease), 
+          deadline, 
+          executeSwap: false, 
+          zeroForOne: false, 
+          swapAmountIn: BigInt(0), 
+          swapAmountOutMin: BigInt(0), 
+          swapFeeTier: 3000, 
+          nonce: userNonce ?? BigInt(0) 
         },
       });
       setV3Signature(sig);
       setStep("execute");
-      toast.success("EIP-712 intent signed. Click Execute to submit the migration.");
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Signing failed";
-      toast.error(msg.includes("User rejected") || msg.includes("user rejected") ? "Signature rejected" : msg.slice(0, 100));
-    }
+    } catch (err: unknown) { toast.error(decodeContractError(err)); }
   };
 
-  // V3 Execute Handler
   const handleV3Execute = async () => {
-    if (!v3Signature || !address) { toast.error("Please sign the migration intent first"); return; }
+    if (!v3Signature) return;
     try {
       const hash = await writeV3({
         address: CONTRACTS.TELEPORT_V3 as `0x${string}`,
         abi: TELEPORT_V3_ABI,
         functionName: "executeAtomicMigration",
-        args: [
-          {
-            tokenId: BigInt(v3Form.tokenId),
-            newFee: parseInt(v3Form.newFee) as 500 | 3000 | 10000,
-            newTickLower: parseInt(v3Form.tickLower),
-            newTickUpper: parseInt(v3Form.tickUpper),
-            amount0MinMint: BigInt(v3Form.amount0MinMint || "1"),
-            amount1MinMint: BigInt(v3Form.amount1MinMint || "1"),
-            amount0MinDecrease: BigInt(v3Form.amount0MinDecrease || "0"),
-            amount1MinDecrease: BigInt(v3Form.amount1MinDecrease || "0"),
-            deadline: v3Deadline,
-            executeSwap: false,
-            zeroForOne: false,
-            swapAmountIn: BigInt(0),
-            swapAmountOutMin: BigInt(0),
-            swapFeeTier: 3000,
-          },
-          v3Signature,
-        ],
+        args: [{ 
+          tokenId: BigInt(v3Form.tokenId), 
+          newFee: parseInt(v3Form.newFee) as 500 | 3000 | 10000, 
+          newTickLower: parseInt(v3Form.tickLower), 
+          newTickUpper: parseInt(v3Form.tickUpper), 
+          amount0MinMint: BigInt(v3Form.amount0MinMint), 
+          amount1MinMint: BigInt(v3Form.amount1MinMint), 
+          amount0MinDecrease: BigInt(v3Form.amount0MinDecrease), 
+          amount1MinDecrease: BigInt(v3Form.amount1MinDecrease), 
+          deadline: v3Deadline, 
+          executeSwap: false, 
+          zeroForOne: false, 
+          swapAmountIn: BigInt(0), 
+          swapAmountOutMin: BigInt(0), 
+          swapFeeTier: 3000 
+        }, v3Signature],
         chainId: arbitrumSepolia.id,
       });
       setV3TxHash(hash);
-      toast.info(`V3 migration submitted: ${hash.slice(0, 10)}...`);
-    } catch (err: unknown) {
-      toast.error(decodeContractError(err));
-    }
+    } catch (err: unknown) { toast.error(decodeContractError(err)); }
   };
 
-  const handleV3Reset = () => {
-    setStep("form");
-    setV3Signature(undefined);
-    setV3TxHash(undefined);
-  };
+  if (!isConnected) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center max-w-md mx-auto">
+        <div className="h-20 w-20 rounded-2xl bg-surface border border-line flex items-center justify-center mb-8 shadow-2xl">
+          <Lock className="h-10 w-10 text-gold opacity-40" />
+        </div>
+        <h2 className="text-2xl font-display font-bold mb-4">Restricted Access</h2>
+        <p className="text-muted mb-10 leading-relaxed">Please connect your institutional wallet to access the liquidity migration protocol.</p>
+        <WalletButton />
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-6">
-      {!isConnected && (
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-xl border border-[#D4AF37]/30 bg-[#0F1E35]/50">
-          <div className="flex items-start gap-3">
-            <AlertCircle className="h-5 w-5 text-[#D4AF37] shrink-0 mt-0.5" />
-            <p className="text-sm text-white/70 leading-snug">
-              Connect your wallet to Arbitrum Sepolia to start migrating liquidity positions
-            </p>
-          </div>
-          <WalletButton size="sm" className="shrink-0" />
+    <div className="max-w-6xl mx-auto space-y-12">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div>
+          <span className="text-[10px] uppercase tracking-[0.2em] text-gold font-bold mb-4 block">Liquidity Teleportation</span>
+          <h1 className="text-3xl font-display font-bold text-paper">Protocol Migration</h1>
         </div>
-      )}
+        <div className="w-full md:w-96">
+          <ComplianceChecker />
+        </div>
+      </div>
 
-      <ComplianceChecker />
+      <Tabs defaultValue="v3" className="space-y-10">
+        <TabsList className="grid grid-cols-2 w-full max-w-md bg-surface border border-line p-1 rounded-lg h-12">
+          <TabsTrigger value="v3" className="data-[state=active]:bg-gold data-[state=active]:text-ink font-bold rounded-md transition-all text-xs uppercase tracking-widest">
+            Uniswap V3 Engine
+          </TabsTrigger>
+          <TabsTrigger value="v2" className="data-[state=active]:bg-gold data-[state=active]:text-ink font-bold rounded-md transition-all text-xs uppercase tracking-widest">
+            V2 Legacy Router
+          </TabsTrigger>
+        </TabsList>
 
-      <Card className="border-[#D4AF37]/20 bg-[#0F1E35]/50 backdrop-blur">
-        <CardHeader>
-          <CardTitle className="text-white flex items-center gap-2">
-            <Zap className="h-5 w-5 text-[#D4AF37]" />
-            Atomic Liquidity Migration
-          </CardTitle>
-          <CardDescription className="text-white/70">
-            Migrate your liquidity positions atomically with on-chain compliance verification
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Tabs defaultValue="v3">
-            <TabsList className="bg-[#0A1628]/50 border border-[#D4AF37]/20 w-full grid grid-cols-2 mb-6">
-              <TabsTrigger value="v3" className="data-[state=active]:bg-[#D4AF37]/20 data-[state=active]:text-[#D4AF37] text-white/60">
-                V3 Migration (EIP-712)
-              </TabsTrigger>
-              <TabsTrigger value="v2" className="data-[state=active]:bg-[#D4AF37]/20 data-[state=active]:text-[#D4AF37] text-white/60">
-                V2 Migration
-              </TabsTrigger>
-            </TabsList>
-
-            {/* ── V3 Tab ── */}
-            <TabsContent value="v3">
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
-                <ContractStats address={address} />
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="text-white text-sm">Token ID (NFT Position)</Label>
-                    <Input
-                      type="number"
-                      placeholder="e.g. 12345"
-                      value={v3Form.tokenId}
-                      onChange={(e) => setV3Form({ ...v3Form, tokenId: e.target.value })}
-                      className="bg-[#0A1628]/50 border-[#D4AF37]/20 text-white"
-                      disabled={!isConnected || step === "execute"}
-                    />
+        <TabsContent value="v3">
+          <div className="grid lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2 space-y-6">
+              <div className="g-panel-raised p-10 bg-surface/40 backdrop-blur-xl">
+                <div className="flex items-center gap-4 mb-10">
+                  <div className="h-12 w-12 rounded-xl bg-gold/5 border border-gold/20 flex items-center justify-center">
+                    <Zap className="text-gold" size={24} />
                   </div>
-                  <div className="space-y-2">
-                    <Label className="text-white text-sm">New Fee Tier</Label>
-                    <Select
-                      value={v3Form.newFee}
-                      onValueChange={(val) => setV3Form({ ...v3Form, newFee: val })}
-                      disabled={!isConnected || step === "execute"}
-                    >
-                      <SelectTrigger className="bg-[#0A1628]/50 border-[#D4AF37]/20 text-white">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="bg-[#0F1E35] border-[#D4AF37]/20">
-                        <SelectItem value="500" className="text-white">0.05% (Stable)</SelectItem>
-                        <SelectItem value="3000" className="text-white">0.3% (Standard)</SelectItem>
-                        <SelectItem value="10000" className="text-white">1% (Exotic)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  <h3 className="text-2xl font-display font-bold text-paper">Atomic V3 Migration</h3>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="text-white text-sm">Tick Lower</Label>
-                    <Input
-                      type="number"
-                      placeholder="-887220"
-                      value={v3Form.tickLower}
-                      onChange={(e) => setV3Form({ ...v3Form, tickLower: e.target.value })}
-                      className="bg-[#0A1628]/50 border-[#D4AF37]/20 text-white"
-                      disabled={!isConnected || step === "execute"}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-white text-sm">Tick Upper</Label>
-                    <Input
-                      type="number"
-                      placeholder="887220"
-                      value={v3Form.tickUpper}
-                      onChange={(e) => setV3Form({ ...v3Form, tickUpper: e.target.value })}
-                      className="bg-[#0A1628]/50 border-[#D4AF37]/20 text-white"
-                      disabled={!isConnected || step === "execute"}
-                    />
-                  </div>
-                </div>
+                {step === "form" ? (
+                  <div className="space-y-10">
+                    <div className="grid md:grid-cols-2 gap-8">
+                      <div className="space-y-3">
+                        <Label className="text-[10px] uppercase tracking-widest text-muted font-bold">Position Token ID</Label>
+                        <Input value={v3Form.tokenId} onChange={(e) => setV3Form({...v3Form, tokenId: e.target.value})} className="bg-ink border-line text-paper font-mono h-12" placeholder="12345" />
+                      </div>
+                      <div className="space-y-3">
+                        <Label className="text-[10px] uppercase tracking-widest text-muted font-bold">New Fee Tier</Label>
+                        <Select value={v3Form.newFee} onValueChange={(v) => setV3Form({...v3Form, newFee: v})}>
+                          <SelectTrigger className="bg-ink border-line text-paper h-12">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent className="bg-surface border-line text-paper">
+                            <SelectItem value="500">0.05%</SelectItem>
+                            <SelectItem value="3000">0.3%</SelectItem>
+                            <SelectItem value="10000">1.0%</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="text-white text-sm">Min Amount0 (Mint)</Label>
-                    <Input
-                      type="number"
-                      placeholder="1"
-                      value={v3Form.amount0MinMint}
-                      onChange={(e) => setV3Form({ ...v3Form, amount0MinMint: e.target.value })}
-                      className="bg-[#0A1628]/50 border-[#D4AF37]/20 text-white"
-                      disabled={!isConnected || step === "execute"}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-white text-sm">Min Amount1 (Mint)</Label>
-                    <Input
-                      type="number"
-                      placeholder="1"
-                      value={v3Form.amount1MinMint}
-                      onChange={(e) => setV3Form({ ...v3Form, amount1MinMint: e.target.value })}
-                      className="bg-[#0A1628]/50 border-[#D4AF37]/20 text-white"
-                      disabled={!isConnected || step === "execute"}
-                    />
-                  </div>
-                </div>
+                    <div className="grid md:grid-cols-2 gap-8">
+                      <div className="space-y-3">
+                        <Label className="text-[10px] uppercase tracking-widest text-muted font-bold">Lower Tick</Label>
+                        <Input value={v3Form.tickLower} onChange={(e) => setV3Form({...v3Form, tickLower: e.target.value})} className="bg-ink border-line text-paper font-mono h-12" />
+                      </div>
+                      <div className="space-y-3">
+                        <Label className="text-[10px] uppercase tracking-widest text-muted font-bold">Upper Tick</Label>
+                        <Input value={v3Form.tickUpper} onChange={(e) => setV3Form({...v3Form, tickUpper: e.target.value})} className="bg-ink border-line text-paper font-mono h-12" />
+                      </div>
+                    </div>
 
-                <Alert className="border-[#D4AF37]/30 bg-[#0A1628]/30">
-                  <Info className="h-4 w-4 text-[#D4AF37]" />
-                  <AlertDescription className="text-white/70 text-sm">
-                    V3 migrations use EIP-712 typed data signatures for replay protection.
-                    Your nonce is automatically fetched from the TeleportV3 contract.
-                  </AlertDescription>
-                </Alert>
-
-                <div className="p-4 rounded-xl bg-[#0A1628]/50 border border-[#D4AF37]/10">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm text-white/60">Estimated Gas</span>
-                    <span className="text-sm font-medium text-white">~0.0024 ETH</span>
-                  </div>
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm text-white/60">Max Price Movement</span>
-                    <Badge className="bg-[#D4AF37]/20 text-[#D4AF37] border-[#D4AF37]/30">5%</Badge>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-white/60">Signature Type</span>
-                    <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30">EIP-712</Badge>
-                  </div>
-                </div>
-
-                {!v3Confirmed ? (
-                  <div className="flex flex-col sm:flex-row gap-3">
-                    <Button
-                      onClick={handleV3Sign}
-                      disabled={!isConnected || v3Signing || step === "execute"}
-                      variant={step === "execute" ? "outline" : "default"}
-                      className={`flex-1 h-11 font-semibold ${
-                        step !== "execute"
-                          ? "bg-[#D4AF37] text-[#0A1628] hover:bg-[#D4AF37]/90"
-                          : "border-green-500/30 text-green-500"
-                      }`}
-                    >
-                      {v3Signing ? (
-                        <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Signing...</>
-                      ) : step === "execute" ? (
-                        <><CheckCircle2 className="mr-2 h-4 w-4" />Signed</>
-                      ) : (
-                        <>Sign Migration (EIP-712)</>
-                      )}
-                    </Button>
-                    <Button
-                      onClick={handleV3Execute}
-                      disabled={!isConnected || v3Executing || v3Confirming || step !== "execute"}
-                      className="flex-1 h-11 bg-green-600 hover:bg-green-700 text-white font-semibold disabled:opacity-30"
-                    >
-                      {v3Executing || v3Confirming ? (
-                        <><Loader2 className="mr-2 h-4 w-4 animate-spin" />{v3Confirming ? "Confirming..." : "Executing..."}</>
-                      ) : (
-                        <>Execute Migration <ArrowRight className="ml-2 h-4 w-4" /></>
-                      )}
+                    <Button onClick={handleV3Sign} disabled={v3Signing} className="w-full bg-gold text-ink hover:bg-goldsoft h-16 rounded-sm font-bold text-lg shadow-xl shadow-gold/10 transition-all">
+                      {v3Signing ? <Loader2 className="h-5 w-5 animate-spin" /> : "Sign Migration Intent"}
                     </Button>
                   </div>
                 ) : (
-                  <div className="space-y-3">
-                    <Alert className="border-green-500/30 bg-green-500/5">
-                      <CheckCircle2 className="h-4 w-4 text-green-500" />
-                      <AlertDescription className="text-green-400 text-sm">
-                        Migration executed successfully!{" "}
-                        <a
-                          href={`https://sepolia.arbiscan.io/tx/${v3TxHash}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="underline inline-flex items-center gap-1"
-                        >
-                          View on Arbiscan <ExternalLink className="h-3 w-3" />
+                  <div className="space-y-10 py-4">
+                    <div className="p-8 rounded-xl bg-green-500/5 border border-green-500/20">
+                      <div className="flex items-center gap-4 mb-4 text-green-400">
+                        <CheckCircle2 className="h-6 w-6" />
+                        <span className="text-lg font-bold">Intent Signed</span>
+                      </div>
+                      <p className="text-[10px] text-green-400/70 font-mono break-all opacity-60 leading-relaxed">{v3Signature}</p>
+                    </div>
+                    <div className="flex flex-col sm:flex-row gap-4">
+                      <Button onClick={() => setStep("form")} variant="outline" className="flex-1 border-line text-muted hover:text-paper h-16 rounded-sm font-bold text-lg">
+                        <ArrowLeft className="mr-3 h-5 w-5" /> Back
+                      </Button>
+                      <Button onClick={handleV3Execute} disabled={v3Executing || v3Confirming} className="flex-[2] bg-gold text-ink hover:bg-goldsoft h-16 rounded-sm font-bold text-lg shadow-xl shadow-gold/10">
+                        {v3Executing || v3Confirming ? <Loader2 className="h-5 w-5 animate-spin" /> : "Execute Transaction"}
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                {v3TxHash && (
+                  <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mt-10">
+                    <Alert className={`rounded-xl ${v3Confirmed ? 'border-green-500/30 bg-green-500/5 text-green-400' : 'border-gold/30 bg-gold/5 text-goldsoft'}`}>
+                      {v3Confirmed ? <CheckCircle2 className="h-5 w-5" /> : <Loader2 className="h-5 w-5 animate-spin" />}
+                      <AlertDescription className="text-sm font-medium ml-3">
+                        {v3Confirmed ? "Migration complete ✓" : "Transaction pending..."}
+                        <a href={`https://sepolia.arbiscan.io/tx/${v3TxHash}`} target="_blank" rel="noopener noreferrer" className="underline font-bold flex items-center gap-2 mt-3 transition-colors hover:text-paper">
+                          View on Arbiscan <ExternalLink size={14} />
                         </a>
                       </AlertDescription>
                     </Alert>
-                    <Button
-                      onClick={handleV3Reset}
-                      variant="outline"
-                      className="w-full border-[#D4AF37]/30 text-[#D4AF37] hover:bg-[#D4AF37]/10"
-                    >
-                      New Migration
-                    </Button>
-                  </div>
+                  </motion.div>
                 )}
-              </motion.div>
-            </TabsContent>
+              </div>
+            </div>
 
-            {/* ── V2 Tab ── */}
-            <TabsContent value="v2">
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="text-white text-sm">Factory Address (Source)</Label>
-                    <Input
-                      placeholder="0x..."
-                      value={v2Form.factoryFrom}
-                      onChange={(e) => setV2Form({ ...v2Form, factoryFrom: e.target.value })}
-                      className="bg-[#0A1628]/50 border-[#D4AF37]/20 text-white font-mono text-sm"
-                      disabled={!isConnected}
-                    />
+            <div className="lg:col-span-1 space-y-8">
+              <div className="g-panel p-8 bg-deep/20 border-gold/10">
+                <h4 className="text-[10px] uppercase tracking-widest text-gold font-bold mb-8">Safety & Compliance</h4>
+                <div className="space-y-8">
+                  <div className="flex gap-5">
+                    <div className="h-10 w-10 rounded-lg bg-gold/5 border border-gold/20 flex items-center justify-center shrink-0">
+                      <ShieldCheck className="text-gold" size={20} />
+                    </div>
+                    <div>
+                      <h5 className="text-sm font-bold text-paper mb-2">Atomic Execution</h5>
+                      <p className="text-xs text-muted leading-relaxed">Transactions are guaranteed to succeed in full or fail completely.</p>
+                    </div>
                   </div>
-                  <div className="space-y-2">
-                    <Label className="text-white text-sm">Router Address (Destination)</Label>
-                    <Input
-                      placeholder="0x..."
-                      value={v2Form.routerTo}
-                      onChange={(e) => setV2Form({ ...v2Form, routerTo: e.target.value })}
-                      className="bg-[#0A1628]/50 border-[#D4AF37]/20 text-white font-mono text-sm"
-                      disabled={!isConnected}
-                    />
+                  <div className="flex gap-5">
+                    <div className="h-10 w-10 rounded-lg bg-gold/5 border border-gold/20 flex items-center justify-center shrink-0">
+                      <Info className="text-gold" size={20} />
+                    </div>
+                    <div>
+                      <h5 className="text-sm font-bold text-paper mb-2">EIP-712 Signing</h5>
+                      <p className="text-xs text-muted leading-relaxed">Institutional security using typed data signatures for all intents.</p>
+                    </div>
                   </div>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="text-white text-sm">Token A Address</Label>
-                    <Input
-                      placeholder="0x..."
-                      value={v2Form.tokenA}
-                      onChange={(e) => setV2Form({ ...v2Form, tokenA: e.target.value })}
-                      className="bg-[#0A1628]/50 border-[#D4AF37]/20 text-white font-mono text-sm"
-                      disabled={!isConnected}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-white text-sm">Token B Address</Label>
-                    <Input
-                      placeholder="0x..."
-                      value={v2Form.tokenB}
-                      onChange={(e) => setV2Form({ ...v2Form, tokenB: e.target.value })}
-                      className="bg-[#0A1628]/50 border-[#D4AF37]/20 text-white font-mono text-sm"
-                      disabled={!isConnected}
-                    />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-white text-sm">LP Amount (wei)</Label>
-                  <Input
-                    type="number"
-                    placeholder="Amount of LP tokens to migrate"
-                    value={v2Form.amountLiquidity}
-                    onChange={(e) => setV2Form({ ...v2Form, amountLiquidity: e.target.value })}
-                    className="bg-[#0A1628]/50 border-[#D4AF37]/20 text-white"
-                    disabled={!isConnected}
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="text-white text-sm">Min Amount A (slippage)</Label>
-                    <Input
-                      type="number"
-                      placeholder="0"
-                      value={v2Form.amountAMin}
-                      onChange={(e) => setV2Form({ ...v2Form, amountAMin: e.target.value })}
-                      className="bg-[#0A1628]/50 border-[#D4AF37]/20 text-white"
-                      disabled={!isConnected}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-white text-sm">Min Amount B (slippage)</Label>
-                    <Input
-                      type="number"
-                      placeholder="0"
-                      value={v2Form.amountBMin}
-                      onChange={(e) => setV2Form({ ...v2Form, amountBMin: e.target.value })}
-                      className="bg-[#0A1628]/50 border-[#D4AF37]/20 text-white"
-                      disabled={!isConnected}
-                    />
-                  </div>
-                </div>
+              </div>
+            </div>
+          </div>
+        </TabsContent>
 
-                <Alert className="border-amber-500/30 bg-amber-500/5">
-                  <Info className="h-4 w-4 text-amber-400" />
-                  <AlertDescription className="text-amber-300/80 text-sm">
-                    V2 migration requires prior approval of LP tokens to the TeleportV2 contract.
-                    Ensure both tokens are Shariah-compliant and the router is authorized in the PolicyRegistry.
-                  </AlertDescription>
-                </Alert>
+        <TabsContent value="v2">
+          <div className="g-panel-raised p-10 bg-surface/40 backdrop-blur-xl max-w-4xl">
+            <div className="flex items-center gap-4 mb-12">
+              <div className="h-12 w-12 rounded-xl bg-gold/5 border border-gold/20 flex items-center justify-center">
+                <ArrowRightLeft className="text-gold" size={24} />
+              </div>
+              <h3 className="text-2xl font-display font-bold text-paper">Legacy V2 Migration</h3>
+            </div>
+            
+            <div className="space-y-10">
+              <div className="grid md:grid-cols-2 gap-8">
+                <div className="space-y-3">
+                  <Label className="text-[10px] uppercase tracking-widest text-muted font-bold">Factory Address</Label>
+                  <Input value={v2Form.factoryFrom} onChange={(e) => setV2Form({...v2Form, factoryFrom: e.target.value})} className="bg-ink border-line text-paper font-mono h-12" placeholder="0x..." />
+                </div>
+                <div className="space-y-3">
+                  <Label className="text-[10px] uppercase tracking-widest text-muted font-bold">Router Address</Label>
+                  <Input value={v2Form.routerTo} onChange={(e) => setV2Form({...v2Form, routerTo: e.target.value})} className="bg-ink border-line text-paper font-mono h-12" placeholder="0x..." />
+                </div>
+              </div>
+              <div className="grid md:grid-cols-2 gap-8">
+                <div className="space-y-3">
+                  <Label className="text-[10px] uppercase tracking-widest text-muted font-bold">Token A</Label>
+                  <Input value={v2Form.tokenA} onChange={(e) => setV2Form({...v2Form, tokenA: e.target.value})} className="bg-ink border-line text-paper font-mono h-12" placeholder="0x..." />
+                </div>
+                <div className="space-y-3">
+                  <Label className="text-[10px] uppercase tracking-widest text-muted font-bold">Token B</Label>
+                  <Input value={v2Form.tokenB} onChange={(e) => setV2Form({...v2Form, tokenB: e.target.value})} className="bg-ink border-line text-paper font-mono h-12" placeholder="0x..." />
+                </div>
+              </div>
+              <div className="space-y-3">
+                <Label className="text-[10px] uppercase tracking-widest text-muted font-bold">Liquidity Amount</Label>
+                <Input value={v2Form.amountLiquidity} onChange={(e) => setV2Form({...v2Form, amountLiquidity: e.target.value})} className="bg-ink border-line text-paper font-mono h-12" placeholder="1000000000000000000" />
+              </div>
+              
+              <Button onClick={handleV2Migrate} disabled={v2Pending || v2Confirming} className="w-full bg-surface border border-line text-muted hover:text-paper h-16 rounded-sm font-bold text-lg transition-all">
+                {v2Pending || v2Confirming ? <Loader2 className="h-5 w-5 animate-spin" /> : "Migrate V2 Position"}
+              </Button>
 
-                {v2Confirmed && v2TxHash ? (
-                  <Alert className="border-green-500/30 bg-green-500/5">
-                    <CheckCircle2 className="h-4 w-4 text-green-500" />
-                    <AlertDescription className="text-green-400 text-sm">
-                      V2 Migration confirmed!{" "}
-                      <a
-                        href={`https://sepolia.arbiscan.io/tx/${v2TxHash}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="underline inline-flex items-center gap-1"
-                      >
-                        View on Arbiscan <ExternalLink className="h-3 w-3" />
+              {v2TxHash && (
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+                  <Alert className={`rounded-xl ${v2Confirmed ? 'border-green-500/30 bg-green-500/5 text-green-400' : 'border-gold/30 bg-gold/5 text-goldsoft'}`}>
+                    {v2Confirmed ? <CheckCircle2 className="h-5 w-5" /> : <Loader2 className="h-5 w-5 animate-spin" />}
+                    <AlertDescription className="text-sm font-medium ml-3">
+                      {v2Confirmed ? "Legacy migration complete ✓" : "Transaction pending..."}
+                      <a href={`https://sepolia.arbiscan.io/tx/${v2TxHash}`} target="_blank" rel="noopener noreferrer" className="underline font-bold flex items-center gap-2 mt-3 transition-colors hover:text-paper">
+                        View on Arbiscan <ExternalLink size={14} />
                       </a>
                     </AlertDescription>
                   </Alert>
-                ) : (
-                  <Button
-                    onClick={handleV2Migrate}
-                    disabled={!isConnected || v2Pending || v2Confirming}
-                    className="w-full h-11 bg-[#D4AF37] text-[#0A1628] hover:bg-[#D4AF37]/90 font-semibold"
-                  >
-                    {v2Pending || v2Confirming ? (
-                      <><Loader2 className="mr-2 h-4 w-4 animate-spin" />{v2Confirming ? "Confirming..." : "Submitting..."}</>
-                    ) : (
-                      <>Migrate V2 Liquidity <ArrowRight className="ml-2 h-4 w-4" /></>
-                    )}
-                  </Button>
-                )}
-              </motion.div>
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
-
-      {/* How to Migrate */}
-      <Card className="border-[#D4AF37]/20 bg-[#0F1E35]/50 backdrop-blur">
-        <CardHeader>
-          <CardTitle className="text-white">Migration Flow</CardTitle>
-          <CardDescription className="text-white/70">How atomic liquidity migration works</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[
-              { step: "01", title: "Compliance Check", desc: "Verify token is on Shariah-compliant whitelist via PolicyRegistry" },
-              { step: "02", title: "Sign Intent", desc: "For V3: Sign EIP-712 typed data with nonce for replay protection" },
-              { step: "03", title: "Atomic Execute", desc: "Remove LP → Swap → Add LP in one transaction. All or nothing." },
-              { step: "04", title: "Verify", desc: "Check transaction on Arbiscan and view in History tab" },
-            ].map((item, i) => (
-              <div key={i} className="flex flex-col gap-2">
-                <div className="h-8 w-8 rounded-lg bg-[#D4AF37]/10 flex items-center justify-center">
-                  <span className="text-[#D4AF37] font-bold text-xs">{item.step}</span>
-                </div>
-                <h4 className="font-semibold text-white text-sm">{item.title}</h4>
-                <p className="text-xs text-white/50">{item.desc}</p>
-              </div>
-            ))}
+                </motion.div>
+              )}
+            </div>
           </div>
-        </CardContent>
-      </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

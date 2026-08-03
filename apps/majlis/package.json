@@ -1,0 +1,26 @@
+{
+  "name": "gravitas-majlis",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Governance and comprehension environment for Shariah boards supervising on-chain policy",
+  "license": "BUSL-1.1",
+  "workspaces": [
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "install:all": "npm install",
+    "dev": "concurrently -n server,client -c blue,magenta \"npm run dev -w server\" \"npm run dev -w client\"",
+    "build": "npm run build -w server && npm run build -w client",
+    "test": "npm run test -w server && npm run test -w client",
+    "typecheck": "npm run typecheck -w server && npm run typecheck -w client",
+    "lint": "npm run typecheck",
+    "start": "npm run start -w server"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

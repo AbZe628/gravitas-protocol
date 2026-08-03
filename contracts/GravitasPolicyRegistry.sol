@@ -89,7 +89,7 @@ contract GravitasPolicyRegistry is Ownable2Step, Pausable, IShariahPolicyChecker
     // SECURITY: Every verification entry point is gated by whenNotPaused. Pausing the
     // registry is therefore a real, system-wide compliance kill switch: it fails every
     // integrator that routes through this API (TeleportV2/V3 and any external caller such
-    // as Libeara's UltraManager) closed, not open. `whenNotPaused` reverts with
+    // as an integrating fund-subscription manager) closed, not open. `whenNotPaused` reverts with
     // EnforcedPause() rather than returning false, so a paused registry can never be
     // misread as "all assets non-compliant but calls still succeed". The raw storage
     // getters (isAssetCompliant / isRouterAuthorized / isExecutor mappings) remain
@@ -113,10 +113,10 @@ contract GravitasPolicyRegistry is Ownable2Step, Pausable, IShariahPolicyChecker
     }
 
     /**
-     * @notice Single-call compliance gate for Libeara's UltraManager subscription flow.
+     * @notice Single-call compliance gate for an integrating platform's subscription flow.
      * @dev Checks two conditions atomically:
      *      1. subscriptionToken is Shariah-compliant (asset whitelist)
-     *      2. msg.sender (the calling contract, e.g. Libeara's UltraManager) is an
+     *      2. msg.sender (the calling contract, e.g. an integrating fund manager) is an
      *         authorized institutional executor — NOT the end subscriber.
      *         The subscriber parameter is reserved for future per-investor policy logic.
      * @param subscriber The end-investor address (reserved for future use; not checked in v1).

@@ -32,7 +32,7 @@ jobs:
               run: |
                   set -euo pipefail
 
-                  if grep -rEi "PRIVATE_KEY|SECRET_KEY|MNEMONIC|SEED_PHRASE|RECOVERY_PHRASE|sk-|AKIA" . \
+                  if grep -rEiI "PRIVATE_KEY|SECRET_KEY|MNEMONIC|SEED_PHRASE|RECOVERY_PHRASE|sk-|AKIA" . \
                       --exclude-dir=.git \
                       --exclude-dir=.github \
                       --exclude-dir=lib \
@@ -124,4 +124,31 @@ jobs:
               working-directory: ./gravitas-sdk
               run: |
                   npm ci
+                  npm run build
+
+    majlis:
+        name: 🏛️ Majlis (Stage One)
+        needs: security-scan
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                node-version: [20, 22]
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Setup Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  cache: "npm"
+                  cache-dependency-path: apps/majlis/package-lock.json
+
+            - name: Install & Test Majlis
+              working-directory: ./apps/majlis
+              run: |
+                  cp .env.example .env
+                  npm ci
+                  npm run typecheck
+                  npm test
                   npm run build

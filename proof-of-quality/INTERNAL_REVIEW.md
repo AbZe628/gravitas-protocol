@@ -163,7 +163,7 @@ Tests: 66 passed
 - TeleportV2FullFlowTests: 10 passed
 - TeleportV3FullFlowTests: 17 passed
 - GravitasInvariants: 2 passed
-- GravitasLibearaIntegrationTests: 6 passed
+- GravitasSubscriptionIntegrationTests: 6 passed
 - GravitasPolicyRegistryMultisigTests: 3 passed
 - PausableTests: 9 passed
 ```
