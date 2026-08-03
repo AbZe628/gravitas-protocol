@@ -269,6 +269,13 @@ export default function Home() {
             >
               <Link href="/dashboard">Launch App</Link>
             </Button>
+            <Button
+              asChild
+              size="sm"
+              className="bg-transparent border border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37]/10 font-semibold shadow-lg shadow-[#D4AF37]/5 text-xs sm:text-sm px-3 sm:px-4"
+            >
+              <a href="https://majlis.gravitasprotocol.xyz" target="_blank" rel="noopener noreferrer">Majlis</a>
+            </Button>
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="lg:hidden p-2 text-white/60 hover:text-white transition-colors rounded-lg hover:bg-white/5"
