@@ -1,5 +1,8 @@
 import express, { type Express, type Request, type Response } from 'express';
 import cors from 'cors';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { existsSync } from 'node:fs';
 import { z } from 'zod';
 import { boards, matters, briefings, rules } from './data/seed.js';
 import { ask } from './services/assistant.js';
@@ -222,6 +225,39 @@ export function createApp(): Express {
         : undefined;
     res.json(buildAuditExport({ board, rules, matters, asOf }));
   });
+
+  // ---- the built client -------------------------------------------------
+  /**
+   * In production the server serves the compiled front end as well as the API,
+   * so Majlis is a single service on a single origin. Without this the API
+   * answers and the application does not: opening the root URL in a browser
+   * returns nothing.
+   *
+   * The client is a single-page application, so any path that is not an API
+   * route returns index.html and the router resolves it on the client. The
+   * /api guard below matters: without it a mistyped API path would return the
+   * HTML shell with a 200 instead of a 404, and a caller would parse an error
+   * page as data.
+   *
+   * If the build is absent — for example in development, where Vite serves the
+   * client on its own port — this does nothing and the API behaves as before.
+   */
+  const here = path.dirname(fileURLToPath(import.meta.url));
+  const clientDist = path.resolve(here, '../../client/dist');
+
+  if (existsSync(clientDist)) {
+    app.use(express.static(clientDist, { index: false, maxAge: '1h' }));
+
+    app.get('*', (req, res, next) => {
+      if (req.path.startsWith('/api/')) return next();
+      res.sendFile(path.join(clientDist, 'index.html'));
+    });
+  } else {
+    console.warn(
+      `Client build not found at ${clientDist}. Serving the API only. ` +
+        'Run "npm run build" from apps/majlis before starting in production.',
+    );
+  }
 
   return app;
 }

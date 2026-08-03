@@ -1,21 +1,8 @@
-@import "tailwindcss";
 @import "./design/tokens.css";
 
-@theme {
-  --color-ink: var(--g-ink);
-  --color-surface: var(--g-surface);
-  --color-deep: var(--g-deep);
-  --color-line: var(--g-line);
-  --color-muted: var(--g-muted);
-  --color-paper: var(--g-paper);
-  --color-sand: var(--g-sand);
-  --color-gold: var(--g-gold);
-  --color-goldsoft: var(--g-gold-soft);
-
-  --font-display: var(--g-font-text);
-  --font-body: var(--g-font-ui);
-  --font-mono: var(--g-font-mono);
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 @layer base {
   html {
@@ -42,10 +29,10 @@
 
 @layer components {
   .btn-action {
-    @apply inline-flex items-center justify-center px-4 py-2 bg-gold text-ink font-bold rounded-sm 
+    @apply inline-flex items-center justify-center px-4 py-2 bg-gold text-ink font-bold rounded-sm
            hover:bg-goldsoft transition-all duration-150 active:scale-95 text-sm;
   }
-  
+
   .btn-ghost {
     @apply inline-flex items-center justify-center px-4 py-2 text-muted hover:text-paper hover:bg-surface transition-all text-sm;
   }
