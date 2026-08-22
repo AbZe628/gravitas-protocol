@@ -32,7 +32,12 @@ jobs:
               run: |
                   set -euo pipefail
 
-                  if grep -rEiI "PRIVATE_KEY|SECRET_KEY|MNEMONIC|SEED_PHRASE|RECOVERY_PHRASE|sk-|AKIA" . \
+                  # A bare "sk-" also lives inside ordinary words: mask-composite in a
+                  # stylesheet, risk-tier or task-id in application code. The search is
+                  # case-insensitive, so those all counted as leaked keys. Match the shape of a
+                  # real key instead — the prefix, an optional project segment, and the long
+                  # unbroken run that follows it.
+                  if grep -rEiI "PRIVATE_KEY|SECRET_KEY|MNEMONIC|SEED_PHRASE|RECOVERY_PHRASE|sk-([A-Za-z0-9]+-)?[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16}" . \
                       --exclude-dir=.git \
                       --exclude-dir=.github \
                       --exclude-dir=lib \

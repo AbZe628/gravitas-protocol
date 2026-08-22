@@ -1,3 +1,4 @@
+import { usePageMeta } from "@/lib/pageMeta";
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -468,6 +469,8 @@ function PolicyUpdates() {
 
 // ─── Main Admin Page ──────────────────────────────────────────────────────────
 export default function Admin() {
+  usePageMeta("Admin", "Registry administration for the protocol owner. Connect an authorised wallet to read and amend policy on Arbitrum Sepolia.");
+
   const { address, isConnected, chain } = useAccount();
 
   const { data: registryOwner, isLoading: ownerLoading, refetch: refetchOwner } = useReadContract({

@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Not found · Gravitas Protocol</title>
+<meta name="robots" content="noindex">
+<link rel="icon" type="image/png" href="/assets/mark.png">
+<script>
+/* This file is served by GitHub Pages for every path that has no file behind it.
+   It does three jobs, in order.
+
+   1. Legacy application paths. The application used to answer at the root, so
+      /dashboard and friends are forwarded to their new home under /app/.
+   2. The application's own client-side routes. GitHub Pages knows nothing about
+      them, so the path is folded into a query the application unfolds on boot.
+      The matching decoder lives in apps/web/client/index.html.
+   3. Anything else really is missing, and the page below says so.
+
+   The previous version ran step 2 for every path with pathSegmentsToKeep set to
+   1, which is the value for a project page under github.io/name/. On a custom
+   domain at the root it sent /dashboard to /dashboard/?/, which also had no file
+   behind it, so the browser looped between the two forever. That is why every
+   route except the home page answered with a 404. */
+(function () {
+  var l = window.location;
+  var APP = '/app';
+  var LEGACY = ['/dashboard', '/docs', '/compliance', '/sdk', '/admin'];
+
+  for (var i = 0; i < LEGACY.length; i++) {
+    if (l.pathname === LEGACY[i] || l.pathname.indexOf(LEGACY[i] + '/') === 0) {
+      l.replace(l.protocol + '//' + l.host + APP + l.pathname + l.search + l.hash);
+      return;
+    }
+  }
+
+  if (l.pathname.indexOf(APP + '/') === 0) {
+    var rest = l.pathname.slice(APP.length + 1);
+    l.replace(
+      l.protocol + '//' + l.host + APP + '/?/' +
+      rest.replace(/&/g, '~and~') +
+      (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+      l.hash
+    );
+  }
+}());
+</script>
+<style>
+:root{--canvas:#0E1017;--gold:#F7CC74;--gold-2:#E8964A;--text:#F5F4F1;--text-2:#B0B1BE;--text-3:#7F8192;--line:rgba(255,255,255,.11)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{min-height:100svh;display:grid;place-items:center;padding:40px 24px;background:var(--canvas);color:var(--text);
+  font-family:"Manrope",ui-sans-serif,system-ui,"Segoe UI",sans-serif;text-align:center;
+  background-image:radial-gradient(ellipse 60% 50% at 50% 0%,rgba(247,204,116,.09),transparent 70%),
+                   radial-gradient(ellipse 50% 40% at 50% 100%,rgba(138,123,255,.1),transparent 70%)}
+.mark{width:54px;height:auto;margin-inline:auto;
+  filter:drop-shadow(0 3px 6px rgba(0,0,0,.85)) drop-shadow(0 0 14px rgba(80,140,250,.4))}
+.code{margin-top:26px;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px;letter-spacing:.28em;
+  text-transform:uppercase;color:var(--gold)}
+h1{margin-top:14px;font-weight:800;font-size:clamp(2rem,6vw,3.4rem);letter-spacing:-.04em;line-height:1.04;
+  font-family:"Archivo",ui-sans-serif,system-ui,sans-serif}
+p{margin-top:16px;color:var(--text-2);font-weight:300;line-height:1.6;max-width:46ch;margin-inline:auto}
+.row{margin-top:28px;display:flex;gap:11px;justify-content:center;flex-wrap:wrap}
+a.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:13px 24px;border-radius:999px;
+  font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;
+  font-weight:500;text-decoration:none;color:#100c04;background:linear-gradient(120deg,#F7CC74,#E8964A);
+  border:1px solid transparent;transition:transform .4s ease}
+a.btn.ghost{background:rgba(255,255,255,.075);color:var(--text);border-color:rgba(255,255,255,.17)}
+a.btn:hover{transform:translateY(-2px)}
+.foot{margin-top:34px;font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:10.5px;letter-spacing:.1em;color:var(--text-3)}
+</style>
+</head>
+<body>
+  <main>
+    <img class="mark" src="/assets/mark.png" alt="" width="132" height="90">
+    <p class="code">Error 404</p>
+    <h1>This page is not here.</h1>
+    <p>The address may be old, or it may never have existed. Everything the protocol publishes is reachable from the home page.</p>
+    <div class="row">
+      <a class="btn" href="/">Home</a>
+      <a class="btn ghost" href="/app/dashboard">Launch app</a>
+      <a class="btn ghost" href="https://github.com/AbZe628/gravitas-protocol">GitHub</a>
+    </div>
+    <p class="foot">Gravitas Protocol · Testnet on Arbitrum Sepolia</p>
+  </main>
+</body>
+</html>

@@ -1,8 +1,11 @@
+import { usePageMeta } from "@/lib/pageMeta";
 import { Button } from "@/components/ui/button";
 import { AlertCircle, Home, ArrowLeft } from "lucide-react";
 import { useLocation } from "wouter";
 
 export default function NotFound() {
+  usePageMeta("Not found", "This page is not part of the application.");
+
   const [, setLocation] = useLocation();
 
   return (

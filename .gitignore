@@ -49,3 +49,7 @@ integration-kit/**/*.log
 *.log
 REPORT.md
 SESSION-REPORT.md
+
+# Build output. The deploy workflow builds this fresh on every run.
+apps/web/dist/
+_pages/
