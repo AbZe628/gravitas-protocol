@@ -1,3 +1,4 @@
+import { usePageMeta } from "@/lib/pageMeta";
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -42,6 +43,8 @@ function CodeBlock({ code, language = "typescript", title }: { code: string; lan
 }
 
 export default function SDK() {
+  usePageMeta("SDK", "The TypeScript SDK for Gravitas Protocol: install it, read the policy registry, and route through Teleport with a single view call.");
+
   return (
     <div className="min-h-screen bg-[#060E1A] text-white">
       {/* Nav */}

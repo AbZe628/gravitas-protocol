@@ -1,3 +1,4 @@
+import { usePageMeta } from "@/lib/pageMeta";
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -140,6 +141,8 @@ function AddressChecker({
 }
 
 export default function Compliance() {
+  usePageMeta("Compliance", "Compliance enforced at the moment of execution rather than reported afterwards, and how a board confirms that what runs is what it decided.");
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   const { data: policyVersion } = useReadContract({

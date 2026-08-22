@@ -1,3 +1,4 @@
+import { usePageMeta } from "@/lib/pageMeta";
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -60,6 +61,8 @@ const sections = [
 ];
 
 export default function Docs() {
+  usePageMeta("Documentation", "How Gravitas routes liquidity under an approved Shariah ruling — the registry, the checker interface, and integration for institutions.");
+
   const [activeSection, setActiveSection] = useState("overview");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
