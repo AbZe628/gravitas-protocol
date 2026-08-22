@@ -1,0 +1,2558 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gravitas Protocol · A Shariah board's decision, enforced inside the transaction</title>
+<meta name="description" content="A board decides in Majlis, the rule goes into an on-chain Policy Registry, and every Teleport migration has to pass it. Atomic execution, EIP-712 signed intents, verified contracts on Arbitrum Sepolia.">
+<meta name="theme-color" content="#0E1017">
+<meta name="color-scheme" content="dark">
+<link rel="icon" type="image/png" href="assets/mark.png">
+
+<!-- Absolute URLs, required by Open Graph. Update if the domain ever changes. -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Gravitas Protocol">
+<meta property="og:description" content="A Shariah board's decision, enforced inside the transaction rather than written down beside it.">
+<meta property="og:url" content="https://gravitasprotocol.xyz/">
+<meta property="og:image" content="https://gravitasprotocol.xyz/assets/hero-ending.jpg">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Archivo:wght@600;700;800&family=Manrope:wght@300;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+/* ================================================================
+   TOKENS · obsidian lifted, aurora gold, violet counter-light
+   ================================================================ */
+:root{
+  --canvas:#0E1017;
+  --canvas-2:#141722;
+
+  --glass:rgba(255,255,255,.075);
+  --glass-2:rgba(255,255,255,.115);
+  --glass-line:rgba(255,255,255,.17);
+
+  --gold:#F7CC74;
+  --gold-2:#E8964A;
+  --gold-dim:rgba(247,204,116,.16);
+  --violet:#8A7BFF;
+  --violet-2:#B4A2FF;
+  --violet-dim:rgba(138,123,255,.16);
+
+  --text:#F5F4F1;
+  --text-2:#B0B1BE;
+  --text-3:#7F8192;
+  --line:rgba(255,255,255,.11);
+
+  --grad-gold:linear-gradient(120deg,#F7CC74,#E8964A);
+  --grad-mix:linear-gradient(120deg,#F7CC74 0%,#E8964A 46%,#8A7BFF 100%);
+
+  --ease:cubic-bezier(.22,.61,.36,1);
+  --ease-soft:cubic-bezier(.33,0,.15,1);
+  --ease-out:cubic-bezier(.16,1,.3,1);
+
+  --tshadow:0 1px 2px rgba(0,0,0,.9),0 4px 16px rgba(0,0,0,.72),0 14px 50px rgba(0,0,0,.7);
+
+  --gut:clamp(20px,4.4vw,64px);
+  --maxw:1420px;
+  --r:24px;
+  --nav-h:66px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{overflow-x:hidden;overflow-x:clip}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;scroll-padding-top:88px}
+body{
+  background:var(--canvas);color:var(--text);
+  font-family:"Manrope",ui-sans-serif,system-ui,"Segoe UI",sans-serif;
+  font-size:clamp(16px,.52vw + 14.6px,18px);
+  font-weight:400;line-height:1.6;letter-spacing:-.006em;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+}
+img,svg,video,canvas{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:6px}
+::selection{background:rgba(247,204,116,.28);color:#fff}
+
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.skip{position:absolute;inset-inline-start:-999px;top:0;z-index:300;background:var(--gold);color:#100c04;padding:12px 20px;font-family:"IBM Plex Mono",monospace;font-size:13px}
+.skip:focus{inset-inline-start:0}
+
+/* ================================================================
+   THE ENVIRONMENT · one place, the whole page long, in depth
+   ================================================================ */
+#aurora{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+#depth{position:fixed;inset:0;width:100%;height:100%;z-index:1;pointer-events:none;opacity:1}
+.veil{position:fixed;inset:0;z-index:2;pointer-events:none;
+  background:radial-gradient(ellipse 130% 86% at 50% 4%,transparent 46%,rgba(9,10,15,.5) 100%)}
+.grain{position:fixed;inset:0;z-index:3;pointer-events:none;opacity:.17;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E")}
+
+/* the flowing Zaha fields */
+.zaha{position:absolute;pointer-events:none;z-index:0;opacity:.75}
+.zaha svg{width:100%;height:100%;overflow:visible}
+.zaha path{fill:none;stroke-width:1;vector-effect:non-scaling-stroke}
+
+/* ================================================================
+   GLASS
+   ================================================================ */
+.glass{
+  position:relative;border-radius:var(--r);
+  background:linear-gradient(168deg,rgba(255,255,255,.105),rgba(255,255,255,.038) 58%,rgba(255,255,255,.022));
+  backdrop-filter:blur(26px) saturate(1.5);-webkit-backdrop-filter:blur(26px) saturate(1.5);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 30px 70px -40px rgba(0,0,0,.95);
+  overflow:hidden;isolation:isolate;
+}
+.glass::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;pointer-events:none;z-index:2;
+  background:linear-gradient(150deg,rgba(255,255,255,.4),rgba(255,255,255,.06) 38%,rgba(247,204,116,.28) 78%,rgba(138,123,255,.24));
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);mask-composite:exclude}
+.glass .sheen{position:absolute;inset:-40%;pointer-events:none;z-index:1;opacity:0;transition:opacity .5s var(--ease);
+  background:radial-gradient(320px 320px at var(--mx,50%) var(--my,50%),rgba(247,204,116,.2),transparent 62%)}
+.glass:hover .sheen{opacity:1}
+.tilt{transform-style:preserve-3d;transition:transform .8s var(--ease-out),box-shadow .7s var(--ease)}
+.tilt.live{transition:transform .1s linear,box-shadow .5s var(--ease)}
+
+/* ================================================================
+   NAV
+   ================================================================ */
+.nav{position:fixed;top:0;left:0;right:0;z-index:120;height:var(--nav-h);display:flex;align-items:center;
+  gap:clamp(8px,1.6vw,22px);padding:0 var(--gut);
+  background:rgba(14,16,23,.52);backdrop-filter:blur(22px) saturate(1.4);-webkit-backdrop-filter:blur(22px) saturate(1.4);
+  border-bottom:1px solid transparent;transition:background .6s var(--ease),border-color .6s var(--ease)}
+.nav.solid{background:rgba(14,16,23,.8);border-bottom-color:var(--line)}
+.brand{display:flex;align-items:center;gap:11px;flex:0 0 auto;font-family:"IBM Plex Mono",monospace;font-size:12.5px;letter-spacing:.24em;text-transform:uppercase}
+.brand b{font-weight:500;line-height:1;display:inline-flex;align-items:center;height:30px;margin-inline-end:-.24em}
+/* the mark is treated as a real object: tilted in space, lit, and casting a shadow */
+.brand .mark{position:relative;width:30px;height:30px;display:grid;place-items:center;flex:0 0 auto;perspective:460px}
+.brand .mark::before{content:"";position:absolute;inset:-55%;pointer-events:none;
+  background:radial-gradient(circle,rgba(86,148,255,.32),transparent 62%)}
+.brand .mark img{position:relative;width:100%;height:auto;
+  transform:rotateX(26deg) rotateZ(-8deg);
+  filter:drop-shadow(0 3px 5px rgba(0,0,0,.85)) drop-shadow(0 0 11px rgba(80,140,250,.42));
+  transition:transform .9s var(--ease-out),filter .6s var(--ease)}
+.brand:hover .mark img{transform:rotateX(5deg) rotateZ(0deg) scale(1.09);
+  filter:drop-shadow(0 5px 9px rgba(0,0,0,.9)) drop-shadow(0 0 18px rgba(96,156,255,.62))}
+.fbr .brand{font-size:14px;gap:15px}
+.fbr .brand .mark{width:50px;height:50px;perspective:680px}
+.nav-links{display:flex;gap:clamp(7px,1.25vw,19px);margin-inline-start:auto;align-items:center}
+.nav-links a{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-2);
+  padding:8px 2px;position:relative;transition:color .4s var(--ease)}
+.nav-links a::after{content:"";position:absolute;left:0;right:0;bottom:2px;height:1px;background:var(--gold);
+  transform:scaleX(0);transform-origin:left;transition:transform .5s var(--ease)}
+.nav-links a:hover{color:var(--text)}
+.nav-links a:hover::after,.nav-links a.on::after{transform:scaleX(1)}
+.nav-act{display:flex;align-items:center;gap:8px;margin-inline-start:clamp(8px,1.4vw,20px);flex:0 0 auto}
+.icon-btn{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;color:var(--text-2);
+  background:var(--glass);border:1px solid var(--line);transition:color .4s var(--ease),background .4s var(--ease),transform .4s var(--ease)}
+.icon-btn:hover{color:var(--text);background:var(--glass-2);transform:translateY(-2px)}
+.icon-btn svg{width:17px;height:17px}
+/* justify-content matters here: a column flex box stacks from the top without it,
+   so the bars sat high and the close cross rotated about the wrong point */
+.burger{display:none;width:40px;height:38px;border-radius:12px;background:var(--glass);border:1px solid var(--line);
+  align-items:center;justify-content:center;flex-direction:column;gap:5px;padding:0}
+.burger i{display:block;width:16px;height:1.5px;background:var(--text);border-radius:2px;transition:transform .45s var(--ease),opacity .3s var(--ease)}
+body.nav-open .burger i:nth-child(1){transform:translateY(6.5px) rotate(45deg)}
+body.nav-open .burger i:nth-child(2){opacity:0}
+body.nav-open .burger i:nth-child(3){transform:translateY(-6.5px) rotate(-45deg)}
+@media (pointer:coarse){.icon-btn{width:44px;height:44px}.burger{width:44px;height:44px}}
+.nav-quick{display:none;align-items:center;font-family:"IBM Plex Mono",monospace;font-size:12.5px;
+  font-weight:500;letter-spacing:.24em;line-height:1;text-transform:uppercase;color:var(--text);
+  padding:0;height:30px;margin-inline-start:8px;white-space:nowrap;transition:color .4s var(--ease)}
+.nav-quick:hover{color:var(--gold)}
+@media (pointer:coarse){.nav-quick{min-width:44px;min-height:44px;height:44px}}
+@media (max-width:1280px){
+  .nav-links{display:none}
+  .burger{display:flex}
+  .nav-act .hide-sm{display:none}
+  .nav-quick{display:inline-flex;align-items:center}
+}
+/* the narrowest screens keep the bar to a name and a way in */
+@media (max-width:560px){.nav-act .icon-btn{display:none}}
+
+#menu{position:fixed;inset:0;z-index:110;
+  background:linear-gradient(180deg,rgba(19,21,30,.94),rgba(14,16,23,.98));
+  backdrop-filter:blur(20px) saturate(1.3);-webkit-backdrop-filter:blur(20px) saturate(1.3);
+  padding:calc(var(--nav-h) + 22px) var(--gut) 40px;
+  opacity:0;pointer-events:none;transition:opacity .45s var(--ease);overflow-y:auto}
+body.nav-open #menu{opacity:1;pointer-events:auto}
+#menu a.m-link{display:block;font-size:clamp(1.65rem,6.8vw,2.3rem);font-weight:600;letter-spacing:-.022em;line-height:1.2;
+  padding:13px 0;border-bottom:1px solid var(--line);
+  opacity:0;transform:translateY(22px);transition:opacity .5s var(--ease),transform .5s var(--ease),color .3s var(--ease)}
+body.nav-open #menu a.m-link{opacity:1;transform:none}
+#menu a.m-link:hover{color:var(--gold)}
+#menu a.m-link span{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.2em;color:var(--text-3);
+  display:block;margin-bottom:1px;font-weight:400}
+.m-foot{margin-top:26px;display:flex;gap:10px;flex-wrap:wrap}
+
+/* ================================================================
+   BUTTONS
+   ================================================================ */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;position:relative;overflow:hidden;
+  font-family:"IBM Plex Mono",monospace;font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:500;
+  padding:13px 24px;border-radius:999px;border:1px solid transparent;color:#100c04;
+  background:var(--grad-gold);white-space:nowrap;
+  transition:transform .5s var(--ease-out),box-shadow .5s var(--ease),color .4s var(--ease),border-color .4s var(--ease),background .4s var(--ease)}
+.btn::after{content:"";position:absolute;inset:0;background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.5),transparent 70%);
+  transform:translateX(-120%);transition:transform .8s var(--ease)}
+.btn:hover{transform:translateY(-2px);box-shadow:0 16px 40px -18px rgba(247,204,116,.9)}
+.btn:hover::after{transform:translateX(120%)}
+.btn.ghost{background:var(--glass);color:var(--text);border-color:var(--glass-line);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.btn.ghost:hover{background:var(--glass-2);border-color:rgba(247,204,116,.55);box-shadow:none}
+.btn.sm{padding:10px 17px;font-size:11.5px}
+.btn svg{width:15px;height:15px}
+@media (pointer:coarse){.btn{min-height:46px;display:inline-flex;align-items:center;justify-content:center}}
+
+/* ================================================================
+   TYPE
+   ================================================================ */
+/* A dedicated display face. Archivo is narrower and more neutral than the body face,
+   which is what makes it read as institutional rather than as a product startup. */
+.h1,.h2,.h3,.h4,.vow q,.how-step h3,.sv-step h3,.inv-i h3,.card h3,.mj-card h4,.gov-box h4,
+.stat b,.asym .big,.loi-fig b,.tl-clock b,.led .t,.q button,#menu a.m-link,.int-item h4,.tl-case b,.lim b,.ct .nm b{
+  font-family:"Archivo",ui-sans-serif,system-ui,sans-serif;font-feature-settings:"ss01" 1}
+/* background-clip:text paints only inside the element box, so a tight line height
+   clips the tail of a g or a y. Every gradient number gets its descender back. */
+.gd,.stat b,.asym .big,.loi-fig b,.tl-clock b,.sv-num,.inv-m,.vow q{
+  padding-block-end:.16em;margin-block-end:-.16em}
+.kick{display:inline-flex;align-items:center;gap:11px;font-family:"IBM Plex Mono",monospace;font-size:11px;
+  letter-spacing:.28em;text-transform:uppercase;color:var(--gold)}
+.kick::before{content:"";width:22px;height:1px;background:var(--gold);opacity:.75}
+.h1{font-weight:800;font-size:clamp(2.9rem,7.6vw,6.2rem);line-height:.98;letter-spacing:-.05em}
+.h2{font-weight:800;font-size:clamp(2.3rem,5vw,4.2rem);line-height:1.03;letter-spacing:-.046em;text-wrap:balance}
+.h3{font-weight:700;font-size:clamp(1.2rem,1.9vw,1.6rem);line-height:1.2;letter-spacing:-.03em}
+.h4{font-weight:700;font-size:1.05rem;letter-spacing:-.024em}
+.lede{color:var(--text-2);font-size:clamp(1.02rem,1.12vw,1.2rem);line-height:1.62;max-width:56ch;font-weight:300}
+.body{color:var(--text-2);line-height:1.64;font-weight:300;max-width:56ch}
+.mono{font-family:"IBM Plex Mono",monospace}
+.gd{background:var(--grad-gold);-webkit-background-clip:text;background-clip:text;color:transparent}
+.vt{color:var(--violet-2)}
+
+main{position:relative;z-index:5}
+section{position:relative}
+.wrap{max-width:var(--maxw);margin-inline:auto;padding-inline:var(--gut);position:relative;z-index:2}
+.pad{padding-block:clamp(84px,12vh,158px)}
+
+/* the section header that fills the width instead of leaving it gaping */
+.shead{display:grid;grid-template-columns:1.08fr .92fr;gap:clamp(22px,4vw,76px);align-items:end;
+  margin-bottom:clamp(34px,5vh,62px)}
+.shead .h2{margin-top:18px}
+.shead>p{padding-bottom:.4em}
+@media (max-width:940px){.shead{grid-template-columns:1fr;align-items:start;gap:16px}.shead>p{padding-bottom:0}}
+
+/* ================================================================
+   REVEALS
+   ================================================================ */
+[data-rv]{will-change:transform,opacity}
+[data-rv="up"]{opacity:0;transform:translateY(34px)}
+[data-rv="blur"]{opacity:0;transform:translateY(18px) scale(.985);filter:blur(11px)}
+[data-rv="left"]{opacity:0;transform:translateX(-40px)}
+[data-rv="right"]{opacity:0;transform:translateX(40px)}
+[data-rv="scale"]{opacity:0;transform:scale(.9)}
+[data-rv="clip"]{opacity:0;clip-path:inset(0 0 100% 0);transform:translateY(14px)}
+[data-rv="depth"]{opacity:0;transform:perspective(1200px) translate3d(0,38px,-130px)}
+[data-rv].in{opacity:1;transform:none;filter:none;clip-path:inset(0 0 0 0)}
+[data-rv]{transition:opacity .95s var(--ease-out),transform 1.1s var(--ease-out),filter .95s var(--ease-out),clip-path 1.1s var(--ease-out)}
+
+.stag{perspective:1200px}
+.stag>*{opacity:0;transform:translate3d(0,30px,-90px);transition:opacity .9s var(--ease-out),transform 1.05s var(--ease-out)}
+.stag.in>*{opacity:1;transform:none}
+.stag.in>*:nth-child(1){transition-delay:.03s}.stag.in>*:nth-child(2){transition-delay:.12s}
+.stag.in>*:nth-child(3){transition-delay:.21s}.stag.in>*:nth-child(4){transition-delay:.3s}
+.stag.in>*:nth-child(5){transition-delay:.39s}.stag.in>*:nth-child(6){transition-delay:.48s}
+.stag.done.in>*:nth-child(1),.stag.done.in>*:nth-child(2),.stag.done.in>*:nth-child(3),
+.stag.done.in>*:nth-child(4),.stag.done.in>*:nth-child(5),.stag.done.in>*:nth-child(6){transition-delay:0s}
+
+/* ================================================================
+   HERO
+   ================================================================ */
+.hero{position:relative;height:460vh;z-index:5}
+.stage{position:sticky;top:0;height:100svh;overflow:hidden;background:#0A0B10}
+.poster{position:absolute;inset:0;background-size:cover;background-position:50% 56%;transition:opacity 1s var(--ease)}
+#hv{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 56%;opacity:0;
+  transform:translateZ(0);will-change:transform;transition:opacity 1.1s var(--ease)}
+.stage.ready #hv{opacity:1}
+.stage.dead #hv{display:none}
+.scrim{position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse 130% 98% at 50% 46%,rgba(8,9,13,0) 28%,rgba(8,9,13,.74) 100%)}
+.gather{position:absolute;inset:0;pointer-events:none;opacity:0;
+  background:radial-gradient(ellipse 46% 40% at 50% 74%,rgba(247,204,116,.24),transparent 66%),
+             radial-gradient(ellipse 80% 60% at 50% 46%,rgba(138,123,255,.13),transparent 70%)}
+.motes{position:absolute;inset:0;pointer-events:none}
+
+.bands{position:absolute;inset:0}
+.band{position:absolute;inset:0;display:grid;place-items:center;opacity:0;pointer-events:none;padding:0 var(--gut);
+  text-align:center;text-shadow:var(--tshadow)}
+.band::before{content:"";position:absolute;inset:-4%;pointer-events:none;opacity:calc(.25 + .75*var(--k,1));
+  background:radial-gradient(ellipse 78% 60% at 50% 48%,rgba(2,3,6,.72) 0%,rgba(2,3,6,.5) 46%,rgba(2,3,6,0) 76%)}
+.band[data-scrim="open"]::before{background:radial-gradient(ellipse 84% 66% at 50% 48%,rgba(2,3,6,.9) 0%,rgba(2,3,6,.68) 44%,rgba(2,3,6,0) 78%)}
+.band[data-scrim="hook"]::before{background:radial-gradient(ellipse 80% 62% at 50% 48%,rgba(2,3,6,.8) 0%,rgba(2,3,6,.56) 46%,rgba(2,3,6,0) 76%)}
+.band .btn{text-shadow:none}
+.bi{position:relative;z-index:2;max-width:min(96vw,1120px)}
+/* The hero carries its own face. Bricolage is a grotesque, so it stays in the same
+   family as the rest, but its letterforms have character the section headings do not. */
+.hl{font-family:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  font-variation-settings:"opsz" 84;
+  font-weight:800;font-size:clamp(2.9rem,7.3vw,6.1rem);line-height:.96;letter-spacing:-.038em;
+  max-width:16ch;margin-inline:auto;padding-block-end:.06em;margin-block-end:-.06em}
+.hl .w{display:inline-block;white-space:nowrap}
+.hl .c{display:inline-block}
+.hsub{margin-top:clamp(16px,2.2vw,26px);color:#D3D3DD;font-weight:300;font-size:clamp(1.02rem,1.1vw,1.18rem);
+  line-height:1.56;max-width:50ch;margin-inline:auto}
+.cta{margin-top:clamp(22px,2.8vw,34px);display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+
+.chip{display:inline-flex;align-items:center;gap:9px;font-family:"IBM Plex Mono",monospace;font-size:11px;
+  letter-spacing:.2em;text-transform:uppercase;color:var(--text-2);
+  background:rgba(16,18,26,.55);border:1px solid var(--glass-line);border-radius:999px;padding:7px 15px;
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);text-shadow:none}
+.chip i{width:6px;height:6px;border-radius:50%;background:var(--gold);position:relative;display:block}
+.chip i::after{content:"";position:absolute;inset:-4px;border-radius:50%;background:var(--gold);opacity:.3;
+  animation:pl 4.4s var(--ease-soft) -1.1s infinite}
+@keyframes pl{0%,100%{opacity:.1;transform:scale(.7)}50%{opacity:.45;transform:scale(1.3)}}
+
+.e-rise .w{--kc:clamp(0,(var(--k,0) - var(--th,0))*2.7,1);opacity:var(--kc);transform:translateY(calc((1 - var(--kc))*34px))}
+.e-drift .w{--kc:clamp(0,(var(--k,0) - var(--th,0))*2.6,1);opacity:var(--kc);transform:translateY(calc((1 - var(--kc))*-34px))}
+.e-punch .w{--kc:clamp(0,(var(--k,0) - var(--th,0))*3,1);
+  --ks:clamp(0,(var(--k,0) - var(--th,0) - var(--sd,.1))*var(--ss,3.2),1);opacity:var(--kc);
+  transform:scale(calc(0.6 + (0.4 + var(--ov,.13))*var(--kc) - var(--ov,.13)*var(--ks)))}
+.e-punch .w.em{--ov:.26;--sd:.16;--ss:2.6}
+.e-settle .w{--kc:clamp(0,(var(--k,0) - var(--th,0))*2.9,1);opacity:var(--kc);transform:translateY(calc((1 - var(--kc))*28px))}
+.e-settle .hsub{--ks:clamp(0,(var(--k,0) - .58)*3.6,1);opacity:var(--ks);transform:translateY(calc((1 - var(--ks))*18px))}
+.e-settle .cta{--kb:clamp(0,(var(--k,0) - .74)*4.4,1);opacity:var(--kb);transform:translateY(calc((1 - var(--kb))*16px))}
+.e-settle .chip-row{--kz:clamp(0,var(--k,0)*3.4,1);opacity:var(--kz)}
+
+.ring{position:absolute;left:50%;bottom:44px;translate:-50% 0;width:42px;height:42px;color:rgba(247,204,116,.85);opacity:0;transition:opacity .5s var(--ease)}
+.ring.on{opacity:1}
+.ring circle{transform:rotate(-90deg);transform-origin:50% 50%;transition:stroke-dashoffset .16s linear}
+.cue{position:absolute;left:50%;bottom:38px;translate:-50% 0;font-family:"IBM Plex Mono",monospace;font-size:10.5px;
+  letter-spacing:.26em;text-transform:uppercase;color:var(--text-3);opacity:0;transition:opacity 1s var(--ease);
+  display:flex;flex-direction:column;align-items:center;gap:9px}
+.cue.on{opacity:1}
+.cue s{display:block;width:1px;height:26px;background:linear-gradient(var(--gold),transparent);text-decoration:none;
+  animation:drop 2.6s var(--ease-soft) infinite}
+@keyframes drop{0%{transform:scaleY(0);transform-origin:top}45%{transform:scaleY(1);transform-origin:top}
+  55%{transform:scaleY(1);transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+
+.static-hero{display:none;position:absolute;inset:0;flex-direction:column;justify-content:center;align-items:center;
+  text-align:center;padding:calc(var(--nav-h) + 18px) var(--gut) 40px;z-index:3;text-shadow:var(--tshadow)}
+.static-hero .btn{text-shadow:none}
+
+/* ================================================================
+   1 · THE GAP
+   ================================================================ */
+.gap-s{text-align:center;padding-block:clamp(104px,16vh,208px) clamp(66px,9vh,120px);overflow:hidden}
+.gap-s .h2{max-width:15ch;margin:22px auto 0;font-size:clamp(2.4rem,5.6vw,4.7rem)}
+.gap-s .body{margin:26px auto 0;max-width:56ch;font-size:clamp(1.04rem,1.2vw,1.22rem)}
+.gap-s .body b{color:var(--text);font-weight:500}
+.gap-s .zaha{inset:-8% -20%;opacity:.5}
+#contact{overflow:hidden}
+#contact .zaha{inset:-16% -26% -22% -34%;opacity:.45}
+
+/* ================================================================
+   2 · HOW IT WORKS
+   ================================================================ */
+.how{height:250vh;position:relative}
+.how-stage{position:sticky;top:0;height:100svh;display:flex;align-items:center;overflow:hidden}
+.how-stage>.wrap{width:100%;flex:1 1 100%;min-width:0}
+.how-grid{display:grid;grid-template-columns:1.02fr .98fr;gap:clamp(26px,4.6vw,84px);align-items:center;width:100%}
+@media (max-width:960px){.how-grid{grid-template-columns:1fr;gap:22px}}
+.how-copy{position:relative;min-height:clamp(300px,42vh,392px)}
+.how-step{position:absolute;inset:0;opacity:0;transform:translate3d(0,26px,-60px);pointer-events:none;
+  transition:opacity .55s var(--ease),transform .7s var(--ease-out)}
+.how-copy{perspective:1100px}
+.how-step.on{opacity:1;transform:none;pointer-events:auto}
+.how-n{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.28em;color:var(--gold);display:block;margin-bottom:15px}
+.how-step h3{font-weight:800;font-size:clamp(2.05rem,4.2vw,3.4rem);line-height:1.02;letter-spacing:-.046em;margin-bottom:16px}
+.how-step p{color:var(--text-2);font-weight:300;max-width:46ch;line-height:1.6}
+.how-step .tag{margin-top:20px;display:flex;gap:8px;flex-wrap:wrap}
+.how-step .tag span{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--text-2);border:1px solid var(--line);border-radius:999px;padding:6px 12px;background:var(--glass)}
+.how-vis{aspect-ratio:1;width:100%;max-width:min(46vw,480px);margin-inline:auto;position:relative}
+.how-bars{position:absolute;left:var(--gut);right:var(--gut);bottom:clamp(24px,4.6vh,48px);display:flex;gap:10px;max-width:var(--maxw);margin-inline:auto}
+.how-bars i{flex:1;height:2px;background:rgba(255,255,255,.13);border-radius:2px;overflow:hidden;display:block}
+.how-bars i::after{content:"";display:block;height:100%;width:calc(var(--f,0)*100%);background:var(--grad-gold)}
+
+/* ================================================================
+   3 · CARDS
+   ================================================================ */
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(13px,1.5vw,20px)}
+.card{padding:clamp(24px,2.5vw,34px);min-height:270px;display:flex;flex-direction:column}
+.card .n{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.24em;color:var(--gold)}
+.card h3{margin:18px 0 12px;min-height:2.4em;display:flex;align-items:flex-end}
+.card p{color:var(--text-2);font-weight:300;font-size:.99rem;line-height:1.58}
+
+/* ================================================================
+   4 · SEVEN STEPS · held, not scrolled through
+   ================================================================ */
+.seven-grid{display:grid;grid-template-columns:1.02fr .98fr;gap:clamp(26px,4.6vw,76px);align-items:center;
+  margin-top:clamp(10px,2vh,24px)}
+@media (max-width:960px){.seven-grid{grid-template-columns:1fr;gap:26px}.seven-vis{order:-1}}
+.seven-copy{position:relative;min-height:clamp(250px,32vh,320px);perspective:1100px}
+.sv-step{position:absolute;inset:0;opacity:0;transform:translate3d(0,22px,-50px);transition:opacity .42s var(--ease),transform .55s var(--ease-out)}
+.sv-step.on{opacity:1;transform:none}
+.sv-num{font-family:"IBM Plex Mono",monospace;font-size:clamp(3.6rem,8vw,6.2rem);line-height:.85;font-weight:500;
+  background:var(--grad-mix);-webkit-background-clip:text;background-clip:text;color:transparent;display:block;margin-bottom:14px}
+.sv-step h3{font-weight:800;font-size:clamp(1.75rem,3.4vw,2.7rem);letter-spacing:-.042em;line-height:1.04;margin-bottom:12px}
+.sv-step p{color:var(--text-2);font-weight:300;max-width:46ch;line-height:1.6}
+.seven-vis{position:relative;width:100%;max-width:min(46vw,440px);aspect-ratio:1;margin-inline:auto}
+@media (max-width:960px){.seven-vis{max-width:min(74vw,330px)}}
+.sv-arc{position:absolute;inset:0;width:100%;height:100%}
+.sv-arc .trk{fill:none;stroke:rgba(255,255,255,.11);stroke-width:1.2}
+.sv-arc .prg{fill:none;stroke:url(#gg);stroke-width:2.6;stroke-linecap:round}
+.sv-arc .nd{fill:#141722;stroke:rgba(255,255,255,.24);stroke-width:1.2;transition:fill .45s var(--ease),stroke .45s var(--ease)}
+.sv-arc .nd.lit{fill:var(--gold);stroke:var(--gold)}
+.sv-hold{position:absolute;left:50%;top:50%;translate:-50% -50%;width:37%;aspect-ratio:1;border-radius:50%;
+  display:grid;place-items:center;gap:10px;text-align:center;padding:0 9%;
+  background:rgba(255,255,255,.035);border:1px solid var(--glass-line);
+  backdrop-filter:blur(10px) saturate(1.2);-webkit-backdrop-filter:blur(10px) saturate(1.2);
+  touch-action:none;-webkit-user-select:none;user-select:none;
+  transition:border-color .5s var(--ease),background .5s var(--ease),transform .5s var(--ease-out)}
+.sv-hold b{font-family:"IBM Plex Mono",monospace;font-size:clamp(9.5px,1.05vw,11.5px);letter-spacing:.16em;
+  text-transform:uppercase;color:var(--text-2);font-weight:400;line-height:1.5;transition:color .4s var(--ease)}
+.sv-hold i{position:absolute;inset:0;border-radius:50%;pointer-events:none;
+  box-shadow:0 0 0 0 rgba(247,204,116,.35);transition:box-shadow .5s var(--ease)}
+.sv-hold:hover{border-color:var(--gold)}
+.sv-hold:hover b{color:var(--text)}
+.sv-hold.running{border-color:var(--gold);background:rgba(247,204,116,.08);transform:translate(-50%,-50%) scale(.97)}
+.sv-hold.running b{color:var(--gold)}
+.sv-hold.running i{box-shadow:0 0 60px 10px rgba(247,204,116,.22)}
+.sv-hold.done{border-color:var(--gold)}
+.sv-hold.done b{color:var(--gold)}
+.sv-dots{display:flex;gap:8px;margin-top:clamp(24px,3.4vh,40px);overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;
+  padding-bottom:4px}
+.sv-dots::-webkit-scrollbar{display:none}
+.sv-dot{flex:1 1 0;min-width:104px;display:flex;flex-direction:column;gap:5px;align-items:flex-start;text-align:start;
+  padding:12px 14px;border-radius:13px;border:1px solid var(--line);background:var(--glass);
+  transition:border-color .4s var(--ease),background .4s var(--ease),transform .4s var(--ease)}
+.sv-dot b{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.2em;color:var(--text-3);font-weight:400;transition:color .4s var(--ease)}
+.sv-dot span{font-size:.92rem;font-weight:500;color:var(--text-2);transition:color .4s var(--ease)}
+.sv-dot:hover{border-color:var(--glass-line);transform:translateY(-2px)}
+.sv-dot.done b{color:var(--gold)}
+.sv-dot.on{border-color:var(--gold);background:var(--gold-dim)}
+.sv-dot.on b,.sv-dot.on span{color:var(--gold)}
+@media (pointer:coarse){.sv-dot{min-height:56px}}
+.sv-state{margin-top:18px;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-3);
+  transition:color .4s var(--ease)}
+.sv-state.done{color:var(--gold)}
+
+/* ================================================================
+   5 · INVARIANTS · full width, two columns
+   ================================================================ */
+.inv-i{padding-block:clamp(38px,6vh,74px);border-top:1px solid var(--line);position:relative;
+  display:grid;grid-template-columns:1fr .82fr;gap:clamp(24px,4vw,72px);align-items:start}
+@media (max-width:940px){.inv-i{grid-template-columns:1fr;gap:20px}}
+.inv-b{position:relative}
+.inv-m{position:absolute;inset-inline-start:-.08em;top:-.52em;z-index:0;font-family:"IBM Plex Mono",monospace;font-weight:500;
+  font-size:clamp(4.6rem,10vw,8.6rem);line-height:1;background:var(--grad-mix);-webkit-background-clip:text;background-clip:text;
+  color:transparent;opacity:.26;pointer-events:none}
+.inv-i h3{position:relative;z-index:1;font-weight:800;font-size:clamp(1.6rem,3vw,2.5rem);letter-spacing:-.035em;line-height:1.06;margin-bottom:16px;max-width:18ch}
+.inv-i p{position:relative;z-index:1;color:var(--text-2);font-weight:300;line-height:1.64;max-width:52ch}
+.inv-side{padding:clamp(20px,2.2vw,28px)}
+.inv-side .fx{display:block;font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--gold);line-height:1.7;letter-spacing:.01em}
+.inv-side .fx b{color:var(--text);font-weight:500}
+.inv-side .cap{display:block;margin-top:14px;padding-top:13px;border-top:1px solid var(--line);
+  font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-3)}
+
+/* ================================================================
+   6 · THE GATE
+   ================================================================ */
+.gate-s{padding-block:clamp(78px,11vh,148px);overflow:hidden}
+.gate-grid{display:grid;grid-template-columns:.92fr 1.08fr;gap:clamp(24px,4vw,72px);
+  grid-template-areas:"head vis" "ctl vis";align-items:start}
+.g-head{grid-area:head}.g-ctl{grid-area:ctl}.g-vis{grid-area:vis;align-self:center}
+/* on a phone the thing you operate comes before the controls that drive it */
+@media (max-width:960px){
+  .gate-grid{grid-template-columns:1fr;grid-template-areas:"head" "vis" "ctl";gap:26px}
+  .g-vis{align-self:auto}
+}
+.g-head .h2{margin-top:18px;max-width:14ch}
+.g-head .lede{margin-top:18px}
+.gpick{display:flex;flex-direction:column;gap:9px;max-width:420px}
+.pick{display:flex;align-items:center;gap:12px;font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.05em;
+  padding:13px 17px;border-radius:14px;border:1px solid var(--line);color:var(--text-2);background:var(--glass);text-align:start;
+  transition:border-color .45s var(--ease),color .45s var(--ease),background .45s var(--ease),transform .45s var(--ease)}
+.pick:hover{color:var(--text);border-color:var(--glass-line);transform:translateX(4px)}
+.pick[aria-pressed="true"]{border-color:var(--gold);color:var(--gold);background:var(--gold-dim)}
+.pick u{width:7px;height:7px;border-radius:50%;background:currentColor;flex:0 0 auto;text-decoration:none;display:block;opacity:.75}
+@media (pointer:coarse){.pick{min-height:48px}}
+.gwrap{display:flex;flex-direction:column;align-items:center;gap:clamp(16px,2.4vw,26px)}
+.gstage{position:relative;width:min(80vw,420px);aspect-ratio:1}
+.gsvg{position:absolute;inset:0}
+.gsvg .ring-g path{fill:none;stroke:var(--violet-2);stroke-width:1.2;opacity:.44;vector-effect:non-scaling-stroke;
+  transform-box:view-box;transform-origin:50% 50%;transform:rotate(calc(var(--r,0deg) * (1 - var(--p,0))));
+  transition:stroke .7s var(--ease),opacity .7s var(--ease),stroke-width .7s var(--ease)}
+.gstage.pass .gsvg .ring-g path{stroke:var(--gold);opacity:.8;stroke-width:1.35}
+.gstage.fail .gsvg .ring-g path{stroke:var(--text-3);opacity:.22}
+.gstage.fail{animation:shake .5s var(--ease)}
+@keyframes shake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(4px)}30%,50%,70%{transform:translateX(-6px)}40%,60%{transform:translateX(6px)}}
+/* the asset travelling inward while the visitor holds */
+.gtoken{position:absolute;left:50%;top:50%;width:56px;height:56px;margin:-28px 0 0 -28px;border-radius:16px;
+  display:grid;place-items:center;font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.04em;color:var(--gold);
+  background:rgba(20,23,34,.94);border:1px solid var(--gold);pointer-events:none;
+  transform:translateY(calc(-1 * (1 - var(--p,0)) * var(--gr,140px))) scale(calc(.78 + .22*var(--p,0)));
+  opacity:calc(.5 + .5*var(--p,0));box-shadow:0 0 0 0 rgba(247,204,116,0);transition:box-shadow .5s var(--ease),border-color .5s var(--ease),color .5s var(--ease)}
+.gstage.pass .gtoken{box-shadow:0 0 44px 8px rgba(247,204,116,.42)}
+.gstage.fail .gtoken{border-color:var(--violet-2);color:var(--violet-2)}
+.ghold{padding:14px 28px;border-radius:999px;
+  font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-2);
+  background:rgba(255,255,255,.06);border:1px solid var(--glass-line);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  transition:border-color .5s var(--ease),color .5s var(--ease);touch-action:none;-webkit-user-select:none;user-select:none;white-space:nowrap}
+.ghold:hover{border-color:var(--gold);color:var(--text)}
+.gstage.pass .ghold{border-color:var(--gold);color:var(--gold)}
+@media (pointer:coarse){.ghold{min-height:48px;display:inline-flex;align-items:center}}
+.gtrace{margin-top:clamp(30px,4vh,46px);display:flex;flex-direction:column;gap:0}
+.gt-row{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;padding-block:11px;border-top:1px solid var(--line)}
+.gt-row:first-child{border-top:0}
+.gt-row .c{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--text-3);letter-spacing:.14em}
+.gt-row .m{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--text-2);transition:color .4s var(--ease)}
+.gt-row.on .m{color:var(--text)}
+.gt-row .s{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-3);
+  border:1px solid var(--line);border-radius:999px;padding:4px 10px;white-space:nowrap;transition:color .4s var(--ease),border-color .4s var(--ease),background .4s var(--ease)}
+.gt-row.ok .s{color:var(--gold);border-color:var(--gold-dim);background:rgba(247,204,116,.08)}
+.gt-row.no .s{color:var(--violet-2);border-color:var(--violet-dim);background:rgba(138,123,255,.1)}
+.gout{margin-top:18px;min-height:3.4em;font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--text-3);
+  opacity:0;transform:translateY(8px);transition:opacity .5s var(--ease),transform .5s var(--ease)}
+.gout.show{opacity:1;transform:none}
+.gout.ok{color:var(--gold)}
+.gout .nt{display:block;margin-top:8px;font-family:"Manrope",sans-serif;font-size:.93rem;letter-spacing:0;
+  color:var(--text-3);text-transform:none;line-height:1.5;font-weight:300}
+
+/* ================================================================
+   7 · SHARIAH LEDGER
+   ================================================================ */
+.led{display:grid;grid-template-columns:minmax(120px,.4fr) minmax(110px,.34fr) 1.9fr;gap:clamp(14px,3vw,48px);
+  padding-block:clamp(22px,3.2vh,34px);border-top:1px solid var(--line);align-items:baseline;position:relative}
+.led:last-of-type{border-bottom:1px solid var(--line)}
+.led::after{content:"";position:absolute;top:-1px;left:0;height:1px;width:0;background:var(--grad-gold);transition:width 1.4s var(--ease) .1s}
+.led.in::after{width:60px}
+.led .t{font-weight:800;font-size:clamp(1.3rem,2.1vw,1.85rem);letter-spacing:-.032em}
+.led .g{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--text-3)}
+.led p{color:var(--text-2);font-weight:300;line-height:1.6;font-size:1rem;max-width:62ch}
+@media (max-width:760px){.led{grid-template-columns:1fr;gap:7px}}
+.note-g{margin-top:clamp(26px,4vh,44px);padding:20px 24px;border-inline-start:2px solid var(--gold);
+  background:linear-gradient(90deg,rgba(247,204,116,.09),transparent);color:var(--text-2);max-width:76ch;
+  font-size:.98rem;line-height:1.58;font-weight:300;border-radius:0 12px 12px 0}
+
+/* ================================================================
+   8 · MAJLIS
+   ================================================================ */
+.majlis{position:relative;overflow:hidden}
+.majlis .zaha{inset:-10% -25%;opacity:.6}
+.vow{margin-top:clamp(36px,5vh,66px);padding:clamp(30px,4vw,56px);text-align:center}
+.vow q{display:block;font-weight:800;font-size:clamp(1.95rem,4.7vw,3.6rem);letter-spacing:-.046em;line-height:1.06;quotes:none}
+.vow p{margin:20px auto 0;color:var(--text-2);font-weight:300;max-width:62ch;line-height:1.6}
+.mj-cards{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:clamp(28px,4vh,50px)}
+@media (max-width:1080px){.mj-cards{grid-template-columns:repeat(2,1fr)}}
+.mj-card{padding:24px 22px;min-height:222px;display:flex;flex-direction:column}
+.mj-card .ic{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;border:1px solid var(--glass-line);
+  background:var(--glass);color:var(--gold);margin-bottom:auto}
+.mj-card .ic svg{width:16px;height:16px}
+.mj-card h4{margin:22px 0 8px}
+.mj-card p{color:var(--text-2);font-size:.9rem;font-weight:300;line-height:1.52}
+
+.asst{margin-top:clamp(42px,6.5vh,86px);display:grid;grid-template-columns:.88fr 1.12fr;gap:clamp(24px,4vw,64px);align-items:start}
+@media (max-width:1000px){.asst{grid-template-columns:1fr;gap:26px}}
+.asst-q{display:flex;flex-direction:column;gap:9px;margin-top:24px}
+.qbtn{text-align:start;padding:14px 17px;border-radius:14px;border:1px solid var(--line);background:var(--glass);
+  font-size:.96rem;font-weight:300;color:var(--text-2);line-height:1.4;
+  transition:border-color .45s var(--ease),color .45s var(--ease),background .45s var(--ease),transform .45s var(--ease)}
+.qbtn:hover{color:var(--text);border-color:var(--glass-line);transform:translateX(4px)}
+.qbtn[aria-pressed="true"]{border-color:var(--gold);color:var(--text);background:var(--gold-dim)}
+.gates{padding:clamp(22px,3vw,34px);position:relative}
+.grail{position:absolute;inset-inline-start:clamp(22px,3vw,34px);top:clamp(30px,3.6vw,44px);bottom:auto;height:calc(100% - 190px);
+  width:2px;background:var(--line);border-radius:2px;overflow:hidden}
+.grail i{display:block;width:100%;height:calc(var(--gp,0)*100%);background:var(--grad-mix);transition:height .5s var(--ease)}
+.gate-row{display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:start;padding-block:16px;border-top:1px solid var(--line);
+  padding-inline-start:22px}
+.gate-row:first-of-type{border-top:0;padding-top:0}
+.gate-row .gn{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.18em;color:var(--text-3);padding-top:3px}
+.gate-row b{display:block;font-weight:700;font-size:1rem;margin-bottom:3px}
+.gate-row span{color:var(--text-3);font-size:.88rem;font-weight:300;line-height:1.46;display:block}
+.verd{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  padding:5px 10px;border-radius:999px;border:1px solid var(--line);color:var(--text-3);white-space:nowrap;
+  transition:color .5s var(--ease),border-color .5s var(--ease),background .5s var(--ease)}
+.verd.pass{color:var(--gold);border-color:var(--gold-dim);background:rgba(247,204,116,.08)}
+.verd.stop{color:var(--violet-2);border-color:var(--violet-dim);background:rgba(138,123,255,.1)}
+.verd.idle{opacity:.45}
+.asst-out{margin-top:20px;padding-top:18px;border-top:1px solid var(--line);min-height:6.2em}
+.asst-out p{color:var(--text-2);font-weight:300;font-size:.96rem;line-height:1.56}
+.asst-out .cur{display:inline-block;width:7px;height:1.05em;background:var(--gold);vertical-align:-2px;margin-inline-start:2px;
+  animation:blink 1s steps(2) infinite}
+@keyframes blink{50%{opacity:0}}
+.asst-out .src{margin-top:11px;font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--gold);opacity:.85;word-break:break-all}
+
+/* the timelock, the third interaction */
+.tl{margin-top:clamp(40px,6vh,80px);display:grid;grid-template-columns:.86fr 1.14fr;gap:clamp(24px,4vw,64px);align-items:start}
+@media (max-width:1000px){.tl{grid-template-columns:1fr;gap:26px}}
+.tl-panel{padding:clamp(24px,3vw,36px)}
+.tl-clock{display:flex;align-items:baseline;gap:12px;margin-bottom:6px}
+.tl-clock b{font-weight:800;font-size:clamp(2.4rem,5vw,3.6rem);letter-spacing:-.045em;line-height:1;
+  background:var(--grad-gold);-webkit-background-clip:text;background-clip:text;color:transparent;font-variant-numeric:tabular-nums}
+.tl-clock span{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--text-3)}
+input[type=range].tl-range{-webkit-appearance:none;appearance:none;width:100%;height:26px;background:transparent;margin:14px 0 24px;cursor:grab}
+input[type=range].tl-range:active{cursor:grabbing}
+input[type=range].tl-range::-webkit-slider-runnable-track{height:3px;border-radius:3px;
+  background:linear-gradient(90deg,var(--gold) 0%,var(--gold) calc(var(--v,0)*100%),rgba(255,255,255,.13) calc(var(--v,0)*100%))}
+input[type=range].tl-range::-moz-range-track{height:3px;border-radius:3px;background:rgba(255,255,255,.13)}
+input[type=range].tl-range::-moz-range-progress{height:3px;border-radius:3px;background:var(--gold)}
+input[type=range].tl-range::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;
+  background:var(--gold);border:3px solid var(--canvas);margin-top:-9.5px;box-shadow:0 0 0 1px var(--gold),0 6px 18px -6px rgba(247,204,116,.9)}
+input[type=range].tl-range::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--gold);border:3px solid var(--canvas)}
+.tl-case{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;padding-block:15px;border-top:1px solid var(--line)}
+@media (max-width:760px){
+  .tl-case{grid-template-columns:1fr;gap:11px;align-items:start}
+  .tl-right{align-items:flex-start;max-width:none;gap:9px}
+  .tl-sub{text-align:start}
+  .tl-clock{flex-wrap:wrap;gap:4px}
+  .tl-clock span{flex:1 1 100%}
+}
+.tl-case b{display:block;font-weight:700;font-size:1rem;margin-bottom:3px}
+.tl-case span{color:var(--text-3);font-size:.87rem;font-weight:300;line-height:1.46;display:block}
+.tl-right{display:flex;flex-direction:column;align-items:flex-end;gap:7px;flex:0 0 auto;max-width:48%}
+.tl-sub{display:block;font-family:"IBM Plex Mono",monospace;font-style:normal;font-size:10px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--text-3);text-align:end;line-height:1.5;transition:color .45s var(--ease)}
+.tl-sub.on{color:var(--violet-2)}
+.tl-state{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+  padding:6px 11px;border-radius:999px;border:1px solid var(--line);color:var(--text-3);white-space:nowrap;
+  transition:color .45s var(--ease),border-color .45s var(--ease),background .45s var(--ease)}
+.tl-state.wait{color:var(--violet-2);border-color:var(--violet-dim);background:rgba(138,123,255,.1)}
+.tl-state.live{color:var(--gold);border-color:var(--gold-dim);background:rgba(247,204,116,.09)}
+
+.asym{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:clamp(30px,4.5vh,54px)}
+@media (max-width:700px){.asym{grid-template-columns:1fr}}
+.asym div{padding:26px}
+.asym .lbl{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--text-3)}
+.asym .big{font-weight:800;font-size:clamp(2.1rem,4vw,3rem);letter-spacing:-.04em;margin:12px 0 8px;line-height:1}
+.asym p{color:var(--text-2);font-weight:300;font-size:.95rem;line-height:1.52}
+
+.stages{margin-top:clamp(30px,4.5vh,54px);display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media (max-width:900px){.stages{grid-template-columns:repeat(2,1fr)}}
+.stg{padding:22px 20px;position:relative}
+.stg .s{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.2em;color:var(--gold);text-transform:uppercase}
+.stg h4{margin:14px 0 7px;font-size:1rem}
+.stg p{color:var(--text-2);font-size:.88rem;font-weight:300;line-height:1.5}
+.stg .now-tag{position:absolute;top:16px;right:16px;font-family:"IBM Plex Mono",monospace;font-size:9.5px;
+  letter-spacing:.16em;text-transform:uppercase;color:#100c04;background:var(--gold);border-radius:999px;padding:3px 9px}
+
+/* ================================================================
+   9 · GOVERNANCE
+   ================================================================ */
+.gov-chain{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:clamp(9px,1.4vw,18px);align-items:stretch}
+@media (max-width:900px){.gov-chain{grid-template-columns:1fr;gap:12px}.gov-arrow{transform:rotate(90deg);justify-self:center}}
+.gov-box{padding:26px 24px}
+.gov-box .l{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold)}
+.gov-box h4{margin:14px 0 8px;font-size:1.07rem}
+.gov-box p{color:var(--text-2);font-size:.92rem;font-weight:300;line-height:1.52}
+.gov-arrow{display:grid;place-items:center;color:var(--text-3)}
+.gov-arrow svg{width:24px;height:24px}
+.gov-note{margin-top:26px;font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.05em;color:var(--text-3);line-height:1.75}
+
+/* ================================================================
+   10 · DEVELOPERS
+   ================================================================ */
+.int-grid{display:grid;grid-template-columns:1.02fr .98fr;gap:clamp(22px,3.6vw,56px);align-items:start}
+@media (max-width:1000px){.int-grid{grid-template-columns:1fr;gap:26px}}
+.code{padding:0;overflow:hidden}
+.code-bar{display:flex;align-items:center;gap:8px;padding:13px 18px;border-bottom:1px solid var(--line);
+  font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-3)}
+.code-bar u{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.15);text-decoration:none;display:block}
+.code-bar u:first-of-type{background:rgba(247,204,116,.55)}
+.code pre{margin:0;padding:20px 18px;overflow-x:auto;font-family:"IBM Plex Mono",monospace;font-size:12.5px;line-height:1.75;color:#D3D3DE}
+.code .k{color:var(--violet-2)}.code .s{color:var(--gold)}.code .f{color:#8FE0C6}.code .c{color:var(--text-3)}
+.err-row{display:grid;grid-template-columns:minmax(140px,.42fr) 1fr;gap:clamp(12px,2vw,28px);padding-block:14px;border-top:1px solid var(--line)}
+.err-row:first-of-type{border-top:0}
+.err-row code{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--gold)}
+.err-row span{color:var(--text-2);font-size:.94rem;font-weight:300;line-height:1.46}
+@media (max-width:620px){.err-row{grid-template-columns:1fr;gap:5px}}
+.int-list{display:flex;flex-direction:column;gap:11px;margin-top:22px}
+.int-item{padding:20px 22px;display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center}
+.int-item h4{margin-bottom:5px}
+.int-item p{color:var(--text-2);font-size:.9rem;font-weight:300;line-height:1.46}
+
+/* ================================================================
+   11 · PROOF
+   ================================================================ */
+.notice{margin-top:clamp(28px,4vh,48px);padding:clamp(22px,3vw,32px);border-radius:18px;
+  border:1px solid rgba(247,204,116,.34);background:linear-gradient(150deg,rgba(247,204,116,.11),rgba(247,204,116,.03))}
+.notice h3{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:13px}
+.notice p{color:var(--text-2);max-width:84ch;line-height:1.6;font-size:.98rem;font-weight:300}
+.ct{display:grid;grid-template-columns:minmax(180px,.6fr) 1.5fr auto;gap:clamp(14px,2.4vw,34px);align-items:center;
+  padding:clamp(18px,2.4vh,26px) clamp(18px,2.2vw,28px);margin-top:11px}
+@media (max-width:900px){.ct{grid-template-columns:1fr;gap:14px}.ct .btn{justify-self:start}}
+.ct .nm{display:flex;flex-direction:column;gap:7px}
+.ct .nm b{font-weight:700;font-size:1.04rem}
+.ct .st{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);
+  display:inline-flex;align-items:center;gap:6px}
+.ct .st.pend{color:var(--text-3)}
+.ct .st u{width:5px;height:5px;border-radius:50%;background:currentColor;text-decoration:none;display:block}
+.ct p{color:var(--text-2);font-size:.94rem;font-weight:300;line-height:1.46;margin-bottom:7px}
+.ct .ad{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--violet-2);word-break:break-all;opacity:.92}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:clamp(30px,4.4vh,52px)}
+@media (max-width:760px){.stats{grid-template-columns:repeat(2,1fr)}}
+.stat{padding:26px 22px}
+.stat b{display:block;font-weight:800;font-size:clamp(2.1rem,4vw,3.2rem);line-height:1;letter-spacing:-.045em;
+  background:var(--grad-gold);-webkit-background-clip:text;background-clip:text;color:transparent;font-variant-numeric:tabular-nums}
+.stat span{display:block;margin-top:11px;font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--text-3);line-height:1.5}
+.loi{display:grid;grid-template-columns:1.25fr .75fr;gap:12px;margin-top:clamp(30px,4.4vh,52px)}
+@media (max-width:940px){.loi{grid-template-columns:1fr}}
+.loi-box{padding:clamp(26px,3.2vw,40px)}
+.loi-note{margin-top:18px;padding-top:16px;border-top:1px solid var(--line);color:var(--text-3);
+  font-size:.9rem;font-weight:300;line-height:1.52;max-width:64ch}
+.loi-figs{display:grid;gap:12px;grid-template-rows:repeat(3,1fr)}
+@media (max-width:940px){.loi-figs{grid-template-rows:none;grid-template-columns:repeat(3,1fr)}}
+@media (max-width:640px){.loi-figs{grid-template-columns:1fr}}
+.loi-fig{padding:22px 24px;display:flex;flex-direction:column;justify-content:center}
+.loi-fig b{font-weight:800;font-size:clamp(1.9rem,3.4vw,2.6rem);line-height:1;letter-spacing:-.045em;
+  background:var(--grad-gold);-webkit-background-clip:text;background-clip:text;color:transparent}
+.loi-fig span{display:block;margin-top:10px;font-family:"IBM Plex Mono",monospace;font-size:10.5px;
+  letter-spacing:.14em;text-transform:uppercase;color:var(--text-3);line-height:1.5}
+.tick{margin-top:clamp(30px,4.4vh,52px);overflow:hidden;border-block:1px solid var(--line);padding-block:15px;
+  -webkit-mask:linear-gradient(90deg,transparent,#000 9%,#000 91%,transparent);
+  mask:linear-gradient(90deg,transparent,#000 9%,#000 91%,transparent)}
+.tick-track{display:flex;gap:44px;width:max-content;animation:slide 46s linear infinite}
+.tick-track span{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-3);white-space:nowrap}
+.tick-track span em{font-style:normal;color:var(--gold)}
+@keyframes slide{to{transform:translateX(-50%)}}
+
+/* ================================================================
+   12 · LIMITS / FAQ / CONTACT / FOOTER
+   ================================================================ */
+.lim{display:grid;grid-template-columns:minmax(180px,.46fr) 1.54fr;gap:clamp(14px,3vw,48px);padding-block:clamp(18px,2.6vh,28px);
+  border-top:1px solid var(--line);align-items:baseline}
+.lim:last-of-type{border-bottom:1px solid var(--line)}
+.lim b{font-weight:700;font-size:1.02rem}
+.lim p{color:var(--text-2);font-weight:300;line-height:1.58;font-size:.97rem;max-width:70ch}
+@media (max-width:720px){.lim{grid-template-columns:1fr;gap:5px}}
+.q{border-top:1px solid var(--line)}
+.q:last-of-type{border-bottom:1px solid var(--line)}
+.q button{width:100%;display:grid;grid-template-columns:1fr auto;gap:20px;align-items:center;text-align:start;
+  padding-block:clamp(20px,2.8vh,28px);font-weight:700;font-size:clamp(1.05rem,1.7vw,1.36rem);letter-spacing:-.026em;
+  line-height:1.3;transition:color .4s var(--ease)}
+.q button:hover{color:var(--gold)}
+.q .sg{width:22px;height:22px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;
+  color:var(--gold);font-family:"IBM Plex Mono",monospace;font-size:13px;transition:transform .55s var(--ease),border-color .4s var(--ease);flex:0 0 auto}
+.q[data-open="1"] .sg{transform:rotate(135deg);border-color:var(--gold)}
+.qa-p{overflow:hidden;height:0;transition:height .6s var(--ease)}
+.qa-p p{color:var(--text-2);max-width:78ch;line-height:1.68;padding-bottom:clamp(22px,3vh,30px);font-weight:300;font-size:1rem}
+
+.ctc{display:grid;grid-template-columns:1fr 1.06fr;gap:clamp(30px,5vw,84px);align-items:start}
+@media (max-width:900px){.ctc{grid-template-columns:1fr;gap:34px}}
+.frm{padding:clamp(26px,3.2vw,40px)}
+.fr{display:grid;gap:8px;margin-bottom:18px}
+.fr label{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--text-3)}
+.fr input,.fr textarea{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:12px;
+  padding:13px 15px;color:var(--text);font-family:inherit;font-size:1rem;font-weight:300;line-height:1.5;
+  transition:border-color .4s var(--ease),background .4s var(--ease)}
+.fr textarea{min-height:118px;resize:vertical}
+.fr input::placeholder,.fr textarea::placeholder{color:var(--text-3)}
+.fr input:focus,.fr textarea:focus{outline:none;border-color:var(--gold);background:rgba(255,255,255,.07)}
+.fnote{margin-top:13px;color:var(--text-3);font-size:.88rem;line-height:1.5;max-width:46ch;font-weight:300}
+.fstate{margin-top:15px;font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.05em;line-height:1.6;
+  color:var(--text-3);min-height:1.6em;transition:color .4s var(--ease)}
+.fstate.ok{color:var(--gold)}
+.fstate.bad{color:var(--violet-2)}
+#fbtn[disabled]{opacity:.6;pointer-events:none}
+.fsend{margin-top:18px;padding-top:18px;border-top:1px solid var(--line)}
+.fsend[hidden]{display:none}
+.fsend-t{font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:14px}
+.fsend-row{display:flex;flex-wrap:wrap;gap:9px}
+.fsend-n{margin-top:14px;color:var(--text-3);font-size:.86rem;line-height:1.55;font-weight:300;max-width:48ch}
+.fsend-a{color:var(--text-2);font-family:"IBM Plex Mono",monospace;font-size:.82rem;word-break:break-all}
+.fsend-n.done{color:var(--gold)}
+
+footer{border-top:1px solid var(--line);padding-block:clamp(50px,6.5vh,82px) 34px;position:relative;z-index:5}
+.ftop{display:grid;grid-template-columns:1.5fr repeat(4,.75fr);gap:clamp(20px,2.8vw,44px);align-items:start}
+@media (max-width:1280px){.ftop{grid-template-columns:1.35fr repeat(3,1fr)}}
+@media (max-width:960px){.ftop{grid-template-columns:1fr 1fr;gap:28px 24px}.fbr{grid-column:1 / -1}}
+/* one clean ruled list beats four ragged half columns on a phone */
+@media (max-width:640px){
+  .ftop{grid-template-columns:1fr 1fr;gap:26px 18px}
+  .fbr{grid-column:1 / -1;margin-bottom:4px}
+  .fcol{border-top:1px solid var(--line);padding-top:15px}
+  .fcol h4{margin-bottom:4px}
+  .fcol a{font-size:.9rem}
+}
+@media (max-width:380px){.ftop{grid-template-columns:1fr}}
+.fbr p{color:var(--text-3);font-size:.9rem;line-height:1.6;max-width:34ch;margin-top:15px;font-weight:300}
+.fcol h4{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--text-3);margin-bottom:13px}
+.fcol a{display:block;color:var(--text-2);font-size:.92rem;padding-block:5px;font-weight:300;transition:color .4s var(--ease),transform .4s var(--ease)}
+.fcol a:hover{color:var(--gold);transform:translateX(3px)}
+@media (pointer:coarse){.fcol a{min-height:44px;display:flex;align-items:center;justify-content:flex-start}}
+.fleg{margin-top:clamp(36px,5vh,60px);padding-top:24px;border-top:1px solid var(--line);
+  font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.09em;color:var(--text-3);line-height:1.8}
+
+/* ================================================================
+   MOBILE · flow, carousels, tighter rhythm
+   ================================================================ */
+@media (max-width:820px){
+  .cards,.mj-cards,.stages,.asym{display:flex;overflow-x:auto;gap:12px;scroll-snap-type:x mandatory;
+    padding-inline:var(--gut);margin-inline:calc(var(--gut) * -1);padding-block:2px 6px;
+    scrollbar-width:none;-ms-overflow-style:none;overscroll-behavior-x:contain}
+  .cards::-webkit-scrollbar,.mj-cards::-webkit-scrollbar,.stages::-webkit-scrollbar,.asym::-webkit-scrollbar{display:none}
+  .cards>*,.mj-cards>*,.stages>*,.asym>*{flex:0 0 min(84%,340px);scroll-snap-align:center}
+  .card{min-height:250px}
+  .mj-card{min-height:200px}
+  .swipe-hint{display:flex}
+  .pad{padding-block:clamp(66px,9vh,110px)}
+  .gt-row{grid-template-columns:auto 1fr;gap:10px}
+  .gt-row .s{grid-column:2;justify-self:start;margin-top:4px}
+}
+@media (max-width:820px){
+  .swipe-row{display:flex;overflow-x:auto;gap:12px;scroll-snap-type:x mandatory;
+    padding-inline:var(--gut);margin-inline:calc(var(--gut) * -1);padding-block:2px 6px;
+    scrollbar-width:none;-ms-overflow-style:none;overscroll-behavior-x:contain}
+  .swipe-row::-webkit-scrollbar{display:none}
+  .swipe-row>*{flex:0 0 min(84%,340px);scroll-snap-align:center;
+    border:1px solid var(--line) !important;border-radius:var(--r);
+    background:linear-gradient(168deg,rgba(255,255,255,.075),rgba(255,255,255,.028));
+    backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+    padding:24px 22px !important;margin:0 !important}
+  .swipe-row .gov-arrow{display:none}
+  .swipe-row .inv-m{position:static;display:block;font-size:3.4rem;opacity:.32;margin-bottom:4px}
+  .swipe-row .inv-i{display:flex;flex-direction:column;gap:16px}
+  .swipe-row .inv-side{padding:16px 18px !important;border:1px solid var(--line) !important}
+  .swipe-row .led{display:flex;flex-direction:column;gap:8px}
+  .swipe-row .led::after{display:none}
+  .swipe-row .ct{display:flex;flex-direction:column;gap:14px;align-items:flex-start}
+}
+.swipe-hint{display:none;align-items:center;gap:8px;margin-top:14px;font-family:"IBM Plex Mono",monospace;
+  font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--text-3)}
+.swipe-hint s{display:block;width:26px;height:1px;background:linear-gradient(90deg,var(--gold),transparent);text-decoration:none;
+  animation:sw 2.4s var(--ease-soft) infinite}
+@keyframes sw{0%,100%{transform:translateX(0);opacity:.4}50%{transform:translateX(7px);opacity:1}}
+
+/* ================================================================
+   THE FIVE STATIC-HERO GATES
+   These five must stay character for character identical to GATES in JS.
+   ================================================================ */
+@media (max-width: 720px),
+       (orientation: portrait) and (max-width: 1024px),
+       (orientation: portrait) and (pointer: coarse),
+       (orientation: landscape) and (pointer: coarse) and (max-height: 560px),
+       (prefers-reduced-motion: reduce){
+  .hero{height:auto}
+  .stage{position:relative;height:100svh}
+  .bands,.ring,.cue,#hv,.motes{display:none}
+  .static-hero{display:flex}
+  .poster{background-image:var(--static-img)}
+  .how{height:auto}.how-stage{position:relative;height:auto;padding-block:clamp(66px,9vh,110px)}
+  .how-copy{min-height:0;display:flex;flex-direction:column;gap:clamp(46px,7vh,74px);perspective:none}
+  .how-step{position:relative;inset:auto;opacity:1;transform:none;pointer-events:auto}
+  .how-bars{display:none}
+  .how-grid{grid-template-columns:1fr;gap:24px}
+  .how-vis{max-width:min(62vw,270px);order:-1}
+}
+@media (max-height:600px){.cue{display:none}}
+
+/* ================================================================
+   REDUCED MOTION
+   ================================================================ */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;
+    transition-duration:.001ms !important;transition-delay:0s !important;scroll-behavior:auto !important}
+  [data-rv],.stag>*{opacity:1 !important;transform:none !important;filter:none !important;clip-path:none !important}
+  #aurora,#depth{display:none}
+  .nav{background:rgba(14,16,23,.92)}
+}
+body.paused *,body.paused *::before,body.paused *::after{animation-play-state:paused !important}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<canvas id="aurora" aria-hidden="true"></canvas>
+<canvas id="depth" aria-hidden="true"></canvas>
+<div class="veil" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <linearGradient id="gg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0%" stop-color="#F7CC74"/><stop offset="55%" stop-color="#E8964A"/><stop offset="100%" stop-color="#8A7BFF"/>
+  </linearGradient>
+  <linearGradient id="zg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0%" stop-color="#F7CC74" stop-opacity=".55"/><stop offset="55%" stop-color="#E8964A" stop-opacity=".28"/>
+    <stop offset="100%" stop-color="#8A7BFF" stop-opacity=".5"/>
+  </linearGradient>
+</defs></svg>
+
+<!-- ================= NAV ================= -->
+<nav class="nav" id="nav">
+  <a class="brand" href="#top">
+    <span class="mark"><img src="assets/mark.png" alt="" width="132" height="90" decoding="async"></span>
+    <b>Gravitas</b>
+  </a>
+  <div class="nav-links" id="navLinks">
+    <a href="#how">How it works</a>
+    <a href="#protocol">Protocol</a>
+    <a href="#shariah">Shariah</a>
+    <a href="#majlis">Majlis</a>
+    <a href="#governance">Governance</a>
+    <a href="#developers">Developers</a>
+    <a href="#proof">Proof</a>
+    <a href="#contact">Contact</a>
+  </div>
+  <div class="nav-act">
+    <a class="icon-btn" href="https://github.com/AbZe628/gravitas-protocol" target="_blank" rel="noopener noreferrer" aria-label="Gravitas Protocol on GitHub" title="GitHub">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.53-1.34-1.29-1.7-1.29-1.7-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.2 1.77 1.2 1.03 1.77 2.7 1.26 3.36.97.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.7 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.12 3.05.74.81 1.18 1.84 1.18 3.1 0 4.43-2.69 5.4-5.25 5.69.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+    </a>
+    <a class="btn ghost sm hide-sm" href="#majlis">Majlis</a>
+    <a class="btn sm hide-sm" href="/app/dashboard">Launch app</a>
+    <button class="burger" id="burger" aria-label="Open the menu" aria-expanded="false" aria-controls="menu"><i></i><i></i><i></i></button>
+    <a class="nav-quick" href="#protocol">Protocol</a>
+  </div>
+</nav>
+
+<div id="menu" role="dialog" aria-modal="true" aria-label="Menu">
+  <a class="m-link" href="#how"><span>01</span>How it works</a>
+  <a class="m-link" href="#protocol"><span>02</span>Protocol</a>
+  <a class="m-link" href="#shariah"><span>03</span>Shariah</a>
+  <a class="m-link" href="#majlis"><span>04</span>Majlis</a>
+  <a class="m-link" href="#governance"><span>05</span>Governance</a>
+  <a class="m-link" href="#developers"><span>06</span>Developers</a>
+  <a class="m-link" href="#proof"><span>07</span>Proof and limits</a>
+  <a class="m-link" href="#contact"><span>08</span>Contact</a>
+  <div class="m-foot">
+    <a class="btn" href="/app/dashboard">Launch app</a>
+    <a class="btn ghost" href="#contact">Speak with the team</a>
+    <a class="btn ghost" href="https://github.com/AbZe628/gravitas-protocol" target="_blank" rel="noopener noreferrer">GitHub</a>
+  </div>
+</div>
+
+<div id="top"></div>
+
+<!-- ================= HERO ================= -->
+<section class="hero" id="hero" aria-label="Introduction">
+  <div class="stage" id="stage">
+    <div class="poster" id="poster" aria-hidden="true"></div>
+    <video id="hv" preload="none" muted playsinline aria-hidden="true" tabindex="-1"></video>
+    <canvas class="motes" id="motes" aria-hidden="true"></canvas>
+    <div class="scrim" aria-hidden="true"></div>
+    <div class="gather" id="gather" aria-hidden="true"></div>
+
+    <div class="bands" id="bands">
+      <div class="band e-rise" data-scrim="open" data-a="0" data-b="0.22" data-ramp="0.034">
+        <div class="bi"><h1 class="hl split" data-text="An approval in a document stops nothing."></h1></div>
+      </div>
+      <div class="band e-drift" data-a="0.26" data-b="0.48">
+        <div class="bi"><p class="hl split" data-text="So the rule goes into the chain itself."></p></div>
+      </div>
+      <div class="band e-punch" data-scrim="hook" data-a="0.52" data-b="0.74">
+        <div class="bi"><p class="hl split" data-text="What does not comply *does not happen*."></p></div>
+      </div>
+      <div class="band e-settle" data-a="0.78" data-b="1" data-settle="1">
+        <div class="bi">
+          <div class="chip-row" style="margin-bottom:24px"><span class="chip"><i></i>Arbitrum Sepolia · Testnet</span></div>
+          <p class="hl split" data-text="Compliance that can be verified."></p>
+          <p class="hsub">A Shariah board writes its rules into an on-chain registry. Every enforcement decision is a transaction anyone can read.</p>
+          <div class="cta">
+            <a class="btn" href="/app/dashboard">Launch app</a>
+            <a class="btn ghost" href="#how">See how it works</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="static-hero">
+      <span class="chip"><i></i>Arbitrum Sepolia · Testnet</span>
+      <h2 class="hl" style="margin-top:24px">Compliance that can be verified.</h2>
+      <p class="hsub">A rule written on paper cannot stop a transaction. A rule written into the contract can. Gravitas puts a Shariah board's decisions where the transaction has to pass them.</p>
+      <div class="cta">
+        <a class="btn" href="/app/dashboard">Launch app</a>
+        <a class="btn ghost" href="#how">See how it works</a>
+      </div>
+    </div>
+
+    <svg class="ring" id="ldring" viewBox="0 0 48 48" aria-hidden="true">
+      <circle cx="24" cy="24" r="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="126" style="stroke-dashoffset:var(--ld,126)"/>
+    </svg>
+    <span class="cue" id="cue" aria-hidden="true"><s></s>Scroll</span>
+  </div>
+</section>
+
+<main id="main" tabindex="-1">
+
+  <!-- ================= 1 · THE GAP ================= -->
+  <section class="gap-s">
+    <div class="zaha" data-zaha="3" aria-hidden="true"></div>
+    <div class="wrap" data-rv="blur">
+      <span class="kick">The gap</span>
+      <h2 class="h2">A rule on paper cannot stop a transaction.</h2>
+      <p class="body">A board reviews an asset and records its decision. The transaction then runs through software that has never read that decision. Between the two sits a gap that review cannot close, because <b>review happens before, and the transaction happens anyway</b>.</p>
+    </div>
+  </section>
+
+  <!-- ================= 2 · HOW IT WORKS ================= -->
+  <section class="how" id="how" aria-label="How Gravitas works">
+    <div class="how-stage">
+      <div class="wrap">
+        <span class="kick" style="margin-bottom:clamp(16px,2.8vh,32px);display:inline-flex">How it works · three steps</span>
+        <div class="how-grid">
+          <div class="how-copy">
+            <div class="how-step" data-step="0">
+              <span class="how-n">Step one</span>
+              <h3>The board decides, in Majlis.</h3>
+              <p>A Shariah board reads a matter in ordinary language: what is proposed, the exact operative parameters, what is deliberately not being decided, and the mechanism underneath. Before it votes it sees which past transactions the proposed rule would have stopped. The decision, its reasoning and any dissent are kept.</p>
+              <div class="tag"><span>Matters</span><span>Simulation</span><span>Reasoning kept</span></div>
+            </div>
+            <div class="how-step" data-step="1">
+              <span class="how-n">Step two</span>
+              <h3>The rule enters the Policy Registry.</h3>
+              <p>What the board approved becomes a whitelist entry in <span class="mono" style="color:var(--gold)">GravitasPolicyRegistry</span> on Arbitrum: which assets are compliant, which routers may be used, who may execute. The registry version is tracked on chain, and every change is an event anyone can read without asking us.</p>
+              <div class="tag"><span>On-chain whitelist</span><span>Versioned</span><span>Events emitted</span></div>
+            </div>
+            <div class="how-step" data-step="2">
+              <span class="how-n">Step three</span>
+              <h3>Teleport has to pass it.</h3>
+              <p>Every migration calls the registry before anything moves. Both tokens must come back compliant, the owner's EIP-712 intent must match, and the result must meet the minimums that owner signed. If any of that fails the whole transaction reverts and nothing happened at all.</p>
+              <div class="tag"><span>Atomic</span><span>EIP-712 intent</span><span>Reverts on failure</span></div>
+            </div>
+          </div>
+          <div class="how-vis"><svg id="howSvg" viewBox="0 0 200 200" aria-hidden="true"></svg></div>
+        </div>
+      </div>
+      <div class="how-bars" aria-hidden="true"><i></i><i></i><i></i></div>
+    </div>
+  </section>
+
+  <!-- ================= 3 · PROTOCOL ================= -->
+  <section class="pad" id="protocol">
+    <div class="wrap">
+      <div class="shead" data-rv="up">
+        <div><span class="kick">The protocol</span><h2 class="h2">The rule moves into the transaction path.</h2></div>
+        <p class="lede">Three mechanisms carry the whole idea. Each one is a property of the contract rather than a promise about how it is used.</p>
+      </div>
+      <div class="cards stag">
+        <article class="glass card tilt"><span class="sheen"></span>
+          <span class="n">01</span>
+          <h3 class="h3">Atomic migration</h3>
+          <p>Liquidity moves from V2 to V3, or rebalances inside V3, in one transaction. It completes whole or it does not happen. There is no partial state to unwind and no moment where the protocol holds the assets.</p>
+        </article>
+        <article class="glass card tilt"><span class="sheen"></span>
+          <span class="n">02</span>
+          <h3 class="h3">A registry the contract must ask</h3>
+          <p>Every migration checks both tokens against an on-chain whitelist before anything moves. The check is not optional and cannot be routed around. An asset that is not on the list produces a failed transaction, not a warning.</p>
+        </article>
+        <article class="glass card tilt"><span class="sheen"></span>
+          <span class="n">03</span>
+          <h3 class="h3">Signed intent</h3>
+          <p>The owner signs the exact terms with EIP-712 typed data. A nonce ties the signature to one execution, so the same signature cannot be used twice.</p>
+        </article>
+      </div>
+      <p class="swipe-hint"><s></s>Swipe</p>
+    </div>
+  </section>
+
+  <!-- ================= 4 · SEVEN STEPS ================= -->
+  <section class="seven pad" aria-label="The seven steps of a migration">
+    <div class="wrap">
+      <div class="shead" data-rv="up">
+        <div><span class="kick">Execution · one transaction</span><h2 class="h2">Seven steps. One transaction.</h2></div>
+        <p class="lede">Hold the centre and the migration runs. Let go and it waits where it is. If any step fails, every step before it is undone and nothing happened at all.</p>
+      </div>
+      <div class="seven-grid">
+        <div class="seven-copy">
+            <div class="sv-step" data-i="0"><span class="sv-num">01</span><h3>Pre-check</h3><p>Ownership of the position, compliance of both tokens and the deadline are verified before anything moves.</p></div>
+            <div class="sv-step" data-i="1"><span class="sv-num">02</span><h3>Decrease</h3><p>Liquidity is withdrawn from the existing Uniswap V3 position.</p></div>
+            <div class="sv-step" data-i="2"><span class="sv-num">03</span><h3>Collect</h3><p>The underlying tokens and the fees accrued to the position are transferred to the engine.</p></div>
+            <div class="sv-step" data-i="3"><span class="sv-num">04</span><h3>Burn</h3><p>The old position NFT is destroyed and the state is left clean behind it.</p></div>
+            <div class="sv-step" data-i="4"><span class="sv-num">05</span><h3>Swap</h3><p>An optional rebalancing swap through an authorised router, only if the signed intent asked for one.</p></div>
+            <div class="sv-step" data-i="5"><span class="sv-num">06</span><h3>Mint</h3><p>The new position is minted directly to the owner’s address. It never rests with the protocol.</p></div>
+            <div class="sv-step" data-i="6"><span class="sv-num">07</span><h3>Refund</h3><p>Remaining dust is returned by a Yul-optimised routine that saves about 2,000 gas per transaction.</p></div>
+        </div>
+        <div class="seven-vis">
+          <svg class="sv-arc" id="svArc" viewBox="0 0 200 200" aria-hidden="true"></svg>
+          <button class="sv-hold" id="svHold" aria-describedby="svState"><b id="svHoldLabel">Hold to run</b><i></i></button>
+        </div>
+      </div>
+      <div class="sv-dots" id="svDots" role="group" aria-label="Jump to a step">
+        <button class="sv-dot" data-i="0" aria-label="Step 1, Pre-check"><b>01</b><span>Pre-check</span></button>
+        <button class="sv-dot" data-i="1" aria-label="Step 2, Decrease"><b>02</b><span>Decrease</span></button>
+        <button class="sv-dot" data-i="2" aria-label="Step 3, Collect"><b>03</b><span>Collect</span></button>
+        <button class="sv-dot" data-i="3" aria-label="Step 4, Burn"><b>04</b><span>Burn</span></button>
+        <button class="sv-dot" data-i="4" aria-label="Step 5, Swap"><b>05</b><span>Swap</span></button>
+        <button class="sv-dot" data-i="5" aria-label="Step 6, Mint"><b>06</b><span>Mint</span></button>
+        <button class="sv-dot" data-i="6" aria-label="Step 7, Refund"><b>07</b><span>Refund</span></button>
+      </div>
+      <p class="sv-state mono" id="svState" role="status" aria-live="polite">Waiting. Nothing has been sent.</p>
+    </div>
+  </section>
+
+  <!-- ================= 5 · INVARIANTS ================= -->
+  <section class="pad">
+    <div class="wrap">
+      <div class="shead" data-rv="up">
+        <div><span class="kick">Trust model</span><h2 class="h2">The protocol never holds your keys or your funds.</h2></div>
+        <p class="lede">Three invariants hold on every migration. Each one is enforced by the contract, not by the interface, and each one is written out in the technical specification with its proof of mitigation.</p>
+      </div>
+      <div class="swipe-row">
+      <div class="inv-i" data-rv="up">
+        <div class="inv-b">
+          <span class="inv-m" aria-hidden="true">I</span>
+          <h3>Nothing is taken.</h3>
+          <p>The underlying tokens the owner holds are the same before and after, less only slippage and the service fee. Dust is returned inside the same transaction that created it.</p>
+        </div>
+        <div class="glass inv-side"><span class="sheen"></span>
+          <span class="fx"><b>balance start</b> = balance end + fees + slippage</span>
+          <span class="cap">Enforced by _refundDustOptimized</span>
+        </div>
+      </div>
+      <div class="inv-i" data-rv="up">
+        <div class="inv-b">
+          <span class="inv-m" aria-hidden="true">II</span>
+          <h3>Compliance is a condition, not a report.</h3>
+          <p>Both tokens in the pair must be registered compliant. The check runs inside the call. A pair that fails it produces a custom error and a reverted transaction.</p>
+        </div>
+        <div class="glass inv-side"><span class="sheen"></span>
+          <span class="fx"><b>isCompliant(A)</b> and <b>isCompliant(B)</b><br>must both be true</span>
+          <span class="cap">Enforced by verifyAssetCompliance</span>
+        </div>
+      </div>
+      <div class="inv-i" data-rv="up">
+        <div class="inv-b">
+          <span class="inv-m" aria-hidden="true">III</span>
+          <h3>The outcome is fixed before it starts.</h3>
+          <p>The result must meet the minimums the owner signed, or the whole transaction reverts. Nothing settles at a number nobody agreed to. This is what removes gharar from the execution.</p>
+        </div>
+        <div class="glass inv-side"><span class="sheen"></span>
+          <span class="fx"><b>minted</b> &gt;= minimum signed<br><b>out A</b> &gt;= min A, <b>out B</b> &gt;= min B</span>
+          <span class="cap">Enforced by the slippage bounds</span>
+        </div>
+      </div>
+      </div>
+      <p class="swipe-hint"><s></s>Swipe</p>
+    </div>
+  </section>
+
+  <!-- ================= 6 · THE GATE ================= -->
+  <section class="gate-s">
+    <div class="wrap">
+      <div class="gate-grid">
+        <div class="g-head" data-rv="left">
+          <span class="kick">Try it</span>
+          <h2 class="h2">Hold, and watch the rule work.</h2>
+          <p class="lede">Choose an asset pair and hold the gate open. The check runs the way the contract runs it, in order, and stops where the contract would stop. This is a demonstration, not a live call to the network.</p>
+        </div>
+        <div class="g-ctl">
+          <div class="gpick" role="group" aria-label="Choose an asset pair">
+            <button class="pick" data-ok="1" aria-pressed="true"><u></u>WETH / USDC</button>
+            <button class="pick" data-ok="1" aria-pressed="false"><u></u>WBTC / WETH</button>
+            <button class="pick" data-ok="0" aria-pressed="false"><u></u>An asset the board has not approved</button>
+          </div>
+          <div class="gtrace" id="gtrace" aria-hidden="true">
+            <div class="gt-row" data-t="0"><span class="c">01</span><span class="m">ownerOf(tokenId)</span><span class="s">Waiting</span></div>
+            <div class="gt-row" data-t="1"><span class="c">02</span><span class="m">verifyAssetCompliance(A)</span><span class="s">Waiting</span></div>
+            <div class="gt-row" data-t="2"><span class="c">03</span><span class="m">verifyAssetCompliance(B)</span><span class="s">Waiting</span></div>
+            <div class="gt-row" data-t="3"><span class="c">04</span><span class="m">executeAtomicMigration()</span><span class="s">Waiting</span></div>
+          </div>
+          <p class="gout" id="gout" role="status" aria-live="polite"></p>
+        </div>
+        <div class="g-vis gwrap" data-rv="scale">
+          <div class="gstage" id="gstage">
+            <div class="gsvg" data-aperture="7" aria-hidden="true"></div>
+            <span class="gtoken" id="gtoken" aria-hidden="true">A + B</span>
+          </div>
+          <button class="ghold" id="ghold" aria-describedby="gout">Hold to open the gate</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 7 · SHARIAH ================= -->
+  <section class="pad" id="shariah">
+    <div class="wrap">
+      <div class="shead" data-rv="up">
+        <div><span class="kick">Shariah</span><h2 class="h2">Four prohibitions, written into the contract.</h2></div>
+        <p class="lede">These are the categories the registry is able to express. They are not an endorsement by any standards body, and Gravitas certifies nothing itself.</p>
+      </div>
+      <div class="swipe-row">
+      <div class="led" data-rv="up"><span class="t">Riba</span><span class="g">Interest</span><p>Revenue comes from a service fee of five to ten basis points on a completed migration. The protocol lends nothing and pays nothing for time.</p></div>
+      <div class="led" data-rv="up"><span class="t">Gharar</span><span class="g">Uncertainty</span><p>Execution is atomic and the outcome is bounded by the owner's own signed minimums. A result that cannot meet them is not delivered at a worse number, it is not delivered at all.</p></div>
+      <div class="led" data-rv="up"><span class="t">Maysir</span><span class="g">Speculation</span><p>The registry admits only assets a board has approved. Gambling and speculation tokens are not on the list.</p></div>
+      <div class="led" data-rv="up"><span class="t">Halal assets</span><span class="g">Verification</span><p>The whitelist is on-chain and governed. Anyone can read its current state without asking us, and every change to it is an event.</p></div>
+      </div>
+      <p class="swipe-hint"><s></s>Swipe</p>
+      <p class="note-g" data-rv="up">Gravitas enforces the rules a board writes into the registry. It does not implement, adhere to, or certify against any external standards body, and it does not decide what is compliant.</p>
+    </div>
+  </section>
+
+  <!-- ================= 8 · MAJLIS ================= -->
+  <section class="pad majlis" id="majlis">
+    <div class="zaha" data-zaha="1" aria-hidden="true"></div>
+    <div class="wrap">
+      <div class="shead" data-rv="up">
+        <div><span class="kick">Majlis · for Shariah boards</span><h2 class="h2">Where the decision is made, and kept.</h2></div>
+        <p class="lede">Gravitas makes an approved ruling enforceable at the moment of execution. That solves one problem and creates another: once a rule has operational force, the process by which it is proposed, understood and amended becomes the most sensitive part of the system.</p>
+      </div>
+
+      <div class="glass vow" data-rv="scale"><span class="sheen"></span>
+        <q class="gd">The vote is the signature.</q>
+        <p>A scholar's vote does not produce a recommendation that someone else then executes. What is signed is a hash of the exact operative parameters as displayed at the moment of voting. The question "was what the board approved the same as what was deployed" becomes a comparison rather than a matter of testimony.</p>
+      </div>
+
+      <div class="mj-cards stag">
+        <article class="glass mj-card tilt"><span class="sheen"></span>
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4 5h16M4 12h16M4 19h9"/></svg></span>
+          <h4 class="h4">Matters</h4>
+          <p>A plain-language brief, the operative parameters, what is deliberately not being decided, the mechanism, the simulation, and the deliberation record.</p>
+        </article>
+        <article class="glass mj-card tilt"><span class="sheen"></span>
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M5 4h14v16l-7-3-7 3z"/></svg></span>
+          <h4 class="h4">Rules in force</h4>
+          <p>Every rule with its parameters, its hash, and a live check that the two still match. A mismatch means the record was altered.</p>
+        </article>
+        <article class="glass mj-card tilt"><span class="sheen"></span>
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v5l3 2"/></svg></span>
+          <h4 class="h4">Briefings</h4>
+          <p>A standing brief on technological change: what changed, why, which rules it touches, and a question for the board. Never a conclusion.</p>
+        </article>
+        <article class="glass mj-card tilt"><span class="sheen"></span>
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg></span>
+          <h4 class="h4">Assistant</h4>
+          <p>Explains mechanism in ordinary language with its sources named, and is prevented in code from issuing anything that reads as a ruling.</p>
+        </article>
+        <article class="glass mj-card tilt"><span class="sheen"></span>
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h5"/></svg></span>
+          <h4 class="h4">Record</h4>
+          <p>Retained explanations and a one-action audit export carrying an integrity hash, readable without any knowledge of the application.</p>
+        </article>
+      </div>
+      <p class="swipe-hint"><s></s>Swipe</p>
+
+      <div class="asst">
+        <div data-rv="left">
+          <span class="kick">The assistant</span>
+          <h3 class="h3" style="margin:16px 0 14px;font-size:clamp(1.5rem,2.6vw,2.1rem);font-weight:800;letter-spacing:-.038em">Three gates, and every one fails closed.</h3>
+          <p class="body">The failure this guards against is a faithful ruling founded on an unfaithful explanation. A wrong explanation does not fail loudly, it produces a confident scholar ruling correctly on a mechanism that does not exist. So the constraint lives in code rather than in the model's discretion. Pick a question and watch where it stops.</p>
+          <div class="asst-q" role="group" aria-label="Example questions">
+            <button class="qbtn" data-q="0" aria-pressed="true">Is this halal?</button>
+            <button class="qbtn" data-q="1" aria-pressed="false">Summarise what scholars generally hold on this.</button>
+            <button class="qbtn" data-q="2" aria-pressed="false">How should we vote on this?</button>
+            <button class="qbtn" data-q="3" aria-pressed="false">What does the cooldown period actually do?</button>
+          </div>
+        </div>
+        <div class="glass gates" data-rv="right"><span class="sheen"></span>
+          <div class="grail" aria-hidden="true"><i id="grailFill"></i></div>
+          <div class="gate-row"><span class="gn">01</span><div><b>Lexical gate, before the model runs</b><span>Known ruling-seeking phrasings are refused without the model ever being called.</span></div><span class="verd idle" id="v0">Waiting</span></div>
+          <div class="gate-row"><span class="gn">02</span><div><b>Semantic classification</b><span>A separate cheap call reads intent. Anything that is not an unambiguous no is refused.</span></div><span class="verd idle" id="v1">Waiting</span></div>
+          <div class="gate-row"><span class="gn">03</span><div><b>Lexical gate on the way out</b><span>If ruling language survives into the answer, the answer is discarded and the exchange is escalated.</span></div><span class="verd idle" id="v2">Waiting</span></div>
+          <div class="asst-out" id="asstOut" role="status" aria-live="polite"></div>
+        </div>
+      </div>
+
+      <!-- the timelock, the third interaction -->
+      <div class="tl">
+        <div data-rv="left">
+          <span class="kick">The asymmetry</span>
+          <h3 class="h3" style="margin:16px 0 14px;font-size:clamp(1.5rem,2.6vw,2.1rem);font-weight:800;letter-spacing:-.038em">Permitting waits. Restricting cannot.</h3>
+          <p class="body">A delay protects when a change permits something, because the risk grows with everything done under it. The same delay is a hazard in the other direction: two days of continued activity on an asset found to be non-compliant is not caution, it is harm. Drag the clock and watch the two rules diverge.</p>
+        </div>
+        <div class="glass tl-panel" data-rv="right"><span class="sheen"></span>
+          <div class="tl-clock"><b id="tlH">00</b><span>hours since the board voted</span></div>
+          <input class="tl-range" id="tlRange" type="range" min="0" max="72" step="1" value="0" aria-label="Hours since the board voted">
+          <div class="tl-case">
+            <div><b>Permit an asset</b><span>Adds a token to the whitelist. Scheduled, then held in public.</span></div>
+            <div class="tl-right"><span class="tl-state" id="tlPermit">Scheduled</span><em class="tl-sub" id="tlPermitSub">48 h to wait</em></div>
+          </div>
+          <div class="tl-case">
+            <div><b>Restrict an asset</b><span>Removes a token. Takes effect at once, and lapses if the full board does not ratify it.</span></div>
+            <div class="tl-right"><span class="tl-state live" id="tlRestrict">In force</span><em class="tl-sub" id="tlRestrictSub">Ratify within 168 h</em></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="asym">
+        <div class="glass" data-rv="up"><span class="sheen"></span>
+          <span class="lbl">Permitting</span>
+          <div class="big gd">48 hours</div>
+          <p>A change that permits something waits. Delay protects, because the risk of permitting wrongly grows with what is done under it.</p>
+        </div>
+        <div class="glass" data-rv="up"><span class="sheen"></span>
+          <span class="lbl">Restricting</span>
+          <div class="big vt">Immediate</div>
+          <p>Restriction takes effect at once and must be ratified by the full board within a defined window or it lapses.</p>
+        </div>
+      </div>
+
+      <div class="stages">
+        <article class="glass stg" data-rv="up"><span class="now-tag">Built</span><span class="s">Stage one</span><h4 class="h4">Record and comprehension</h4><p>The record, the briefings and the assistant. Read only. A test asserts that no route exists which can write a rule.</p></article>
+        <article class="glass stg" data-rv="up"><span class="s">Stage two</span><h4 class="h4">Deliberation</h4><p>Matters, briefs, simulation and threaded discussion. Votes recorded, signing still outside the system.</p></article>
+        <article class="glass stg" data-rv="up"><span class="s">Stage three</span><h4 class="h4">The vote becomes the signature</h4><p>Threshold signing moves into Majlis, with a timelock countdown and an emergency restriction path.</p></article>
+        <article class="glass stg" data-rv="up"><span class="s">Stage four</span><h4 class="h4">Plurality</h4><p>Multiple boards and institutions, cross-reference between them, and a published reference from the accumulated record.</p></article>
+      </div>
+
+      <p class="note-g" data-rv="up" style="margin-top:clamp(28px,4vh,48px)">Stage one is what exists today, and it carries no voting and no signing authority. Three languages at launch, English, Arabic and Urdu, with full right-to-left support. Every record in the running application is fabricated demonstration data and represents no real scholar, board or institution.</p>
+
+      <div class="cta" style="justify-content:flex-start;margin-top:clamp(24px,3.6vh,40px)" data-rv="up">
+        <a class="btn" href="https://majlis.gravitasprotocol.xyz" target="_blank" rel="noopener noreferrer">Open Majlis</a>
+        <a class="btn ghost" href="#contact">Request access</a>
+        <a class="btn ghost" href="https://github.com/AbZe628/gravitas-protocol/tree/main/apps/majlis" target="_blank" rel="noopener noreferrer">Read the source</a>
+        <a class="btn ghost" href="https://github.com/AbZe628/gravitas-protocol/blob/main/apps/majlis/docs/ASSISTANT-RULES.md" target="_blank" rel="noopener noreferrer">The assistant's constraints</a>
+      </div>
+      <p class="mono" style="margin-top:18px;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--text-3)">Access is restricted. Contact the team for credentials.</p>
+    </div>
+  </section>
+
+  <!-- ================= 9 · GOVERNANCE ================= -->
+  <section class="pad" id="governance">
+    <div class="wrap">
+      <div class="shead" data-rv="up">
+        <div><span class="kick">Governance</span><h2 class="h2">Nobody changes the rules alone.</h2></div>
+        <p class="lede">On testnet the registry has a single owner, which is fast and is not good enough for real money. For mainnet the ownership moves behind a multi-signature wallet and a timelock, so every compliance change is proposed by several people and then sits in public for two days before it can take effect.</p>
+      </div>
+      <div class="gov-chain swipe-row">
+        <div class="glass gov-box tilt" data-rv="depth"><span class="sheen"></span>
+          <span class="l">Proposed by</span><h4 class="h4">Gnosis Safe, 3 of 5</h4>
+          <p>Founder, co-founder, legal counsel, a Shariah scholar representative and a technical advisor. Three of the five must approve before anything is scheduled.</p>
+        </div>
+        <div class="gov-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 12h15M13 6l6 6-6 6"/></svg></div>
+        <div class="glass gov-box tilt" data-rv="depth"><span class="sheen"></span>
+          <span class="l">Held by</span><h4 class="h4">GravitasTimelock, 48 hours</h4>
+          <p>The change is scheduled and waits. Institutional partners get two days to read it and object. After the delay anyone at all can execute it, which is the point. The contract is written, with no admin and no privileged executor.</p>
+        </div>
+        <div class="gov-arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 12h15M13 6l6 6-6 6"/></svg></div>
+        <div class="glass gov-box tilt" data-rv="depth"><span class="sheen"></span>
+          <span class="l">Applied to</span><h4 class="h4">GravitasPolicyRegistry</h4>
+          <p>The whitelist, the authorised routers and executor status. Ownership is transferred to the timelock with a two-step handover, and the timelock itself has no admin.</p>
+        </div>
+      </div>
+      <p class="swipe-hint"><s></s>Swipe</p>
+      <p class="gov-note" data-rv="up">GravitasTimelock is written, its ownership handover is tested, and the deployment procedure is in the repository.<br>Guardian, one of one, can pause in an emergency and can do nothing else.<br>What remains is deployment, not development: create the Safe, deploy the timelock, hand the registry over.<br>Community voting arrives after mainnet, not before.</p>
+    </div>
+  </section>
+
+  <!-- ================= 10 · DEVELOPERS ================= -->
+  <section class="pad" id="developers">
+    <div class="wrap">
+      <div class="shead" data-rv="up">
+        <div><span class="kick">Developers · integration</span><h2 class="h2">The compliance check happens before the mempool.</h2></div>
+        <p class="lede">The SDK queries the registry before it simulates anything, so a non-compliant asset throws in your own process rather than reverting on chain and costing gas. Built on viem with runtime validation through zod, and no loose types in the core.</p>
+      </div>
+      <div class="int-grid">
+        <div class="glass code" data-rv="left"><span class="sheen"></span>
+          <div class="code-bar"><u></u><u></u><u></u><span style="margin-inline-start:8px">quick start</span></div>
+<pre><code><span class="c">// npm install @gravitas/sdk viem zod</span>
+<span class="k">import</span> { GravitasClient } <span class="k">from</span> <span class="s">'@gravitas/sdk'</span>;
+
+<span class="k">const</span> client = <span class="k">new</span> <span class="f">GravitasClient</span>({
+  rpcUrl: <span class="s">'https://sepolia-rollup.arbitrum.io/rpc'</span>,
+  chainId: <span class="s">421614</span>,
+  registryAddress: <span class="s">'0xbcaE...4679'</span>,
+  teleportV3Address: <span class="s">'0x5D42...E993'</span>,
+});
+
+<span class="c">// throws ShariahViolationError before anything is sent</span>
+<span class="k">await</span> client.compliance.<span class="f">validateAsset</span>(tokenAddress);
+
+<span class="k">const</span> migration = client.<span class="f">migration</span>()
+  .<span class="f">tokenId</span>(<span class="s">123n</span>)
+  .<span class="f">newFee</span>(<span class="s">3000</span>)
+  .<span class="f">ticks</span>(<span class="s">-887220</span>, <span class="s">887220</span>)
+  .<span class="f">slippage</span>(minMint0, minMint1, minDec0, minDec1)
+  .<span class="f">deadline</span>(deadline);
+
+<span class="k">const</span> sim = <span class="k">await</span> migration.<span class="f">simulate</span>(wallet);
+console.<span class="f">log</span>(sim.gasEstimate);</code></pre>
+        </div>
+        <div data-rv="right">
+          <h3 class="h3" style="font-weight:800;letter-spacing:-.036em">Every revert has a name.</h3>
+          <div style="margin-top:14px">
+            <div class="err-row"><code>AssetNotCompliant</code><span>The token is not on the Shariah-compliant whitelist.</span></div>
+            <div class="err-row"><code>CooldownNotMet</code><span>The V2 migration cooldown for this path has not elapsed.</span></div>
+            <div class="err-row"><code>InvalidSignature</code><span>The EIP-712 signature is invalid, replayed or expired.</span></div>
+            <div class="err-row"><code>DeadlineExpired</code><span>The deadline in the signed intent has passed.</span></div>
+            <div class="err-row"><code>SlippageExceeded</code><span>The output fell below the minimum the owner signed.</span></div>
+          </div>
+          <div class="int-list">
+            <div class="glass int-item tilt"><span class="sheen"></span>
+              <div><h4 class="h4">Integration kit</h4><p>An OpenAPI description of the compliance API, a mock server, sandbox policies and end-to-end test scenarios, so a bank can run a proof of concept without touching the chain.</p></div>
+              <a class="btn ghost sm" href="https://github.com/AbZe628/gravitas-protocol/tree/main/integration-kit" target="_blank" rel="noopener noreferrer">Open</a>
+            </div>
+            <div class="glass int-item tilt"><span class="sheen"></span>
+              <div><h4 class="h4">SDK reference</h4><p>The fluent migration builder, the compliance client, EIP-712 helpers and the typed error surface.</p></div>
+              <a class="btn ghost sm" href="/app/sdk">Open</a>
+            </div>
+            <div class="glass int-item tilt"><span class="sheen"></span>
+              <div><h4 class="h4">Compliance checker</h4><p>Paste an address and read the registry's answer for it, straight from the chain.</p></div>
+              <a class="btn ghost sm" href="/app/compliance">Open</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 11 · PROOF ================= -->
+  <section class="pad" id="proof">
+    <div class="wrap">
+      <div class="shead" data-rv="up">
+        <div><span class="kick">Proof</span><h2 class="h2">Read it yourself.</h2></div>
+        <p class="lede">Every contract is deployed and verified on Arbiscan. Nothing on this page depends on trusting this page, and the notice below says exactly where the deployed code and the repository disagree.</p>
+      </div>
+
+      <div class="notice" data-rv="up">
+        <h3>The deployed bytecode is older than the source</h3>
+        <p>The contracts below were deployed at version 0.1.0. Two fixes released in 0.1.2 are in the repository and not yet on chain: the migration typehash does not bind every economic parameter, and the pause mechanism compiles but does not gate the verification functions. Reading the verified source on Arbiscan shows the older code. This notice comes down when the redeploy has happened.</p>
+      </div>
+
+      <div class="stag swipe-row" style="margin-top:clamp(22px,3.2vh,36px)">
+        <div class="glass ct tilt"><span class="sheen"></span>
+          <div class="nm"><b>GravitasPolicyRegistry</b><span class="st"><u></u>Verified</span></div>
+          <div><p>On-chain Shariah compliance whitelist. Governs token and router authorisation.</p><span class="ad">0xbcaE3069362B0f0b80f44139052f159456C84679</span></div>
+          <a class="btn ghost sm" href="https://sepolia.arbiscan.io/address/0xbcaE3069362B0f0b80f44139052f159456C84679" target="_blank" rel="noopener noreferrer">Arbiscan</a>
+        </div>
+        <div class="glass ct tilt"><span class="sheen"></span>
+          <div class="nm"><b>TeleportV3</b><span class="st"><u></u>Verified</span></div>
+          <div><p>Atomic V3 NFT position migration with EIP-712 signed intents.</p><span class="ad">0x5D423f8d01539B92D3f3953b91682D9884D1E993</span></div>
+          <a class="btn ghost sm" href="https://sepolia.arbiscan.io/address/0x5D423f8d01539B92D3f3953b91682D9884D1E993" target="_blank" rel="noopener noreferrer">Arbiscan</a>
+        </div>
+        <div class="glass ct tilt"><span class="sheen"></span>
+          <div class="nm"><b>TeleportV2</b><span class="st pend"><u></u>Not yet deployed</span></div>
+          <div><p>Atomic Uniswap V2 LP token migration with a pool stability limit and a cooldown.</p><span class="ad">Testnet pending</span></div>
+          <a class="btn ghost sm" href="https://github.com/AbZe628/gravitas-protocol/blob/main/docs/DEPLOYMENTS.md" target="_blank" rel="noopener noreferrer">Deployment docs</a>
+        </div>
+      </div>
+
+      <p class="swipe-hint"><s></s>Swipe</p>
+      <div class="stats stag">
+        <div class="glass stat"><b data-count="90.2" data-suffix="%">0</b><span>Line coverage across the contracts</span></div>
+        <div class="glass stat"><b data-count="60" data-suffix="">0</b><span>Foundry tests passing</span></div>
+        <div class="glass stat"><b data-count="69" data-suffix="">0</b><span>Majlis tests passing</span></div>
+        <div class="glass stat"><b data-count="0" data-suffix="">0</b><span>Funds ever held by the protocol</span></div>
+      </div>
+
+      <div class="loi" data-rv="up">
+        <div class="glass loi-box"><span class="sheen"></span>
+          <span class="kick">Ahead of mainnet</span>
+          <h3 class="h3" style="margin:16px 0 14px;font-weight:800;font-size:clamp(1.5rem,2.6vw,2.1rem);letter-spacing:-.038em">Four institutions are waiting on the audit.</h3>
+          <p class="body" style="max-width:62ch">Four letters of intent are signed, each one conditional on the independent security audit and on mainnet deployment. Separately, a Shariah scholar has reviewed the mechanism and provided a letter stating that the technology is aligned with Shariah. Formal certification follows mainnet.</p>
+          <p class="loi-note">A letter of intent is not a contract and a scholar's letter is not a certification. Both are named here because they are what exists. Neither is counted as revenue, and neither is presented as compliance.</p>
+        </div>
+        <div class="loi-figs">
+          <div class="glass loi-fig"><span class="sheen"></span><b>4</b><span>Letters of intent, conditional on audit and mainnet</span></div>
+          <div class="glass loi-fig"><span class="sheen"></span><b>1</b><span>Scholar's letter on the mechanism, certification to follow</span></div>
+          <div class="glass loi-fig"><span class="sheen"></span><b>0</b><span>Revenue recognised, and none claimed</span></div>
+        </div>
+      </div>
+
+      <div class="tick" data-rv="up" aria-hidden="true">
+        <div class="tick-track">
+          <span>Chain <em>Arbitrum Sepolia</em></span><span>Chain ID <em>421614</em></span>
+          <span>Registry <em>v1.0</em></span><span>V3 migration gas <em>about 220K</em></span>
+          <span>V2 migration gas <em>about 180K</em></span><span>Compliance check <em>about 8K gas</em></span>
+          <span>Protocol fee <em>5 to 10 bps</em></span><span>Critical issues, all time <em>0</em></span>
+          <span>Chain <em>Arbitrum Sepolia</em></span><span>Chain ID <em>421614</em></span>
+          <span>Registry <em>v1.0</em></span><span>V3 migration gas <em>about 220K</em></span>
+          <span>V2 migration gas <em>about 180K</em></span><span>Compliance check <em>about 8K gas</em></span>
+          <span>Protocol fee <em>5 to 10 bps</em></span><span>Critical issues, all time <em>0</em></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 12 · LIMITS ================= -->
+  <section class="pad" id="stands">
+    <div class="wrap">
+      <div class="shead" data-rv="up">
+        <div><span class="kick">Where it stands</span><h2 class="h2">What is not true yet.</h2></div>
+        <p class="lede">Everything below is a limitation, and we would rather you heard it from us than found it later.</p>
+      </div>
+      <div class="lim" data-rv="up"><b>Testnet only</b><p>Arbitrum Sepolia. No mainnet deployment has happened. Dashboard figures are simulated.</p></div>
+      <div class="lim" data-rv="up"><b>No external audit</b><p>An internal review is in the repository. A third-party audit has not been commissioned, because the round funding it has not closed.</p></div>
+      <div class="lim" data-rv="up"><b>No Shariah certification</b><p>A scholar has reviewed the mechanism and given a letter stating the technology is aligned. That letter is not a certification. Formal certification is in progress through AmanX Advisory, follows mainnet, and no date is claimed.</p></div>
+      <div class="lim" data-rv="up"><b>No signed contracts</b><p>Four letters of intent exist and every one is conditional on the audit and on mainnet. None is a commitment to buy, none has produced revenue, and none should be read as one.</p></div>
+      <div class="lim" data-rv="up"><b>One admin key</b><p>The registry owner controls the whitelist today. GravitasTimelock and the two-step ownership handover are written and tested, but no timelock is deployed, so the single key still holds.</p></div>
+      <div class="lim" data-rv="up"><b>Majlis reads the chain best-effort</b><p>The registry interface Majlis uses has not been checked against the deployed contract. A failed read is reported as a failure rather than disguised, and no unverified read is presented as confirmed.</p></div>
+      <div class="lim" data-rv="up"><b>The Arabic and Urdu need a native reviewer</b><p>Terminology in Islamic finance is precise, and a plausible translation is not a correct one.</p></div>
+      <div class="lim" data-rv="up"><b>Coverage is not proof</b><p>Line coverage is 90.2 percent with invariant and fuzz tests passing. Undiscovered bugs remain possible.</p></div>
+      <p class="mono" data-rv="up" style="margin-top:clamp(26px,3.6vh,42px);font-size:11.5px;letter-spacing:.1em;color:var(--text-3)">Nothing on this page is financial, legal or religious advice.</p>
+    </div>
+  </section>
+
+  <!-- ================= 13 · QUESTIONS ================= -->
+  <section class="pad">
+    <div class="wrap">
+      <div class="shead" data-rv="up">
+        <div><span class="kick">Questions</span><h2 class="h2">The ones institutions actually ask.</h2></div>
+        <p class="lede">Answered the way we would answer them in a room, without the parts that sound better than they are.</p>
+      </div>
+      <div id="qaList">
+        <div class="q"><button type="button"><span>You have no certification. Why would a board look at this?</span><span class="sg" aria-hidden="true">+</span></button><div class="qa-p"><p>Because the board is the one who certifies. Gravitas is the machinery that enforces whatever a board decides, and the registry holds their list rather than ours. Certification of the protocol matters for procurement and is in progress. It is not what makes the enforcement work.</p></div></div>
+        <div class="q"><button type="button"><span>How do I check any of this without trusting you?</span><span class="sg" aria-hidden="true">+</span></button><div class="qa-p"><p>Read the contracts on Arbiscan and query the registry directly. Every compliance decision is emitted as an event. The one thing not to do is read the verified source and assume it matches the repository, because right now it does not, and the notice above says which two fixes are missing.</p></div></div>
+        <div class="q"><button type="button"><span>What happens to my position if something fails mid-migration?</span><span class="sg" aria-hidden="true">+</span></button><div class="qa-p"><p>The transaction reverts and you keep what you started with, less the gas. There is no custody step, so there is no state where the protocol holds your position and fails.</p></div></div>
+        <div class="q"><button type="button"><span>Why does Majlis refuse to answer whether something is permissible?</span><span class="sg" aria-hidden="true">+</span></button><div class="qa-p"><p>Because an assistant that rules would be doing the board's work with none of the board's authority, and a wrong explanation there does not fail loudly. It produces a confident scholar ruling correctly on a mechanism that does not exist. The assistant sets out the mechanism the ruling attaches to, and the ruling stays with the people who are answerable for it.</p></div></div>
+        <div class="q"><button type="button"><span>Why build liquidity migration first?</span><span class="sg" aria-hidden="true">+</span></button><div class="qa-p"><p>Because it is the smallest complete case. One transaction carries a compliance decision, a custody risk and an execution guarantee, so it proves the model without asking anyone to move real money first.</p></div></div>
+        <div class="q"><button type="button"><span>Is the fee riba?</span><span class="sg" aria-hidden="true">+</span></button><div class="qa-p"><p>No. It is charged once on a completed service, at five to ten basis points, and it does not accrue with time. Time is what makes a return riba.</p></div></div>
+        <div class="q"><button type="button"><span>What would change your mind about the design?</span><span class="sg" aria-hidden="true">+</span></button><div class="qa-p"><p>A board telling us the registry cannot express a rule they need. That is the failure mode we watch for, and it is why Majlis shows the consequence of a rule before the board votes on it.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 14 · CONTACT ================= -->
+  <section class="pad" id="contact">
+    <div class="zaha" data-zaha="2" aria-hidden="true"></div>
+    <div class="wrap">
+      <div class="ctc">
+        <div data-rv="left">
+          <span class="kick">Contact</span>
+          <h2 class="h2" style="margin-top:18px;max-width:11ch">Speak with the team.</h2>
+          <p class="lede" style="margin-top:18px">Institutions, Shariah boards and auditors. Tell us what you need to see and we will send it.</p>
+          <div class="cta" style="justify-content:flex-start;margin-top:24px">
+            <a class="btn ghost" href="https://github.com/AbZe628/gravitas-protocol" target="_blank" rel="noopener noreferrer">
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5A11.5 11.5 0 0 0 .5 12a11.5 11.5 0 0 0 7.86 10.92c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.53-1.34-1.29-1.7-1.29-1.7-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.2 1.77 1.2 1.03 1.77 2.7 1.26 3.36.97.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.7 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.12 3.05.74.81 1.18 1.84 1.18 3.1 0 4.43-2.69 5.4-5.25 5.69.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 23.5 12 11.5 11.5 0 0 0 12 .5Z"/></svg>
+              Browse the repository
+            </a>
+          </div>
+        </div>
+        <form class="glass frm" id="cform" novalidate data-rv="right"><span class="sheen"></span>
+          <div class="fr"><label for="f-name">Name</label><input id="f-name" name="name" type="text" autocomplete="name" required></div>
+          <div class="fr"><label for="f-org">Organisation</label><input id="f-org" name="org" type="text" autocomplete="organization"></div>
+          <div class="fr"><label for="f-email">Email</label><input id="f-email" name="email" type="email" autocomplete="email" required></div>
+          <div class="fr"><label for="f-msg">What do you need to see?</label><textarea id="f-msg" name="msg" placeholder="An audit scope, the registry state, access to Majlis, a walkthrough of the contracts"></textarea></div>
+          <button class="btn" type="submit" id="fbtn"><span id="fbtnLabel">Send</span></button>
+          <p class="fnote" id="fnote">We answer within two working days.</p>
+          <p class="fstate" id="fstate" role="status" aria-live="polite"></p>
+          <div class="fsend" id="fsend" hidden>
+            <p class="fsend-t">Sending did not go through. Here is the message, ready to send yourself.</p>
+            <div class="fsend-row">
+              <a class="btn sm" id="sendGmail" href="#" target="_blank" rel="noopener noreferrer">Gmail</a>
+              <a class="btn ghost sm" id="sendOutlook" href="#" target="_blank" rel="noopener noreferrer">Outlook</a>
+              <a class="btn ghost sm" id="sendMail" href="#">Mail app</a>
+              <button class="btn ghost sm" type="button" id="sendCopy">Copy it</button>
+            </div>
+            <p class="fsend-n" id="fsendNote"></p>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="ftop">
+      <div class="fbr">
+        <a class="brand" href="#top">
+          <span class="mark"><img src="assets/mark.png" alt="" width="132" height="90" decoding="async"></span>
+          <b>Gravitas</b>
+        </a>
+        <p>Institutional Shariah-compliant liquidity infrastructure. Testnet v1.0 on Arbitrum Sepolia. Licensed BUSL-1.1.</p>
+        <a class="btn sm" href="#contact" style="margin-top:20px">Contact us</a>
+      </div>
+      <div class="fcol">
+        <h4>Application</h4>
+        <a href="/app/dashboard">Launch app</a><a href="/app/compliance">Compliance checker</a>
+        <a href="/app/docs">Documentation</a><a href="/app/sdk">SDK reference</a>
+      </div>
+      <div class="fcol">
+        <h4>Protocol</h4>
+        <a href="#how">How it works</a><a href="#protocol">Architecture</a>
+        <a href="#shariah">Shariah</a><a href="#governance">Governance</a><a href="#stands">Limitations</a>
+      </div>
+      <div class="fcol">
+        <h4>Majlis</h4>
+        <a href="#majlis">What it is</a>
+        <a href="https://majlis.gravitasprotocol.xyz" target="_blank" rel="noopener noreferrer">Open Majlis</a>
+        <a href="https://github.com/AbZe628/gravitas-protocol/tree/main/apps/majlis" target="_blank" rel="noopener noreferrer">Source</a>
+        <a href="https://github.com/AbZe628/gravitas-protocol/blob/main/apps/majlis/docs/ASSISTANT-RULES.md" target="_blank" rel="noopener noreferrer">Assistant constraints</a>
+        <a href="https://github.com/AbZe628/gravitas-protocol/blob/main/apps/majlis/docs/ROADMAP.md" target="_blank" rel="noopener noreferrer">Roadmap</a>
+      </div>
+      <div class="fcol">
+        <h4>Developers</h4>
+        <a href="https://github.com/AbZe628/gravitas-protocol" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="https://github.com/AbZe628/gravitas-protocol/tree/main/gravitas-sdk" target="_blank" rel="noopener noreferrer">SDK source</a>
+        <a href="https://github.com/AbZe628/gravitas-protocol/tree/main/integration-kit" target="_blank" rel="noopener noreferrer">Integration kit</a>
+        <a href="https://github.com/AbZe628/gravitas-protocol/blob/main/docs/whitepaper.md" target="_blank" rel="noopener noreferrer">Whitepaper</a>
+      </div>
+    </div>
+    <p class="fleg">© 2026 Gravitas Protocol. Testnet only. Nothing on this page is financial, legal or religious advice.</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+"use strict";
+var clamp=function(v,lo,hi){return Math.min(hi,Math.max(lo,v));};
+var smooth=function(p,a,b){var t=clamp((p-a)/(b-a),0,1);return t*t*(3-2*t);};
+function rng(s){var x=s>>>0;return function(){x=(x*1664525+1013904223)>>>0;return x/4294967296;};}
+var reduceQ=matchMedia('(prefers-reduced-motion: reduce)');
+var $=function(s,r){return (r||document).querySelector(s);};
+var $$=function(s,r){return [].slice.call((r||document).querySelectorAll(s));};
+
+/* ============================================================
+   AURORA · a tiny canvas the compositor stretches for free
+   ============================================================ */
+var AU_W=200;
+var au=$('#aurora'),actx=null,aRaf=null,aLast=0,aScroll=0,auH=112;
+var BLOBS=[
+  {c:[247,204,116], r:.58, x:.22, y:.18, sx:.00013, sy:.00009, ph:0,   a:.5},
+  {c:[232,150,74],  r:.48, x:.78, y:.34, sx:.00017, sy:.00011, ph:1.7, a:.44},
+  {c:[138,123,255], r:.66, x:.62, y:.74, sx:.00011, sy:.00014, ph:3.1, a:.54},
+  {c:[180,162,255], r:.4,  x:.12, y:.82, sx:.00019, sy:.00008, ph:4.6, a:.38},
+  {c:[247,204,116], r:.36, x:.5,  y:.5,  sx:.00009, sy:.00016, ph:2.3, a:.32}
+];
+function auSize(){
+  if(!au) return;
+  auH=Math.max(80,Math.round(AU_W*innerHeight/Math.max(1,innerWidth)));
+  au.width=AU_W;au.height=auH;
+  actx=actx||au.getContext('2d');
+}
+/* The hero stage is opaque, so while it covers the screen both background layers are
+   drawing something nobody can see, right where the video needs the main thread. */
+var heroHides=false;
+function heroCovers(){
+  if(!hero) return false;
+  var r=hero.getBoundingClientRect();
+  return r.top<=0 && r.bottom>innerHeight*0.55;
+}
+function auDraw(now){
+  aRaf=requestAnimationFrame(auDraw);
+  if(now-aLast<40) return;
+  if(heroHides) return;
+  aLast=now;
+  var w=AU_W,h=auH,i;
+  actx.globalCompositeOperation='source-over';
+  actx.fillStyle='#0E1017';actx.fillRect(0,0,w,h);
+  actx.globalCompositeOperation='lighter';
+  for(i=0;i<BLOBS.length;i++){
+    var b=BLOBS[i];
+    var x=(b.x+Math.sin(now*b.sx+b.ph)*.18)*w;
+    var y=(b.y+Math.cos(now*b.sy+b.ph)*.16 - aScroll*(0.5+i*0.22))*h;
+    y=((y%(h*2.4))+h*2.4)%(h*2.4)-h*.7;
+    var rad=b.r*w;
+    var g=actx.createRadialGradient(x,y,0,x,y,rad);
+    g.addColorStop(0,'rgba('+b.c[0]+','+b.c[1]+','+b.c[2]+','+b.a+')');
+    g.addColorStop(1,'rgba('+b.c[0]+','+b.c[1]+','+b.c[2]+',0)');
+    actx.fillStyle=g;actx.beginPath();actx.arc(x,y,rad,0,6.2832);actx.fill();
+  }
+  actx.globalCompositeOperation='source-over';
+}
+function auStart(){if(!au||aRaf!==null||reduceQ.matches)return;auSize();aRaf=requestAnimationFrame(auDraw);}
+function auStop(){if(aRaf!==null){cancelAnimationFrame(aRaf);aRaf=null;}}
+
+/* ============================================================
+   THE DEPTH FIELD · the hero's descent, carried through the page
+   Real perspective: points at a z distance, projected, rushing
+   toward the viewer. Scrolling pushes them faster.
+   ============================================================ */
+var dp=$('#depth'),dctx=null,dRaf=null,dLast=0,dW=0,dH=0,dPts=[],dScale=1,dT=0,dSprites=null;
+function dpSize(){
+  if(!dp) return;
+  dScale=1;                       /* bokeh is soft by definition, so no retina backing store */
+  dW=innerWidth;dH=innerHeight;
+  dp.width=Math.round(dW*dScale);dp.height=Math.round(dH*dScale);
+  dctx=dctx||dp.getContext('2d');
+  dctx.setTransform(dScale,0,0,dScale,0,0);
+}
+function makeSprite(r,g,b){
+  var c=document.createElement('canvas');c.width=c.height=64;
+  var x=c.getContext('2d');
+  var rad=x.createRadialGradient(32,32,0,32,32,32);
+  rad.addColorStop(0,'rgba('+r+','+g+','+b+',.92)');
+  rad.addColorStop(.28,'rgba('+r+','+g+','+b+',.34)');
+  rad.addColorStop(1,'rgba('+r+','+g+','+b+',0)');
+  x.fillStyle=rad;x.beginPath();x.arc(32,32,32,0,6.2832);x.fill();
+  return c;
+}
+function dpSeed(){
+  var r=rng(5501),i,n=(innerWidth<760)?64:104;
+  dPts=[];
+  for(i=0;i<n;i++){
+    /* d is depth: 0 is far and small, 1 is near, large and soft.
+       It creeps toward 1 over about eighty seconds, so points approach without ever rushing. */
+    dPts.push({x:r(),y:r()*1.4,d:r(),g:r()<0.36,ph:r()*6.2832,sp:0.55+r()*0.9});
+  }
+  if(!dSprites) dSprites=[makeSprite(247,204,116),makeSprite(180,162,255)];
+}
+function dpStart(){
+  if(!dp||dRaf!==null||reduceQ.matches) return;
+  dpSize();if(!dPts.length) dpSeed();
+  dLast=0;dRaf=requestAnimationFrame(dpDraw);
+}
+function dpStop(){if(dRaf!==null){cancelAnimationFrame(dRaf);dRaf=null;}}
+/* Depth by parallax and focus, not by speed. Nothing rushes the eye:
+   layers drift slowly and scroll moves the near ones further than the far ones. */
+function dpDraw(now){
+  dRaf=requestAnimationFrame(dpDraw);
+  var dt=Math.min(48,now-(dLast||now));dLast=now;
+  if(dt<33) return;                 /* thirty draws a second is plenty for dust */
+  if(heroHides){ if(!dp._blank){dctx.clearRect(0,0,dW,dH);dp._blank=true;} return; }
+  dp._blank=false;
+  dT+=dt;
+  dctx.clearRect(0,0,dW,dH);
+  dctx.globalCompositeOperation='lighter';
+  var scr=dPageY/Math.max(1,dH);
+  var breathe=1+Math.sin(dT*0.00013)*0.06;
+  for(var i=0;i<dPts.length;i++){
+    var p=dPts[i];
+    /* the slow approach: eighty seconds from the back of the field to the front */
+    p.d+=dt*0.0000125*p.sp;
+    if(p.d>1){p.d-=1;p.x=Math.random();p.y=Math.random()*1.4;}
+    var yy=p.y + dT*0.0000105*(0.4+p.d) - scr*(0.07+p.d*0.42);
+    yy=((yy%1.4)+1.4)%1.4;
+    var sy=(yy-0.2)*dH;
+    if(sy<-90||sy>dH+90) continue;
+    var sx=(p.x+Math.sin(dT*0.00007+p.ph)*0.018)*dW;
+    var size=(3.2+p.d*p.d*28)*breathe;
+    /* fade in from the back and out at the very front so nothing ever pops */
+    var edge=Math.min(1,p.d*7)*Math.min(1,(1-p.d)*5);
+    var a=(0.74-p.d*0.34)*edge*(0.74+0.26*Math.sin(dT*0.00042+p.ph));
+    if(a<=0.004) continue;
+    dctx.globalAlpha=a;
+    dctx.drawImage(dSprites[p.g?0:1],sx-size/2,sy-size/2,size,size);
+  }
+  dctx.globalAlpha=1;
+  dctx.globalCompositeOperation='source-over';
+}
+
+/* ============================================================
+   ZAHA · flowing fields that morph as the page moves
+   ============================================================ */
+function organic(seed,n,base){
+  var r=rng(seed),h=[];
+  for(var k=0;k<4;k++) h.push({a:(0.06+r()*0.13)*base,f:2+Math.floor(r()*5),p:r()*6.2832});
+  return function(th){
+    var v=base;
+    for(var k=0;k<h.length;k++) v+=h[k].a*Math.sin(h[k].f*th+h[k].p);
+    return v;
+  };
+}
+function ZahaField(host,seed,rings){
+  var ns='http://www.w3.org/2000/svg';
+  var svg=document.createElementNS(ns,'svg');
+  svg.setAttribute('viewBox','0 0 200 200');
+  svg.setAttribute('preserveAspectRatio','xMidYMid slice');
+  var paths=[],A=[],B=[],i,PTS=110;
+  for(i=0;i<rings;i++){
+    var base=34+i*20;
+    A.push(organic(seed+i*77,PTS,base));
+    B.push(organic(seed+i*77+9001,PTS,base));
+    var p=document.createElementNS(ns,'path');
+    p.setAttribute('stroke', i%2 ? 'url(#zg)' : 'rgba(255,255,255,.13)');
+    p.setAttribute('stroke-width','1');
+    svg.appendChild(p);paths.push(p);
+  }
+  host.appendChild(svg);
+  var lastT=-1;
+  return function(t){
+    if(Math.abs(t-lastT)<0.004) return;
+    lastT=t;
+    var e=t*t*(3-2*t);
+    for(var i=0;i<paths.length;i++){
+      var d='',th,rr;
+      for(var j=0;j<=PTS;j++){
+        th=j/PTS*6.2832;
+        rr=A[i](th)*(1-e)+B[i](th)*e;
+        d+=(j?'L':'M')+(100+rr*Math.cos(th)).toFixed(2)+' '+(100+rr*Math.sin(th)).toFixed(2);
+      }
+      paths[i].setAttribute('d',d+'Z');
+    }
+  };
+}
+var zahas=[];
+$$('[data-zaha]').forEach(function(h){
+  var n=parseInt(h.getAttribute('data-zaha'),10)||1;
+  zahas.push({el:h,draw:ZahaField(h,3300+n*613,n===3?4:3)});
+});
+function zahaUpdate(){
+  for(var i=0;i<zahas.length;i++){
+    var z=zahas[i],r=z.el.getBoundingClientRect();
+    if(r.bottom<-200||r.top>innerHeight+200) continue;
+    var t=clamp((innerHeight-r.top)/(innerHeight+r.height),0,1);
+    z.draw(t);
+  }
+}
+
+/* ============================================================
+   THE APERTURE
+   ============================================================ */
+function apPath(R,lobes,amp,phase,pts){
+  var d='',i,th,r;
+  for(i=0;i<=pts;i++){
+    th=i/pts*Math.PI*2;r=R*(1+amp*Math.cos(lobes*th+phase));
+    d+=(i===0?'M':'L')+(50+r*Math.cos(th)).toFixed(3)+' '+(50+r*Math.sin(th)).toFixed(3);
+  }
+  return d+'Z';
+}
+function buildAperture(host,count){
+  var svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.setAttribute('viewBox','0 0 100 100');
+  svg.style.width='100%';svg.style.height='100%';svg.style.overflow='visible';
+  for(var i=0;i<count;i++){
+    var t=i/(count-1||1);
+    var g=document.createElementNS('http://www.w3.org/2000/svg','g');
+    g.setAttribute('class','ring-g');
+    var p=document.createElementNS('http://www.w3.org/2000/svg','path');
+    p.setAttribute('d',apPath(7+t*40,8,0.05+(1-t)*0.105,-Math.PI/2,320));
+    p.setAttribute('fill','none');p.setAttribute('stroke','currentColor');
+    p.setAttribute('stroke-width','1');p.setAttribute('vector-effect','non-scaling-stroke');
+    p.style.setProperty('--r',((i%2?1:-1)*(5+i*2.4)).toFixed(1)+'deg');
+    g.appendChild(p);svg.appendChild(g);
+  }
+  host.appendChild(svg);return svg;
+}
+$$('[data-aperture]').forEach(function(h){buildAperture(h,parseInt(h.getAttribute('data-aperture'),10)||7);});
+
+/* ============================================================
+   TEXT SPLITTING
+   ============================================================ */
+function splitInto(el){
+  var raw=el.getAttribute('data-text')||'',plain=raw.replace(/\*/g,'');
+  el.textContent='';
+  var sr=document.createElement('span');sr.className='sr-only';sr.textContent=plain;el.appendChild(sr);
+  var vis=document.createElement('span');vis.setAttribute('aria-hidden','true');
+  var rand=rng(9137),words=raw.split(' '),total=0,seen=0;
+  words.forEach(function(w){total+=w.replace(/\*/g,'').length;});
+  words.forEach(function(word,wi){
+    var em=word.indexOf('*')>-1,w=word.replace(/\*/g,'');
+    var ws=document.createElement('span');ws.className='w'+(em?' em':'');
+    ws.style.setProperty('--th',(wi/Math.max(1,words.length)*0.42+rand()*0.05).toFixed(3));
+    for(var ci=0;ci<w.length;ci++){
+      var cs=document.createElement('span');cs.className='c';cs.textContent=w[ci];
+      cs.style.setProperty('--th',(seen/Math.max(1,total)*0.4+rand()*0.06).toFixed(3));
+      ws.appendChild(cs);seen++;
+    }
+    vis.appendChild(ws);
+    if(wi<words.length-1) vis.appendChild(document.createTextNode(' '));
+  });
+  el.appendChild(vis);
+}
+$$('.split').forEach(splitInto);
+
+/* ============================================================
+   HERO SCRUB
+   ============================================================ */
+var VIDEO_URL='assets/hero-scrub.mp4',VIDEO_BYTES=8181568,POSTER='assets/hero-poster.jpg';
+var hero=$('#hero'),stage=$('#stage'),video=$('#hv'),poster=$('#poster'),ldring=$('#ldring'),cue=$('#cue'),gather=$('#gather');
+document.documentElement.style.setProperty('--static-img',"url('assets/hero-ending.jpg')");
+var bands=$$('#bands .band').map(function(el){
+  return {el:el,a:parseFloat(el.dataset.a),b:parseFloat(el.dataset.b),
+          ramp:parseFloat(el.dataset.ramp)||0,settle:el.dataset.settle==='1',op:-1,k:-1,pe:''};
+});
+function heroP(){var r=hero.offsetHeight-innerHeight;if(r<=0)return 0;return clamp(-hero.getBoundingClientRect().top/r,0,1);}
+
+var seekBusy=false,pendT=null;
+function requestSeek(t){
+  if(!video.duration) return;
+  if(seekBusy){pendT=t;return;}
+  seekBusy=true;try{video.currentTime=t;}catch(e){seekBusy=false;}
+}
+video.addEventListener('seeked',function(){seekBusy=false;if(pendT!==null){var t=pendT;pendT=null;requestSeek(t);}});
+video.addEventListener('error',function(){seekBusy=false;pendT=null;failVideo();});
+
+var loadK=0,loadStart=0,cueArmed=false;
+function updateCaptions(p){
+  for(var i=0;i<bands.length;i++){
+    var b=bands[i],f=Math.min(0.02,(b.b-b.a)/3),op;
+    if(i===0) op=1-smooth(p,b.b-f,b.b);
+    else if(i===bands.length-1) op=smooth(p,b.a,b.a+f);
+    else op=smooth(p,b.a,b.a+f)*(1-smooth(p,b.b-f,b.b));
+    if(Math.abs(op-b.op)>0.004){b.op=op;b.el.style.opacity=op;}
+    var k=clamp((p-b.a)/(b.ramp||Math.min(0.025,(b.b-b.a)*0.35)),0,1);
+    if(i===0) k=Math.max(k,loadK);
+    if(Math.abs(k-b.k)>0.008){b.k=k;b.el.style.setProperty('--k',k.toFixed(3));}
+    if(b.settle){var pe=op>0.6?'auto':'none';if(pe!==b.pe){b.pe=pe;b.el.style.pointerEvents=pe;}}
+  }
+  var g=smooth(p,0.55,0.98);
+  if(Math.abs(g-(gather._v||0))>0.006){gather._v=g;gather.style.opacity=g.toFixed(3);}
+  if(cue){var cv=(cueArmed&&p<=0.02)?1:0;if(cv!==cue._v){cue._v=cv;cue.classList.toggle('on',cv===1);}}
+}
+var target=0,shown=0,hRaf=null,hLast=0,heroOn=true;
+function hTick(now){
+  var dt=Math.min(100,now-(hLast||now));hLast=now;
+  shown+=(target-shown)*(1-Math.pow(1-0.2,dt/16.667));
+  if(loadStart&&loadK<1){var t=clamp((now-loadStart)/900,0,1);loadK=t*t*(3-2*t);bands[0].k=-1;}
+  var done=Math.abs(target-shown)<0.0004&&loadK>=1;
+  if(done){shown=target;hRaf=null;hLast=0;} else hRaf=requestAnimationFrame(hTick);
+  if(video.duration) requestSeek(shown*video.duration);
+  updateCaptions(shown);
+}
+function hKick(){if(hRaf===null&&heroOn&&scrubOn)hRaf=requestAnimationFrame(hTick);}
+if('IntersectionObserver' in window){
+  new IntersectionObserver(function(e){heroOn=e[0].isIntersecting;if(heroOn)hKick();},{rootMargin:'140px'}).observe(hero);
+}
+var heroInit=false;
+function initHeroOnce(){
+  if(heroInit)return;heroInit=true;
+  poster.style.backgroundImage="url('"+POSTER+"')";
+  loadStart=performance.now();
+  loadBlob().catch(failVideo);
+  setTimeout(function(){cueArmed=true;if(scrubOn)updateCaptions(shown);},1200);
+}
+function loadBlob(){
+  if(!('fetch' in window)||!window.ReadableStream) return Promise.reject(new Error('no stream'));
+  ldring.classList.add('on');
+  var ctrl=new AbortController(),wd=setTimeout(function(){ctrl.abort();},20000);
+  return fetch(VIDEO_URL,{signal:ctrl.signal}).then(function(res){
+    if(!res.ok||!res.body) throw new Error('bad response');
+    var total=Number(res.headers.get('Content-Length'))||VIDEO_BYTES;
+    var rd=res.body.getReader(),chunks=[],got=0,lr=0;
+    function pump(){
+      return rd.read().then(function(r){
+        if(r.done) return;
+        clearTimeout(wd);wd=setTimeout(function(){ctrl.abort();},20000);
+        chunks.push(r.value);got+=r.value.length;
+        var frac=Math.min(1,got/total),now=performance.now();
+        if(now-lr>100||frac===1){lr=now;ldring.style.setProperty('--ld',Math.round(126*(1-frac)));}
+        return pump();
+      });
+    }
+    return pump().then(function(){
+      clearTimeout(wd);ldring.style.setProperty('--ld',0);
+      video.src=URL.createObjectURL(new Blob(chunks,{type:'video/mp4'}));
+      video.load();
+      video.addEventListener('canplay',function(){
+        ldring.classList.remove('on');
+        requestSeek(heroP()*video.duration);
+        stage.classList.add('ready');hKick();
+      },{once:true});
+    });
+  });
+}
+var failed=false;
+function failVideo(){if(failed)return;failed=true;ldring.classList.remove('on');stage.classList.add('dead');}
+
+var GATES=[
+  '(max-width: 720px)',
+  '(orientation: portrait) and (max-width: 1024px)',
+  '(orientation: portrait) and (pointer: coarse)',
+  '(orientation: landscape) and (pointer: coarse) and (max-height: 560px)',
+  '(prefers-reduced-motion: reduce)'
+];
+var scrubOn=false;
+function enableScrub(){
+  if(scrubOn)return;scrubOn=true;
+  initHeroOnce();
+  bands.forEach(function(b){b.op=-1;b.k=-1;b.pe='';});
+  unpin();
+  target=heroP();updateCaptions(target);hKick();
+  startMotes();
+}
+function disableScrub(){
+  if(!scrubOn)return;scrubOn=false;
+  if(hRaf!==null){cancelAnimationFrame(hRaf);hRaf=null;}
+  stopMotes();
+}
+function applyHeroMode(){
+  var hit=false;
+  for(var i=0;i<GATES.length;i++){if(matchMedia(GATES[i]).matches){hit=true;break;}}
+  if(hit) disableScrub(); else enableScrub();
+}
+var MQLS=GATES.map(function(q){return matchMedia(q);});
+MQLS.forEach(function(m){m.addEventListener?m.addEventListener('change',applyHeroMode):m.addListener(applyHeroMode);});
+
+var motes=$('#motes'),mctx=null,mRaf=null,mP=[],mW=0,mH=0,mL=0;
+function mSize(){if(!motes)return;var d=Math.min(2,devicePixelRatio||1);mW=motes.clientWidth;mH=motes.clientHeight;
+  motes.width=Math.round(mW*d);motes.height=Math.round(mH*d);if(mctx)mctx.setTransform(d,0,0,d,0,0);}
+function startMotes(){
+  if(!motes||mRaf!==null||reduceQ.matches)return;
+  mctx=mctx||motes.getContext('2d');mSize();
+  if(!mP.length){var r=rng(2027);for(var i=0;i<40;i++)mP.push({x:r(),y:r(),s:.5+r()*1.5,v:.006+r()*.02,o:.12+r()*.4,ph:r()*6.28});}
+  mL=0;mRaf=requestAnimationFrame(mDraw);
+}
+function stopMotes(){if(mRaf!==null){cancelAnimationFrame(mRaf);mRaf=null;}}
+function mDraw(now){
+  var dt=Math.min(64,now-(mL||now));mL=now;
+  mctx.clearRect(0,0,mW,mH);
+  for(var i=0;i<mP.length;i++){
+    var p=mP[i];p.y+=p.v*dt/1000;if(p.y>1.04)p.y=-.04;
+    mctx.globalAlpha=p.o*(.55+.45*Math.sin(now/3600+p.ph));
+    mctx.fillStyle= i%3===0 ? '#F7CC74' : '#B4A2FF';
+    mctx.beginPath();mctx.arc((p.x+Math.sin(now/9000+p.ph)*.012)*mW,p.y*mH,p.s,0,6.2832);mctx.fill();
+  }
+  mctx.globalAlpha=1;mRaf=requestAnimationFrame(mDraw);
+}
+
+/* ============================================================
+   PINNED SEQUENCES
+   ============================================================ */
+function pinProgress(sec){
+  var range=sec.offsetHeight-innerHeight;
+  if(range<=0) return 0;
+  return clamp(-sec.getBoundingClientRect().top/range,0,1);
+}
+var how=$('#how'),howSteps=$$('.how-step'),howBars=$$('.how-bars i'),howSvg=$('#howSvg'),howCur=-1;
+function buildHowSvg(){
+  if(!howSvg) return;
+  var ns='http://www.w3.org/2000/svg',i;
+  howSvg.innerHTML='';
+  var g1=document.createElementNS(ns,'g');g1.setAttribute('id','hv1');
+  for(i=0;i<5;i++){
+    var c=document.createElementNS(ns,'circle');
+    c.setAttribute('cx',100);c.setAttribute('cy',100);c.setAttribute('r',18+i*13);
+    c.setAttribute('fill','none');c.setAttribute('stroke','#8A7BFF');
+    c.setAttribute('stroke-width','.9');c.setAttribute('opacity',(0.62-i*0.08).toFixed(2));
+    c.setAttribute('stroke-dasharray',(6+i*3)+' '+(4+i*2));
+    g1.appendChild(c);
+  }
+  howSvg.appendChild(g1);
+  var g2=document.createElementNS(ns,'g');g2.setAttribute('id','hv2');
+  for(i=0;i<7;i++){
+    var rct=document.createElementNS(ns,'rect');
+    rct.setAttribute('x',44);rct.setAttribute('y',40+i*18);rct.setAttribute('width',112);rct.setAttribute('height',11);
+    rct.setAttribute('rx',5.5);rct.setAttribute('fill','none');
+    rct.setAttribute('stroke',i===2||i===5?'#F7CC74':'rgba(255,255,255,.2)');
+    rct.setAttribute('stroke-width','.9');
+    g2.appendChild(rct);
+  }
+  howSvg.appendChild(g2);
+  var g3=document.createElementNS(ns,'g');g3.setAttribute('id','hv3');
+  var pth=document.createElementNS(ns,'path');
+  pth.setAttribute('d','M22 100 C 60 40, 140 160, 178 100');
+  pth.setAttribute('fill','none');pth.setAttribute('stroke','url(#gg)');pth.setAttribute('stroke-width','2');
+  pth.setAttribute('stroke-linecap','round');
+  g3.appendChild(pth);
+  for(i=0;i<7;i++){
+    var d=document.createElementNS(ns,'circle');
+    d.setAttribute('r',3.4);d.setAttribute('fill','#141722');d.setAttribute('stroke','#F7CC74');d.setAttribute('stroke-width','1.2');
+    d.setAttribute('cx',22+i*26);d.setAttribute('cy',100+(i%2?-1:1)*(18-Math.abs(i-3)*4));
+    g3.appendChild(d);
+  }
+  howSvg.appendChild(g3);
+}
+function howUpdate(){
+  if(!how||!howSteps.length) return;
+  var p=pinProgress(how),n=howSteps.length,i;
+  var idx=clamp(Math.floor(p*n*0.999),0,n-1);
+  for(i=0;i<n;i++){
+    var f=clamp(p*n-i,0,1);
+    if(howBars[i]&&Math.abs(f-(howBars[i]._f||0))>0.008){howBars[i]._f=f;howBars[i].style.setProperty('--f',f.toFixed(3));}
+  }
+  if(idx!==howCur){
+    howCur=idx;
+    howSteps.forEach(function(s,i){s.classList.toggle('on',i===idx);});
+    ['hv1','hv2','hv3'].forEach(function(id,i){
+      var g=document.getElementById(id);
+      if(!g) return;
+      g.style.transition='opacity .6s var(--ease),transform .8s var(--ease-out)';
+      g.style.transformOrigin='100px 100px';
+      g.style.opacity=i===idx?'1':'0';
+      g.style.transform=i===idx?'none':'scale(.84)';
+    });
+  }
+}
+var svSteps=$$('.sv-step'),svArc=$('#svArc'),svDots=$$('.sv-dot'),svHold=$('#svHold'),
+    svHoldLabel=$('#svHoldLabel'),svState=$('#svState');
+var svNodes=[],svPrg=null,svLen=0,svP=0,svIdx=-1,svRaf=null,svLast=0,svHolding=false;
+var SVSTATE=['Verifying ownership, compliance and deadline','Withdrawing liquidity from the position',
+  'Collecting tokens and accrued fees','Burning the old position NFT','Rebalancing through an authorised router',
+  'Minting the new position to the owner','Returning the remaining dust'];
+function buildArc(){
+  if(!svArc) return;
+  var ns='http://www.w3.org/2000/svg';
+  svArc.innerHTML='';
+  var d='M100 14 A 86 86 0 1 1 99.9 14';
+  var trk=document.createElementNS(ns,'path');
+  trk.setAttribute('class','trk');trk.setAttribute('d',d);svArc.appendChild(trk);
+  svPrg=document.createElementNS(ns,'path');
+  svPrg.setAttribute('class','prg');svPrg.setAttribute('d',d);svArc.appendChild(svPrg);
+  try{svLen=svPrg.getTotalLength();}catch(e){svLen=540;}
+  svPrg.style.strokeDasharray=svLen;svPrg.style.strokeDashoffset=svLen;
+  svNodes=[];
+  for(var i=0;i<7;i++){
+    var a=-Math.PI/2+i/7*Math.PI*2;
+    var c=document.createElementNS(ns,'circle');
+    c.setAttribute('class','nd');c.setAttribute('r',5);
+    c.setAttribute('cx',(100+86*Math.cos(a)).toFixed(2));
+    c.setAttribute('cy',(100+86*Math.sin(a)).toFixed(2));
+    svArc.appendChild(c);svNodes.push(c);
+  }
+  var inner=buildAperture(document.createElement('div'),5);
+  var wrap=document.createElementNS(ns,'g');
+  wrap.setAttribute('transform','translate(100 100) scale(1.3) translate(-50 -50)');
+  [].forEach.call(inner.querySelectorAll('path'),function(p){
+    p.setAttribute('stroke','#8A7BFF');p.setAttribute('opacity','.3');wrap.appendChild(p);
+  });
+  svArc.appendChild(wrap);
+  svApply(0,true);
+}
+function svApply(p,force){
+  svP=clamp(p,0,1);
+  if(svPrg) svPrg.style.strokeDashoffset=(svLen*(1-svP)).toFixed(1);
+  var idx=svP>=1?6:clamp(Math.floor(svP*7),0,6);
+  if(idx===svIdx&&!force) return;
+  svIdx=idx;
+  svSteps.forEach(function(s,i){s.classList.toggle('on',i===idx);});
+  svNodes.forEach(function(c,i){c.classList.toggle('lit',i<=idx&&svP>0);});
+  svDots.forEach(function(b,i){b.classList.toggle('on',i===idx&&svP>0);b.classList.toggle('done',i<idx);});
+  if(svState){
+    if(svP<=0){svState.textContent='Waiting. Nothing has been sent.';svState.classList.remove('done');}
+    else if(svP>=1){svState.textContent='Complete. The new position is with its owner.';svState.classList.add('done');}
+    else{svState.textContent=SVSTATE[idx];svState.classList.remove('done');}
+  }
+  if(svHold){
+    svHold.classList.toggle('done',svP>=1);
+    if(svHoldLabel) svHoldLabel.textContent = svP>=1 ? 'Run again' : (svHolding ? 'Running' : (svP>0 ? 'Hold to continue' : 'Hold to run'));
+  }
+}
+function svTick(now){
+  var dt=Math.min(64,now-(svLast||now));svLast=now;
+  if(svHolding&&svP<1){
+    svApply(svP+dt/9000);
+    if(svP<1){svRaf=requestAnimationFrame(svTick);return;}
+  }
+  svRaf=null;svLast=0;
+  if(svHold) svHold.classList.remove('running');
+  svApply(svP,true);
+}
+function svStart(e){
+  if(e&&e.preventDefault) e.preventDefault();
+  if(svP>=1) svApply(0,true);
+  if(reduceQ.matches){svApply(1,true);return;}
+  svHolding=true;
+  if(svHold) svHold.classList.add('running');
+  svApply(svP,true);
+  if(svRaf===null){svLast=0;svRaf=requestAnimationFrame(svTick);}
+}
+function svEnd(){
+  if(!svHolding) return;
+  svHolding=false;
+  if(svHold) svHold.classList.remove('running');
+  svApply(svP,true);
+}
+if(svHold){
+  svHold.addEventListener('pointerdown',svStart);
+  addEventListener('pointerup',svEnd);addEventListener('pointercancel',svEnd);
+  svHold.addEventListener('keydown',function(e){if((e.key===' '||e.key==='Enter')&&!e.repeat){e.preventDefault();svStart();}});
+  svHold.addEventListener('keyup',function(e){if(e.key===' '||e.key==='Enter')svEnd();});
+}
+svDots.forEach(function(b){
+  b.addEventListener('click',function(){
+    var i=parseInt(b.getAttribute('data-i'),10);
+    svHolding=false;
+    if(svRaf!==null){cancelAnimationFrame(svRaf);svRaf=null;}
+    svApply((i+0.999)/7,true);
+  });
+});
+
+/* ============================================================
+   NAV, MENU, SPY
+   ============================================================ */
+var nav=$('#nav'),burger=$('#burger'),navSolid=false;
+burger.addEventListener('click',function(){
+  var open=document.body.classList.toggle('nav-open');
+  burger.setAttribute('aria-expanded',open?'true':'false');
+  burger.setAttribute('aria-label',open?'Close the menu':'Open the menu');
+  document.body.style.overflow=open?'hidden':'';
+  if(open) $$('#menu .m-link').forEach(function(a,i){a.style.transitionDelay=(0.04+i*0.04)+'s';});
+});
+$$('#menu a').forEach(function(a){a.addEventListener('click',function(){
+  document.body.classList.remove('nav-open');document.body.style.overflow='';
+  burger.setAttribute('aria-expanded','false');
+});});
+addEventListener('keydown',function(e){
+  if(e.key==='Escape'&&document.body.classList.contains('nav-open')){
+    document.body.classList.remove('nav-open');document.body.style.overflow='';burger.setAttribute('aria-expanded','false');burger.focus();
+  }
+});
+var spyIds=['how','protocol','shariah','majlis','governance','developers','proof','contact'],spyCur='';
+function spy(){
+  var best='',bestT=-1e9;
+  for(var i=0;i<spyIds.length;i++){
+    var el=document.getElementById(spyIds[i]);if(!el)continue;
+    var t=el.getBoundingClientRect().top-140;
+    if(t<=0&&t>bestT){bestT=t;best=spyIds[i];}
+  }
+  if(best!==spyCur){
+    spyCur=best;
+    $$('#navLinks a').forEach(function(a){a.classList.toggle('on',a.getAttribute('href')==='#'+best);});
+  }
+}
+
+/* ============================================================
+   REVEALS, COUNTERS, TILT
+   ============================================================ */
+var io=null;
+if('IntersectionObserver' in window){
+  io=new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(!e.isIntersecting)return;
+      var el=e.target;el.classList.add('in');
+      setTimeout(function(){el.classList.add('done');},1600);
+      io.unobserve(el);
+    });
+  },{rootMargin:'0px 0px -8% 0px',threshold:0.06});
+  $$('[data-rv],.stag,.led').forEach(function(el){io.observe(el);});
+  var cio=new IntersectionObserver(function(es){
+    es.forEach(function(e){if(e.isIntersecting){runCounter(e.target);cio.unobserve(e.target);}});
+  },{threshold:0.3});
+  $$('.stat b[data-count]').forEach(function(el){cio.observe(el);});
+}else{
+  $$('[data-rv],.stag,.led').forEach(function(el){el.classList.add('in','done');});
+}
+function runCounter(el){
+  var to=parseFloat(el.getAttribute('data-count')),suf=el.getAttribute('data-suffix')||'';
+  var dec=(el.getAttribute('data-count').indexOf('.')>-1)?1:0;
+  if(reduceQ.matches||to===0){el.textContent=to.toFixed(dec)+suf;return;}
+  var t0=performance.now(),last='';
+  (function step(now){
+    var t=clamp((now-t0)/1500,0,1),e=1-Math.pow(1-t,3);
+    var s=(to*e).toFixed(dec)+suf;
+    if(s!==last){last=s;el.textContent=s;}
+    if(t<1) requestAnimationFrame(step);
+  })(t0);
+}
+if(matchMedia('(pointer: fine)').matches&&!reduceQ.matches){
+  $$('.tilt').forEach(function(c){
+    c.addEventListener('pointermove',function(e){
+      var r=c.getBoundingClientRect();
+      var px=(e.clientX-r.left)/r.width,py=(e.clientY-r.top)/r.height;
+      c.classList.add('live');
+      c.style.transform='perspective(900px) rotateX('+((0.5-py)*6).toFixed(2)+'deg) rotateY('+((px-0.5)*7).toFixed(2)+'deg) translateY(-4px)';
+      c.style.setProperty('--mx',(px*100).toFixed(1)+'%');
+      c.style.setProperty('--my',(py*100).toFixed(1)+'%');
+    });
+    c.addEventListener('pointerleave',function(){c.classList.remove('live');c.style.transform='';});
+  });
+  $$('.glass').forEach(function(g){
+    if(g.classList.contains('tilt'))return;
+    g.addEventListener('pointermove',function(e){
+      var r=g.getBoundingClientRect();
+      g.style.setProperty('--mx',(((e.clientX-r.left)/r.width)*100).toFixed(1)+'%');
+      g.style.setProperty('--my',(((e.clientY-r.top)/r.height)*100).toFixed(1)+'%');
+    });
+  });
+}
+
+/* ============================================================
+   INTERACTION ONE · THE GATE
+   ============================================================ */
+var gstage=$('#gstage'),ghold=$('#ghold'),gout=$('#gout'),gtoken=$('#gtoken'),gtrace=$('#gtrace');
+var gRows=$$('.gt-row',gtrace);
+var gRings=gstage?gstage.querySelectorAll('.gsvg .ring-g path'):[];
+var gOk=true,gP=0,gHold=false,gRaf=null,gLast=0,gState='idle',gStep=-1;
+var GLABEL=['Owner confirmed','Compliant','Compliant','Executed'];
+function gSet(p){
+  gP=p;var s=p.toFixed(3);
+  gstage.style.setProperty('--p',s);
+  for(var i=0;i<gRings.length;i++) gRings[i].style.setProperty('--p',s);
+  var step=Math.min(gRows.length-1,Math.floor(p*gRows.length*0.999));
+  if(p<=0){step=-1;}
+  if(step!==gStep){
+    gStep=step;
+    for(var j=0;j<gRows.length;j++){
+      var row=gRows[j],on=j<=step;
+      row.classList.toggle('on',on);
+      row.classList.remove('ok','no');
+      var badge=row.querySelector('.s');
+      if(!on){badge.textContent='Waiting';}
+      else if(!gOk&&j===2){badge.textContent='Not registered';row.classList.add('no');}
+      else if(!gOk&&j===3){badge.textContent='Reverted';row.classList.add('no');}
+      else{badge.textContent=GLABEL[j];row.classList.add('ok');}
+    }
+  }
+}
+function gTick(now){
+  var dt=Math.min(64,now-(gLast||now));gLast=now;
+  var rising=gHold&&gState==='idle',held=gState==='pass'&&gHold;
+  if(rising) gSet(Math.min(1,gP+dt/1500));
+  else if(!held) gSet(Math.max(0,gP-dt/650));
+  if(gP>=1&&gState==='idle') gResolve();
+  if(rising||(!held&&gP>0)) gRaf=requestAnimationFrame(gTick);
+  else{gRaf=null;gLast=0;}
+}
+function gKick(){if(gRaf===null){gLast=0;gRaf=requestAnimationFrame(gTick);}}
+function gReset(){gState='idle';gstage.classList.remove('pass','fail');gout.classList.remove('show','ok');}
+function gStart(e){
+  if(e&&e.preventDefault)e.preventDefault();
+  if(gState!=='idle') gReset();
+  if(reduceQ.matches){gSet(1);gResolve();return;}
+  gHold=true;gKick();
+}
+function gEnd(){if(!gHold)return;gHold=false;gKick();}
+function gResolve(){
+  if(gOk){gState='pass';gstage.classList.add('pass');
+    gout.innerHTML='Registered. The migration proceeds.<span class="nt">Both tokens came back compliant, so execution continued into the seven steps.</span>';
+    gout.classList.add('show','ok');}
+  else{gState='fail';gstage.classList.remove('fail');void gstage.offsetWidth;gstage.classList.add('fail');
+    gout.innerHTML='Not registered. The transaction reverted.<span class="nt">The check failed on the second token. On the network this costs one failed transaction and no assets move.</span>';
+    gout.classList.add('show');}
+}
+if(ghold){
+  ghold.addEventListener('pointerdown',gStart);
+  addEventListener('pointerup',gEnd);addEventListener('pointercancel',gEnd);
+  ghold.addEventListener('keydown',function(e){if((e.key===' '||e.key==='Enter')&&!e.repeat){e.preventDefault();gStart();}});
+  ghold.addEventListener('keyup',function(e){if(e.key===' '||e.key==='Enter')gEnd();});
+  $$('.pick').forEach(function(b){
+    b.addEventListener('click',function(){
+      $$('.pick').forEach(function(x){x.setAttribute('aria-pressed','false');});
+      b.setAttribute('aria-pressed','true');
+      gOk=b.getAttribute('data-ok')==='1';gHold=false;gReset();gStep=-1;gKick();
+    });
+  });
+  addEventListener('resize',function(){
+    if(gstage) gstage.style.setProperty('--gr',Math.round(gstage.getBoundingClientRect().width*0.34)+'px');
+  },{passive:true});
+}
+
+/* ============================================================
+   INTERACTION TWO · THE ASSISTANT'S GATES
+   ============================================================ */
+var QDATA=[
+  {stop:0,out:'Refused before the model ran.',note:'This phrasing is on the list of known ruling-seeking questions, so no model was called at all. A refusal that depends on how a model feels on the day is not a constraint.'},
+  {stop:1,out:'Refused by the intent classifier.',note:'The words are innocent, the intent is not. A separate cheap call reads intent, and anything that is not an unambiguous no is refused. Manual testing found four of five indirect phrasings passed a two-gate design, which is why this gate exists.'},
+  {stop:0,out:'Refused before the model ran.',note:'Asking how to vote is asking for a ruling with the question turned around. What the assistant offers instead is the mechanism the ruling would attach to, so the scholar rules with the facts in front of him.'},
+  {stop:3,out:'Answered, with its source named.',note:'The cooldown stops the same liquidity path being migrated again until a set number of seconds have passed since the last successful migration on that path. It exists so a pool cannot be repeatedly drained and refilled in quick succession.',src:'contracts/TeleportV2.sol · test/foundry/TeleportV2FullFlow.t.sol'}
+];
+var verds=[$('#v0'),$('#v1'),$('#v2')],asstOut=$('#asstOut'),grailFill=$('#grailFill'),qTimer=null,typeTimer=null;
+function typeOut(node,text,done){
+  if(reduceQ.matches){node.textContent=text;if(done)done();return;}
+  var i=0;
+  clearInterval(typeTimer);
+  typeTimer=setInterval(function(){
+    i+=2;
+    node.textContent=text.slice(0,i);
+    if(i>=text.length){clearInterval(typeTimer);if(done)done();}
+  },12);
+}
+function runQ(i){
+  var d=QDATA[i];
+  if(qTimer){clearTimeout(qTimer);qTimer=null;}
+  clearInterval(typeTimer);
+  verds.forEach(function(v){v.className='verd idle';v.textContent='Waiting';});
+  asstOut.innerHTML='';
+  if(grailFill) grailFill.style.setProperty('--gp','0');
+  var step=0;
+  function next(){
+    if(step>2||step>d.stop){
+      var head=document.createElement('p');
+      var b=document.createElement('b');
+      b.style.color=d.stop===3?'var(--gold)':'var(--violet-2)';
+      b.textContent=d.out+' ';
+      head.appendChild(b);
+      var body=document.createElement('span');
+      head.appendChild(body);
+      asstOut.innerHTML='';asstOut.appendChild(head);
+      typeOut(body,d.note,function(){
+        if(d.src){var s=document.createElement('div');s.className='src';s.textContent=d.src;asstOut.appendChild(s);}
+      });
+      return;
+    }
+    var v=verds[step];
+    if(grailFill) grailFill.style.setProperty('--gp',((step+1)/3).toFixed(2));
+    if(step===d.stop){v.className='verd stop';v.textContent='Refused';step=99;}
+    else{v.className='verd pass';v.textContent='Passed';step++;}
+    qTimer=setTimeout(next,reduceQ.matches?0:520);
+  }
+  next();
+}
+$$('.qbtn').forEach(function(b){
+  b.addEventListener('click',function(){
+    $$('.qbtn').forEach(function(x){x.setAttribute('aria-pressed','false');});
+    b.setAttribute('aria-pressed','true');
+    runQ(parseInt(b.getAttribute('data-q'),10));
+  });
+});
+
+/* ============================================================
+   INTERACTION THREE · THE TIMELOCK
+   ============================================================ */
+var tlRange=$('#tlRange'),tlH=$('#tlH'),tlPermit=$('#tlPermit'),tlRestrict=$('#tlRestrict'),
+    tlPermitSub=$('#tlPermitSub'),tlRestrictSub=$('#tlRestrictSub');
+function tlUpdate(){
+  if(!tlRange) return;
+  var h=+tlRange.value;
+  tlRange.style.setProperty('--v',(h/72).toFixed(3));
+  tlH.textContent=(h<10?'0':'')+h;
+  if(h===0){tlPermit.textContent='Scheduled';tlPermit.className='tl-state';tlPermitSub.textContent='48 h to wait';tlPermitSub.className='tl-sub';}
+  else if(h<48){tlPermit.textContent='Waiting';tlPermit.className='tl-state wait';tlPermitSub.textContent=(48-h)+' h to go';tlPermitSub.className='tl-sub on';}
+  else{tlPermit.textContent='Executable';tlPermit.className='tl-state live';tlPermitSub.textContent='By anyone at all';tlPermitSub.className='tl-sub';}
+  if(h<168){tlRestrict.textContent='In force';tlRestrict.className='tl-state live';
+    tlRestrictSub.textContent='Ratify within '+(168-h)+' h';tlRestrictSub.className='tl-sub'+(h>0?' on':'');}
+  else{tlRestrict.textContent='Lapsed';tlRestrict.className='tl-state';tlRestrictSub.textContent='Not ratified in time';tlRestrictSub.className='tl-sub';}
+}
+if(tlRange){tlRange.addEventListener('input',tlUpdate);}
+
+/* ============================================================
+   QUESTIONS
+   ============================================================ */
+$$('.q').forEach(function(q){
+  var btn=$('button',q),panel=$('.qa-p',q),id='qa-'+Math.random().toString(36).slice(2,8);
+  panel.id=id;btn.setAttribute('aria-expanded','false');btn.setAttribute('aria-controls',id);
+  btn.addEventListener('click',function(){
+    var open=q.getAttribute('data-open')==='1';
+    if(open){panel.style.height=panel.scrollHeight+'px';requestAnimationFrame(function(){panel.style.height='0px';});}
+    else panel.style.height=panel.scrollHeight+'px';
+    q.setAttribute('data-open',open?'0':'1');btn.setAttribute('aria-expanded',open?'false':'true');
+  });
+  panel.addEventListener('transitionend',function(){if(q.getAttribute('data-open')==='1')panel.style.height='auto';});
+});
+
+/* ============================================================
+   FORM
+   ============================================================ */
+/* ---- FORM DELIVERY ----------------------------------------------------
+   The page is static, so a form service carries the message. Two are wired.
+
+   ACCESS_KEY empty  -> FormSubmit, no account needed. The very first message
+                        triggers one confirmation email to the address below;
+                        click the link in it once and every later message
+                        arrives on its own.
+   ACCESS_KEY set    -> Web3Forms. Get a free key at web3forms.com in about
+                        thirty seconds, paste it here, and the address stops
+                        appearing in the page source at all. Preferred.
+   ---------------------------------------------------------------------- */
+var TO=['abdusamed','gravitasprotocol.xyz'].join(String.fromCharCode(64));
+var ACCESS_KEY='5989091b-6f10-49b5-95c8-67f804b4f949';
+var ENDPOINT=ACCESS_KEY ? 'https://api.web3forms.com/submit'
+                        : 'https://formsubmit.co/ajax/'+TO;
+
+var form=$('#cform'),fsend=$('#fsend'),fsendNote=$('#fsendNote'),fstate=$('#fstate'),
+    fbtn=$('#fbtn'),fbtnLabel=$('#fbtnLabel'),lastBody='';
+
+function setState(kind,text){
+  fstate.className='fstate'+(kind?' '+kind:'');
+  fstate.textContent=text||'';
+}
+if(form){
+  form.addEventListener('submit',function(e){
+    e.preventDefault();
+    var n=(form.name.value||'').trim(),o=(form.org.value||'').trim(),
+        m=(form.email.value||'').trim(),t=(form.msg.value||'').trim();
+    if(!n){setState('bad','Your name is missing.');form.name.focus();return;}
+    if(!m||m.indexOf('@')<1){setState('bad','That email address does not look right.');form.email.focus();return;}
+
+    var sub='Gravitas Protocol enquiry from '+n+(o?' at '+o:'');
+    var body='Name: '+n+'\nOrganisation: '+(o||'not given')+'\nEmail: '+m+'\n\n'+(t||'');
+    lastBody='To: '+TO+'\nSubject: '+sub+'\n\n'+body;
+
+    var payload={name:n,organisation:o||'not given',email:m,message:t||'(no message)'};
+    if(ACCESS_KEY){
+      payload.access_key=ACCESS_KEY;
+      payload.subject=sub;
+      payload.from_name='Gravitas Protocol site';
+      payload.replyto=m;              /* a reply goes straight back to the visitor */
+    } else {
+      payload._subject=sub;payload._template='table';payload._captcha='false';
+    }
+
+    fbtn.disabled=true;fbtnLabel.textContent='Sending';
+    setState('','Sending your message.');
+    fsend.hidden=true;
+
+    fetch(ENDPOINT,{method:'POST',
+      headers:{'Content-Type':'application/json',Accept:'application/json'},
+      body:JSON.stringify(payload)})
+    .then(function(r){return r.json().catch(function(){return {};}).then(function(d){return {ok:r.ok,d:d};});})
+    .then(function(res){
+      var good=res.ok&&(res.d.success===true||res.d.success==='true');
+      if(!good) throw new Error((res.d&&res.d.message)||'The form service refused the message.');
+      fbtn.disabled=false;fbtnLabel.textContent='Send';
+      form.reset();
+      setState('ok','Message sent. We answer within two working days.');
+    })
+    .catch(function(err){
+      fbtn.disabled=false;fbtnLabel.textContent='Send';
+      setState('bad','That did not send. '+(err&&err.message?err.message:''));
+      offerFallback();
+    });
+  });
+
+  function offerFallback(){
+    var sub=fstateSubject(),B=encodeURIComponent(lastBody.split('\n\n').slice(1).join('\n\n')),
+        S=encodeURIComponent(sub),T=encodeURIComponent(TO);
+    $('#sendGmail').href='https://mail.google.com/mail/?view=cm&fs=1&to='+T+'&su='+S+'&body='+B;
+    $('#sendOutlook').href='https://outlook.live.com/mail/0/deeplink/compose?to='+T+'&subject='+S+'&body='+B;
+    $('#sendMail').href='mailto:'+TO+'?subject='+S+'&body='+B;
+    fsendNote.innerHTML='Or copy it and send it to <span class="fsend-a">'+TO+'</span> however you like.';
+    fsend.hidden=false;
+  }
+  function fstateSubject(){
+    var l=lastBody.split('\n');
+    for(var i=0;i<l.length;i++) if(l[i].indexOf('Subject: ')===0) return l[i].slice(9);
+    return 'Gravitas Protocol enquiry';
+  }
+  $('#sendCopy').addEventListener('click',function(){
+    var done=function(){fsendNote.textContent='Copied. Paste it into any mail client and send it to '+TO+'.';};
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(lastBody).then(done,fb);
+    } else fb();
+    function fb(){
+      var ta=document.createElement('textarea');
+      ta.value=lastBody;ta.setAttribute('readonly','');
+      ta.style.cssText='position:fixed;top:-1000px';
+      document.body.appendChild(ta);ta.select();
+      try{document.execCommand('copy');done();}catch(err){
+        fsendNote.textContent='Copy did not work here. The address is '+TO+'.';
+      }
+      document.body.removeChild(ta);
+    }
+  });
+}
+
+/* ============================================================
+   ONE SCROLL HANDLER
+   ============================================================ */
+var ticking=false,lastY=0,dPageY=0;
+function onScroll(){
+  if(ticking) return;
+  ticking=true;
+  requestAnimationFrame(function(){
+    ticking=false;
+    var y=scrollY;lastY=y;
+    aScroll=y/Math.max(1,document.documentElement.scrollHeight-innerHeight);
+    dPageY=y;heroHides=heroCovers();
+    var s=y>40;
+    if(s!==navSolid){navSolid=s;nav.classList.toggle('solid',s);}
+    if(scrubOn){target=heroP();hKick();}
+    howUpdate();zahaUpdate();spy();
+  });
+}
+addEventListener('scroll',onScroll,{passive:true});
+
+/* ============================================================
+   PAUSE / REDUCED MOTION / BOOT
+   ============================================================ */
+document.addEventListener('visibilitychange',function(){
+  var h=document.hidden;
+  document.body.classList.toggle('paused',h);
+  if(h){stopMotes();auStop();dpStop();} else {auStart();dpStart();if(scrubOn)startMotes();}
+});
+function pinAll(){
+  $$('[data-rv],.stag,.led').forEach(function(el){el.classList.add('in','done');});
+  if(svPrg) svApply(1,true);
+  howSteps.forEach(function(s){s.classList.add('on');});
+  stopMotes();auStop();dpStop();
+  if(gstage) gSet(1);
+  zahaUpdate();
+}
+function unpin(){
+  if(reduceQ.matches) return;
+  howCur=-1;howUpdate();
+  if(gstage&&gState==='idle'){gStep=-1;gSet(0);}
+  auStart();dpStart();
+}
+function onReduce(e){
+  if(e.matches) pinAll();
+  else{applyHeroMode();unpin();}
+}
+reduceQ.addEventListener?reduceQ.addEventListener('change',onReduce):reduceQ.addListener(onReduce);
+
+function boot(){
+  auSize();auStart();dpStart();
+  buildHowSvg();buildArc();
+  if(gstage) gstage.style.setProperty('--gr',Math.round(gstage.getBoundingClientRect().width*0.34)+'px');
+  applyHeroMode();
+  heroHides=heroCovers();howUpdate();zahaUpdate();spy();onScroll();
+  runQ(0);tlUpdate();
+  if(reduceQ.matches) pinAll();
+}
+if(document.readyState!=='loading') boot();
+else addEventListener('DOMContentLoaded',boot);
+
+var rz=null;
+addEventListener('resize',function(){
+  clearTimeout(rz);
+  rz=setTimeout(function(){
+    auSize();dpSize();mSize();
+    howCur=-1;howUpdate();zahaUpdate();
+    if(scrubOn){bands.forEach(function(b){b.op=-1;b.k=-1;});target=heroP();hKick();}
+  },200);
+},{passive:true});
+
+})();
+</script>
+</body>
+</html>

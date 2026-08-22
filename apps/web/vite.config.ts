@@ -5,7 +5,7 @@ import path from "node:path";
 import { defineConfig } from "vite";
 
 export default defineConfig({
-  base: '/',
+  base: '/app/',   // the marketing site owns the root; the application answers under /app/
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {

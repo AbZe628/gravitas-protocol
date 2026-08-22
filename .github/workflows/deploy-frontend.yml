@@ -1,16 +1,23 @@
-# Publishes apps/web to GitHub Pages.
+# Publishes the site to GitHub Pages.
 #
-# This workflow did not previously exist, although the README described it. The
-# live site was therefore served from the committed apps/web/dist/ build output,
-# which meant edits to source never reached production on their own. See
-# DEPLOY.md section 8.
+# The artifact carries two things:
+#   /        the static marketing site from site/
+#   /app/    the React application built from apps/web/
+#
+# They are separate on purpose. The marketing page is one HTML file with no build
+# step, and the application keeps its own routes underneath /app/. The root
+# 404.html forwards the old root paths (/dashboard and friends) to their new
+# home, and restores client-side routes for /app/*, which is what GitHub Pages
+# cannot do on its own.
 name: Deploy frontend
 
 on:
   push:
     branches: [main]
     paths:
+      - 'site/**'
       - 'apps/web/**'
+      - 'CNAME'
       - '.github/workflows/deploy-frontend.yml'
   workflow_dispatch:
 
@@ -31,17 +38,40 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Install
+
+      - name: Install the application
         working-directory: apps/web
         run: npm install
-      - name: Build
+
+      - name: Build the application
         working-directory: apps/web
         run: npm run build
-      - name: Keep the custom domain
-        run: cp CNAME apps/web/dist/public/CNAME
+
+      - name: Assemble the artifact
+        run: |
+          mkdir -p _pages
+          cp -r site/. _pages/
+          mkdir -p _pages/app
+          cp -r apps/web/dist/public/. _pages/app/
+          cp CNAME _pages/CNAME
+          echo "--- artifact root ---"
+          ls -la _pages
+          echo "--- application ---"
+          ls -la _pages/app | head -20
+
+      - name: Check the pieces are all there
+        run: |
+          test -f _pages/index.html      || { echo "the marketing page is missing"; exit 1; }
+          test -f _pages/404.html        || { echo "the root 404 is missing"; exit 1; }
+          test -f _pages/CNAME           || { echo "the custom domain is missing"; exit 1; }
+          test -f _pages/assets/hero-scrub.mp4 || { echo "the hero video is missing"; exit 1; }
+          test -f _pages/app/index.html  || { echo "the application build is missing"; exit 1; }
+          grep -q 'href="/app/dashboard"' _pages/index.html || { echo "the marketing page does not point at the application"; exit 1; }
+          grep -q '/app/assets/' _pages/app/index.html || { echo "the application was built for the wrong base path"; exit 1; }
+
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: apps/web/dist/public
+          path: _pages
 
   deploy:
     needs: build
