@@ -6,6 +6,14 @@ import { ShariahViolationError } from './types.js';
  * @notice ABI for the Risk & Compliance Oracle.
  * @dev Function names match exactly with the deployed contract (Bank-Grade synchronization).
  */
+/*
+ * The registry exposes the same facts twice. The verify* family is gated behind
+ * whenNotPaused and reverts while the registry is halted; the raw mapping getters
+ * (isAssetCompliant and friends) are ungated by design and keep answering. Every
+ * enforcement decision below goes through the gated family, so a paused registry
+ * fails closed. Reading isAssetCompliant to decide whether something is permitted
+ * would silently opt out of the protocol's kill switch.
+ */
 const REGISTRY_ABI = parseAbi([
   // Compliance verification functions
   'function isAssetCompliant(address asset) view returns (bool)',
@@ -72,6 +80,33 @@ export class ComplianceService {
   }
 
   /**
+   * @notice Runs a gated read and turns a halted registry into a clear refusal.
+   * @dev The verify* functions revert with EnforcedPause() rather than returning
+   *      false, which is the point: a halt cannot be misread as "everything is
+   *      non-compliant but the call succeeded". Surfacing the raw revert would
+   *      leave a caller guessing, so it is named here.
+   */
+  private async gatedRead(functionName: string, args: readonly unknown[]): Promise<boolean> {
+    try {
+      return (await this.client.readContract({
+        address: this.registryAddress,
+        abi: REGISTRY_ABI,
+        functionName: functionName as never,
+        args: args as never,
+      })) as boolean;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      if (/EnforcedPause|Pausable: paused|reverted/i.test(message)) {
+        throw new ShariahViolationError(
+          'The Gravitas Policy Registry is paused. Compliance cannot be confirmed while it is ' +
+          'halted, and nothing is treated as permitted until it resumes.'
+        );
+      }
+      throw error;
+    }
+  }
+
+  /**
    * @notice Validates if a single asset is Shariah-compliant.
    * @dev Used during the "Intent Capture" phase for early validation.
    *
@@ -79,12 +114,7 @@ export class ComplianceService {
    * @throws {ShariahViolationError} If the asset is non-compliant.
    */
   async validateAsset(asset: Address): Promise<void> {
-    const isCompliant = await this.client.readContract({
-      address: this.registryAddress,
-      abi: REGISTRY_ABI,
-      functionName: 'isAssetCompliant',
-      args: [asset],
-    });
+    const isCompliant = await this.gatedRead('verifyAssetCompliance', [asset]);
 
     if (!isCompliant) {
       throw new ShariahViolationError(
@@ -102,12 +132,7 @@ export class ComplianceService {
    * @throws {ShariahViolationError} If the router is not authorized.
    */
   async validateRouter(router: Address): Promise<void> {
-    const isAuthorized = await this.client.readContract({
-      address: this.registryAddress,
-      abi: REGISTRY_ABI,
-      functionName: 'isRouterAuthorized',
-      args: [router],
-    });
+    const isAuthorized = await this.gatedRead('verifyRouterAuthorization', [router]);
 
     if (!isAuthorized) {
       throw new ShariahViolationError(
@@ -125,12 +150,7 @@ export class ComplianceService {
    * @throws {ShariahViolationError} If the executor is not authorized.
    */
   async validateExecutor(executor: Address): Promise<void> {
-    const isAuthorized = await this.client.readContract({
-      address: this.registryAddress,
-      abi: REGISTRY_ABI,
-      functionName: 'isExecutor',
-      args: [executor],
-    });
+    const isAuthorized = await this.gatedRead('verifyExecutorStatus', [executor]);
 
     if (!isAuthorized) {
       throw new ShariahViolationError(
@@ -193,18 +213,8 @@ export class ComplianceService {
     pairCompliant: boolean;
   }> {
     const [tokenACompliant, tokenBCompliant, pairCompliant] = await Promise.all([
-      this.client.readContract({
-        address: this.registryAddress,
-        abi: REGISTRY_ABI,
-        functionName: 'isAssetCompliant',
-        args: [tokenA],
-      }),
-      this.client.readContract({
-        address: this.registryAddress,
-        abi: REGISTRY_ABI,
-        functionName: 'isAssetCompliant',
-        args: [tokenB],
-      }),
+      this.gatedRead('verifyAssetCompliance', [tokenA]),
+      this.gatedRead('verifyAssetCompliance', [tokenB]),
       this.client.readContract({
         address: this.registryAddress,
         abi: REGISTRY_ABI,

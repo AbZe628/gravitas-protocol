@@ -40,14 +40,28 @@ We encourage security researchers to review our contracts and report any potenti
 
 **IMPORTANT:** Please do not disclose any vulnerabilities publicly until they have been addressed and a coordinated disclosure plan is in place.
 
-## 5. Audit Status
+## 5. Current State
+
+Stated plainly, because a threat model is only useful next to what is actually true today.
+
+- **Testnet only.** Arbitrum Sepolia. The protocol has never held funds, and none are at risk.
+- **Ownership of `GravitasPolicyRegistry` is a single externally owned account.** The mitigation
+  in section 2 — timelock with a 48-hour delay, multi-signature proposers — is the intended
+  production configuration and is **not in force yet**. `GravitasTimelock` is deployed but does
+  not hold the registry. Until that handover completes, one key can change compliance policy.
+- **No independent audit has been completed.** Nothing here should be read as an audited system.
+- Current addresses are in [`docs/DEPLOYMENTS.md`](../docs/DEPLOYMENTS.md). The pair superseded
+  by the redeployment of 23 August 2026 still resolves on chain and must not be integrated
+  against.
+
+## 6. Audit Status
 
 - **Internal Review:** Completed. See `proof-of-quality/INTERNAL_REVIEW.md`.
 - **External Audit:** Planned for pending (no date claimed). This document will be updated with a link to the final report upon completion.
 
 We do **not** claim that the protocol is "fully audited" by a third party at this time. The security of the protocol is our highest priority, and we are committed to a transparent and continuous audit process.
 
-## 6. Secret Management
+## 7. Secret Management
 
 - **NEVER** commit `.env` or private keys.
 - Use `.env.example` as a template for local development.

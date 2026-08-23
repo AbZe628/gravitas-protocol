@@ -119,7 +119,7 @@ Report security vulnerabilities privately via:
 - GitHub Security Advisories
 - Email: abdusamed@gravitasprotocol.xyz
 
-See [SECURITY.md](./SECURITY.md) for details.
+See [SECURITY.md](./.github/SECURITY.md) for details.
 
 ## Questions?
 

@@ -1,0 +1,49 @@
+version: 2
+
+# Grouped and monthly on purpose. A weekly stream of individual bumps trains
+# everyone to merge without reading, which is worse than being a few weeks
+# behind. Security advisories arrive separately and immediately regardless of
+# this schedule.
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      actions:
+        patterns: ['*']
+
+  - package-ecosystem: npm
+    directory: /apps/web
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 5
+    groups:
+      dev-tooling:
+        dependency-type: development
+        patterns: ['*']
+      production:
+        dependency-type: production
+        patterns: ['*']
+
+  - package-ecosystem: npm
+    directory: /apps/majlis
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 5
+    groups:
+      dev-tooling:
+        dependency-type: development
+        patterns: ['*']
+      production:
+        dependency-type: production
+        patterns: ['*']
+
+  - package-ecosystem: npm
+    directory: /gravitas-sdk
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 5
+    groups:
+      all:
+        patterns: ['*']

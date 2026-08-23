@@ -131,6 +131,13 @@ jobs:
                   npm ci
                   npm run build
 
+            # The SDK is what an integrator actually holds. Building it proves it
+            # compiles; these prove it asks the registry the gated question and
+            # refuses rather than guessing when the registry is halted.
+            - name: Test SDK
+              working-directory: ./gravitas-sdk
+              run: npm test
+
     majlis:
         name: 🏛️ Majlis (Stage One)
         needs: security-scan

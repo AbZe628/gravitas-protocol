@@ -197,7 +197,7 @@ The app uses a light theme by default with institutional design principles:
 - ✅ Responsive design
 - ✅ Smooth animations
 
-### Planned (See TODO.md)
+### Planned
 
 - 🚧 Contract read interfaces (Policy Registry, Teleport V2/V3)
 - 🚧 Transaction submission forms
@@ -219,7 +219,7 @@ pnpm format
 
 ## 📚 Documentation
 
-- **Implementation Roadmap:** [TODO.md](./TODO.md)
+- **Roadmap and release history:** [../../CHANGELOG.md](../../CHANGELOG.md)
 - **Protocol Docs:** [../../README.md](../../README.md)
 - **Smart Contracts:** [../../contracts/](../../contracts/)
 - **SDK:** [../../gravitas-sdk/](../../gravitas-sdk/)

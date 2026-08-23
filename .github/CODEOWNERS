@@ -1,0 +1,12 @@
+# Every change needs a review from the protocol owner. Listed last-match-wins, so
+# the catch-all sits first and the sensitive paths repeat it deliberately — a
+# future addition to this file cannot accidentally leave them unowned.
+*                       @AbZe628
+
+# The parts where a mistake is expensive or irreversible.
+/contracts/             @AbZe628
+/script/                @AbZe628
+/test/                  @AbZe628
+/.github/workflows/     @AbZe628
+/.github/SECURITY.md    @AbZe628
+/foundry.toml           @AbZe628
