@@ -48,7 +48,12 @@ contract Deploy is Script {
 
     function run()
         external
-        returns (GravitasPolicyRegistry registry, TeleportV3 teleportV3, TeleportV2 teleportV2, GravitasTimelock timelock)
+        returns (
+            GravitasPolicyRegistry registry,
+            TeleportV3 teleportV3,
+            TeleportV2 teleportV2,
+            GravitasTimelock timelock
+        )
     {
         // Two ways in. DEPLOYER_KEY is convenient but leaves the key in the
         // shell history and the process environment. Leaving it unset lets
