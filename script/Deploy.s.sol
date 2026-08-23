@@ -24,9 +24,10 @@ import "../contracts/governance/GravitasTimelock.sol";
  * Usage:
  *   forge script script/Deploy.s.sol \
  *     --rpc-url https://sepolia-rollup.arbitrum.io/rpc \
- *     --broadcast --interactive 1
+ *     --broadcast --interactive
  *
- *   --interactive prompts for the key without echoing it, so it never reaches
+ *   --interactive is a flag and takes no value; --interactives <NUM> is the one
+ *   that does. It prompts for the key without echoing it, so it never reaches
  *   the shell history or the process environment. Setting DEPLOYER_KEY works
  *   too, and is what CI would use.
  */
