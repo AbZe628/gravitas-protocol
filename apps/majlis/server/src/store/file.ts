@@ -29,7 +29,7 @@
  * something with automatic backups. Nothing above this file changes.
  */
 
-import { mkdirSync, readFileSync, renameSync, writeFileSync, existsSync } from 'node:fs';
+import { appendFileSync, mkdirSync, readFileSync, renameSync, writeFileSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import type { AssistantExchange, Board, Briefing, Matter, Rule } from '../types.js';
 import { boards as seedBoards, briefings as seedBriefings, matters as seedMatters, rules as seedRules } from '../data/seed.js';
@@ -41,8 +41,20 @@ interface Document {
   rules: Rule[];
   matters: Matter[];
   briefings: Briefing[];
-  assistantLog: AssistantExchange[];
 }
+
+/*
+ * The assistant log lives beside the record, not inside it, and is written one
+ * JSON object per line.
+ *
+ * It is part of the record rather than the record itself: append-only, bounded,
+ * and written far more often than a decision is taken. Keeping it in the same
+ * document meant every question asked rewrote every matter the board had ever
+ * decided — a thousand appends rewrote the whole document a thousand times, and
+ * the cost grew with the log. Appending a line is flat, and the file is
+ * compacted only when it drifts past the cap.
+ */
+const COMPACT_AT = ASSISTANT_LOG_MAX * 1.5;
 
 const copy = <T>(value: T): T => structuredClone(value);
 
@@ -55,29 +67,43 @@ export interface FileStoreOptions {
 
 export class FileStore implements Store {
   private readonly file: string;
+  private readonly logFile: string;
   private doc: Document;
+  private log: AssistantExchange[];
   /** Mutations queue behind this, so no two can interleave around an await. */
   private queue: Promise<unknown> = Promise.resolve();
 
   constructor(opts: FileStoreOptions) {
     this.file = opts.file;
+    this.logFile = opts.file.replace(/[.]json$/, '') + '.assistant.jsonl';
     mkdirSync(dirname(this.file), { recursive: true });
 
+    this.log = existsSync(this.logFile) ? readLog(this.logFile) : [];
+
     if (existsSync(this.file)) {
-      this.doc = JSON.parse(readFileSync(this.file, 'utf8')) as Document;
+      const loaded = JSON.parse(readFileSync(this.file, 'utf8')) as Document & {
+        assistantLog?: AssistantExchange[];
+      };
+      // An earlier version kept the log inside the record. Carry it across
+      // rather than dropping it, then leave it behind on the next write.
+      if (loaded.assistantLog?.length) {
+        this.log = [...loaded.assistantLog, ...this.log];
+        writeLog(this.logFile, this.log);
+        delete loaded.assistantLog;
+      }
+      this.doc = loaded;
       return;
     }
 
     this.doc =
       opts.seedIfEmpty === false
-        ? { version: 1, boards: [], rules: [], matters: [], briefings: [], assistantLog: [] }
+        ? { version: 1, boards: [], rules: [], matters: [], briefings: [] }
         : {
             version: 1,
             boards: copy(seedBoards),
             rules: copy(seedRules),
             matters: copy(seedMatters),
             briefings: copy(seedBriefings),
-            assistantLog: [],
           };
     this.persist();
   }
@@ -161,16 +187,20 @@ export class FileStore implements Store {
 
   async appendAssistantExchange(exchange: AssistantExchange): Promise<void> {
     await this.serialise(() => {
-      this.doc.assistantLog.push(copy(exchange));
-      if (this.doc.assistantLog.length > ASSISTANT_LOG_MAX) {
-        this.doc.assistantLog.splice(0, this.doc.assistantLog.length - ASSISTANT_LOG_MAX);
+      this.log.push(copy(exchange));
+      appendFileSync(this.logFile, JSON.stringify(exchange) + '\n', 'utf8');
+
+      // Trim in memory as soon as it is over, so a reader never sees more than
+      // the cap, but rewrite the file only when it has drifted well past it.
+      if (this.log.length > ASSISTANT_LOG_MAX) {
+        this.log.splice(0, this.log.length - ASSISTANT_LOG_MAX);
       }
-      this.persist();
+      if (countLines(this.logFile) > COMPACT_AT) writeLog(this.logFile, this.log);
     });
   }
 
   async assistantLog(limit?: number): Promise<AssistantExchange[]> {
-    const newestFirst = [...this.doc.assistantLog].reverse();
+    const newestFirst = [...this.log].reverse();
     return copy(limit ? newestFirst.slice(0, limit) : newestFirst);
   }
 
@@ -178,4 +208,34 @@ export class FileStore implements Store {
     // Let anything still queued finish before the caller moves on.
     await this.queue;
   }
+}
+
+/** Read a JSON-lines log, skipping any line a crash left half-written. */
+function readLog(file: string): AssistantExchange[] {
+  const out: AssistantExchange[] = [];
+  for (const line of readFileSync(file, 'utf8').split('\n')) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+    try {
+      out.push(JSON.parse(trimmed) as AssistantExchange);
+    } catch {
+      // A torn final line is the one thing an append-only file can leave
+      // behind. Dropping it is right; refusing to start over it is not.
+    }
+  }
+  return out.slice(-ASSISTANT_LOG_MAX);
+}
+
+function writeLog(file: string, entries: AssistantExchange[]): void {
+  const temp = join(dirname(file), `.${Date.now()}-${process.pid}.log.tmp`);
+  writeFileSync(temp, entries.map((e) => JSON.stringify(e)).join('\n') + (entries.length ? '\n' : ''), 'utf8');
+  renameSync(temp, file);
+}
+
+function countLines(file: string): number {
+  if (!existsSync(file)) return 0;
+  const text = readFileSync(file, 'utf8');
+  let n = 0;
+  for (let i = 0; i < text.length; i++) if (text.charCodeAt(i) === 10) n++;
+  return n;
 }

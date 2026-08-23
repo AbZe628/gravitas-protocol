@@ -11,14 +11,21 @@ import { buildAuditExport } from './services/export.js';
 import { verifyParameters } from './services/hash.js';
 import { Limiter, REFUSAL_MESSAGES } from './services/limits.js';
 import { basicAuth, authFromEnv } from './middleware/basicAuth.js';
+import { governanceRoutes } from './routes/governance.js';
 
 
 /**
- * Stage One is read-only. There is deliberately no route by which a rule can
- * be created, amended or approved through this API. Governance functions
- * arrive in Stage Three together with signing authority, and adding them
- * before then would produce exactly the gap the system exists to close: a
- * decision recorded in one place and executed by someone else in another.
+ * Stage Two writes.
+ *
+ * A board can open a matter here, deliberate on it, vote with a written reason,
+ * object during a timelock and bring a change into force. What it cannot do is
+ * sign: nothing in this application touches the Policy Registry, and a matter
+ * reaching `in_force` records what the board decided rather than executing it.
+ *
+ * That separation is the whole of Stage Two — the full process exercised with
+ * nothing yet resting on it — and closing it is Stage Three, where the vote
+ * becomes the signature. Until then the gap the system exists to close is still
+ * open, and saying so plainly is more useful than pretending otherwise.
  */
 
 const limiter = new Limiter();
@@ -43,12 +50,13 @@ export function createApp(store: Store = storeFromEnv()): Express {
   app.get('/api/health', (_req: Request, res: Response) => {
     res.json({
       ok: true,
-      stage: 1,
-      // No governance write route exists. The assistant endpoint accepts POST
-      // because asking a question is an action, but nothing it does changes a
-      // rule, a vote or the record of either.
-      readOnly: true,
-      governanceWrites: false,
+      stage: 2,
+      // The board decides here now. What it still cannot do is sign: no route
+      // in this application writes to the Policy Registry, so a decision is
+      // recorded rather than executed. Stage Three closes that.
+      readOnly: false,
+      governanceWrites: true,
+      signingAuthority: false,
       assistant: limiter.status(),
     });
   });
@@ -199,6 +207,9 @@ export function createApp(store: Store = storeFromEnv()): Express {
   app.get('/api/assistant/log', async (_req, res) => {
     res.json(await store.assistantLog());
   });
+
+  // ---- governance ------------------------------------------------------
+  app.use('/api', governanceRoutes(store));
 
   // ---- audit export ----------------------------------------------------
   app.get('/api/export/:boardId', async (req, res) => {

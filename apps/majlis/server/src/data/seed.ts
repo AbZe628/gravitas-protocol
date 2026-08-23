@@ -27,6 +27,16 @@ export const boards: Board[] = [
     quorumRestrict: 2,
     totalSignatories: 5,
     ratificationWindowHours: 168,
+    /*
+     * Five signatories, matching totalSignatories, plus an advisory member and
+     * a technical liaison who deliberate without voting.
+     *
+     * The count has to match. The board previously declared five signatories
+     * and a permitting quorum of three while listing two members, which meant a
+     * permitting change could never reach quorum. In Stage One that was
+     * invisible, because nothing could be voted on. In Stage Two it made the
+     * demonstration board unable to demonstrate the process it exists to show.
+     */
     members: [
       {
         id: 'member-a',
@@ -41,6 +51,41 @@ export const boards: Board[] = [
         title: 'Shariah Auditor (placeholder)',
         board: 'demo-board',
         signatory: true,
+      },
+      {
+        id: 'member-c',
+        name: 'Board Member C',
+        title: 'Shariah Board Member (placeholder)',
+        board: 'demo-board',
+        signatory: true,
+      },
+      {
+        id: 'member-d',
+        name: 'Board Member D',
+        title: 'Shariah Board Member (placeholder)',
+        board: 'demo-board',
+        signatory: true,
+      },
+      {
+        id: 'member-e',
+        name: 'Board Member E',
+        title: 'Shariah Board Member (placeholder)',
+        board: 'demo-board',
+        signatory: true,
+      },
+      {
+        id: 'advisor-1',
+        name: 'Advisory Member',
+        title: 'Advisory, without signing authority (placeholder)',
+        board: 'demo-board',
+        signatory: false,
+      },
+      {
+        id: 'liaison-1',
+        name: 'Technical Liaison',
+        title: 'Answers questions of mechanism, does not vote (placeholder)',
+        board: 'demo-board',
+        signatory: false,
       },
     ],
   },

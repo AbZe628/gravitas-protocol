@@ -379,10 +379,19 @@ describe('audit export', () => {
 });
 
 describe('api', () => {
-  it('reports stage one and read-only', async () => {
+  it('reports stage two, writing, and still not signing', async () => {
     const res = await request(app).get('/api/health');
     expect(res.status).toBe(200);
-    expect(res.body).toMatchObject({ ok: true, stage: 1, readOnly: true });
+    expect(res.body).toMatchObject({
+      ok: true,
+      stage: 2,
+      readOnly: false,
+      governanceWrites: true,
+      // The one that must not drift. A board decides here; nothing here signs.
+      // If this ever reports true before Stage Three lands, the application is
+      // claiming an authority it does not have.
+      signingAuthority: false,
+    });
   });
 
   it('lists boards', async () => {
@@ -453,19 +462,34 @@ describe('api', () => {
     expect(mutating.sort()).toEqual([...ALLOWED].sort());
   });
 
-  it('still 404s the obvious governance write paths', async () => {
+  it('still refuses to write a rule directly', async () => {
+    // Matters are how a rule changes. A route that edited one straight would
+    // put a change in force without the process that justifies it, which is
+    // the gap this system exists to close.
     const attempts = [
       request(app).post('/api/rules').send({ id: 'x' }),
-      request(app).post('/api/matters').send({ id: 'x' }),
-      request(app).post('/api/matters/matter-2026-07-03/vote').send({ position: 'for' }),
       request(app).put('/api/rules/rule-tangible-ratio').send({}),
       request(app).patch('/api/matters/matter-2026-07-03').send({}),
       request(app).delete('/api/rules/rule-tangible-ratio'),
     ];
     for (const a of attempts) {
-      const res = await a;
-      expect(res.status).toBe(404);
+      expect((await a).status).toBe(404);
     }
+  });
+
+  it('the governance routes exist and refuse rather than 404', async () => {
+    // Without member credentials every request is an observer, so these are
+    // refusals of authority — which proves the route is there and gated,
+    // rather than absent.
+    const res = await request(app).post('/api/matters').send({
+      boardId: 'demo-board',
+      title: 'A matter raised in a test',
+      proposal: 'Something is proposed.',
+      direction: 'permit',
+      origin: 'protocol_change',
+    });
+    expect(res.status).toBe(403);
+    expect(res.body.error).toBe('role_not_permitted');
   });
 
   it('rejects a malformed assistant request', async () => {
