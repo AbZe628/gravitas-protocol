@@ -65,6 +65,7 @@ jobs:
           test -f _pages/404.html        || { echo "the root 404 is missing"; exit 1; }
           test -f _pages/CNAME           || { echo "the custom domain is missing"; exit 1; }
           test -f _pages/assets/hero-scrub.mp4 || { echo "the hero video is missing"; exit 1; }
+          test -f _pages/favicon.ico     || { echo "the favicon is missing from the artifact root"; exit 1; }
           test -f _pages/app/index.html  || { echo "the application build is missing"; exit 1; }
           grep -q 'href="/app/dashboard"' _pages/index.html || { echo "the marketing page does not point at the application"; exit 1; }
           grep -q '/app/assets/' _pages/app/index.html || { echo "the application was built for the wrong base path"; exit 1; }

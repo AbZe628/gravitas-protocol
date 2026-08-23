@@ -7,7 +7,10 @@
 <meta name="description" content="A board decides in Majlis, the rule goes into an on-chain Policy Registry, and every Teleport migration has to pass it. Atomic execution, EIP-712 signed intents, verified contracts on Arbitrum Sepolia.">
 <meta name="theme-color" content="#0E1017">
 <meta name="color-scheme" content="dark">
-<link rel="icon" type="image/png" href="assets/mark.png">
+<link rel="icon" href="/favicon.ico" sizes="32x32 48x48">
+  <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="/assets/icon-512.png">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 
 <!-- Absolute URLs, required by Open Graph. Update if the domain ever changes. -->
 <meta property="og:type" content="website">
@@ -802,10 +805,15 @@ footer{border-top:1px solid var(--line);padding-block:clamp(50px,6.5vh,82px) 34p
   .gt-row .s{grid-column:2;justify-self:start;margin-top:4px}
 }
 @media (max-width:820px){
-  .swipe-row{display:flex;overflow-x:auto;gap:12px;scroll-snap-type:x mandatory;
+  .swipe-row{display:flex;overflow-x:auto;overflow-y:hidden;gap:12px;scroll-snap-type:x mandatory;
     padding-inline:var(--gut);margin-inline:calc(var(--gut) * -1);padding-block:2px 6px;
     scrollbar-width:none;-ms-overflow-style:none;overscroll-behavior-x:contain}
   .swipe-row::-webkit-scrollbar{display:none}
+  /* A card waiting to be revealed sits 34px below its resting place. Setting
+     overflow-x turns the other axis into a scroll area as well, so that offset
+     became something a finger could drag up and down inside the row. The row is
+     clipped vertically and the cards fade in without moving. */
+  .swipe-row>[data-rv],.swipe-row.stag>*{transform:none}
   .swipe-row>*{flex:0 0 min(84%,340px);scroll-snap-align:center;
     border:1px solid var(--line) !important;border-radius:var(--r);
     background:linear-gradient(168deg,rgba(255,255,255,.075),rgba(255,255,255,.028));
