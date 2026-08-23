@@ -4,14 +4,14 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { existsSync } from 'node:fs';
 import { z } from 'zod';
-import { boards, matters, briefings, rules } from './data/seed.js';
+import { storeFromEnv, type Store } from './store/index.js';
 import { ask } from './services/assistant.js';
 import { readRegistry, configFromEnv } from './services/registry.js';
 import { buildAuditExport } from './services/export.js';
 import { verifyParameters } from './services/hash.js';
 import { Limiter, REFUSAL_MESSAGES } from './services/limits.js';
 import { basicAuth, configFromEnv as basicAuthFromEnv } from './middleware/basicAuth.js';
-import type { AssistantExchange } from './types.js';
+
 
 /**
  * Stage One is read-only. There is deliberately no route by which a rule can
@@ -21,24 +21,14 @@ import type { AssistantExchange } from './types.js';
  * decision recorded in one place and executed by someone else in another.
  */
 
-/**
- * Everything the assistant is asked is retained.
- *
- * Bounded, because an unbounded array in a long-running process is a leak, and
- * because the log is part of the record rather than the record itself. Stage
- * Two moves this to the store; until then the cap keeps a public deployment
- * from growing until it falls over.
- */
-const ASSISTANT_LOG_MAX = 1000;
-const assistantLog: AssistantExchange[] = [];
-
 const limiter = new Limiter();
 
-export function getAssistantLog(): readonly AssistantExchange[] {
-  return assistantLog;
-}
-
-export function createApp(): Express {
+/**
+ * The store is passed in so a test can hand over a fresh one and production can
+ * hand over the durable one. Left out, it is chosen from the environment, which
+ * refuses to fall back to memory when NODE_ENV is production.
+ */
+export function createApp(store: Store = storeFromEnv()): Express {
   const app = express();
   app.use(cors());
   app.use(express.json({ limit: '256kb' }));
@@ -64,20 +54,20 @@ export function createApp(): Express {
   });
 
   // ---- boards ----------------------------------------------------------
-  app.get('/api/boards', (_req, res) => {
-    res.json(boards);
+  app.get('/api/boards', async (_req, res) => {
+    res.json(await store.boards());
   });
 
-  app.get('/api/boards/:id', (req, res) => {
-    const board = boards.find((b) => b.id === req.params.id);
+  app.get('/api/boards/:id', async (req, res) => {
+    const board = await store.board(req.params.id);
     if (!board) return res.status(404).json({ error: 'board not found' });
     res.json(board);
   });
 
   // ---- rules -----------------------------------------------------------
-  app.get('/api/rules', (req, res) => {
-    const boardId = typeof req.query.board === 'string' ? req.query.board : null;
-    const list = boardId ? rules.filter((r) => r.boardId === boardId) : rules;
+  app.get('/api/rules', async (req, res) => {
+    const boardId = typeof req.query.board === 'string' ? req.query.board : undefined;
+    const list = await store.rules(boardId);
     res.json(
       list.map((r) => ({
         ...r,
@@ -86,8 +76,8 @@ export function createApp(): Express {
     );
   });
 
-  app.get('/api/rules/:id', (req, res) => {
-    const rule = rules.find((r) => r.id === req.params.id);
+  app.get('/api/rules/:id', async (req, res) => {
+    const rule = await store.rule(req.params.id);
     if (!rule) return res.status(404).json({ error: 'rule not found' });
     res.json({
       ...rule,
@@ -96,14 +86,13 @@ export function createApp(): Express {
   });
 
   // ---- matters ---------------------------------------------------------
-  app.get('/api/matters', (req, res) => {
-    const boardId = typeof req.query.board === 'string' ? req.query.board : null;
+  app.get('/api/matters', async (req, res) => {
+    const boardId = typeof req.query.board === 'string' ? req.query.board : undefined;
     const status = typeof req.query.status === 'string' ? req.query.status : null;
-    let list = boardId ? matters.filter((m) => m.boardId === boardId) : matters;
+    let list = await store.matters(boardId);
     if (status) list = list.filter((m) => m.status === status);
     res.json(
       list
-        .slice()
         .sort((a, b) => (a.openedAt < b.openedAt ? 1 : -1))
         .map((m) => ({
           id: m.id,
@@ -120,8 +109,8 @@ export function createApp(): Express {
     );
   });
 
-  app.get('/api/matters/:id', (req, res) => {
-    const matter = matters.find((m) => m.id === req.params.id);
+  app.get('/api/matters/:id', async (req, res) => {
+    const matter = await store.matter(req.params.id);
     if (!matter) return res.status(404).json({ error: 'matter not found' });
     res.json({
       ...matter,
@@ -136,14 +125,13 @@ export function createApp(): Express {
   });
 
   // ---- briefings -------------------------------------------------------
-  app.get('/api/briefings', (_req, res) => {
-    res.json(
-      briefings.slice().sort((a, b) => (a.publishedAt < b.publishedAt ? 1 : -1)),
-    );
+  app.get('/api/briefings', async (_req, res) => {
+    const list = await store.briefings();
+    res.json(list.sort((a, b) => (a.publishedAt < b.publishedAt ? 1 : -1)));
   });
 
-  app.get('/api/briefings/:id', (req, res) => {
-    const b = briefings.find((x) => x.id === req.params.id);
+  app.get('/api/briefings/:id', async (req, res) => {
+    const b = await store.briefing(req.params.id);
     if (!b) return res.status(404).json({ error: 'briefing not found' });
     res.json(b);
   });
@@ -186,10 +174,7 @@ export function createApp(): Express {
         scholarId: parsed.data.scholarId ?? null,
         context: parsed.data.context,
       });
-      assistantLog.push(result);
-      if (assistantLog.length > ASSISTANT_LOG_MAX) {
-        assistantLog.splice(0, assistantLog.length - ASSISTANT_LOG_MAX);
-      }
+      await store.appendAssistantExchange(result);
       res.json(result);
     } catch (err) {
       // The detail is for the operator, not the caller: it can carry request
@@ -211,19 +196,26 @@ export function createApp(): Express {
    * are what actually fix it. A second shared secret in front of this route
    * would look like defence in depth without being any.
    */
-  app.get('/api/assistant/log', (_req, res) => {
-    res.json(assistantLog);
+  app.get('/api/assistant/log', async (_req, res) => {
+    res.json(await store.assistantLog());
   });
 
   // ---- audit export ----------------------------------------------------
-  app.get('/api/export/:boardId', (req, res) => {
-    const board = boards.find((b) => b.id === req.params.boardId);
+  app.get('/api/export/:boardId', async (req, res) => {
+    const board = await store.board(req.params.boardId);
     if (!board) return res.status(404).json({ error: 'board not found' });
     const asOf =
       typeof req.query.asOf === 'string' && !Number.isNaN(Date.parse(req.query.asOf))
         ? new Date(req.query.asOf)
         : undefined;
-    res.json(buildAuditExport({ board, rules, matters, asOf }));
+    res.json(
+      buildAuditExport({
+        board,
+        rules: await store.rules(board.id),
+        matters: await store.matters(board.id),
+        asOf,
+      }),
+    );
   });
 
   // ---- the built client -------------------------------------------------

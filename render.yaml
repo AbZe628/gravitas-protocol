@@ -34,6 +34,15 @@ services:
       - key: BASIC_AUTH_PASSWORD
         sync: false
 
+      # --- the record -------------------------------------------------------
+      # Stage Two writes. Render's filesystem is ephemeral unless a disk is
+      # mounted, so this path survives a restart only once one is: without it
+      # every decision the board takes is lost on the next deploy, silently.
+      # Adding a disk is a paid change and is a precondition for putting a real
+      # board on this, not for demonstrating the process.
+      - key: MAJLIS_DB
+        value: /var/majlis/majlis.json
+
       # --- limits: the only thing between an open endpoint and the budget ---
       - key: RATE_LIMIT_PER_IP
         value: 10
