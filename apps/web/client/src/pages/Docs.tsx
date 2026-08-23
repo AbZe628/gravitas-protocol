@@ -206,8 +206,8 @@ export default function Docs() {
 const client = new GravitasClient({
   rpcUrl: 'https://sepolia-rollup.arbitrum.io/rpc',
   chainId: 421614,
-  registryAddress: '0xbcaE3069362B0f0b80f44139052f159456C84679',
-  teleportV3Address: '0x5D423f8d01539B92D3f3953b91682D9884D1E993',
+  registryAddress: '0x6f3bfb896DD9964C9c05dA88692bDf1b1b2C3F23',
+  teleportV3Address: '0x6702C2CE6eD58ca3934eBBd785CaC1De8DCd85B4',
 });`} language="typescript" />
                   </div>
                   <div>
@@ -245,15 +245,15 @@ console.log('Estimated gas:', result.gasEstimate);`} language="typescript" />
                   {[
                     {
                       name: "GravitasPolicyRegistry",
-                      address: "0xbcaE3069362B0f0b80f44139052f159456C84679",
+                      address: "0x6f3bfb896DD9964C9c05dA88692bDf1b1b2C3F23",
                       desc: "Risk & Compliance Oracle. Validates assets, routers, and executors.",
-                      link: "https://sepolia.arbiscan.io/address/0xbcaE3069362B0f0b80f44139052f159456C84679",
+                      link: "https://sepolia.arbiscan.io/address/0x6f3bfb896DD9964C9c05dA88692bDf1b1b2C3F23",
                     },
                     {
                       name: "TeleportV3",
-                      address: "0x5D423f8d01539B92D3f3953b91682D9884D1E993",
+                      address: "0x6702C2CE6eD58ca3934eBBd785CaC1De8DCd85B4",
                       desc: "Deterministic Liquidity Routing Engine for Uniswap V3 positions.",
-                      link: "https://sepolia.arbiscan.io/address/0x5D423f8d01539B92D3f3953b91682D9884D1E993",
+                      link: "https://sepolia.arbiscan.io/address/0x6702C2CE6eD58ca3934eBBd785CaC1De8DCd85B4",
                     },
                   ].map((contract, i) => (
                     <Card key={i} className="border border-[#D4AF37]/10 bg-[#0A1628]/60">

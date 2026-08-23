@@ -309,7 +309,7 @@ export const matters: Matter[] = [
     inForceAt: null,
     sources: [
       { kind: 'code', label: 'GravitasPolicyRegistry', ref: 'contracts/GravitasPolicyRegistry.sol' },
-      { kind: 'chain', label: 'Registry on Arbitrum Sepolia', ref: '0xbcaE3069362B0f0b80f44139052f159456C84679' },
+      { kind: 'chain', label: 'Registry on Arbitrum Sepolia', ref: '0x6f3bfb896DD9964C9c05dA88692bDf1b1b2C3F23' },
     ],
   },
   {

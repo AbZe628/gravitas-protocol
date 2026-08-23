@@ -2,7 +2,7 @@
   "policySetId": "SANDBOX-2026-07",
   "version": "1.0.0",
   "network": "arbitrum-sepolia",
-  "registry": "0xbcaE3069362B0f0b80f44139052f159456C84679",
+  "registry": "0x6f3bfb896DD9964C9c05dA88692bDf1b1b2C3F23",
   "note": "Illustrative sandbox policy set. Asset entries use canonical Arbitrum One token addresses (USDC, WETH) as stable, recognizable examples for classification; the on-chain registry referenced above is the Arbitrum Sepolia deployment. Testnet deployments whitelist testnet mock tokens rather than these mainnet addresses.",
   "policies": [
     {

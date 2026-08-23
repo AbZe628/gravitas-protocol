@@ -1,13 +1,11 @@
 # Gravitas Protocol Deployments
 
-> **The deployed bytecode is version 0.1.0 and predates the 0.1.2 security hardening.**
->
-> Two fixes are present in this repository and are **not yet on chain**:
-> `MIGRATION_TYPEHASH` in the deployed `TeleportV3` does not bind every economic parameter,
-> and the `Pausable` mechanism in the deployed `GravitasPolicyRegistry` does not gate the
-> verification functions. The verified source on Arbiscan will therefore not match this
-> repository. Redeployment is required before these fixes take effect. See `CHANGELOG.md`,
-> entry 0.1.2.
+> **Redeployed 23 August 2026.** The contracts at the addresses below are built from the
+> source in this repository. The previous deployment was not: it carried no pause, no
+> two-step ownership, no policy version history, and no EIP-712 signed intent, and its
+> swap router pointed at an address with no code on this network. Those addresses are
+> listed under "Superseded" at the foot of this document and should not be integrated
+> against.
 
 
 ## Arbitrum Sepolia (Testnet)
@@ -16,8 +14,36 @@
 
 | Contract | Address | Explorer |
 |----------|---------|----------|
-| **GravitasPolicyRegistry** | `0xbcaE3069362B0f0b80f44139052f159456C84679` | [View on Arbiscan](https://sepolia.arbiscan.io/address/0xbcaE3069362B0f0b80f44139052f159456C84679) |
-| **TeleportV3** | `0x5D423f8d01539B92D3f3953b91682D9884D1E993` | [View on Arbiscan](https://sepolia.arbiscan.io/address/0x5D423f8d01539B92D3f3953b91682D9884D1E993) |
+| **GravitasPolicyRegistry** | `0x6f3bfb896DD9964C9c05dA88692bDf1b1b2C3F23` | [View on Arbiscan](https://sepolia.arbiscan.io/address/0x6f3bfb896DD9964C9c05dA88692bDf1b1b2C3F23) |
+| **TeleportV3** | `0x6702C2CE6eD58ca3934eBBd785CaC1De8DCd85B4` | [View on Arbiscan](https://sepolia.arbiscan.io/address/0x6702C2CE6eD58ca3934eBBd785CaC1De8DCd85B4) |
+| **TeleportV2** | `0xEDfF3dFdcdd7C04B11d9B614d5E0cd368f1e93c0` | [View on Arbiscan](https://sepolia.arbiscan.io/address/0xEDfF3dFdcdd7C04B11d9B614d5E0cd368f1e93c0) |
+| **GravitasTimelock** | `0xbFFAd90B2607e3E5926260B640BbcD1E128680Ba` | [View on Arbiscan](https://sepolia.arbiscan.io/address/0xbFFAd90B2607e3E5926260B640BbcD1E128680Ba) |
+
+### Uniswap V3 on this network
+
+| | |
+|---|---|
+| NonfungiblePositionManager | `0x6b2937Bde17889EDCf8fbD8dE31C3C2a70Bc4d65` |
+| SwapRouter02 | `0x101F443B4d1b059569D643917553c771E1b9663E` |
+
+TeleportV3 previously pointed at `0xE592427A0AEce92De3Edee1F18E0157C05861564`, the original
+SwapRouter. That address holds no code on Arbitrum Sepolia, so the rebalancing swap could never
+have executed. SwapRouter02 has a shorter params struct — no `deadline` field — and the
+interface in `TeleportV3` matches it.
+
+**TeleportV2 has nothing to route through on this network.** There is no Uniswap V2 deployment
+on Arbitrum Sepolia at any canonical address. The contract is deployed and callable, but a
+migration through it needs a V2 factory and router to exist first.
+
+### Superseded
+
+These carried the 0.1.0 bytecode and are no longer the protocol's addresses. Left here so an
+old link resolves to an explanation rather than to nothing.
+
+| Contract | Address |
+|---|---|
+| GravitasPolicyRegistry (0.1.0) | `0xbcaE3069362B0f0b80f44139052f159456C84679` |
+| TeleportV3 (0.1.0) | `0x5D423f8d01539B92D3f3953b91682D9884D1E993` |
 
 ### Network Information
 
@@ -195,3 +221,37 @@ For deployment-related questions:
 - [Arbitrum Documentation](https://docs.arbitrum.io/)
 - [Foundry Deployment Guide](https://book.getfoundry.sh/forge/deploying)
 - [Contract Verification Guide](https://docs.arbiscan.io/tutorials/verifying-contracts-programmatically)
+
+---
+
+## Source verification on Arbiscan
+
+Verification is what puts the green tick on the address page and lets anyone read the source
+next to the bytecode. It needs a free Etherscan API key — one V2 key works across every chain.
+Get it at [etherscan.io/apis](https://etherscan.io/apis), then:
+
+```
+$env:ETHERSCAN_API_KEY = "your key"
+forge script script/Deploy.s.sol --rpc-url https://sepolia-rollup.arbitrum.io/rpc --verify --resume
+```
+
+`--resume` reads the broadcast record from the deployment, so the constructor arguments and the
+compiler settings come from what was actually deployed rather than from anything retyped.
+
+If a single contract needs doing on its own, the arguments are:
+
+| Contract | Constructor arguments |
+|---|---|
+| GravitasPolicyRegistry | none |
+| TeleportV3 | `(positionManager, swapRouter, registry)` |
+| TeleportV2 | `(registry)` |
+| GravitasTimelock | `(300, [deployer], [address(0)], address(0))` |
+
+```
+forge verify-contract <address> <ContractName> \
+  --chain 421614 --constructor-args $(cast abi-encode "c(address)" <registry>)
+```
+
+Compiler settings come from `foundry.toml` and must match the deployment exactly: solc 0.8.24,
+optimizer on, 200 runs, `via_ir` enabled. A mismatch in any one of them makes the bytecode differ
+and the verification fail.

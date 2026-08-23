@@ -262,7 +262,7 @@ export default function Compliance() {
                       <code className="text-xs md:text-sm font-mono text-[#D4AF37] break-all">0xbcaE...4679</code>
                       <div className="mt-2">
                         <a
-                          href="https://sepolia.arbiscan.io/address/0xbcaE3069362B0f0b80f44139052f159456C84679"
+                          href="https://sepolia.arbiscan.io/address/0x6f3bfb896DD9964C9c05dA88692bDf1b1b2C3F23"
                           target="_blank" rel="noopener noreferrer"
                         >
                           <Button size="sm" variant="ghost" className="h-6 px-2 text-white/40 hover:text-[#D4AF37] text-xs">

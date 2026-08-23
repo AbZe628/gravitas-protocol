@@ -14,7 +14,7 @@
  */
 import { ethers, type InterfaceAbi } from "ethers";
 
-const REGISTRY = "0xbcaE3069362B0f0b80f44139052f159456C84679";
+const REGISTRY = "0x6f3bfb896DD9964C9c05dA88692bDf1b1b2C3F23";
 const RPC = process.env.ARB_SEPOLIA_RPC || "https://sepolia-rollup.arbitrum.io/rpc";
 
 // Sourcify V2 — public, no key required, decentralised verification.

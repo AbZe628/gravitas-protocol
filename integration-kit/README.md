@@ -65,8 +65,8 @@ trail format referenced in Annex A.
 
 | Contract | Network | Address |
 |----------|---------|---------|
-| GravitasPolicyRegistry | Arbitrum Sepolia | `0xbcaE3069362B0f0b80f44139052f159456C84679` |
-| TeleportV3 (atomic execution engine) | Arbitrum Sepolia | `0x5D423f8d01539B92D3f3953b91682D9884D1E993` |
+| GravitasPolicyRegistry | Arbitrum Sepolia | `0x6f3bfb896DD9964C9c05dA88692bDf1b1b2C3F23` |
+| TeleportV3 (atomic execution engine) | Arbitrum Sepolia | `0x6702C2CE6eD58ca3934eBBd785CaC1De8DCd85B4` |
 
 Both are source-verified. `onchain-read.ts` deliberately pulls the ABI from the
 explorer at runtime — the same path any independent reviewer would take.

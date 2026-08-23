@@ -260,7 +260,7 @@ export default function History() {
             {filtered.length > 0 && (
               <div className="mt-6 flex items-center justify-between text-sm text-white/40">
                 <span>Showing {filtered.length} of {mockTransactions.length} transactions</span>
-                <a href="https://sepolia.arbiscan.io/address/0x5D423f8d01539B92D3f3953b91682D9884D1E993" target="_blank" rel="noopener noreferrer">
+                <a href="https://sepolia.arbiscan.io/address/0x6702C2CE6eD58ca3934eBBd785CaC1De8DCd85B4" target="_blank" rel="noopener noreferrer">
                   <Button size="sm" variant="ghost" className="text-white/40 hover:text-[#D4AF37] text-xs gap-1">
                     <ExternalLink className="h-3 w-3" />
                     View all on Arbiscan

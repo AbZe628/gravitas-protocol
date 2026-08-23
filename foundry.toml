@@ -25,3 +25,8 @@ gas_reports = ["*"]
 via_ir = true
 optimizer = true
 optimizer_runs = 200
+
+# Source verification. One Etherscan V2 key covers every chain; get a free one at
+# etherscan.io/apis and export it as ETHERSCAN_API_KEY. Nothing here holds a key.
+[etherscan]
+arbitrum-sepolia = { key = "${ETHERSCAN_API_KEY}", chain = 421614 }

@@ -38,7 +38,7 @@ ETHERSCAN_API_KEY=your_arbiscan_api_key
 
 # Optional: Uniswap V3 addresses (defaults provided in script)
 POSITION_MANAGER=0xC36442b4a4522E871399CD717aBDD847Ab11FE88
-SWAP_ROUTER=0xE592427A0AEce92De3Edee1F18E0157C05861564
+SWAP_ROUTER=0x101F443B4d1b059569D643917553c771E1b9663E
 ```
 
 ### Step 2: Secure Your Credentials
@@ -204,7 +204,7 @@ forge verify-contract \
 | Contract | Address |
 |----------|---------|
 | **NonfungiblePositionManager** | `0xC36442b4a4522E871399CD717aBDD847Ab11FE88` |
-| **SwapRouter** | `0xE592427A0AEce92De3Edee1F18E0157C05861564` |
+| **SwapRouter** | `0x101F443B4d1b059569D643917553c771E1b9663E` |
 | **Factory** | `0x1F98431c8aD98523631AE4a59f267346ea31F984` |
 
 ---

@@ -43,7 +43,7 @@ export function configFromEnv(): RegistryConfig {
     rpcUrl: process.env.RPC_URL ?? 'https://sepolia-rollup.arbitrum.io/rpc',
     address:
       process.env.POLICY_REGISTRY_ADDRESS ??
-      '0xbcaE3069362B0f0b80f44139052f159456C84679',
+      '0x6f3bfb896DD9964C9c05dA88692bDf1b1b2C3F23',
     offline: (process.env.OFFLINE_MODE ?? 'false').toLowerCase() === 'true',
   };
 }

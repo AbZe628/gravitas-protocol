@@ -119,16 +119,16 @@ const faqSections = [
 const contracts = [
   {
     name: "PolicyRegistry",
-    address: "0xbcaE3069362B0f0b80f44139052f159456C84679",
+    address: "0x6f3bfb896DD9964C9c05dA88692bDf1b1b2C3F23",
     description: "On-chain Shariah compliance whitelist. Governs token and router authorization.",
-    explorer: "https://sepolia.arbiscan.io/address/0xbcaE3069362B0f0b80f44139052f159456C84679",
+    explorer: "https://sepolia.arbiscan.io/address/0x6f3bfb896DD9964C9c05dA88692bDf1b1b2C3F23",
     verified: true,
   },
   {
     name: "TeleportV3",
-    address: "0x5D423f8d01539B92D3f3953b91682D9884D1E993",
+    address: "0x6702C2CE6eD58ca3934eBBd785CaC1De8DCd85B4",
     description: "Atomic V3 NFT position migration with EIP-712 signed intents.",
-    explorer: "https://sepolia.arbiscan.io/address/0x5D423f8d01539B92D3f3953b91682D9884D1E993",
+    explorer: "https://sepolia.arbiscan.io/address/0x6702C2CE6eD58ca3934eBBd785CaC1De8DCd85B4",
     verified: true,
   },
   {
@@ -515,7 +515,7 @@ export default function Home() {
                 role: "Risk & Compliance Oracle",
                 description: "On-chain whitelist of Shariah-compliant assets and authorized DEX routers. Every migration must pass a compliance check before execution. The registry version is tracked on-chain for auditability.",
                 address: "0xbcaE...4679",
-                link: "https://sepolia.arbiscan.io/address/0xbcaE3069362B0f0b80f44139052f159456C84679",
+                link: "https://sepolia.arbiscan.io/address/0x6f3bfb896DD9964C9c05dA88692bDf1b1b2C3F23",
                 borderColor: "border-blue-500/20",
                 bgColor: "bg-blue-500/5",
                 iconColor: "text-blue-400",
@@ -526,7 +526,7 @@ export default function Home() {
                 role: "V3 Migration Engine",
                 description: "Atomic migration of Uniswap V3 NFT positions. EIP-712 signed intents with nonce-based replay protection. Yul-optimized dust refund. Optional rebalancing swap within the same transaction.",
                 address: "0x5D42...993",
-                link: "https://sepolia.arbiscan.io/address/0x5D423f8d01539B92D3f3953b91682D9884D1E993",
+                link: "https://sepolia.arbiscan.io/address/0x6702C2CE6eD58ca3934eBBd785CaC1De8DCd85B4",
                 borderColor: "border-[#D4AF37]/20",
                 bgColor: "bg-[#D4AF37]/5",
                 iconColor: "text-[#D4AF37]",

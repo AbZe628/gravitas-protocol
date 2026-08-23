@@ -11,7 +11,7 @@ info:
 
     Status: SANDBOX / TESTNET. Production keys are issued after the tier-1 security audit.
     On-chain policy source of truth: GravitasPolicyRegistry on Arbitrum Sepolia
-    (0xbcaE3069362B0f0b80f44139052f159456C84679, source-verified).
+    (0x6f3bfb896DD9964C9c05dA88692bDf1b1b2C3F23, source-verified).
 servers:
   - url: http://localhost:8787
     description: Local mock sandbox (this directory, /mock-server)
@@ -122,7 +122,7 @@ components:
           description: Pointer for optional trustless verification against the public registry
           properties:
             network:  { type: string, example: "arbitrum-sepolia" }
-            registry: { type: string, example: "0xbcaE3069362B0f0b80f44139052f159456C84679" }
+            registry: { type: string, example: "0x6f3bfb896DD9964C9c05dA88692bDf1b1b2C3F23" }
     PolicySet:
       type: object
       properties:

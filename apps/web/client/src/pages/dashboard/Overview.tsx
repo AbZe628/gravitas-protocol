@@ -248,15 +248,15 @@ export default function Overview() {
             <CardContent className="space-y-3">
               <ContractAddress
                 label="GravitasPolicyRegistry"
-                address="0xbcaE3069362B0f0b80f44139052f159456C84679"
+                address="0x6f3bfb896DD9964C9c05dA88692bDf1b1b2C3F23"
                 short="0xbcaE...4679"
-                href="https://sepolia.arbiscan.io/address/0xbcaE3069362B0f0b80f44139052f159456C84679"
+                href="https://sepolia.arbiscan.io/address/0x6f3bfb896DD9964C9c05dA88692bDf1b1b2C3F23"
               />
               <ContractAddress
                 label="TeleportV3"
-                address="0x5D423f8d01539B92D3f3953b91682D9884D1E993"
+                address="0x6702C2CE6eD58ca3934eBBd785CaC1De8DCd85B4"
                 short="0x5D42...E993"
-                href="https://sepolia.arbiscan.io/address/0x5D423f8d01539B92D3f3953b91682D9884D1E993"
+                href="https://sepolia.arbiscan.io/address/0x6702C2CE6eD58ca3934eBBd785CaC1De8DCd85B4"
               />
 
               <div className="pt-2 space-y-2">

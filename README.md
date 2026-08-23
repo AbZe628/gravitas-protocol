@@ -28,10 +28,12 @@ The protocol is live and verified on the Arbitrum Sepolia testnet. All contract 
 
 | Contract | Address | Explorer |
 |---|---|---|
-| **GravitasPolicyRegistry** | `0xbcaE3069362B0f0b80f44139052f159456C84679` | [View on Arbiscan](https://sepolia.arbiscan.io/address/0xbcaE3069362B0f0b80f44139052f159456C84679) |
-| **TeleportV3** | `0x5D423f8d01539B92D3f3953b91682D9884D1E993` | [View on Arbiscan](https://sepolia.arbiscan.io/address/0x5D423f8d01539B92D3f3953b91682D9884D1E993) |
+| **GravitasPolicyRegistry** | `0x6f3bfb896DD9964C9c05dA88692bDf1b1b2C3F23` | [View on Arbiscan](https://sepolia.arbiscan.io/address/0x6f3bfb896DD9964C9c05dA88692bDf1b1b2C3F23) |
+| **TeleportV3** | `0x6702C2CE6eD58ca3934eBBd785CaC1De8DCd85B4` | [View on Arbiscan](https://sepolia.arbiscan.io/address/0x6702C2CE6eD58ca3934eBBd785CaC1De8DCd85B4) |
+| **TeleportV2** | `0xEDfF3dFdcdd7C04B11d9B614d5E0cd368f1e93c0` | [View on Arbiscan](https://sepolia.arbiscan.io/address/0xEDfF3dFdcdd7C04B11d9B614d5E0cd368f1e93c0) |
+| **GravitasTimelock** | `0xbFFAd90B2607e3E5926260B640BbcD1E128680Ba` | [View on Arbiscan](https://sepolia.arbiscan.io/address/0xbFFAd90B2607e3E5926260B640BbcD1E128680Ba) |
 
-> **Note:** These addresses point to the pre-`0.1.2` bytecode. The contracts are being redeployed to Arbitrum Sepolia with the `0.1.2` security hardening (see `CHANGELOG.md`), and the addresses above will be updated once the new source-verified deployment is live.
+Deployed 23 August 2026. The bytecode at these addresses is built from the source in this repository at the commit that deployed it — the earlier deployment was not, and that gap is now closed.
 
 ---
 
