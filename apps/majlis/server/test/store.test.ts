@@ -4,18 +4,18 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import type { Matter } from '../src/types.js';
 import { MemoryStore } from '../src/store/memory.js';
-import { SqliteStore } from '../src/store/sqlite.js';
+import { FileStore } from '../src/store/file.js';
 import { NotFound, type Store } from '../src/store/store.js';
 import { Refused, recordVote } from '../src/services/lifecycle.js';
 
 /**
- * One suite, both implementations. The in-memory store is the reference and the
- * SQLite store is what runs in production, so any disagreement between them
- * should be a failing test here rather than a surprise later.
+ * One suite, both implementations. The in-memory store is the reference and
+ * keeps the tests fast; the file store is what ships. Any disagreement between
+ * them should be a failing test here rather than a surprise later.
  */
 const backends: Array<[string, () => Store]> = [
   ['memory', () => new MemoryStore()],
-  ['sqlite', () => new SqliteStore({ file: ':memory:' })],
+  ['file', () => new FileStore({ file: join(mkdtempSync(join(tmpdir(), 'majlis-mem-')), 'r.json') })],
 ];
 
 const T0 = '2026-08-24T09:00:00.000Z';
@@ -184,21 +184,21 @@ describe.each(backends)('%s store', (_name, make) => {
 
 // ── what only the file-backed store can be asked ──────────────────────────
 
-describe('sqlite, on disk', () => {
+describe('the file store, on disk', () => {
   let dir: string;
 
   beforeEach(() => { dir = mkdtempSync(join(tmpdir(), 'majlis-')); });
   afterEach(() => { rmSync(dir, { recursive: true, force: true }); });
 
   it('a matter survives the process that wrote it', async () => {
-    const file = join(dir, 'majlis.db');
+    const file = join(dir, 'majlis.json');
 
-    const first = new SqliteStore({ file });
+    const first = new FileStore({ file });
     await first.createMatter(newMatter('m-durable', { title: 'written before restart' }));
     await first.updateMatter('m-durable', (m) => ({ ...m, status: 'deliberation' }));
     await first.close();
 
-    const second = new SqliteStore({ file });
+    const second = new FileStore({ file });
     const read = await second.matter('m-durable');
     expect(read?.title).toBe('written before restart');
     expect(read?.status).toBe('deliberation');
@@ -206,14 +206,14 @@ describe('sqlite, on disk', () => {
   });
 
   it('reopening does not seed over what is already there', async () => {
-    const file = join(dir, 'majlis.db');
+    const file = join(dir, 'majlis.json');
 
-    const first = new SqliteStore({ file });
+    const first = new FileStore({ file });
     await first.updateMatter((await first.matters())[0].id, (m) => ({ ...m, title: 'edited' }));
     const countBefore = (await first.matters()).length;
     await first.close();
 
-    const second = new SqliteStore({ file });
+    const second = new FileStore({ file });
     expect((await second.matters()).length).toBe(countBefore);
     expect((await second.matters())[0].title).toBe('edited');
     await second.close();
