@@ -211,19 +211,37 @@ Explorer links are in `docs/DEPLOYMENTS.md`.
 | Multi-signature and timelock governance | Contracts written, handover tested, **not deployed**. See 4.2 |
 | Mainnet deployment | Not started |
 
-### 3.3 The deployed bytecode is older than this repository
+### 3.3 What the redeployment of 23 August 2026 closed
 
-The contracts at the addresses above were deployed at version 0.1.0. Two fixes released in 0.1.2
-are present in this repository and are **not yet on chain**:
+Until that date the bytecode on chain was a generation behind this repository, and the gap was
+wider than earlier versions of this document described. The deployed contracts carried **no pause
+mechanism at all**, no two-step ownership transfer, no policy version history, and no EIP-712
+signed intent — not weakened versions of those things, but no versions of them. TeleportV3's swap
+router pointed at `0xE592427A0AEce92De3Edee1F18E0157C05861564`, an address holding no code on
+Arbitrum Sepolia, so the rebalancing swap could not have executed at all.
 
-1. `MIGRATION_TYPEHASH` in the deployed TeleportV3 does not bind every economic parameter, so an
-   authorised executor could replay a valid owner signature with weakened slippage bounds.
-2. The Pausable mechanism in the deployed PolicyRegistry compiles but does not gate the
-   verification functions, so pausing the registry does not halt enforcement.
+All four contracts were redeployed and verified on Arbiscan. Three further faults were corrected
+before deploying rather than after, because deploying any of them would have committed the fault
+and required a second deployment:
 
-Reading the verified source on Arbiscan shows the older code, and it will not match this
-repository. Redeployment is required before these fixes take effect on chain. This section comes
-out when that has happened.
+1. **The policy hash did not commit to the policy.** It hashed the block timestamp, the sender and
+   the version number — metadata about the write, carrying nothing derived from the whitelist. Two
+   entirely different registries produced the same hash when written in the same block by the same
+   owner at the same version. Since the claim made throughout this document is that "was what the
+   board approved the same as what was deployed" reduces to comparing hashes, the one value that
+   comparison rests on could not support it. Each change is now folded into the hash before it and
+   tagged with which register it touched, so `policyHistory[v]` commits to the ordered sequence
+   that produced version v and can be replayed from events and independently recomputed.
+2. **The dust refund dropped the ERC-20 return value.** Hand-written assembly checked only whether
+   the call reverted. Against a token that reports failure by returning false, the leftover balance
+   stayed in the contract while the migration reported success. It now uses `SafeERC20`.
+3. **Approvals were not reset** after the position manager and the swap router had been used.
+
+The superseded addresses still resolve on chain and must not be integrated against. They are
+listed in `docs/DEPLOYMENTS.md`.
+
+What this section does **not** claim: the contracts have not been independently audited, and
+ownership of the registry has not yet moved to the timelock. Both are covered in section 4.
 
 ---
 

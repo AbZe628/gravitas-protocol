@@ -49,8 +49,8 @@ services:
       # --- chain ------------------------------------------------------------
       - key: RPC_URL
         value: https://sepolia-rollup.arbitrum.io/rpc
-      # Deployed bytecode is 0.1.0 and predates the 0.1.2 hardening.
-      # See docs/DEPLOYMENTS.md before treating these as current.
+      # Redeployed and verified on Arbiscan, 23 August 2026. The bytecode at
+      # these addresses is built from the source in this repository.
       - key: POLICY_REGISTRY_ADDRESS
         value: "0x6f3bfb896DD9964C9c05dA88692bDf1b1b2C3F23"
       - key: TELEPORT_V3_ADDRESS

@@ -45,10 +45,13 @@ We encourage security researchers to review our contracts and report any potenti
 Stated plainly, because a threat model is only useful next to what is actually true today.
 
 - **Testnet only.** Arbitrum Sepolia. The protocol has never held funds, and none are at risk.
-- **Ownership of `GravitasPolicyRegistry` is a single externally owned account.** The mitigation
-  in section 2 — timelock with a 48-hour delay, multi-signature proposers — is the intended
-  production configuration and is **not in force yet**. `GravitasTimelock` is deployed but does
-  not hold the registry. Until that handover completes, one key can change compliance policy.
+- **Ownership of `GravitasPolicyRegistry` is a single externally owned account, deliberately.**
+  `GravitasTimelock` is deployed and does not hold the registry yet. A 48-hour delay on every
+  policy change is the right property for a protocol in production and the wrong one for a
+  protocol still being built, where a compliance rule may need correcting the same day it is
+  found to be wrong. The handover is scheduled for **after the independent audit and before
+  mainnet**, and is a precondition for mainnet rather than an open item. Until it runs, one key
+  can change compliance policy, and this document does not claim otherwise.
 - **No independent audit has been completed.** Nothing here should be read as an audited system.
 - Current addresses are in [`docs/DEPLOYMENTS.md`](../docs/DEPLOYMENTS.md). The pair superseded
   by the redeployment of 23 August 2026 still resolves on chain and must not be integrated
