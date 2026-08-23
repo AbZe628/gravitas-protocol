@@ -11,7 +11,8 @@
     "start": "node dist/index.js",
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "member": "tsx scripts/member.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.65.0",

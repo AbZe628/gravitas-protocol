@@ -29,6 +29,11 @@ services:
       # --- secrets: entered in the Render dashboard, never committed --------
       - key: ANTHROPIC_API_KEY
         sync: false
+      # One credential per member, so a vote can be attributed. Without it the
+      # shared credential below authenticates as an observer, which reads and
+      # writes nothing. Generate entries with: npm run member -w server
+      - key: MAJLIS_MEMBERS
+        sync: false
       - key: BASIC_AUTH_USER
         sync: false
       - key: BASIC_AUTH_PASSWORD

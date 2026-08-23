@@ -10,7 +10,7 @@ import { readRegistry, configFromEnv } from './services/registry.js';
 import { buildAuditExport } from './services/export.js';
 import { verifyParameters } from './services/hash.js';
 import { Limiter, REFUSAL_MESSAGES } from './services/limits.js';
-import { basicAuth, configFromEnv as basicAuthFromEnv } from './middleware/basicAuth.js';
+import { basicAuth, authFromEnv } from './middleware/basicAuth.js';
 
 
 /**
@@ -35,10 +35,10 @@ export function createApp(store: Store = storeFromEnv()): Express {
 
   app.set('trust proxy', 1);
 
-  // Everything except /api/health sits behind basic auth. Stage Two replaces
-  // this with real roles; until then a shared credential is the difference
-  // between "internal" and "on the open internet".
-  app.use(basicAuth(basicAuthFromEnv()));
+  // Everything except /api/health sits behind authentication. With
+  // MAJLIS_MEMBERS each request carries an identity; with only the shared
+  // credential it carries the observer role, which reads and writes nothing.
+  app.use(basicAuth(authFromEnv()));
 
   app.get('/api/health', (_req: Request, res: Response) => {
     res.json({
