@@ -29,6 +29,12 @@ contract GravitasPolicyRegistry is Ownable2Step, Pausable, IShariahPolicyChecker
     uint256 public currentVersion;
     mapping(uint256 => bytes32) public policyHistory;
 
+    // Which register a change touched. Folded into the hash so that moving an
+    // address between registers cannot produce the same commitment.
+    bytes32 private constant FIELD_ASSET = keccak256("asset");
+    bytes32 private constant FIELD_ROUTER = keccak256("router");
+    bytes32 private constant FIELD_EXECUTOR = keccak256("executor");
+
     // ═══════════════════════════════════════════════════════════════════════════════════
     //                                   EVENTS
     // ═══════════════════════════════════════════════════════════════════════════════════
@@ -39,7 +45,12 @@ contract GravitasPolicyRegistry is Ownable2Step, Pausable, IShariahPolicyChecker
     event PolicyUpdated(uint256 indexed version, bytes32 policyHash);
 
     constructor() Ownable(msg.sender) {
+        // The deployer's executor right is a policy decision like any other. It
+        // belongs in the event log and in the hash chain, or anything rebuilding
+        // the executor set from events starts with this grant missing.
         isExecutor[msg.sender] = true;
+        _recordChange(FIELD_EXECUTOR, msg.sender, true);
+        emit ExecutorStatusUpdated(msg.sender, true);
     }
 
     // ═══════════════════════════════════════════════════════════════════════════════════
@@ -48,22 +59,25 @@ contract GravitasPolicyRegistry is Ownable2Step, Pausable, IShariahPolicyChecker
 
     function setAssetCompliance(address asset, bool status) external onlyOwner {
         require(asset != address(0), "GPR: Invalid asset address");
+        if (isAssetCompliant[asset] == status) return;
         isAssetCompliant[asset] = status;
-        _updateVersion();
+        _recordChange(FIELD_ASSET, asset, status);
         emit AssetComplianceUpdated(asset, status);
     }
 
     function setRouterAuthorization(address router, bool status) external onlyOwner {
         require(router != address(0), "GPR: Invalid router address");
+        if (isRouterAuthorized[router] == status) return;
         isRouterAuthorized[router] = status;
-        _updateVersion();
+        _recordChange(FIELD_ROUTER, router, status);
         emit RouterAuthorizationUpdated(router, status);
     }
 
     function setExecutorStatus(address executor, bool status) external onlyOwner {
         require(executor != address(0), "GPR: Invalid executor address");
+        if (isExecutor[executor] == status) return;
         isExecutor[executor] = status;
-        _updateVersion();
+        _recordChange(FIELD_EXECUTOR, executor, status);
         emit ExecutorStatusUpdated(executor, status);
     }
 
@@ -75,9 +89,26 @@ contract GravitasPolicyRegistry is Ownable2Step, Pausable, IShariahPolicyChecker
         _unpause();
     }
 
-    function _updateVersion() internal {
+    /**
+     * @notice Records one policy change and extends the commitment chain.
+     * @dev The previous version hashed the timestamp, the sender and the version
+     *      number — metadata about the write, carrying nothing derived from the
+     *      policy. Two entirely different registries produced the same hash if
+     *      written in the same block by the same owner at the same version, and
+     *      the same registry produced a different one when re-recorded later. It
+     *      could not answer the question it existed to answer.
+     *
+     *      Each change is now folded into the hash before it, so
+     *      policyHistory[v] commits to the whole ordered sequence of changes
+     *      that produced version v. An observer replays PolicyUpdated from
+     *      genesis, recomputes, and compares. "Is what runs what the board
+     *      approved" becomes a comparison rather than testimony.
+     *
+     *      policyHistory[0] is zero and is the genesis of the chain.
+     */
+    function _recordChange(bytes32 field, address subject, bool status) internal {
         currentVersion++;
-        bytes32 policyHash = keccak256(abi.encode(block.timestamp, msg.sender, currentVersion));
+        bytes32 policyHash = keccak256(abi.encode(policyHistory[currentVersion - 1], field, subject, status));
         policyHistory[currentVersion] = policyHash;
         emit PolicyUpdated(currentVersion, policyHash);
     }

@@ -16,6 +16,28 @@ import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
  * @notice A mock position manager that only uses HALF the desired amounts,
  *         leaving the other half as dust to test the YUL assembly refund path.
  */
+/**
+ * @title LyingToken
+ * @notice An ERC-20 that reports failure by returning false instead of reverting,
+ *         which is the behaviour SafeERC20 exists to absorb and the behaviour the
+ *         old hand-written assembly refund silently accepted as success. It lies
+ *         only about transfers to one address, so it can still be moved into
+ *         position by the harness.
+ */
+contract LyingToken is ERC20 {
+    address public immutable refuseTransfersTo;
+
+    constructor(address _refuseTransfersTo) ERC20("Lying Token", "LIE") {
+        refuseTransfersTo = _refuseTransfersTo;
+        _mint(msg.sender, 1_000_000 ether);
+    }
+
+    function transfer(address to, uint256 amount) public override returns (bool) {
+        if (to == refuseTransfersTo) return false;
+        return super.transfer(to, amount);
+    }
+}
+
 contract DustMockPositionManager is ERC721 {
     using SafeERC20 for IERC20;
 
@@ -959,5 +981,82 @@ contract TeleportV3FullFlowTests is Test {
 
         vm.expectRevert("TV3: Invalid Registry");
         new TeleportV3(address(positionManager), address(swapRouter), address(0));
+    }
+
+    /**
+     * @notice A dust refund that the token refuses must fail loudly.
+     * @dev The refund used to run through hand-written assembly that checked only
+     *      whether the call reverted and never read the returned boolean. Against a
+     *      token that returns false, the dust stayed in this contract and the
+     *      migration reported success — the owner was told their position had moved
+     *      and quietly did not get their change back. It now runs through SafeERC20,
+     *      so the whole migration reverts and nothing is lost silently.
+     */
+    function test_V3_DustRefundRevertsWhenTheTokenReturnsFalse() public {
+        DustMockPositionManager dustPM = new DustMockPositionManager();
+        MockUniswapV3SwapRouter dustSwapRouter = new MockUniswapV3SwapRouter();
+
+        vm.startPrank(owner);
+        GravitasPolicyRegistry reg = new GravitasPolicyRegistry();
+        TeleportV3 tele = new TeleportV3(address(dustPM), address(dustSwapRouter), address(reg));
+        vm.stopPrank();
+
+        // The liar refuses exactly the refund leg: transfers back to the position owner.
+        vm.startPrank(user);
+        LyingToken liar = new LyingToken(user);
+        TestTokenV3 honest = new TestTokenV3("Honest", "HON");
+        vm.stopPrank();
+
+        (address t0, address t1) =
+            address(liar) < address(honest) ? (address(liar), address(honest)) : (address(honest), address(liar));
+
+        vm.startPrank(owner);
+        reg.setAssetCompliance(t0, true);
+        reg.setAssetCompliance(t1, true);
+        reg.setExecutorStatus(executor, true);
+        vm.stopPrank();
+
+        vm.startPrank(user);
+        IERC20(t0).approve(address(dustPM), 100 ether);
+        IERC20(t1).approve(address(dustPM), 100 ether);
+        (uint256 tokenId,,,) = dustPM.mint(
+            DustMockPositionManager.MintParams({
+                token0: t0,
+                token1: t1,
+                fee: 3000,
+                tickLower: -600,
+                tickUpper: 600,
+                amount0Desired: 100 ether,
+                amount1Desired: 100 ether,
+                amount0Min: 1,
+                amount1Min: 1,
+                recipient: user,
+                deadline: block.timestamp + 1 hours
+            })
+        );
+        dustPM.approve(address(tele), tokenId);
+        vm.stopPrank();
+
+        TeleportV3.AtomicMigrationParams memory params = TeleportV3.AtomicMigrationParams({
+            tokenId: tokenId,
+            newFee: 500,
+            newTickLower: -10,
+            newTickUpper: 10,
+            amount0MinMint: 1,
+            amount1MinMint: 1,
+            amount0MinDecrease: 1,
+            amount1MinDecrease: 1,
+            deadline: block.timestamp + 1 hours,
+            executeSwap: false,
+            zeroForOne: false,
+            swapAmountIn: 0,
+            swapAmountOutMin: 0,
+            swapFeeTier: 500
+        });
+        bytes memory signature = _signMigrationFor(userPrivateKey, address(tele), params, 0);
+
+        vm.prank(executor);
+        vm.expectRevert(abi.encodeWithSelector(SafeERC20.SafeERC20FailedOperation.selector, address(liar)));
+        tele.executeAtomicMigration(params, signature);
     }
 }

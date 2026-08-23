@@ -13,12 +13,12 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 contract MockUniswapV3SwapRouter {
     using SafeERC20 for IERC20;
 
+    // Mirrors SwapRouter02, which carries no deadline inside the params struct.
     struct ExactInputSingleParams {
         address tokenIn;
         address tokenOut;
         uint24 fee;
         address recipient;
-        uint256 deadline;
         uint256 amountIn;
         uint256 amountOutMinimum;
         uint160 sqrtPriceLimitX96;
@@ -52,7 +52,6 @@ contract MockUniswapV3SwapRouter {
      * @dev Simplified swap that uses configured ratio or 1:1 default
      */
     function exactInputSingle(ExactInputSingleParams calldata params) external payable returns (uint256 amountOut) {
-        require(params.deadline >= block.timestamp, "MockRouter: expired");
         require(params.amountIn > 0, "MockRouter: zero amount");
 
         // Get swap ratio (default to 1:1 if not set)

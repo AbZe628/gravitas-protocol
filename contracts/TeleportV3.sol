@@ -77,7 +77,6 @@ interface ISwapRouter {
         address tokenOut;
         uint24 fee;
         address recipient;
-        uint256 deadline;
         uint256 amountIn;
         uint256 amountOutMinimum;
         uint160 sqrtPriceLimitX96;
@@ -234,8 +233,8 @@ contract TeleportV3 is ReentrancyGuard, Pausable, Ownable, IERC721Receiver, EIP7
 
         (newTokenId, newLiquidity) = _mintNewPosition(params, token0, token1, amount0Available, amount1Available, owner);
 
-        _refundDustOptimized(token0, owner, balance0Start);
-        _refundDustOptimized(token1, owner, balance1Start);
+        _refundDust(token0, owner, balance0Start);
+        _refundDust(token1, owner, balance1Start);
 
         emit LiquidityTeleported(params.tokenId, newTokenId, owner, newLiquidity, params.newFee, params.executeSwap);
     }
@@ -310,12 +309,14 @@ contract TeleportV3 is ReentrancyGuard, Pausable, Ownable, IERC721Receiver, EIP7
                 tokenOut: tokenOut,
                 fee: params.swapFeeTier,
                 recipient: address(this),
-                deadline: params.deadline,
                 amountIn: amountIn,
                 amountOutMinimum: params.swapAmountOutMin,
                 sqrtPriceLimitX96: 0
             })
         );
+
+        // Whatever the router did not take stays approved otherwise.
+        IERC20(tokenIn).forceApprove(address(swapRouter), 0);
 
         return params.zeroForOne
             ? (amount0Available - amountIn, amount1Available + amountOut)
@@ -348,20 +349,31 @@ contract TeleportV3 is ReentrancyGuard, Pausable, Ownable, IERC721Receiver, EIP7
                 deadline: params.deadline
             })
         );
+
+        // The position manager takes only what the range needs; the rest of the
+        // budget would remain approved to it indefinitely.
+        IERC20(token0).forceApprove(address(positionManager), 0);
+        IERC20(token1).forceApprove(address(positionManager), 0);
     }
 
-    function _refundDustOptimized(address token, address recipient, uint256 balanceBefore) private {
+    /**
+     * @notice Returns whatever the migration did not consume to the position owner.
+     * @dev This was hand-written assembly that checked only whether the call
+     *      reverted and never read the returned boolean. A token that signals
+     *      failure by returning false rather than reverting — the behaviour
+     *      SafeERC20 exists to absorb — left the dust stranded in this contract
+     *      while the migration reported success. The rest of the contract used
+     *      SafeERC20 throughout; this one path opted out of it for a gas saving
+     *      that did not justify the exposure.
+     *
+     *      Measuring the balance rather than tracking amounts means a fee-on-
+     *      transfer token refunds what actually arrived, and a pre-existing
+     *      balance held by this contract is never swept into a user's refund.
+     */
+    function _refundDust(address token, address recipient, uint256 balanceBefore) private {
         uint256 balanceAfter = IERC20(token).balanceOf(address(this));
         if (balanceAfter > balanceBefore) {
-            uint256 dustAmount = balanceAfter - balanceBefore;
-            assembly {
-                let ptr := mload(0x40)
-                mstore(ptr, 0xa9059cbb00000000000000000000000000000000000000000000000000000000)
-                mstore(add(ptr, 0x04), and(recipient, 0xffffffffffffffffffffffffffffffffffffffff))
-                mstore(add(ptr, 0x24), dustAmount)
-                let success := call(gas(), token, 0, ptr, 0x44, 0, 0)
-                if iszero(success) { revert(0, 0) }
-            }
+            IERC20(token).safeTransfer(recipient, balanceAfter - balanceBefore);
         }
     }
 
