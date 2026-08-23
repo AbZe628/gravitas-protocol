@@ -22,10 +22,13 @@ import "../contracts/governance/GravitasTimelock.sol";
  *      decision and does not belong in a deployment script.
  *
  * Usage:
- *   export DEPLOYER_KEY=0x...          # never committed, never shared
  *   forge script script/Deploy.s.sol \
  *     --rpc-url https://sepolia-rollup.arbitrum.io/rpc \
- *     --broadcast --verify
+ *     --broadcast --interactive 1
+ *
+ *   --interactive prompts for the key without echoing it, so it never reaches
+ *   the shell history or the process environment. Setting DEPLOYER_KEY works
+ *   too, and is what CI would use.
  */
 contract Deploy is Script {
     // Uniswap V3 on Arbitrum Sepolia. Override through the environment for any
@@ -46,8 +49,12 @@ contract Deploy is Script {
         external
         returns (GravitasPolicyRegistry registry, TeleportV3 teleportV3, TeleportV2 teleportV2, GravitasTimelock timelock)
     {
-        uint256 deployerKey = vm.envUint("DEPLOYER_KEY");
-        address deployer = vm.addr(deployerKey);
+        // Two ways in. DEPLOYER_KEY is convenient but leaves the key in the
+        // shell history and the process environment. Leaving it unset lets
+        // forge supply the signer instead, from --interactive or --account,
+        // and the key never becomes a string anywhere.
+        uint256 deployerKey = vm.envOr("DEPLOYER_KEY", uint256(0));
+        address deployer = deployerKey != 0 ? vm.addr(deployerKey) : msg.sender;
 
         address positionManager = vm.envOr("POSITION_MANAGER", DEFAULT_POSITION_MANAGER);
         address swapRouter = vm.envOr("SWAP_ROUTER", DEFAULT_SWAP_ROUTER);
@@ -64,7 +71,11 @@ contract Deploy is Script {
         console.log("swap router       ", swapRouter);
         console.log("");
 
-        vm.startBroadcast(deployerKey);
+        if (deployerKey != 0) {
+            vm.startBroadcast(deployerKey);
+        } else {
+            vm.startBroadcast();
+        }
 
         registry = new GravitasPolicyRegistry();
         console.log("GravitasPolicyRegistry", address(registry));
