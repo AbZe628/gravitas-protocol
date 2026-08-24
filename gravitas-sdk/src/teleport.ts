@@ -38,10 +38,14 @@ const POSITION_MANAGER_ABI = parseAbi([
  *        .tokenId(123n)
  *        .newFee(3000)
  *        .ticks(-887220, 887220)
- *        .slippage(0n, 0n, 0n, 0n)
+ *        .slippage(1n, 1n, 0n, 0n)
  *        .deadline(BigInt(Math.floor(Date.now() / 1000) + 3600))
- *        .simulate(userAddress);
+ *        .simulate(userAddress, signature);
  *      ```
+ *
+ *      Both mint minimums must exceed zero. TeleportV3 refuses a migration whose
+ *      new position would accept any amount at all: a bound of zero is not
+ *      slippage protection but the absence of it, and the contract says so.
  */
 export class MigrationBuilder {
   private params: Partial<MigrationParams> = {
@@ -145,6 +149,17 @@ export class MigrationBuilder {
    * @returns Simulation result with expected outcomes.
    * @throws {ShariahViolationError} If tokens are not Shariah-compliant.
    */
+  /**
+   * @notice Returns the completed parameters, validated.
+   * @dev The EIP-712 signature covers exactly this object, so signing means
+   *      reading it back out. Throws if something required was never set,
+   *      which is the right moment to learn it — before a wallet asks the
+   *      owner to approve parameters that cannot be submitted.
+   */
+  build(): MigrationParams {
+    return MigrationParamsSchema.parse(this.params);
+  }
+
   async simulate(account: Address, signature: `0x${string}`) {
     const validatedParams = MigrationParamsSchema.parse(this.params);
     

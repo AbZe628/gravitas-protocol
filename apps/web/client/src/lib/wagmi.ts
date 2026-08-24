@@ -31,8 +31,38 @@ export const config = createConfig({
   },
 });
 
-// Contract addresses on Arbitrum Sepolia
+// Contract addresses on Arbitrum Sepolia. All four are deployed and verified;
+// listing only the two the dashboard calls made the deployment look half-finished
+// on every page that renders from this object.
 export const CONTRACTS = {
   POLICY_REGISTRY: '0x6f3bfb896DD9964C9c05dA88692bDf1b1b2C3F23' as const,
   TELEPORT_V3: '0x6702C2CE6eD58ca3934eBBd785CaC1De8DCd85B4' as const,
+  TELEPORT_V2: '0xEDfF3dFdcdd7C04B11d9B614d5E0cd368f1e93c0' as const,
+  TIMELOCK: '0xbFFAd90B2607e3E5926260B640BbcD1E128680Ba' as const,
 } as const;
+
+export const ARBISCAN = 'https://sepolia.arbiscan.io/address/';
+
+/** What each address is, in the order a reader should meet them. */
+export const DEPLOYMENT = [
+  {
+    name: 'GravitasPolicyRegistry',
+    address: CONTRACTS.POLICY_REGISTRY,
+    role: 'The ruling, on chain. Every other contract asks it before it moves anything.',
+  },
+  {
+    name: 'TeleportV3',
+    address: CONTRACTS.TELEPORT_V3,
+    role: 'Migrates a Uniswap V3 position in one transaction, against a signed intent.',
+  },
+  {
+    name: 'TeleportV2',
+    address: CONTRACTS.TELEPORT_V2,
+    role: 'The constant-product path. Deployed, but Arbitrum Sepolia hosts no Uniswap V2 to route through.',
+  },
+  {
+    name: 'GravitasTimelock',
+    address: CONTRACTS.TIMELOCK,
+    role: 'Holds delay over privileged changes. Ownership moves to it before mainnet, after the audit.',
+  },
+] as const;

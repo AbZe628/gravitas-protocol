@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import { motion } from "framer-motion";
 import {
-  Code2, Package, Copy, CheckCheck, ChevronRight, Home,
+  Code2, Package, Copy, CheckCheck, ChevronRight,
   Terminal, Zap, Shield, ArrowRight, ExternalLink, BookOpen
 } from "lucide-react";
 
@@ -89,14 +89,15 @@ export default function SDK() {
                 Gravitas SDK
               </motion.h1>
               <motion.p variants={fadeUp} className="text-xl text-white/50 leading-relaxed mb-6">
-                A Stripe-like developer experience for institutional DeFi integrations.
-                Fully typed, pre-flight compliance checks, and a fluent builder API.
+                Typed end to end, with the compliance check built into the path rather than
+                bolted beside it: a migration that would break the ruling fails before a wallet
+                is ever asked to sign it.
               </motion.p>
               <motion.div variants={fadeUp} className="flex gap-3">
-                <Badge className="bg-white/5 border-white/10 text-white/60">v1.0.0</Badge>
+                <Badge className="bg-white/5 border-white/10 text-white/60">v2.0.0</Badge>
                 <Badge className="bg-white/5 border-white/10 text-white/60">TypeScript</Badge>
                 <Badge className="bg-white/5 border-white/10 text-white/60">ESM + CJS</Badge>
-                <Badge className="bg-green-500/10 border-green-500/20 text-green-400">Stable</Badge>
+                <Badge className="bg-amber-400/10 border-amber-400/25 text-amber-300">Testnet</Badge>
               </motion.div>
             </motion.div>
           </div>
@@ -111,15 +112,32 @@ export default function SDK() {
                 <Terminal className="h-6 w-6 text-gold" />
                 <h2 className="text-2xl font-bold">Installation</h2>
               </div>
-              <div className="grid md:grid-cols-3 gap-4 mb-6">
-                {[
-                  { pm: "npm", cmd: "npm install @gravitas/sdk" },
-                  { pm: "yarn", cmd: "yarn add @gravitas/sdk" },
-                  { pm: "pnpm", cmd: "pnpm add @gravitas/sdk" },
-                ].map((item, i) => (
-                  <CodeBlock key={i} code={item.cmd} language={item.pm} />
-                ))}
+
+              <div className="rounded-xl border border-amber-400/30 bg-amber-400/[0.06] p-4 mb-6">
+                <p className="text-sm text-white/80 font-medium mb-1">Not on the public registry yet</p>
+                <p className="text-sm text-white/60 leading-relaxed">
+                  <code className="font-mono text-gold text-xs">npm install @gravitas/sdk</code> returns 404
+                  today. Publishing waits on the independent audit, so that a package with this name cannot be
+                  installed before the code behind it has been reviewed. Build it from the repository instead.
+                </p>
               </div>
+
+              <CodeBlock
+                title="Build once, then reference by path"
+                language="bash"
+                code={`git clone https://github.com/AbZe628/gravitas-protocol.git
+cd gravitas-protocol/gravitas-sdk
+npm install && npm run build
+
+# from your own project
+npm install /path/to/gravitas-protocol/gravitas-sdk`}
+              />
+
+              <p className="text-sm text-white/60 mt-4 leading-relaxed">
+                It brings <code className="font-mono text-gold text-xs">viem</code> ^2 and
+                <code className="font-mono text-gold text-xs"> zod</code> ^3 with it, and ships ESM, CJS and
+                type declarations.
+              </p>
             </motion.section>
 
             {/* GravitasClient */}
@@ -128,10 +146,10 @@ export default function SDK() {
                 <Code2 className="h-6 w-6 text-gold" />
                 <h2 className="text-2xl font-bold">GravitasClient</h2>
               </div>
-              <p className="text-white/50 mb-6">The main entry point for all SDK interactions.</p>
+              <p className="text-white/60 mb-6">The entry point. Four fields, all required.</p>
 
               <CodeBlock
-                title="Initialize client"
+                title="Initialize the client"
                 code={`import { GravitasClient } from '@gravitas/sdk';
 
 const client = new GravitasClient({
@@ -139,181 +157,234 @@ const client = new GravitasClient({
   chainId: 421614,
   registryAddress: '0x6f3bfb896DD9964C9c05dA88692bDf1b1b2C3F23',
   teleportV3Address: '0x6702C2CE6eD58ca3934eBBd785CaC1De8DCd85B4',
-});`}
+});
+
+client.compliance;      // ComplianceService — a property, not a call
+client.migration();     // a fresh MigrationBuilder
+client.publicClient;    // the underlying viem client, if you need it`}
               />
 
-              <div className="mt-6 grid md:grid-cols-3 gap-4">
+              <div className="mt-6 grid md:grid-cols-2 gap-4">
                 {[
-                  { prop: "rpcUrl", type: "string", desc: "Arbitrum Sepolia RPC endpoint" },
-                  { prop: "chainId", type: "number", desc: "Chain ID (421614 for Arbitrum Sepolia)" },
-                  { prop: "registryAddress", type: "`0x${string}`", desc: "GravitasPolicyRegistry contract address" },
-                  { prop: "teleportV3Address", type: "`0x${string}`", desc: "TeleportV3 contract address" },
-                  { prop: "signer", type: "Signer (optional)", desc: "Ethers.js signer for write operations" },
-                  { prop: "timeout", type: "number (optional)", desc: "Request timeout in milliseconds" },
+                  { prop: "rpcUrl", type: "string", desc: "Must parse as a URL, or construction throws." },
+                  { prop: "chainId", type: "number", desc: "421614 for Arbitrum Sepolia." },
+                  { prop: "registryAddress", type: "Address", desc: "GravitasPolicyRegistry." },
+                  { prop: "teleportV3Address", type: "Address", desc: "TeleportV3, and the EIP-712 verifying contract." },
                 ].map((prop, i) => (
                   <div key={i} className="p-3 rounded-lg border border-gold/10 bg-canvas/40">
                     <code className="text-sm font-mono text-gold">{prop.prop}</code>
                     <p className="text-xs text-white/50 mt-0.5">{prop.type}</p>
-                    <p className="text-xs text-white/50 mt-1">{prop.desc}</p>
+                    <p className="text-xs text-white/60 mt-1">{prop.desc}</p>
                   </div>
                 ))}
               </div>
+
+              <p className="text-sm text-white/60 mt-4 leading-relaxed">
+                There is no signer and no timeout field — the schema rejects anything it does not recognise.
+                The SDK reads and simulates; signing and sending stay with your wallet client, so a private
+                key never passes through it.
+              </p>
             </motion.section>
 
             {/* Compliance API */}
             <motion.section variants={fadeUp}>
               <div className="flex items-center gap-3 mb-2">
                 <Shield className="h-6 w-6 text-gold" />
-                <h2 className="text-2xl font-bold">Compliance API</h2>
+                <h2 className="text-2xl font-bold">ComplianceService</h2>
               </div>
-              <p className="text-white/50 mb-6">Pre-flight Shariah compliance checks before any migration.</p>
+              <p className="text-white/60 mb-6">
+                Reached at <code className="font-mono text-gold text-sm">client.compliance</code>. The
+                validators throw and name what was refused; the readers return a value to render.
+              </p>
 
               <CodeBlock
-                title="compliance.ts"
-                code={`const compliance = client.compliance();
+                title="Validators — throw on refusal"
+                code={`await client.compliance.validateAsset(token);
+await client.compliance.validateTokens(token0, token1);
+await client.compliance.validateRouter(router);
+await client.compliance.validateExecutor(executor);
 
-// Check if an asset is Shariah-compliant
-const isCompliant = await compliance.isAssetCompliant(
-  '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48' // USDC
-);
-
-// Check if an executor is authorized
-const isAuthorized = await compliance.isExecutorAuthorized(
-  '0x...' // executor address
-);
-
-// Get current policy version
-const version = await compliance.getPolicyVersion();
-
-// Run full pre-flight check (throws if any check fails)
-await compliance.preflight({
-  tokenA: '0x...',
-  tokenB: '0x...',
-  executor: '0x...',
-});`}
+// All of the above, in one call, before you build anything.
+await client.compliance.performPreFlightCheck(token0, token1, executor);`}
               />
+
+              <div className="mt-6">
+                <CodeBlock
+                  title="Readers — return a value"
+                  code={`const status = await client.compliance.getComplianceStatus(token0, token1);
+// { tokenACompliant: boolean, tokenBCompliant: boolean, pairCompliant: boolean }
+
+const version = await client.compliance.getPolicyVersion();
+// bigint — increments on every change the board makes`}
+                />
+              </div>
+
+              <div className="mt-6 rounded-xl border border-gold/20 bg-canvas/50 p-4">
+                <p className="text-sm text-white/80 font-medium mb-2">Why these read the gated getters</p>
+                <p className="text-sm text-white/60 leading-relaxed">
+                  The registry can answer compliance from a public mapping or from a verifier that carries
+                  <code className="font-mono text-gold text-xs"> whenNotPaused</code>. The mapping keeps
+                  answering while the registry is paused; the verifier reverts. A pause is the board
+                  withdrawing its ruling, so anything about to move value has to fail closed when it happens —
+                  which is why the SDK reads the verifier and not the mapping.
+                </p>
+              </div>
             </motion.section>
 
             {/* Migration Builder */}
             <motion.section variants={fadeUp}>
               <div className="flex items-center gap-3 mb-2">
                 <Zap className="h-6 w-6 text-gold" />
-                <h2 className="text-2xl font-bold">Migration Builder</h2>
+                <h2 className="text-2xl font-bold">MigrationBuilder</h2>
               </div>
-              <p className="text-white/50 mb-6">Fluent builder API for constructing and executing migrations.</p>
+              <p className="text-white/60 mb-6">
+                Describes one migration of a Uniswap V3 position. Every setter returns the builder, and
+                nothing is validated until you call <code className="font-mono text-gold text-sm">build()</code>,
+                <code className="font-mono text-gold text-sm"> simulate()</code> or
+                <code className="font-mono text-gold text-sm"> encodeCalldata()</code>.
+              </p>
 
               <div className="space-y-6">
                 <CodeBlock
-                  title="V3 Migration (simulate)"
-                  code={`const result = await client.migration()
-  .tokenId(123n)                    // Uniswap V3 NFT position ID
-  .newFee(3000)                     // Target fee tier (500, 3000, 10000)
-  .ticks(-887220, 887220)           // tickLower, tickUpper
-  .slippage(0n, 0n, 0n, 0n)        // amount0Min/Max for decrease/mint
-  .deadline(BigInt(Math.floor(Date.now() / 1000) + 3600))
-  .simulate(userAddress);
-
-console.log('Gas estimate:', result.gasEstimate);
-console.log('Expected output:', result.expectedAmounts);`}
-                />
-
-                <CodeBlock
-                  title="V3 Migration (execute with EIP-712)"
-                  code={`// Step 1: Build migration params
-const migration = client.migration()
-  .tokenId(123n)
-  .newFee(3000)
-  .ticks(-887220, 887220)
-  .slippage(0n, 0n, 0n, 0n)
+                  title="Describe it"
+                  code={`const migration = client.migration()
+  .tokenId(123n)                 // Uniswap V3 position NFT
+  .newFee(3000)                  // 100, 500, 3000 or 10000
+  .ticks(-887220, 887220)        // both divisible by that tier's spacing
+  .slippage(1n, 1n, 0n, 0n)      // mint0Min, mint1Min, decrease0Min, decrease1Min
   .deadline(BigInt(Math.floor(Date.now() / 1000) + 3600));
 
-// Step 2: Get current nonce
-const nonce = await migration.getNonce(userAddress);
+// Optional rebalancing swap on the way through.
+migration.withSwap(true, amountIn, minOut, 3000);`}
+                />
 
-// Step 3: Sign with EIP-712
-const signature = await migration.sign(signer, nonce);
+                <div className="rounded-xl border border-gold/25 bg-gold/[0.06] p-4">
+                  <p className="text-sm text-white/80 font-medium mb-1">Both mint minimums must exceed zero</p>
+                  <p className="text-sm text-white/60 leading-relaxed">
+                    <code className="font-mono text-gold text-xs">slippage(0n, 0n, 0n, 0n)</code> reverts on
+                    chain with <code className="font-mono text-gold text-xs">TV3: Zero slippage not allowed</code>.
+                    A position that would accept any amount at all is not protected against an adverse move,
+                    and TeleportV3 will not open one. The last two arguments bound what leaves the old
+                    position and may be zero.
+                  </p>
+                </div>
 
-// Step 4: Execute atomically
-const tx = await migration.execute(signature);
-const receipt = await tx.wait();
+                <CodeBlock
+                  title="Simulate it"
+                  code={`// A signature of the right shape is enough to simulate.
+const probe = ('0x' + '00'.repeat(65)) as \`0x\${string}\`;
 
-console.log('Migration successful:', receipt.transactionHash);`}
+const result = await migration.simulate(userAddress, probe);
+console.log(result.request);
+
+// simulate() runs the compliance pre-flight first, so a non-compliant
+// position throws ShariahViolationError before any RPC simulation runs.`}
                 />
 
                 <CodeBlock
-                  title="V2 Migration"
-                  code={`const tx = await client.migrationV2()
-  .pair('0x...')                    // Uniswap V2 pair address
-  .lpAmount(BigInt('1000000000000000000')) // LP token amount (1 LP)
-  .routerTo('0x...')                // Destination router
-  .deadline(BigInt(Math.floor(Date.now() / 1000) + 3600))
-  .execute();
+                  title="Sign it and submit it"
+                  code={`import { buildMigrationTypedData } from '@gravitas/sdk';
 
-const receipt = await tx.wait();`}
+// The signature covers exactly these parameters, so read them back out.
+const params = migration.build();
+
+const nonce = await client.publicClient.readContract({
+  address: teleportV3Address,
+  abi: [{
+    name: 'nonces', type: 'function', stateMutability: 'view',
+    inputs: [{ type: 'address' }], outputs: [{ type: 'uint256' }],
+  }],
+  functionName: 'nonces',
+  args: [owner],
+});
+
+const typedData = buildMigrationTypedData(params, nonce, teleportV3Address, 421614);
+const signature = await walletClient.signTypedData({ account: owner, ...typedData });
+
+// Raw calldata, for a multisig or a relayer to submit.
+const calldata = migration.encodeCalldata(signature);`}
                 />
+              </div>
+
+              <div className="mt-6 rounded-xl border border-gold/20 bg-canvas/50 p-4">
+                <p className="text-sm text-white/80 font-medium mb-2">There is no V2 builder</p>
+                <p className="text-sm text-white/60 leading-relaxed">
+                  TeleportV2 is called directly, as
+                  <code className="font-mono text-gold text-xs"> migrateLiquidityV2</code> with nine arguments,
+                  by an address the registry lists as an executor. It is not wrapped by this SDK, because
+                  Arbitrum Sepolia hosts no Uniswap V2 deployment for it to route through and a builder that
+                  cannot be exercised is a builder nobody has tested.
+                </p>
               </div>
             </motion.section>
 
-            {/* SDK Snippet Generator */}
+            {/* Full example */}
             <motion.section variants={fadeUp}>
               <div className="flex items-center gap-3 mb-2">
                 <Code2 className="h-6 w-6 text-gold" />
-                <h2 className="text-2xl font-bold">SDK Snippet Generator</h2>
+                <h2 className="text-2xl font-bold">End to end</h2>
               </div>
-              <p className="text-white/50 mb-6">Generate ready-to-use code snippets for your integration.</p>
+              <p className="text-white/60 mb-6">
+                The whole path in one file: check the ruling, describe the move, simulate it, have the owner
+                sign it, submit it.
+              </p>
 
-              <Card className="border border-gold/10 bg-canvas/60">
-                <CardHeader>
-                  <CardTitle className="text-white text-base">Example Integration</CardTitle>
-                  <CardDescription className="text-white/50">Copy this snippet to get started immediately</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <CodeBlock
-                    title="Full integration example"
-                    code={`import { GravitasClient } from '@gravitas/sdk';
-import { ethers } from 'ethers';
+              <CodeBlock
+                title="migrate.ts"
+                code={`import { createWalletClient, custom, type Address } from 'viem';
+import { arbitrumSepolia } from 'viem/chains';
+import { GravitasClient, buildMigrationTypedData } from '@gravitas/sdk';
 
-async function migratePosition(tokenId: bigint) {
-  // Initialize provider and signer
-  const provider = new ethers.JsonRpcProvider(
-    'https://sepolia-rollup.arbitrum.io/rpc'
-  );
-  const signer = new ethers.Wallet(process.env.WALLET_SIGNER_KEY!, provider);
+const TELEPORT_V3 = '0x6702C2CE6eD58ca3934eBBd785CaC1De8DCd85B4' as const;
+const REGISTRY = '0x6f3bfb896DD9964C9c05dA88692bDf1b1b2C3F23' as const;
 
-  // Initialize Gravitas client
-  const client = new GravitasClient({
-    rpcUrl: 'https://sepolia-rollup.arbitrum.io/rpc',
-    chainId: 421614,
-    registryAddress: '0x6f3bfb896DD9964C9c05dA88692bDf1b1b2C3F23',
-    teleportV3Address: '0x6702C2CE6eD58ca3934eBBd785CaC1De8DCd85B4',
-    signer,
+const client = new GravitasClient({
+  rpcUrl: 'https://sepolia-rollup.arbitrum.io/rpc',
+  chainId: 421614,
+  registryAddress: REGISTRY,
+  teleportV3Address: TELEPORT_V3,
+});
+
+export async function migrate(tokenId: bigint, owner: Address) {
+  const wallet = createWalletClient({
+    account: owner,
+    chain: arbitrumSepolia,
+    transport: custom(window.ethereum),
   });
 
-  // Pre-flight compliance check
-  await client.compliance().preflight({
-    tokenA: '0x...', // your token addresses
-    tokenB: '0x...',
-    executor: await signer.getAddress(),
-  });
-
-  // Build and execute migration
-  const migration = client.migration()
+  const migration = client
+    .migration()
     .tokenId(tokenId)
     .newFee(3000)
     .ticks(-887220, 887220)
-    .slippage(0n, 0n, 0n, 0n)
+    .slippage(1n, 1n, 0n, 0n)
     .deadline(BigInt(Math.floor(Date.now() / 1000) + 3600));
 
-  const nonce = await migration.getNonce(await signer.getAddress());
-  const signature = await migration.sign(signer, nonce);
-  const tx = await migration.execute(signature);
+  // Simulate first. This also runs the compliance pre-flight, so a
+  // non-compliant position fails here rather than in the wallet.
+  const probe = ('0x' + '00'.repeat(65)) as \`0x\${string}\`;
+  await migration.simulate(owner, probe);
 
-  console.log('Migration tx:', tx.hash);
-  return await tx.wait();
+  const nonce = await client.publicClient.readContract({
+    address: TELEPORT_V3,
+    abi: [{
+      name: 'nonces', type: 'function', stateMutability: 'view',
+      inputs: [{ type: 'address' }], outputs: [{ type: 'uint256' }],
+    }],
+    functionName: 'nonces',
+    args: [owner],
+  });
+
+  const typedData = buildMigrationTypedData(
+    migration.build(), nonce as bigint, TELEPORT_V3, 421614,
+  );
+  const signature = await wallet.signTypedData({ account: owner, ...typedData });
+
+  // Simulate once more with the real signature, then send.
+  const { request } = await migration.simulate(owner, signature);
+  return wallet.writeContract(request);
 }`}
-                  />
-                </CardContent>
-              </Card>
+              />
             </motion.section>
 
             {/* Resources */}

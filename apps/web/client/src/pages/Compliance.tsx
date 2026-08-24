@@ -7,10 +7,10 @@ import { Input } from "@/components/ui/input";
 import { Link } from "wouter";
 import { motion } from "framer-motion";
 import { useReadContract } from "wagmi";
-import { CONTRACTS } from "@/lib/wagmi";
+import { ARBISCAN, CONTRACTS, DEPLOYMENT } from "@/lib/wagmi";
 import {
   Shield, CheckCircle, XCircle, Search, ExternalLink,
-  ChevronRight, Home, AlertTriangle, Menu, X
+  ChevronRight, AlertTriangle, Menu, X
 } from "lucide-react";
 
 const fadeUp = {
@@ -52,11 +52,15 @@ function AddressChecker({
   placeholder,
   functionName,
   description,
+  positive,
+  negative,
 }: {
   title: string;
   placeholder: string;
     functionName: "isAssetCompliant" | "isExecutor";
   description: string;
+  positive: string;
+  negative: string;
 }) {
   const [input, setInput] = useState("");
   const [address, setAddress] = useState<`0x${string}` | undefined>(undefined);
@@ -114,22 +118,22 @@ function AddressChecker({
             ) : isError ? (
               <div className="flex items-center gap-2 text-red-400">
                 <AlertTriangle className="h-4 w-4" />
-                <span className="text-sm">Error querying contract</span>
+                <span className="text-sm">The registry did not answer. Check the address and try again.</span>
               </div>
             ) : data ? (
               <div className="flex items-center gap-2 text-green-400">
                 <CheckCircle className="h-5 w-5" />
                 <div>
-                  <p className="font-semibold">Compliant ✓</p>
-                  <p className="text-xs text-green-400/70">This address passes Shariah compliance checks</p>
+                  <p className="font-semibold">Yes</p>
+                  <p className="text-xs text-green-300/80">{positive}</p>
                 </div>
               </div>
             ) : (
               <div className="flex items-center gap-2 text-red-400">
                 <XCircle className="h-5 w-5" />
                 <div>
-                  <p className="font-semibold">Not Compliant ✗</p>
-                  <p className="text-xs text-red-400/70">This address is not on the compliance whitelist</p>
+                  <p className="font-semibold">No</p>
+                  <p className="text-xs text-red-300/80">{negative}</p>
                 </div>
               </div>
             )}
@@ -284,7 +288,9 @@ export default function Compliance() {
                     title="Asset Compliance Check"
                     placeholder="0x... (token address)"
                     functionName="isAssetCompliant"
-                    description="Verify if a token is on the Shariah-compliant whitelist"
+                    description="Ask the registry whether a token is covered by the current ruling"
+                    positive="The board has approved this token. A migration touching it will pass the asset check."
+                    negative="This token is not on the approved list. Any migration touching it reverts."
                   />
                 </motion.div>
                 <motion.div variants={fadeUp}>
@@ -292,10 +298,112 @@ export default function Compliance() {
                     title="Executor Authorization Check"
                     placeholder="0x... (executor address)"
                     functionName="isExecutor"
-                    description="Verify if an executor is authorized to perform migrations"
+                    description="Ask the registry whether an address may submit migrations"
+                    positive="The registry lists this address as an executor. It may submit migrations — against intents their owners signed."
+                    negative="The registry does not list this address. Any migration it submits reverts."
                   />
                 </motion.div>
               </div>
+
+              {/* What the registry actually enforces */}
+              <motion.h3 variants={fadeUp} className="text-xl md:text-2xl font-bold mb-2">What the registry enforces</motion.h3>
+              <motion.p variants={fadeUp} className="text-white/60 mb-6 max-w-3xl leading-relaxed">
+                The registry is not a document. It is the contract every other contract asks before it moves
+                anything, and it answers in the same transaction that would do the moving.
+              </motion.p>
+
+              <div className="grid md:grid-cols-3 gap-4 mb-12">
+                {[
+                  {
+                    title: "Assets",
+                    body: "A migration touching a token that is not on the approved list reverts. Both tokens of a position are checked, every time, not once at onboarding.",
+                  },
+                  {
+                    title: "Routers",
+                    body: "Liquidity may only be re-added through a venue the board has authorized. An unlisted router is refused before any approval is granted.",
+                  },
+                  {
+                    title: "Executors",
+                    body: "Only listed addresses may submit a migration. The position owner still signs the intent, so an executor cannot move what it was not asked to.",
+                  },
+                ].map((item) => (
+                  <motion.div key={item.title} variants={fadeUp}>
+                    <Card className="h-full border border-gold/10 bg-canvas/60">
+                      <CardContent className="pt-6">
+                        <p className="font-semibold text-white mb-2">{item.title}</p>
+                        <p className="text-sm text-white/60 leading-relaxed">{item.body}</p>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* The pause, and why it is not a formality */}
+              <motion.div variants={fadeUp} className="rounded-2xl border border-gold/20 bg-canvas/50 p-5 md:p-6 mb-12">
+                <p className="font-semibold text-white mb-2">Withdrawing the ruling stops execution</p>
+                <p className="text-sm md:text-base text-white/60 leading-relaxed mb-3">
+                  The registry can be paused. While it is, every verifier reverts rather than answering, and
+                  a migration that depends on one cannot complete. That is deliberate: a pause is the board
+                  saying it no longer stands behind the ruling, and code about to move value has to fail
+                  closed the moment that happens rather than run on the last answer it heard.
+                </p>
+                <p className="text-sm md:text-base text-white/60 leading-relaxed">
+                  Every change is recorded on chain as well as applied. Each one increments the policy
+                  version and folds the previous hash, the field, the subject and the new status into a new
+                  one — so the current hash commits to the entire history that produced it, and a version
+                  cannot be quietly rewritten to say something it never said.
+                </p>
+              </motion.div>
+
+              {/* Deployment */}
+              <motion.h3 variants={fadeUp} className="text-xl md:text-2xl font-bold mb-2">Deployed contracts</motion.h3>
+              <motion.p variants={fadeUp} className="text-white/60 mb-6 max-w-3xl leading-relaxed">
+                All four are live on Arbitrum Sepolia and verified, so the source behind each address can be
+                read on Arbiscan rather than taken on trust.
+              </motion.p>
+
+              <div className="grid sm:grid-cols-2 gap-4 mb-12">
+                {DEPLOYMENT.map((contract) => (
+                  <motion.div key={contract.address} variants={fadeUp}>
+                    <Card className="h-full border border-gold/10 bg-canvas/60">
+                      <CardContent className="pt-6">
+                        <p className="font-semibold text-white mb-1">{contract.name}</p>
+                        <p className="text-sm text-white/60 mb-3 leading-relaxed">{contract.role}</p>
+                        <code className="text-[11px] md:text-xs font-mono text-gold break-all">{contract.address}</code>
+                        <div className="mt-2">
+                          <a href={ARBISCAN + contract.address} target="_blank" rel="noopener noreferrer">
+                            <Button size="sm" variant="ghost" className="h-6 px-2 text-white/60 hover:text-gold text-xs">
+                              <ExternalLink className="h-3 w-3 mr-1" />
+                              View on Arbiscan
+                            </Button>
+                          </a>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* Who decides */}
+              <motion.div variants={fadeUp} className="rounded-2xl border border-gold/20 bg-gradient-to-br from-gold/[0.07] to-transparent p-6 md:p-8">
+                <p className="text-lg md:text-xl font-bold text-white mb-2">Who changes the list</p>
+                <p className="text-sm md:text-base text-white/60 leading-relaxed mb-5 max-w-3xl">
+                  Nothing on this page decides anything. What an address is permitted to do is a ruling, and
+                  rulings are made by the Shariah board in Majlis — where permitting is slow and reversible,
+                  restricting is fast, and every decision carries the reasoning that produced it.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Button asChild className="bg-gold text-abyss hover:bg-gold/90 font-semibold">
+                    <a href="https://majlis.gravitasprotocol.xyz" target="_blank" rel="noopener noreferrer">
+                      Open Majlis
+                      <ExternalLink className="h-4 w-4 ml-2" />
+                    </a>
+                  </Button>
+                  <Button asChild variant="outline" className="border-gold/30 text-white hover:bg-gold/10">
+                    <Link href="/docs">Read the documentation</Link>
+                  </Button>
+                </div>
+              </motion.div>
             </motion.div>
           </div>
         </section>
