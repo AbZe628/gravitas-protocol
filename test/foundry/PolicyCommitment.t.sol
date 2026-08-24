@@ -169,4 +169,86 @@ contract PolicyCommitment is Test {
         registry.setAssetCompliance(TOKEN_A, true);
         assertEq(registry.getPolicyVersion(), registry.currentVersion());
     }
+
+    // ── the same rule, on the other two registers ───────────────────────────
+    //
+    // The no-op guard was held to account for assets and nowhere else, so the
+    // router and executor registers could have advanced the version on a write
+    // that changed nothing and no test would have noticed. A version that moves
+    // without a change makes the record say a decision was taken when none was.
+
+    function test_RewritingARouterChangesNothing() public {
+        registry.setRouterAuthorization(ROUTER, true);
+        uint256 version = registry.currentVersion();
+        bytes32 hashAtVersion = registry.policyHistory(version);
+
+        registry.setRouterAuthorization(ROUTER, true);
+        registry.setRouterAuthorization(ROUTER, true);
+
+        assertEq(registry.currentVersion(), version);
+        assertEq(registry.policyHistory(version), hashAtVersion);
+        assertTrue(registry.isRouterAuthorized(ROUTER));
+    }
+
+    function test_RewritingAnExecutorChangesNothing() public {
+        address executor = address(0x3333);
+        registry.setExecutorStatus(executor, true);
+        uint256 version = registry.currentVersion();
+        bytes32 hashAtVersion = registry.policyHistory(version);
+
+        registry.setExecutorStatus(executor, true);
+
+        assertEq(registry.currentVersion(), version);
+        assertEq(registry.policyHistory(version), hashAtVersion);
+        assertTrue(registry.isExecutor(executor));
+    }
+
+    function test_RevokingWhatWasNeverGrantedIsNotAChange() public {
+        uint256 version = registry.currentVersion();
+
+        registry.setRouterAuthorization(ROUTER, false);
+        registry.setExecutorStatus(address(0x4444), false);
+
+        assertEq(registry.currentVersion(), version);
+        assertFalse(registry.isRouterAuthorized(ROUTER));
+        assertFalse(registry.isExecutor(address(0x4444)));
+    }
+
+    function test_ARepeatedWriteEmitsNothing() public {
+        registry.setExecutorStatus(address(0x5555), true);
+
+        // recordLogs rather than expectEmit: the assertion is that nothing was
+        // emitted at all, which expectEmit cannot express.
+        vm.recordLogs();
+        registry.setExecutorStatus(address(0x5555), true);
+        assertEq(vm.getRecordedLogs().length, 0);
+    }
+
+    // ── the address guards on the other two registers ───────────────────────
+
+    function test_ZeroAddressIsRejectedOnEveryRegister() public {
+        vm.expectRevert("GPR: Invalid asset address");
+        registry.setAssetCompliance(address(0), true);
+
+        vm.expectRevert("GPR: Invalid router address");
+        registry.setRouterAuthorization(address(0), true);
+
+        vm.expectRevert("GPR: Invalid executor address");
+        registry.setExecutorStatus(address(0), true);
+
+        assertEq(registry.currentVersion(), 1);
+    }
+
+    function test_OnlyTheOwnerWritesToEveryRegister() public {
+        vm.startPrank(address(0xDEAD));
+
+        vm.expectRevert();
+        registry.setRouterAuthorization(ROUTER, true);
+
+        vm.expectRevert();
+        registry.setExecutorStatus(address(0x6666), true);
+
+        vm.stopPrank();
+        assertEq(registry.currentVersion(), 1);
+    }
 }

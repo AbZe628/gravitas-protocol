@@ -1059,4 +1059,62 @@ contract TeleportV3FullFlowTests is Test {
         vm.expectRevert(abi.encodeWithSelector(SafeERC20.SafeERC20FailedOperation.selector, address(liar)));
         tele.executeAtomicMigration(params, signature);
     }
+
+    /**
+     * @notice An already-emptied position cannot be migrated.
+     * @dev The guard existed and no test reached it. Migrating a position with no
+     *      liquidity would run the whole sequence — burn, collect, mint — over
+     *      nothing, and mint a replacement position holding zero while the owner's
+     *      nonce is spent. The revert is what keeps the operation meaningful.
+     */
+    function test_V3_RevertOnNoLiquidity() public {
+        uint256 tokenId = _createPosition(user, 100 ether, 100 ether, 3000, -600, 600);
+
+        (,,,,,,, uint128 liquidity,,,,) = positionManager.positions(tokenId);
+        assertGt(liquidity, 0, "position should start with liquidity");
+
+        // Empty it the way it would be emptied in practice, then try to move it.
+        vm.prank(user);
+        positionManager.decreaseLiquidity(
+            MockUniswapV3PositionManager.DecreaseLiquidityParams({
+                tokenId: tokenId,
+                liquidity: liquidity,
+                amount0Min: 0,
+                amount1Min: 0,
+                deadline: block.timestamp + 1 hours
+            })
+        );
+
+        (,,,,,,, uint128 emptied,,,,) = positionManager.positions(tokenId);
+        assertEq(emptied, 0, "position should now be empty");
+
+        TeleportV3.AtomicMigrationParams memory params = TeleportV3.AtomicMigrationParams({
+            tokenId: tokenId,
+            newFee: 500,
+            newTickLower: -600,
+            newTickUpper: 600,
+            amount0MinMint: 1,
+            amount1MinMint: 1,
+            amount0MinDecrease: 1,
+            amount1MinDecrease: 1,
+            deadline: block.timestamp + 1 hours,
+            executeSwap: false,
+            zeroForOne: false,
+            swapAmountIn: 0,
+            swapAmountOutMin: 0,
+            swapFeeTier: 500
+        });
+
+        bytes memory signature = _signMigration(userPrivateKey, params, 0);
+
+        vm.prank(user);
+        positionManager.approve(address(teleportV3), tokenId);
+
+        vm.prank(executor);
+        vm.expectRevert("TV3: No liquidity");
+        teleportV3.executeAtomicMigration(params, signature);
+
+        // The intent was refused, so it was not spent: the nonce must be unchanged.
+        assertEq(teleportV3.nonces(user), 0, "a refused migration must not consume the nonce");
+    }
 }

@@ -1436,7 +1436,7 @@ console.<span class="f">log</span>(sim.gasEstimate);</code></pre>
       <p class="swipe-hint"><s></s>Swipe</p>
       <div class="stats stag">
         <div class="glass stat"><b data-count="94.4" data-suffix="%">0</b><span>Line coverage across the three contracts</span></div>
-        <div class="glass stat"><b data-count="79" data-suffix="">0</b><span>Contract tests passing</span></div>
+        <div class="glass stat"><b data-count="86" data-suffix="">0</b><span>Contract tests passing</span></div>
         <div class="glass stat"><b data-count="278" data-suffix="">0</b><span>Majlis tests passing</span></div>
         <div class="glass stat"><b data-count="0" data-suffix="">0</b><span>Funds ever held by the protocol</span></div>
       </div>
@@ -1484,7 +1484,7 @@ console.<span class="f">log</span>(sim.gasEstimate);</code></pre>
       <div class="lim" data-rv="up"><b>One admin key</b><p>The registry owner controls the whitelist today. GravitasTimelock and the two-step ownership handover are written and tested, but no timelock is deployed, so the single key still holds.</p></div>
       <div class="lim" data-rv="up"><b>Majlis reads the chain best-effort</b><p>The registry interface Majlis uses has not been checked against the deployed contract. A failed read is reported as a failure rather than disguised, and no unverified read is presented as confirmed.</p></div>
       <div class="lim" data-rv="up"><b>The Arabic and Urdu need a native reviewer</b><p>Terminology in Islamic finance is precise, and a plausible translation is not a correct one.</p></div>
-      <div class="lim" data-rv="up"><b>Coverage is not proof</b><p>Line coverage is 94.4 percent with invariant and fuzz tests passing. Branch coverage is far lower, and undiscovered bugs remain possible.</p></div>
+      <div class="lim" data-rv="up"><b>Coverage is not proof</b><p>Line coverage is 94.4 percent, invariant and fuzz tests pass, and every guard in the three contracts is exercised from both sides. None of that is proof of correctness, and undiscovered bugs remain possible.</p></div>
       <p class="mono" data-rv="up" style="margin-top:clamp(26px,3.6vh,42px);font-size:11.5px;letter-spacing:.1em;color:var(--text-3)">Nothing on this page is financial, legal or religious advice.</p>
     </div>
   </section>
