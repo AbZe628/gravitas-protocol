@@ -312,3 +312,58 @@ describe('a matter that is not there', () => {
     expect(res.status).toBe(404);
   });
 });
+
+// ── what needs looking at ─────────────────────────────────────────────────
+
+describe('attention is personal and derived', () => {
+  it('asks the member who has not spoken, and stops once they have', async () => {
+    const id = await openMatter();
+
+    const before = await request(app).get('/api/attention').set('Authorization', as('member-b'));
+    expect(before.status).toBe(200);
+    expect(before.body.scholarId).toBe('member-b');
+    expect(before.body.items.some((i: { matterId: string }) => i.matterId === id)).toBe(true);
+
+    await say(id, 'member-b');
+
+    const after = await request(app).get('/api/attention').set('Authorization', as('member-b'));
+    expect(after.body.items.some((i: { matterId: string }) => i.matterId === id)).toBe(false);
+  });
+
+  it('two members are told different things about the same matter', async () => {
+    const id = await openMatter();
+    await say(id, 'member-a');
+    await request(app).post(`/api/matters/${id}/voting`).set('Authorization', as('member-a'));
+    await vote(id, 'member-a');
+
+    const voted = await request(app).get('/api/attention').set('Authorization', as('member-a'));
+    const notYet = await request(app).get('/api/attention').set('Authorization', as('member-b'));
+
+    expect(voted.body.items.find((i: { matterId: string }) => i.matterId === id)).toBeUndefined();
+    expect(notYet.body.items.find((i: { matterId: string }) => i.matterId === id)?.kind).toBe(
+      'awaiting_your_vote',
+    );
+  });
+
+  it('a timelock carries its deadline, so it cannot pass unnoticed', async () => {
+    const id = await openMatter();
+    await say(id, 'member-a');
+    await request(app).post(`/api/matters/${id}/voting`).set('Authorization', as('member-a'));
+    for (const m of ['member-a', 'member-b', 'member-c']) await vote(id, m);
+    await request(app).post(`/api/matters/${id}/close`).set('Authorization', as('member-a'));
+
+    const res = await request(app).get('/api/attention').set('Authorization', as('member-d'));
+    const found = res.body.items.find((i: { matterId: string }) => i.matterId === id);
+    expect(found.kind).toBe('objection_window_open');
+    expect(found.deadline).not.toBeNull();
+    expect(found.hoursRemaining).toBeGreaterThan(47);
+  });
+
+  it('an observer is asked for nothing', async () => {
+    await openMatter();
+    const res = await request(app).get('/api/attention').set('Authorization', as('watcher'));
+    expect(res.status).toBe(200);
+    // Not on the board, so nothing is outstanding for them.
+    expect(res.body.items).toEqual([]);
+  });
+});

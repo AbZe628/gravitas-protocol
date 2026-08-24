@@ -2,6 +2,7 @@ import 'dotenv/config';
 import { createApp } from './app.js';
 import { assertConfiguredForProduction } from './middleware/basicAuth.js';
 import { storeFromEnv } from './store/index.js';
+import { startSweeping } from './services/sweep.js';
 
 const port = Number(process.env.PORT ?? 4000);
 assertConfiguredForProduction();
@@ -15,6 +16,14 @@ assertConfiguredForProduction();
  */
 const store = storeFromEnv();
 const app = createApp(store);
+
+/*
+ * Deadlines pass whether or not anyone is looking. A restriction whose
+ * ratification window has closed must read as lapsed rather than as in force,
+ * or the record says a rule is operative when the board rules it expired.
+ * Runs once now and every five minutes after.
+ */
+const stopSweeping = startSweeping(store);
 
 const server = app.listen(port, () => {
   const where = process.env.MAJLIS_DB?.trim();
@@ -38,6 +47,7 @@ const server = app.listen(port, () => {
  */
 for (const signal of ['SIGTERM', 'SIGINT'] as const) {
   process.on(signal, () => {
+    stopSweeping();
     server.close(() => {
       void store.close().then(() => process.exit(0));
     });

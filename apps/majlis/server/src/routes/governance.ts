@@ -34,6 +34,7 @@ import {
   tally,
   withdraw,
 } from '../services/lifecycle.js';
+import { attentionList } from '../services/attention.js';
 import { NotFound, type Store } from '../store/index.js';
 import type { Deliberation, Matter } from '../types.js';
 
@@ -338,6 +339,29 @@ export function governanceRoutes(store: Store, now: () => string = () => new Dat
       const who = identityOf(req);
       if (!requireRole(res, mayDeliberate(who.role), 'withdraw a matter')) return;
       res.json(await store.updateMatter(req.params.id, withdraw));
+    }),
+  );
+
+  /**
+   * What this member still has to do, soonest deadline first.
+   *
+   * Derived from the record rather than kept as a queue, so it cannot drift
+   * from what is actually true. Personal: "three matters need attention" is
+   * not useful to someone who has already acted on all three.
+   */
+  router.get(
+    '/attention',
+    handle(async (req, res) => {
+      const who = identityOf(req);
+      const [boards, matters] = await Promise.all([store.boards(), store.matters()]);
+      const items = attentionList(boards, matters, { scholarId: who.scholarId, now: now() });
+      res.json({
+        scholarId: who.scholarId,
+        role: who.role,
+        outstanding: items.length,
+        overdue: items.filter((i) => i.overdue).length,
+        items,
+      });
     }),
   );
 
