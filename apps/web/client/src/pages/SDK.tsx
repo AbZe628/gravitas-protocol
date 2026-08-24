@@ -51,7 +51,7 @@ export default function SDK() {
       <nav className="fixed top-0 left-0 right-0 z-50 border-b border-gold/10 bg-abyss/90 backdrop-blur-xl" role="navigation">
         <div className="container flex h-16 items-center justify-between px-4 md:px-6 mx-auto max-w-7xl">
           <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-            <Link href="/">
+            <Link href="/dashboard">
               <div className="flex items-center gap-2 cursor-pointer shrink-0">
                 <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-gold to-gold-deep flex items-center justify-center">
                   <span className="text-abyss font-black text-sm">G</span>
@@ -64,7 +64,7 @@ export default function SDK() {
           </div>
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <Button asChild variant="ghost" size="sm" className="text-white/60 hover:text-white hidden sm:flex">
-              <Link href="/"><Home className="h-4 w-4 mr-2" />Home</Link>
+              <a href="/">Website</a>
             </Button>
             <Button asChild size="sm" className="bg-gold text-abyss hover:bg-gold/90 font-semibold text-xs sm:text-sm px-3 sm:px-4">
               <Link href="/dashboard">Launch App</Link>

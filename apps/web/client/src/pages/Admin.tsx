@@ -529,10 +529,12 @@ export default function Admin() {
               </Link>
             </Button>
             <Button asChild variant="ghost" size="sm" className="text-white/50 hover:text-white hover:bg-white/5">
-              <Link href="/">
+              {/* A plain anchor: a wouter Link would resolve to /app/ and land
+                  back inside the application it is meant to leave. */}
+              <a href="/" className="inline-flex items-center">
                 <Home className="h-4 w-4 mr-2" />
-                Home
-              </Link>
+                Website
+              </a>
             </Button>
             {policyVersion !== undefined && (
               <Badge className="bg-gold/20 text-gold border-gold/30">

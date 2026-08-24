@@ -72,7 +72,7 @@ export default function Docs() {
       <nav className="fixed top-0 left-0 right-0 z-50 border-b border-gold/10 bg-abyss/80 backdrop-blur-xl">
         <div className="container flex h-16 items-center justify-between px-4 md:px-6">
           <div className="flex items-center gap-3">
-            <Link href="/">
+            <Link href="/dashboard">
               <div className="flex items-center gap-2 cursor-pointer">
                 <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-gold to-gold-deep flex items-center justify-center">
                   <span className="text-abyss font-black">G</span>
@@ -85,7 +85,7 @@ export default function Docs() {
           </div>
           <div className="hidden md:flex items-center gap-3">
             <Button asChild variant="ghost" size="sm" className="text-white/60 hover:text-white">
-              <Link href="/"><Home className="h-4 w-4 mr-2" />Home</Link>
+              <a href="/">Website</a>
             </Button>
             <Button asChild size="sm" className="bg-gold text-abyss hover:bg-gold/90 font-semibold">
               <Link href="/dashboard">Launch App</Link>
@@ -172,8 +172,15 @@ export default function Docs() {
                     { icon: Terminal, title: "Quick Start", desc: "Get up and running in 5 minutes", href: "#quickstart" },
                     { icon: Package, title: "SDK Reference", desc: "Full TypeScript SDK documentation", href: "/sdk" },
                     { icon: Shield, title: "Compliance API", desc: "Policy registry integration guide", href: "/compliance" },
-                  ].map((card, i) => (
-                    <Link key={i} href={card.href}>
+                  ].map((card, i) => {
+                    /*
+                      One of these is an anchor within this page and the others are
+                      routes. Wrapping an anchor in a wouter Link turns "#quickstart"
+                      into a navigation to /app#quickstart, which leaves the
+                      application instead of scrolling down it.
+                    */
+                    const inPage = card.href.startsWith("#");
+                    const body = (
                       <Card className="border border-gold/10 bg-canvas/60 hover:border-gold/30 transition-all cursor-pointer group">
                         <CardHeader className="pb-3">
                           <card.icon className="h-5 w-5 text-gold mb-2" />
@@ -181,8 +188,13 @@ export default function Docs() {
                           <p className="text-xs text-white/60">{card.desc}</p>
                         </CardHeader>
                       </Card>
-                    </Link>
-                  ))}
+                    );
+                    return inPage ? (
+                      <a key={i} href={card.href}>{body}</a>
+                    ) : (
+                      <Link key={i} href={card.href}>{body}</Link>
+                    );
+                  })}
                 </div>
               </motion.section>
 

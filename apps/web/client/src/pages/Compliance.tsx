@@ -158,7 +158,7 @@ export default function Compliance() {
       <nav className="fixed top-0 left-0 right-0 z-50 border-b border-gold/10 bg-abyss/80 backdrop-blur-xl">
         <div className="container flex h-16 items-center justify-between px-4 md:px-6">
           <div className="flex items-center gap-3">
-            <Link href="/">
+            <Link href="/dashboard">
               <div className="flex items-center gap-2 cursor-pointer">
                 <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-gold to-gold-deep flex items-center justify-center">
                   <span className="text-abyss font-black">G</span>
@@ -171,7 +171,7 @@ export default function Compliance() {
           </div>
           <div className="hidden md:flex items-center gap-3">
             <Button asChild variant="ghost" size="sm" className="text-white/60 hover:text-white">
-              <Link href="/"><Home className="h-4 w-4 mr-2" />Home</Link>
+              <a href="/">Website</a>
             </Button>
             <Button asChild size="sm" className="bg-gold text-abyss hover:bg-gold/90 font-semibold">
               <Link href="/dashboard">Launch App</Link>
@@ -193,7 +193,7 @@ export default function Compliance() {
             className="md:hidden border-t border-gold/10 bg-canvas/95 backdrop-blur"
           >
             <div className="px-4 py-4 space-y-3">
-              <Link href="/" onClick={() => setMobileMenuOpen(false)} className="block px-4 py-2 text-white/60 hover:text-gold hover:bg-gold/10 rounded-lg transition-colors">Home</Link>
+              <a href="/" className="block px-4 py-2 text-white/60 hover:text-gold hover:bg-gold/10 rounded-lg transition-colors">Website</a>
               <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} className="block px-4 py-2 text-white/60 hover:text-gold hover:bg-gold/10 rounded-lg transition-colors">Dashboard</Link>
             </div>
           </motion.div>
