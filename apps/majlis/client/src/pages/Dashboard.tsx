@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { api, type MatterSummary, type RegistrySnapshot } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { Card, DateText, ErrorText, Loading, Tag } from '../components/ui.js';
+import Attention from '../components/Attention.js';
 
 export default function Dashboard() {
   const { t } = useI18n();
@@ -23,8 +24,15 @@ export default function Dashboard() {
 
   return (
     <div>
+      {/*
+        What is waiting for this member comes first. A deadline that passes
+        because nobody looked is the failure this panel exists to prevent, so it
+        sits above the list of everything rather than below it.
+      */}
+      <Attention />
+
       <div className="mb-5 rounded-lg border border-line bg-surface/60 px-4 py-3 text-[13px] text-muted">
-        {t('dash.readOnlyNotice')}
+        {t('dash.stageNotice')}
       </div>
 
       <h1 className="mb-4 text-[19px] font-semibold">{t('dash.title')}</h1>

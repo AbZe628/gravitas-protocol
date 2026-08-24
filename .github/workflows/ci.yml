@@ -139,7 +139,7 @@ jobs:
               run: npm test
 
     majlis:
-        name: 🏛️ Majlis (Stage One)
+        name: 🏛️ Majlis
         needs: security-scan
         runs-on: ubuntu-latest
         strategy:

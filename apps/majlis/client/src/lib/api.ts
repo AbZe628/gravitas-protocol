@@ -154,3 +154,114 @@ export const api = {
     return (await res.json()) as AssistantExchange;
   },
 };
+
+// ── Stage Two ─────────────────────────────────────────────────────────────
+
+export type Role = 'signatory' | 'advisory' | 'liaison' | 'observer';
+
+export interface Tally {
+  for: number;
+  against: number;
+  abstain: number;
+  required: number;
+  met: boolean;
+  outstanding: string[];
+}
+
+export type AttentionKind =
+  | 'awaiting_your_deliberation'
+  | 'awaiting_your_vote'
+  | 'objection_window_open'
+  | 'ready_to_take_effect'
+  | 'awaiting_ratification'
+  | 'overdue';
+
+export interface AttentionItem {
+  matterId: string;
+  boardId: string;
+  title: string;
+  status: string;
+  direction: 'permit' | 'restrict';
+  kind: AttentionKind;
+  deadline: string | null;
+  hoursRemaining: number | null;
+  overdue: boolean;
+  note: string;
+}
+
+export interface Attention {
+  scholarId: string;
+  role: Role;
+  outstanding: number;
+  overdue: number;
+  items: AttentionItem[];
+}
+
+/**
+ * A refusal from the server is not a failure of the server. It is the process
+ * saying no, and the reason it gives is written to be read by a scholar rather
+ * than by a developer. Carrying the message through unchanged is the whole
+ * point; replacing it with "something went wrong" would throw away the only
+ * part that helps.
+ */
+export class Refused extends Error {
+  constructor(
+    readonly code: string,
+    message: string,
+    readonly status: number,
+  ) {
+    super(message);
+    this.name = 'Refused';
+  }
+}
+
+async function send<T>(path: string, body?: unknown): Promise<T> {
+  const res = await fetch(path, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body ?? {}),
+  });
+
+  if (!res.ok) {
+    let payload: { error?: string; message?: string } = {};
+    try {
+      payload = (await res.json()) as typeof payload;
+    } catch {
+      // A response with no JSON body: fall through to the status.
+    }
+    throw new Refused(
+      payload.error ?? 'unknown',
+      payload.message ?? `The change was not made (${res.status}).`,
+      res.status,
+    );
+  }
+  return (await res.json()) as T;
+}
+
+export const governance = {
+  attention: () => get<Attention>('/api/attention'),
+  tally: (id: string) => get<Tally>(`/api/matters/${id}/tally`),
+
+  openMatter: (input: {
+    boardId: string;
+    title: string;
+    proposal: string;
+    direction: 'permit' | 'restrict';
+    origin: string;
+    mechanism?: string;
+    notDecided?: string[];
+  }) => send<Matter>('/api/matters', input),
+
+  openDeliberation: (id: string) => send<Matter>(`/api/matters/${id}/open`),
+  say: (id: string, body: string, replyTo?: string | null) =>
+    send<Matter>(`/api/matters/${id}/deliberation`, { body, replyTo: replyTo ?? null }),
+
+  openVoting: (id: string) => send<Matter>(`/api/matters/${id}/voting`),
+  vote: (id: string, position: 'for' | 'against' | 'abstain', reason: string) =>
+    send<Matter>(`/api/matters/${id}/vote`, { position, reason }),
+  closeVoting: (id: string) => send<Matter & { outcome: string }>(`/api/matters/${id}/close`),
+
+  object: (id: string, reason: string) => send<Matter>(`/api/matters/${id}/object`, { reason }),
+  bringIntoForce: (id: string) => send<Matter>(`/api/matters/${id}/force`),
+  withdraw: (id: string) => send<Matter>(`/api/matters/${id}/withdraw`),
+};

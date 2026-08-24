@@ -25,7 +25,7 @@ type Dict = Record<string, string>;
 
 const en: Dict = {
   'app.name': 'Gravitas Majlis',
-  'app.stage': 'Stage One — record and comprehension. Read only.',
+  'app.stage': 'Stage Two — the board decides here. Nothing here signs.',
 
   'nav.matters': 'Matters',
   'nav.rules': 'Rules in force',
@@ -38,8 +38,48 @@ const en: Dict = {
   'dash.registry': 'Policy Registry',
   'dash.registryReachable': 'Reachable',
   'dash.registryUnreachable': 'Not reachable',
-  'dash.readOnlyNotice':
-    'This stage carries the record and the explanations. It does not yet carry voting or signing authority.',
+  'dash.stageNotice':
+    'The board decides here: matters, deliberation and votes are recorded. Signing authority is not here — ' +
+    'a decision taken in Majlis does not itself change the Policy Registry.',
+
+  'attention.title': 'What is waiting for you',
+  'attention.none': 'Nothing is waiting for you.',
+  'attention.overdue': 'Past its deadline',
+  'attention.remaining': 'left',
+  'attention.hours': 'hours',
+  'attention.days': 'days',
+  'attention.awaiting_your_deliberation': 'Your view has not been recorded',
+  'attention.awaiting_your_vote': 'Your vote has not been recorded',
+  'attention.objection_window_open': 'You can still object',
+  'attention.ready_to_take_effect': 'Ready to take effect',
+  'attention.awaiting_ratification': 'Awaiting ratification',
+  'attention.overdueKind': 'Lapsed',
+
+  'vote.for': 'In favour',
+  'vote.against': 'Against',
+  'vote.abstain': 'Abstain',
+  'vote.reason': 'Your reasoning',
+  'vote.reasonHelp':
+    'A position with no reasoning attached cannot be reviewed, cited or disagreed with later. It is required.',
+  'vote.submit': 'Record my position',
+  'vote.recorded': 'Your position is recorded.',
+  'vote.tally': 'Where the vote stands',
+  'vote.outstanding': 'Not yet recorded',
+  'say.placeholder': 'Say something on this matter',
+  'say.submit': 'Add to the deliberation',
+  'say.reply': 'Reply',
+  'say.replyingTo': 'Replying to',
+  'say.cancel': 'Cancel',
+  'object.title': 'Object during the timelock',
+  'object.help':
+    'One objection halts the change outright. It does not reopen the vote; the matter would return as a fresh proposal.',
+  'object.submit': 'Record my objection',
+  'action.openDeliberation': 'Open for deliberation',
+  'action.openVoting': 'Open the vote',
+  'action.close': 'Close the vote',
+  'action.force': 'Bring into force',
+  'action.withdraw': 'Withdraw',
+  'action.refused': 'Not done',
 
   'matter.origin.institution_request': 'Requested by an institution',
   'matter.origin.protocol_change': 'A mechanism has changed',
@@ -125,7 +165,6 @@ const en: Dict = {
 
 const ar: Dict = {
   ...en,
-  'app.stage': 'المرحلة الأولى — السجل والفهم. للاطلاع فقط.',
   'nav.matters': 'المسائل',
   'nav.rules': 'القواعد النافذة',
   'nav.briefings': 'الإحاطات',
@@ -157,7 +196,6 @@ const ar: Dict = {
 
 const ur: Dict = {
   ...en,
-  'app.stage': 'پہلا مرحلہ — ریکارڈ اور فہم۔ صرف مطالعہ کے لیے۔',
   'nav.matters': 'مسائل',
   'nav.rules': 'نافذ قواعد',
   'nav.briefings': 'بریفنگ',

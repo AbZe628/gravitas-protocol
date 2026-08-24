@@ -115,9 +115,12 @@ describe('localisation', () => {
 });
 
 describe('shell', () => {
-  it('states that the stage is read only', async () => {
+  it('says the board decides here and that nothing here signs', async () => {
+    // The distinction this has to keep making. Stage Two records a decision;
+    // it does not execute one. If the interface ever stops saying so, it is
+    // claiming an authority the application does not have.
     renderApp();
-    expect(await screen.findAllByText(/read only/i)).not.toHaveLength(0);
+    expect(await screen.findAllByText(/nothing here signs/i)).not.toHaveLength(0);
   });
 
   it('shows matters before the board', async () => {
