@@ -60,11 +60,15 @@ export default function VotePanel({ matter, role, scholarId, onChanged }: Props)
   const [position, setPosition] = useState<'for' | 'against' | 'abstain'>('for');
   const [reason, setReason] = useState('');
   const [objecting, setObjecting] = useState(false);
+  const [reopening, setReopening] = useState(false);
 
   const signatory = role === 'signatory';
   const deliberator = signatory || role === 'advisory' || role === 'liaison';
   const countdown = useCountdown(matter.status === 'timelock' ? matter.timelockEndsAt : null);
-  const alreadyVoted = (matter.reasoning ?? []).some((r) => r.scholarId === scholarId);
+  // A released position does not stand, so the member may record a new one.
+  const alreadyVoted = (matter.reasoning ?? []).some(
+    (r) => r.scholarId === scholarId && !r.releasedAt,
+  );
 
   const showsTally = ['voting', 'timelock', 'in_force', 'rejected'].includes(matter.status);
 
@@ -218,6 +222,34 @@ export default function VotePanel({ matter, role, scholarId, onChanged }: Props)
         </Card>
       )}
 
+      {/* Returning an open vote to deliberation */}
+      {matter.status === 'voting' && signatory && reopening && (
+        <Card accent>
+          <div className="mb-1 text-[13px] font-medium">{t('reopen.title')}</div>
+          <p className="mb-2 text-[12px] leading-relaxed text-muted">{t('reopen.help')}</p>
+          <textarea
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+            rows={3}
+            className="w-full resize-y rounded border border-line bg-transparent p-2 text-[14px] leading-relaxed outline-none"
+          />
+          <Refusal message={refusal} />
+          <div className="mt-2 flex gap-2">
+            <button
+              type="button"
+              disabled={busy || reason.trim().length < MIN_REASON}
+              onClick={() => run(() => governance.reopen(matter.id, reason.trim()))}
+              className="rounded border border-line px-3 py-1.5 text-[12px] hover:bg-surface/60 disabled:opacity-40"
+            >
+              {t('reopen.submit')}
+            </button>
+            <button type="button" onClick={() => setReopening(false)} className="text-[12px] text-muted hover:text-paper">
+              {t('say.cancel')}
+            </button>
+          </div>
+        </Card>
+      )}
+
       {/* Moving the matter along */}
       <div className="flex flex-wrap gap-2">
         {matter.status === 'draft' && deliberator &&
@@ -229,6 +261,9 @@ export default function VotePanel({ matter, role, scholarId, onChanged }: Props)
         {matter.status === 'voting' && signatory &&
           button(t('action.close'), () => run(() => governance.closeVoting(matter.id)))}
 
+        {matter.status === 'voting' && signatory && !reopening &&
+          button(t('reopen.title'), () => { setReason(''); setReopening(true); })}
+
         {matter.status === 'timelock' && signatory && !objecting &&
           button(t('object.title'), () => { setReason(''); setObjecting(true); }, 'warn')}
 
@@ -239,7 +274,7 @@ export default function VotePanel({ matter, role, scholarId, onChanged }: Props)
           button(t('action.withdraw'), () => run(() => governance.withdraw(matter.id)))}
       </div>
 
-      {!objecting && matter.status !== 'voting' && <Refusal message={refusal} />}
+      {!objecting && !reopening && matter.status !== 'voting' && <Refusal message={refusal} />}
     </div>
   );
 }

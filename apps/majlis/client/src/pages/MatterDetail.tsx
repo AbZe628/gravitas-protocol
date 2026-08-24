@@ -157,15 +157,35 @@ export default function MatterDetail() {
         <Section title={t('matter.reasoning')}>
           <ul className="space-y-4">
             {matter.reasoning.map((r, i) => (
-              <li key={i} className="rounded-lg border border-line p-3.5">
-                <div className="mb-1.5 flex items-center gap-2 text-[12px]">
-                  <span className="text-goldsoft">{r.scholarId}</span>
-                  <Tag tone={r.position === 'against' ? 'warn' : 'neutral'}>{r.position}</Tag>
+              <li
+                key={i}
+                className={
+                  'rounded-lg border p-3.5 ' +
+                  (r.releasedAt ? 'border-line/50 bg-surface/20' : 'border-line')
+                }
+              >
+                <div className="mb-1.5 flex flex-wrap items-center gap-2 text-[12px]">
+                  <span className={r.releasedAt ? 'text-muted' : 'text-goldsoft'}>{r.scholarId}</span>
+                  <Tag tone={r.releasedAt ? 'neutral' : r.position === 'against' ? 'warn' : 'neutral'}>
+                    {r.position}
+                  </Tag>
                   <span className="text-muted">
                     <DateText iso={r.at} />
                   </span>
+                  {r.releasedAt && (
+                    <span className="rounded border border-line px-1.5 py-0.5 text-[10.5px] uppercase tracking-wide text-muted">
+                      {t('vote.released')}
+                    </span>
+                  )}
                 </div>
-                <p className="text-[14px] leading-relaxed">{r.reason}</p>
+                <p className={'text-[14px] leading-relaxed ' + (r.releasedAt ? 'text-muted' : '')}>
+                  {r.reason}
+                </p>
+                {r.releasedAt && (
+                  <p className="mt-1.5 text-[11.5px] leading-relaxed text-muted">
+                    {t('vote.releasedNote')}
+                  </p>
+                )}
               </li>
             ))}
           </ul>

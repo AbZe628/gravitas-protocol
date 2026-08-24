@@ -27,6 +27,7 @@ import {
   Refused,
   bringIntoForce,
   closeVoting,
+  returnToDeliberation,
   objectDuringTimelock,
   openDeliberation,
   openVoting,
@@ -237,6 +238,52 @@ export function governanceRoutes(store: Store, now: () => string = () => new Dat
       });
 
       res.status(201).json(updated);
+    }),
+  );
+
+  /**
+   * Return an open vote to deliberation, releasing every position cast on it.
+   * The reason is written into the thread, because a vote that stops without
+   * saying why is the thing this whole system exists to prevent.
+   */
+  router.post(
+    '/matters/:id/reopen',
+    handle(async (req, res) => {
+      const who = identityOf(req);
+      if (!requireRole(res, mayVote(who.role), 'return a matter to deliberation')) return;
+
+      const parsed = objectSchema.safeParse(req.body);
+      if (!parsed.success) return badRequest(res, parsed.error.issues);
+
+      const board = await boardFor(store, res, req.params.id);
+      if (!board) return;
+
+      const at = now();
+      const updated = await store.updateMatter(req.params.id, (matter) => {
+        const { matter: returned, released } = returnToDeliberation(
+          board,
+          matter,
+          { scholarId: who.scholarId, reason: parsed.data.reason },
+          at,
+        );
+
+        const entry: Deliberation = {
+          id: `d-${at.replace(/[^0-9]/g, '').slice(0, 14)}-${Math.random().toString(36).slice(2, 8)}`,
+          scholarId: who.scholarId,
+          body:
+            parsed.data.reason +
+            (released > 0
+              ? `\n\n(The vote was returned to deliberation. ${released} position${released === 1 ? '' : 's'} released.)`
+              : ''),
+          at,
+          replyTo: null,
+          liaisonAnswer: false,
+        };
+
+        return { ...returned, deliberation: [...returned.deliberation, entry] };
+      });
+
+      res.json(updated);
     }),
   );
 

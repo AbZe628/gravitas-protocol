@@ -14,6 +14,7 @@ import {
   ratificationDeadline,
   ratify,
   recordVote,
+  returnToDeliberation,
   tally,
   withdraw,
 } from '../src/services/lifecycle.js';
@@ -310,5 +311,123 @@ describe('the failure mode is toward refusal', () => {
     const under = voteAll(matter({ status: 'voting', deliberation: [said()] }), ['s1', 's2']);
     expect(tally(board, under).met).toBe(false);
     expect(closeVoting(board, under, T0).matter.status).toBe('rejected');
+  });
+});
+
+// ── returning an open vote to deliberation ────────────────────────────────
+
+describe('a vote can be returned to deliberation while it is still open', () => {
+  const openVote = () => openVoting(matter({ status: 'deliberation', deliberation: [said()] }));
+
+  it('goes back to deliberation', () => {
+    const { matter: back } = returnToDeliberation(
+      board, openVote(), { scholarId: 's1', reason: REASON }, T0,
+    );
+    expect(back.status).toBe('deliberation');
+  });
+
+  /*
+   * The part that cannot be skipped. A vote is a position on the matter as it
+   * stood; carrying it across a change would record a member as supporting
+   * something they have not seen.
+   */
+  it('releases every position already cast', () => {
+    const voted = voteAll(openVote(), ['s1', 's2']);
+    expect(tally(board, voted).for).toBe(2);
+
+    const { matter: back, released } = returnToDeliberation(
+      board, voted, { scholarId: 's1', reason: REASON }, T0,
+    );
+
+    expect(released).toBe(2);
+    expect(tally(board, back).for).toBe(0);
+    expect(tally(board, back).met).toBe(false);
+  });
+
+  /* Released, not deleted: what a member said is part of how this was reached. */
+  it('keeps the released positions in the record', () => {
+    const voted = voteAll(openVote(), ['s1', 's2']);
+    const { matter: back } = returnToDeliberation(
+      board, voted, { scholarId: 's1', reason: REASON }, T0,
+    );
+
+    expect(back.reasoning).toHaveLength(2);
+    expect(back.reasoning.every((r) => r.releasedAt === T0)).toBe(true);
+    expect(back.reasoning[0].reason).toBe(REASON);
+  });
+
+  /* Everyone is outstanding again, because nobody's position stands. */
+  it('puts every signatory back among those yet to record a position', () => {
+    const voted = voteAll(openVote(), ['s1', 's2']);
+    const { matter: back } = returnToDeliberation(
+      board, voted, { scholarId: 's1', reason: REASON }, T0,
+    );
+    expect(tally(board, back).outstanding).toEqual(['s1', 's2', 's3', 's4']);
+  });
+
+  it('lets the same member vote again afterwards', () => {
+    const voted = voteAll(openVote(), ['s1']);
+    const { matter: back } = returnToDeliberation(
+      board, voted, { scholarId: 's1', reason: REASON }, T0,
+    );
+    const reopened = openVoting(back);
+    const again = recordVote(
+      board, reopened, { scholarId: 's1', position: 'against', reason: REASON }, T0,
+    );
+
+    expect(tally(board, again).against).toBe(1);
+    expect(tally(board, again).for).toBe(0);
+    // Both are kept: the position they held, and the position they hold.
+    expect(again.reasoning).toHaveLength(2);
+  });
+
+  it('a second return releases nothing that was already released', () => {
+    const voted = voteAll(openVote(), ['s1']);
+    const first = returnToDeliberation(board, voted, { scholarId: 's1', reason: REASON }, T0).matter;
+    const reopened = openVoting(first);
+    const second = returnToDeliberation(board, reopened, { scholarId: 's1', reason: REASON }, T0);
+
+    expect(second.released).toBe(0);
+  });
+
+  // ── what it refuses ─────────────────────────────────────────────────────
+
+  it('is not available before the vote opens', () => {
+    expect(
+      refusalCode(() =>
+        returnToDeliberation(
+          board,
+          matter({ status: 'deliberation', deliberation: [said()] }),
+          { scholarId: 's1', reason: REASON },
+          T0,
+        ),
+      ),
+    ).toBe('wrong_status');
+  });
+
+  /*
+   * By the timelock the decision is taken. A signatory who has changed their
+   * mind objects, which halts it — that path exists and this one would blur it.
+   */
+  it('is not available once the matter is in timelock', () => {
+    const carried = voteAll(openVote(), ['s1', 's2', 's3']);
+    const closed = closeVoting(board, carried, T0).matter;
+    expect(closed.status).toBe('timelock');
+
+    expect(
+      refusalCode(() => returnToDeliberation(board, closed, { scholarId: 's1', reason: REASON }, T0)),
+    ).toBe('wrong_status');
+  });
+
+  it('requires a signatory', () => {
+    expect(
+      refusalCode(() => returnToDeliberation(board, openVote(), { scholarId: 'adv', reason: REASON }, T0)),
+    ).toBe('not_a_signatory');
+  });
+
+  it('requires a written reason', () => {
+    expect(
+      refusalCode(() => returnToDeliberation(board, openVote(), { scholarId: 's1', reason: '   ' }, T0)),
+    ).toBe('no_reason_given');
   });
 });

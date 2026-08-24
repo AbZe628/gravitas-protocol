@@ -199,6 +199,16 @@ const en: Dict = {
     'demonstration data. Export anything worth keeping. A board working for real needs ' +
     'a mounted volume first.',
 
+  'reopen.title': 'Return to deliberation',
+  'reopen.help':
+    'The board is mid-vote and something has changed. Returning it releases every ' +
+    'position already recorded — a vote is a position on the matter as it stood, and ' +
+    'it cannot be carried across a change the member has not seen. Released positions ' +
+    'stay in the record, and everyone votes again once the vote reopens.',
+  'reopen.submit': 'Return it',
+  'vote.released': 'Released',
+  'vote.releasedNote': 'This position was recorded before the matter returned to deliberation. It no longer counts.',
+
   'who.role.signatory': 'Signatory',
   'who.role.advisory': 'Advisory',
   'who.role.liaison': 'Liaison',

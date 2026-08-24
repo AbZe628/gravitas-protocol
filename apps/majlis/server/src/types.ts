@@ -102,6 +102,16 @@ export interface Reasoning {
   /** A vote is not accepted without a written reason. */
   reason: string;
   at: string;
+  /**
+   * When this position stopped counting, if it has.
+   *
+   * A vote is a position on the matter as it stood, so returning the matter to
+   * deliberation releases every position cast on it. Released rather than
+   * deleted: a member who voted and then saw the question change is part of how
+   * the decision was reached, and a record that quietly loses that is not a
+   * record. The tally ignores these; the page still shows them.
+   */
+  releasedAt?: string | null;
 }
 
 export interface Deliberation {

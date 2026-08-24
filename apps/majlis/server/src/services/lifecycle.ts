@@ -72,7 +72,12 @@ const MIN_REASON_CHARS = 20;
 const TRANSITIONS: Record<MatterStatus, readonly MatterStatus[]> = {
   draft: ['deliberation', 'withdrawn'],
   deliberation: ['voting', 'withdrawn'],
-  voting: ['timelock', 'in_force', 'rejected', 'withdrawn'],
+  // Back to deliberation while the vote is still open: a board that learns
+  // something after the vote opens has to be able to act on it, and its only
+  // alternatives were to vote on a question it no longer believed in or to
+  // withdraw the matter entirely. Not offered from timelock — by then the
+  // decision is taken, and the objection path exists for exactly that.
+  voting: ['deliberation', 'timelock', 'in_force', 'rejected', 'withdrawn'],
   timelock: ['in_force', 'rejected', 'withdrawn'],
   in_force: ['lapsed'],
   withdrawn: [],
@@ -143,6 +148,9 @@ export function tally(board: Board, matter: Matter): Tally {
   const voted = new Set<string>();
 
   for (const r of matter.reasoning) {
+    // A released position was cast on a question that has since changed. It
+    // stays in the record and stays out of the arithmetic.
+    if (r.releasedAt) continue;
     // Only signatories count. An advisory member's written position stays in
     // the record and stays out of the arithmetic.
     const member = board.members.find((m) => m.id === r.scholarId);
@@ -181,6 +189,44 @@ export function openVoting(matter: Matter): Matter {
   return { ...matter, status: 'voting' };
 }
 
+/**
+ * Return an open vote to deliberation.
+ *
+ * The board is mid-vote and something has changed — a liaison answers a
+ * question of mechanism, a member reads the proposal differently, a source
+ * turns out to say something else. Without this the only ways out were to
+ * finish voting on a question no one believes in any more, or to withdraw the
+ * matter and lose everything said on it.
+ *
+ * Every position already cast is released. This is the part that cannot be
+ * skipped: a vote is a position on the matter as it stood when it was cast, and
+ * carrying it across a change would record a member as supporting something
+ * they have not seen. They vote again, or they do not, and either way it is
+ * their choice rather than an inherited one.
+ *
+ * Requires the same authority as opening the vote, and a written reason — the
+ * board will want to know why the vote stopped, and so will anyone reading the
+ * record afterwards.
+ */
+export function returnToDeliberation(
+  board: Board,
+  matter: Matter,
+  by: { scholarId: string; reason: string },
+  at: string
+): { matter: Matter; released: number } {
+  requireStatus(matter, ['voting']);
+  requireSignatory(board, by.scholarId);
+  const reason = requireReason(by.reason, 'Returning a matter to deliberation');
+
+  const released = matter.reasoning.filter((r) => !r.releasedAt).length;
+  const reasoning = matter.reasoning.map((r) => (r.releasedAt ? r : { ...r, releasedAt: at }));
+
+  return {
+    matter: { ...matter, status: 'deliberation', reasoning },
+    released,
+  };
+}
+
 export function recordVote(
   board: Board,
   matter: Matter,
@@ -191,7 +237,7 @@ export function recordVote(
   requireSignatory(board, vote.scholarId);
   const reason = requireReason(vote.reason, 'A vote');
 
-  if (matter.reasoning.some((r) => r.scholarId === vote.scholarId)) {
+  if (matter.reasoning.some((r) => r.scholarId === vote.scholarId && !r.releasedAt)) {
     throw new Refused(
       'already_voted',
       'That member has already recorded a position on this matter. A position may be ' +

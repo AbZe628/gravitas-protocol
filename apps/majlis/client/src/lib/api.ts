@@ -67,6 +67,8 @@ export interface Reasoning {
   position: 'for' | 'against' | 'abstain';
   reason: string;
   at: string;
+  /** Set when the matter returned to deliberation. The position stays; it stops counting. */
+  releasedAt?: string | null;
 }
 
 export interface Matter extends MatterSummary {
@@ -270,6 +272,9 @@ export const governance = {
   vote: (id: string, position: 'for' | 'against' | 'abstain', reason: string) =>
     send<Matter>(`/api/matters/${id}/vote`, { position, reason }),
   closeVoting: (id: string) => send<Matter & { outcome: string }>(`/api/matters/${id}/close`),
+
+  /** Return an open vote to deliberation. Every position cast on it is released. */
+  reopen: (id: string, reason: string) => send<Matter>(`/api/matters/${id}/reopen`, { reason }),
 
   object: (id: string, reason: string) => send<Matter>(`/api/matters/${id}/object`, { reason }),
   bringIntoForce: (id: string) => send<Matter>(`/api/matters/${id}/force`),
