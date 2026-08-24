@@ -193,6 +193,11 @@ const en: Dict = {
   'common.back': 'Back',
   'common.loading': 'Loading…',
   'common.error': 'Could not load.',
+  'who.role.signatory': 'Signatory',
+  'who.role.advisory': 'Advisory',
+  'who.role.liaison': 'Liaison',
+  'who.role.observer': 'Observer',
+
   'common.opened': 'Opened',
   'common.none': 'None',
 };

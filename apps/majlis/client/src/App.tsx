@@ -7,6 +7,7 @@ import Rules from './pages/Rules.js';
 import Briefings from './pages/Briefings.js';
 import Assistant from './pages/Assistant.js';
 import Record from './pages/Record.js';
+import SignedInAs from './components/SignedInAs.js';
 
 function Nav() {
   const { t } = useI18n();
@@ -73,7 +74,10 @@ export default function App() {
             <div className="text-[17px] font-semibold tracking-tight">{t('app.name')}</div>
             <div className="text-[11px] text-muted mt-0.5">{t('app.stage')}</div>
           </div>
-          <LangSwitch />
+          <div className="flex items-center gap-4">
+            <SignedInAs />
+            <LangSwitch />
+          </div>
         </div>
       </header>
 

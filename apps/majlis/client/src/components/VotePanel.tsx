@@ -111,7 +111,6 @@ export default function VotePanel({ matter, role, scholarId, onChanged }: Props)
     <div className="space-y-4">
       {showsTally && tally && (
         <Card>
-          <div className="mb-2 text-[12px] uppercase tracking-wide text-muted">{t('vote.tally')}</div>
           <div className="flex flex-wrap items-baseline gap-3 text-[14px]">
             <span className="text-[19px] font-semibold tabular-nums">
               {tally.for} / {tally.required}
