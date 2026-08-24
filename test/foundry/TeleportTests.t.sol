@@ -63,7 +63,7 @@ contract TeleportTests is Test {
         assertTrue(registry.isExecutor(address(0x66)));
     }
 
-    function test_Registry_VerifyFunctions() public {
+    function test_Registry_VerifyFunctions() public view {
         assertTrue(registry.verifyAssetCompliance(address(token0)));
         assertTrue(registry.verifyRouterAuthorization(address(0x4)));
         assertTrue(registry.verifyExecutorStatus(executor));

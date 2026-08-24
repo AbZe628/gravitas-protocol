@@ -13,7 +13,8 @@
 
   <a href="./LICENSE"><img src="https://img.shields.io/badge/License-BUSL--1.1-yellow.svg" alt="License: BUSL-1.1"></a>
   <a href="https://soliditylang.org/"><img src="https://img.shields.io/badge/Solidity-0.8.24-blue.svg" alt="Solidity"></a>
-  <a href="./proof-of-quality/INTERNAL_REVIEW.md"><img src="https://img.shields.io/badge/Audit-Internal%20Passed-blueviolet.svg" alt="Audit: Internal Passed"></a>
+  <a href="./proof-of-quality/INTERNAL_REVIEW.md"><img src="https://img.shields.io/badge/Review-Internal%20only-blueviolet.svg" alt="Review: internal only"></a>
+  <a href="./docs/KNOWN-ISSUES.md"><img src="https://img.shields.io/badge/Known%20issues-documented-orange.svg" alt="Known issues: documented"></a>
 </p>
 
 ---
@@ -34,6 +35,8 @@ The protocol is live and verified on the Arbitrum Sepolia testnet. All contract 
 | **GravitasTimelock** | `0xbFFAd90B2607e3E5926260B640BbcD1E128680Ba` | [View on Arbiscan](https://sepolia.arbiscan.io/address/0xbFFAd90B2607e3E5926260B640BbcD1E128680Ba) |
 
 Deployed 23 August 2026. The bytecode at these addresses is built from the source in this repository at the commit that deployed it — the earlier deployment was not, and that gap is now closed.
+
+What is still open, and why, is recorded in [docs/KNOWN-ISSUES.md](./docs/KNOWN-ISSUES.md).
 
 ---
 

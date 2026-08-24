@@ -668,11 +668,8 @@ contract TeleportV3FullFlowTests is Test {
      * @notice Test revert on non-compliant assets
      */
     function test_V3_RevertOnNonCompliantAssets() public {
-        // Create a non-compliant token
-        TestTokenV3 badToken = new TestTokenV3("Bad Token", "BAD");
-
-        // Create position with non-compliant token (this will fail in real scenario)
-        // For testing, we'll use compliant tokens but then revoke compliance
+        // Build the position while both tokens are compliant, then withdraw the
+        // ruling from one of them — which is how it happens in practice.
         uint256 tokenId = _createPosition(user, 100 ether, 100 ether, 3000, -600, 600);
 
         // Revoke compliance
@@ -742,7 +739,7 @@ contract TeleportV3FullFlowTests is Test {
     /**
      * @notice Test onERC721Received callback
      */
-    function test_V3_OnERC721Received() public {
+    function test_V3_OnERC721Received() public view {
         bytes4 selector = teleportV3.onERC721Received(address(0), address(0), 0, "");
         assertEq(selector, teleportV3.onERC721Received.selector);
     }

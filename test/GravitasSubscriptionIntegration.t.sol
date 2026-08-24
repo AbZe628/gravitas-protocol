@@ -44,7 +44,7 @@ contract GravitasSubscriptionIntegrationTest is Test {
         registry.checkSubscriptionCompliance(subscriber, asset);
     }
 
-    function test_VerifyAssetCompliance() public {
+    function test_VerifyAssetCompliance() public view {
         assertTrue(registry.verifyAssetCompliance(asset));
         assertFalse(registry.verifyAssetCompliance(address(0xdead)));
     }
@@ -58,7 +58,7 @@ contract GravitasSubscriptionIntegrationTest is Test {
         assertFalse(registry.areTokensCompliant(asset, address(0xdead)));
     }
 
-    function test_VerifyExecutorStatus() public {
+    function test_VerifyExecutorStatus() public view {
         assertTrue(registry.verifyExecutorStatus(executor));
         assertFalse(registry.verifyExecutorStatus(unauthorized));
     }

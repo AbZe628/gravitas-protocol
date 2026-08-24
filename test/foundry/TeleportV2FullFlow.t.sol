@@ -85,6 +85,7 @@ contract TeleportV2FullFlowTests is Test {
         tokenX.approve(address(pairFrom), 100 ether);
         tokenY.approve(address(pairFrom), 100 ether);
         uint256 liquidity = MockUniswapV2Pair(pairFrom).mint(user, 100 ether, 100 ether);
+        assertGt(liquidity, 0, "the pair should have minted LP tokens");
 
         uint256 totalSupply = MockUniswapV2Pair(pairFrom).totalSupply();
 

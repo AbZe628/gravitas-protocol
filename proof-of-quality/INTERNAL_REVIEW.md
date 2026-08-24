@@ -1,6 +1,6 @@
 ## On-Chain Verification
 
-Both core contracts are deployed, verified, and publicly readable on Arbitrum Sepolia testnet.
+All four contracts are deployed, verified, and publicly readable on Arbitrum Sepolia. The two reviewed here are listed below; the full deployment is in [README.md](../README.md).
 
 | Contract | Address | Verified Source |
 |---|---|---|
@@ -11,12 +11,18 @@ Contract source code is publicly verifiable — anyone can confirm the deployed 
 
 ---
 
-# Gravitas Protocol - Security Audit Report
+# Gravitas Protocol — Internal Security Review
 
-**Date**: January 31, 2026  
-**Auditor**: Internal Security Review (Bank-Grade Standards)  
-**Scope**: Core Smart Contracts (GravitasPolicyRegistry.sol, TeleportV3.sol, Teleport.sol)  
-**Status**: ✅ PASSED - Ready for External Audit
+**Date**: 24 August 2026  
+**Reviewed by**: Abdusamed Zelić  
+**Scope**: GravitasPolicyRegistry.sol, TeleportV3.sol, TeleportV2.sol  
+**Status**: Findings closed; no external audit has been commissioned
+
+> This is my own review of my own code. It is not an audit, it did not "pass"
+> anything, and it cannot substitute for a third party with no stake in the
+> answer. It is published because showing the work is worth more than claiming
+> a verdict. Known issues still open are listed in
+> [docs/KNOWN-ISSUES.md](../docs/KNOWN-ISSUES.md).
 
 ---
 
@@ -172,7 +178,8 @@ Tests: 66 passed
 
 ## Conclusion
 
-The Gravitas Protocol smart contracts demonstrate **institutional-grade security** suitable for Pre-Seed due diligence. The codebase follows best practices for:
+The findings raised in this review are closed. The contracts implement, and are
+tested for:
 
 - ✅ Reentrancy protection
 - ✅ Access control
@@ -181,9 +188,12 @@ The Gravitas Protocol smart contracts demonstrate **institutional-grade security
 - ✅ Shariah compliance implementation
 - ✅ Atomic execution guarantees
 
-**Recommendation**: Proceed with external audit engagement for mainnet deployment.
+**What this does not establish**: that the contracts are correct. It records what
+I checked and what I found, so that whoever audits this next starts from a
+written position rather than from nothing. An external audit is a precondition
+for mainnet, not a formality after it.
 
 ---
 
-**Prepared by**: Internal Security Review Team  
-**Classification**: Bank-Grade MVP - Pre-Seed Ready
+**Prepared by**: Abdusamed Zelić  
+**Status**: Testnet. Not audited. Not certified.

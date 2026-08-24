@@ -39,10 +39,10 @@ Gravitas has achieved significant technical milestones and is on a clear path to
 
 ## 4. Security & Risk Mitigation
 
-Security is the bedrock of the Gravitas Protocol. Our security posture is multi-layered, combining rigorous testing, formal verification, and operational best practices.
+Security is the bedrock of the Gravitas Protocol, and the honest summary is that it rests on testing and on design, not on proof. There is no formal verification and no external audit yet.
 
-- **Internal Security Review:** A comprehensive internal audit has been completed, with all findings addressed. The report is available in the repository at `proof-of-quality/INTERNAL_REVIEW.md`.
-- **High Test Coverage:** The protocol's core contracts have achieved **>90% line coverage** through deterministic, mock-based testing, ensuring that all critical paths, including complex swap logic, are thoroughly validated.
+- **Internal Security Review:** I reviewed the contracts myself and closed every finding it raised. The write-up is at `proof-of-quality/INTERNAL_REVIEW.md` and what remains open is at `docs/KNOWN-ISSUES.md`. It is my own review of my own code and is not a substitute for a third party.
+- **Test Coverage:** 94.4% line coverage across the three contracts, 86 tests, with invariant and fuzz tests among them, and every guard exercised from both sides. Coverage measures what was executed, not what is correct.
 - **External Audit Not Yet Commissioned:** An external audit with a tier-2 firm (e.g. Hacken or Certik) is budgeted as part of the pre-seed round. That round has not closed, so the audit has not been commissioned and no date is claimed.
 - **Operational Controls:** We strongly recommend that the protocol's ownership and administrative functions be managed by a **multi-signature wallet (e.g., 3-of-5)** to prevent single points of failure. Furthermore, all critical policy changes should be executed through a **timelock contract**, providing a delay that allows users and stakeholders to review and react to upcoming changes.
 

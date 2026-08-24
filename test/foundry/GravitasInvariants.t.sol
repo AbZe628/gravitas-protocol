@@ -66,7 +66,7 @@ contract GravitasInvariants is Test {
         );
     }
 
-    function test_AssetIntegrityInvariant() public {
+    function test_AssetIntegrityInvariant() public view {
         uint256 balA = tokenA.balanceOf(address(teleport));
         uint256 balB = tokenB.balanceOf(address(teleport));
         assertEq(balA, 0);
