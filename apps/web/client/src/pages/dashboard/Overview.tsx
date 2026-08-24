@@ -40,16 +40,16 @@ function ContractAddress({ label, address, short, href }: { label: string; addre
     setTimeout(() => setCopied(false), 2000);
   };
   return (
-    <div className="p-3 rounded-lg bg-[#0A1628]/50 border border-[#D4AF37]/10">
+    <div className="p-3 rounded-lg bg-canvas/50 border border-gold/10">
       <p className="text-xs font-medium text-white/40 mb-2 uppercase tracking-wider">{label}</p>
       <div className="flex items-center justify-between gap-2">
-        <code className="text-sm font-mono text-[#D4AF37]">{short}</code>
+        <code className="text-sm font-mono text-gold">{short}</code>
         <div className="flex gap-1">
-          <Button size="sm" variant="ghost" onClick={copy} className="h-6 w-6 p-0 text-white/30 hover:text-[#D4AF37]">
+          <Button size="sm" variant="ghost" onClick={copy} className="h-6 w-6 p-0 text-white/30 hover:text-gold">
             {copied ? <CheckCheck className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
           </Button>
           <a href={href} target="_blank" rel="noopener noreferrer">
-            <Button size="sm" variant="ghost" className="h-6 w-6 p-0 text-white/30 hover:text-[#D4AF37]">
+            <Button size="sm" variant="ghost" className="h-6 w-6 p-0 text-white/30 hover:text-gold">
               <ExternalLink className="h-3 w-3" />
             </Button>
           </a>
@@ -130,10 +130,10 @@ export default function Overview() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat, index) => (
           <motion.div key={index} variants={itemVariants}>
-            <Card className="border-[#D4AF37]/20 bg-[#0F1E35]/50 backdrop-blur hover:border-[#D4AF37]/40 transition-colors">
+            <Card className="border-gold/20 bg-surface/50 backdrop-blur hover:border-gold/40 transition-colors">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-sm font-medium text-white/70">{stat.title}</CardTitle>
-                <stat.icon className="h-4 w-4 text-[#D4AF37]" />
+                <stat.icon className="h-4 w-4 text-gold" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-white tabular-nums">{stat.value}</div>
@@ -158,10 +158,10 @@ export default function Overview() {
       {/* Protocol Parameters & Contract Addresses */}
       <div className="grid gap-6 lg:grid-cols-2">
         <motion.div variants={itemVariants}>
-          <Card className="border-[#D4AF37]/20 bg-[#0F1E35]/50 backdrop-blur h-full">
+          <Card className="border-gold/20 bg-surface/50 backdrop-blur h-full">
             <CardHeader>
               <CardTitle className="text-white flex items-center gap-2">
-                <Zap className="h-5 w-5 text-[#D4AF37]" />
+                <Zap className="h-5 w-5 text-gold" />
                 Protocol Parameters
               </CardTitle>
               <CardDescription className="text-white/70">
@@ -169,7 +169,7 @@ export default function Overview() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
-              <div className="p-4 rounded-xl bg-[#0A1628]/50 border border-[#D4AF37]/10">
+              <div className="p-4 rounded-xl bg-canvas/50 border border-gold/10">
                 <p className="text-xs text-white/40 mb-1 uppercase tracking-wider">Protocol Status</p>
                 <p className="text-2xl font-bold text-white">
                   {isPaused !== undefined ? (isPaused ? "🔴 Paused" : "🟢 Active") : (
@@ -177,7 +177,7 @@ export default function Overview() {
                   )}
                 </p>
               </div>
-              <div className="p-4 rounded-xl bg-[#0A1628]/50 border border-[#D4AF37]/10">
+              <div className="p-4 rounded-xl bg-canvas/50 border border-gold/10">
                 <p className="text-xs text-white/40 mb-1 uppercase tracking-wider">Policy Version</p>
                 <p className="text-2xl font-bold text-white">
                   {policyVersion !== undefined ? `v${policyVersion.toString()}` : (
@@ -185,19 +185,19 @@ export default function Overview() {
                   )}
                 </p>
               </div>
-              <div className="p-4 rounded-xl bg-[#0A1628]/50 border border-[#D4AF37]/10">
+              <div className="p-4 rounded-xl bg-canvas/50 border border-gold/10">
                 <p className="text-xs text-white/40 mb-1 uppercase tracking-wider">Network</p>
-                <Badge className="bg-[#D4AF37] text-[#0A1628] mt-1">Arbitrum Sepolia · Chain 421614</Badge>
+                <Badge className="bg-gold text-canvas mt-1">Arbitrum Sepolia · Chain 421614</Badge>
               </div>
             </CardContent>
           </Card>
         </motion.div>
 
         <motion.div variants={itemVariants}>
-          <Card className="border-[#D4AF37]/20 bg-[#0F1E35]/50 backdrop-blur h-full">
+          <Card className="border-gold/20 bg-surface/50 backdrop-blur h-full">
             <CardHeader>
               <CardTitle className="text-white flex items-center gap-2">
-                <Shield className="h-5 w-5 text-[#D4AF37]" />
+                <Shield className="h-5 w-5 text-gold" />
                 Deployed Contracts
               </CardTitle>
               <CardDescription className="text-white/70">
@@ -233,13 +233,13 @@ export default function Overview() {
               </div>
 
               <div className="pt-2 flex gap-2">
-                <Button asChild size="sm" variant="outline" className="flex-1 border-[#D4AF37]/30 text-[#D4AF37] hover:bg-[#D4AF37]/10 text-xs">
+                <Button asChild size="sm" variant="outline" className="flex-1 border-gold/30 text-gold hover:bg-gold/10 text-xs">
                   <Link href="/compliance">
                     <Shield className="h-3 w-3 mr-1" />
                     Compliance Check
                   </Link>
                 </Button>
-                <Button asChild size="sm" variant="outline" className="flex-1 border-[#D4AF37]/30 text-[#D4AF37] hover:bg-[#D4AF37]/10 text-xs">
+                <Button asChild size="sm" variant="outline" className="flex-1 border-gold/30 text-gold hover:bg-gold/10 text-xs">
                   <Link href="/docs">
                     Docs
                   </Link>
@@ -252,7 +252,7 @@ export default function Overview() {
 
       {/* Quick Actions */}
       <motion.div variants={itemVariants}>
-        <Card className="border-[#D4AF37]/20 bg-[#0F1E35]/50 backdrop-blur">
+        <Card className="border-gold/20 bg-surface/50 backdrop-blur">
           <CardHeader>
             <CardTitle className="text-white">Quick Actions</CardTitle>
             <CardDescription className="text-white/70">Common tasks and navigation</CardDescription>
@@ -266,9 +266,9 @@ export default function Overview() {
                 { label: "Transaction History", desc: "Past migrations", href: "/dashboard/history", icon: "📋" },
               ].map((action, i) => (
                 <Link key={i} href={action.href}>
-                  <div className="p-4 rounded-xl border border-[#D4AF37]/10 bg-[#0A1628]/30 hover:border-[#D4AF37]/30 hover:bg-[#0A1628]/50 transition-all cursor-pointer group">
+                  <div className="p-4 rounded-xl border border-gold/10 bg-canvas/30 hover:border-gold/30 hover:bg-canvas/50 transition-all cursor-pointer group">
                     <div className="text-2xl mb-2">{action.icon}</div>
-                    <p className="font-semibold text-white text-sm group-hover:text-[#D4AF37] transition-colors">{action.label}</p>
+                    <p className="font-semibold text-white text-sm group-hover:text-gold transition-colors">{action.label}</p>
                     <p className="text-xs text-white/40 mt-0.5">{action.desc}</p>
                   </div>
                 </Link>

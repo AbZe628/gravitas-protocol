@@ -170,10 +170,10 @@ function ComplianceChecker() {
   };
 
   return (
-    <Card className="border-[#D4AF37]/20 bg-[#0F1E35]/50 backdrop-blur">
+    <Card className="border-gold/20 bg-surface/50 backdrop-blur">
       <CardHeader className="pb-3">
         <CardTitle className="text-white text-base flex items-center gap-2">
-          <Shield className="h-4 w-4 text-[#D4AF37]" />
+          <Shield className="h-4 w-4 text-gold" />
           Shariah Compliance Checker
         </CardTitle>
         <CardDescription className="text-white/50 text-xs">
@@ -186,13 +186,13 @@ function ComplianceChecker() {
             placeholder="Token address (0x...)"
             value={tokenAddress}
             onChange={(e) => setTokenAddress(e.target.value)}
-            className="bg-[#0A1628]/50 border-[#D4AF37]/20 text-white font-mono text-sm"
+            className="bg-canvas/50 border-gold/20 text-white font-mono text-sm"
             onKeyDown={(e) => e.key === "Enter" && handleCheck()}
           />
           <Button
             onClick={handleCheck}
             size="sm"
-            className="bg-[#D4AF37] text-[#0A1628] hover:bg-[#D4AF37]/90 shrink-0"
+            className="bg-gold text-canvas hover:bg-gold/90 shrink-0"
             disabled={isLoading}
           >
             {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
@@ -245,15 +245,15 @@ function ContractStats({ address }: { address?: string }) {
 
   return (
     <div className="grid grid-cols-3 gap-3">
-      <div className="p-3 rounded-lg bg-[#0A1628]/50 border border-[#D4AF37]/10 text-center">
+      <div className="p-3 rounded-lg bg-canvas/50 border border-gold/10 text-center">
         <p className="text-xs text-white/40 mb-1">Your Nonce</p>
         <p className="text-lg font-bold text-white">{nonce?.toString() ?? "—"}</p>
       </div>
-      <div className="p-3 rounded-lg bg-[#0A1628]/50 border border-[#D4AF37]/10 text-center">
+      <div className="p-3 rounded-lg bg-canvas/50 border border-gold/10 text-center">
         <p className="text-xs text-white/40 mb-1">Cooldown</p>
         <p className="text-lg font-bold text-white">{cooldown ? `${Number(cooldown) / 60}m` : "—"}</p>
       </div>
-      <div className="p-3 rounded-lg bg-[#0A1628]/50 border border-[#D4AF37]/10 text-center">
+      <div className="p-3 rounded-lg bg-canvas/50 border border-gold/10 text-center">
         <p className="text-xs text-white/40 mb-1">Max Move</p>
         <p className="text-lg font-bold text-white">{maxMove ? `${Number(maxMove) / 100}%` : "—"}</p>
       </div>
@@ -435,9 +435,9 @@ export default function Migrate() {
   return (
     <div className="space-y-6">
       {!isConnected && (
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-xl border border-[#D4AF37]/30 bg-[#0F1E35]/50">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-xl border border-gold/30 bg-surface/50">
           <div className="flex items-start gap-3">
-            <AlertCircle className="h-5 w-5 text-[#D4AF37] shrink-0 mt-0.5" />
+            <AlertCircle className="h-5 w-5 text-gold shrink-0 mt-0.5" />
             <p className="text-sm text-white/70 leading-snug">
               Connect your wallet to Arbitrum Sepolia to start migrating liquidity positions
             </p>
@@ -448,10 +448,10 @@ export default function Migrate() {
 
       <ComplianceChecker />
 
-      <Card className="border-[#D4AF37]/20 bg-[#0F1E35]/50 backdrop-blur">
+      <Card className="border-gold/20 bg-surface/50 backdrop-blur">
         <CardHeader>
           <CardTitle className="text-white flex items-center gap-2">
-            <Zap className="h-5 w-5 text-[#D4AF37]" />
+            <Zap className="h-5 w-5 text-gold" />
             Atomic Liquidity Migration
           </CardTitle>
           <CardDescription className="text-white/70">
@@ -460,11 +460,11 @@ export default function Migrate() {
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="v3">
-            <TabsList className="bg-[#0A1628]/50 border border-[#D4AF37]/20 w-full grid grid-cols-2 mb-6">
-              <TabsTrigger value="v3" className="data-[state=active]:bg-[#D4AF37]/20 data-[state=active]:text-[#D4AF37] text-white/60">
+            <TabsList className="bg-canvas/50 border border-gold/20 w-full grid grid-cols-2 mb-6">
+              <TabsTrigger value="v3" className="data-[state=active]:bg-gold/20 data-[state=active]:text-gold text-white/60">
                 V3 Migration (EIP-712)
               </TabsTrigger>
-              <TabsTrigger value="v2" className="data-[state=active]:bg-[#D4AF37]/20 data-[state=active]:text-[#D4AF37] text-white/60">
+              <TabsTrigger value="v2" className="data-[state=active]:bg-gold/20 data-[state=active]:text-gold text-white/60">
                 V2 Migration
               </TabsTrigger>
             </TabsList>
@@ -482,7 +482,7 @@ export default function Migrate() {
                       placeholder="e.g. 12345"
                       value={v3Form.tokenId}
                       onChange={(e) => setV3Form({ ...v3Form, tokenId: e.target.value })}
-                      className="bg-[#0A1628]/50 border-[#D4AF37]/20 text-white"
+                      className="bg-canvas/50 border-gold/20 text-white"
                       disabled={!isConnected || step === "execute"}
                     />
                   </div>
@@ -493,10 +493,10 @@ export default function Migrate() {
                       onValueChange={(val) => setV3Form({ ...v3Form, newFee: val })}
                       disabled={!isConnected || step === "execute"}
                     >
-                      <SelectTrigger className="bg-[#0A1628]/50 border-[#D4AF37]/20 text-white">
+                      <SelectTrigger className="bg-canvas/50 border-gold/20 text-white">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent className="bg-[#0F1E35] border-[#D4AF37]/20">
+                      <SelectContent className="bg-surface border-gold/20">
                         <SelectItem value="500" className="text-white">0.05% (Stable)</SelectItem>
                         <SelectItem value="3000" className="text-white">0.3% (Standard)</SelectItem>
                         <SelectItem value="10000" className="text-white">1% (Exotic)</SelectItem>
@@ -513,7 +513,7 @@ export default function Migrate() {
                       placeholder="-887220"
                       value={v3Form.tickLower}
                       onChange={(e) => setV3Form({ ...v3Form, tickLower: e.target.value })}
-                      className="bg-[#0A1628]/50 border-[#D4AF37]/20 text-white"
+                      className="bg-canvas/50 border-gold/20 text-white"
                       disabled={!isConnected || step === "execute"}
                     />
                   </div>
@@ -524,7 +524,7 @@ export default function Migrate() {
                       placeholder="887220"
                       value={v3Form.tickUpper}
                       onChange={(e) => setV3Form({ ...v3Form, tickUpper: e.target.value })}
-                      className="bg-[#0A1628]/50 border-[#D4AF37]/20 text-white"
+                      className="bg-canvas/50 border-gold/20 text-white"
                       disabled={!isConnected || step === "execute"}
                     />
                   </div>
@@ -538,7 +538,7 @@ export default function Migrate() {
                       placeholder="1"
                       value={v3Form.amount0MinMint}
                       onChange={(e) => setV3Form({ ...v3Form, amount0MinMint: e.target.value })}
-                      className="bg-[#0A1628]/50 border-[#D4AF37]/20 text-white"
+                      className="bg-canvas/50 border-gold/20 text-white"
                       disabled={!isConnected || step === "execute"}
                     />
                   </div>
@@ -549,28 +549,28 @@ export default function Migrate() {
                       placeholder="1"
                       value={v3Form.amount1MinMint}
                       onChange={(e) => setV3Form({ ...v3Form, amount1MinMint: e.target.value })}
-                      className="bg-[#0A1628]/50 border-[#D4AF37]/20 text-white"
+                      className="bg-canvas/50 border-gold/20 text-white"
                       disabled={!isConnected || step === "execute"}
                     />
                   </div>
                 </div>
 
-                <Alert className="border-[#D4AF37]/30 bg-[#0A1628]/30">
-                  <Info className="h-4 w-4 text-[#D4AF37]" />
+                <Alert className="border-gold/30 bg-canvas/30">
+                  <Info className="h-4 w-4 text-gold" />
                   <AlertDescription className="text-white/70 text-sm">
                     V3 migrations use EIP-712 typed data signatures for replay protection.
                     Your nonce is automatically fetched from the TeleportV3 contract.
                   </AlertDescription>
                 </Alert>
 
-                <div className="p-4 rounded-xl bg-[#0A1628]/50 border border-[#D4AF37]/10">
+                <div className="p-4 rounded-xl bg-canvas/50 border border-gold/10">
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-sm text-white/60">Estimated Gas</span>
                     <span className="text-sm font-medium text-white">~0.0024 ETH</span>
                   </div>
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-sm text-white/60">Max Price Movement</span>
-                    <Badge className="bg-[#D4AF37]/20 text-[#D4AF37] border-[#D4AF37]/30">5%</Badge>
+                    <Badge className="bg-gold/20 text-gold border-gold/30">5%</Badge>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-white/60">Signature Type</span>
@@ -586,7 +586,7 @@ export default function Migrate() {
                       variant={step === "execute" ? "outline" : "default"}
                       className={`flex-1 h-11 font-semibold ${
                         step !== "execute"
-                          ? "bg-[#D4AF37] text-[#0A1628] hover:bg-[#D4AF37]/90"
+                          ? "bg-gold text-canvas hover:bg-gold/90"
                           : "border-green-500/30 text-green-500"
                       }`}
                     >
@@ -629,7 +629,7 @@ export default function Migrate() {
                     <Button
                       onClick={handleV3Reset}
                       variant="outline"
-                      className="w-full border-[#D4AF37]/30 text-[#D4AF37] hover:bg-[#D4AF37]/10"
+                      className="w-full border-gold/30 text-gold hover:bg-gold/10"
                     >
                       New Migration
                     </Button>
@@ -648,7 +648,7 @@ export default function Migrate() {
                       placeholder="0x..."
                       value={v2Form.factoryFrom}
                       onChange={(e) => setV2Form({ ...v2Form, factoryFrom: e.target.value })}
-                      className="bg-[#0A1628]/50 border-[#D4AF37]/20 text-white font-mono text-sm"
+                      className="bg-canvas/50 border-gold/20 text-white font-mono text-sm"
                       disabled={!isConnected}
                     />
                   </div>
@@ -658,7 +658,7 @@ export default function Migrate() {
                       placeholder="0x..."
                       value={v2Form.routerTo}
                       onChange={(e) => setV2Form({ ...v2Form, routerTo: e.target.value })}
-                      className="bg-[#0A1628]/50 border-[#D4AF37]/20 text-white font-mono text-sm"
+                      className="bg-canvas/50 border-gold/20 text-white font-mono text-sm"
                       disabled={!isConnected}
                     />
                   </div>
@@ -670,7 +670,7 @@ export default function Migrate() {
                       placeholder="0x..."
                       value={v2Form.tokenA}
                       onChange={(e) => setV2Form({ ...v2Form, tokenA: e.target.value })}
-                      className="bg-[#0A1628]/50 border-[#D4AF37]/20 text-white font-mono text-sm"
+                      className="bg-canvas/50 border-gold/20 text-white font-mono text-sm"
                       disabled={!isConnected}
                     />
                   </div>
@@ -680,7 +680,7 @@ export default function Migrate() {
                       placeholder="0x..."
                       value={v2Form.tokenB}
                       onChange={(e) => setV2Form({ ...v2Form, tokenB: e.target.value })}
-                      className="bg-[#0A1628]/50 border-[#D4AF37]/20 text-white font-mono text-sm"
+                      className="bg-canvas/50 border-gold/20 text-white font-mono text-sm"
                       disabled={!isConnected}
                     />
                   </div>
@@ -692,7 +692,7 @@ export default function Migrate() {
                     placeholder="Amount of LP tokens to migrate"
                     value={v2Form.amountLiquidity}
                     onChange={(e) => setV2Form({ ...v2Form, amountLiquidity: e.target.value })}
-                    className="bg-[#0A1628]/50 border-[#D4AF37]/20 text-white"
+                    className="bg-canvas/50 border-gold/20 text-white"
                     disabled={!isConnected}
                   />
                 </div>
@@ -704,7 +704,7 @@ export default function Migrate() {
                       placeholder="0"
                       value={v2Form.amountAMin}
                       onChange={(e) => setV2Form({ ...v2Form, amountAMin: e.target.value })}
-                      className="bg-[#0A1628]/50 border-[#D4AF37]/20 text-white"
+                      className="bg-canvas/50 border-gold/20 text-white"
                       disabled={!isConnected}
                     />
                   </div>
@@ -715,7 +715,7 @@ export default function Migrate() {
                       placeholder="0"
                       value={v2Form.amountBMin}
                       onChange={(e) => setV2Form({ ...v2Form, amountBMin: e.target.value })}
-                      className="bg-[#0A1628]/50 border-[#D4AF37]/20 text-white"
+                      className="bg-canvas/50 border-gold/20 text-white"
                       disabled={!isConnected}
                     />
                   </div>
@@ -748,7 +748,7 @@ export default function Migrate() {
                   <Button
                     onClick={handleV2Migrate}
                     disabled={!isConnected || v2Pending || v2Confirming}
-                    className="w-full h-11 bg-[#D4AF37] text-[#0A1628] hover:bg-[#D4AF37]/90 font-semibold"
+                    className="w-full h-11 bg-gold text-canvas hover:bg-gold/90 font-semibold"
                   >
                     {v2Pending || v2Confirming ? (
                       <><Loader2 className="mr-2 h-4 w-4 animate-spin" />{v2Confirming ? "Confirming..." : "Submitting..."}</>
@@ -764,7 +764,7 @@ export default function Migrate() {
       </Card>
 
       {/* How to Migrate */}
-      <Card className="border-[#D4AF37]/20 bg-[#0F1E35]/50 backdrop-blur">
+      <Card className="border-gold/20 bg-surface/50 backdrop-blur">
         <CardHeader>
           <CardTitle className="text-white">Migration Flow</CardTitle>
           <CardDescription className="text-white/70">How atomic liquidity migration works</CardDescription>
@@ -778,8 +778,8 @@ export default function Migrate() {
               { step: "04", title: "Verify", desc: "Check transaction on Arbiscan and view in History tab" },
             ].map((item, i) => (
               <div key={i} className="flex flex-col gap-2">
-                <div className="h-8 w-8 rounded-lg bg-[#D4AF37]/10 flex items-center justify-center">
-                  <span className="text-[#D4AF37] font-bold text-xs">{item.step}</span>
+                <div className="h-8 w-8 rounded-lg bg-gold/10 flex items-center justify-center">
+                  <span className="text-gold font-bold text-xs">{item.step}</span>
                 </div>
                 <h4 className="font-semibold text-white text-sm">{item.title}</h4>
                 <p className="text-xs text-white/50">{item.desc}</p>

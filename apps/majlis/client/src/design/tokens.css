@@ -1,31 +1,43 @@
 /**
- * Gravitas design tokens — Majlis Edition.
+ * Gravitas design tokens — Majlis.
  *
- * Aligned with the protocol design system: Apple clarity, Hadid structure.
- * Majlis overrides density for high-efficiency institutional work.
+ * The palette is the protocol's, to the value. It previously claimed to be
+ * "strictly aligned with apps/web" while sharing not one colour with it: a
+ * blue-black ground and a duller gold against the site's near-black and warm
+ * gold. Three products in one family looked like three products.
+ *
+ * What stays different is deliberate rather than left over. Majlis sets its
+ * body text in a serif because a scholar reads long deliberation here, and it
+ * runs denser because it is an instrument rather than a page to be persuaded
+ * by. Same system, different job — which is not the same as a different system.
  */
 
 :root {
-  /* Palette — strictly aligned with apps/web */
-  --g-ink: #0A1428;
-  --g-surface: #0C1A33;
-  --g-deep: #0E2A2E;
-  --g-line: #22314F;
-  --g-muted: #7C8BA5;
-  --g-paper: #EDEAE0;
-  --g-sand: #C9BFA6;
-  --g-gold: #C9A845;
-  --g-gold-soft: #E3C878;
+  /* Palette — the same values as the site and the protocol application. */
+  --g-ink: #0E1017;
+  --g-surface: #171A24;
+  --g-deep: #1E2230;
+  --g-line: rgba(255, 255, 255, 0.11);
+  --g-muted: #7F8192;
+  --g-paper: #F5F4F1;
+  --g-sand: #B0B1BE;
+  --g-gold: #F7CC74;
+  --g-gold-soft: #E8964A;
 
   /* Derived states */
   --g-surface-raised: var(--g-deep);
-  --g-paper-dim: rgba(237, 234, 224, 0.7);
-  --g-gold-wash: rgba(201, 168, 69, 0.08);
+  --g-paper-dim: rgba(245, 244, 241, 0.7);
+  --g-gold-wash: rgba(247, 204, 116, 0.08);
 
   /* Typography — Institutional serif for display, neutral sans for UI. */
-  --g-font-text: "Iowan Old Style", "Palatino Linotype", Palatino, serif;
-  --g-font-ui: "Inter", system-ui, -apple-system, sans-serif;
-  --g-font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
+  /*
+   * The serif carries the reading, which is what a scholar comes here to do.
+   * The interface around it and the monospace are the site's own faces, so the
+   * kinship is visible without pretending the two products have the same job.
+   */
+  --g-font-text: "Newsreader", "Iowan Old Style", "Palatino Linotype", Palatino, serif;
+  --g-font-ui: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --g-font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
 
   /* Scale — Fluid but dense for Majlis instrument usage. */
   --g-text-xs: clamp(0.8125rem, 0.8rem + 0.05vw, 0.875rem);

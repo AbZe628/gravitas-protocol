@@ -3,6 +3,45 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/*
+ * The Gravitas palette.
+ *
+ * Every colour in this application used to be written into the class that used
+ * it: #D4AF37 appeared 291 times across 88 files, on a #0A1628 ground. That is
+ * not a design system, it is 291 opportunities to be slightly wrong, and it is
+ * why the application never looked like the site it belongs to.
+ *
+ * These are the site's own values. Tailwind v4 turns each one into a utility,
+ * so `text-gold`, `border-gold/20` and `bg-surface/50` all work — the opacity
+ * modifiers that arbitrary hex values also supported, so nothing at the call
+ * site had to change shape.
+ *
+ * Changing the protocol's colour is now one line here rather than a search and
+ * replace nobody will get completely right.
+ */
+@theme {
+  /* Ground, darkest to lightest. */
+  --color-abyss: #0A0B10;
+  --color-canvas: #0E1017;
+  --color-surface: #171A24;
+  --color-raised: #1E2230;
+
+  /* The protocol's own colour, and the warmer end of it. */
+  --color-gold: #F7CC74;
+  --color-gold-deep: #E8964A;
+
+  /* Used sparingly, for the parametric field and for depth. */
+  --color-violet: #8A7BFF;
+
+  /* Text, brightest to quietest. */
+  --color-ink: #F5F4F1;
+  --color-ink-2: #B0B1BE;
+  --color-ink-3: #7F8192;
+
+  --color-hairline: rgba(255, 255, 255, 0.11);
+}
+
+
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -146,7 +185,7 @@
   }
   /* Focus ring for accessibility */
   :focus-visible {
-    outline: 2px solid #D4AF37;
+    outline: 2px solid var(--color-gold);
     outline-offset: 2px;
   }
   /* Smooth scroll */
@@ -200,7 +239,7 @@
 
   /* Gold gradient text */
   .gold-gradient {
-    background: linear-gradient(135deg, #D4AF37 0%, #F4D03F 50%, #D4AF37 100%);
+    background: linear-gradient(135deg, var(--color-gold) 0%, var(--color-gold-deep) 50%, var(--color-gold) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -260,7 +299,7 @@
   /* Gradient border card */
   .gradient-border {
     position: relative;
-    background: linear-gradient(#0F1E35, #0F1E35) padding-box,
+    background: linear-gradient(var(--color-surface), var(--color-surface)) padding-box,
                 linear-gradient(135deg, rgba(212,175,55,0.4), rgba(212,175,55,0.1), rgba(212,175,55,0.4)) border-box;
     border: 1px solid transparent;
   }

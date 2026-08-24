@@ -159,7 +159,7 @@ function AssetManagement() {
           placeholder="0x..."
           value={assetAddress}
           onChange={(e) => setAssetAddress(e.target.value)}
-          className="bg-[#0A1628]/50 border-[#D4AF37]/20 text-white font-mono text-sm"
+          className="bg-canvas/50 border-gold/20 text-white font-mono text-sm"
         />
       </div>
       <div className="flex gap-3">
@@ -271,14 +271,14 @@ function RouterExecutorManagement() {
             placeholder="0x..."
             value={routerAddress}
             onChange={(e) => setRouterAddress(e.target.value)}
-            className="bg-[#0A1628]/50 border-[#D4AF37]/20 text-white font-mono text-sm"
+            className="bg-canvas/50 border-gold/20 text-white font-mono text-sm"
           />
         </div>
         <div className="flex gap-3">
           <Button
             onClick={() => handleSetRouter(true)}
             disabled={routerPending || routerConfirming}
-            className="flex-1 bg-[#D4AF37] text-[#0A1628] hover:bg-[#D4AF37]/90 font-semibold text-sm"
+            className="flex-1 bg-gold text-canvas hover:bg-gold/90 font-semibold text-sm"
           >
             {routerPending || routerConfirming ? <Loader2 className="h-4 w-4 animate-spin" /> : "Authorize Router"}
           </Button>
@@ -301,7 +301,7 @@ function RouterExecutorManagement() {
         )}
       </div>
 
-      <Separator className="bg-[#D4AF37]/10" />
+      <Separator className="bg-gold/10" />
 
       {/* Executor Section */}
       <div className="space-y-3">
@@ -312,14 +312,14 @@ function RouterExecutorManagement() {
             placeholder="0x..."
             value={executorAddress}
             onChange={(e) => setExecutorAddress(e.target.value)}
-            className="bg-[#0A1628]/50 border-[#D4AF37]/20 text-white font-mono text-sm"
+            className="bg-canvas/50 border-gold/20 text-white font-mono text-sm"
           />
         </div>
         <div className="flex gap-3">
           <Button
             onClick={() => handleSetExecutor(true)}
             disabled={executorPending || executorConfirming}
-            className="flex-1 bg-[#D4AF37] text-[#0A1628] hover:bg-[#D4AF37]/90 font-semibold text-sm"
+            className="flex-1 bg-gold text-canvas hover:bg-gold/90 font-semibold text-sm"
           >
             {executorPending || executorConfirming ? <Loader2 className="h-4 w-4 animate-spin" /> : "Authorize Executor"}
           </Button>
@@ -399,13 +399,13 @@ function PolicyUpdates() {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 gap-4">
-        <div className="p-4 rounded-xl bg-[#0A1628]/50 border border-[#D4AF37]/10 text-center">
+        <div className="p-4 rounded-xl bg-canvas/50 border border-gold/10 text-center">
           <p className="text-xs text-white/40 mb-1">Current Cooldown</p>
           <p className="text-xl font-bold text-white">
             {currentCooldown !== undefined ? `${Number(currentCooldown) / 60}m` : "N/A"}
           </p>
         </div>
-        <div className="p-4 rounded-xl bg-[#0A1628]/50 border border-[#D4AF37]/10 text-center">
+        <div className="p-4 rounded-xl bg-canvas/50 border border-gold/10 text-center">
           <p className="text-xs text-white/40 mb-1">Current Max Move</p>
           <p className="text-xl font-bold text-white">
             {currentMaxBps !== undefined ? `${Number(currentMaxBps) / 100}%` : "N/A"}
@@ -424,7 +424,7 @@ function PolicyUpdates() {
             placeholder="900 (= 15 minutes)"
             value={cooldown}
             onChange={(e) => setCooldown(e.target.value)}
-            className="bg-[#0A1628]/50 border-[#D4AF37]/20 text-white"
+            className="bg-canvas/50 border-gold/20 text-white"
           />
         </div>
         <div className="space-y-2">
@@ -437,13 +437,13 @@ function PolicyUpdates() {
             placeholder="2000 (= 20%)"
             value={maxBps}
             onChange={(e) => setMaxBps(e.target.value)}
-            className="bg-[#0A1628]/50 border-[#D4AF37]/20 text-white"
+            className="bg-canvas/50 border-gold/20 text-white"
           />
         </div>
         <Button
           onClick={handleSetPolicy}
           disabled={isPending || isConfirming}
-          className="w-full bg-[#D4AF37] text-[#0A1628] hover:bg-[#D4AF37]/90 font-semibold h-11"
+          className="w-full bg-gold text-canvas hover:bg-gold/90 font-semibold h-11"
         >
           {isPending || isConfirming ? (
             <><Loader2 className="mr-2 h-4 w-4 animate-spin" />{isConfirming ? "Confirming..." : "Submitting..."}</>
@@ -497,7 +497,7 @@ export default function Admin() {
   const isWrongNetwork = isConnected && chain?.id !== arbitrumSepolia.id;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0A1628] via-[#0F1E35] to-[#0A1628] p-4 md:p-8">
+    <div className="min-h-screen bg-gradient-to-br from-canvas via-surface to-canvas p-4 md:p-8">
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
         <motion.div
@@ -507,13 +507,13 @@ export default function Admin() {
         >
           <div>
             <div className="flex items-center gap-3 mb-1">
-              <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-[#D4AF37] to-[#B8941F] flex items-center justify-center">
-                <Shield className="h-4 w-4 text-[#0A1628]" />
+              <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-gold to-gold-deep flex items-center justify-center">
+                <Shield className="h-4 w-4 text-canvas" />
               </div>
               <h1 className="text-2xl font-bold text-white">Admin Control Panel</h1>
             </div>
             <p className="text-white/50 text-sm ml-11">
-              GravitasPolicyRegistry — Protected by <code className="text-[#D4AF37]">registry.owner()</code>
+              GravitasPolicyRegistry — Protected by <code className="text-gold">registry.owner()</code>
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -524,7 +524,7 @@ export default function Admin() {
               </Link>
             </Button>
             {policyVersion !== undefined && (
-              <Badge className="bg-[#D4AF37]/20 text-[#D4AF37] border-[#D4AF37]/30">
+              <Badge className="bg-gold/20 text-gold border-gold/30">
                 Policy v{policyVersion.toString()}
               </Badge>
             )}
@@ -533,7 +533,7 @@ export default function Admin() {
               target="_blank"
               rel="noopener noreferrer"
             >
-              <Button variant="outline" size="sm" className="border-[#D4AF37]/30 text-[#D4AF37] hover:bg-[#D4AF37]/10">
+              <Button variant="outline" size="sm" className="border-gold/30 text-gold hover:bg-gold/10">
                 <ExternalLink className="h-3 w-3 mr-1" />
                 Arbiscan
               </Button>
@@ -543,9 +543,9 @@ export default function Admin() {
 
         {/* Access Gate */}
         {!isConnected && (
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-xl border border-[#D4AF37]/30 bg-[#0F1E35]/50">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-xl border border-gold/30 bg-surface/50">
             <div className="flex items-start gap-3">
-              <Lock className="h-5 w-5 text-[#D4AF37] shrink-0 mt-0.5" />
+              <Lock className="h-5 w-5 text-gold shrink-0 mt-0.5" />
               <p className="text-sm text-white/70 leading-snug">
                 Connect your wallet to verify ownership. This panel is restricted to the registry owner.
               </p>
@@ -586,7 +586,7 @@ export default function Admin() {
 
         {/* Owner Status Card */}
         {isConnected && !isWrongNetwork && registryOwner && (
-          <Card className="border-[#D4AF37]/20 bg-[#0F1E35]/50 backdrop-blur">
+          <Card className="border-gold/20 bg-surface/50 backdrop-blur">
             <CardContent className="pt-4 pb-4">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div className="flex items-center gap-3">
@@ -629,31 +629,31 @@ export default function Admin() {
             transition={{ delay: 0.1 }}
           >
             <Tabs defaultValue="assets">
-              <TabsList className="bg-[#0A1628]/50 border border-[#D4AF37]/20 w-full grid grid-cols-3">
-                <TabsTrigger value="assets" className="data-[state=active]:bg-[#D4AF37]/20 data-[state=active]:text-[#D4AF37] text-white/60 text-xs sm:text-sm">
+              <TabsList className="bg-canvas/50 border border-gold/20 w-full grid grid-cols-3">
+                <TabsTrigger value="assets" className="data-[state=active]:bg-gold/20 data-[state=active]:text-gold text-white/60 text-xs sm:text-sm">
                   <Shield className="h-3 w-3 mr-1 sm:mr-2" />
                   Assets
                 </TabsTrigger>
-                <TabsTrigger value="routers" className="data-[state=active]:bg-[#D4AF37]/20 data-[state=active]:text-[#D4AF37] text-white/60 text-xs sm:text-sm">
+                <TabsTrigger value="routers" className="data-[state=active]:bg-gold/20 data-[state=active]:text-gold text-white/60 text-xs sm:text-sm">
                   <Users className="h-3 w-3 mr-1 sm:mr-2" />
                   Routers
                 </TabsTrigger>
-                <TabsTrigger value="policy" className="data-[state=active]:bg-[#D4AF37]/20 data-[state=active]:text-[#D4AF37] text-white/60 text-xs sm:text-sm">
+                <TabsTrigger value="policy" className="data-[state=active]:bg-gold/20 data-[state=active]:text-gold text-white/60 text-xs sm:text-sm">
                   <Sliders className="h-3 w-3 mr-1 sm:mr-2" />
                   Policy
                 </TabsTrigger>
               </TabsList>
 
               <TabsContent value="assets">
-                <Card className="border-[#D4AF37]/20 bg-[#0F1E35]/50 backdrop-blur mt-4">
+                <Card className="border-gold/20 bg-surface/50 backdrop-blur mt-4">
                   <CardHeader>
                     <CardTitle className="text-white text-base flex items-center gap-2">
-                      <Shield className="h-4 w-4 text-[#D4AF37]" />
+                      <Shield className="h-4 w-4 text-gold" />
                       Asset Compliance Management
                     </CardTitle>
                     <CardDescription className="text-white/50 text-sm">
                       Whitelist or blacklist tokens in the Shariah-compliance registry via{" "}
-                      <code className="text-[#D4AF37]">setAssetCompliance()</code>
+                      <code className="text-gold">setAssetCompliance()</code>
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -663,16 +663,16 @@ export default function Admin() {
               </TabsContent>
 
               <TabsContent value="routers">
-                <Card className="border-[#D4AF37]/20 bg-[#0F1E35]/50 backdrop-blur mt-4">
+                <Card className="border-gold/20 bg-surface/50 backdrop-blur mt-4">
                   <CardHeader>
                     <CardTitle className="text-white text-base flex items-center gap-2">
-                      <Users className="h-4 w-4 text-[#D4AF37]" />
+                      <Users className="h-4 w-4 text-gold" />
                       Router & Executor Management
                     </CardTitle>
                     <CardDescription className="text-white/50 text-sm">
                       Authorize DEX routers and protocol executors via{" "}
-                      <code className="text-[#D4AF37]">setRouterAuthorization()</code> and{" "}
-                      <code className="text-[#D4AF37]">setExecutorStatus()</code>
+                      <code className="text-gold">setRouterAuthorization()</code> and{" "}
+                      <code className="text-gold">setExecutorStatus()</code>
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -682,15 +682,15 @@ export default function Admin() {
               </TabsContent>
 
               <TabsContent value="policy">
-                <Card className="border-[#D4AF37]/20 bg-[#0F1E35]/50 backdrop-blur mt-4">
+                <Card className="border-gold/20 bg-surface/50 backdrop-blur mt-4">
                   <CardHeader>
                     <CardTitle className="text-white text-base flex items-center gap-2">
-                      <Sliders className="h-4 w-4 text-[#D4AF37]" />
+                      <Sliders className="h-4 w-4 text-gold" />
                       Policy Parameter Updates
                     </CardTitle>
                     <CardDescription className="text-white/50 text-sm">
-                      Update <code className="text-[#D4AF37]">cooldownSeconds</code> and{" "}
-                      <code className="text-[#D4AF37]">maxMoveBps</code> on the TeleportV2 contract
+                      Update <code className="text-gold">cooldownSeconds</code> and{" "}
+                      <code className="text-gold">maxMoveBps</code> on the TeleportV2 contract
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -703,15 +703,15 @@ export default function Admin() {
         )}
 
         {/* Security Notice */}
-        <Card className="border-[#D4AF37]/10 bg-[#0A1628]/30">
+        <Card className="border-gold/10 bg-canvas/30">
           <CardContent className="pt-4 pb-4">
             <div className="flex gap-3">
-              <Lock className="h-4 w-4 text-[#D4AF37] shrink-0 mt-0.5" />
+              <Lock className="h-4 w-4 text-gold shrink-0 mt-0.5" />
               <div>
                 <p className="text-xs font-semibold text-white/60 uppercase tracking-wider mb-1">Security Notice</p>
                 <p className="text-xs text-white/40">
                   All write operations require on-chain ownership verification against{" "}
-                  <code className="text-[#D4AF37]">registry.owner()</code>. Transactions are signed locally and
+                  <code className="text-gold">registry.owner()</code>. Transactions are signed locally and
                   submitted directly to Arbitrum Sepolia. No private keys are stored or transmitted.
                 </p>
               </div>

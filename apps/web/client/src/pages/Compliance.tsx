@@ -77,7 +77,7 @@ function AddressChecker({
   };
 
   return (
-    <Card className="border border-[#D4AF37]/10 bg-[#0A1628]/60 backdrop-blur">
+    <Card className="border border-gold/10 bg-canvas/60 backdrop-blur">
       <CardHeader>
         <CardTitle className="text-white text-lg">{title}</CardTitle>
         <CardDescription className="text-white/50">{description}</CardDescription>
@@ -88,12 +88,12 @@ function AddressChecker({
             placeholder={placeholder}
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            className="bg-[#060E1A] border-[#D4AF37]/20 text-white font-mono text-sm"
+            className="bg-abyss border-gold/20 text-white font-mono text-sm"
             onKeyDown={(e) => e.key === "Enter" && handleCheck()}
           />
           <Button
             onClick={handleCheck}
-            className="bg-[#D4AF37] text-[#060E1A] hover:bg-[#D4AF37]/90 shrink-0"
+            className="bg-gold text-abyss hover:bg-gold/90 shrink-0"
             disabled={isLoading}
           >
             <Search className="h-4 w-4" />
@@ -108,7 +108,7 @@ function AddressChecker({
           }`}>
             {isLoading ? (
               <div className="flex items-center gap-2 text-white/50">
-                <div className="h-4 w-4 border-2 border-[#D4AF37] border-t-transparent rounded-full animate-spin" />
+                <div className="h-4 w-4 border-2 border-gold border-t-transparent rounded-full animate-spin" />
                 <span className="text-sm">Querying on-chain...</span>
               </div>
             ) : isError ? (
@@ -153,15 +153,15 @@ export default function Compliance() {
   });
 
   return (
-    <div className="min-h-screen bg-[#060E1A] text-white">
+    <div className="min-h-screen bg-abyss text-white">
       {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-[#D4AF37]/10 bg-[#060E1A]/80 backdrop-blur-xl">
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-gold/10 bg-abyss/80 backdrop-blur-xl">
         <div className="container flex h-16 items-center justify-between px-4 md:px-6">
           <div className="flex items-center gap-3">
             <Link href="/">
               <div className="flex items-center gap-2 cursor-pointer">
-                <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-[#D4AF37] to-[#B8941F] flex items-center justify-center">
-                  <span className="text-[#060E1A] font-black">G</span>
+                <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-gold to-gold-deep flex items-center justify-center">
+                  <span className="text-abyss font-black">G</span>
                 </div>
                 <span className="font-bold text-white hidden sm:inline">Gravitas</span>
               </div>
@@ -173,13 +173,13 @@ export default function Compliance() {
             <Button asChild variant="ghost" size="sm" className="text-white/60 hover:text-white">
               <Link href="/"><Home className="h-4 w-4 mr-2" />Home</Link>
             </Button>
-            <Button asChild size="sm" className="bg-[#D4AF37] text-[#060E1A] hover:bg-[#D4AF37]/90 font-semibold">
+            <Button asChild size="sm" className="bg-gold text-abyss hover:bg-gold/90 font-semibold">
               <Link href="/dashboard">Launch App</Link>
             </Button>
           </div>
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 text-white/60 hover:text-[#D4AF37] transition-colors"
+            className="md:hidden p-2 text-white/60 hover:text-gold transition-colors"
           >
             {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
@@ -190,11 +190,11 @@ export default function Compliance() {
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="md:hidden border-t border-[#D4AF37]/10 bg-[#0A1628]/95 backdrop-blur"
+            className="md:hidden border-t border-gold/10 bg-canvas/95 backdrop-blur"
           >
             <div className="px-4 py-4 space-y-3">
-              <Link href="/" onClick={() => setMobileMenuOpen(false)} className="block px-4 py-2 text-white/60 hover:text-[#D4AF37] hover:bg-[#D4AF37]/10 rounded-lg transition-colors">Home</Link>
-              <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} className="block px-4 py-2 text-white/60 hover:text-[#D4AF37] hover:bg-[#D4AF37]/10 rounded-lg transition-colors">Dashboard</Link>
+              <Link href="/" onClick={() => setMobileMenuOpen(false)} className="block px-4 py-2 text-white/60 hover:text-gold hover:bg-gold/10 rounded-lg transition-colors">Home</Link>
+              <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} className="block px-4 py-2 text-white/60 hover:text-gold hover:bg-gold/10 rounded-lg transition-colors">Dashboard</Link>
             </div>
           </motion.div>
         )}
@@ -202,12 +202,12 @@ export default function Compliance() {
 
       <div className="pt-16">
         {/* Hero */}
-        <section className="relative py-16 md:py-24 border-b border-[#D4AF37]/10">
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,#D4AF3706_1px,transparent_1px),linear-gradient(to_bottom,#D4AF3706_1px,transparent_1px)] bg-[size:48px_48px]" />
+        <section className="relative py-16 md:py-24 border-b border-gold/10">
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,color-mix(in_srgb,var(--color-gold)_4%,transparent)_1px,transparent_1px),linear-gradient(to_bottom,color-mix(in_srgb,var(--color-gold)_4%,transparent)_1px,transparent_1px)] bg-[size:48px_48px]" />
           <div className="container relative z-10 px-4 md:px-6">
             <motion.div variants={stagger} initial="hidden" animate="visible" className="max-w-3xl">
               <motion.div variants={fadeUp}>
-                <Badge className="mb-4 bg-[#D4AF37]/10 border-[#D4AF37]/30 text-[#D4AF37]">
+                <Badge className="mb-4 bg-gold/10 border-gold/30 text-gold">
                   <Shield className="h-3 w-3 mr-2" />
                   Shariah Compliance Framework
                 </Badge>
@@ -233,10 +233,10 @@ export default function Compliance() {
 
               <div className="grid md:grid-cols-3 gap-6 mb-12">
                 <motion.div variants={fadeUp}>
-                  <Card className="border border-[#D4AF37]/20 bg-[#0A1628]/60">
+                  <Card className="border border-gold/20 bg-canvas/60">
                     <CardContent className="pt-6">
                       <p className="text-sm text-white/40 mb-1">Policy Version</p>
-                      <p className="text-2xl md:text-3xl font-bold text-[#D4AF37]">
+                      <p className="text-2xl md:text-3xl font-bold text-gold">
                         {policyVersion !== undefined ? `v${policyVersion.toString()}` : "—"}
                       </p>
                       <p className="text-xs text-white/30 mt-1">On-chain governance version</p>
@@ -256,16 +256,16 @@ export default function Compliance() {
                   </Card>
                 </motion.div>
                 <motion.div variants={fadeUp}>
-                  <Card className="border border-[#D4AF37]/20 bg-[#0A1628]/60">
+                  <Card className="border border-gold/20 bg-canvas/60">
                     <CardContent className="pt-6">
                       <p className="text-sm text-white/40 mb-1">Contract Address</p>
-                      <code className="text-xs md:text-sm font-mono text-[#D4AF37] break-all">0x6f3bfb896DD9964C9c05dA88692bDf1b1b2C3F23</code>
+                      <code className="text-xs md:text-sm font-mono text-gold break-all">0x6f3bfb896DD9964C9c05dA88692bDf1b1b2C3F23</code>
                       <div className="mt-2">
                         <a
                           href="https://sepolia.arbiscan.io/address/0x6f3bfb896DD9964C9c05dA88692bDf1b1b2C3F23"
                           target="_blank" rel="noopener noreferrer"
                         >
-                          <Button size="sm" variant="ghost" className="h-6 px-2 text-white/40 hover:text-[#D4AF37] text-xs">
+                          <Button size="sm" variant="ghost" className="h-6 px-2 text-white/40 hover:text-gold text-xs">
                             <ExternalLink className="h-3 w-3 mr-1" />
                             View on Arbiscan
                           </Button>
@@ -302,7 +302,7 @@ export default function Compliance() {
       </div>
 
       {/* Footer */}
-      <footer className="border-t border-[#D4AF37]/10 py-8 bg-[#060E1A]">
+      <footer className="border-t border-gold/10 py-8 bg-abyss">
         <div className="container px-4 md:px-6 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-white/30">
             © 2026 Gravitas Protocol. Built for institutional DeFi.
@@ -310,7 +310,7 @@ export default function Compliance() {
           <div className="flex items-center gap-4 text-xs text-white/30">
             <span>BUSL-1.1</span>
             <span>·</span>
-            <a href="https://github.com/AbZe628/gravitas-protocol" target="_blank" rel="noopener noreferrer" className="hover:text-[#D4AF37] transition-colors">GitHub</a>
+            <a href="https://github.com/AbZe628/gravitas-protocol" target="_blank" rel="noopener noreferrer" className="hover:text-gold transition-colors">GitHub</a>
           </div>
         </div>
       </footer>

@@ -53,7 +53,7 @@ function Row({ migration }: { migration: Migration }) {
 
   return (
     <motion.div variants={itemVariants}>
-      <Card className="border-[#D4AF37]/20 bg-[#0F1E35]/50 backdrop-blur">
+      <Card className="border-gold/20 bg-surface/50 backdrop-blur">
         <CardContent className="flex flex-wrap items-center gap-x-6 gap-y-3 py-4">
           <div className="min-w-0">
             <div className="text-[11px] uppercase tracking-wide text-white/40">Transaction</div>
@@ -105,14 +105,14 @@ function Row({ migration }: { migration: Migration }) {
               href={explorer.address(migration.user)}
               target="_blank"
               rel="noopener noreferrer"
-              className="font-mono text-sm text-white hover:text-[#D4AF37]"
+              className="font-mono text-sm text-white hover:text-gold"
             >
               {short(migration.user)}
             </a>
           </div>
 
           {migration.swapExecuted && (
-            <Badge variant="outline" className="border-[#D4AF37]/40 text-[#D4AF37]">
+            <Badge variant="outline" className="border-gold/40 text-gold">
               Rebalancing swap
             </Badge>
           )}
@@ -127,7 +127,7 @@ export default function History() {
 
   return (
     <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-6">
-      <Card className="border-[#D4AF37]/20 bg-[#0F1E35]/50 backdrop-blur">
+      <Card className="border-gold/20 bg-surface/50 backdrop-blur">
         <CardHeader>
           <CardTitle className="text-white">Migrations</CardTitle>
           <CardDescription className="text-white/60">
@@ -150,7 +150,7 @@ export default function History() {
       )}
 
       {chain.migrations?.length === 0 && (
-        <Card className="border-[#D4AF37]/20 bg-[#0F1E35]/50 backdrop-blur">
+        <Card className="border-gold/20 bg-surface/50 backdrop-blur">
           <CardContent className="space-y-2 py-6">
             <div className="text-sm text-white">No migrations yet.</div>
             <p className="max-w-prose text-sm leading-relaxed text-white/60">
@@ -162,7 +162,7 @@ export default function History() {
               href={explorer.address(CONTRACTS.TELEPORT_V3)}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-sm text-[#D4AF37] hover:underline"
+              className="inline-flex items-center gap-1.5 text-sm text-gold hover:underline"
             >
               Check for yourself on Arbiscan
               <ExternalLink className="h-3.5 w-3.5" />

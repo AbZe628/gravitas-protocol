@@ -28,21 +28,21 @@ function CodeBlock({ code, language = "bash" }: { code: string; language?: strin
     setTimeout(() => setCopied(false), 2000);
   };
   return (
-    <div className="relative group rounded-xl border border-[#D4AF37]/10 bg-[#060E1A] overflow-hidden">
-      <div className="flex items-center justify-between px-4 py-2 border-b border-[#D4AF37]/10 bg-[#0A1628]/50">
+    <div className="relative group rounded-xl border border-gold/10 bg-abyss overflow-hidden">
+      <div className="flex items-center justify-between px-4 py-2 border-b border-gold/10 bg-canvas/50">
         <span className="text-xs text-white/30 font-mono">{language}</span>
         <Button
           size="sm"
           variant="ghost"
           onClick={copy}
-          className="h-6 px-2 text-white/30 hover:text-[#D4AF37]"
+          className="h-6 px-2 text-white/30 hover:text-gold"
         >
           {copied ? <CheckCheck className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
         </Button>
       </div>
       <div className="overflow-x-auto overflow-y-hidden max-h-96 sm:max-h-full">
         <pre className="p-3 sm:p-4 text-xs sm:text-sm min-w-min">
-        <code className="text-[#D4AF37]/90 font-mono whitespace-pre-wrap break-words sm:whitespace-pre">{code}</code>
+        <code className="text-gold/90 font-mono whitespace-pre-wrap break-words sm:whitespace-pre">{code}</code>
       </pre>
       </div>
     </div>
@@ -67,15 +67,15 @@ export default function Docs() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[#060E1A] text-white">
+    <div className="min-h-screen bg-abyss text-white">
       {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-[#D4AF37]/10 bg-[#060E1A]/80 backdrop-blur-xl">
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-gold/10 bg-abyss/80 backdrop-blur-xl">
         <div className="container flex h-16 items-center justify-between px-4 md:px-6">
           <div className="flex items-center gap-3">
             <Link href="/">
               <div className="flex items-center gap-2 cursor-pointer">
-                <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-[#D4AF37] to-[#B8941F] flex items-center justify-center">
-                  <span className="text-[#060E1A] font-black">G</span>
+                <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-gold to-gold-deep flex items-center justify-center">
+                  <span className="text-abyss font-black">G</span>
                 </div>
                 <span className="font-bold text-white hidden sm:inline">Gravitas</span>
               </div>
@@ -87,13 +87,13 @@ export default function Docs() {
             <Button asChild variant="ghost" size="sm" className="text-white/60 hover:text-white">
               <Link href="/"><Home className="h-4 w-4 mr-2" />Home</Link>
             </Button>
-            <Button asChild size="sm" className="bg-[#D4AF37] text-[#060E1A] hover:bg-[#D4AF37]/90 font-semibold">
+            <Button asChild size="sm" className="bg-gold text-abyss hover:bg-gold/90 font-semibold">
               <Link href="/dashboard">Launch App</Link>
             </Button>
           </div>
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 text-white/60 hover:text-[#D4AF37] transition-colors"
+            className="md:hidden p-2 text-white/60 hover:text-gold transition-colors"
           >
             {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
@@ -104,7 +104,7 @@ export default function Docs() {
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="md:hidden border-t border-[#D4AF37]/10 bg-[#0A1628]/95 backdrop-blur max-h-[60vh] overflow-y-auto"
+            className="md:hidden border-t border-gold/10 bg-canvas/95 backdrop-blur max-h-[60vh] overflow-y-auto"
           >
             <div className="px-4 py-4 space-y-2">
               {sections.map((s) => (
@@ -116,7 +116,7 @@ export default function Docs() {
                   }}
                   className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all text-left ${
                     activeSection === s.id
-                      ? "bg-[#D4AF37]/15 text-[#D4AF37]"
+                      ? "bg-gold/15 text-gold"
                       : "text-white/50 hover:text-white hover:bg-white/5"
                   }`}
                 >
@@ -131,7 +131,7 @@ export default function Docs() {
 
       <div className="flex flex-col lg:flex-row pt-16">
         {/* Sidebar */}
-        <aside className="hidden lg:block w-64 fixed left-0 top-16 bottom-0 border-r border-[#D4AF37]/10 bg-[#060E1A]/80 backdrop-blur overflow-y-auto">
+        <aside className="hidden lg:block w-64 fixed left-0 top-16 bottom-0 border-r border-gold/10 bg-abyss/80 backdrop-blur overflow-y-auto">
           <div className="p-4">
             <p className="text-xs font-semibold text-white/30 uppercase tracking-wider mb-3">Documentation</p>
             <nav className="space-y-1">
@@ -141,7 +141,7 @@ export default function Docs() {
                   onClick={() => setActiveSection(s.id)}
                   className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all text-left ${
                     activeSection === s.id
-                      ? "bg-[#D4AF37]/15 text-[#D4AF37]"
+                      ? "bg-gold/15 text-gold"
                       : "text-white/50 hover:text-white hover:bg-white/5"
                   }`}
                 >
@@ -160,7 +160,7 @@ export default function Docs() {
 
               {/* Overview */}
               <motion.section variants={fadeUp} id="overview">
-                <Badge className="mb-4 bg-[#D4AF37]/10 border-[#D4AF37]/30 text-[#D4AF37]">Documentation</Badge>
+                <Badge className="mb-4 bg-gold/10 border-gold/30 text-gold">Documentation</Badge>
                 <h1 className="text-3xl md:text-4xl font-bold mb-4">Gravitas Protocol Docs</h1>
                 <p className="text-base md:text-lg text-white/60 leading-relaxed mb-6">
                   Gravitas Protocol is an institutional-grade, Shariah-compliant liquidity infrastructure
@@ -174,10 +174,10 @@ export default function Docs() {
                     { icon: Shield, title: "Compliance API", desc: "Policy registry integration guide", href: "/compliance" },
                   ].map((card, i) => (
                     <Link key={i} href={card.href}>
-                      <Card className="border border-[#D4AF37]/10 bg-[#0A1628]/60 hover:border-[#D4AF37]/30 transition-all cursor-pointer group">
+                      <Card className="border border-gold/10 bg-canvas/60 hover:border-gold/30 transition-all cursor-pointer group">
                         <CardHeader className="pb-3">
-                          <card.icon className="h-5 w-5 text-[#D4AF37] mb-2" />
-                          <CardTitle className="text-white text-sm group-hover:text-[#D4AF37] transition-colors">{card.title}</CardTitle>
+                          <card.icon className="h-5 w-5 text-gold mb-2" />
+                          <CardTitle className="text-white text-sm group-hover:text-gold transition-colors">{card.title}</CardTitle>
                           <p className="text-xs text-white/40">{card.desc}</p>
                         </CardHeader>
                       </Card>
@@ -189,7 +189,7 @@ export default function Docs() {
               {/* Quick Start */}
               <motion.section variants={fadeUp} id="quickstart">
                 <h2 className="text-2xl md:text-3xl font-bold mb-2 flex items-center gap-2">
-                  <Terminal className="h-6 w-6 text-[#D4AF37]" />
+                  <Terminal className="h-6 w-6 text-gold" />
                   Quick Start
                 </h2>
                 <p className="text-white/50 mb-6">Get the Gravitas SDK installed and make your first migration in minutes.</p>
@@ -236,7 +236,7 @@ console.log('Estimated gas:', result.gasEstimate);`} language="typescript" />
               {/* Contract Addresses */}
               <motion.section variants={fadeUp} id="contracts">
                 <h2 className="text-2xl md:text-3xl font-bold mb-2 flex items-center gap-2">
-                  <FileCode className="h-6 w-6 text-[#D4AF37]" />
+                  <FileCode className="h-6 w-6 text-gold" />
                   Contract Addresses
                 </h2>
                 <p className="text-white/50 mb-6">All contracts are deployed and verified on Arbitrum Sepolia (Chain ID: 421614).</p>
@@ -256,18 +256,18 @@ console.log('Estimated gas:', result.gasEstimate);`} language="typescript" />
                       link: "https://sepolia.arbiscan.io/address/0x6702C2CE6eD58ca3934eBBd785CaC1De8DCd85B4",
                     },
                   ].map((contract, i) => (
-                    <Card key={i} className="border border-[#D4AF37]/10 bg-[#0A1628]/60">
+                    <Card key={i} className="border border-gold/10 bg-canvas/60">
                       <CardContent className="pt-4">
                         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                           <div className="flex-1 min-w-0">
                             <h4 className="font-semibold text-white mb-1">{contract.name}</h4>
                             <p className="text-sm text-white/50 mb-3">{contract.desc}</p>
-                            <code className="text-xs md:text-sm font-mono text-[#D4AF37] bg-[#060E1A] px-3 py-1 rounded-lg border border-[#D4AF37]/10 break-all">
+                            <code className="text-xs md:text-sm font-mono text-gold bg-abyss px-3 py-1 rounded-lg border border-gold/10 break-all">
                               {contract.address}
                             </code>
                           </div>
                           <a href={contract.link} target="_blank" rel="noopener noreferrer">
-                            <Button size="sm" variant="outline" className="border-[#D4AF37]/30 text-[#D4AF37] hover:bg-[#D4AF37]/10 shrink-0 whitespace-nowrap">
+                            <Button size="sm" variant="outline" className="border-gold/30 text-gold hover:bg-gold/10 shrink-0 whitespace-nowrap">
                               <ExternalLink className="h-3 w-3 mr-1" />
                               Arbiscan
                             </Button>
@@ -285,7 +285,7 @@ console.log('Estimated gas:', result.gasEstimate);`} language="typescript" />
       </div>
 
       {/* Footer */}
-      <footer className="border-t border-[#D4AF37]/10 py-8 bg-[#060E1A]">
+      <footer className="border-t border-gold/10 py-8 bg-abyss">
         <div className="container px-4 md:px-6 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-white/30">
             © 2026 Gravitas Protocol. Built for institutional DeFi.
@@ -293,7 +293,7 @@ console.log('Estimated gas:', result.gasEstimate);`} language="typescript" />
           <div className="flex items-center gap-4 text-xs text-white/30">
             <span>BUSL-1.1</span>
             <span>·</span>
-            <a href="https://github.com/AbZe628/gravitas-protocol" target="_blank" rel="noopener noreferrer" className="hover:text-[#D4AF37] transition-colors">GitHub</a>
+            <a href="https://github.com/AbZe628/gravitas-protocol" target="_blank" rel="noopener noreferrer" className="hover:text-gold transition-colors">GitHub</a>
           </div>
         </div>
       </footer>

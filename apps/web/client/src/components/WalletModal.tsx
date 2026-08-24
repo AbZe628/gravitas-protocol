@@ -17,14 +17,17 @@ const WALLET_ICONS: Record<string, string> = {
   MetaMask: `<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M35.6 3L22.1 12.7l2.5-5.9L35.6 3z" fill="#E2761B"/><path d="M4.4 3l13.4 9.8-2.4-5.9L4.4 3z" fill="#E4761B"/><path d="M30.7 27.6l-3.6 5.5 7.7 2.1 2.2-7.5-6.3-.1z" fill="#E4761B"/><path d="M2.9 27.7l2.2 7.5 7.7-2.1-3.6-5.5-6.3.1z" fill="#E4761B"/><path d="M12.4 18.1l-2.1 3.2 7.5.3-.3-8.1-5.1 4.6z" fill="#E4761B"/><path d="M27.6 18.1l-5.2-4.7-.2 8.2 7.5-.3-2.1-3.2z" fill="#E4761B"/><path d="M12.8 33.1l4.5-2.2-3.9-3-.6 5.2z" fill="#E4761B"/><path d="M22.7 30.9l4.5 2.2-.6-5.2-3.9 3z" fill="#E4761B"/></svg>`,
   "Coinbase Wallet": `<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="20" cy="20" r="20" fill="#0052FF"/><path d="M20 8C13.4 8 8 13.4 8 20s5.4 12 12 12 12-5.4 12-12S26.6 8 20 8zm0 18.5c-3.6 0-6.5-2.9-6.5-6.5s2.9-6.5 6.5-6.5 6.5 2.9 6.5 6.5-2.9 6.5-6.5 6.5z" fill="white"/><rect x="16" y="18" width="8" height="4" rx="1" fill="white"/></svg>`,
   WalletConnect: `<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="20" cy="20" r="20" fill="#3B99FC"/><path d="M12.5 17.5c4.1-4 10.9-4 15 0l.5.5c.2.2.2.5 0 .7l-1.7 1.7c-.1.1-.3.1-.4 0l-.7-.7c-2.9-2.8-7.5-2.8-10.4 0l-.7.7c-.1.1-.3.1-.4 0l-1.7-1.7c-.2-.2-.2-.5 0-.7l.5-.5zm18.5 3.5l1.5 1.5c.2.2.2.5 0 .7l-6.8 6.6c-.2.2-.5.2-.7 0l-4.8-4.7c-.1-.1-.2-.1-.4 0l-4.8 4.7c-.2.2-.5.2-.7 0L7.5 23.2c-.2-.2-.2-.5 0-.7l1.5-1.5c.2-.2.5-.2.7 0l4.8 4.7c.1.1.2.1.4 0l4.8-4.7c.2-.2.5-.2.7 0l4.8 4.7c.1.1.2.1.4 0l4.8-4.7c.2-.2.5-.2.7 0z" fill="white"/></svg>`,
-  Injected: `<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="20" cy="20" r="20" fill="#1A1A2E"/><path d="M20 10c-5.5 0-10 4.5-10 10s4.5 10 10 10 10-4.5 10-10S25.5 10 20 10zm0 3c1.7 0 3 1.3 3 3s-1.3 3-3 3-3-1.3-3-3 1.3-3 3-3zm0 14c-2.5 0-4.7-1.3-6-3.2.1-2 4-3 6-3s5.9 1 6 3c-1.3 1.9-3.5 3.2-6 3.2z" fill="#D4AF37"/></svg>`,
+  Injected: `<svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="20" cy="20" r="20" fill="#1A1A2E"/><path d="M20 10c-5.5 0-10 4.5-10 10s4.5 10 10 10 10-4.5 10-10S25.5 10 20 10zm0 3c1.7 0 3 1.3 3 3s-1.3 3-3 3-3-1.3-3-3 1.3-3 3-3zm0 14c-2.5 0-4.7-1.3-6-3.2.1-2 4-3 6-3s5.9 1 6 3c-1.3 1.9-3.5 3.2-6 3.2z" fill="currentColor"/></svg>`,
 };
 
 function WalletIcon({ name }: { name: string }) {
   const svg = WALLET_ICONS[name] || WALLET_ICONS["Injected"];
   return (
     <div
-      className="h-10 w-10 rounded-xl flex items-center justify-center overflow-hidden shrink-0"
+      /* text-gold reaches the generic browser-wallet icon through currentColor.
+         The branded ones keep their own colours: a Coinbase mark in our gold
+         would be wrong, and recognisable is the point of a wallet icon. */
+      className="h-10 w-10 shrink-0 overflow-hidden rounded-xl flex items-center justify-center text-gold"
       dangerouslySetInnerHTML={{ __html: svg }}
     />
   );
@@ -79,10 +82,10 @@ export function WalletModal({ open, onOpenChange }: WalletModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-[#0A1628] border border-[#D4AF37]/20 text-white max-w-sm w-full p-0 gap-0 rounded-2xl overflow-hidden">
-        <DialogHeader className="px-6 pt-6 pb-4 border-b border-[#D4AF37]/10">
+      <DialogContent className="bg-canvas border border-gold/20 text-white max-w-sm w-full p-0 gap-0 rounded-2xl overflow-hidden">
+        <DialogHeader className="px-6 pt-6 pb-4 border-b border-gold/10">
           <DialogTitle className="text-lg font-semibold text-white flex items-center gap-2">
-            <Wallet className="h-5 w-5 text-[#D4AF37]" />
+            <Wallet className="h-5 w-5 text-gold" />
             Connect Wallet
           </DialogTitle>
           <DialogDescription className="text-white/50 text-sm mt-1">
@@ -101,19 +104,19 @@ export function WalletModal({ open, onOpenChange }: WalletModalProps) {
                 key={connector.id}
                 onClick={() => connect({ connector })}
                 disabled={isPending}
-                className="w-full flex items-center gap-4 px-4 py-3.5 rounded-xl border border-[#D4AF37]/10 hover:border-[#D4AF37]/30 hover:bg-[#D4AF37]/5 transition-all duration-150 disabled:opacity-60 disabled:cursor-not-allowed group text-left"
+                className="w-full flex items-center gap-4 px-4 py-3.5 rounded-xl border border-gold/10 hover:border-gold/30 hover:bg-gold/5 transition-all duration-150 disabled:opacity-60 disabled:cursor-not-allowed group text-left"
               >
                 <WalletIcon name={label} />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-white group-hover:text-[#D4AF37] transition-colors truncate">
+                  <p className="text-sm font-semibold text-white group-hover:text-gold transition-colors truncate">
                     {label}
                   </p>
                   <p className="text-xs text-white/40 truncate mt-0.5">{description}</p>
                 </div>
                 {isConnecting ? (
-                  <Loader2 className="h-4 w-4 text-[#D4AF37] animate-spin shrink-0" />
+                  <Loader2 className="h-4 w-4 text-gold animate-spin shrink-0" />
                 ) : (
-                  <div className="h-2 w-2 rounded-full bg-white/10 group-hover:bg-[#D4AF37]/50 transition-colors shrink-0" />
+                  <div className="h-2 w-2 rounded-full bg-white/10 group-hover:bg-gold/50 transition-colors shrink-0" />
                 )}
               </button>
             );
@@ -150,7 +153,7 @@ export function ConnectedWallet({ address, chainName, onDisconnect, compact = fa
   if (compact) {
     return (
       <div className="flex items-center gap-2">
-        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#0F1E35]/80 border border-[#D4AF37]/20">
+        <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface/80 border border-gold/20">
           <div className="h-2 w-2 rounded-full bg-green-400 shrink-0" />
           <span className="text-xs font-mono text-white/70">
             {address.slice(0, 6)}…{address.slice(-4)}
@@ -171,7 +174,7 @@ export function ConnectedWallet({ address, chainName, onDisconnect, compact = fa
 
   return (
     <div className="space-y-3">
-      <div className="p-3 rounded-xl bg-[#0F1E35]/50 border border-[#D4AF37]/10">
+      <div className="p-3 rounded-xl bg-surface/50 border border-gold/10">
         <p className="text-xs text-white/40 mb-1.5 uppercase tracking-wider font-medium">Connected</p>
         <div className="flex items-center justify-between gap-2">
           <code className="text-xs font-mono text-white/80 break-all leading-relaxed">
@@ -182,7 +185,7 @@ export function ConnectedWallet({ address, chainName, onDisconnect, compact = fa
               variant="ghost"
               size="icon"
               onClick={handleCopy}
-              className="h-6 w-6 text-white/30 hover:text-[#D4AF37]"
+              className="h-6 w-6 text-white/30 hover:text-gold"
               title="Copy address"
             >
               {copied ? <CheckCheck className="h-3 w-3 text-green-400" /> : <Copy className="h-3 w-3" />}
@@ -192,7 +195,7 @@ export function ConnectedWallet({ address, chainName, onDisconnect, compact = fa
               target="_blank"
               rel="noopener noreferrer"
             >
-              <Button variant="ghost" size="icon" className="h-6 w-6 text-white/30 hover:text-[#D4AF37]" title="View on Arbiscan">
+              <Button variant="ghost" size="icon" className="h-6 w-6 text-white/30 hover:text-gold" title="View on Arbiscan">
                 <ExternalLink className="h-3 w-3" />
               </Button>
             </a>
@@ -208,7 +211,7 @@ export function ConnectedWallet({ address, chainName, onDisconnect, compact = fa
         variant="outline"
         size="sm"
         onClick={onDisconnect}
-        className="w-full border-[#D4AF37]/20 text-white/60 hover:border-red-500/40 hover:text-red-400 hover:bg-red-500/5 h-9 text-xs transition-all"
+        className="w-full border-gold/20 text-white/60 hover:border-red-500/40 hover:text-red-400 hover:bg-red-500/5 h-9 text-xs transition-all"
       >
         <LogOut className="h-3 w-3 mr-2" />
         Disconnect
@@ -253,7 +256,7 @@ export function WalletButton({ className = "", size = "default", compact = false
       <Button
         onClick={() => setOpen(true)}
         size={size}
-        className={`bg-[#D4AF37] text-[#0A1628] hover:bg-[#D4AF37]/90 font-semibold shadow-lg shadow-[#D4AF37]/20 ${className}`}
+        className={`bg-gold text-canvas hover:bg-gold/90 font-semibold shadow-lg shadow-gold/20 ${className}`}
       >
         <Wallet className="h-4 w-4 mr-2" />
         Connect Wallet

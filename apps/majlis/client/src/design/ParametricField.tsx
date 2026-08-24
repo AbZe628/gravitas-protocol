@@ -85,16 +85,16 @@ export default function ParametricField({
       <defs>
         <radialGradient id={`${uid}-bg`} cx={`${anchor.x * 100}%`} cy={`${anchor.y * 100}%`} r="82%">
           <stop offset="0%" stopColor="#12233F" />
-          <stop offset="62%" stopColor="var(--g-surface, #0C1A33)" />
-          <stop offset="100%" stopColor="var(--g-navy, #0A1428)" />
+          <stop offset="62%" stopColor="var(--g-surface, #171A24)" />
+          <stop offset="100%" stopColor="var(--g-navy, #0E1017)" />
         </radialGradient>
         <radialGradient id={`${uid}-core`} cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="var(--g-gold-soft, #E3C878)" stopOpacity="0.20" />
-          <stop offset="100%" stopColor="var(--g-gold, #C9A845)" stopOpacity="0" />
+          <stop offset="0%" stopColor="var(--g-gold-soft, #E8964A)" stopOpacity="0.20" />
+          <stop offset="100%" stopColor="var(--g-gold, #F7CC74)" stopOpacity="0" />
         </radialGradient>
         <linearGradient id={`${uid}-vault`} x1="0.15" y1="0.05" x2="0.85" y2="0.95">
-          <stop offset="0%" stopColor="var(--g-gold-soft, #E3C878)" stopOpacity="0.13" />
-          <stop offset="55%" stopColor="var(--g-gold, #C9A845)" stopOpacity="0.035" />
+          <stop offset="0%" stopColor="var(--g-gold-soft, #E8964A)" stopOpacity="0.13" />
+          <stop offset="55%" stopColor="var(--g-gold, #F7CC74)" stopOpacity="0.035" />
           <stop offset="100%" stopColor="#000000" stopOpacity="0.10" />
         </linearGradient>
       </defs>
@@ -113,7 +113,7 @@ export default function ParametricField({
         ))}
 
         {/* The compass-and-straightedge skeleton the surfaces are built from. */}
-        <path d={octagram} fill="none" stroke="var(--g-line, #22314F)" strokeOpacity="0.9" strokeWidth="1.1" />
+        <path d={octagram} fill="none" stroke="var(--g-line, rgba(255,255,255,0.11))" strokeOpacity="0.9" strokeWidth="1.1" />
 
         {paths.map((p, i) => {
           const lead = i === leadShell;
@@ -122,7 +122,7 @@ export default function ParametricField({
               key={`e${i}`}
               d={p.d}
               fill="none"
-              stroke={lead ? 'var(--g-gold-soft, #E3C878)' : 'var(--g-gold, #C9A845)'}
+              stroke={lead ? 'var(--g-gold-soft, #E8964A)' : 'var(--g-gold, #F7CC74)'}
               strokeOpacity={lead ? 0.5 : Math.max(0.08, 0.26 - 0.025 * i)}
               strokeWidth={lead ? 1.6 : Math.max(0.6, 1.0 - 0.06 * i)}
             />

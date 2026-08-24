@@ -55,7 +55,7 @@ export default function Analytics() {
 
   return (
     <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-6">
-      <Card className="border-[#D4AF37]/20 bg-[#0F1E35]/50 backdrop-blur">
+      <Card className="border-gold/20 bg-surface/50 backdrop-blur">
         <CardHeader>
           <CardTitle className="text-white">Activity</CardTitle>
           <CardDescription className="text-white/60">
@@ -76,7 +76,7 @@ export default function Analytics() {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {figures.map((f) => (
             <motion.div key={f.label} variants={itemVariants}>
-              <Card className="border-[#D4AF37]/20 bg-[#0F1E35]/50 backdrop-blur">
+              <Card className="border-gold/20 bg-surface/50 backdrop-blur">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-sm font-medium text-white/70">{f.label}</CardTitle>
                 </CardHeader>
@@ -92,7 +92,7 @@ export default function Analytics() {
 
       {chain.migrations?.length === 0 && (
         <motion.div variants={itemVariants}>
-          <Card className="border-[#D4AF37]/20 bg-[#0F1E35]/50 backdrop-blur">
+          <Card className="border-gold/20 bg-surface/50 backdrop-blur">
             <CardContent className="space-y-2 py-6">
               <div className="text-sm text-white">Nothing to chart yet.</div>
               <p className="max-w-prose text-sm leading-relaxed text-white/60">
@@ -105,7 +105,7 @@ export default function Analytics() {
                 href={explorer.address(CONTRACTS.TELEPORT_V3)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-sm text-[#D4AF37] hover:underline"
+                className="inline-flex items-center gap-1.5 text-sm text-gold hover:underline"
               >
                 Check the contract on Arbiscan
                 <ExternalLink className="h-3.5 w-3.5" />

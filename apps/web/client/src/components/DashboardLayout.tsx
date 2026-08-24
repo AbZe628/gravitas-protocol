@@ -63,16 +63,16 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0A1628] via-[#0F1E35] to-[#0A1628]">
+    <div className="min-h-screen bg-gradient-to-br from-canvas via-surface to-canvas">
       {/* Mobile Header */}
-      <header className="lg:hidden sticky top-0 z-50 w-full border-b border-[#D4AF37]/20 bg-[#0A1628]/95 backdrop-blur-xl">
+      <header className="lg:hidden sticky top-0 z-50 w-full border-b border-gold/20 bg-canvas/95 backdrop-blur-xl">
         <div className="flex h-16 items-center justify-between px-4">
           <button
             onClick={() => navigate("/")}
             className="flex items-center gap-2 shrink-0 hover:opacity-80 transition-opacity"
           >
-            <div className="h-9 w-9 rounded-lg bg-gradient-to-br from-[#D4AF37] to-[#B8941F] flex items-center justify-center">
-              <span className="text-[#0A1628] font-bold text-lg">G</span>
+            <div className="h-9 w-9 rounded-lg bg-gradient-to-br from-gold to-gold-deep flex items-center justify-center">
+              <span className="text-canvas font-bold text-lg">G</span>
             </div>
             <div>
               <h1 className="text-sm font-bold text-white leading-tight">Gravitas</h1>
@@ -82,7 +82,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
           <div className="flex items-center gap-2">
             {isConnected && address && chain?.id === arbitrumSepolia.id && (
-              <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0F1E35]/80 border border-[#D4AF37]/20">
+              <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface/80 border border-gold/20">
                 <div className="h-1.5 w-1.5 rounded-full bg-green-400" />
                 <span className="text-xs font-mono text-white/70">
                   {address.slice(0, 6)}…{address.slice(-4)}
@@ -93,7 +93,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               <Button
                 size="sm"
                 onClick={() => setWalletModalOpen(true)}
-                className="bg-[#D4AF37] text-[#0A1628] hover:bg-[#D4AF37]/90 font-semibold h-8 px-3 text-xs"
+                className="bg-gold text-canvas hover:bg-gold/90 font-semibold h-8 px-3 text-xs"
               >
                 <Wallet className="h-3.5 w-3.5 mr-1.5" />
                 Connect
@@ -105,23 +105,23 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="text-[#D4AF37] hover:bg-[#D4AF37]/10 lg:hidden"
+                  className="text-gold hover:bg-gold/10 lg:hidden"
                   aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
                 >
                   {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[280px] bg-[#0A1628] border-[#D4AF37]/20 p-0">
+              <SheetContent side="right" className="w-[280px] bg-canvas border-gold/20 p-0">
                 <nav className="flex flex-col gap-1 pt-6 px-4">
                   <Button
                     variant="ghost"
                     onClick={() => { navigate("/"); setMobileMenuOpen(false); }}
-                    className="justify-start text-white/70 hover:text-[#D4AF37] hover:bg-[#D4AF37]/10 h-10"
+                    className="justify-start text-white/70 hover:text-gold hover:bg-gold/10 h-10"
                   >
                     <Home className="h-4 w-4 mr-3" />
                     Home
                   </Button>
-                  <Separator className="bg-[#D4AF37]/20 my-2" />
+                  <Separator className="bg-gold/20 my-2" />
                   {navItems.map((item) => (
                     <Button
                       key={item.path}
@@ -129,15 +129,15 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                       onClick={() => { navigate(item.path); setMobileMenuOpen(false); }}
                       className={`justify-start h-10 ${
                         isActive(item.path)
-                          ? "bg-[#D4AF37]/20 text-[#D4AF37]"
-                          : "text-white/70 hover:text-[#D4AF37] hover:bg-[#D4AF37]/10"
+                          ? "bg-gold/20 text-gold"
+                          : "text-white/70 hover:text-gold hover:bg-gold/10"
                       }`}
                     >
                       <item.icon className="h-4 w-4 mr-3" />
                       {item.label}
                     </Button>
                   ))}
-                  <Separator className="bg-[#D4AF37]/20 my-2" />
+                  <Separator className="bg-gold/20 my-2" />
                   <div className="px-1 py-2">
                     {isConnected && address ? (
                       <ConnectedWallet
@@ -148,7 +148,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                     ) : (
                       <Button
                         onClick={() => { setWalletModalOpen(true); setMobileMenuOpen(false); }}
-              className="w-full bg-[#D4AF37] text-[#0A1628] hover:bg-[#D4AF37]/90 h-10 text-sm font-semibold"
+              className="w-full bg-gold text-canvas hover:bg-gold/90 h-10 text-sm font-semibold"
             >
               <Wallet className="h-4 w-4 mr-2" />
               Connect Wallet
@@ -169,16 +169,16 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           initial={{ x: -20, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           transition={{ duration: 0.3 }}
-          className="w-64 border-r border-[#D4AF37]/20 bg-[#0A1628]/50 backdrop-blur flex flex-col overflow-y-auto"
+          className="w-64 border-r border-gold/20 bg-canvas/50 backdrop-blur flex flex-col overflow-y-auto"
         >
           {/* Logo */}
           <button
             onClick={() => navigate("/")}
-            className="p-6 border-b border-[#D4AF37]/20 shrink-0 w-full hover:bg-[#D4AF37]/5 transition-colors text-left"
+            className="p-6 border-b border-gold/20 shrink-0 w-full hover:bg-gold/5 transition-colors text-left"
           >
             <div className="flex items-center gap-3">
-              <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-[#D4AF37] to-[#B8941F] flex items-center justify-center shrink-0">
-                <span className="text-[#0A1628] font-bold text-2xl">G</span>
+              <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-gold to-gold-deep flex items-center justify-center shrink-0">
+                <span className="text-canvas font-bold text-2xl">G</span>
               </div>
               <div>
                 <h1 className="text-xl font-bold text-white">Gravitas</h1>
@@ -192,12 +192,12 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             <Button
               variant="ghost"
               onClick={() => navigate("/")}
-              className="w-full justify-start text-white/70 hover:text-[#D4AF37] hover:bg-[#D4AF37]/10 h-10"
+              className="w-full justify-start text-white/70 hover:text-gold hover:bg-gold/10 h-10"
             >
               <Home className="h-4 w-4 mr-3" />
               Home
             </Button>
-            <Separator className="bg-[#D4AF37]/20 my-3" />
+            <Separator className="bg-gold/20 my-3" />
             {navItems.map((item) => (
               <Button
                 key={item.path}
@@ -205,8 +205,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 onClick={() => navigate(item.path)}
                 className={`w-full justify-start h-10 ${
                   isActive(item.path)
-                    ? "bg-[#D4AF37]/20 text-[#D4AF37]"
-                    : "text-white/70 hover:text-[#D4AF37] hover:bg-[#D4AF37]/10"
+                    ? "bg-gold/20 text-gold"
+                    : "text-white/70 hover:text-gold hover:bg-gold/10"
                 }`}
               >
                 <item.icon className="h-4 w-4 mr-3" />
@@ -216,7 +216,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           </nav>
 
           {/* Wallet Section */}
-          <div className="p-4 border-t border-[#D4AF37]/20 shrink-0">
+          <div className="p-4 border-t border-gold/20 shrink-0">
             {isConnected && address ? (
               <ConnectedWallet
                 address={address}
@@ -226,7 +226,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             ) : (
               <Button
                 onClick={() => setWalletModalOpen(true)}
-                className="w-full bg-[#D4AF37] text-[#0A1628] hover:bg-[#D4AF37]/90 h-10 text-sm font-semibold"
+                className="w-full bg-gold text-canvas hover:bg-gold/90 h-10 text-sm font-semibold"
               >
                 Connect Wallet
               </Button>
@@ -237,7 +237,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         {/* Main Content */}
         <div className="flex-1 flex flex-col overflow-hidden">
           {/* Top Bar */}
-          <header className="h-16 border-b border-[#D4AF37]/20 bg-[#0A1628]/50 backdrop-blur flex items-center justify-between px-6 shrink-0">
+          <header className="h-16 border-b border-gold/20 bg-canvas/50 backdrop-blur flex items-center justify-between px-6 shrink-0">
             <div className="flex items-center gap-4 min-w-0">
               <h2 className="text-lg font-semibold text-white truncate">
                 {navItems.find((item) => isActive(item.path))?.label || "Dashboard"}
@@ -261,7 +261,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               <Button
                 variant="outline"
                 size="sm"
-                className="border-[#D4AF37]/20 text-[#D4AF37] hover:bg-[#D4AF37]/10 h-9 text-xs"
+                className="border-gold/20 text-gold hover:bg-gold/10 h-9 text-xs"
               >
                 <ExternalLink className="h-3 w-3 mr-2" />
                 Arbiscan
@@ -299,7 +299,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
       {/* Mobile Bottom Navigation */}
       <nav
-        className="lg:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-[#D4AF37]/20 bg-[#0A1628]/98 backdrop-blur-xl"
+        className="lg:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-gold/20 bg-canvas/98 backdrop-blur-xl"
         style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
         aria-label="Mobile bottom navigation"
       >
@@ -311,7 +311,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 key={item.path}
                 onClick={() => navigate(item.path)}
                 className={`relative flex flex-col items-center justify-center gap-1 flex-1 h-full transition-colors ${
-                  active ? "text-[#D4AF37]" : "text-white/40 hover:text-white/70"
+                  active ? "text-gold" : "text-white/40 hover:text-white/70"
                 }`}
                 aria-label={item.label}
                 aria-current={active ? "page" : undefined}
@@ -319,7 +319,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 <item.icon className={`h-5 w-5 transition-transform ${active ? "scale-110" : ""}`} />
                 <span className="text-[10px] font-medium leading-none">{item.label}</span>
                 {active && (
-                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 w-8 bg-[#D4AF37] rounded-t-full" />
+                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 w-8 bg-gold rounded-t-full" />
                 )}
               </button>
             );
