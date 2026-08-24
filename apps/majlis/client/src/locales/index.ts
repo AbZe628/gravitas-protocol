@@ -42,6 +42,13 @@ const en: Dict = {
     'The board decides here: matters, deliberation and votes are recorded. Signing authority is not here — ' +
     'a decision taken in Majlis does not itself change the Policy Registry.',
 
+  'whoami.observerTitle': 'You are reading, not taking part',
+  'whoami.observerBody':
+    'This session is authenticated with the board\u2019s shared credential. It can say that someone from ' +
+    'the board is here, but not which member \u2014 and a vote that cannot be attributed is not a record ' +
+    'of anything. So it reads, and nothing more. To deliberate, vote or object, each member needs their ' +
+    'own credential: set MAJLIS_MEMBERS on the server, one line per member. See apps/majlis/.env.example.',
+
   'attention.title': 'What is waiting for you',
   'attention.none': 'Nothing is waiting for you.',
   'attention.overdue': 'Past its deadline',

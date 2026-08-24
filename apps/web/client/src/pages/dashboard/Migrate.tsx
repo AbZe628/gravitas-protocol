@@ -246,15 +246,15 @@ function ContractStats({ address }: { address?: string }) {
   return (
     <div className="grid grid-cols-3 gap-3">
       <div className="p-3 rounded-lg bg-canvas/50 border border-gold/10 text-center">
-        <p className="text-xs text-white/40 mb-1">Your Nonce</p>
+        <p className="text-xs text-white/60 mb-1">Your Nonce</p>
         <p className="text-lg font-bold text-white">{nonce?.toString() ?? "—"}</p>
       </div>
       <div className="p-3 rounded-lg bg-canvas/50 border border-gold/10 text-center">
-        <p className="text-xs text-white/40 mb-1">Cooldown</p>
+        <p className="text-xs text-white/60 mb-1">Cooldown</p>
         <p className="text-lg font-bold text-white">{cooldown ? `${Number(cooldown) / 60}m` : "—"}</p>
       </div>
       <div className="p-3 rounded-lg bg-canvas/50 border border-gold/10 text-center">
-        <p className="text-xs text-white/40 mb-1">Max Move</p>
+        <p className="text-xs text-white/60 mb-1">Max Move</p>
         <p className="text-lg font-bold text-white">{maxMove ? `${Number(maxMove) / 100}%` : "—"}</p>
       </div>
     </div>

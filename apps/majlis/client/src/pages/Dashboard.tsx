@@ -4,6 +4,7 @@ import { api, type MatterSummary, type RegistrySnapshot } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { Card, DateText, ErrorText, Loading, Tag } from '../components/ui.js';
 import Attention from '../components/Attention.js';
+import WhoYouAre from '../components/WhoYouAre.js';
 import RaiseMatter from '../components/RaiseMatter.js';
 import { mayDeliberate, useIdentity } from '../lib/identity.js';
 
@@ -32,6 +33,12 @@ export default function Dashboard() {
         because nobody looked is the failure this panel exists to prevent, so it
         sits above the list of everything rather than below it.
       */}
+      {/*
+        Before anything else. Someone who cannot act needs to know that before
+        they go looking for the buttons, not after.
+      */}
+      <WhoYouAre />
+
       <Attention />
 
       <div className="mb-5 rounded-lg border border-line bg-surface/60 px-4 py-3 text-[13px] text-muted">

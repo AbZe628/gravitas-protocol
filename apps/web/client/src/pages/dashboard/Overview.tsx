@@ -41,15 +41,15 @@ function ContractAddress({ label, address, short, href }: { label: string; addre
   };
   return (
     <div className="p-3 rounded-lg bg-canvas/50 border border-gold/10">
-      <p className="text-xs font-medium text-white/40 mb-2 uppercase tracking-wider">{label}</p>
+      <p className="text-xs font-medium text-white/60 mb-2 uppercase tracking-wider">{label}</p>
       <div className="flex items-center justify-between gap-2">
         <code className="text-sm font-mono text-gold">{short}</code>
         <div className="flex gap-1">
-          <Button size="sm" variant="ghost" onClick={copy} className="h-6 w-6 p-0 text-white/30 hover:text-gold">
+          <Button size="sm" variant="ghost" onClick={copy} className="h-6 w-6 p-0 text-white/50 hover:text-gold">
             {copied ? <CheckCheck className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
           </Button>
           <a href={href} target="_blank" rel="noopener noreferrer">
-            <Button size="sm" variant="ghost" className="h-6 w-6 p-0 text-white/30 hover:text-gold">
+            <Button size="sm" variant="ghost" className="h-6 w-6 p-0 text-white/50 hover:text-gold">
               <ExternalLink className="h-3 w-3" />
             </Button>
           </a>
@@ -170,23 +170,23 @@ export default function Overview() {
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="p-4 rounded-xl bg-canvas/50 border border-gold/10">
-                <p className="text-xs text-white/40 mb-1 uppercase tracking-wider">Protocol Status</p>
+                <p className="text-xs text-white/60 mb-1 uppercase tracking-wider">Protocol Status</p>
                 <p className="text-2xl font-bold text-white">
                   {isPaused !== undefined ? (isPaused ? "🔴 Paused" : "🟢 Active") : (
-                    <span className="text-white/30 text-lg">Querying...</span>
+                    <span className="text-white/50 text-lg">Querying...</span>
                   )}
                 </p>
               </div>
               <div className="p-4 rounded-xl bg-canvas/50 border border-gold/10">
-                <p className="text-xs text-white/40 mb-1 uppercase tracking-wider">Policy Version</p>
+                <p className="text-xs text-white/60 mb-1 uppercase tracking-wider">Policy Version</p>
                 <p className="text-2xl font-bold text-white">
                   {policyVersion !== undefined ? `v${policyVersion.toString()}` : (
-                    <span className="text-white/30 text-lg">Querying...</span>
+                    <span className="text-white/50 text-lg">Querying...</span>
                   )}
                 </p>
               </div>
               <div className="p-4 rounded-xl bg-canvas/50 border border-gold/10">
-                <p className="text-xs text-white/40 mb-1 uppercase tracking-wider">Network</p>
+                <p className="text-xs text-white/60 mb-1 uppercase tracking-wider">Network</p>
                 <Badge className="bg-gold text-canvas mt-1">Arbitrum Sepolia · Chain 421614</Badge>
               </div>
             </CardContent>
@@ -269,7 +269,7 @@ export default function Overview() {
                   <div className="p-4 rounded-xl border border-gold/10 bg-canvas/30 hover:border-gold/30 hover:bg-canvas/50 transition-all cursor-pointer group">
                     <div className="text-2xl mb-2">{action.icon}</div>
                     <p className="font-semibold text-white text-sm group-hover:text-gold transition-colors">{action.label}</p>
-                    <p className="text-xs text-white/40 mt-0.5">{action.desc}</p>
+                    <p className="text-xs text-white/60 mt-0.5">{action.desc}</p>
                   </div>
                 </Link>
               ))}

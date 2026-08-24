@@ -111,7 +111,7 @@ export function WalletModal({ open, onOpenChange }: WalletModalProps) {
                   <p className="text-sm font-semibold text-white group-hover:text-gold transition-colors truncate">
                     {label}
                   </p>
-                  <p className="text-xs text-white/40 truncate mt-0.5">{description}</p>
+                  <p className="text-xs text-white/60 truncate mt-0.5">{description}</p>
                 </div>
                 {isConnecting ? (
                   <Loader2 className="h-4 w-4 text-gold animate-spin shrink-0" />
@@ -124,7 +124,7 @@ export function WalletModal({ open, onOpenChange }: WalletModalProps) {
         </div>
 
         <div className="px-6 pb-5 pt-1">
-          <p className="text-[11px] text-white/25 text-center leading-relaxed">
+          <p className="text-[11px] text-white/50 text-center leading-relaxed">
             By connecting, you agree to interact with Arbitrum Sepolia testnet contracts.
             No real funds are at risk.
           </p>
@@ -163,7 +163,7 @@ export function ConnectedWallet({ address, chainName, onDisconnect, compact = fa
           variant="ghost"
           size="icon"
           onClick={onDisconnect}
-          className="h-8 w-8 text-white/40 hover:text-red-400 hover:bg-red-400/10"
+          className="h-8 w-8 text-white/60 hover:text-red-400 hover:bg-red-400/10"
           title="Disconnect"
         >
           <LogOut className="h-3.5 w-3.5" />
@@ -175,7 +175,7 @@ export function ConnectedWallet({ address, chainName, onDisconnect, compact = fa
   return (
     <div className="space-y-3">
       <div className="p-3 rounded-xl bg-surface/50 border border-gold/10">
-        <p className="text-xs text-white/40 mb-1.5 uppercase tracking-wider font-medium">Connected</p>
+        <p className="text-xs text-white/60 mb-1.5 uppercase tracking-wider font-medium">Connected</p>
         <div className="flex items-center justify-between gap-2">
           <code className="text-xs font-mono text-white/80 break-all leading-relaxed">
             {address.slice(0, 10)}…{address.slice(-8)}
@@ -185,7 +185,7 @@ export function ConnectedWallet({ address, chainName, onDisconnect, compact = fa
               variant="ghost"
               size="icon"
               onClick={handleCopy}
-              className="h-6 w-6 text-white/30 hover:text-gold"
+              className="h-6 w-6 text-white/50 hover:text-gold"
               title="Copy address"
             >
               {copied ? <CheckCheck className="h-3 w-3 text-green-400" /> : <Copy className="h-3 w-3" />}
@@ -195,7 +195,7 @@ export function ConnectedWallet({ address, chainName, onDisconnect, compact = fa
               target="_blank"
               rel="noopener noreferrer"
             >
-              <Button variant="ghost" size="icon" className="h-6 w-6 text-white/30 hover:text-gold" title="View on Arbiscan">
+              <Button variant="ghost" size="icon" className="h-6 w-6 text-white/50 hover:text-gold" title="View on Arbiscan">
                 <ExternalLink className="h-3 w-3" />
               </Button>
             </a>

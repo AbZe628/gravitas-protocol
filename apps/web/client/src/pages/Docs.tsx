@@ -30,12 +30,12 @@ function CodeBlock({ code, language = "bash" }: { code: string; language?: strin
   return (
     <div className="relative group rounded-xl border border-gold/10 bg-abyss overflow-hidden">
       <div className="flex items-center justify-between px-4 py-2 border-b border-gold/10 bg-canvas/50">
-        <span className="text-xs text-white/30 font-mono">{language}</span>
+        <span className="text-xs text-white/50 font-mono">{language}</span>
         <Button
           size="sm"
           variant="ghost"
           onClick={copy}
-          className="h-6 px-2 text-white/30 hover:text-gold"
+          className="h-6 px-2 text-white/50 hover:text-gold"
         >
           {copied ? <CheckCheck className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
         </Button>
@@ -80,7 +80,7 @@ export default function Docs() {
                 <span className="font-bold text-white hidden sm:inline">Gravitas</span>
               </div>
             </Link>
-            <ChevronRight className="h-4 w-4 text-white/30" />
+            <ChevronRight className="h-4 w-4 text-white/50" />
             <span className="text-white/60 text-sm">Documentation</span>
           </div>
           <div className="hidden md:flex items-center gap-3">
@@ -133,7 +133,7 @@ export default function Docs() {
         {/* Sidebar */}
         <aside className="hidden lg:block w-64 fixed left-0 top-16 bottom-0 border-r border-gold/10 bg-abyss/80 backdrop-blur overflow-y-auto">
           <div className="p-4">
-            <p className="text-xs font-semibold text-white/30 uppercase tracking-wider mb-3">Documentation</p>
+            <p className="text-xs font-semibold text-white/50 uppercase tracking-wider mb-3">Documentation</p>
             <nav className="space-y-1">
               {sections.map((s) => (
                 <button
@@ -178,7 +178,7 @@ export default function Docs() {
                         <CardHeader className="pb-3">
                           <card.icon className="h-5 w-5 text-gold mb-2" />
                           <CardTitle className="text-white text-sm group-hover:text-gold transition-colors">{card.title}</CardTitle>
-                          <p className="text-xs text-white/40">{card.desc}</p>
+                          <p className="text-xs text-white/60">{card.desc}</p>
                         </CardHeader>
                       </Card>
                     </Link>
@@ -287,10 +287,10 @@ console.log('Estimated gas:', result.gasEstimate);`} language="typescript" />
       {/* Footer */}
       <footer className="border-t border-gold/10 py-8 bg-abyss">
         <div className="container px-4 md:px-6 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-white/30">
+          <p className="text-sm text-white/50">
             © 2026 Gravitas Protocol. Built for institutional DeFi.
           </p>
-          <div className="flex items-center gap-4 text-xs text-white/30">
+          <div className="flex items-center gap-4 text-xs text-white/50">
             <span>BUSL-1.1</span>
             <span>·</span>
             <a href="https://github.com/AbZe628/gravitas-protocol" target="_blank" rel="noopener noreferrer" className="hover:text-gold transition-colors">GitHub</a>

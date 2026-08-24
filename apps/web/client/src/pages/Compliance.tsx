@@ -166,7 +166,7 @@ export default function Compliance() {
                 <span className="font-bold text-white hidden sm:inline">Gravitas</span>
               </div>
             </Link>
-            <ChevronRight className="h-4 w-4 text-white/30" />
+            <ChevronRight className="h-4 w-4 text-white/50" />
             <span className="text-white/60 text-sm">Compliance</span>
           </div>
           <div className="hidden md:flex items-center gap-3">
@@ -235,37 +235,37 @@ export default function Compliance() {
                 <motion.div variants={fadeUp}>
                   <Card className="border border-gold/20 bg-canvas/60">
                     <CardContent className="pt-6">
-                      <p className="text-sm text-white/40 mb-1">Policy Version</p>
+                      <p className="text-sm text-white/60 mb-1">Policy Version</p>
                       <p className="text-2xl md:text-3xl font-bold text-gold">
                         {policyVersion !== undefined ? `v${policyVersion.toString()}` : "—"}
                       </p>
-                      <p className="text-xs text-white/30 mt-1">On-chain governance version</p>
+                      <p className="text-xs text-white/50 mt-1">On-chain governance version</p>
                     </CardContent>
                   </Card>
                 </motion.div>
                 <motion.div variants={fadeUp}>
                   <Card className="border border-green-500/20 bg-green-500/5">
                     <CardContent className="pt-6">
-                      <p className="text-sm text-white/40 mb-1">Registry Status</p>
+                      <p className="text-sm text-white/60 mb-1">Registry Status</p>
                       <div className="flex items-center gap-2">
                         <div className="h-2 w-2 rounded-full bg-green-400 animate-pulse" />
                         <p className="text-2xl md:text-3xl font-bold text-green-400">Active</p>
                       </div>
-                      <p className="text-xs text-white/30 mt-1">Arbitrum Sepolia</p>
+                      <p className="text-xs text-white/50 mt-1">Arbitrum Sepolia</p>
                     </CardContent>
                   </Card>
                 </motion.div>
                 <motion.div variants={fadeUp}>
                   <Card className="border border-gold/20 bg-canvas/60">
                     <CardContent className="pt-6">
-                      <p className="text-sm text-white/40 mb-1">Contract Address</p>
+                      <p className="text-sm text-white/60 mb-1">Contract Address</p>
                       <code className="text-xs md:text-sm font-mono text-gold break-all">0x6f3bfb896DD9964C9c05dA88692bDf1b1b2C3F23</code>
                       <div className="mt-2">
                         <a
                           href="https://sepolia.arbiscan.io/address/0x6f3bfb896DD9964C9c05dA88692bDf1b1b2C3F23"
                           target="_blank" rel="noopener noreferrer"
                         >
-                          <Button size="sm" variant="ghost" className="h-6 px-2 text-white/40 hover:text-gold text-xs">
+                          <Button size="sm" variant="ghost" className="h-6 px-2 text-white/60 hover:text-gold text-xs">
                             <ExternalLink className="h-3 w-3 mr-1" />
                             View on Arbiscan
                           </Button>
@@ -304,10 +304,10 @@ export default function Compliance() {
       {/* Footer */}
       <footer className="border-t border-gold/10 py-8 bg-abyss">
         <div className="container px-4 md:px-6 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-white/30">
+          <p className="text-sm text-white/50">
             © 2026 Gravitas Protocol. Built for institutional DeFi.
           </p>
-          <div className="flex items-center gap-4 text-xs text-white/30">
+          <div className="flex items-center gap-4 text-xs text-white/50">
             <span>BUSL-1.1</span>
             <span>·</span>
             <a href="https://github.com/AbZe628/gravitas-protocol" target="_blank" rel="noopener noreferrer" className="hover:text-gold transition-colors">GitHub</a>

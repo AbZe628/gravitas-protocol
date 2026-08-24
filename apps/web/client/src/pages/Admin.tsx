@@ -10,8 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Shield, Lock, AlertCircle, Loader2, CheckCircle2,
-  ExternalLink, Settings, Users, Sliders, RefreshCw, Home
-} from "lucide-react";
+  ExternalLink, Settings, Users, Sliders, RefreshCw, Home, ArrowLeft } from "lucide-react";
 import { Link } from "wouter";
 import { WalletButton } from "@/components/WalletModal";
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
@@ -400,13 +399,13 @@ function PolicyUpdates() {
     <div className="space-y-6">
       <div className="grid grid-cols-2 gap-4">
         <div className="p-4 rounded-xl bg-canvas/50 border border-gold/10 text-center">
-          <p className="text-xs text-white/40 mb-1">Current Cooldown</p>
+          <p className="text-xs text-white/60 mb-1">Current Cooldown</p>
           <p className="text-xl font-bold text-white">
             {currentCooldown !== undefined ? `${Number(currentCooldown) / 60}m` : "N/A"}
           </p>
         </div>
         <div className="p-4 rounded-xl bg-canvas/50 border border-gold/10 text-center">
-          <p className="text-xs text-white/40 mb-1">Current Max Move</p>
+          <p className="text-xs text-white/60 mb-1">Current Max Move</p>
           <p className="text-xl font-bold text-white">
             {currentMaxBps !== undefined ? `${Number(currentMaxBps) / 100}%` : "N/A"}
           </p>
@@ -417,7 +416,7 @@ function PolicyUpdates() {
         <div className="space-y-2">
           <Label className="text-white text-sm">
             New Cooldown (seconds)
-            <span className="text-white/40 ml-2 text-xs">max: 604800 (7 days)</span>
+            <span className="text-white/60 ml-2 text-xs">max: 604800 (7 days)</span>
           </Label>
           <Input
             type="number"
@@ -430,7 +429,7 @@ function PolicyUpdates() {
         <div className="space-y-2">
           <Label className="text-white text-sm">
             New Max Move BPS
-            <span className="text-white/40 ml-2 text-xs">100 BPS = 1%, max: 10000</span>
+            <span className="text-white/60 ml-2 text-xs">100 BPS = 1%, max: 10000</span>
           </Label>
           <Input
             type="number"
@@ -517,7 +516,19 @@ export default function Admin() {
             </p>
           </div>
           <div className="flex items-center gap-3">
+            {/*
+              Admin had one way out and it left the application entirely: "Home"
+              resolves to /app/, which returns the visitor to the marketing site.
+              Anyone who opened the registry controls had to use the browser back
+              button to get to the dashboard again.
+            */}
             <Button asChild variant="outline" size="sm" className="border-white/15 text-white/60 hover:text-white hover:bg-white/5">
+              <Link href="/dashboard">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Dashboard
+              </Link>
+            </Button>
+            <Button asChild variant="ghost" size="sm" className="text-white/50 hover:text-white hover:bg-white/5">
               <Link href="/">
                 <Home className="h-4 w-4 mr-2" />
                 Home
@@ -570,7 +581,7 @@ export default function Admin() {
               <strong>Access Denied.</strong> Your wallet ({address?.slice(0, 6)}...{address?.slice(-4)}) is not the
               registry owner.
               <br />
-              <span className="text-xs text-white/40 mt-1 block">
+              <span className="text-xs text-white/60 mt-1 block">
                 Registry owner: {registryOwner ? `${(registryOwner as string).slice(0, 10)}...${(registryOwner as string).slice(-8)}` : "Loading..."}
               </span>
             </AlertDescription>
@@ -592,7 +603,7 @@ export default function Admin() {
                 <div className="flex items-center gap-3">
                   <div className={`h-2.5 w-2.5 rounded-full ${isOwner ? "bg-green-400" : "bg-red-400"}`} />
                   <div>
-                    <p className="text-xs text-white/40">Connected Wallet</p>
+                    <p className="text-xs text-white/60">Connected Wallet</p>
                     <p className="text-sm font-mono text-white">{address?.slice(0, 10)}...{address?.slice(-8)}</p>
                   </div>
                 </div>
@@ -611,7 +622,7 @@ export default function Admin() {
                     variant="ghost"
                     size="sm"
                     onClick={() => refetchOwner()}
-                    className="text-white/40 hover:text-white"
+                    className="text-white/60 hover:text-white"
                   >
                     <RefreshCw className="h-3 w-3" />
                   </Button>
@@ -709,7 +720,7 @@ export default function Admin() {
               <Lock className="h-4 w-4 text-gold shrink-0 mt-0.5" />
               <div>
                 <p className="text-xs font-semibold text-white/60 uppercase tracking-wider mb-1">Security Notice</p>
-                <p className="text-xs text-white/40">
+                <p className="text-xs text-white/60">
                   All write operations require on-chain ownership verification against{" "}
                   <code className="text-gold">registry.owner()</code>. Transactions are signed locally and
                   submitted directly to Arbitrum Sepolia. No private keys are stored or transmitted.

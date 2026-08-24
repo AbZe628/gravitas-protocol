@@ -76,7 +76,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             </div>
             <div>
               <h1 className="text-sm font-bold text-white leading-tight">Gravitas</h1>
-              <p className="text-[10px] text-white/40 leading-tight">Protocol</p>
+              <p className="text-[10px] text-white/60 leading-tight">Protocol</p>
             </div>
           </button>
 
@@ -311,7 +311,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 key={item.path}
                 onClick={() => navigate(item.path)}
                 className={`relative flex flex-col items-center justify-center gap-1 flex-1 h-full transition-colors ${
-                  active ? "text-gold" : "text-white/40 hover:text-white/70"
+                  active ? "text-gold" : "text-white/60 hover:text-white/70"
                 }`}
                 aria-label={item.label}
                 aria-current={active ? "page" : undefined}

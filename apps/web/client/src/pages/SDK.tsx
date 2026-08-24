@@ -30,8 +30,8 @@ function CodeBlock({ code, language = "typescript", title }: { code: string; lan
   return (
     <div className="rounded-xl border border-gold/10 bg-abyss overflow-hidden">
       <div className="flex items-center justify-between px-4 py-2 border-b border-gold/10 bg-canvas/50">
-        <span className="text-xs text-white/40 font-mono">{title || language}</span>
-        <Button size="sm" variant="ghost" onClick={copy} className="h-6 px-2 text-white/30 hover:text-gold">
+        <span className="text-xs text-white/60 font-mono">{title || language}</span>
+        <Button size="sm" variant="ghost" onClick={copy} className="h-6 px-2 text-white/50 hover:text-gold">
           {copied ? <CheckCheck className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
         </Button>
       </div>
@@ -59,7 +59,7 @@ export default function SDK() {
                 <span className="font-bold text-white hidden sm:block">Gravitas</span>
               </div>
             </Link>
-            <ChevronRight className="h-4 w-4 text-white/30 shrink-0" />
+            <ChevronRight className="h-4 w-4 text-white/50 shrink-0" />
             <span className="text-white/60 text-sm truncate">SDK Reference</span>
           </div>
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
@@ -153,7 +153,7 @@ const client = new GravitasClient({
                 ].map((prop, i) => (
                   <div key={i} className="p-3 rounded-lg border border-gold/10 bg-canvas/40">
                     <code className="text-sm font-mono text-gold">{prop.prop}</code>
-                    <p className="text-xs text-white/30 mt-0.5">{prop.type}</p>
+                    <p className="text-xs text-white/50 mt-0.5">{prop.type}</p>
                     <p className="text-xs text-white/50 mt-1">{prop.desc}</p>
                   </div>
                 ))}
@@ -332,7 +332,7 @@ async function migratePosition(tokenId: bigint) {
                           <CardHeader className="pb-3">
                             <item.icon className="h-5 w-5 text-gold mb-2" />
                             <CardTitle className="text-white text-sm group-hover:text-gold transition-colors">{item.title}</CardTitle>
-                            <p className="text-xs text-white/40">{item.desc}</p>
+                            <p className="text-xs text-white/60">{item.desc}</p>
                           </CardHeader>
                         </Card>
                       </a>
@@ -342,7 +342,7 @@ async function migratePosition(tokenId: bigint) {
                           <CardHeader className="pb-3">
                             <item.icon className="h-5 w-5 text-gold mb-2" />
                             <CardTitle className="text-white text-sm group-hover:text-gold transition-colors">{item.title}</CardTitle>
-                            <p className="text-xs text-white/40">{item.desc}</p>
+                            <p className="text-xs text-white/60">{item.desc}</p>
                           </CardHeader>
                         </Card>
                       </Link>

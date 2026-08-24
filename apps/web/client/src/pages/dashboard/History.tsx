@@ -56,14 +56,14 @@ function Row({ migration }: { migration: Migration }) {
       <Card className="border-gold/20 bg-surface/50 backdrop-blur">
         <CardContent className="flex flex-wrap items-center gap-x-6 gap-y-3 py-4">
           <div className="min-w-0">
-            <div className="text-[11px] uppercase tracking-wide text-white/40">Transaction</div>
+            <div className="text-[11px] uppercase tracking-wide text-white/60">Transaction</div>
             <div className="flex items-center gap-2">
               <span className="font-mono text-sm text-white">{short(migration.hash)}</span>
               <button
                 type="button"
                 onClick={copy}
                 aria-label="Copy the transaction hash"
-                className="text-white/40 hover:text-white"
+                className="text-white/60 hover:text-white"
               >
                 {copied ? <CheckCheck className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
               </button>
@@ -72,7 +72,7 @@ function Row({ migration }: { migration: Migration }) {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Open on Arbiscan"
-                className="text-white/40 hover:text-white"
+                className="text-white/60 hover:text-white"
               >
                 <ExternalLink className="h-3.5 w-3.5" />
               </a>
@@ -80,27 +80,27 @@ function Row({ migration }: { migration: Migration }) {
           </div>
 
           <div>
-            <div className="text-[11px] uppercase tracking-wide text-white/40">Position</div>
+            <div className="text-[11px] uppercase tracking-wide text-white/60">Position</div>
             <div className="flex items-center gap-1.5 font-mono text-sm text-white tabular-nums">
               #{String(migration.oldTokenId)}
-              <ArrowRight className="h-3 w-3 text-white/40" />#{String(migration.newTokenId)}
+              <ArrowRight className="h-3 w-3 text-white/60" />#{String(migration.newTokenId)}
             </div>
           </div>
 
           <div>
-            <div className="text-[11px] uppercase tracking-wide text-white/40">New fee tier</div>
+            <div className="text-[11px] uppercase tracking-wide text-white/60">New fee tier</div>
             <div className="text-sm text-white tabular-nums">
               {FEE_LABEL[migration.newFee] ?? `${migration.newFee}`}
             </div>
           </div>
 
           <div>
-            <div className="text-[11px] uppercase tracking-wide text-white/40">Block</div>
+            <div className="text-[11px] uppercase tracking-wide text-white/60">Block</div>
             <div className="font-mono text-sm text-white tabular-nums">{String(migration.blockNumber)}</div>
           </div>
 
           <div>
-            <div className="text-[11px] uppercase tracking-wide text-white/40">Owner</div>
+            <div className="text-[11px] uppercase tracking-wide text-white/60">Owner</div>
             <a
               href={explorer.address(migration.user)}
               target="_blank"
