@@ -46,9 +46,13 @@ export default function Attention() {
       .catch(() => setFailed(true));
   }, []);
 
-  // Say nothing rather than imply there is nothing.
-  if (failed || !data) return null;
-  if (data.items.length === 0) {
+  // Say nothing rather than imply there is nothing. A response that is not the
+  // shape this expects is treated the same way: a panel is not worth taking the
+  // dashboard down for, and a board that cannot see its matters because a
+  // reminder failed to load is worse off than one with no reminders.
+  const items = Array.isArray(data?.items) ? data.items : null;
+  if (failed || !data || !items) return null;
+  if (items.length === 0) {
     return (
       <div className="mb-5 rounded-lg border border-line bg-surface/60 px-4 py-3 text-[13px] text-muted">
         {t('attention.none')}
@@ -61,13 +65,15 @@ export default function Attention() {
       <h2 className="mb-3 flex items-baseline gap-2 text-[15px] font-semibold">
         {t('attention.title')}
         <span className="text-[12px] font-normal text-muted">
-          {data.outstanding}
-          {data.overdue > 0 ? ` · ${data.overdue} ${t('attention.overdue').toLowerCase()}` : ''}
+          {items.length}
+          {items.filter((i) => i.overdue).length > 0
+            ? ` · ${items.filter((i) => i.overdue).length} ${t('attention.overdue').toLowerCase()}`
+            : ''}
         </span>
       </h2>
 
       <ul className="space-y-2">
-        {data.items.map((item) => {
+        {items.map((item) => {
           const left = remaining(item, t);
           return (
             <li key={item.matterId}>

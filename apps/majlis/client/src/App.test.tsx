@@ -26,6 +26,10 @@ beforeEach(() => {
           headers: { 'Content-Type': 'application/json' },
         });
 
+      if (url.includes('/api/attention')) {
+        return json({ scholarId: 'member-a', role: 'signatory', outstanding: 0, overdue: 0, items: [] });
+      }
+
       if (url.includes('/api/matters/')) {
         return json({
           id: 'm1',
