@@ -5,15 +5,18 @@ import type { RegistrySnapshot } from '../types.js';
 /**
  * Read side of the deployed Policy Registry.
  *
- * IMPORTANT — the ABI below is a minimal assumed interface. It has NOT been
- * verified against the deployed contract. Before this is relied on for
- * anything, replace it with the ABI emitted by the actual build and confirm
- * each function exists with the signature given here.
+ * The ABI below is deliberately minimal: Majlis asks the registry two things,
+ * whether it is paused and who owns it, and has no business asking more.
  *
- * Until that is done, every read is treated as best-effort: a failure is
- * reported as a failure rather than being disguised, and the application
- * continues to serve the recorded seed data. The application must never
- * present an unverified chain read as though it were confirmed.
+ * Both were checked against the deployed registry at
+ * 0x6f3bfb896DD9964C9c05dA88692bDf1b1b2C3F23 on 24 August 2026 and answer with
+ * the signatures given here. Anything added to this list must be checked the
+ * same way — an assumed signature does not fail loudly, it returns a decoded
+ * value that means nothing.
+ *
+ * Reads stay best-effort regardless: a failure is reported as a failure rather
+ * than disguised, and the application continues to serve the recorded seed
+ * data. It must never present an unverified chain read as though confirmed.
  */
 export const POLICY_REGISTRY_ABI = [
   {
