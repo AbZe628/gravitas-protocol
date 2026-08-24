@@ -1,15 +1,17 @@
 import { useEffect, useState } from 'react';
-import { api, type AssistantExchange } from '../lib/api.js';
+import { api, type AssistantExchange, type Health } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { Card, DateText, Tag } from '../components/ui.js';
 
 export default function Record() {
   const { t } = useI18n();
   const [log, setLog] = useState<AssistantExchange[]>([]);
+  const [health, setHealth] = useState<Health | null>(null);
   const [exporting, setExporting] = useState(false);
 
   useEffect(() => {
     api.assistantLog().then(setLog).catch(() => setLog([]));
+    api.health().then(setHealth).catch(() => setHealth(null));
   }, []);
 
   async function exportAudit() {
@@ -33,6 +35,15 @@ export default function Record() {
   return (
     <div>
       <h1 className="mb-5 text-[19px] font-semibold">{t('record.title')}</h1>
+
+      {health?.recordSince && (
+        <div className="mb-5 rounded-lg border border-line bg-surface/40 px-4 py-3">
+          <div className="text-[13px] text-paper">
+            {t('record.since')} <DateText iso={health.recordSince} />
+          </div>
+          <p className="mt-1 text-[12.5px] leading-relaxed text-muted">{t('record.notDurable')}</p>
+        </div>
+      )}
 
       <Card>
         <div className="text-[15px] font-medium">{t('record.export')}</div>

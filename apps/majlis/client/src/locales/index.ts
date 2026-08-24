@@ -193,6 +193,12 @@ const en: Dict = {
   'common.back': 'Back',
   'common.loading': 'Loading…',
   'common.error': 'Could not load.',
+  'record.since': 'This record began on',
+  'record.notDurable':
+    'It is not held on durable storage, so a redeployment starts it again from the ' +
+    'demonstration data. Export anything worth keeping. A board working for real needs ' +
+    'a mounted volume first.',
+
   'who.role.signatory': 'Signatory',
   'who.role.advisory': 'Advisory',
   'who.role.liaison': 'Liaison',

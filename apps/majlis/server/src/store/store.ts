@@ -29,6 +29,12 @@ export class NotFound extends Error {
 }
 
 export interface Store {
+  /**
+   * When this record began, if it knows. Null means it cannot say, which is
+   * itself an answer and better than a date it made up.
+   */
+  readonly startedAt?: string | null;
+
   // ── the record, as Stage One exposed it ────────────────────────────────
   boards(): Promise<Board[]>;
   board(id: string): Promise<Board | null>;

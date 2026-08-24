@@ -133,7 +133,17 @@ async function get<T>(path: string): Promise<T> {
   return (await res.json()) as T;
 }
 
+export interface Health {
+  ok: boolean;
+  stage: number;
+  governanceWrites: boolean;
+  signingAuthority: boolean;
+  /** When the record began, or null if the store cannot say. */
+  recordSince: string | null;
+}
+
 export const api = {
+  health: () => get<Health>('/api/health'),
   boards: () => get<Board[]>('/api/boards'),
   board: (id: string) => get<Board>(`/api/boards/${id}`),
   matters: () => get<MatterSummary[]>('/api/matters'),

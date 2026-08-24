@@ -25,6 +25,9 @@ export interface MemorySeed {
 }
 
 export class MemoryStore implements Store {
+  /** Nothing here outlives the process, so the record began when it did. */
+  readonly startedAt: string = new Date().toISOString();
+
   private readonly _boards: Board[];
   private readonly _rules: Rule[];
   private readonly _matters: Map<string, Matter>;

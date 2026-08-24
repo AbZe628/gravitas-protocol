@@ -37,6 +37,17 @@ import { ASSISTANT_LOG_MAX, NotFound, type Store } from './store.js';
 
 interface Document {
   version: 1;
+  /**
+   * When this record began. Written once, when the document is first created,
+   * and carried through every write after that.
+   *
+   * Storage here is not durable: without a mounted disk the file is discarded on
+   * every deploy and the record starts again from the seed. That is a deliberate
+   * choice for now, not an accident, and this is what keeps it from being an
+   * invisible one — a record dated an hour ago, shown to a room, says plainly
+   * that it is a demonstration and not a board's history.
+   */
+  startedAt?: string;
   boards: Board[];
   rules: Rule[];
   matters: Matter[];
@@ -95,17 +106,24 @@ export class FileStore implements Store {
       return;
     }
 
+    const startedAt = new Date().toISOString();
     this.doc =
       opts.seedIfEmpty === false
-        ? { version: 1, boards: [], rules: [], matters: [], briefings: [] }
+        ? { version: 1, startedAt, boards: [], rules: [], matters: [], briefings: [] }
         : {
             version: 1,
+            startedAt,
             boards: copy(seedBoards),
             rules: copy(seedRules),
             matters: copy(seedMatters),
             briefings: copy(seedBriefings),
           };
     this.persist();
+  }
+
+  /** When this record began, if it says. Older documents predate the field. */
+  get startedAt(): string | null {
+    return this.doc.startedAt ?? null;
   }
 
   /**

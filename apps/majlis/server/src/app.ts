@@ -57,6 +57,10 @@ export function createApp(store: Store = storeFromEnv()): Express {
       readOnly: false,
       governanceWrites: true,
       signingAuthority: false,
+      // Storage is not durable — no disk is mounted, so a deploy discards the
+      // file and the record restarts from the seed. Saying when it began is
+      // what keeps that from happening unnoticed.
+      recordSince: store.startedAt ?? null,
       assistant: limiter.status(),
     });
   });

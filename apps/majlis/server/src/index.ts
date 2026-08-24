@@ -27,14 +27,36 @@ const stopSweeping = startSweeping(store);
 
 const server = app.listen(port, () => {
   const where = process.env.MAJLIS_DB?.trim();
-  // Still read-only: the record is durable now, but no route writes a decision
-  // yet. This line changes when that does, and not before.
-  console.log(`Gravitas Majlis — Stage One, durable record — listening on :${port}`);
+  const board = process.env.MAJLIS_MEMBERS?.trim();
+
+  console.log(`Gravitas Majlis — Stage Two, the board decides here — listening on :${port}`);
+
   console.log(
     where
       ? `Record: ${where}`
-      : 'Record: in memory. It will not survive a restart. Set MAJLIS_DB to keep it.',
+      : 'Record: in memory. Every decision is lost when this process stops. Set MAJLIS_DB.',
   );
+
+  /*
+   * The single most confusing state this can be in, and it used to say nothing
+   * about it: with no member credentials the shared login authenticates as an
+   * observer, every control is hidden because none of them would be permitted,
+   * and the application looks broken to someone who was told it was finished.
+   *
+   * Nothing is wrong when this prints. It is a board that has not been given
+   * its keys, and that is worth one loud line at boot rather than an afternoon
+   * of wondering.
+   */
+  if (!board) {
+    console.warn(
+      'MAJLIS_MEMBERS is not set: everyone authenticates as an observer, so no one can ' +
+        'deliberate, vote or object. Generate a board with: npm run members -w server',
+    );
+  } else {
+    const count = board.split(/\r?\n/).map((l) => l.trim()).filter(Boolean).length;
+    console.log(`Board: ${count} member credential${count === 1 ? '' : 's'} configured.`);
+  }
+
   if (!process.env.ANTHROPIC_API_KEY) {
     console.warn('ANTHROPIC_API_KEY is not set: the comprehension assistant will return 502.');
   }

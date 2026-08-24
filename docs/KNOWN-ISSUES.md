@@ -113,3 +113,59 @@ line execution counts, then checking the remainder against the tests asserting
 their exact revert strings.
 
 Line coverage is 94.4% across the three contracts. 86 tests pass.
+
+---
+
+## The Majlis deployment does not match its blueprint
+
+`render.yaml` describes the service `apps/majlis` should run as. The live service
+does not match it, and the differences are the ones that decide whether a
+demonstration survives being demonstrated.
+
+Checked 24 August 2026 against the running service.
+
+### It is on the free plan
+
+`render.yaml` says `plan: starter`, with a note explaining why: cold starts make
+a poor first impression. The service is on **free**, which spins down after
+inactivity and can take **50 seconds or more** to answer the first request.
+
+Anyone opening `majlis.gravitasprotocol.xyz` cold — an investor following a link,
+a scholar sent an address — waits through that with no indication anything is
+happening.
+
+### `MAJLIS_DB` is not set
+
+The startup log says so directly: *Record: in memory.* Every decision the board
+takes is lost when the process stops, and on the free plan the process stops
+whenever nobody is looking.
+
+`storeFromEnv` refuses to start in production without it, so the fact that the
+service runs at all means `NODE_ENV` is not `production` there either.
+
+### No disk is mounted
+
+A deliberate decision for now: a mounted volume is a paid change and the
+demonstration does not need one. What it does need is for the reset not to be
+silent, which is now handled — the record carries the date it began, `/api/health`
+reports it as `recordSince`, and the Record page states plainly that storage is
+not durable and that anything worth keeping should be exported.
+
+### `MAJLIS_MEMBERS` is not set
+
+Without it every credential authenticates as an observer, so no one can
+deliberate, vote or object, and every control is hidden because none would be
+permitted. The application looks broken while working exactly as configured.
+
+The server now says this at boot rather than leaving it to be discovered:
+
+```
+MAJLIS_MEMBERS is not set: everyone authenticates as an observer, so no one can
+deliberate, vote or object. Generate a board with: npm run members -w server
+```
+
+Stage Two itself is complete and works end to end — a matter raised, deliberated,
+put to a vote, carried at threshold, moved into a 48-hour timelock, and halted by
+a single signatory's objection, with every refusal along the way behaving as the
+rules require. Verified against a running server and through the interface as
+each role.
