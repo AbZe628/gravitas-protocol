@@ -1,10 +1,10 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { mkdtempSync, rmSync } from 'node:fs';
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import type { Matter } from '../src/types.js';
 import { MemoryStore } from '../src/store/memory.js';
-import { FileStore } from '../src/store/file.js';
+import { FileStore, StorePathError } from '../src/store/file.js';
 import { NotFound, type Store } from '../src/store/store.js';
 import { Refused, recordVote } from '../src/services/lifecycle.js';
 
@@ -217,5 +217,44 @@ describe('the file store, on disk', () => {
     expect((await second.matters()).length).toBe(countBefore);
     expect((await second.matters())[0].title).toBe('edited');
     await second.close();
+  });
+});
+
+/*
+ * A record path the process cannot create used to kill the server with a raw
+ * mkdirSync stack trace, which on a hosting platform means a configuration
+ * mistake arrives as an unexplained crash. It cost a failed deploy to learn
+ * that, so it is held here.
+ */
+describe('a record path that cannot be created', () => {
+  const impossible = () =>
+    // A directory cannot be created beneath a regular file, on any platform.
+    new FileStore({ file: join(existingFile(), 'nested', 'r.json') });
+
+  function existingFile(): string {
+    const dir = mkdtempSync(join(tmpdir(), 'majlis-block-'));
+    const file = join(dir, 'a-file');
+    writeFileSync(file, 'not a directory');
+    return file;
+  }
+
+  it('refuses with StorePathError rather than a filesystem stack', () => {
+    expect(impossible).toThrow(StorePathError);
+  });
+
+  it('names the variable, the path and what to do', () => {
+    let message = '';
+    try { impossible(); } catch (e) { message = (e as Error).message; }
+
+    expect(message).toContain('MAJLIS_DB');
+    expect(message).toContain('r.json');
+    expect(message).toMatch(/writable|may write|mount/i);
+  });
+
+  it('keeps the underlying cause', () => {
+    let error: StorePathError | null = null;
+    try { impossible(); } catch (e) { error = e as StorePathError; }
+
+    expect(error?.cause).toBeInstanceOf(Error);
   });
 });

@@ -76,6 +76,28 @@ export interface FileStoreOptions {
   seedIfEmpty?: boolean;
 }
 
+/**
+ * MAJLIS_DB points somewhere this process cannot write.
+ *
+ * The usual cause on a hosting platform is a path under a volume that was never
+ * mounted: the blueprint names one, nobody attached it, and the directory cannot
+ * be created because the process is not root. The fix is a writable path or a
+ * mounted disk, and the message says so rather than leaving a filesystem stack
+ * trace to be decoded.
+ */
+export class StorePathError extends Error {
+  constructor(file: string, readonly cause: unknown) {
+    super(
+      `MAJLIS_DB is set to "${file}", and its directory cannot be created: ` +
+        `${cause instanceof Error ? cause.message : String(cause)}. ` +
+        'Point it somewhere this process may write, or mount a volume at that path. ' +
+        'Without a mounted volume the record is discarded on every deploy either way, ' +
+        'so a writable temporary path loses nothing that was being kept.',
+    );
+    this.name = 'StorePathError';
+  }
+}
+
 export class FileStore implements Store {
   private readonly file: string;
   private readonly logFile: string;
@@ -87,7 +109,12 @@ export class FileStore implements Store {
   constructor(opts: FileStoreOptions) {
     this.file = opts.file;
     this.logFile = opts.file.replace(/[.]json$/, '') + '.assistant.jsonl';
-    mkdirSync(dirname(this.file), { recursive: true });
+
+    try {
+      mkdirSync(dirname(this.file), { recursive: true });
+    } catch (cause) {
+      throw new StorePathError(this.file, cause);
+    }
 
     this.log = existsSync(this.logFile) ? readLog(this.logFile) : [];
 
