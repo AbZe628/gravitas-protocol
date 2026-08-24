@@ -3,12 +3,16 @@ import { Link, useParams } from 'react-router-dom';
 import { api, type Matter } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { Card, DateText, ErrorText, Loading, Section, Sources, Tag } from '../components/ui.js';
+import Deliberation from '../components/Deliberation.js';
+import VotePanel from '../components/VotePanel.js';
+import { mayDeliberate, useIdentity } from '../lib/identity.js';
 
 export default function MatterDetail() {
   const { id } = useParams<{ id: string }>();
   const { t } = useI18n();
   const [matter, setMatter] = useState<Matter | null>(null);
   const [failed, setFailed] = useState(false);
+  const { identity } = useIdentity();
 
   useEffect(() => {
     if (!id) return;
@@ -127,30 +131,27 @@ export default function MatterDetail() {
         </Section>
       )}
 
-      {matter.deliberation.length > 0 && (
-        <Section title={t('matter.deliberation')}>
-          <ul className="space-y-4">
-            {matter.deliberation.map((d) => (
-              <li
-                key={d.id}
-                className={
-                  'rounded-lg border p-3.5 ' +
-                  (d.liaisonAnswer ? 'border-line bg-surface/40' : 'border-line')
-                }
-              >
-                <div className="mb-1.5 flex items-center gap-2 text-[12px]">
-                  <span className="text-goldsoft">{d.scholarId}</span>
-                  {d.liaisonAnswer && <Tag>{t('matter.liaison')}</Tag>}
-                  <span className="text-muted">
-                    <DateText iso={d.at} />
-                  </span>
-                </div>
-                <p className="text-[14px] leading-relaxed">{d.body}</p>
-              </li>
-            ))}
-          </ul>
-        </Section>
-      )}
+      <Section title={t('matter.deliberation')}>
+        <Deliberation
+          matter={matter}
+          canSpeak={mayDeliberate(identity?.role)}
+          onChanged={setMatter}
+        />
+      </Section>
+
+      {/*
+        What this member can still do sits after the argument and before the
+        record of positions already taken: you read what was said, then act,
+        then see where everyone stands.
+      */}
+      <Section title={t('vote.tally')}>
+        <VotePanel
+          matter={matter}
+          role={identity?.role}
+          scholarId={identity?.scholarId}
+          onChanged={setMatter}
+        />
+      </Section>
 
       {matter.reasoning.length > 0 && (
         <Section title={t('matter.reasoning')}>
