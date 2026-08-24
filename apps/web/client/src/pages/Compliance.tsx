@@ -259,7 +259,7 @@ export default function Compliance() {
                   <Card className="border border-[#D4AF37]/20 bg-[#0A1628]/60">
                     <CardContent className="pt-6">
                       <p className="text-sm text-white/40 mb-1">Contract Address</p>
-                      <code className="text-xs md:text-sm font-mono text-[#D4AF37] break-all">0xbcaE...4679</code>
+                      <code className="text-xs md:text-sm font-mono text-[#D4AF37] break-all">0x6f3bfb896DD9964C9c05dA88692bDf1b1b2C3F23</code>
                       <div className="mt-2">
                         <a
                           href="https://sepolia.arbiscan.io/address/0x6f3bfb896DD9964C9c05dA88692bDf1b1b2C3F23"

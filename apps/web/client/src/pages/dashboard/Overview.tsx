@@ -1,4 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useProtocolState } from "@/lib/protocolState";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -30,24 +31,6 @@ const POLICY_REGISTRY_ABI = [
 ] as const;
 
 // Mock data for charts
-const tvlData = [
-  { date: "Jan", value: 1200000 },
-  { date: "Feb", value: 1450000 },
-  { date: "Mar", value: 1680000 },
-  { date: "Apr", value: 1920000 },
-  { date: "May", value: 2150000 },
-  { date: "Jun", value: 2400000 },
-];
-
-const volumeData = [
-  { date: "Mon", volume: 145000 },
-  { date: "Tue", volume: 182000 },
-  { date: "Wed", volume: 156000 },
-  { date: "Thu", volume: 198000 },
-  { date: "Fri", volume: 224000 },
-  { date: "Sat", volume: 189000 },
-  { date: "Sun", volume: 167000 },
-];
 
 function ContractAddress({ label, address, short, href }: { label: string; address: string; short: string; href: string }) {
   const [copied, setCopied] = useState(false);
@@ -91,11 +74,43 @@ export default function Overview() {
     chainId: 421614,
   });
 
+  /*
+   * Four figures used to be written in here: $2.4M locked, $224K of daily
+   * volume, 342 active users, 1,247 migrations, each with a percentage change
+   * "vs last period". None of them came from anywhere. The protocol has never
+   * held funds — the marketing page says exactly that, while this page was
+   * claiming millions — and a dashboard that invents its own numbers is worse
+   * than one with none, because a reader cannot tell which of the rest are real.
+   *
+   * These are read from the chain. Where the true answer is zero it says zero.
+   */
+  const chain = useProtocolState();
+
   const stats = [
-    { title: "Total Value Locked", value: "$2.4M", change: "+12.3%", trend: "up", icon: DollarSign },
-    { title: "24h Volume", value: "$224K", change: "+8.7%", trend: "up", icon: Activity },
-    { title: "Active Users", value: "342", change: "+15.2%", trend: "up", icon: Users },
-    { title: "Migrations", value: "1,247", change: "+23.1%", trend: "up", icon: ArrowUpRight },
+    {
+      title: "Policy version",
+      value: chain.policyVersion === null ? "—" : String(chain.policyVersion),
+      note: "Every change to the registry advances it",
+      icon: Activity,
+    },
+    {
+      title: "Registry",
+      value: chain.registryPaused === null ? "—" : chain.registryPaused ? "Paused" : "Live",
+      note: "Pausing halts every compliance check",
+      icon: DollarSign,
+    },
+    {
+      title: "Migrations",
+      value: chain.migrations === null ? "—" : String(chain.migrations.length),
+      note: "Recorded on chain in the recent window",
+      icon: ArrowUpRight,
+    },
+    {
+      title: "Addresses migrated",
+      value: chain.uniqueUsers === null ? "—" : String(chain.uniqueUsers),
+      note: "Distinct owners, not visits",
+      icon: Users,
+    },
   ];
 
   const containerVariants = {
@@ -121,80 +136,24 @@ export default function Overview() {
                 <stat.icon className="h-4 w-4 text-[#D4AF37]" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-white">{stat.value}</div>
-                <div className="flex items-center gap-1 mt-1">
-                  {stat.trend === "up" ? (
-                    <TrendingUp className="h-3 w-3 text-green-500" />
-                  ) : (
-                    <TrendingDown className="h-3 w-3 text-red-500" />
-                  )}
-                  <span className={`text-xs ${stat.trend === "up" ? "text-green-500" : "text-red-500"}`}>
-                    {stat.change}
-                  </span>
-                  <span className="text-xs text-white/50 ml-1">vs last period</span>
-                </div>
+                <div className="text-2xl font-bold text-white tabular-nums">{stat.value}</div>
+                <div className="mt-1 text-xs text-white/50">{stat.note}</div>
               </CardContent>
             </Card>
           </motion.div>
         ))}
       </div>
 
-      {/* Charts */}
-      <div className="grid gap-6 lg:grid-cols-2">
-        <motion.div variants={itemVariants}>
-          <Card className="border-[#D4AF37]/20 bg-[#0F1E35]/50 backdrop-blur">
-            <CardHeader>
-              <CardTitle className="text-white">Total Value Locked</CardTitle>
-              <CardDescription className="text-white/70">6-month TVL trend</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={250}>
-                <AreaChart data={tvlData}>
-                  <defs>
-                    <linearGradient id="colorTvl" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#D4AF37" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#D4AF37" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#D4AF37" opacity={0.1} />
-                  <XAxis dataKey="date" stroke="#fff" opacity={0.5} tick={{ fontSize: 12 }} />
-                  <YAxis stroke="#fff" opacity={0.5} tick={{ fontSize: 12 }} tickFormatter={(v) => `$${(v/1000000).toFixed(1)}M`} />
-                  <Tooltip
-                    contentStyle={{ backgroundColor: "#0F1E35", border: "1px solid rgba(212,175,55,0.2)", borderRadius: "8px" }}
-                    labelStyle={{ color: "#fff" }}
-                    formatter={(v: number) => [`$${(v/1000000).toFixed(2)}M`, "TVL"]}
-                  />
-                  <Area type="monotone" dataKey="value" stroke="#D4AF37" strokeWidth={2} fill="url(#colorTvl)" />
-                </AreaChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        </motion.div>
+      {/*
+        Two charts stood here: a six-month total-value-locked trend rising to
+        $2.4M, and a week of trading volume peaking near $240K. Both were drawn
+        from arrays written into this file. The protocol has never held funds and
+        has never migrated a position, so every point on both was invented — and a
+        chart is unusually good at making an invented number look measured.
 
-        <motion.div variants={itemVariants}>
-          <Card className="border-[#D4AF37]/20 bg-[#0F1E35]/50 backdrop-blur">
-            <CardHeader>
-              <CardTitle className="text-white">Weekly Volume</CardTitle>
-              <CardDescription className="text-white/70">Last 7 days trading volume</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={250}>
-                <LineChart data={volumeData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#D4AF37" opacity={0.1} />
-                  <XAxis dataKey="date" stroke="#fff" opacity={0.5} tick={{ fontSize: 12 }} />
-                  <YAxis stroke="#fff" opacity={0.5} tick={{ fontSize: 12 }} tickFormatter={(v) => `$${(v/1000).toFixed(0)}K`} />
-                  <Tooltip
-                    contentStyle={{ backgroundColor: "#0F1E35", border: "1px solid rgba(212,175,55,0.2)", borderRadius: "8px" }}
-                    labelStyle={{ color: "#fff" }}
-                    formatter={(v: number) => [`$${(v/1000).toFixed(0)}K`, "Volume"]}
-                  />
-                  <Line type="monotone" dataKey="volume" stroke="#D4AF37" strokeWidth={2} dot={{ fill: "#D4AF37", r: 4 }} />
-                </LineChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        </motion.div>
-      </div>
+        They come back when there is something to plot, built from the same
+        LiquidityTeleported events the migrations page reads.
+      */}
 
       {/* Protocol Parameters & Contract Addresses */}
       <div className="grid gap-6 lg:grid-cols-2">
@@ -249,13 +208,13 @@ export default function Overview() {
               <ContractAddress
                 label="GravitasPolicyRegistry"
                 address="0x6f3bfb896DD9964C9c05dA88692bDf1b1b2C3F23"
-                short="0xbcaE...4679"
+                short="0x6f3b…3F23"
                 href="https://sepolia.arbiscan.io/address/0x6f3bfb896DD9964C9c05dA88692bDf1b1b2C3F23"
               />
               <ContractAddress
                 label="TeleportV3"
                 address="0x6702C2CE6eD58ca3934eBBd785CaC1De8DCd85B4"
-                short="0x5D42...E993"
+                short="0x6702…85B4"
                 href="https://sepolia.arbiscan.io/address/0x6702C2CE6eD58ca3934eBBd785CaC1De8DCd85B4"
               />
 
