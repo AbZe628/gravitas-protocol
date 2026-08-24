@@ -72,6 +72,25 @@ const en: Dict = {
   'vote.timelockDone': 'The timelock has run',
   'vote.timelockDoneNote': 'Nobody objected. It can now be brought into force.',
   'matter.noDeliberation': 'Nothing has been said on this matter yet.',
+
+  'raise.open': 'Raise a matter',
+  'raise.title': 'Raise a matter',
+  'raise.subject': 'What is the question',
+  'raise.proposal': 'What is proposed',
+  'raise.direction': 'What would this change do',
+  'raise.directionHelp':
+    'This decides how the rest runs. Permitting is slow: the full quorum, then a timelock any one signatory can halt. ' +
+    'Restricting is fast: a reduced quorum, immediate effect, and then ratification by the full quorum or it lapses. ' +
+    'Choose by what the change does, not by how quickly you would like it decided.',
+  'raise.direction.permit': 'It permits something that is not permitted now',
+  'raise.direction.restrict': 'It restricts something that is permitted now',
+  'raise.origin': 'Why it is being raised',
+  'raise.notDecided': 'What is expressly not being decided',
+  'raise.notDecidedHelp':
+    'One per line. A narrow approval later read as a broad endorsement is what this prevents, and nobody writes it unless asked.',
+  'raise.submit': 'Open as a draft',
+  'raise.draftNote':
+    'It opens as a draft: yours to write before the board is asked to look. Opening it for deliberation is a separate step.',
   'vote.outstanding': 'Not yet recorded',
   'say.placeholder': 'Say something on this matter',
   'say.submit': 'Add to the deliberation',

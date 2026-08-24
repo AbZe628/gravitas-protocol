@@ -4,12 +4,15 @@ import { api, type MatterSummary, type RegistrySnapshot } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { Card, DateText, ErrorText, Loading, Tag } from '../components/ui.js';
 import Attention from '../components/Attention.js';
+import RaiseMatter from '../components/RaiseMatter.js';
+import { mayDeliberate, useIdentity } from '../lib/identity.js';
 
 export default function Dashboard() {
   const { t } = useI18n();
   const [matters, setMatters] = useState<MatterSummary[] | null>(null);
   const [registry, setRegistry] = useState<RegistrySnapshot | null>(null);
   const [failed, setFailed] = useState(false);
+  const { identity } = useIdentity();
 
   useEffect(() => {
     api.matters().then(setMatters).catch(() => setFailed(true));
@@ -36,6 +39,8 @@ export default function Dashboard() {
       </div>
 
       <h1 className="mb-4 text-[19px] font-semibold">{t('dash.title')}</h1>
+
+      {mayDeliberate(identity?.role) && <RaiseMatter boardId="demo-board" />}
 
       {open.length === 0 ? (
         <p className="text-muted text-sm">{t('dash.none')}</p>

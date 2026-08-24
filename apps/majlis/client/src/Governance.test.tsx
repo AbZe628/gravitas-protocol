@@ -307,3 +307,72 @@ describe('what the interface sends', () => {
     expect(posted[0].body).not.toHaveProperty('scholarId');
   });
 });
+
+// ── raising a matter ──────────────────────────────────────────────────────
+
+describe('raising a matter', () => {
+  function renderDashboard() {
+    return render(
+      <I18nProvider>
+        <MemoryRouter initialEntries={['/']}>
+          <App />
+        </MemoryRouter>
+      </I18nProvider>,
+    );
+  }
+
+  it('is offered to anyone who deliberates and not to an observer', async () => {
+    stub({ role: 'observer' });
+    renderDashboard();
+    await waitFor(() => expect(screen.queryByText('Raise a matter')).toBeNull());
+
+    vi.unstubAllGlobals();
+    stub({ role: 'advisory' });
+    renderDashboard();
+    await waitFor(() => expect(screen.getAllByText('Raise a matter').length).toBeGreaterThan(0));
+  });
+
+  it('will not submit until the direction has been chosen', async () => {
+    stub({ role: 'signatory' });
+    renderDashboard();
+
+    fireEvent.click(await screen.findByText('Raise a matter'));
+
+    const input = document.querySelector('input') as HTMLInputElement;
+    const areas = document.querySelectorAll('textarea');
+    fireEvent.change(input, { target: { value: 'Whether a wrapper inherits its ruling' } });
+    fireEvent.change(areas[0], { target: { value: 'The board is asked to decide.' } });
+
+    // Direction decides how the whole process runs, so it is not defaulted.
+    expect((screen.getByText('Open as a draft') as HTMLButtonElement).disabled).toBe(true);
+
+    fireEvent.click(screen.getByText(/It restricts something/));
+    await waitFor(() =>
+      expect((screen.getByText('Open as a draft') as HTMLButtonElement).disabled).toBe(false),
+    );
+  });
+
+  it('sends what was chosen, and splits the not-decided lines', async () => {
+    stub({ role: 'signatory' });
+    renderDashboard();
+
+    fireEvent.click(await screen.findByText('Raise a matter'));
+    const input = document.querySelector('input') as HTMLInputElement;
+    const areas = document.querySelectorAll('textarea');
+    fireEvent.change(input, { target: { value: 'A question for the board' } });
+    fireEvent.change(areas[0], { target: { value: 'What is proposed.' } });
+    fireEvent.change(areas[1], { target: { value: 'Not the underlying asset\n\nNot other wrappers' } });
+    fireEvent.click(screen.getByText(/It permits something/));
+
+    await waitFor(() =>
+      expect((screen.getByText('Open as a draft') as HTMLButtonElement).disabled).toBe(false),
+    );
+    fireEvent.click(screen.getByText('Open as a draft'));
+
+    await waitFor(() => expect(posted.length).toBeGreaterThan(0));
+    const body = posted[0].body as { direction: string; notDecided: string[]; boardId: string };
+    expect(body.direction).toBe('permit');
+    expect(body.notDecided).toEqual(['Not the underlying asset', 'Not other wrappers']);
+    expect(body.boardId).toBe('demo-board');
+  });
+});
