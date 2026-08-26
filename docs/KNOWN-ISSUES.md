@@ -4,7 +4,7 @@ What is open, why it is open, and what closing it costs. Kept here so that an
 auditor, an integrator or an investor finds it in the repository rather than
 discovering it themselves.
 
-Last checked: 24 August 2026, against the deployment of 23 August 2026.
+Last checked: 26 August 2026. Contracts as deployed 23 August 2026.
 
 ---
 
@@ -116,56 +116,80 @@ Line coverage is 94.4% across the three contracts. 86 tests pass.
 
 ---
 
-## The Majlis deployment does not match its blueprint
+## The Majlis deployment
 
-`render.yaml` describes the service `apps/majlis` should run as. The live service
-does not match it, and the differences are the ones that decide whether a
-demonstration survives being demonstrated.
+`render.yaml` describes the service `apps/majlis` should run as. Two of the gaps
+recorded here on 24 August are closed; the rest stand by decision.
 
-Checked 24 August 2026 against the running service.
+Checked 26 August 2026 against the running service.
 
-### It is on the free plan
+### Configured, after costing a failed deploy
 
-`render.yaml` says `plan: starter`, with a note explaining why: cold starts make
-a poor first impression. The service is on **free**, which spins down after
-inactivity and can take **50 seconds or more** to answer the first request.
+`MAJLIS_MEMBERS` and `MAJLIS_DB` are both set.
 
-Anyone opening `majlis.gravitasprotocol.xyz` cold — an investor following a link,
-a scholar sent an address — waits through that with no indication anything is
-happening.
-
-### `MAJLIS_DB` is not set
-
-The startup log says so directly: *Record: in memory.* Every decision the board
-takes is lost when the process stops, and on the free plan the process stops
-whenever nobody is looking.
-
-`storeFromEnv` refuses to start in production without it, so the fact that the
-service runs at all means `NODE_ENV` is not `production` there either.
-
-### No disk is mounted
-
-A deliberate decision for now: a mounted volume is a paid change and the
-demonstration does not need one. What it does need is for the reset not to be
-silent, which is now handled — the record carries the date it began, `/api/health`
-reports it as `recordSince`, and the Record page states plainly that storage is
-not durable and that anything worth keeping should be exported.
-
-### `MAJLIS_MEMBERS` is not set
-
-Without it every credential authenticates as an observer, so no one can
-deliberate, vote or object, and every control is hidden because none would be
-permitted. The application looks broken while working exactly as configured.
-
-The server now says this at boot rather than leaving it to be discovered:
+Neither was, and `MAJLIS_MEMBERS` being unset was the single most expensive
+thing in this project to discover: without it every credential authenticates as
+an observer, so every control is hidden because none would be permitted, and the
+application looks broken while working exactly as configured. **The server now
+says so at boot** rather than leaving it to be found:
 
 ```
 MAJLIS_MEMBERS is not set: everyone authenticates as an observer, so no one can
 deliberate, vote or object. Generate a board with: npm run members -w server
 ```
 
-Stage Two itself is complete and works end to end — a matter raised, deliberated,
-put to a vote, carried at threshold, moved into a 48-hour timelock, and halted by
-a single signatory's objection, with every refusal along the way behaving as the
-rules require. Verified against a running server and through the interface as
-each role.
+The shared `BASIC_AUTH` credential still authenticates after members are
+configured — as an observer, because it cannot say who is at the keyboard and a
+vote that cannot be attributed is not a record of anything. Signing in with it
+looks identical to the misconfigured state. **Sign in as a member.**
+
+`MAJLIS_DB` took a failed deploy to get right. It was set to
+`/var/majlis/majlis.json`, the value this blueprint carried, which only works with
+a disk mounted there. None is, the process is not root, and the server died at
+boot on `mkdir`. The blueprint now names a path the process can create, and
+`StorePathError` explains that failure instead of printing a filesystem stack.
+
+**A dashboard environment variable overrides `render.yaml`.** Fixing the file
+changes nothing on a running service.
+
+### Still on the free plan
+
+`render.yaml` says `plan: starter`, with a note explaining why: cold starts make
+a poor first impression. The service is on **free**, which spins down after
+inactivity and can take **50 seconds or more** to answer the first request.
+
+This is not theoretical. `recordSince` has been observed moving without any
+deploy between the two readings — the instance had spun down and come back, and
+the record started again from the seed.
+
+Anyone opening `majlis.gravitasprotocol.xyz` cold waits through that with no
+indication anything is happening.
+
+### No disk is mounted
+
+A decision, not an oversight: a mounted volume is a paid change and the
+demonstration does not need one. What it does need is for the reset not to be
+silent, and that is handled — the record carries the date it began, `/api/health`
+reports it as `recordSince`, and the Record page states that storage is not
+durable and that anything worth keeping should be exported.
+
+### Checking any of this
+
+The boot log answers all of it in three lines:
+
+```
+Gravitas Majlis — Stage Two, the board decides here — listening on :10000
+Record: /tmp/majlis.json
+Board: 7 member credentials configured.
+```
+
+**A failed Render deploy leaves the previous build serving.** `/api/health`
+answers 200 throughout, so health being up is not evidence that a deploy worked.
+
+### Stage Two itself
+
+Complete, in the server and in the browser, verified rather than assumed: a
+matter raised, deliberated, put to a vote, carried at threshold, moved into a
+48-hour timelock, and halted by a single signatory's objection — and, since 24
+August, returned from an open vote to deliberation with every position cast on it
+released. Every refusal along the way behaves as the rules require.
