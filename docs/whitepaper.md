@@ -48,7 +48,9 @@ execution.
 
 ### Revenue
 
-A service fee of 5 to 10 basis points is charged once, on a completed migration. It does not
+A service fee of 5 to 10 basis points is intended, charged once on a completed migration. It is not
+implemented: no fee is taken anywhere in the contracts as they stand, and the figures here describe
+a designed model rather than a shipped one. It would not
 accrue with time, and the protocol lends nothing. No revenue has been realised to date; the
 protocol has never run on mainnet.
 
@@ -328,7 +330,7 @@ compliant. The categories below describe what the registry is able to express.
 
 | Principle | How the protocol addresses it |
 | :--- | :--- |
-| **Riba**, interest | Revenue is a service fee of 5 to 10 basis points charged once on a completed migration. It does not accrue with time. The protocol lends nothing and pays nothing for time. |
+| **Riba**, interest | The intended revenue is a service fee of 5 to 10 basis points, charged once on a completed migration and not accruing with time. It is designed, not implemented — no fee is taken in the contracts today. The protocol lends nothing and pays nothing for time. |
 | **Gharar**, uncertainty | Execution is atomic and the outcome is bounded by the owner's own signed minimums. A result that cannot meet them is not delivered at a worse number, it is not delivered at all. |
 | **Maysir**, speculation | The registry admits only assets a board has approved. Whether a given asset qualifies is the board's judgement, not the protocol's. |
 | **Asset eligibility** | The whitelist is on-chain and governed. Anyone can read its current state without asking us, and every change is an event. |

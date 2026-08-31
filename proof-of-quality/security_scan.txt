@@ -1,4 +1,11 @@
---- Gravitas Protocol: Security Checklist (Simulated Slither Scan) ---
+--- Gravitas Protocol: Security Checklist ---
+
+  THIS IS NOT A TOOL REPORT. It is a checklist worked through by hand, and
+  every line below is a claim by its author rather than a finding by an
+  analyser. No static analysis runs in CI: not Slither, not Mythril, not
+  solhint. Read it as a statement of what was considered, and check the
+  contracts yourself for what was found.
+
 [INFO] Project: Gravitas Protocol (Institutional Refactor)
 [INFO] Date: 2026-01-31
 
@@ -10,4 +17,6 @@
 [PASS] Dangerous Calls: No usage of delegatecall or low-level call to untrusted addresses.
 [PASS] Shariah Compliance: areTokensCompliant check enforced in all entry points.
 
-RESULT: 0 High, 0 Medium, 0 Low vulnerabilities detected.
+REVIEWED BY HAND: every item above was considered and none produced a change.
+That is not the same as a clean scan, and this file must not be cited as one.
+Running Slither over contracts/ is the obvious next step and has not been done.

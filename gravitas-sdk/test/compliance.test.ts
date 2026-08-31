@@ -91,6 +91,21 @@ describe('a halted registry fails closed and says so', () => {
     await expect(service.validateAsset(TOKEN)).rejects.toThrow(/paused/i);
   });
 
+  /*
+   * validateTokens read the registry directly instead of through the gate, so a
+   * paused registry reached the caller as a raw viem error about a failed call —
+   * the one condition the gate exists to name was the one it did not name. It is
+   * the check a migration actually runs, which made it the worst one to miss.
+   */
+  it('validateTokens refuses, and names the pause', async () => {
+    const { client, calls } = fakeClient({}, { revertOn: ['areTokensCompliant'] });
+    const service = new ComplianceService(client, REGISTRY);
+
+    await expect(service.validateTokens(TOKEN, ROUTER)).rejects.toBeInstanceOf(ShariahViolationError);
+    await expect(service.validateTokens(TOKEN, ROUTER)).rejects.toThrow(/paused/i);
+    expect(names(calls)).toContain('areTokensCompliant');
+  });
+
   it('validateRouter refuses', async () => {
     const { client } = paused();
     await expect(new ComplianceService(client, REGISTRY).validateRouter(ROUTER)).rejects.toThrow(/paused/i);

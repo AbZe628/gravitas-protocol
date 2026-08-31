@@ -33,7 +33,7 @@ Gravitas has achieved significant technical milestones and is on a clear path to
 
 | Phase | Status | Key Deliverables |
 | :--- | :--- | :--- |
-| **Phase 1: Technical Validation** | ✅ **Completed** | Contracts deployed and verified on Arbitrum Sepolia. 46 passing deterministic tests with >90% coverage. Internal security review completed. |
+| **Phase 1: Technical Validation** | ✅ **Completed** | Contracts deployed and verified on Arbitrum Sepolia. 86 passing tests at 94.4% line coverage. Internal review completed; no external audit. |
 | **Phase 2: Market & Governance** | 🔄 **In Progress** | Shariah certification in progress through AmanX Advisory; not complete, no date claimed. External audit not yet commissioned — funded by a round that has not closed. Mainnet follows both. |
 | **Phase 3: Ecosystem Integration** | 📋 **Planned** | Formal Shariah certification for GCC integration; conditional on Phase 2, no date claimed. Engagement with institutional asset managers. Compliance API as a potential revenue stream — none realised to date. |
 
@@ -52,7 +52,7 @@ Gravitas addresses the core prohibitions of Islamic Finance through technical en
 
 | Islamic Finance Principle | Gravitas Implementation |
 | :--- | :--- |
-| **Riba (Interest)** | The protocol derives revenue from flat service fees on migrations, not from interest-based lending or yield-bearing activities. |
+| **Riba (Interest)** | The intended revenue model is a flat service fee on a completed migration — not interest, not lending, not yield. **The fee is not implemented in the contracts.** It is a designed model, not a shipped one, and is stated that way wherever it appears. |
 | **Gharar (Uncertainty)** | **Deterministic execution** is the cornerstone of our design. Transactions are atomic and revert if the exact specified outcomes cannot be met, completely eliminating the uncertainty that is prohibited. |
 | **Maysir (Speculation/Gambling)** | The `GravitasPolicyRegistry` is used to whitelist only productive, non-speculative assets, filtering out tokens related to gambling, derivatives, or other prohibited activities. |
 

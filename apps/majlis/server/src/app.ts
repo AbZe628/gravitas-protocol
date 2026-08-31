@@ -11,6 +11,7 @@ import { buildAuditExport } from './services/export.js';
 import { verifyParameters } from './services/hash.js';
 import { Limiter, REFUSAL_MESSAGES } from './services/limits.js';
 import { basicAuth, authFromEnv } from './middleware/basicAuth.js';
+import { LoginLimiter, loginThrottle } from './middleware/loginLimit.js';
 import { governanceRoutes } from './routes/governance.js';
 
 
@@ -37,15 +38,51 @@ const limiter = new Limiter();
  */
 export function createApp(store: Store = storeFromEnv()): Express {
   const app = express();
-  app.use(cors());
+
+  /*
+   * The interface is served by this same process, so nothing legitimate calls
+   * this API from another origin. MAJLIS_ORIGINS opens it to a named list when
+   * something does; unset, cross-origin requests are simply not answered, which
+   * is what a wildcard was quietly undoing.
+   */
+  const origins = (process.env.MAJLIS_ORIGINS ?? '')
+    .split(',')
+    .map((o) => o.trim())
+    .filter(Boolean);
+  app.use(cors(origins.length ? { origin: origins, credentials: true } : { origin: false }));
+
+  /*
+   * The record is read by people, not embedded by anyone. These are the headers
+   * that matter for that and they cost nothing: no framing, no sniffing, no
+   * referrer leaking a matter id to another site.
+   */
+  app.use((_req, res, next) => {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('Referrer-Policy', 'no-referrer');
+    res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+    next();
+  });
+
   app.use(express.json({ limit: '256kb' }));
 
   app.set('trust proxy', 1);
 
+  /*
+   * Authentication derives a scrypt hash on every attempt, including for member
+   * ids that do not exist — which is what keeps "no such member" and "wrong
+   * password" indistinguishable. Nothing counted those attempts, so a loop of
+   * wrong passwords was a way to spend this single instance's CPU until the
+   * board could not use it. The throttle sits ahead of the check so the
+   * derivation never runs for someone already known to be guessing.
+   */
+  const logins = new LoginLimiter();
+  app.use(loginThrottle(logins));
+
   // Everything except /api/health sits behind authentication. With
   // MAJLIS_MEMBERS each request carries an identity; with only the shared
   // credential it carries the observer role, which reads and writes nothing.
-  app.use(basicAuth(authFromEnv()));
+  app.use(basicAuth(authFromEnv(), logins));
 
   app.get('/api/health', (_req: Request, res: Response) => {
     res.json({

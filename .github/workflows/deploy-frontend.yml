@@ -41,7 +41,7 @@ jobs:
 
       - name: Install the application
         working-directory: apps/web
-        run: npm install
+        run: npm ci
 
       - name: Build the application
         working-directory: apps/web

@@ -64,12 +64,7 @@ export class ComplianceService {
    * @throws {ShariahViolationError} If any token is non-compliant.
    */
   async validateTokens(tokenA: Address, tokenB: Address): Promise<void> {
-    const isCompliant = await this.client.readContract({
-      address: this.registryAddress,
-      abi: REGISTRY_ABI,
-      functionName: 'areTokensCompliant',
-      args: [tokenA, tokenB],
-    });
+    const isCompliant = await this.gatedRead('areTokensCompliant', [tokenA, tokenB]);
 
     if (!isCompliant) {
       throw new ShariahViolationError(

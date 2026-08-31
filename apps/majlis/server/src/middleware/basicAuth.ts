@@ -81,7 +81,7 @@ export function assertConfiguredForProduction(): void {
   throw new Error(
     'Majlis holds a board record and will not start unauthenticated. Set MAJLIS_MEMBERS to give ' +
       'each member their own credential, which is what Stage Two needs, or BASIC_AUTH_USER and ' +
-      'BASIC_AUTH_PASSWORD for shared read-only access. See DEPLOY.md section 5.',
+      'BASIC_AUTH_PASSWORD for shared read-only access. See apps/majlis/.env.example.',
   );
 }
 
@@ -110,7 +110,20 @@ function credentials(header: string): { user: string; pass: string } | null {
   return { user: decoded.slice(0, idx), pass: decoded.slice(idx + 1) };
 }
 
-export function basicAuth(options: AuthOptions | BasicAuthConfig | null) {
+/**
+ * Told about each attempt, so failures can be counted somewhere that knows how
+ * to refuse. Kept as a callback rather than a limiter passed in, because this
+ * middleware should not care what is done with the answer.
+ */
+export interface AttemptRecorder {
+  fail(key: string): void;
+  succeed(key: string): void;
+}
+
+export function basicAuth(
+  options: AuthOptions | BasicAuthConfig | null,
+  attempts?: AttemptRecorder,
+) {
   // Accepts the old shape so existing callers and tests keep working.
   const opts: AuthOptions =
     options && 'user' in options ? { shared: options, members: null } : (options as AuthOptions | null) ?? { shared: null, members: null };
@@ -129,6 +142,7 @@ export function basicAuth(options: AuthOptions | BasicAuthConfig | null) {
         const identity = opts.members.authenticate(supplied.user, supplied.pass);
         if (identity) {
           req.identity = identity;
+          attempts?.succeed(req.ip ?? 'unknown');
           return next();
         }
       }
@@ -141,10 +155,15 @@ export function basicAuth(options: AuthOptions | BasicAuthConfig | null) {
         if (userOk && passOk) {
           // The shared credential cannot say who is here, so it may only watch.
           req.identity = { scholarId: 'shared', role: 'observer' };
+          attempts?.succeed(req.ip ?? 'unknown');
           return next();
         }
       }
     }
+
+    // Counted before the reply, so a caller cannot spend attempts faster than
+    // they are recorded by abandoning the connection.
+    attempts?.fail(req.ip ?? 'unknown');
 
     res.setHeader('WWW-Authenticate', `Basic realm="${realm}", charset="UTF-8"`);
     // No detail: which of the two was wrong is not the caller's business.

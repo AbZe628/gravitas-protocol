@@ -86,7 +86,7 @@ Gravitas Protocol treats Shariah compliance as a **technical requirement**, not 
 
 | Principle | Implementation |
 |---|---|
-| **No Riba (Interest)** | Revenue model based exclusively on service fees (0.05-0.1%), not interest. |
+| **No Riba (Interest)** | The intended revenue model is a service fee on a completed migration, not interest. **It is not implemented:** no fee is charged anywhere in the contracts today. |
 | **No Gharar (Uncertainty)** | Deterministic routing and simulation APIs provide exact outcomes before execution. |
 | **No Maysir (Gambling)** | Protocol-level filtering of speculative and gambling-related tokens. |
 | **Asset Halal Verification** | On-chain whitelist of Shariah-compliant tokens maintained by governance. |
@@ -111,7 +111,8 @@ The `GravitasPolicyRegistry` is architected as a **jurisdiction-agnostic complia
 
 ## Development & CI/CD
 
-This project is a monorepo managed with `pnpm` workspaces.
+The repository holds four pieces, each built on its own. There is no root package
+and no workspace linking them; `apps/web` and `apps/majlis` carry their own.
 
 - `apps/web`: The React frontend application.
 - `apps/majlis`: The Majlis governance transparency portal.
@@ -122,8 +123,8 @@ This project is a monorepo managed with `pnpm` workspaces.
 
 Two primary GitHub Actions workflows ensure code quality and deployment:
 
-1.  **`ci.yml`**: Triggered on pushes to `main`. Runs Foundry tests for all smart contracts to ensure correctness and security. (66 passing tests)
-2.  **`deploy-frontend.yml`**: Triggered on pushes touching `apps/web`. Builds the React application and publishes it to GitHub Pages. Note that until this workflow was added, the live site was served from the committed `apps/web/dist/` output, so source changes did not reach production on their own — see `DEPLOY.md` section 8.
+1.  **`ci.yml`**: Triggered on pushes to `main`. Runs Foundry tests for all smart contracts to ensure correctness and security. (86 passing tests)
+2.  **`deploy-frontend.yml`**: Triggered on pushes touching `apps/web`. Builds the React application and publishes it to GitHub Pages. Note that until this workflow was added, the live site was served from the committed `apps/web/dist/` output, so source changes did not reach production on their own. Deployment is documented in [DEPLOYMENT.md](./DEPLOYMENT.md).
 
 ---
 
@@ -131,31 +132,32 @@ Two primary GitHub Actions workflows ensure code quality and deployment:
 
 ### Prerequisites
 
-- [Foundry](https://getfoundry.sh/) (for smart contracts)
-- [Node.js 22+](https://nodejs.org/) & [pnpm 10+](https://pnpm.io/)
+- [Foundry](https://getfoundry.sh/) — for the contracts
+- [Node.js 22+](https://nodejs.org/) with npm
+
+Clone with submodules, or the contracts will not build: OpenZeppelin and forge-std
+are git submodules, and a source archive downloaded from GitHub does not contain
+them.
+
+```bash
+git clone --recurse-submodules https://github.com/AbZe628/gravitas-protocol.git
+# already cloned without them:
+git submodule update --init --recursive
+```
 
 ### Run Frontend Locally
 
 ```bash
-# Clone the repository
-git clone https://github.com/AbZe628/gravitas-protocol.git
-cd gravitas-protocol
-
-# Install dependencies for the entire monorepo
-pnpm install
-
-# Run the frontend application
-pnpm --filter web dev
+cd apps/web
+npm ci        # ci, not install: the lockfile is what CI and production build from
+npm run dev
 ```
 
 ### Run Contract Tests
 
 ```bash
-# Build contracts
-pnpm --filter contracts build
-
-# Run tests
-pnpm --filter contracts test
+forge build
+forge test        # 86 tests
 ```
 
 ---

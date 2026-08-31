@@ -62,26 +62,19 @@ The Arbitrum Sepolia deployment is used for:
 
 ### Deployment Scripts
 
-#### Deploy Policy Registry
+#### Deploy everything
+
+One script deploys all four contracts in order and refuses to start if either
+Uniswap address it depends on has no code at it. There are no per-contract
+scripts; earlier versions of this document named two that were never written.
 
 ```bash
-forge script script/DeployPolicyRegistry.s.sol:DeployPolicyRegistry \
+forge script script/Deploy.s.sol:Deploy \
   --rpc-url $SEPOLIA_RPC_URL \
-  --private-key $DEPLOYER_PRIVATE_KEY \
+  --account deployer \
   --broadcast \
   --verify \
-  --etherscan-api-key $ARBISCAN_API_KEY
-```
-
-#### Deploy Teleport V3
-
-```bash
-forge script script/DeployTeleportV3.s.sol:DeployTeleportV3 \
-  --rpc-url $SEPOLIA_RPC_URL \
-  --private-key $DEPLOYER_PRIVATE_KEY \
-  --broadcast \
-  --verify \
-  --etherscan-api-key $ARBISCAN_API_KEY
+  --etherscan-api-key $ETHERSCAN_API_KEY
 ```
 
 ### Verification
@@ -95,7 +88,7 @@ forge verify-contract \
   --watch \
   --constructor-args $(cast abi-encode "constructor(address)" <REGISTRY_ADDRESS>) \
   --etherscan-api-key $ARBISCAN_API_KEY \
-  --compiler-version v0.8.20+commit.a1b79de6 \
+  --compiler-version v0.8.24+commit.e11b9ed9 \
   <CONTRACT_ADDRESS> \
   contracts/TeleportV3.sol:TeleportV3
 ```
@@ -136,14 +129,14 @@ Initial configuration:
 
 ### Teleport V2
 
-- **Cooldown Period**: 3600 seconds (1 hour)
-- **Max Move BPS**: 10000 (100%)
+- **Cooldown Period**: 900 seconds (15 minutes) — `cooldownSeconds`, adjustable by the owner via `setPolicy`
+- **Max Move BPS**: 2000 (20%) — `maxMoveBps`, adjustable by the owner via `setPolicy`
 
 ### Teleport V3
 
 - **Supported Fee Tiers**: 100, 500, 3000, 10000 (0.01%, 0.05%, 0.3%, 1%)
 - **EIP-712 Domain**: 
-  - Name: `TeleportV3`
+  - Name: `GravitasTeleportV3`
   - Version: `1`
   - Chain ID: Network-specific
 

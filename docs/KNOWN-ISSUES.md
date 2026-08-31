@@ -43,6 +43,33 @@ that is not otherwise adversarial.
 
 **What it costs to close.** A require of the same shape as the one above.
 
+### The engines are single-step `Ownable`, and their pause obeys the timelock
+
+The registry is `Ownable2Step`. TeleportV2 and TeleportV3 are plain `Ownable`, so
+a transfer to a wrong address is final with no acceptance step to catch it.
+
+Worse for governance: `pause()` on both engines is `onlyOwner`. Once the timelock
+owns them — which is the whole point of the handover — pausing waits out the
+delay, and an emergency stop that takes 48 hours is not an emergency stop. There
+is no guardian role that can halt without the delay.
+
+`script/TransferOwnershipToTimelock.s.sol` now covers the engines as well as the
+registry, so the handover is at least complete and scripted. The contract change
+is two things: `Ownable2Step` on both engines, and a pauser role separate from
+the owner.
+
+**Until then the handover is a real decision, not a formality.** Moving the
+engines buys governance and costs the fast stop.
+
+### Stray ERC-721s cannot be recovered
+
+TeleportV3 implements `onERC721Received` and accepts any ERC-721 sent to it.
+There is no rescue function of any kind, so a position transferred directly
+rather than through `executeAtomicMigration` is held permanently.
+
+TeleportV2 has `rescueTokens` for ERC-20s. TeleportV3 has no equivalent for
+either kind.
+
 ### One compiler warning
 
 ```
@@ -69,10 +96,21 @@ warnings at all.
 `0xbFFAd90B2607e3E5926260B640BbcD1E128680Ba` and verified. The registry owner is
 still the deployer.
 
+The same is true of TeleportV2 and TeleportV3, and that matters more than it
+looks: their `onlyAuthorized` modifier short-circuits on `msg.sender == owner()`,
+so the deployer's key can execute migrations without the registry having any say.
+Handing over the registry alone would leave the governance claim reading as
+satisfied while the engines still answered to one key.
+
 This is deliberate. Handing control to a 48-hour timelock during active
 development means every fix waits two days. The handover happens after the
-external audit and before mainnet, and `Ownable2Step` is already in place so it
-cannot be completed by accident or to a wrong address.
+external audit and before mainnet. `Ownable2Step` protects the registry from a
+transfer to a wrong address; the engines have no such protection, which is in the
+deployment queue above.
+
+`contracts/governance/MultisigSetup.md` claimed "Ownable2Step + Timelock
+eliminates single private key risk". That was true of the registry and false of
+the engines, and it has been corrected.
 
 ### No asset is approved in the registry
 
@@ -193,3 +231,81 @@ matter raised, deliberated, put to a vote, carried at threshold, moved into a
 48-hour timelock, and halted by a single signatory's objection — and, since 24
 August, returned from an open vote to deliberation with every position cast on it
 released. Every refusal along the way behaves as the rules require.
+
+---
+
+## What an outside reading of the repository found — 26 August 2026
+
+Someone unpacked the repository, installed Foundry and the submodules, and ran
+everything rather than reading it. Most of what they found was true. It is
+recorded here because the pattern matters more than the individual items:
+**almost every finding was a document claiming something the code did not do.**
+
+### Fixed
+
+- **The service fee does not exist.** README, INVESTOR.md and the whitepaper all
+  stated a fee of 5 to 10 basis points — the whitepaper twice, in the present
+  tense. There is no fee anywhere in TeleportV2 or TeleportV3: no rate, no
+  recipient, no line that takes anything. All four now say the model is intended
+  and not implemented. **Whether to implement it is a decision, not a bug**, and
+  it belongs in the deployment queue if the answer is yes.
+- **Test counts disagreed in four places.** README said 66, INVESTOR.md said 46
+  in one paragraph and 86 in another, and `test_output.txt` — committed, dated 22
+  August — said 60. The number is 86. The stale artefacts are deleted.
+- **`docs/DEPLOYMENTS.md` documented a signer that could not work.** It gave the
+  EIP-712 domain name as `TeleportV3`; the contract uses `GravitasTeleportV3`.
+  Anyone building a signer from that document produces signatures that revert
+  with no way to see why. It also gave solc 0.8.20 for a 0.8.24 build, a 3600s
+  cooldown for a 900s one, 10000 bps for 2000, and two deploy scripts that were
+  never written.
+- **`proof-of-quality/security_scan.txt` read as a tool report.** Its title said
+  "Simulated" and its last line said "RESULT: 0 High, 0 Medium, 0 Low
+  vulnerabilities detected." No static analysis runs in CI. It now says what it
+  is in its first paragraph, and that running Slither is the obvious next step.
+- **The frontend deployed from an unpinned dependency graph.** CI ran `npm ci`
+  and the deploy workflow ran `npm install`, so the one build that reached
+  production was the one that did not install from the lockfile. Both use
+  `npm ci` now.
+- **`UniV2Adapter.sol` had no access control** on either liquidity function,
+  each taking a recipient from the caller. Dead — nothing imported it, nothing
+  deployed it — and deleted.
+- **The README's Quick Start could not be run.** It described `pnpm` workspaces;
+  there is no `pnpm-workspace.yaml` and no root package. It also failed to say
+  that OpenZeppelin and forge-std are submodules, so a source archive downloaded
+  from GitHub cannot build the contracts at all.
+- **Majlis authenticated without counting attempts.** Every attempt derives a
+  scrypt hash, deliberately including for member ids that do not exist — which
+  is what keeps "no such member" and "wrong password" indistinguishable. Nothing
+  counted them, so a loop of wrong passwords was a way to spend this single
+  instance's CPU until the board could not use it. Failed attempts are now
+  throttled per address, ahead of the credential check, with a success clearing
+  the record. Seven tests hold it.
+- **`cors()` was open to every origin.** The interface is served by this same
+  process, so nothing legitimate needs it. Cross-origin is refused unless
+  `MAJLIS_ORIGINS` names somewhere, and the response headers that matter for a
+  page read by people are set.
+- **The SDK's `validateTokens` bypassed `gatedRead`**, in a class documented as
+  always using it — so a paused registry reached the caller as a raw viem error
+  rather than the named refusal. It is the check a migration actually runs,
+  which made it the worst one to miss.
+- **Dead references.** `DEPLOY.md` was cited by the README and by
+  `basicAuth.ts` and has never existed. `apps/majlis/.env.example` said the
+  assistant endpoint is unauthenticated; it is not.
+
+### Did not hold up
+
+**`npm ci` does not fail.** The lockfile is in sync, and `brotli-wasm` — reported
+missing — is required by nothing and installed by nothing. Verified with
+`npm ci --dry-run` and by searching the lockfile and `node_modules`. The finding
+was probably taken from an older archive. The `npm install` half of it was real
+and is fixed.
+
+Their coverage figures also differ from ours (they report 96.25% overall against
+our 94.4%, and 97.7% for TeleportV2 against our 90.7%). Coverage here depends on
+`--ir-minimum`; see the branch-coverage note above before trusting either.
+
+### Still open
+
+Seven production dependency vulnerabilities, six moderate and one high, all
+reached through the wallet SDKs. `npm audit fix` does not clear them without
+changing major versions of dependencies the wallet connectors pull in.

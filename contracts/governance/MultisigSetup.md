@@ -76,7 +76,8 @@ For testnet, use shorter delay:
 ## Why This Matters for GCC Institutional Sales
 
 Islamic financial institutions require:
-1. **No single point of failure** — Ownable2Step + Timelock eliminates single private key risk
+1. **No single point of failure** — for the registry: `Ownable2Step` plus the timelock removes the single-key risk on policy.
+   **Not yet for the engines.** TeleportV2 and TeleportV3 are plain `Ownable`, still owned by the deployer's key, and their `onlyAuthorized` modifier short-circuits on `msg.sender == owner()` — so that key can execute migrations without the registry having any say. The handover script covers them; the ownership has not moved. See [docs/KNOWN-ISSUES.md](../../docs/KNOWN-ISSUES.md).
 2. **Transparent governance** — All changes are on-chain and time-delayed
 3. **Auditability** — TimelockController events provide full change history
 4. **Reversibility window** — 48h delay allows reaction to malicious proposals
