@@ -61,6 +61,27 @@ the owner.
 **Until then the handover is a real decision, not a formality.** Moving the
 engines buys governance and costs the fast stop.
 
+### The web lockfile is not usable on Linux, so production builds unpinned
+
+`apps/web/package-lock.json` was last written on Windows. On Linux, dependency
+resolution reaches three packages the lockfile does not contain —
+`@base-org/account`, `brotli-wasm` and `clsx` — so `npm ci` refuses to start and
+the deploy fails.
+
+Regenerating the lockfile on Windows does not add them: `brotli-wasm` is
+referenced by nothing there at all. It needs to be regenerated **on Linux**, or
+in a container, and committed from there.
+
+Until then `.github/workflows/deploy-frontend.yml` runs `npm install`, which
+means **the frontend that reaches production is built from a dependency graph
+nothing pins**. CI itself runs `npm ci` and passes, because it installs the
+workspaces that are in sync.
+
+Related and worth doing at the same time: the deploy runs on **Node 20** while
+`@wallet-standard/base` requires Node 22 or newer, which shows as an
+`EBADENGINE` warning on every build. The README already tells contributors to
+use Node 22.
+
 ### Stray ERC-721s cannot be recovered
 
 TeleportV3 implements `onERC721Received` and accepts any ERC-721 sent to it.
@@ -294,11 +315,26 @@ recorded here because the pattern matters more than the individual items:
 
 ### Did not hold up
 
-**`npm ci` does not fail.** The lockfile is in sync, and `brotli-wasm` — reported
-missing — is required by nothing and installed by nothing. Verified with
-`npm ci --dry-run` and by searching the lockfile and `node_modules`. The finding
-was probably taken from an older archive. The `npm install` half of it was real
-and is fixed.
+**This was recorded here as not holding up, and that was wrong.** The claim was
+that `npm ci` does not fail, on the strength of `npm ci --dry-run` passing and of
+`brotli-wasm` appearing nowhere in the lockfile or `node_modules`.
+
+Changing the deploy to `npm ci` proved otherwise within sixteen seconds:
+
+```
+npm error Missing: @base-org/account@2.5.10 from lock file
+npm error Missing: brotli-wasm@3.0.1 from lock file
+npm error Missing: clsx@1.2.1 from lock file
+```
+
+Exactly the three packages reported. The dry run passed because `node_modules`
+was already populated and npm short-circuited; the local toolchain is npm 11 on
+Node 24 while CI is npm 10 on Node 20; and the resolution differs by platform.
+**A check that passes without exercising the thing it claims to check is worth
+less than no check**, and this is the second time that pattern has appeared in
+this repository.
+
+See the open item below.
 
 Their coverage figures also differ from ours (they report 96.25% overall against
 our 94.4%, and 97.7% for TeleportV2 against our 90.7%). Coverage here depends on

@@ -41,7 +41,15 @@ jobs:
 
       - name: Install the application
         working-directory: apps/web
-        run: npm ci
+        # npm install, not npm ci, and that is a known defect rather than a
+        # preference. On Linux the lockfile resolves three packages it does not
+        # contain - @base-org/account, brotli-wasm and clsx - so npm ci refuses
+        # to start. None of them appear when the lockfile is regenerated on
+        # Windows, which is where it was last written.
+        #
+        # Until the lockfile is regenerated on Linux, production builds from an
+        # unpinned graph. See docs/KNOWN-ISSUES.md.
+        run: npm install
 
       - name: Build the application
         working-directory: apps/web
