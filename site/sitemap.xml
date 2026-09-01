@@ -5,4 +5,8 @@
   <url><loc>https://gravitasprotocol.xyz/app/compliance</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
   <url><loc>https://gravitasprotocol.xyz/app/docs</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>
   <url><loc>https://gravitasprotocol.xyz/app/sdk</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://gravitasprotocol.xyz/privacy.html</loc><changefreq>yearly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://gravitasprotocol.xyz/terms.html</loc><changefreq>yearly</changefreq><priority>0.4</priority></url>
+  <url><loc>https://gravitasprotocol.xyz/risk.html</loc><changefreq>yearly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://gravitasprotocol.xyz/legal.html</loc><changefreq>yearly</changefreq><priority>0.4</priority></url>
 </urlset>

@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Risk Disclosure · Gravitas Protocol</title>
+<meta name="description" content="What can go wrong with Gravitas Protocol, stated plainly: unaudited testnet contracts, one admin key, a Shariah letter that is not a certification, and no revenue.">
+<meta name="theme-color" content="#0E1017">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="/favicon.ico" sizes="32x32 48x48">
+<link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,800&family=Archivo:wght@600;700&family=Manrope:wght@300;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/legal.css">
+</head>
+<body>
+
+<a class="skip" href="#doc">Skip to the document</a>
+
+<header class="bar">
+  <div class="wrap">
+    <a class="brand" href="/"><img src="/assets/mark.png" alt="" width="132" height="90" decoding="async"><b>Gravitas</b></a>
+    <nav>
+      <a href="/privacy.html">Privacy</a>
+      <a href="/terms.html">Terms</a>
+      <a href="/risk.html" aria-current="page">Risk</a>
+      <a href="/legal.html">Legal notice</a>
+    </nav>
+  </div>
+</header>
+
+<main id="doc">
+  <div class="wrap">
+
+    <p class="eyebrow">Risk Disclosure</p>
+    <h1>Everything that can go wrong</h1>
+    <p class="updated">In force from 26 August 2026 · Version 1.0</p>
+
+    <div class="note warn">
+      <b>Read this before you rely on anything else on this site</b>
+      <p>
+        Gravitas Protocol is unaudited software on a test network, run by one person, with no
+        company behind it yet and no revenue. Everything below is stated here rather than buried,
+        because a limitation someone discovers for themselves costs more than one they were told.
+      </p>
+    </div>
+
+    <div class="toc">
+      <b>Contents</b>
+      <ol>
+        <li><a href="#stage">What stage this is actually at</a></li>
+        <li><a href="#contracts">Smart contract risk</a></li>
+        <li><a href="#audit">No external audit</a></li>
+        <li><a href="#keys">One key still controls it</a></li>
+        <li><a href="#shariah">The Shariah position</a></li>
+        <li><a href="#notoffer">This is not an offer of anything</a></li>
+        <li><a href="#business">Business risk</a></li>
+        <li><a href="#regulatory">Regulatory risk</a></li>
+        <li><a href="#technical">Dependencies and technical risk</a></li>
+        <li><a href="#forward">Forward-looking statements</a></li>
+      </ol>
+    </div>
+
+    <h2 id="stage">1. What stage this is actually at</h2>
+    <div class="tbl">
+      <table>
+        <tr><th>Claim someone might assume</th><th>What is true</th></tr>
+        <tr><td>Deployed on mainnet</td><td><strong>No.</strong> Arbitrum Sepolia testnet only. Testnet tokens have no value.</td></tr>
+        <tr><td>Audited</td><td><strong>No.</strong> An internal review exists. No external firm has been engaged.</td></tr>
+        <tr><td>Shariah certified</td><td><strong>No.</strong> A scholar's letter of alignment is not a certification.</td></tr>
+        <tr><td>Under multisig or timelock control</td><td><strong>Not yet.</strong> A timelock is deployed; ownership has not moved to it.</td></tr>
+        <tr><td>Earning revenue</td><td><strong>No.</strong> The fee model is designed and <em>not implemented</em> in the contracts.</td></tr>
+        <tr><td>Has signed customers</td><td><strong>No.</strong> Letters of intent exist. Every one is conditional and none is a commitment to buy.</td></tr>
+      </table>
+    </div>
+
+    <h2 id="contracts">2. Smart contract risk</h2>
+    <p>
+      Smart contracts are software that moves value and cannot be patched after deployment. The
+      contracts here are immutable: there is no proxy and no upgrade path. A defect found after
+      deployment is fixed by deploying again at a new address, not by repairing the one in use.
+    </p>
+    <p>Software of this kind can fail through:</p>
+    <ul>
+      <li>A logic error that testing did not reach.</li>
+      <li>An economic assumption that holds until it does not.</li>
+      <li>A dependency behaving differently from its documentation.</li>
+      <li>A change in the underlying network.</li>
+    </ul>
+    <p>
+      86 tests pass at 94.4% line coverage across the three contracts, including invariant and fuzz
+      tests. <strong>Coverage measures what was executed, not what is correct.</strong> It is
+      evidence of care, not evidence of safety.
+    </p>
+
+    <h2 id="audit">3. No external audit</h2>
+    <p>
+      No third-party security firm has reviewed this code. An internal review is published, and so
+      is a list of what remains open — including items that are <em>known</em> and deliberately not
+      yet fixed, with the reasoning for each.
+    </p>
+    <p>
+      <a href="https://github.com/AbZe628/gravitas-protocol/blob/main/docs/KNOWN-ISSUES.md" target="_blank" rel="noopener noreferrer">docs/KNOWN-ISSUES.md</a> ·
+      <a href="https://github.com/AbZe628/gravitas-protocol/blob/main/proof-of-quality/INTERNAL_REVIEW.md" target="_blank" rel="noopener noreferrer">the internal review</a>
+    </p>
+    <p>
+      An external audit is budgeted as part of a pre-seed round. That round has not closed, so the
+      audit has not been commissioned and no date is claimed.
+    </p>
+
+    <h2 id="keys">4. One key still controls it</h2>
+    <div class="note warn">
+      <b>A single private key can currently change the compliance whitelist and execute migrations.</b>
+      <p>
+        <code>GravitasTimelock</code> is deployed and verified, and the two-step handover is written
+        and tested — but <strong>ownership has not been transferred to it</strong>. The deployer's
+        key remains the owner of the registry and of both Teleport engines.
+      </p>
+      <p>
+        This is deliberate during development: a 48-hour timelock makes every fix wait two days. It
+        is also, unambiguously, a single point of failure until it changes. The handover happens
+        after the external audit and before any mainnet deployment.
+      </p>
+    </div>
+
+    <h2 id="shariah">5. The Shariah position</h2>
+    <p>
+      A scholar has reviewed the mechanism and given a letter stating that the technology is
+      aligned with Shariah principles. <strong>That letter is not a certification and must not be
+      presented as one.</strong>
+    </p>
+    <ul>
+      <li>Formal certification is in progress through AmanX Advisory, follows mainnet, and
+        <strong>no date is claimed</strong>.</li>
+      <li>Whether any particular asset is permissible is a ruling, made by a qualified board — not
+        by this software, and not by its assistant.</li>
+      <li>The Majlis assistant explains mechanism and is built to refuse rulings. Its refusals are
+        a design property, not a caveat.</li>
+      <li>Scholars differ. A structure one board accepts, another may not.</li>
+    </ul>
+    <p>
+      Take the view of your own Shariah board. Nothing here substitutes for it.
+    </p>
+
+    <h2 id="notoffer">6. This is not an offer of anything</h2>
+    <p>
+      Nothing on this site or in its documentation is an offer, solicitation or invitation to buy
+      or subscribe for any security, token, fund interest, or financial instrument of any kind, in
+      any jurisdiction.
+    </p>
+    <ul>
+      <li><strong>There is no token.</strong> None exists, none is planned for sale, and anyone
+        offering you one is defrauding you.</li>
+      <li>There is no fund, no pooled investment and no yield product.</li>
+      <li>Material shared with prospective investors is provided privately, to people who qualify
+        under the law that applies to them, and is not this website.</li>
+    </ul>
+
+    <h2 id="business">7. Business risk</h2>
+    <p>Stated plainly, because an investor will find each of these anyway:</p>
+    <ul>
+      <li><strong>No incorporated company.</strong> The project is currently one person. An entity
+        will be formed; it does not exist today.</li>
+      <li><strong>No revenue.</strong> The intended service fee of 5 to 10 basis points is a
+        designed model. It is <strong>not written into the contracts</strong> — there is no fee
+        rate, no recipient, and no code that takes anything.</li>
+      <li><strong>Key person concentration.</strong> One person wrote the contracts, the SDK, the
+        applications and this page.</li>
+      <li><strong>Letters of intent are not contracts.</strong> Four exist. Every one is
+        conditional on the audit and on mainnet, none has produced revenue, and none should be read
+        as a commitment to buy.</li>
+      <li><strong>Unproven market.</strong> Institutional demand for Shariah-compliant on-chain
+        liquidity routing is a thesis, not a measured fact.</li>
+    </ul>
+
+    <h2 id="regulatory">8. Regulatory risk</h2>
+    <p>
+      The regulation of decentralised finance is unsettled and moving. <strong>MiCA</strong> in the
+      European Union, and the frameworks of the GCC jurisdictions this project is aimed at, may
+      apply to activities like these in ways that are not yet settled and may change again.
+    </p>
+    <p>
+      No licence or authorisation is held in any jurisdiction. None is currently required for what
+      is offered — an informational site, a non-custodial interface, and published source code —
+      but that assessment could change with the rules, or with what the project later does.
+    </p>
+    <p>
+      Access may be restricted by jurisdiction in future. You are responsible for whether using
+      this is lawful where you are.
+    </p>
+
+    <h2 id="technical">9. Dependencies and technical risk</h2>
+    <ul>
+      <li><strong>Arbitrum</strong> — an L2 with its own sequencer, its own failure modes, and its
+        own governance.</li>
+      <li><strong>Uniswap V3</strong> — the position manager and router the engine routes through.</li>
+      <li><strong>Public RPC endpoints</strong> — which can rate-limit, lag, or return stale state.</li>
+      <li><strong>Your wallet</strong> — whose behaviour and security are not ours.</li>
+      <li><strong>Hosting platforms</strong> — GitHub Pages and Render, either of which can be
+        unavailable.</li>
+    </ul>
+    <p>
+      <strong>TeleportV2 cannot currently be exercised at all:</strong> Arbitrum Sepolia hosts no
+      Uniswap V2 deployment for it to route through. It is deployed and verified, and its tests pass
+      against mocks.
+    </p>
+
+    <h2 id="forward">10. Forward-looking statements</h2>
+    <p>
+      The roadmap, the stages, the certification path and anything else describing what is intended
+      are statements about the future. They rest on assumptions that may prove wrong, on funding
+      that has not closed, and on decisions by people who have not made them yet.
+    </p>
+    <p>
+      <strong>Nothing here is a promise that any of it will happen</strong>, and no date on this
+      site is a commitment.
+    </p>
+
+    <div class="note">
+      <b>If something on this site contradicts something in the code, the code is what is true</b>
+      <p>
+        That is the standard this project holds itself to, and the reason this page exists. If you
+        find a claim that the software does not support, write to
+        <a href="mailto:abdusamed@gravitasprotocol.xyz">abdusamed@gravitasprotocol.xyz</a> and it
+        gets corrected rather than defended.
+      </p>
+    </div>
+
+  </div>
+</main>
+
+<footer class="leg">
+  <div class="wrap">
+    <span>© 2026 Gravitas Protocol</span>
+    <span class="sep">·</span>
+    <a href="/">Home</a>
+    <a href="/privacy.html">Privacy</a>
+    <a href="/terms.html">Terms</a>
+    <a href="/legal.html">Legal notice</a>
+  </div>
+</footer>
+
+</body>
+</html>
