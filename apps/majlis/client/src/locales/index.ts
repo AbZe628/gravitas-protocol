@@ -209,6 +209,44 @@ const en: Dict = {
   'vote.released': 'Released',
   'vote.releasedNote': 'This position was recorded before the matter returned to deliberation. It no longer counts.',
 
+  // ── search ──
+  'nav.search': 'Search',
+  'search.title': 'Search the record',
+  'search.lead':
+    'A board that cannot find what it decided last year has lost the thing this record exists to ' +
+    'accumulate. Every result says where the words were found.',
+  'search.placeholder': 'A word, a standard, a member, a phrase from a reason',
+  'search.go': 'Search',
+  'search.clear': 'Clear',
+  'search.none': 'Nothing matched. Every word has to appear somewhere in the matter.',
+  'search.count': 'matters',
+  'search.filters': 'Narrow it',
+  'search.anyStatus': 'Any status',
+  'search.anyDirection': 'Either direction',
+  'search.mine': 'Only what I took part in',
+  'search.emptyQuery':
+    'Search for a word, or narrow by status, direction or your own participation \u2014 a question ' +
+    'with no words in it is still a question.',
+  'search.field.title': 'in the title',
+  'search.field.proposal': 'in what was proposed',
+  'search.field.rule': 'in the rule',
+  'search.field.parameter': 'in the operative terms',
+  'search.field.source': 'in what it rests on',
+  'search.field.reasoning': 'in a recorded position',
+  'search.field.deliberation': 'in the deliberation',
+  'search.field.mechanism': 'in the mechanism',
+  'search.field.notDecided': 'in what was not decided',
+
+  // ── precedent ──
+  'related.title': 'What the board has already decided about this',
+  'related.none': 'Nothing in the record connects to this matter yet.',
+  'related.help':
+    'Each of these shares something specific with this matter \u2014 a citation, a declared ' +
+    'interaction, an operative term. Nothing here is offered on a resemblance.',
+  'related.same_source': 'Argued from the same source',
+  'related.declared': 'Declared as interacting',
+  'related.same_parameter': 'Sets the same term',
+
   // ── evidence ──
   'evidence.title': 'What this rests on',
   'evidence.none': 'Nothing has been cited yet.',

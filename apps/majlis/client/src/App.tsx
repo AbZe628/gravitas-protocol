@@ -7,12 +7,15 @@ import Rules from './pages/Rules.js';
 import Briefings from './pages/Briefings.js';
 import Assistant from './pages/Assistant.js';
 import Record from './pages/Record.js';
+import Search from './pages/Search.js';
 import SignedInAs from './components/SignedInAs.js';
 
 function Nav() {
   const { t } = useI18n();
   const items = [
     { to: '/', label: t('nav.matters'), end: true },
+    // Finding a matter is the same errand as reading one, so it sits beside it.
+    { to: '/search', label: t('nav.search') },
     { to: '/rules', label: t('nav.rules') },
     { to: '/briefings', label: t('nav.briefings') },
     { to: '/assistant', label: t('nav.assistant') },
@@ -92,6 +95,7 @@ export default function App() {
           <Route path="/rules" element={<Rules />} />
           <Route path="/briefings" element={<Briefings />} />
           <Route path="/assistant" element={<Assistant />} />
+          <Route path="/search" element={<Search />} />
           <Route path="/record" element={<Record />} />
         </Routes>
       </main>

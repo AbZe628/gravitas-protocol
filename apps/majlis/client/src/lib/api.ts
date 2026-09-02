@@ -270,8 +270,71 @@ async function send<T>(
   return (await res.json()) as T;
 }
 
+export type MatchField =
+  | 'title' | 'proposal' | 'rule' | 'parameter'
+  | 'source' | 'reasoning' | 'deliberation' | 'mechanism' | 'notDecided';
+
+export interface Match {
+  field: MatchField;
+  snippet: string;
+  by?: string;
+}
+
+export interface SearchHit {
+  matterId: string;
+  boardId: string;
+  title: string;
+  status: string;
+  direction: 'permit' | 'restrict';
+  origin: string;
+  openedAt: string;
+  inForceAt: string | null;
+  score: number;
+  matches: Match[];
+}
+
+export interface SearchResult {
+  query: string;
+  count: number;
+  hits: SearchHit[];
+}
+
+export interface SearchQuery {
+  q?: string;
+  status?: string[];
+  direction?: string;
+  member?: string;
+  from?: string;
+}
+
+export type RelationKind = 'same_source' | 'declared' | 'same_parameter';
+
+export interface Related {
+  matterId: string;
+  title: string;
+  status: string;
+  direction: 'permit' | 'restrict';
+  openedAt: string;
+  inForceAt: string | null;
+  relations: { kind: RelationKind; shared: string }[];
+}
+
 export const governance = {
   attention: () => get<Attention>('/api/attention'),
+
+  /** Search the record. A query of only filters is valid. */
+  search: (query: SearchQuery) => {
+    const p = new URLSearchParams();
+    if (query.q) p.set('q', query.q);
+    if (query.status?.length) p.set('status', query.status.join(','));
+    if (query.direction) p.set('direction', query.direction);
+    if (query.member) p.set('member', query.member);
+    if (query.from) p.set('from', query.from);
+    return get<SearchResult>('/api/search?' + p.toString());
+  },
+
+  /** What the board already decided that bears on this matter. */
+  related: (id: string) => get<Related[]>(`/api/matters/${id}/related`),
   tally: (id: string) => get<Tally>(`/api/matters/${id}/tally`),
 
   openMatter: (input: {

@@ -5,6 +5,7 @@ import { useI18n } from '../lib/i18n.js';
 import { Card, DateText, ErrorText, Loading, Section, Sources, Tag } from '../components/ui.js';
 import Deliberation from '../components/Deliberation.js';
 import Evidence from '../components/Evidence.js';
+import Precedent from '../components/Precedent.js';
 import Terms from '../components/Terms.js';
 import VotePanel from '../components/VotePanel.js';
 import { mayDeliberate, useIdentity } from '../lib/identity.js';
@@ -155,6 +156,14 @@ export default function MatterDetail() {
           canAttach={mayDeliberate(identity?.role)}
           onChanged={setMatter}
         />
+      </Section>
+
+      {/*
+        After the evidence and before the vote: what the board already decided
+        about this is part of what a member should have in front of them.
+      */}
+      <Section title={t('related.title')}>
+        <Precedent matterId={matter.id} />
       </Section>
 
       <Section title={t('vote.tally')}>

@@ -39,6 +39,8 @@ import {
   withdraw,
 } from '../services/lifecycle.js';
 import { attentionList } from '../services/attention.js';
+import { search, type SearchFilters } from '../services/search.js';
+import { relatedTo } from '../services/precedent.js';
 import { NotFound, type Store } from '../store/index.js';
 import type { Deliberation, Matter, SourceKind } from '../types.js';
 import { SOURCE_KINDS } from '../types.js';
@@ -502,6 +504,58 @@ export function governanceRoutes(store: Store, now: () => string = () => new Dat
    * from what is actually true. Personal: "three matters need attention" is
    * not useful to someone who has already acted on all three.
    */
+  /**
+   * Search the record.
+   *
+   * Reading is open to everyone who can reach the application, observers
+   * included: an observer who cannot find what the board decided cannot check
+   * it, and being able to check it is the entire claim.
+   *
+   * A query of only filters is valid — "everything this member voted on" is a
+   * question worth asking with no words in it.
+   */
+  router.get(
+    '/search',
+    handle(async (req, res) => {
+      const q = typeof req.query.q === 'string' ? req.query.q : '';
+
+      const list = (v: unknown): string[] =>
+        typeof v === 'string' ? v.split(',').map((x) => x.trim()).filter(Boolean) : [];
+
+      const filters: SearchFilters = {
+        boardId: typeof req.query.board === 'string' ? req.query.board : undefined,
+        status: list(req.query.status) as SearchFilters['status'],
+        direction: (typeof req.query.direction === 'string' ? req.query.direction : undefined) as SearchFilters['direction'],
+        origin: (typeof req.query.origin === 'string' ? req.query.origin : undefined) as SearchFilters['origin'],
+        scholarId: typeof req.query.member === 'string' ? req.query.member : undefined,
+        from: typeof req.query.from === 'string' ? req.query.from : undefined,
+        to: typeof req.query.to === 'string' ? req.query.to : undefined,
+      };
+
+      const hits = search(await store.matters(), q, filters);
+      res.json({ query: q, count: hits.length, hits: hits.slice(0, 60) });
+    }),
+  );
+
+  /**
+   * What the board already decided that bears on this matter.
+   *
+   * Every relation is a fact in the record — a shared citation, a declared
+   * interaction, the same operative term — never a resemblance. Offering a
+   * scholar a coincidence as a precedent would invite them to treat it as one.
+   */
+  router.get(
+    '/matters/:id/related',
+    handle(async (req, res) => {
+      const matter = await store.matter(req.params.id);
+      if (!matter) {
+        res.status(404).json({ error: 'not_found', message: 'No such matter.' });
+        return;
+      }
+      res.json(relatedTo(matter, await store.matters()));
+    }),
+  );
+
   router.get(
     '/attention',
     handle(async (req, res) => {
