@@ -9,16 +9,19 @@ import Assistant from './pages/Assistant.js';
 import Record from './pages/Record.js';
 import Search from './pages/Search.js';
 import SignedInAs from './components/SignedInAs.js';
+import { useHealth } from './lib/health.js';
 
 function Nav() {
   const { t } = useI18n();
+  const health = useHealth();
   const items = [
     { to: '/', label: t('nav.matters'), end: true },
     // Finding a matter is the same errand as reading one, so it sits beside it.
     { to: '/search', label: t('nav.search') },
     { to: '/rules', label: t('nav.rules') },
     { to: '/briefings', label: t('nav.briefings') },
-    { to: '/assistant', label: t('nav.assistant') },
+    // Offering a page that can only refuse is worse than not offering it.
+    ...(health?.assistantKind === 'off' ? [] : [{ to: '/assistant', label: t('nav.assistant') }]),
     { to: '/record', label: t('nav.record') },
   ];
   return (

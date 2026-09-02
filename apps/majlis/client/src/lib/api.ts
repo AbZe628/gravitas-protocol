@@ -157,6 +157,26 @@ export interface Health {
   signingAuthority: boolean;
   /** When the record began, or null if the store cannot say. */
   recordSince: string | null;
+  /**
+   * What this installation has attached. A board inside a bank runs with
+   * neither, and that is the ordinary installation rather than a degraded one —
+   * so the interface must not offer what is not there.
+   */
+  enforcement?: 'none' | 'gravitas-registry';
+  assistantKind?: 'off' | 'anthropic';
+}
+
+export interface EnforcementSnapshot {
+  kind: 'none' | 'gravitas-registry';
+  configured: boolean;
+  readAt: string;
+  label?: string;
+  reachable?: boolean;
+  paused?: boolean;
+  owner?: string;
+  address?: string;
+  chainId?: number;
+  error?: string;
 }
 
 export const api = {
@@ -167,7 +187,7 @@ export const api = {
   matter: (id: string) => get<Matter>(`/api/matters/${id}`),
   rules: () => get<Rule[]>('/api/rules'),
   briefings: () => get<Briefing[]>('/api/briefings'),
-  registry: () => get<RegistrySnapshot>('/api/registry'),
+  enforcement: () => get<EnforcementSnapshot>('/api/enforcement'),
   assistantLog: () => get<AssistantExchange[]>('/api/assistant/log'),
   exportBoard: (id: string) => get<unknown>(`/api/export/${id}`),
 

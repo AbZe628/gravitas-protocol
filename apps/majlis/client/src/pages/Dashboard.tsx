@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { api, type MatterSummary, type RegistrySnapshot } from '../lib/api.js';
+import { api, type EnforcementSnapshot, type MatterSummary } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { Card, DateText, ErrorText, Loading, Tag } from '../components/ui.js';
 import Attention from '../components/Attention.js';
@@ -11,13 +11,13 @@ import { mayDeliberate, useIdentity } from '../lib/identity.js';
 export default function Dashboard() {
   const { t } = useI18n();
   const [matters, setMatters] = useState<MatterSummary[] | null>(null);
-  const [registry, setRegistry] = useState<RegistrySnapshot | null>(null);
+  const [enforcement, setEnforcement] = useState<EnforcementSnapshot | null>(null);
   const [failed, setFailed] = useState(false);
   const { identity } = useIdentity();
 
   useEffect(() => {
     api.matters().then(setMatters).catch(() => setFailed(true));
-    api.registry().then(setRegistry).catch(() => setRegistry(null));
+    api.enforcement().then(setEnforcement).catch(() => setEnforcement(null));
   }, []);
 
   if (failed) return <ErrorText />;
@@ -107,14 +107,30 @@ export default function Dashboard() {
         </>
       )}
 
-      {registry && (
+      {/*
+        An installation with nothing attached says so in a sentence rather than
+        showing an empty address and an unreachable badge, which would read as a
+        fault in something that was never configured.
+      */}
+      {enforcement && !enforcement.configured && (
         <div className="mt-9 rounded-lg border border-line px-4 py-3">
           <div className="text-[11px] uppercase tracking-wider text-muted">
-            {t('dash.registry')}
+            {t('dash.enforcement')}
           </div>
-          <div className="mt-1 font-mono text-[11px] break-all text-muted">{registry.address}</div>
+          <p className="mt-1.5 text-[13px] leading-relaxed text-muted">{t('dash.enforcementNone')}</p>
+        </div>
+      )}
+
+      {enforcement?.configured && (
+        <div className="mt-9 rounded-lg border border-line px-4 py-3">
+          <div className="text-[11px] uppercase tracking-wider text-muted">
+            {enforcement.label ?? t('dash.registry')}
+          </div>
+          {enforcement.address && (
+            <div className="mt-1 font-mono text-[11px] break-all text-muted">{enforcement.address}</div>
+          )}
           <div className="mt-2">
-            {registry.reachable ? (
+            {enforcement.reachable ? (
               <Tag tone="ok">{t('dash.registryReachable')}</Tag>
             ) : (
               <Tag tone="warn">{t('dash.registryUnreachable')}</Tag>

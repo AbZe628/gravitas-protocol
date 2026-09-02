@@ -1,6 +1,8 @@
 import 'dotenv/config';
 import { createApp } from './app.js';
 import { assertConfiguredForProduction } from './middleware/basicAuth.js';
+import { enforcementFromEnv } from './services/enforcement.js';
+import { comprehensionFromEnv } from './services/comprehension.js';
 import { storeFromEnv } from './store/index.js';
 import { startSweeping } from './services/sweep.js';
 
@@ -57,9 +59,26 @@ const server = app.listen(port, () => {
     console.log(`Board: ${count} member credential${count === 1 ? '' : 's'} configured.`);
   }
 
-  if (!process.env.ANTHROPIC_API_KEY) {
-    console.warn('ANTHROPIC_API_KEY is not set: the comprehension assistant will return 502.');
-  }
+  /*
+   * What this installation is. An operator reading a log should not have to
+   * infer from the absence of a warning that nothing is attached — and nothing
+   * attached is the ordinary arrangement, so it is reported rather than warned
+   * about.
+   */
+  const enforcement = enforcementFromEnv();
+  const comprehension = comprehensionFromEnv();
+
+  console.log(
+    enforcement.kind === 'none'
+      ? 'Enforcement: none. Decisions are recorded here and carried out elsewhere.'
+      : `Enforcement: ${enforcement.kind}.`,
+  );
+
+  console.log(
+    comprehension.available
+      ? `Assistant: ${comprehension.kind}. Questions are sent to ${comprehension.processor}.`
+      : 'Assistant: off. Questions of mechanism go to the technical liaison.',
+  );
 });
 
 /*

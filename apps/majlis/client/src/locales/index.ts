@@ -209,6 +209,11 @@ const en: Dict = {
   'vote.released': 'Released',
   'vote.releasedNote': 'This position was recorded before the matter returned to deliberation. It no longer counts.',
 
+  'dash.enforcement': 'What carries this out',
+  'dash.enforcementNone':
+    'Nothing is attached. Decisions are recorded here and carried out by whatever this ' +
+    'institution already uses \u2014 which is the ordinary arrangement, not a missing piece.',
+
   // ── search ──
   'nav.search': 'Search',
   'search.title': 'Search the record',

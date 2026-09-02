@@ -5,8 +5,13 @@ import { fileURLToPath } from 'node:url';
 import { existsSync } from 'node:fs';
 import { z } from 'zod';
 import { storeFromEnv, type Store } from './store/index.js';
-import { ask } from './services/assistant.js';
-import { readRegistry, configFromEnv } from './services/registry.js';
+
+import { enforcementFromEnv, type Enforcement } from './services/enforcement.js';
+import {
+  AssistantUnavailable,
+  comprehensionFromEnv,
+  type Comprehension,
+} from './services/comprehension.js';
 import { buildAuditExport } from './services/export.js';
 import { verifyParameters } from './services/hash.js';
 import { Limiter, REFUSAL_MESSAGES } from './services/limits.js';
@@ -36,7 +41,17 @@ const limiter = new Limiter();
  * hand over the durable one. Left out, it is chosen from the environment, which
  * refuses to fall back to memory when NODE_ENV is production.
  */
-export function createApp(store: Store = storeFromEnv()): Express {
+export function createApp(
+  store: Store = storeFromEnv(),
+  /*
+   * Chosen once, at construction. Everything an institution might refuse,
+   * forbid or already own arrives here rather than being reached for inside a
+   * route — which is what lets a bank run this with neither attached and be
+   * running the ordinary installation rather than a degraded one.
+   */
+  enforcement: Enforcement = enforcementFromEnv(),
+  comprehension: Comprehension = comprehensionFromEnv(),
+): Express {
   const app = express();
 
   /*
@@ -98,6 +113,9 @@ export function createApp(store: Store = storeFromEnv()): Express {
       // file and the record restarts from the seed. Saying when it began is
       // what keeps that from happening unnoticed.
       recordSince: store.startedAt ?? null,
+      // What this installation is, rather than what the default one is.
+      enforcement: enforcement.kind,
+      assistantKind: comprehension.kind,
       assistant: limiter.status(),
     });
   });
@@ -185,11 +203,15 @@ export function createApp(store: Store = storeFromEnv()): Express {
     res.json(b);
   });
 
-  // ---- registry --------------------------------------------------------
-  app.get('/api/registry', async (_req, res) => {
-    const snapshot = await readRegistry(configFromEnv());
-    res.json(snapshot);
-  });
+  // ---- enforcement -----------------------------------------------------
+  //
+  // Kept at /api/registry as well, because an installation configured before
+  // this adapter existed is still calling it.
+  const enforcementRoute = async (_req: Request, res: Response) => {
+    res.json(await enforcement.snapshot());
+  };
+  app.get('/api/enforcement', enforcementRoute);
+  app.get('/api/registry', enforcementRoute);
 
   // ---- assistant -------------------------------------------------------
   const askSchema = z.object({
@@ -217,8 +239,17 @@ export function createApp(store: Store = storeFromEnv()): Express {
       });
     }
 
+    // "There is no assistant here" and "the assistant is broken" are different
+    // states, and a scholar deserves to be told which.
+    if (!comprehension.available) {
+      return res.status(501).json({
+        error: 'assistant_off',
+        message: new AssistantUnavailable().message,
+      });
+    }
+
     try {
-      const result = await ask({
+      const result = await comprehension.ask({
         question: parsed.data.question,
         scholarId: parsed.data.scholarId ?? null,
         context: parsed.data.context,

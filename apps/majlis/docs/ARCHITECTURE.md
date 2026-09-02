@@ -3,7 +3,8 @@
 What Majlis is, what it is made of today, and what it has to become.
 
 Written against the code rather than against intention: every claim in the
-present tense was checked in the source on 2 September 2026. The previous version
+present tense was checked in the source on 2 September 2026, and again after each
+step below. The previous version
 of this document described an application with no write routes; Stage Two had
 added twelve. **If a statement here stops matching the code, the code is right
 and this file is a defect.**
@@ -55,6 +56,10 @@ server  Express · TypeScript
   ├── store         JSON document, atomic temp+rename, mutations queued
   ├── lifecycle     every transition and every refusal
   ├── attention     what is waiting for you
+  ├── search        retrieval, with an explainable ranking
+  ├── precedent     what the board already decided about this
+  ├── enforcement   adapter · none by default
+  ├── comprehension adapter · off by default
   ├── assistant     three-gate constraint against rulings
   ├── hash          canonical parameter hashing
   ├── registry      viem read of the deployed Policy Registry
@@ -100,7 +105,7 @@ first three; voting and objecting belong to signatories. Without
 12 governance routes, each applying its change inside `store.updateMatter` so the
 rules run against the stored matter in a transaction and a refusal writes nothing.
 
-**272 server tests, 26 client.**
+**328 server tests, 26 client.**
 
 ### Deployment
 
@@ -110,55 +115,77 @@ the seed whenever the instance idles, and the application says so.
 
 ---
 
-## 3. What is missing
+## 3. Where it stands
 
-### Critical — the record cannot justify itself
+Five of the gaps this document opened with are closed. What follows is what is
+true now, not what was true when it was written.
 
-**3.1 The parameter hash has no input path.**
-Every matter is created with `parameters: []` and `parameterHash: ''`, and no
-route can set them. A carefully designed integrity mechanism — sorted keys,
-excluded presentation, version tag, `parameterHashVerified` in the export — has
-nothing to canonicalise.
+### Closed
 
-The board can decide *permit this asset*. It cannot record *at a ratio of 30%,
-measured quarterly, with a 30-day cure for drift*. That is
-[open question 1](ROADMAP.md#open-questions) arriving as a gap in the software.
+**3.1 The operative terms can be set, and the hash means something.** A matter
+carried an empty parameter list and an empty hash that no route could fill, so
+the canonicalisation design had nothing to work on. The terms are now set while
+the matter is worked out and **frozen when the vote opens** — a set of terms
+that can move under a standing position is not a set anyone can be said to have
+approved. Every position carries the hash it was taken against, so *did this
+member approve these exact terms* is a comparison. Returning a matter to
+deliberation clears the hash and each released position keeps the one it was
+cast against.
 
-**3.2 Evidence cannot be attached.**
-`Matter.sources` exists and only the seed fills it. A scholar can argue from an
-AAOIFI standard for a week with nowhere to record which standard. For a board
-whose output is reasoning, evidence that cannot be attached to the reasoning is
-the largest ordinary gap here.
+**3.2 Evidence attaches.** Attributed and timed, open to anyone who may
+deliberate — an advisory member who knows the standard should be able to put it
+in front of the board without holding the authority to decide. Withdrawn rather
+than deleted and only by whoever attached it: one member deleting another's
+citation is not a correction. Evidence closes when the matter closes.
 
-**3.3 The record cannot be searched.**
-Matters split into open and settled. That is the whole of retrieval. A board with
-two hundred decided matters that cannot find last year's has lost the thing this
-was built to accumulate. **Precedent is the product.**
+**3.3 The record can be searched.** Across title, proposal, mechanism, what was
+expressly not decided, the rule, the terms, the evidence, every position and
+every line of deliberation — narrowed by status, direction, origin, board, date
+and by the member who took part. **The ranking is explainable on purpose**:
+every result names the field the words were found in and shows the text, because
+a score nobody can account for is the wrong instrument for a record whose claim
+is that it can be checked.
 
-### Structural — it is not yet a product an institution can buy
+**Precedent** comes with it, and every relation is a fact in the record rather
+than a resemblance: the same citation, a declared interaction, the same
+operative term. The interface names the specific thing shared.
 
-**3.4 The chain is assumed, not adapted.** A bank board with no chain still gets
-registry code, chain-shaped types and a dashboard describing Arbitrum.
+**3.4 The chain is an adapter.** `MAJLIS_ENFORCEMENT` defaults to nothing.
+Nothing here ever *performs* enforcement — an adapter reports what the enforcing
+system says, so a board can see whether what runs matches what it approved.
 
-**3.5 There is no institution.** `boardId` exists; a tenant that owns boards,
+**3.7 The assistant is an adapter.** `MAJLIS_ASSISTANT` defaults to off. A
+board's deliberation is among the most sensitive text an institution holds and
+some will forbid sending it anywhere; that is a configuration, not a rebuild.
+An installation that quietly started sending deliberation to a third party
+because a key happened to be in the environment would be the wrong default.
+
+**An installation with neither attached is the ordinary one.** The navigation
+stops offering an assistant that is not there; the dashboard says nothing is
+attached rather than showing an empty address and an unreachable badge; the boot
+log states both. Twelve tests hold that.
+
+Both are inferred from existing configuration, so no running installation lost
+anything on upgrade.
+
+### Still open
+
+**3.5 There is no institution.** `boardId` exists; a tenant owning boards,
 users, retention and branding does not. No bank shares a database with another
-bank.
+bank. **This is the next structural piece.**
 
-**3.6 Identity does not suit an institution.** Basic auth with a per-member
-password. A bank requires SSO — OIDC or SAML — and a scholar will not manage
-another credential.
+**3.6 Identity does not suit an institution.** Still a password per member. A
+bank requires OIDC or SAML, and a scholar will not manage another credential.
+Storage has been an adapter since the store interface; identity has not been
+made one.
 
-**3.7 The assistant cannot be turned off or moved.** Deliberation text goes to a
-US API. Some institutions will forbid that outright, and it must be a
-configuration rather than a rebuild.
+**3.8 No mobile application.** The web client is responsive. That is not an
+application on the device a scholar carries.
 
-**3.8 No mobile application.** The web client is responsive. That is not the same
-as an application a scholar has on the device they actually carry.
-
-**3.9 No upload or download of documents.** Needs durable storage; building it
-onto an ephemeral disk means silently losing a scholar's document.
-
-### Ordinary
+**3.9 No upload or download of documents.** Needs durable storage. The
+`SourceRef` shape already carries a `file` field, unused, so an uploaded
+document becomes a source of the same shape and nothing written now needs
+migrating.
 
 **3.10** The assistant is a separate page, not attached to the matter being read.
 **3.11** `Matter.simulation` is always `null`; nothing produces one.
@@ -262,7 +289,16 @@ cannot justify.
 
 **Third — make it stand alone.**
 5. **Adapters** — enforcement, assistant, storage, identity; null by default.
-6. **Institution** as a tenant.
+   *Enforcement and assistant are done.* `MAJLIS_ENFORCEMENT` and
+   `MAJLIS_ASSISTANT` both default to nothing, and an installation with neither
+   is the ordinary one: the navigation stops offering an assistant that is not
+   there, and the dashboard says nothing is attached rather than showing an
+   empty address and an unreachable badge. Both are inferred from existing
+   configuration so no running installation lost anything on upgrade. Storage
+   has been an adapter since the store interface; **identity has not been done**
+   — it is still a password per member, and an institution needs OIDC or SAML.
+6. **Institution** as a tenant. Not started: `boardId` exists, a tenant owning
+   boards, users, retention and branding does not.
 
 **Fourth — reduce the work.**
 7. Assistant in context of a matter · what changed since you last looked ·
