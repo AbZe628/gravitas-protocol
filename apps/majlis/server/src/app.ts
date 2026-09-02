@@ -97,7 +97,15 @@ export function createApp(
   // Everything except /api/health sits behind authentication. With
   // MAJLIS_MEMBERS each request carries an identity; with only the shared
   // credential it carries the observer role, which reads and writes nothing.
-  app.use(basicAuth(authFromEnv(), logins));
+  /*
+   * The store already knows which institution it serves; the door is told the
+   * same thing, so a credential belonging elsewhere is refused at it rather
+   * than admitted and then shown an empty record.
+   */
+  const servingInstitution =
+    'institutionId' in store ? (store as { institutionId?: string }).institutionId : undefined;
+
+  app.use(basicAuth(authFromEnv(), logins, servingInstitution));
 
   app.get('/api/health', (_req: Request, res: Response) => {
     res.json({

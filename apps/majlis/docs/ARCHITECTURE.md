@@ -106,7 +106,7 @@ first three; voting and objecting belong to signatories. Without
 12 governance routes, each applying its change inside `store.updateMatter` so the
 rules run against the stored matter in a transaction and a refusal writes nothing.
 
-**344 server tests, 26 client.**
+**353 server tests, 26 client.**
 
 ### Deployment
 
@@ -194,10 +194,20 @@ anything on upgrade.
 
 ### Still open
 
-**3.6 Identity does not suit an institution.** Still a password per member. A
-bank requires OIDC or SAML, and a scholar will not manage another credential.
-Storage has been an adapter since the store interface; identity has not been
-made one.
+**3.6 Identity is institution-aware but is still a password.** A member entry
+may name its institution — `institution/member:role:secret` — and a service
+serving one institution refuses a credential naming another **at the door**,
+rather than admitting them to a record they cannot see. It says no more about
+that refusal than it says about a wrong password, so nobody can map which
+institutions a deployment serves by trying credentials against it. Attribution
+stays the short form, because the institution is already known from the record
+it sits in.
+
+What is still missing is what a bank actually requires: **OIDC or SAML**. A
+scholar will not manage another credential, and the bank's directory should
+decide who sits on a board. That is a second implementation behind the same
+boundary rather than a change to it — and it is not written, so it is not
+claimed.
 
 **3.8 No mobile application.** The web client is responsive. That is not an
 application on the device a scholar carries.

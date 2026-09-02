@@ -77,3 +77,6 @@ console.log(issued.map((i) => `${i.id}:${i.role}:${hashPassword(i.secret)}`).joi
 console.log('\nThe server reads it as one value; newlines inside it are fine.');
 console.log('Until it is set, the shared credential authenticates as an observer, which reads');
 console.log('and does nothing else.\n');
+console.log('');
+console.log('An entry may also name its institution: institution/member:role:secret.');
+console.log('A service serving one institution refuses a credential naming another.');

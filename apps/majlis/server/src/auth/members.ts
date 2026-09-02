@@ -38,8 +38,20 @@ export type Role = 'signatory' | 'advisory' | 'liaison' | 'observer';
 export const ROLES: readonly Role[] = ['signatory', 'advisory', 'liaison', 'observer'];
 
 export interface Member {
+  /**
+   * What the member types. `institution/member` where the entry names one,
+   * otherwise just the member id.
+   */
+  loginId: string;
+  /**
+   * How the record refers to them. Always the short form: attribution reads
+   * "member-a" rather than "alpha-bank/member-a", because the institution is
+   * already known from the record the attribution sits in.
+   */
   scholarId: string;
   role: Role;
+  /** From an `institution/member` id. Absent in the shorter form. */
+  institutionId?: string;
   /** scrypt$saltHex$hashHex */
   secret: string;
 }
@@ -47,6 +59,15 @@ export interface Member {
 export interface Identity {
   scholarId: string;
   role: Role;
+  /**
+   * Which institution this member belongs to.
+   *
+   * A credential that cannot say whose it is cannot be checked against the
+   * record it is reaching for. Absent on entries written in the older
+   * `memberId:role:secret` form, which belong to whichever institution the
+   * service serves.
+   */
+  institutionId?: string;
 }
 
 const SCRYPT_KEYLEN = 64;
@@ -82,7 +103,7 @@ export class Members {
   private readonly byId: Map<string, Member>;
 
   constructor(members: Member[]) {
-    this.byId = new Map(members.map((m) => [m.scholarId, m]));
+    this.byId = new Map(members.map((m) => [m.loginId, m]));
   }
 
   get size(): number {
@@ -102,7 +123,11 @@ export class Members {
     const member = this.byId.get(scholarId);
     const ok = verifyPassword(password, member?.secret ?? DECOY);
     if (!member || !ok) return null;
-    return { scholarId: member.scholarId, role: member.role };
+    return {
+      scholarId: member.scholarId,
+      role: member.role,
+      institutionId: member.institutionId,
+    };
   }
 }
 
@@ -137,9 +162,24 @@ export function parseMembers(raw: string): Members {
       );
     }
 
-    const scholarId = line.slice(0, first);
+    const rawId = line.slice(0, first);
     const role = line.slice(first + 1, second) as Role;
     const secret = line.slice(second + 1);
+
+    /*
+     * `institution/member` names both; a bare `member` belongs to whichever
+     * institution the service serves. The slash is not part of any existing id,
+     * so every entry written before this still parses to the same member.
+     */
+    const slash = rawId.indexOf('/');
+    const institutionId = slash > 0 ? rawId.slice(0, slash) : undefined;
+    const scholarId = slash > 0 ? rawId.slice(slash + 1) : rawId;
+
+    if (slash > 0 && !scholarId) {
+      throw new MemberConfigError(
+        `"${rawId}" names an institution and no member. Expected institution/member:role:secret.`,
+      );
+    }
 
     if (!ROLES.includes(role)) {
       throw new MemberConfigError(
@@ -152,12 +192,12 @@ export function parseMembers(raw: string): Members {
           'generate a hash with `npm run member -w server -- ' + scholarId + ' ' + role + '`.'
       );
     }
-    if (seen.has(scholarId)) {
-      throw new MemberConfigError(`${scholarId} appears twice. Which entry wins is not a guess worth making.`);
+    if (seen.has(rawId)) {
+      throw new MemberConfigError(`${rawId} appears twice. Which entry wins is not a guess worth making.`);
     }
 
-    seen.add(scholarId);
-    members.push({ scholarId, role, secret });
+    seen.add(rawId);
+    members.push({ loginId: rawId, scholarId, role, secret, institutionId });
   }
 
   return new Members(members);

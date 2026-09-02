@@ -123,6 +123,11 @@ export interface AttemptRecorder {
 export function basicAuth(
   options: AuthOptions | BasicAuthConfig | null,
   attempts?: AttemptRecorder,
+  /**
+   * Which institution this service serves. A member credential naming another
+   * one is refused rather than admitted and then shown an empty record.
+   */
+  institutionId?: string,
 ) {
   // Accepts the old shape so existing callers and tests keep working.
   const opts: AuthOptions =
@@ -140,6 +145,18 @@ export function basicAuth(
     if (supplied) {
       if (opts.members) {
         const identity = opts.members.authenticate(supplied.user, supplied.pass);
+        if (
+          identity &&
+          institutionId &&
+          identity.institutionId &&
+          identity.institutionId !== institutionId
+        ) {
+          // Correct credential, wrong door. Counted as a failure so it cannot
+          // be used to probe which institutions a deployment serves.
+          attempts?.fail(req.ip ?? 'unknown');
+          res.setHeader('WWW-Authenticate', `Basic realm="${realm}", charset="UTF-8"`);
+          return res.status(401).json({ error: 'unauthorized' });
+        }
         if (identity) {
           req.identity = identity;
           attempts?.succeed(req.ip ?? 'unknown');
