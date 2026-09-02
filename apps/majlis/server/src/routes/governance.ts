@@ -26,8 +26,11 @@ import { mayDeliberate, mayOpenMatter, mayVote, type Identity } from '../auth/me
 import {
   Refused,
   bringIntoForce,
+  attachSource,
   closeVoting,
+  setParameters,
   returnToDeliberation,
+  withdrawSource,
   objectDuringTimelock,
   openDeliberation,
   openVoting,
@@ -37,7 +40,8 @@ import {
 } from '../services/lifecycle.js';
 import { attentionList } from '../services/attention.js';
 import { NotFound, type Store } from '../store/index.js';
-import type { Deliberation, Matter } from '../types.js';
+import type { Deliberation, Matter, SourceKind } from '../types.js';
+import { SOURCE_KINDS } from '../types.js';
 
 /**
  * A refusal is not an error in the server. It is the system doing its job, and
@@ -133,6 +137,37 @@ const voteSchema = z.object({
 });
 
 const objectSchema = z.object({ reason: reasonSchema });
+
+/*
+ * A citation, not an essay. The label is what a reader scans for and the ref is
+ * where they go to check it; the note is the sentence explaining why this is
+ * here, which the citation itself never carries.
+ */
+/*
+ * The terms themselves. `meaning` is required and excluded from the hash: a
+ * board approves an operative rule, and the plain-language explanation is what
+ * the scholar actually read — so it must exist, and improving its wording must
+ * not invalidate the approval.
+ */
+const parametersSchema = z.object({
+  parameters: z
+    .array(
+      z.object({
+        key: z.string().min(1).max(120),
+        value: z.string().min(1).max(500),
+        meaning: z.string().min(3).max(2_000),
+        unit: z.string().max(60).optional(),
+      }),
+    )
+    .max(60),
+});
+
+const sourceSchema = z.object({
+  kind: z.enum(SOURCE_KINDS as [SourceKind, ...SourceKind[]]),
+  label: z.string().min(3).max(300),
+  ref: z.string().min(1).max(2_000),
+  note: z.string().max(2_000).optional(),
+});
 
 function badRequest(res: Response, issues: unknown): void {
   res.status(400).json({ error: 'invalid_request', detail: issues });
@@ -238,6 +273,77 @@ export function governanceRoutes(store: Store, now: () => string = () => new Dat
       });
 
       res.status(201).json(updated);
+    }),
+  );
+
+  /**
+   * Set the operative terms of the proposed rule.
+   *
+   * Open to anyone who may deliberate. Working out that a ratio is 30% rather
+   * than 33% is deliberation, and requiring the authority to decide the matter
+   * before you may write down what is being decided gets the order backwards.
+   *
+   * Refused once a vote is open: the terms are what the board is voting on.
+   */
+  router.put(
+    '/matters/:id/parameters',
+    handle(async (req, res) => {
+      const who = identityOf(req);
+      if (!requireRole(res, mayDeliberate(who.role), 'set the operative terms')) return;
+
+      const parsed = parametersSchema.safeParse(req.body);
+      if (!parsed.success) return badRequest(res, parsed.error.issues);
+
+      const updated = await store.updateMatter(req.params.id, (matter) =>
+        setParameters(matter, parsed.data.parameters),
+      );
+
+      res.json(updated);
+    }),
+  );
+
+  /**
+   * Attach a source to a matter.
+   *
+   * Open to anyone who may deliberate, because evidence is not a vote. An
+   * advisory member who knows the standard should be able to put it in front of
+   * the board without needing the authority to decide the matter.
+   */
+  router.post(
+    '/matters/:id/sources',
+    handle(async (req, res) => {
+      const who = identityOf(req);
+      if (!requireRole(res, mayDeliberate(who.role), 'attach a source')) return;
+
+      const parsed = sourceSchema.safeParse(req.body);
+      if (!parsed.success) return badRequest(res, parsed.error.issues);
+
+      const at = now();
+      const id = `s-${at.replace(/[^0-9]/g, '').slice(0, 14)}-${Math.random().toString(36).slice(2, 8)}`;
+
+      const updated = await store.updateMatter(req.params.id, (matter) =>
+        attachSource(matter, { scholarId: who.scholarId, source: parsed.data }, at, id),
+      );
+
+      res.status(201).json(updated);
+    }),
+  );
+
+  /**
+   * Withdraw a source you attached. Withdrawn, not deleted — see the lifecycle.
+   */
+  router.delete(
+    '/matters/:id/sources/:sourceId',
+    handle(async (req, res) => {
+      const who = identityOf(req);
+      if (!requireRole(res, mayDeliberate(who.role), 'withdraw a source')) return;
+
+      const at = now();
+      const updated = await store.updateMatter(req.params.id, (matter) =>
+        withdrawSource(matter, { scholarId: who.scholarId, sourceId: req.params.sourceId }, at),
+      );
+
+      res.json(updated);
     }),
   );
 

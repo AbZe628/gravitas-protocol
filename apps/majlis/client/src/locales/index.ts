@@ -209,6 +209,66 @@ const en: Dict = {
   'vote.released': 'Released',
   'vote.releasedNote': 'This position was recorded before the matter returned to deliberation. It no longer counts.',
 
+  // ── evidence ──
+  'evidence.title': 'What this rests on',
+  'evidence.none': 'Nothing has been cited yet.',
+  'evidence.add': 'Cite something',
+  'evidence.attach': 'Attach it',
+  'evidence.help':
+    'A standard, a prior ruling, a document, a link. What the board is arguing from belongs ' +
+    'beside the argument, not in someone\u2019s memory of the meeting.',
+  'evidence.label': 'What it is',
+  'evidence.labelHint': 'AAOIFI Shariah Standard No. 21',
+  'evidence.ref': 'Where it is',
+  'evidence.refHint': 'Clause 3/1, or a URL, or a matter id',
+  'evidence.note': 'Why it is here',
+  'evidence.noteHint': 'The sentence the citation itself does not carry.',
+  'evidence.withdraw': 'Withdraw this',
+  'evidence.withdrawn': 'Withdrawn',
+  'evidence.withdrawnNote':
+    'Offered and taken back by the member who attached it. It no longer counts as evidence and ' +
+    'stays here, because what was offered is part of how the board arrived.',
+  'evidence.closed':
+    'Evidence closed when the matter did. A source added after a decision is not a source the ' +
+    'decision rested on.',
+  'evidence.kind.standard': 'Standard',
+  'evidence.kind.ruling': 'Ruling',
+  'evidence.kind.document': 'Document',
+  'evidence.kind.external': 'Link',
+  'evidence.kind.code': 'Code',
+  'evidence.kind.test': 'Test',
+  'evidence.kind.chain': 'Chain',
+
+  // ── the operative terms ──
+  'terms.title': 'The operative terms',
+  'terms.none': 'No terms have been set. The rule would carry none.',
+  'terms.set': 'Set the terms',
+  'terms.edit': 'Change the terms',
+  'terms.save': 'Save the terms',
+  'terms.help':
+    'Deciding to permit something is one act. Saying at what ratio, measured how often, and what ' +
+    'happens when it drifts is another \u2014 and it is the one an institution has to implement. ' +
+    'The plain-language meaning is required and is deliberately excluded from the hash, so ' +
+    'improving a wording never invalidates an approval.',
+  'terms.key': 'Term',
+  'terms.keyHint': 'tangible_ratio_min',
+  'terms.value': 'Value',
+  'terms.valueHint': '30',
+  'terms.unit': 'Unit',
+  'terms.unitHint': 'percent',
+  'terms.meaning': 'What it does',
+  'terms.meaningHint': 'Tangible assets as a share of total, below which it is not permitted.',
+  'terms.addRow': 'Add a term',
+  'terms.removeRow': 'Remove',
+  'terms.notFixed':
+    'The terms are not fixed yet. They are committed to when the vote opens, and every position ' +
+    'recorded afterwards carries that commitment.',
+  'terms.fixed': 'Committed to',
+  'terms.fixedNote':
+    'The terms stopped moving when the vote opened. Every position below was recorded against ' +
+    'this value, so whether a member approved exactly these terms is a comparison rather than a ' +
+    'recollection.',
+
   'who.role.signatory': 'Signatory',
   'who.role.advisory': 'Advisory',
   'who.role.liaison': 'Liaison',

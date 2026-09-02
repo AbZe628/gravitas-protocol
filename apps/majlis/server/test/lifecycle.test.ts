@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import type { Board, Matter, Rule } from '../src/types.js';
+import type { Board, Matter, Rule, RuleParameter, SourceRef } from '../src/types.js';
+import { verifyParameters } from '../src/services/hash.js';
 import {
   Refused,
   bringIntoForce,
@@ -14,7 +15,11 @@ import {
   ratificationDeadline,
   ratify,
   recordVote,
+  attachSource,
   returnToDeliberation,
+  setParameters,
+  standingSources,
+  withdrawSource,
   tally,
   withdraw,
 } from '../src/services/lifecycle.js';
@@ -429,5 +434,272 @@ describe('a vote can be returned to deliberation while it is still open', () => 
     expect(
       refusalCode(() => returnToDeliberation(board, openVote(), { scholarId: 's1', reason: '   ' }, T0)),
     ).toBe('no_reason_given');
+  });
+});
+
+// ── evidence ──────────────────────────────────────────────────────────────
+
+/*
+ * A matter could carry sources and nobody could add one. For a board whose
+ * entire output is reasoning, evidence that cannot be attached to the reasoning
+ * was the largest ordinary gap in the application.
+ */
+describe('evidence attaches to a matter', () => {
+  const cite = (over: Partial<SourceRef> = {}) => ({
+    kind: 'standard' as const,
+    label: 'AAOIFI Shariah Standard No. 21',
+    ref: 'AAOIFI SS 21, clauses 3/1 and 3/4',
+    ...over,
+  });
+
+  const open = () => matter({ status: 'deliberation' });
+
+  it('records who attached it and when', () => {
+    const m = attachSource(open(), { scholarId: 's1', source: cite() }, T0, 'src-1');
+    const [s] = m.sources;
+
+    expect(s.addedBy).toBe('s1');
+    expect(s.at).toBe(T0);
+    expect(s.id).toBe('src-1');
+    expect(s.kind).toBe('standard');
+    expect(s.withdrawnAt).toBeNull();
+  });
+
+  /*
+   * Attribution is not decoration. "The board decided X citing standard Y" and
+   * "a member cited Y and the board decided X anyway" are different records, and
+   * only one survives if nobody knows who attached what.
+   */
+  it('keeps two members citing different things apart', () => {
+    let m = attachSource(open(), { scholarId: 's1', source: cite() }, T0, 'a');
+    m = attachSource(m, { scholarId: 's2', source: cite({ ref: 'IFSB-17, section 4' }) }, T0, 'b');
+
+    expect(m.sources.map((s) => s.addedBy)).toEqual(['s1', 's2']);
+  });
+
+  it('carries the note explaining why it is here', () => {
+    const m = attachSource(
+      open(),
+      { scholarId: 's1', source: cite({ note: 'The tangible-asset ratio is defined here, not in 59.' }) },
+      T0,
+      'a',
+    );
+    expect(m.sources[0].note).toContain('tangible-asset ratio');
+  });
+
+  it('refuses the same reference twice', () => {
+    const m = attachSource(open(), { scholarId: 's1', source: cite() }, T0, 'a');
+    expect(
+      refusalCode(() => attachSource(m, { scholarId: 's2', source: cite() }, T0, 'b')),
+    ).toBe('already_cited');
+  });
+
+  it('refuses a label too short to find anything by', () => {
+    expect(
+      refusalCode(() => attachSource(open(), { scholarId: 's1', source: cite({ label: 'x' }) }, T0, 'a')),
+    ).toBe('no_reason_given');
+  });
+
+  /*
+   * Evidence closes when the matter does. A source added after a decision is not
+   * evidence the decision rested on, and admitting it would let the record be
+   * improved after the fact.
+   */
+  it('is refused once the matter is settled', () => {
+    for (const status of ['in_force', 'rejected', 'withdrawn', 'lapsed'] as const) {
+      expect(
+        refusalCode(() => attachSource(matter({ status }), { scholarId: 's1', source: cite() }, T0, 'a')),
+      ).toBe('wrong_status');
+    }
+  });
+
+  it('is open while the matter still is', () => {
+    for (const status of ['draft', 'deliberation', 'voting', 'timelock'] as const) {
+      expect(() =>
+        attachSource(matter({ status }), { scholarId: 's1', source: cite() }, T0, 'a'),
+      ).not.toThrow();
+    }
+  });
+});
+
+describe('a source is withdrawn, never deleted', () => {
+  const cited = () =>
+    attachSource(
+      matter({ status: 'deliberation' }),
+      { scholarId: 's1', source: { kind: 'ruling', label: 'A prior decision of this board', ref: 'matter-2026-01-08' } },
+      T0,
+      'src-1',
+    );
+
+  it('stops standing but stays in the record', () => {
+    const m = withdrawSource(cited(), { scholarId: 's1', sourceId: 'src-1' }, T0);
+
+    expect(m.sources).toHaveLength(1);
+    expect(m.sources[0].withdrawnAt).toBe(T0);
+    expect(standingSources(m)).toHaveLength(0);
+  });
+
+  /*
+   * One member deleting another's evidence is not a correction. It is an
+   * argument conducted by deletion, and the deliberation exists for the other
+   * kind.
+   */
+  it('can only be withdrawn by whoever attached it', () => {
+    expect(
+      refusalCode(() => withdrawSource(cited(), { scholarId: 's2', sourceId: 'src-1' }, T0)),
+    ).toBe('not_yours');
+  });
+
+  it('cannot be withdrawn twice', () => {
+    const m = withdrawSource(cited(), { scholarId: 's1', sourceId: 'src-1' }, T0);
+    expect(
+      refusalCode(() => withdrawSource(m, { scholarId: 's1', sourceId: 'src-1' }, T0)),
+    ).toBe('already_withdrawn');
+  });
+
+  it('refuses a source that is not there', () => {
+    expect(
+      refusalCode(() => withdrawSource(cited(), { scholarId: 's1', sourceId: 'nope' }, T0)),
+    ).toBe('not_found');
+  });
+
+  /* Withdrawing frees the reference: a mistyped citation can be corrected. */
+  it('frees the reference so a correction can be attached', () => {
+    const m = withdrawSource(cited(), { scholarId: 's1', sourceId: 'src-1' }, T0);
+    expect(() =>
+      attachSource(
+        m,
+        { scholarId: 's1', source: { kind: 'ruling', label: 'A prior decision of this board', ref: 'matter-2026-01-08' } },
+        T0,
+        'src-2',
+      ),
+    ).not.toThrow();
+  });
+});
+
+// ── the operative terms ───────────────────────────────────────────────────
+
+/*
+ * Every matter used to be created with an empty parameter list and an empty
+ * hash, and no route could fill either. A carefully designed integrity
+ * mechanism had nothing to work on, and a board could say "permit this asset"
+ * but not "at a ratio of 30%, measured quarterly".
+ */
+describe('the operative terms of a rule', () => {
+  const terms = (over: Partial<RuleParameter>[] = []) =>
+    over.length
+      ? (over as RuleParameter[])
+      : [
+          { key: 'tangible_ratio_min', value: '30', unit: 'percent', meaning: 'Tangible assets as a share of total assets, below which the instrument is not permitted.' },
+          { key: 'measurement', value: 'quarterly', meaning: 'How often the ratio is measured.' },
+        ];
+
+  const drafting = () => matter({ status: 'deliberation', deliberation: [said()] });
+
+  it('records the terms on the proposed rule', () => {
+    const m = setParameters(drafting(), terms());
+    expect(m.proposedRule.parameters).toHaveLength(2);
+    expect(m.proposedRule.parameters[0].value).toBe('30');
+    expect(m.proposedRule.parameters[0].unit).toBe('percent');
+  });
+
+  it('leaves the hash empty while the terms can still move', () => {
+    const m = setParameters(drafting(), terms());
+    expect(m.proposedRule.parameterHash).toBe('');
+  });
+
+  it('refuses two values for one term', () => {
+    expect(
+      refusalCode(() =>
+        setParameters(drafting(), [
+          { key: 'ratio', value: '30', meaning: 'One reading of it.' },
+          { key: 'ratio', value: '33', meaning: 'Another reading of it.' },
+        ]),
+      ),
+    ).toBe('duplicate_parameter');
+  });
+
+  it('requires the plain-language meaning', () => {
+    expect(
+      refusalCode(() => setParameters(drafting(), [{ key: 'ratio', value: '30', meaning: '' }])),
+    ).toBe('no_reason_given');
+  });
+
+  /*
+   * The terms are what the board is voting on. A set of terms that can move
+   * under a standing position is not a set anyone can be said to have approved.
+   */
+  it('cannot be changed once a vote is open', () => {
+    const voting = openVoting(setParameters(drafting(), terms()));
+    expect(refusalCode(() => setParameters(voting, terms()))).toBe('wrong_status');
+  });
+
+  it('cannot be changed after the matter is settled', () => {
+    for (const status of ['timelock', 'in_force', 'rejected', 'withdrawn'] as const) {
+      expect(refusalCode(() => setParameters(matter({ status }), terms()))).toBe('wrong_status');
+    }
+  });
+});
+
+describe('the hash fixes the terms when the vote opens', () => {
+  const withTerms = () =>
+    setParameters(matter({ status: 'deliberation', deliberation: [said()] }), [
+      { key: 'tangible_ratio_min', value: '30', unit: 'percent', meaning: 'The floor.' },
+    ]);
+
+  it('computes on opening and not before', () => {
+    const before = withTerms();
+    expect(before.proposedRule.parameterHash).toBe('');
+
+    const after = openVoting(before);
+    expect(after.proposedRule.parameterHash).toMatch(/^0x[0-9a-f]{64}$/);
+  });
+
+  it('commits to an empty set too, because that is also a statement', () => {
+    const m = openVoting(matter({ status: 'deliberation', deliberation: [said()] }));
+    expect(m.proposedRule.parameterHash).toMatch(/^0x[0-9a-f]{64}$/);
+  });
+
+  it('matches what verifyParameters recomputes', () => {
+    const m = openVoting(withTerms());
+    expect(verifyParameters(m.proposedRule.parameters, m.proposedRule.parameterHash)).toBe(true);
+  });
+
+  /*
+   * This is what makes the hash worth computing: "did this member approve these
+   * exact terms" becomes a comparison rather than an argument about what was on
+   * the screen at the time.
+   */
+  it('is recorded on every position taken against it', () => {
+    const voting = openVoting(withTerms());
+    const voted = recordVote(board, voting, { scholarId: 's1', position: 'for', reason: REASON }, T0);
+
+    expect(voted.reasoning[0].onParameterHash).toBe(voting.proposedRule.parameterHash);
+  });
+
+  /*
+   * Going back reopens the terms. Leaving the hash standing would say the board
+   * is still committed to terms nobody is currently voting on.
+   */
+  it('is cleared when the matter returns to deliberation', () => {
+    const voting = openVoting(withTerms());
+    const voted = recordVote(board, voting, { scholarId: 's1', position: 'for', reason: REASON }, T0);
+    const { matter: back } = returnToDeliberation(board, voted, { scholarId: 's1', reason: REASON }, T0);
+
+    expect(back.proposedRule.parameterHash).toBe('');
+    // The released position keeps the hash it was cast against, which is how
+    // anyone reading later can see what it was a position on.
+    expect(back.reasoning[0].onParameterHash).toBe(voting.proposedRule.parameterHash);
+  });
+
+  it('changes when the terms change, so a new vote is a new commitment', () => {
+    const first = openVoting(withTerms()).proposedRule.parameterHash;
+
+    const reopened = setParameters(matter({ status: 'deliberation', deliberation: [said()] }), [
+      { key: 'tangible_ratio_min', value: '33', unit: 'percent', meaning: 'The floor.' },
+    ]);
+    const second = openVoting(reopened).proposedRule.parameterHash;
+
+    expect(second).not.toBe(first);
   });
 });

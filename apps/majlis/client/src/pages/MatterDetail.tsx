@@ -4,6 +4,8 @@ import { api, type Matter } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { Card, DateText, ErrorText, Loading, Section, Sources, Tag } from '../components/ui.js';
 import Deliberation from '../components/Deliberation.js';
+import Evidence from '../components/Evidence.js';
+import Terms from '../components/Terms.js';
 import VotePanel from '../components/VotePanel.js';
 import { mayDeliberate, useIdentity } from '../lib/identity.js';
 
@@ -71,28 +73,25 @@ export default function MatterDetail() {
         <Card>
           <div className="mb-3 text-[14px] font-medium">{rule.title}</div>
           <p className="mb-4 text-[14px] text-paper/80">{rule.statement}</p>
-          <dl className="space-y-3">
-            {rule.parameters.map((p) => (
-              <div key={p.key} className="border-t border-line pt-3 first:border-0 first:pt-0">
-                <dt className="font-mono text-[12px] text-goldsoft break-all">
-                  {p.key} = {p.value}
-                  {p.unit ? <span className="text-muted"> {p.unit}</span> : null}
-                </dt>
-                <dd className="mt-1 text-[13px] text-paper/75">{p.meaning}</dd>
-              </div>
-            ))}
-          </dl>
-          <div className="mt-4 border-t border-line pt-3">
-            <div className="font-mono text-[10px] break-all text-muted">{rule.parameterHash}</div>
-            <div className="mt-1.5">
+
+          {/*
+            The terms, the hash and whether they can still be changed. A board
+            can decide to permit something; saying at what ratio, measured how
+            often, and what happens when it drifts is the part an institution
+            has to implement.
+          */}
+          <Terms matter={matter} canEdit={mayDeliberate(identity?.role)} onChanged={setMatter} />
+
+          {rule.parameterHash && (
+            <div className="mt-4 border-t border-line pt-3">
               {rule.parameterHashVerified ? (
                 <Tag tone="ok">{t('rule.hashOk')}</Tag>
               ) : (
                 <Tag tone="warn">{t('rule.hashBad')}</Tag>
               )}
+              <p className="mt-2 text-[12px] leading-relaxed text-muted">{t('rule.hashExplain')}</p>
             </div>
-            <p className="mt-2 text-[12px] leading-relaxed text-muted">{t('rule.hashExplain')}</p>
-          </div>
+          )}
         </Card>
       </Section>
 
@@ -144,6 +143,20 @@ export default function MatterDetail() {
         record of positions already taken: you read what was said, then act,
         then see where everyone stands.
       */}
+      {/*
+        Evidence sits before the tally on purpose: what the board is arguing
+        from is what a member needs in front of them before being asked to take
+        a position.
+      */}
+      <Section title={t('evidence.title')}>
+        <Evidence
+          matter={matter}
+          scholarId={identity?.scholarId}
+          canAttach={mayDeliberate(identity?.role)}
+          onChanged={setMatter}
+        />
+      </Section>
+
       <Section title={t('vote.tally')}>
         <VotePanel
           matter={matter}

@@ -1,15 +1,3 @@
-export interface SourceRef {
-  kind: 'code' | 'test' | 'document' | 'chain' | 'external';
-  label: string;
-  ref: string;
-}
-
-export interface RuleParameter {
-  key: string;
-  value: string;
-  unit?: string;
-  meaning: string;
-}
 
 export interface Rule {
   id: string;
@@ -62,11 +50,38 @@ export interface Deliberation {
   liaisonAnswer: boolean;
 }
 
+export type SourceKind = 'standard' | 'ruling' | 'document' | 'external' | 'code' | 'test' | 'chain';
+
+export const SOURCE_KINDS: readonly SourceKind[] = [
+  'standard', 'ruling', 'document', 'external', 'code', 'test', 'chain',
+];
+
+export interface SourceRef {
+  kind: SourceKind;
+  label: string;
+  ref: string;
+  id?: string;
+  addedBy?: string | null;
+  at?: string;
+  note?: string;
+  /** Set when withdrawn. It stops counting and stays visible. */
+  withdrawnAt?: string | null;
+}
+
+export interface RuleParameter {
+  key: string;
+  value: string;
+  unit?: string;
+  meaning: string;
+}
+
 export interface Reasoning {
   scholarId: string;
   position: 'for' | 'against' | 'abstain';
   reason: string;
   at: string;
+  /** The terms this position was taken on. Lets "did they approve these exact terms" be checked. */
+  onParameterHash?: string;
   /** Set when the matter returned to deliberation. The position stays; it stops counting. */
   releasedAt?: string | null;
 }
@@ -227,11 +242,16 @@ export class Refused extends Error {
   }
 }
 
-async function send<T>(path: string, body?: unknown): Promise<T> {
+async function send<T>(
+  path: string,
+  body?: unknown,
+  method: 'POST' | 'PUT' | 'DELETE' = 'POST',
+): Promise<T> {
   const res = await fetch(path, {
-    method: 'POST',
+    method,
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body ?? {}),
+    // A DELETE with a body confuses proxies more often than it helps.
+    body: method === 'DELETE' ? undefined : JSON.stringify(body ?? {}),
   });
 
   if (!res.ok) {
@@ -275,6 +295,18 @@ export const governance = {
 
   /** Return an open vote to deliberation. Every position cast on it is released. */
   reopen: (id: string, reason: string) => send<Matter>(`/api/matters/${id}/reopen`, { reason }),
+
+  /** Attach a source. Anyone who may deliberate. */
+  attachSource: (id: string, source: { kind: SourceKind; label: string; ref: string; note?: string }) =>
+    send<Matter>(`/api/matters/${id}/sources`, source),
+
+  /** Withdraw one you attached. Withdrawn, not deleted. */
+  withdrawSource: (id: string, sourceId: string) =>
+    send<Matter>(`/api/matters/${id}/sources/${sourceId}`, undefined, 'DELETE'),
+
+  /** Set the operative terms. Refused once a vote is open. */
+  setParameters: (id: string, parameters: RuleParameter[]) =>
+    send<Matter>(`/api/matters/${id}/parameters`, { parameters }, 'PUT'),
 
   object: (id: string, reason: string) => send<Matter>(`/api/matters/${id}/object`, { reason }),
   bringIntoForce: (id: string) => send<Matter>(`/api/matters/${id}/force`),

@@ -90,10 +90,61 @@ export interface Rule {
   sources: SourceRef[];
 }
 
+export type SourceKind =
+  /** A published standard: AAOIFI, IFSB, a central bank circular. */
+  | 'standard'
+  /** A ruling that already exists — this board's or another's. */
+  | 'ruling'
+  /** Something written down: a memo, an opinion, a file. */
+  | 'document'
+  /** Somewhere on the web. */
+  | 'external'
+  /** The contracts themselves. */
+  | 'code'
+  /** A test that demonstrates a behaviour. */
+  | 'test'
+  /** An address or transaction on chain. */
+  | 'chain';
+
+export const SOURCE_KINDS: readonly SourceKind[] = [
+  'standard', 'ruling', 'document', 'external', 'code', 'test', 'chain',
+];
+
 export interface SourceRef {
-  kind: 'code' | 'test' | 'document' | 'chain' | 'external';
+  kind: SourceKind;
+  /** What it is, in the words a reader would look for. */
   label: string;
+  /** Where it is: a citation, a URL, a path, an address. */
   ref: string;
+
+  /**
+   * Everything below is optional, because the record already holds sources that
+   * predate it and rewriting history to add fields would be its own kind of lie.
+   */
+
+  /** Stable enough to withdraw one without withdrawing its neighbour. */
+  id?: string;
+  /** Who attached it. Absent on sources that came with the seed. */
+  addedBy?: string | null;
+  at?: string;
+  /** Why this is here — the sentence a reader needs and the citation does not give. */
+  note?: string;
+
+  /**
+   * Withdrawn rather than deleted, like a released vote: a member who cited
+   * something and then thought better of it is part of how the board reasoned,
+   * and a record that loses that is not a record.
+   */
+  withdrawnAt?: string | null;
+
+  /**
+   * Set when the source is an uploaded file rather than a citation. Declared
+   * now and unused: storage here is not durable, and a feature that silently
+   * loses a scholar's document is worse than one that does not exist. When a
+   * volume is mounted, an upload becomes a source of kind 'document' carrying
+   * this, and nothing written before then needs migrating.
+   */
+  file?: { name: string; bytes: number; mediaType: string; key: string } | null;
 }
 
 export interface Reasoning {
@@ -102,6 +153,18 @@ export interface Reasoning {
   /** A vote is not accepted without a written reason. */
   reason: string;
   at: string;
+  /**
+   * The parameter hash as it stood when this position was recorded.
+   *
+   * This is what makes the hash worth computing. "Did this member approve these
+   * exact terms" becomes a comparison rather than an argument about what was on
+   * the screen at the time — and if the terms are ever changed under a standing
+   * vote, the mismatch is visible instead of silent.
+   *
+   * Absent on positions recorded before the field existed.
+   */
+  onParameterHash?: string;
+
   /**
    * When this position stopped counting, if it has.
    *
