@@ -11,13 +11,20 @@
  * accident, and the bug that produces surfaces far away from the cause.
  */
 
-import type { AssistantExchange, Board, Briefing, Matter, Rule } from '../types.js';
-import { boards as seedBoards, briefings as seedBriefings, matters as seedMatters, rules as seedRules } from '../data/seed.js';
+import type { AssistantExchange, Board, Briefing, Institution, Matter, Rule } from '../types.js';
+import {
+  boards as seedBoards,
+  briefings as seedBriefings,
+  institutions as seedInstitutions,
+  matters as seedMatters,
+  rules as seedRules,
+} from '../data/seed.js';
 import { ASSISTANT_LOG_MAX, NotFound, type Store } from './store.js';
 
 const copy = <T>(value: T): T => structuredClone(value);
 
 export interface MemorySeed {
+  institutions?: Institution[];
   boards?: Board[];
   rules?: Rule[];
   matters?: Matter[];
@@ -28,6 +35,7 @@ export class MemoryStore implements Store {
   /** Nothing here outlives the process, so the record began when it did. */
   readonly startedAt: string = new Date().toISOString();
 
+  private readonly _institutions: Institution[];
   private readonly _boards: Board[];
   private readonly _rules: Rule[];
   private readonly _matters: Map<string, Matter>;
@@ -35,10 +43,19 @@ export class MemoryStore implements Store {
   private readonly _log: AssistantExchange[] = [];
 
   constructor(seed: MemorySeed = {}) {
+    this._institutions = copy(seed.institutions ?? seedInstitutions);
     this._boards = copy(seed.boards ?? seedBoards);
     this._rules = copy(seed.rules ?? seedRules);
     this._briefings = copy(seed.briefings ?? seedBriefings);
     this._matters = new Map((seed.matters ?? seedMatters).map((m) => [m.id, copy(m)]));
+  }
+
+  async institutions(): Promise<Institution[]> {
+    return copy(this._institutions);
+  }
+
+  async institution(id: string): Promise<Institution | null> {
+    return copy(this._institutions.find((i) => i.id === id) ?? null);
   }
 
   async boards(): Promise<Board[]> {

@@ -1,4 +1,4 @@
-import type { Board, Matter, Briefing, Rule } from '../types.js';
+import type { Board, Institution, Matter, Briefing, Rule } from '../types.js';
 import { hashParameters } from '../services/hash.js';
 
 /**
@@ -19,9 +19,18 @@ import { hashParameters } from '../services/hash.js';
  * constraint is the reason the placeholders are unnamed.
  */
 
+export const institutions: Institution[] = [
+  {
+    id: 'demo-institution',
+    name: 'Demonstration Institution (illustrative data only)',
+    shortName: 'Demonstration',
+  },
+];
+
 export const boards: Board[] = [
   {
     id: 'demo-board',
+    institutionId: 'demo-institution',
     name: 'Demonstration Board (illustrative data only)',
     quorumPermit: 3,
     quorumRestrict: 2,

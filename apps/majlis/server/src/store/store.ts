@@ -19,7 +19,7 @@
  * so they drop straight in.
  */
 
-import type { AssistantExchange, Board, Briefing, Matter, Rule } from '../types.js';
+import type { AssistantExchange, Board, Briefing, Institution, Matter, Rule } from '../types.js';
 
 export class NotFound extends Error {
   constructor(what: string, id: string) {
@@ -29,6 +29,12 @@ export class NotFound extends Error {
 }
 
 export interface Store {
+  /**
+   * The institutions this store can see. A scoped store sees exactly one.
+   */
+  institutions(): Promise<Institution[]>;
+  institution(id: string): Promise<Institution | null>;
+
   /**
    * When this record began, if it knows. Null means it cannot say, which is
    * itself an answer and better than a date it made up.

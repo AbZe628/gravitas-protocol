@@ -31,12 +31,20 @@
 
 import { appendFileSync, mkdirSync, readFileSync, renameSync, writeFileSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
-import type { AssistantExchange, Board, Briefing, Matter, Rule } from '../types.js';
-import { boards as seedBoards, briefings as seedBriefings, matters as seedMatters, rules as seedRules } from '../data/seed.js';
+import type { AssistantExchange, Board, Briefing, Institution, Matter, Rule } from '../types.js';
+import {
+  boards as seedBoards,
+  briefings as seedBriefings,
+  institutions as seedInstitutions,
+  matters as seedMatters,
+  rules as seedRules,
+} from '../data/seed.js';
 import { ASSISTANT_LOG_MAX, NotFound, type Store } from './store.js';
 
 interface Document {
   version: 1;
+  /** Whose boards these are. See store/tenant.ts for why this exists. */
+  institutions?: Institution[];
   /**
    * When this record began. Written once, when the document is first created,
    * and carried through every write after that.
@@ -140,6 +148,7 @@ export class FileStore implements Store {
         : {
             version: 1,
             startedAt,
+            institutions: copy(seedInstitutions),
             boards: copy(seedBoards),
             rules: copy(seedRules),
             matters: copy(seedMatters),
@@ -170,6 +179,14 @@ export class FileStore implements Store {
     // unhandled rejection escape from the queue itself.
     this.queue = next.catch(() => undefined);
     return next;
+  }
+
+  async institutions(): Promise<Institution[]> {
+    return copy(this.doc.institutions ?? []);
+  }
+
+  async institution(id: string): Promise<Institution | null> {
+    return copy((this.doc.institutions ?? []).find((i) => i.id === id) ?? null);
   }
 
   async boards(): Promise<Board[]> {

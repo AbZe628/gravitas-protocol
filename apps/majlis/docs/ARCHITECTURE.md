@@ -58,6 +58,7 @@ server  Express · TypeScript
   ├── attention     what is waiting for you
   ├── search        retrieval, with an explainable ranking
   ├── precedent     what the board already decided about this
+  ├── tenant        one institution, enforced at the boundary
   ├── enforcement   adapter · none by default
   ├── comprehension adapter · off by default
   ├── assistant     three-gate constraint against rulings
@@ -105,7 +106,7 @@ first three; voting and objecting belong to signatories. Without
 12 governance routes, each applying its change inside `store.updateMatter` so the
 rules run against the stored matter in a transaction and a refusal writes nothing.
 
-**328 server tests, 26 client.**
+**344 server tests, 26 client.**
 
 ### Deployment
 
@@ -160,6 +161,29 @@ some will forbid sending it anywhere; that is a configuration, not a rebuild.
 An installation that quietly started sending deliberation to a third party
 because a key happened to be in the environment would be the wrong default.
 
+**3.5 Every board belongs to an institution.** `Institution` is a first-class
+type and isolation is enforced **at the store boundary rather than in the
+routes** — thirty-two routes would be thirty-two chances to forget, and
+forgetting once means one institution's deliberation reaching another. A route
+is handed a store scoped to one institution and cannot reach outside it.
+
+Two rules run through it. **Absence, not refusal**: asking for another
+institution's matter returns null exactly as asking for one that does not exist
+does, because a refusal would confirm it exists and let an outsider map a record
+by probing. **Writes are checked, not filtered**: a write aimed elsewhere is a
+fault in the caller and is refused loudly, since dropping it silently would
+leave them believing it happened.
+
+The assistant log carries an institution too — it holds members' questions,
+which could not be scoped before. Entries written before the field existed are
+returned only where there is exactly one institution and nothing they could
+ambiguously belong to.
+
+`MAJLIS_INSTITUTION` names which institution a service is for, and where the
+record holds several and nothing says which, **the service refuses to start**.
+A single deployment per institution is still what a bank will ask for; this
+makes the record correct either way.
+
 **An installation with neither attached is the ordinary one.** The navigation
 stops offering an assistant that is not there; the dashboard says nothing is
 attached rather than showing an empty address and an unreachable badge; the boot
@@ -169,10 +193,6 @@ Both are inferred from existing configuration, so no running installation lost
 anything on upgrade.
 
 ### Still open
-
-**3.5 There is no institution.** `boardId` exists; a tenant owning boards,
-users, retention and branding does not. No bank shares a database with another
-bank. **This is the next structural piece.**
 
 **3.6 Identity does not suit an institution.** Still a password per member. A
 bank requires OIDC or SAML, and a scholar will not manage another credential.
@@ -297,8 +317,11 @@ cannot justify.
    configuration so no running installation lost anything on upgrade. Storage
    has been an adapter since the store interface; **identity has not been done**
    — it is still a password per member, and an institution needs OIDC or SAML.
-6. **Institution** as a tenant. Not started: `boardId` exists, a tenant owning
-   boards, users, retention and branding does not.
+6. **Institution** as a tenant. *Done for the record.* Every board belongs to an
+   institution and isolation is enforced at the store boundary, with sixteen
+   tests holding it. What remains is the part that needs identity: members are
+   still configured per deployment rather than per institution, so serving two
+   institutions from one service needs the identity adapter first.
 
 **Fourth — reduce the work.**
 7. Assistant in context of a matter · what changed since you last looked ·

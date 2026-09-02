@@ -48,8 +48,35 @@ export interface Scholar {
   signatory: boolean;
 }
 
+/**
+ * Whose boards these are.
+ *
+ * A Shariah board belongs to an institution, and **no bank shares a database
+ * with another bank.** That sentence is the whole reason this type exists: not
+ * to add a label to a board, but to give isolation somewhere to be enforced.
+ *
+ * Isolation is enforced at the store boundary rather than in each route. There
+ * are thirty-two routes and twelve store methods; scoping the routes would be
+ * thirty-two chances to forget, and forgetting once means one institution's
+ * deliberation reaching another. A route is handed a store that is already
+ * scoped and cannot reach outside it.
+ *
+ * **A single deployment per institution remains the arrangement a bank will
+ * actually ask for**, and this does not replace it. What it does is make the
+ * record correct either way, so serving two institutions is a deployment
+ * decision rather than a rewrite.
+ */
+export interface Institution {
+  id: string;
+  name: string;
+  /** How the institution refers to itself, where a name is too long to show. */
+  shortName?: string;
+}
+
 export interface Board {
   id: string;
+  /** Whose board this is. Everything below a board inherits its institution. */
+  institutionId: string;
   name: string;
   /** Signatures required for an ordinary (permitting) change. */
   quorumPermit: number;
@@ -273,6 +300,16 @@ export interface Briefing {
 /** A retained exchange with the comprehension assistant. */
 export interface AssistantExchange {
   id: string;
+  /**
+   * Whose question this was.
+   *
+   * The text of a member's question is deliberation-adjacent and among the most
+   * sensitive this record holds, so it must be able to say which institution it
+   * belongs to. Optional because entries written before the field existed carry
+   * none; a scoped store returns those only where there is exactly one
+   * institution and nothing they could ambiguously belong to.
+   */
+  institutionId?: string;
   at: string;
   scholarId: string | null;
   question: string;

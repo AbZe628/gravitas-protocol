@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import { createApp } from './app.js';
 import { assertConfiguredForProduction } from './middleware/basicAuth.js';
+import { scopeToInstitution } from './store/index.js';
 import { enforcementFromEnv } from './services/enforcement.js';
 import { comprehensionFromEnv } from './services/comprehension.js';
 import { storeFromEnv } from './store/index.js';
@@ -17,7 +18,14 @@ assertConfiguredForProduction();
  * not start.
  */
 const store = storeFromEnv();
-const app = createApp(store);
+
+/*
+ * Scoped before a single route can touch it. Isolation lives at the store
+ * boundary rather than in the routes, so a route cannot reach another
+ * institution even by mistake — see store/tenant.ts.
+ */
+const scoped = await scopeToInstitution(store);
+const app = createApp(scoped);
 
 /*
  * Deadlines pass whether or not anyone is looking. A restriction whose
