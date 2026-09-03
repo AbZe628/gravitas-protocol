@@ -367,3 +367,65 @@ describe('attention is personal and derived', () => {
     expect(res.body.items).toEqual([]);
   });
 });
+
+describe('the pace of the board, over HTTP', () => {
+  const pace = async (who = 'member-a') =>
+    (await request(app).get('/api/pace').set('Authorization', as(who)).expect(200)).body;
+
+  it('answers for the seeded board and dates its answer', async () => {
+    const body = await pace();
+    expect(body.boards).toHaveLength(1);
+    expect(body.boards[0].boardId).toBe('demo-board');
+    expect(body.asOf).toBeTruthy();
+  });
+
+  it('counts a newly opened matter as one more thing waiting', async () => {
+    const before = await pace();
+    const id = await openMatter();
+    const after = await pace();
+
+    expect(after.boards[0].open).toBe(before.boards[0].open + 1);
+    expect(after.waiting.some((w: { matterId: string }) => w.matterId === id)).toBe(true);
+
+    const mine = after.waiting.find((w: { matterId: string }) => w.matterId === id);
+    expect(mine.phase).toBe('deliberation');
+    // Nothing recorded when the institution first asked, so the figure is
+    // honest about covering only the part this system witnessed.
+    expect(mine.partial).toBe(true);
+  });
+
+  it('stops counting a matter once the board is done with it', async () => {
+    const id = await openMatter();
+    const openWhileLive = (await pace()).boards[0].open;
+
+    await request(app).post(`/api/matters/${id}/withdraw`).set('Authorization', as('member-a')).expect(200);
+
+    const after = await pace();
+    expect(after.boards[0].open).toBe(openWhileLive - 1);
+    expect(after.waiting.some((w: { matterId: string }) => w.matterId === id)).toBe(false);
+  });
+
+  it('orders what is waiting with the longest first', async () => {
+    await openMatter();
+    await openMatter();
+    const { waiting } = await pace();
+    const hours = waiting.map((w: { hours: number }) => w.hours);
+    expect([...hours].sort((a: number, b: number) => b - a)).toEqual(hours);
+  });
+
+  it('is open to an observer, who could not otherwise report on the board', async () => {
+    await pace('watcher');
+  });
+
+  it('refuses anonymously, like every other read', async () => {
+    await request(app).get('/api/pace').expect(401);
+  });
+
+  it('says so when asked about a board that does not exist', async () => {
+    const res = await request(app)
+      .get('/api/pace?board=no-such-board')
+      .set('Authorization', as('member-a'))
+      .expect(404);
+    expect(res.body.error).toBe('not_found');
+  });
+});

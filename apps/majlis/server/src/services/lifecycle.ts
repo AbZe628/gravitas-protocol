@@ -484,9 +484,12 @@ export function closeVoting(board: Board, matter: Matter, at: string): Closed {
   requireStatus(matter, ['voting']);
   const result = tally(board, matter);
 
+  // The vote closing is the moment the board's part ends, whichever way it
+  // went. A permit still has its timelock to run, but that is the system
+  // waiting deliberately rather than the board taking time.
   if (!result.met) {
     return {
-      matter: { ...matter, status: 'rejected' },
+      matter: { ...matter, status: 'rejected', settledAt: at },
       outcome: 'rejected',
     };
   }
@@ -494,14 +497,20 @@ export function closeVoting(board: Board, matter: Matter, at: string): Closed {
   const hours = TIMELOCK_HOURS[matter.direction];
   if (hours === 0) {
     return {
-      matter: { ...matter, status: 'in_force', inForceAt: at },
+      matter: { ...matter, status: 'in_force', inForceAt: at, settledAt: at },
       outcome: 'in_force',
     };
   }
 
   const ends = new Date(new Date(at).getTime() + hours * 3_600_000).toISOString();
   return {
-    matter: { ...matter, status: 'timelock', timelockStartedAt: at, timelockEndsAt: ends },
+    matter: {
+      ...matter,
+      status: 'timelock',
+      timelockStartedAt: at,
+      timelockEndsAt: ends,
+      settledAt: at,
+    },
     outcome: 'timelock_started',
   };
 }
@@ -522,7 +531,12 @@ export function objectDuringTimelock(
   const reason = requireReason(objection.reason, 'An objection');
 
   const recorded: Objection = { scholarId: objection.scholarId, reason, at };
-  return { ...matter, status: 'rejected', objections: [...matter.objections, recorded] };
+  return {
+    ...matter,
+    status: 'rejected',
+    settledAt: at,
+    objections: [...matter.objections, recorded],
+  };
 }
 
 export function timelockElapsed(matter: Matter, now: string): boolean {
@@ -593,12 +607,18 @@ export function hasLapsed(board: Board, matter: Matter, now: string): boolean {
   return new Date(now).getTime() > new Date(deadline).getTime();
 }
 
-export function lapse(matter: Matter): Matter {
+/**
+ * `at` is optional on both of these because callers predate it. Supplying it
+ * records exactly when the matter stopped needing the board; omitting it leaves
+ * the pace calculation to fall back on the record's last event, which is
+ * approximate and says so rather than inventing a precise-looking figure.
+ */
+export function lapse(matter: Matter, at?: string): Matter {
   requireStatus(matter, ['in_force']);
-  return { ...matter, status: 'lapsed' };
+  return { ...matter, status: 'lapsed', ...(at ? { settledAt: at } : {}) };
 }
 
-export function withdraw(matter: Matter): Matter {
+export function withdraw(matter: Matter, at?: string): Matter {
   requireStatus(matter, ['draft', 'deliberation', 'voting', 'timelock']);
-  return { ...matter, status: 'withdrawn' };
+  return { ...matter, status: 'withdrawn', ...(at ? { settledAt: at } : {}) };
 }

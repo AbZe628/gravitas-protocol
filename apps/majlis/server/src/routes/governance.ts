@@ -39,6 +39,7 @@ import {
   withdraw,
 } from '../services/lifecycle.js';
 import { attentionList } from '../services/attention.js';
+import { paceOf, waitingNow } from '../services/clocks.js';
 import { search, type SearchFilters } from '../services/search.js';
 import { relatedTo } from '../services/precedent.js';
 import { NotFound, type Store } from '../store/index.js';
@@ -493,17 +494,11 @@ export function governanceRoutes(store: Store, now: () => string = () => new Dat
     handle(async (req, res) => {
       const who = identityOf(req);
       if (!requireRole(res, mayDeliberate(who.role), 'withdraw a matter')) return;
-      res.json(await store.updateMatter(req.params.id, withdraw));
+      const at = new Date().toISOString();
+      res.json(await store.updateMatter(req.params.id, (m) => withdraw(m, at)));
     }),
   );
 
-  /**
-   * What this member still has to do, soonest deadline first.
-   *
-   * Derived from the record rather than kept as a queue, so it cannot drift
-   * from what is actually true. Personal: "three matters need attention" is
-   * not useful to someone who has already acted on all three.
-   */
   /**
    * Search the record.
    *
@@ -556,6 +551,13 @@ export function governanceRoutes(store: Store, now: () => string = () => new Dat
     }),
   );
 
+  /**
+   * What this member still has to do, soonest deadline first.
+   *
+   * Derived from the record rather than kept as a queue, so it cannot drift
+   * from what is actually true. Personal: "three matters need attention" is
+   * not useful to someone who has already acted on all three.
+   */
   router.get(
     '/attention',
     handle(async (req, res) => {
@@ -568,6 +570,40 @@ export function governanceRoutes(store: Store, now: () => string = () => new Dat
         outstanding: items.length,
         overdue: items.filter((i) => i.overdue).length,
         items,
+      });
+    }),
+  );
+
+  /**
+   * How long the board takes, and what is waiting on it now.
+   *
+   * The counterpart to `/attention`: that one is personal and asks what *you*
+   * owe, this one is institutional and asks what the board is costing the
+   * business. It is the only figure here that measures the board rather than
+   * its decisions, which is why it is deliberately plain about its own limits —
+   * `approximate` is true whenever any arrival or settlement had to be inferred.
+   *
+   * Open to observers. An auditor who cannot see how long a board takes cannot
+   * report on it.
+   */
+  router.get(
+    '/pace',
+    handle(async (req, res) => {
+      const at = now();
+      const [boards, matters] = await Promise.all([store.boards(), store.matters()]);
+
+      const wanted = typeof req.query.board === 'string' ? req.query.board : null;
+      const scoped = wanted ? boards.filter((b) => b.id === wanted) : boards;
+
+      if (wanted && scoped.length === 0) {
+        res.status(404).json({ error: 'not_found', message: 'No such board.' });
+        return;
+      }
+
+      res.json({
+        asOf: at,
+        boards: scoped.map((b) => paceOf(b, matters, at)),
+        waiting: waitingNow(scoped, matters, at),
       });
     }),
   );

@@ -245,6 +245,36 @@ export interface Matter {
   status: MatterStatus;
   openedAt: string;
 
+  /**
+   * When the institution first asked, as against when it reached this system.
+   *
+   * These are not the same date and pretending they are would flatter the
+   * board. A business unit that raised a structure by email three weeks before
+   * anybody opened a matter has been waiting three weeks, and a measurement
+   * that starts at `openedAt` reports a board deciding in four days when the
+   * institution experienced twenty-five.
+   *
+   * Optional, and absent on everything recorded before it existed. Where it is
+   * absent the wait is measured from `openedAt` and the figure is marked as
+   * measuring only the part this system can see — an understated number that
+   * says so beats a confident one that is wrong.
+   */
+  arrivedAt?: string;
+
+  /**
+   * When the board's part ended: the vote closed, an objection halted it, it
+   * was withdrawn, or it lapsed.
+   *
+   * Deliberately not the same as `inForceAt`. A permitting change sits in a
+   * 48-hour timelock *after* the board has decided, and that delay is a
+   * deliberate safety property rather than slowness — charging it to the
+   * board's pace would punish the system for working as designed.
+   *
+   * Absent on matters settled before the field existed; the record's last
+   * event stands in, which is approximate and reported as such.
+   */
+  settledAt?: string;
+
   /** What is proposed, in ordinary language. */
   proposal: string;
   /** What is expressly NOT being decided. Prevents narrow approvals being

@@ -46,7 +46,7 @@ export async function sweep(store: Store, now: () => string = () => new Date().t
     try {
       const updated = await store.updateMatter(matter.id, (current) => {
         if (current.status !== 'in_force' || !hasLapsed(board, current, at)) return current;
-        return lapse(current);
+        return lapse(current, at);
       });
       if (updated.status === 'lapsed') lapsedNow.push(updated);
     } catch {
