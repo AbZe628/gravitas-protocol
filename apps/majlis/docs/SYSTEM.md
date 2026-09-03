@@ -326,11 +326,27 @@ product.
    Web2 · a document           Web3 · the registry
 ```
 
-**Web2 — ✎ the export is JSON with a sha256 document hash (✅). It needs to
-become finished work:**
+**Web2 — ✅ the document is built (`services/fatwa.ts`), alongside the JSON
+audit export:**
 
-- The **fatwa PDF** — ruling, conditions, implementation steps, evidence,
-  signatures, dissent, date, canonical hash. Not a data dump.
+- The **fatwa** ✅ — ruling, conditions, mechanism, evidence, signatures,
+  dissent, dates, canonical hash. A self-contained page designed for print, with
+  nothing fetched from a network: a document a bank files with its regulator has
+  to render the same in five years, and anything loaded at open time can stop
+  existing. No headless browser is carried to produce it — the reader's own
+  browser saves the same page as a PDF, and a server-side engine later consumes
+  the same `Fatwa` structure.
+  - It **assembles and never composes.** Every sentence was written by a member
+    of the board or by the institution: no summary of the deliberation, no
+    tidier restatement of anyone's reasoning, no generated preamble.
+  - It **refuses to look final before it is.** A matter in deliberation or
+    voting produces no document at all — a business unit handed a
+    plausible-looking page for an open question will act on it.
+  - It **checks the hash instead of printing it.** Where the stored terms do not
+    produce the stored hash, the document says so in place of the reassuring
+    hex string.
+  - Refusals, lapses and withdrawals get a document too. "The board did not
+    approve this" is something the business needs in writing.
 - The **compliance manual entry** (IFSB GN-6), added as it takes effect
 - The **regulator submission** for an SNC
 - The **annual report**, assembled from the year, opinion blank
@@ -415,8 +431,8 @@ than a form.
 
 ### Block 2 — the record becomes a product
 
-PostgreSQL + RLS behind `Store` · JWT + OAuth · **fatwa PDF** · compliance manual
-· annual report assembly · calendar feed · digests · @mentions
+**Fatwa document ✅** · PostgreSQL + RLS behind `Store` · JWT + OAuth ·
+compliance manual · annual report assembly · calendar feed · digests · @mentions
 
 ### Block 3 — the chain
 

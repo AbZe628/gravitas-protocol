@@ -41,6 +41,7 @@ import {
 } from '../services/lifecycle.js';
 import { attentionList } from '../services/attention.js';
 import { paceOf, waitingNow } from '../services/clocks.js';
+import { assemble, render } from '../services/fatwa.js';
 import { reviewStatus, reviewsDue } from '../services/review.js';
 import { BadFigure, assess, crossings, type Assessment, type Figures } from '../services/screening.js';
 import { search, type SearchFilters } from '../services/search.js';
@@ -633,6 +634,39 @@ export function governanceRoutes(store: Store, now: () => string = () => new Dat
         }
         throw e;
       }
+    }),
+  );
+
+  /**
+   * The document, at the moment of decision.
+   *
+   * The Web2 half of the whole thesis: a bank that waits nine weeks for a
+   * meeting and three more for the minutes has not been helped by software that
+   * only holds the vote.
+   *
+   * HTML by default and designed for print — a browser saves it as a PDF
+   * identically, and no headless engine is carried to achieve that. `?format=json`
+   * returns the same structure for a bank rendering its own template.
+   *
+   * Open to observers: the auditor and the regulator are who it is for.
+   */
+  router.get(
+    '/matters/:id/fatwa',
+    handle(async (req, res) => {
+      const board = await boardFor(store, res, req.params.id);
+      if (!board) return;
+
+      const matter = await store.matter(req.params.id);
+      if (!matter) return;
+
+      const fatwa = assemble(board, matter, now());
+
+      if (req.query.format === 'json') {
+        res.json(fatwa);
+        return;
+      }
+
+      res.type('html').send(render(fatwa));
     }),
   );
 

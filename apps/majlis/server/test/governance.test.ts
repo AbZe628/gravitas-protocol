@@ -535,3 +535,58 @@ describe('reviews and screening, over HTTP', () => {
     expect(res.body.error).toBe('no_figures');
   });
 });
+
+describe('the document, over HTTP', () => {
+  it('refuses to produce one for a matter still being decided', async () => {
+    const id = await openMatter();
+    const res = await request(app)
+      .get(`/api/matters/${id}/fatwa`)
+      .set('Authorization', as('member-a'))
+      .expect(409);
+    expect(res.body.error).toBe('wrong_status');
+    expect(res.body.message).toContain('will be acted on');
+  });
+
+  it('serves a whole printable page once the board has decided', async () => {
+    const id = await openMatter();
+    await say(id, 'member-a');
+    await request(app).post(`/api/matters/${id}/voting`).set('Authorization', as('member-a')).expect(200);
+    for (const who of ['member-a', 'member-b', 'member-c']) await vote(id, who).expect(201);
+    await request(app).post(`/api/matters/${id}/close`).set('Authorization', as('member-a')).expect(200);
+
+    const res = await request(app)
+      .get(`/api/matters/${id}/fatwa`)
+      .set('Authorization', as('member-a'))
+      .expect(200);
+
+    expect(res.headers['content-type']).toContain('text/html');
+    expect(res.text.startsWith('<!doctype html>')).toBe(true);
+    expect(res.text).toContain('What this does not decide');
+    expect(res.text).toContain('@page');
+    expect(res.text).not.toContain('<script');
+  });
+
+  it('returns the same document as data for a bank rendering its own template', async () => {
+    const id = await openMatter();
+    await request(app).post(`/api/matters/${id}/withdraw`).set('Authorization', as('member-a')).expect(200);
+
+    const res = await request(app)
+      .get(`/api/matters/${id}/fatwa?format=json`)
+      .set('Authorization', as('member-a'))
+      .expect(200);
+
+    expect(res.body.kind).toBe('withdrawn');
+    expect(res.body.reference).toBe(id);
+    expect(Array.isArray(res.body.notDecided)).toBe(true);
+  });
+
+  it('is open to an observer, who is who it is for', async () => {
+    const id = await openMatter();
+    await request(app).post(`/api/matters/${id}/withdraw`).set('Authorization', as('member-a')).expect(200);
+    await request(app).get(`/api/matters/${id}/fatwa`).set('Authorization', as('watcher')).expect(200);
+  });
+
+  it('404s for a matter that is not there', async () => {
+    await request(app).get('/api/matters/no-such/fatwa').set('Authorization', as('member-a')).expect(404);
+  });
+});
