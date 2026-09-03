@@ -9,6 +9,7 @@ import Evidence from '../components/Evidence.js';
 import Precedent from '../components/Precedent.js';
 import Terms from '../components/Terms.js';
 import { DocumentLink } from '../components/Documents.js';
+import Screening from '../components/Screening.js';
 import VotePanel from '../components/VotePanel.js';
 import { mayDeliberate, useIdentity } from '../lib/identity.js';
 
@@ -191,6 +192,17 @@ export default function MatterDetail() {
         After the evidence and before the vote: what the board already decided
         about this is part of what a member should have in front of them.
       */}
+      {/*
+        A tool, not a finding. It sits beside the evidence because that is what
+        the arithmetic is: something the board looks at before ruling, in the
+        matter it is ruling on, rather than in a calculator somewhere else with
+        no record of what was computed or from whose figures.
+      */}
+      <Section title={t('screen.title')}>
+        <p className="mb-3 text-[13px] leading-relaxed text-muted">{t('screen.intro')}</p>
+        <Screening />
+      </Section>
+
       <Section title={t('related.title')}>
         <Precedent matterId={matter.id} />
       </Section>

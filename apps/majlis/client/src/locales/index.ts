@@ -24,6 +24,19 @@ export function dirFor(lang: Lang): 'ltr' | 'rtl' {
 type Dict = Record<string, string>;
 
 const en: Dict = {
+  'screen.title': "Screening ratios",
+  'screen.open': "Work out the screening ratios",
+  'screen.intro': "The software does the arithmetic and shows the sums. Whether the instrument is permissible is a ruling, and no ratio answers it.",
+  'screen.asOf': "Figures as at",
+  'screen.currency': "Currency",
+  'screen.marketCap': "Market capitalisation",
+  'screen.debt': "Interest-bearing debt",
+  'screen.cash': "Cash and interest-bearing securities",
+  'screen.revenue': "Total revenue",
+  'screen.nonPermissible': "Non-permissible income",
+  'screen.source': "Who supplied these figures",
+  'screen.sourceHint': "A ratio is only as good as its source",
+  'screen.compute': "Work it out",
   'rule.inForce': "in force",
   'doc.opens': "opens the document",
   'doc.fatwa': "The ruling, written up",
@@ -416,6 +429,19 @@ const en: Dict = {
 };
 
 const ar: Dict = {
+  'screen.title': "نسب الفرز",
+  'screen.open': "احسب نسب الفرز",
+  'screen.intro': "يقوم البرنامج بالحساب ويعرض العمليات. أما جواز الأداة فحكم لا تجيب عنه أي نسبة.",
+  'screen.asOf': "الأرقام بتاريخ",
+  'screen.currency': "العملة",
+  'screen.marketCap': "القيمة السوقية",
+  'screen.debt': "الدين بفائدة",
+  'screen.cash': "النقد والأوراق ذات الفائدة",
+  'screen.revenue': "إجمالي الإيرادات",
+  'screen.nonPermissible': "الدخل غير الجائز",
+  'screen.source': "من قدّم هذه الأرقام",
+  'screen.sourceHint': "النسبة بقدر مصدرها",
+  'screen.compute': "احسب",
   'rule.inForce': "سارية",
   'doc.opens': "يفتح المستند",
   'doc.fatwa': "الحكم، محرَّراً",
@@ -541,6 +567,19 @@ const ar: Dict = {
 };
 
 const ur: Dict = {
+  'screen.title': "اسکریننگ تناسب",
+  'screen.open': "اسکریننگ تناسب نکالیں",
+  'screen.intro': "سافٹ ویئر حساب کرتا ہے اور اعداد دکھاتا ہے۔ آلہ جائز ہے یا نہیں، یہ ایک حکم ہے جس کا جواب کوئی تناسب نہیں دیتا۔",
+  'screen.asOf': "اعداد بتاریخ",
+  'screen.currency': "کرنسی",
+  'screen.marketCap': "مارکیٹ کیپٹلائزیشن",
+  'screen.debt': "سودی قرض",
+  'screen.cash': "نقدی اور سودی سیکیورٹیز",
+  'screen.revenue': "کل آمدنی",
+  'screen.nonPermissible': "ناجائز آمدنی",
+  'screen.source': "یہ اعداد کس نے فراہم کیے",
+  'screen.sourceHint': "تناسب اتنا ہی معتبر جتنا اس کا ماخذ",
+  'screen.compute': "حساب کریں",
   'rule.inForce': "نافذ",
   'doc.opens': "دستاویز کھولتا ہے",
   'doc.fatwa': "فیصلہ، تحریری صورت میں",
