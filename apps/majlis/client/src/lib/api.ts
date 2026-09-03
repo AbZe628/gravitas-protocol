@@ -395,3 +395,263 @@ export const governance = {
   bringIntoForce: (id: string) => send<Matter>(`/api/matters/${id}/force`),
   withdraw: (id: string) => send<Matter>(`/api/matters/${id}/withdraw`),
 };
+
+// ── the clocks ────────────────────────────────────────────────────────────
+
+export type WaitPhase =
+  | 'unopened'
+  | 'deliberation'
+  | 'voting'
+  | 'timelock'
+  | 'ratification'
+  | 'settled';
+
+export interface Wait {
+  matterId: string;
+  boardId: string;
+  title: string;
+  status: string;
+  phase: WaitPhase;
+  hours: number;
+  days: number;
+  /** True where the wait covers only the part this system witnessed. */
+  partial: boolean;
+  inferredSettlement: boolean;
+  waitingOn: string[];
+  /** True when nothing is required of anyone and only time is passing. */
+  onTheClock: boolean;
+  note: string;
+}
+
+export interface BoardPace {
+  boardId: string;
+  settled: number;
+  medianDays: number | null;
+  fastestDays: number | null;
+  slowestDays: number | null;
+  open: number;
+  longestOpen: Wait | null;
+  approximate: boolean;
+}
+
+export interface PaceResponse {
+  asOf: string;
+  boards: BoardPace[];
+  waiting: Wait[];
+}
+
+// ── periodic review ───────────────────────────────────────────────────────
+
+export type ReviewState = 'scheduled' | 'due' | 'unscheduled' | 'not_applicable';
+
+export interface ReviewStatus {
+  ruleId: string;
+  boardId: string;
+  title: string;
+  state: ReviewState;
+  everyMonths: number | null;
+  dueAt: string | null;
+  daysUntilDue: number | null;
+  overdue: boolean;
+  note: string;
+}
+
+export interface ReviewsResponse {
+  asOf: string;
+  due: number;
+  unscheduled: number;
+  items: ReviewStatus[];
+}
+
+// ── reported non-compliance ───────────────────────────────────────────────
+
+export type IncidentStage =
+  | 'reported'
+  | 'not_actual'
+  | 'determined'
+  | 'plan_filed'
+  | 'endorsed'
+  | 'approved'
+  | 'submitted'
+  | 'closed';
+
+export interface RectificationClock {
+  deadline: string;
+  daysRemaining: number;
+  overdue: boolean;
+  planFiled: boolean;
+  note: string;
+}
+
+export interface Concurrence {
+  scholarId: string;
+  actual: boolean;
+  reason: string;
+  at: string;
+}
+
+export interface RectificationPlan {
+  filedBy: string;
+  filedAt: string;
+  steps: string[];
+  completeBy: string;
+  endorsedBy: string[];
+  endorsedAt: string | null;
+  returnedReason: string | null;
+}
+
+export interface Purification {
+  amount: string;
+  currency: string;
+  destination: string;
+  prescribedAt: string;
+  paidAt: string | null;
+  paidReference: string | null;
+}
+
+export interface Incident {
+  id: string;
+  boardId: string;
+  reference: string;
+  title: string;
+  report: string;
+  reportedBy: string;
+  reportedAt: string;
+  stage: IncidentStage;
+  concurrences: Concurrence[];
+  determinedAt: string | null;
+  actual: boolean | null;
+  stopped: string[];
+  plans: RectificationPlan[];
+  directorsApprovedAt: string | null;
+  submittedToRegulatorAt: string | null;
+  purification: Purification | null;
+  closedAt: string | null;
+  /** Present on a single incident read. */
+  plan?: RectificationPlan | null;
+  clock?: RectificationClock | null;
+}
+
+export interface IncidentList {
+  asOf: string;
+  count: number;
+  awaitingDetermination: number;
+  overdue: number;
+  incidents: Incident[];
+}
+
+// ── screening ─────────────────────────────────────────────────────────────
+
+export interface Figures {
+  asOf: string;
+  source: string;
+  currency: string;
+  marketCapitalisation: string;
+  interestBearingDebt: string;
+  cashAndInterestBearingSecurities: string;
+  totalRevenue: string;
+  nonPermissibleIncome: string;
+}
+
+export interface RatioResult {
+  key: 'debt' | 'liquidity' | 'income';
+  label: string;
+  numerator: string;
+  denominator: string;
+  valueBps: number | null;
+  percent: string | null;
+  withinThreshold: boolean | null;
+  workings: string;
+  authority: string;
+}
+
+export interface Assessment {
+  asOf: string;
+  source: string;
+  currency: string;
+  ratios: RatioResult[];
+  allWithinThresholds: boolean | null;
+  note: string;
+}
+
+export interface Crossing {
+  key: string;
+  label: string;
+  direction: 'into_breach' | 'back_within';
+  was: string | null;
+  now: string | null;
+  questionForBoard: string;
+}
+
+// ── the manual ────────────────────────────────────────────────────────────
+
+export interface ManualEntry {
+  ruleId: string;
+  title: string;
+  statement: string;
+  inForceFrom: string | null;
+  terms: RuleParameter[];
+  implementationSteps: string[];
+  notDecided: string[];
+  decidedIn: string | null;
+  review: ReviewStatus;
+  gaps: string[];
+}
+
+export interface Manual {
+  generatedAt: string;
+  entries: ManualEntry[];
+  superseded: ManualEntry[];
+  incomplete: number;
+  unscheduled: number;
+}
+
+/**
+ * Everything Block One added, and the documents it produces.
+ *
+ * The documents are deliberately not fetched as JSON and rendered here. They
+ * are whole pages designed for print, and a browser opening one directly is
+ * both simpler and the thing a scholar actually wants — a tab they can save as
+ * a PDF. `hrefs` gives the address; nothing fetches it.
+ */
+export const oversight = {
+  pace: () => get<PaceResponse>('/api/pace'),
+  reviews: () => get<ReviewsResponse>('/api/reviews'),
+
+  incidents: () => get<IncidentList>('/api/incidents'),
+  incident: (id: string) => get<Incident>(`/api/incidents/${id}`),
+
+  report: (input: { boardId: string; reference: string; title: string; report: string }) =>
+    send<Incident>('/api/incidents', input),
+  concur: (id: string, actual: boolean, reason: string) =>
+    send<Incident>(`/api/incidents/${id}/concurrence`, { actual, reason }),
+  stop: (id: string, activities: string[]) =>
+    send<Incident>(`/api/incidents/${id}/stopped`, { activities }),
+  filePlan: (id: string, steps: string[], completeBy: string) =>
+    send<Incident>(`/api/incidents/${id}/plan`, { steps, completeBy }),
+  endorsePlan: (id: string) => send<Incident>(`/api/incidents/${id}/plan/endorse`),
+  returnPlan: (id: string, reason: string) =>
+    send<Incident>(`/api/incidents/${id}/plan/return`, { reason }),
+  directors: (id: string) => send<Incident>(`/api/incidents/${id}/directors`),
+  submission: (id: string) => send<Incident>(`/api/incidents/${id}/submission`),
+  prescribe: (id: string, p: { amount: string; currency: string; destination: string }) =>
+    send<Incident>(`/api/incidents/${id}/purification`, p),
+  purificationPaid: (id: string, reference: string) =>
+    send<Incident>(`/api/incidents/${id}/purification/paid`, { reference }),
+  closeIncident: (id: string) => send<Incident>(`/api/incidents/${id}/close`),
+
+  manual: () => get<Manual>('/api/manual?format=json'),
+
+  screen: (figures: Figures, previous?: Assessment) =>
+    send<{ assessment: Assessment; crossings: Crossing[] }>('/api/screening', { figures, previous }),
+
+  setImplementation: (id: string, steps: string[]) =>
+    send<Matter>(`/api/matters/${id}/implementation`, { steps }),
+
+  /** Addresses of the printable documents. Opened, never fetched. */
+  hrefs: {
+    fatwa: (id: string) => `/api/matters/${id}/fatwa`,
+    manual: () => '/api/manual',
+    annual: (year: number) => `/api/annual?year=${year}`,
+  },
+};

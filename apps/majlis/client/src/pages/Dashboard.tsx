@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { api, type EnforcementSnapshot, type MatterSummary } from '../lib/api.js';
+import { api, oversight, type EnforcementSnapshot, type MatterSummary, type Wait } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { Card, DateText, ErrorText, Loading, Tag } from '../components/ui.js';
 import Attention from '../components/Attention.js';
+import Pace, { WaitingFor } from '../components/Pace.js';
 import WhoYouAre from '../components/WhoYouAre.js';
 import RaiseMatter from '../components/RaiseMatter.js';
 import { mayDeliberate, useIdentity } from '../lib/identity.js';
@@ -12,12 +13,19 @@ export default function Dashboard() {
   const { t } = useI18n();
   const [matters, setMatters] = useState<MatterSummary[] | null>(null);
   const [enforcement, setEnforcement] = useState<EnforcementSnapshot | null>(null);
+  // How long each open matter has been waiting, keyed by matter. A failure here
+  // takes nothing off the page: the rows simply carry no figure.
+  const [waits, setWaits] = useState<Map<string, Wait>>(new Map());
   const [failed, setFailed] = useState(false);
   const { identity } = useIdentity();
 
   useEffect(() => {
     api.matters().then(setMatters).catch(() => setFailed(true));
     api.enforcement().then(setEnforcement).catch(() => setEnforcement(null));
+    oversight
+      .pace()
+      .then((p) => setWaits(new Map((p.waiting ?? []).map((w) => [w.matterId, w]))))
+      .catch(() => undefined);
   }, []);
 
   if (failed) return <ErrorText />;
@@ -40,6 +48,13 @@ export default function Dashboard() {
       <WhoYouAre />
 
       <Attention />
+
+      {/*
+        What the board costs the institution in time. Institutional rather than
+        personal, which is why it sits below what this member owes and above
+        everything else.
+      */}
+      <Pace />
 
       <div className="mb-5 rounded-lg border border-line bg-surface/60 px-4 py-3 text-[13px] text-muted">
         {t('dash.stageNotice')}
@@ -68,6 +83,12 @@ export default function Dashboard() {
                     {t(`matter.origin.${m.origin}`)}
                     <span className="mx-1.5 opacity-40">·</span>
                     {t('common.opened')} <DateText iso={m.openedAt} />
+                    {waits.has(m.id) && (
+                      <>
+                        <span className="mx-1.5 opacity-40">·</span>
+                        <WaitingFor wait={waits.get(m.id)} />
+                      </>
+                    )}
                     {m.affected !== null && (
                       <>
                         <span className="mx-1.5 opacity-40">·</span>

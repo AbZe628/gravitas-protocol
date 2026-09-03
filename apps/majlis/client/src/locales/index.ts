@@ -24,6 +24,16 @@ export function dirFor(lang: Lang): 'ltr' | 'rtl' {
 type Dict = Record<string, string>;
 
 const en: Dict = {
+  'pace.underADay': 'under a day',
+
+  'pace.median': 'The board decides in',
+  'pace.waitingNow': 'waiting now',
+  'pace.range': 'range',
+  'pace.longest': 'Longest waiting:',
+  'pace.waiting': 'waiting',
+  'pace.onTheClock': 'in its timelock',
+  'pace.partial': '* Measured from when the matter reached this system, which may be later than when the institution first asked.',
+
   'app.name': 'Gravitas Majlis',
   'app.stage': 'Stage Two — the board decides here. Nothing here signs.',
 
@@ -322,6 +332,16 @@ const en: Dict = {
 };
 
 const ar: Dict = {
+  'pace.underADay': 'أقل من يوم',
+
+  'pace.median': 'يقرر المجلس خلال',
+  'pace.waitingNow': 'قيد الانتظار الآن',
+  'pace.range': 'المدى',
+  'pace.longest': 'الأطول انتظاراً:',
+  'pace.waiting': 'منتظر منذ',
+  'pace.onTheClock': 'في مدة التأجيل',
+  'pace.partial': '* تُحتسب من وصول المسألة إلى هذا النظام، وقد يكون ذلك بعد طلب المؤسسة الأول.',
+
   ...en,
   'nav.matters': 'المسائل',
   'nav.rules': 'القواعد النافذة',
@@ -353,6 +373,16 @@ const ar: Dict = {
 };
 
 const ur: Dict = {
+  'pace.underADay': 'ایک دن سے کم',
+
+  'pace.median': 'بورڈ فیصلہ کرتا ہے',
+  'pace.waitingNow': 'اس وقت زیرِ التوا',
+  'pace.range': 'حد',
+  'pace.longest': 'سب سے زیادہ التوا:',
+  'pace.waiting': 'التوا',
+  'pace.onTheClock': 'ٹائم لاک میں',
+  'pace.partial': '* پیمائش اُس وقت سے جب معاملہ اس نظام تک پہنچا، جو ادارے کی پہلی درخواست کے بعد ہو سکتا ہے۔',
+
   ...en,
   'nav.matters': 'مسائل',
   'nav.rules': 'نافذ قواعد',
