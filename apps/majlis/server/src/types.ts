@@ -318,6 +318,19 @@ export interface Matter {
   /** Rules this interacts with or would supersede. */
   interactsWith: string[];
 
+  /**
+   * What this matter is about.
+   *
+   * The link that makes the two outputs one thing. Without it the fatwa is
+   * prose concerning something and the registry entry is keyed by a hand-typed
+   * string, and nothing guarantees the two refer to the same object.
+   *
+   * Optional and absent on everything recorded before it existed. A matter with
+   * no asset is a question about the process rather than about a holding, which
+   * is a real thing a board does.
+   */
+  assetIds?: string[];
+
   proposedRule: Rule;
   simulation: Simulation | null;
   deliberation: Deliberation[];
@@ -529,4 +542,148 @@ export interface Purification {
   paidAt: string | null;
   /** The institution's own reference for the payment. */
   paidReference: string | null;
+}
+
+/**
+ * Something the board rules on.
+ *
+ * One type whichever world it is in. A token with a contract address and a
+ * sukuk with an ISIN are the same kind of object to a board: something held,
+ * with a composition, that a ruling attaches to. Forcing them apart would mean
+ * two registers, two status calculations and two places to forget one.
+ */
+export type AssetKind = 'token' | 'pool' | 'security' | 'instrument' | 'product';
+
+export const ASSET_KINDS: readonly AssetKind[] = [
+  'token', 'pool', 'security', 'instrument', 'product',
+];
+
+/**
+ * One of the names a thing goes by.
+ *
+ * A list, because one asset genuinely has several: a wrapped token has an
+ * address on two chains and a ticker, a sukuk has an ISIN and the bank's own
+ * code. Forcing a single identifier means the same instrument entered twice
+ * under different schemes, which is the failure the register exists to end.
+ */
+export interface AssetIdentifier {
+  scheme: 'chain' | 'isin' | 'ticker' | 'internal';
+  value: string;
+  /** Which chain, for a contract address. */
+  network?: string;
+}
+
+export const IDENTIFIER_SCHEMES: readonly AssetIdentifier['scheme'][] = [
+  'chain', 'isin', 'ticker', 'internal',
+];
+
+/**
+ * What a pool is made of, as at a date.
+ *
+ * Basis points rather than percentages, and integers rather than floats, for
+ * the same reason the screening ratios are: a threshold test that turned on
+ * binary rounding would be a ruling decided by IEEE 754.
+ *
+ * `source` is not decoration. A composition with no source is a number
+ * somebody typed, and the board is entitled to know whose figure it is ruling
+ * on.
+ */
+export interface Composition {
+  asOf: string;
+  source: string;
+  parts: CompositionPart[];
+}
+
+export interface CompositionPart {
+  label: string;
+  /** Basis points. The parts are expected to sum to 10 000. */
+  bps: number;
+  kind: 'tangible' | 'debt' | 'cash' | 'receivable' | 'other';
+}
+
+export const PART_KINDS: readonly CompositionPart['kind'][] = [
+  'tangible', 'debt', 'cash', 'receivable', 'other',
+];
+
+export interface Asset {
+  id: string;
+  /** Whose it is. Isolation at the store, exactly as everything else. */
+  institutionId: string;
+  kind: AssetKind;
+  name: string;
+  identifiers: AssetIdentifier[];
+
+  /**
+   * Where the entry came from, which is not the same as who ruled on it.
+   *
+   * "Nobody has ruled on this" and "nobody has even told us about it" are
+   * different states, and a board acting on the first should not be able to
+   * mistake it for the second.
+   */
+  source: 'registry' | 'institution' | 'member';
+  addedAt: string;
+  addedBy: string | null;
+
+  composition: Composition | null;
+
+  /** Withdrawn from the universe. Kept, never deleted. */
+  retiredAt: string | null;
+  retiredReason: string | null;
+}
+
+/**
+ * Derived from the rules in force and the matters open against an asset, never
+ * stored. A stored status is a second copy of the truth: a rule is withdrawn
+ * and the badge stays green, which is worse than no badge.
+ */
+export type AssetStatus =
+  /** In the register, no ruling, no open matter. Where the work is. */
+  | 'never_examined'
+  /** A matter naming it is open. */
+  | 'under_consideration'
+  /** A rule in force permits it. */
+  | 'permitted'
+  /** A rule in force restricts it. */
+  | 'restricted'
+  /** A restriction lapsed unratified. Neither restricted nor approved. */
+  | 'lapsed'
+  /** Withdrawn from the universe. */
+  | 'retired';
+
+/**
+ * A meeting, as a record rather than as a room.
+ *
+ * Majlis does not host the call. A conversation on camera is not a record, and
+ * a board that decides on one leaves a vote with no reasoning behind it — the
+ * failure this whole system exists to replace. What Majlis owns is the minute.
+ *
+ * It also closes the one clock that has never had anything to count from: the
+ * six-month cadence, which the annual report and the calendar both currently
+ * report as a gap.
+ */
+export interface Meeting {
+  id: string;
+  boardId: string;
+  at: string;
+  /** Their own tool, in one field. Teams, Zoom, a room with a table. */
+  joinUrl: string | null;
+  agenda: AgendaItem[];
+  attendance: Attendance[];
+  /** What was discussed and what was decided. Attributed, like everything. */
+  minute: string;
+  recordedBy: string;
+  closedAt: string | null;
+}
+
+export interface AgendaItem {
+  /** Set where the item is a matter already before the board. */
+  matterId?: string;
+  item: string;
+}
+
+export interface Attendance {
+  scholarId: string;
+  present: boolean;
+  /** Frameworks that set an attendance floor expect absence to be explicable. */
+  note?: string;
 }
