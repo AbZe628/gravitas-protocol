@@ -43,6 +43,7 @@ import {
 import { attentionList } from '../services/attention.js';
 import { paceOf, waitingNow } from '../services/clocks.js';
 import { assemble, render } from '../services/fatwa.js';
+import { assembleAnnualReport, renderAnnualReport } from '../services/annual.js';
 import { buildManual, renderManual } from '../services/manual.js';
 import { reviewStatus, reviewsDue } from '../services/review.js';
 import { BadFigure, assess, crossings, type Assessment, type Figures } from '../services/screening.js';
@@ -699,6 +700,53 @@ export function governanceRoutes(store: Store, now: () => string = () => new Dat
 
       const name = boardId ? boards.find((b) => b.id === boardId)?.name : undefined;
       res.type('html').send(renderManual(manual, name ?? boards[0]?.name ?? 'Shariah Supervisory Board'));
+    }),
+  );
+
+  /**
+   * The board's annual report to shareholders, as a draft.
+   *
+   * Every figure in it was written down during the year by a member of the
+   * board or by the institution. **The opinion is not drafted and cannot be**:
+   * it is the only part that is the board's, the only part worth their
+   * signature, and a board under year-end pressure would sign a draft if one
+   * were offered. The document leaves a labelled blank and states what the
+   * opinion has to address instead.
+   *
+   * What the record cannot support — meetings, zakat, the internal review
+   * functions — is named in the document rather than omitted from it.
+   */
+  router.get(
+    '/annual',
+    handle(async (req, res) => {
+      const at = now();
+      const raw = typeof req.query.year === 'string' ? Number(req.query.year) : new Date(at).getUTCFullYear();
+      if (!Number.isInteger(raw) || raw < 2000 || raw > 2200) {
+        res.status(400).json({ error: 'bad_year', message: 'Give a four-digit year.' });
+        return;
+      }
+
+      const boards = await store.boards();
+      const boardId = typeof req.query.board === 'string' ? req.query.board : boards[0]?.id;
+      const board = boards.find((b) => b.id === boardId);
+      if (!board) {
+        res.status(404).json({ error: 'not_found', message: 'No such board.' });
+        return;
+      }
+
+      const [matters, rules, incidents] = await Promise.all([
+        store.matters(board.id),
+        store.rules(board.id),
+        store.incidents(board.id),
+      ]);
+
+      const report = assembleAnnualReport({ year: raw, board, matters, rules, incidents, generatedAt: at });
+
+      if (req.query.format === 'json') {
+        res.json(report);
+        return;
+      }
+      res.type('html').send(renderAnnualReport(report));
     }),
   );
 

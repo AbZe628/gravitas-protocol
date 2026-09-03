@@ -358,7 +358,16 @@ audit export:**
   as finished would be comfortable and useless, since the point of holding a
   manual is to find what is missing before a regulator does.
 - The **regulator submission** for an SNC
-- The **annual report**, assembled from the year, opinion blank
+- The **annual report** ✅ — composition, what the board decided, the time it
+  took, reviews outstanding, and the year's non-compliance with its purification.
+  **The opinion is typed `null`**, not `string | null`: there is no code path
+  that can fill it, and adding one would not compile. A system that drafted the
+  opinion — even carefully, even marked for editing — would be writing the
+  sentence a regulator relies on, and a board under year-end pressure would sign
+  it. The document leaves a labelled blank and states what the opinion must
+  address instead. What the record cannot support — meetings and attendance,
+  zakat, the internal review functions — is **named in the document** rather
+  than omitted from it.
 
 **Web3 — ✅ the adapter exists (`enforcement.ts`).** Operative terms go to the
 policy registry; the transaction cannot proceed against them.
@@ -440,8 +449,8 @@ than a form.
 
 ### Block 2 — the record becomes a product
 
-**Fatwa document ✅** · **compliance manual ✅** · PostgreSQL + RLS behind
-`Store` · JWT + OAuth · annual report assembly · calendar feed · digests ·
+**Fatwa document ✅** · **compliance manual ✅** · **annual report ✅** ·
+PostgreSQL + RLS behind `Store` · JWT + OAuth · calendar feed · digests ·
 @mentions
 
 ### Block 3 — the chain

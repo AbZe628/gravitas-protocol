@@ -664,3 +664,70 @@ describe('the compliance manual, over HTTP', () => {
       .expect(403);
   });
 });
+
+describe('the annual report, over HTTP', () => {
+  const year = () => new Date().getUTCFullYear();
+
+  it('assembles the year and leaves the opinion null', async () => {
+    const res = await request(app)
+      .get(`/api/annual?year=${year()}&format=json`)
+      .set('Authorization', as('watcher'))
+      .expect(200);
+
+    expect(res.body.opinion).toBeNull();
+    expect(res.body.opinionMustAddress.length).toBeGreaterThan(3);
+    expect(res.body.boardId).toBe('demo-board');
+  });
+
+  it('serves a printable draft with a blank where the opinion goes', async () => {
+    const res = await request(app).get('/api/annual').set('Authorization', as('member-a')).expect(200);
+
+    expect(res.headers['content-type']).toContain('text/html');
+    expect(res.text).toContain('The board’s opinion goes here.');
+    expect(res.text).toContain('What this draft cannot state');
+    expect(res.text).not.toContain('<script');
+  });
+
+  it('counts a decision taken this year', async () => {
+    const id = await openMatter('member-a', { direction: 'restrict' });
+    await say(id, 'member-a');
+    await request(app).post(`/api/matters/${id}/voting`).set('Authorization', as('member-a')).expect(200);
+    for (const who of ['member-a', 'member-b']) await vote(id, who).expect(201);
+    await request(app).post(`/api/matters/${id}/close`).set('Authorization', as('member-a')).expect(200);
+
+    const res = await request(app)
+      .get(`/api/annual?year=${year()}&format=json`)
+      .set('Authorization', as('member-a'))
+      .expect(200);
+
+    expect(res.body.activity.approved).toBeGreaterThanOrEqual(1);
+    expect(res.body.decisions.some((d: { reference: string }) => d.reference === id)).toBe(true);
+  });
+
+  it('reports an empty year without inventing figures', async () => {
+    const res = await request(app)
+      .get('/api/annual?year=2020&format=json')
+      .set('Authorization', as('member-a'))
+      .expect(200);
+
+    expect(res.body.activity.decided).toBe(0);
+    expect(res.body.pace.medianDays).toBeNull();
+    expect(res.body.nonCompliance.count).toBe(0);
+  });
+
+  it('always names what it cannot state', async () => {
+    const res = await request(app)
+      .get('/api/annual?format=json')
+      .set('Authorization', as('member-a'))
+      .expect(200);
+
+    const gaps = res.body.gaps.join(' ');
+    expect(gaps).toContain('meetings');
+    expect(gaps).toContain('Zakat');
+  });
+
+  it('refuses a year that is not one, and a board that is not there', async () => {
+    await request(app).get('/api/annual?year=soon').set('Authorization', as('member-a')).expect(400);
+    await request(app).get('/api/annual?board=nope').set('Authorization', as('member-a')).expect(404);
+  });
+});
