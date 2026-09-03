@@ -625,6 +625,7 @@ export const oversight = {
   settings: () => get<Settings>('/api/settings'),
 
   register: () => get<Register>('/api/register'),
+  drift: () => get<DriftReport>('/api/drift'),
 
   structures: () => get<{ structures: Structure[]; note: string }>('/api/structures'),
   checklist: (id: string) => get<Checklist>(`/api/matters/${id}/checklist`),
@@ -859,4 +860,35 @@ export interface Checklist {
   answered: number;
   total: number;
   note: string;
+}
+
+// ── drift ─────────────────────────────────────────────────────────────────
+
+export interface Drift {
+  assetId: string;
+  assetName: string;
+  /** The decision whose term is crossed, so a reader can go and read it. */
+  matterId: string;
+  term: { key: string; value: string; meaning: string; bound: 'minimum' | 'maximum' };
+  observed: { kind: string; bps: number; percent: string };
+  direction: 'into_breach' | 'back_within';
+  asOf: string;
+  source: string;
+  /** Written by the server, so no interface can soften it into a conclusion. */
+  questionForBoard: string;
+}
+
+export interface Unwatched {
+  assetId: string;
+  matterId: string;
+  key: string;
+  reason: string;
+}
+
+export interface DriftReport {
+  asOf: string;
+  drifting: Drift[];
+  /** Terms that could be checked and are not, which is its own finding. */
+  unwatched: Unwatched[];
+  unmeasured: { assetId: string; assetName: string; reason: string }[];
 }

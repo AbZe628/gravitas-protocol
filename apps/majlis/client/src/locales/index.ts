@@ -24,6 +24,12 @@ export function dirFor(lang: Lang): 'ltr' | 'rtl' {
 type Dict = Record<string, string>;
 
 const en: Dict = {
+  'drift.title': "What has moved under a ruling",
+  'drift.minimum': "Below the minimum set",
+  'drift.maximum': "Above the maximum set",
+  'drift.against': "against",
+  'drift.notChecked': "Thresholds nothing is checking",
+  'drift.onThisHolding': "This holding has moved under its ruling",
   'chk.title': "The conditions",
   'chk.noShape': "This matter is not being judged against a contract shape. Choosing one puts the conditions of that contract in front of the board instead of an empty box.",
   'chk.answered': "conditions answered",
@@ -531,6 +537,12 @@ const en: Dict = {
 };
 
 const ar: Dict = {
+  'drift.title': "ما تغيّر تحت حكم قائم",
+  'drift.minimum': "دون الحد الأدنى المقرر",
+  'drift.maximum': "فوق الحد الأعلى المقرر",
+  'drift.against': "مقابل",
+  'drift.notChecked': "حدود لا يتحقق منها شيء",
+  'drift.onThisHolding': "هذا الأصل تغيّر تحت حكمه",
   'chk.title': "الشروط",
   'chk.noShape': "هذه المسألة لا تُقاس على شكل عقد. اختيار شكل يضع شروط ذلك العقد أمام المجلس بدل صندوق فارغ.",
   'chk.answered': "شروط أُجيب عنها",
@@ -771,6 +783,12 @@ const ar: Dict = {
 };
 
 const ur: Dict = {
+  'drift.title': "کسی حکم کے نیچے کیا بدلا",
+  'drift.minimum': "مقررہ کم از کم سے نیچے",
+  'drift.maximum': "مقررہ زیادہ سے زیادہ سے اوپر",
+  'drift.against': "مقابلے میں",
+  'drift.notChecked': "حدود جن کی کوئی جانچ نہیں",
+  'drift.onThisHolding': "یہ ملکیت اپنے حکم کے نیچے بدل چکی ہے",
   'chk.title': "شرائط",
   'chk.noShape': "یہ معاملہ کسی معاہدے کی شکل پر نہیں پرکھا جا رہا۔ ایک شکل چننے سے اس معاہدے کی شرائط بورڈ کے سامنے آ جاتی ہیں، خالی خانے کے بجائے۔",
   'chk.answered': "شرائط کے جواب دیے",

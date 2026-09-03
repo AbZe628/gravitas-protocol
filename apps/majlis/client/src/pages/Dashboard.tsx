@@ -4,6 +4,7 @@ import { api, oversight, type EnforcementSnapshot, type MatterSummary, type Wait
 import { useI18n } from '../lib/i18n.js';
 import { Card, DateText, ErrorText, Loading, Tag } from '../components/ui.js';
 import Attention from '../components/Attention.js';
+import DriftPanel from '../components/Drift.js';
 import Pace, { WaitingFor } from '../components/Pace.js';
 import WhoYouAre from '../components/WhoYouAre.js';
 import RaiseMatter from '../components/RaiseMatter.js';
@@ -55,6 +56,13 @@ export default function Dashboard() {
         everything else.
       */}
       <Pace />
+
+      {/*
+        Below the pace and above the list, because it is the one thing on this
+        page nobody asked the system to look for. It reports and links; it does
+        not raise anything.
+      */}
+      <DriftPanel />
 
       <div className="mb-5 rounded-lg border border-line bg-surface/60 px-4 py-3 text-[13px] text-muted">
         {t('dash.stageNotice')}

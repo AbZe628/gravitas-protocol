@@ -4,6 +4,7 @@ import { governance, oversight, type AssetDetail as Detail } from '../lib/api.js
 import { useI18n } from '../lib/i18n.js';
 import { DateText, ErrorText, Loading, Section, Tag } from '../components/ui.js';
 import { mayDeliberate, useIdentity } from '../lib/identity.js';
+import { DriftForAsset } from '../components/Drift.js';
 
 /**
  * One holding: where it stands, what the board has said about it, what it is
@@ -104,6 +105,12 @@ export default function AssetDetail() {
           {refusal}
         </div>
       )}
+
+      {/*
+        Above the composition it concerns, so a reader looking at 50.00% sees at
+        once what the board set rather than assembling it from two places.
+      */}
+      <DriftForAsset assetId={a.id} />
 
       {canRaise && (
         <button
