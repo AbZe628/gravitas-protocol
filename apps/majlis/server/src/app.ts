@@ -16,6 +16,8 @@ import { buildAuditExport } from './services/export.js';
 import { verifyParameters } from './services/hash.js';
 import { Limiter, REFUSAL_MESSAGES } from './services/limits.js';
 import { basicAuth, authFromEnv } from './middleware/basicAuth.js';
+import { buildSettings } from './services/settings.js';
+import { TIMELOCK_HOURS } from './types.js';
 import { LoginLimiter, loginThrottle } from './middleware/loginLimit.js';
 import { governanceRoutes } from './routes/governance.js';
 import { incidentRoutes } from './routes/incidents.js';
@@ -106,7 +108,11 @@ export function createApp(
   const servingInstitution =
     'institutionId' in store ? (store as { institutionId?: string }).institutionId : undefined;
 
-  app.use(basicAuth(authFromEnv(), logins, servingInstitution));
+  // Held rather than only passed, so the settings route can compare the
+  // credential file against the board record. Nothing but ids and roles ever
+  // leaves it.
+  const auth = authFromEnv();
+  app.use(basicAuth(auth, logins, servingInstitution));
 
   app.get('/api/health', (_req: Request, res: Response) => {
     res.json({
@@ -210,6 +216,33 @@ export function createApp(
     const b = await store.briefing(req.params.id);
     if (!b) return res.status(404).json({ error: 'briefing not found' });
     res.json(b);
+  });
+
+  // ---- settings --------------------------------------------------------
+  //
+  // Who is on this board and how it decides — and the one check nothing has
+  // ever made. The board record says who signs; the credential file says who
+  // may act. They are maintained separately and they disagree quietly, so this
+  // compares them and names what each disagreement costs. It repairs nothing:
+  // an application that edited its own board membership would be deciding who
+  // sits on a Shariah board, which is the one thing it must never do.
+  app.get('/api/settings', async (req: Request, res: Response) => {
+    const boards = await store.boards();
+    const wanted = typeof req.query.board === 'string' ? req.query.board : boards[0]?.id;
+    const board = boards.find((b) => b.id === wanted);
+
+    if (!board) {
+      res.status(404).json({ error: 'not_found', message: 'No such board.' });
+      return;
+    }
+
+    res.json(
+      buildSettings({
+        board,
+        members: auth.members,
+        timelockHours: TIMELOCK_HOURS.permit,
+      }),
+    );
   });
 
   // ---- enforcement -----------------------------------------------------

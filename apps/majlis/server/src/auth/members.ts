@@ -142,6 +142,27 @@ export class Members {
   }
 
   /**
+   * Who holds a credential, by the name the record attributes to.
+   *
+   * Ids and roles only. No secret and no login id leaves this method: the
+   * scholar ids are already in the record as attribution, so listing them
+   * discloses nothing, while a login id names a person's way in.
+   *
+   * It exists so the two lists a board depends on can be compared. The board
+   * record says who signs; the credential file says who may act. Nothing has
+   * ever checked that they agree, and they disagree quietly — a member with no
+   * credential simply never appears, and a credential with no member votes
+   * under a name the board does not carry.
+   */
+  roster(): { scholarId: string; role: Role; office?: Office }[] {
+    return [...this.byId.values()].map((m) => ({
+      scholarId: m.scholarId,
+      role: m.role,
+      office: m.office,
+    }));
+  }
+
+  /**
    * Returns the identity, or null. Always does the same work either way: an
    * unknown member id is checked against a decoy so that "no such member" and
    * "wrong password" take the same time and are the same answer.

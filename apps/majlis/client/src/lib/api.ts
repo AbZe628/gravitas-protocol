@@ -620,6 +620,7 @@ export const oversight = {
   pace: () => get<PaceResponse>('/api/pace'),
   reviews: () => get<ReviewsResponse>('/api/reviews'),
   calendar: () => get<Calendar>('/api/calendar'),
+  settings: () => get<Settings>('/api/settings'),
 
   incidents: () => get<IncidentList>('/api/incidents'),
   incident: (id: string) => get<Incident>(`/api/incidents/${id}`),
@@ -685,4 +686,44 @@ export interface Calendar {
   entries: CalendarEntry[];
   /** What the record cannot put on a calendar. Shown, not footnoted. */
   gaps: string[];
+}
+
+// ── the board's own configuration ─────────────────────────────────────────
+
+export interface SeatedMember {
+  scholarId: string;
+  name: string;
+  title: string;
+  /** What the board record says. */
+  signatory: boolean;
+  /** What the credential file says. Null where they hold none. */
+  role: Role | null;
+  office: 'chair' | 'secretary' | null;
+}
+
+export interface Mismatch {
+  kind: 'no_credential' | 'not_on_board' | 'vote_discarded' | 'cannot_vote';
+  scholarId: string;
+  /** What goes wrong, in terms of what it costs. */
+  consequence: string;
+}
+
+export interface Settings {
+  boardId: string;
+  boardName: string;
+  institutionId: string;
+  /** Whether any credential is configured. Not the same as whether they agree. */
+  credentialsConfigured: boolean;
+  members: SeatedMember[];
+  decides: {
+    quorumPermit: number;
+    quorumRestrict: number;
+    totalSignatories: number;
+    signatoriesSeated: number;
+    ratificationWindowHours: number;
+    timelockHours: number;
+  };
+  /** Where the board record and the credential file disagree. Empty is the goal. */
+  mismatches: Mismatch[];
+  fixIn: string;
 }

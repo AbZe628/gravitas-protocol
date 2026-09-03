@@ -5,6 +5,7 @@ import Dashboard from './pages/Dashboard.js';
 import MatterDetail from './pages/MatterDetail.js';
 import Rules from './pages/Rules.js';
 import Calendar from './pages/Calendar.js';
+import Settings from './pages/Settings.js';
 import Incidents from './pages/Incidents.js';
 import IncidentDetail from './pages/IncidentDetail.js';
 import Briefings from './pages/Briefings.js';
@@ -30,6 +31,7 @@ function Nav() {
     // Offering a page that can only refuse is worse than not offering it.
     ...(health?.assistantKind === 'off' ? [] : [{ to: '/assistant', label: t('nav.assistant') }]),
     { to: '/record', label: t('nav.record') },
+    { to: '/settings', label: t('nav.settings') },
   ];
   return (
     <nav className="sticky bottom-0 z-20 border-t border-line bg-surface/95 backdrop-blur md:static md:border-b md:border-t-0">
@@ -110,6 +112,7 @@ export default function App() {
           <Route path="/assistant" element={<Assistant />} />
           <Route path="/search" element={<Search />} />
           <Route path="/record" element={<Record />} />
+          <Route path="/settings" element={<Settings />} />
         </Routes>
       </main>
 
