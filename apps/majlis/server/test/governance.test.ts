@@ -590,3 +590,77 @@ describe('the document, over HTTP', () => {
     await request(app).get('/api/matters/no-such/fatwa').set('Authorization', as('member-a')).expect(404);
   });
 });
+
+describe('the compliance manual, over HTTP', () => {
+  it('describes the seeded rules and names what each is missing', async () => {
+    const res = await request(app)
+      .get('/api/manual?format=json')
+      .set('Authorization', as('watcher'))
+      .expect(200);
+
+    expect(res.body.entries.length).toBeGreaterThan(0);
+    // The seed predates implementation steps and review intervals, so every
+    // entry is incomplete — which the manual says rather than reporting all well.
+    expect(res.body.incomplete).toBe(res.body.entries.length);
+    expect(res.body.entries[0].gaps.join(' ')).toContain('GN-6');
+  });
+
+  it('serves a printable page', async () => {
+    const res = await request(app).get('/api/manual').set('Authorization', as('member-a')).expect(200);
+    expect(res.headers['content-type']).toContain('text/html');
+    expect(res.text).toContain('Shariah compliance manual');
+    expect(res.text).toContain('Conditions every transaction must meet');
+    expect(res.text).not.toContain('<script');
+  });
+
+  it('404s for a board that does not exist', async () => {
+    await request(app).get('/api/manual?board=nope').set('Authorization', as('member-a')).expect(404);
+  });
+
+  it('carries implementation steps into both the manual and the fatwa', async () => {
+    // A restriction takes effect the moment the vote closes; a permit would
+    // still be in its timelock and so not yet part of the manual.
+    const id = await openMatter('member-a', { direction: 'restrict' });
+    await request(app)
+      .post(`/api/matters/${id}/implementation`)
+      .set('Authorization', as('member-a'))
+      .send({ steps: ['Confirm the address against the registry.', 'Cap the position at the recorded limit.'] })
+      .expect(200);
+
+    await say(id, 'member-a');
+    await request(app).post(`/api/matters/${id}/voting`).set('Authorization', as('member-a')).expect(200);
+    for (const who of ['member-a', 'member-b']) await vote(id, who).expect(201);
+    await request(app).post(`/api/matters/${id}/close`).set('Authorization', as('member-a')).expect(200);
+
+    const fatwa = await request(app).get(`/api/matters/${id}/fatwa`).set('Authorization', as('member-a')).expect(200);
+    expect(fatwa.text).toContain('How it is implemented');
+    expect(fatwa.text).toContain('Confirm the address against the registry.');
+
+    const manual = await request(app).get('/api/manual?format=json').set('Authorization', as('member-a')).expect(200);
+    const entry = manual.body.entries.find((e: { decidedIn: string }) => e.decidedIn === id);
+    expect(entry.implementationSteps).toHaveLength(2);
+    expect(entry.gaps.join(' ')).not.toContain('No implementation steps');
+  });
+
+  it('refuses to change the steps once the vote has opened', async () => {
+    const id = await openMatter();
+    await say(id, 'member-a');
+    await request(app).post(`/api/matters/${id}/voting`).set('Authorization', as('member-a')).expect(200);
+
+    const res = await request(app)
+      .post(`/api/matters/${id}/implementation`)
+      .set('Authorization', as('member-a'))
+      .send({ steps: ['A late addition nobody voted on.'] })
+      .expect(409);
+    expect(res.body.error).toBe('wrong_status');
+  });
+
+  it('refuses an observer setting steps', async () => {
+    const id = await openMatter();
+    await request(app)
+      .post(`/api/matters/${id}/implementation`)
+      .set('Authorization', as('watcher'))
+      .send({ steps: ['Something.'] })
+      .expect(403);
+  });
+});

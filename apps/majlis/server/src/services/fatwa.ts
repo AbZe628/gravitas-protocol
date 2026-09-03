@@ -88,6 +88,15 @@ export interface Fatwa {
    */
   notDecided: string[];
 
+  /**
+   * The steps the institution must follow, in order.
+   *
+   * A ruling that says what is permitted without saying how it is done leaves
+   * the desk to work it out, and the desk will work it out differently from
+   * what the board pictured.
+   */
+  implementationSteps: string[];
+
   /** The operative terms, as approved. */
   parameters: RuleParameter[];
   parameterHash: string;
@@ -189,6 +198,7 @@ export function assemble(board: Board, matter: Matter, generatedAt: string): Fat
 
     question: matter.proposal,
     mechanism: matter.mechanism,
+    implementationSteps: matter.implementationSteps ?? [],
     notDecided: matter.notDecided,
 
     parameters,
@@ -389,6 +399,8 @@ ${fatwa.evidence
   .mono { font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace; font-size: 9pt; word-break: break-all; }
   .unit { color: #5b6b65; }
   .none { color: #5b6b65; font-style: italic; }
+  .steps { padding-left: 6mm; }
+  .steps li { margin-bottom: 2mm; }
   .sig { margin-bottom: 5mm; padding-left: 4mm; border-left: 2px solid #cfdad5; break-inside: avoid; }
   .sig.released { border-left-style: dotted; color: #6d7b76; }
   .who strong { font-size: 11pt; }
@@ -435,6 +447,13 @@ ${fatwa.mechanism ? `    <section>
     </section>` : ''}
 
 ${notDecided}
+
+${fatwa.implementationSteps.length ? `    <section>
+      <h2>How it is implemented</h2>
+      <ol class="steps">
+${fatwa.implementationSteps.map((s) => `        <li>${esc(s)}</li>`).join('\n')}
+      </ol>
+    </section>` : ''}
 
     <section>
       <h2>Operative terms</h2>

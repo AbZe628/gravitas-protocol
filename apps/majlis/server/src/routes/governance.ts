@@ -29,6 +29,7 @@ import {
   bringIntoForce,
   attachSource,
   closeVoting,
+  setImplementationSteps,
   setParameters,
   returnToDeliberation,
   withdrawSource,
@@ -42,6 +43,7 @@ import {
 import { attentionList } from '../services/attention.js';
 import { paceOf, waitingNow } from '../services/clocks.js';
 import { assemble, render } from '../services/fatwa.js';
+import { buildManual, renderManual } from '../services/manual.js';
 import { reviewStatus, reviewsDue } from '../services/review.js';
 import { BadFigure, assess, crossings, type Assessment, type Figures } from '../services/screening.js';
 import { search, type SearchFilters } from '../services/search.js';
@@ -119,6 +121,10 @@ const parametersSchema = z.object({
       }),
     )
     .max(60),
+});
+
+const stepsSchema = z.object({
+  steps: z.array(z.string().min(3).max(2_000)).max(60),
 });
 
 const sourceSchema = z.object({
@@ -634,6 +640,65 @@ export function governanceRoutes(store: Store, now: () => string = () => new Dat
         }
         throw e;
       }
+    }),
+  );
+
+  /**
+   * The steps the institution must follow.
+   *
+   * Frozen with the parameters and for the same reason: they are part of what
+   * the board approved, and a ruling whose implementation could be rewritten
+   * after the vote is a ruling nobody signed.
+   */
+  router.post(
+    '/matters/:id/implementation',
+    handle(async (req, res) => {
+      const who = identityOf(req);
+      if (!requireRole(res, mayDeliberate(who.role), 'set implementation steps')) return;
+
+      const parsed = stepsSchema.safeParse(req.body);
+      if (!parsed.success) return badRequest(res, parsed.error.issues);
+
+      res.json(
+        await store.updateMatter(req.params.id, (current) =>
+          setImplementationSteps(current, parsed.data.steps),
+        ),
+      );
+    }),
+  );
+
+  /**
+   * The Shariah compliance manual.
+   *
+   * Computed from the rules in force rather than maintained, so it cannot drift
+   * from what it describes — the failure every hand-kept manual has. Entries
+   * that are missing something GN-6 asks for say so; a document presenting every
+   * entry as finished would be comfortable and useless.
+   *
+   * Open to observers. The auditor is exactly who asks for this.
+   */
+  router.get(
+    '/manual',
+    handle(async (req, res) => {
+      const at = now();
+      const boardId = typeof req.query.board === 'string' ? req.query.board : undefined;
+
+      const boards = await store.boards();
+      if (boardId && !boards.some((b) => b.id === boardId)) {
+        res.status(404).json({ error: 'not_found', message: 'No such board.' });
+        return;
+      }
+
+      const [rules, matters] = await Promise.all([store.rules(boardId), store.matters(boardId)]);
+      const manual = buildManual(rules, matters, at, boardId);
+
+      if (req.query.format === 'json') {
+        res.json(manual);
+        return;
+      }
+
+      const name = boardId ? boards.find((b) => b.id === boardId)?.name : undefined;
+      res.type('html').send(renderManual(manual, name ?? boards[0]?.name ?? 'Shariah Supervisory Board'));
     }),
   );
 

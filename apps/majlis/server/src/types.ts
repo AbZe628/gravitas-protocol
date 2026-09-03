@@ -301,6 +301,20 @@ export interface Matter {
   notDecided: string[];
   /** What mechanically occurs when the rule applies. */
   mechanism: string;
+  /**
+   * What the institution must actually do, in order.
+   *
+   * Distinct from `mechanism`, which describes what happens; these are the
+   * steps somebody follows. IFSB GN-6 asks an institution to hold a Shariah
+   * compliance manual of every approved product **and the steps by which it is
+   * implemented**, and prose describing a mechanism is not that: a compliance
+   * officer checking whether a desk followed the ruling needs an ordered list
+   * they can tick against.
+   *
+   * Optional, and absent on everything recorded before it existed. The manual
+   * says so rather than presenting an entry as complete when it is not.
+   */
+  implementationSteps?: string[];
   /** Rules this interacts with or would supersede. */
   interactsWith: string[];
 

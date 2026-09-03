@@ -316,6 +316,24 @@ const OPEN_TO_PARAMETERS: readonly MatterStatus[] = ['draft', 'deliberation'];
  * The hash is deliberately *not* set here. It is computed when the vote opens,
  * because that is the moment the terms stop moving.
  */
+/**
+ * Set the steps the institution must follow.
+ *
+ * Frozen at the same moment as the parameters and for the same reason: they are
+ * part of what the board approved. A ruling whose implementation steps could be
+ * rewritten after the vote would be a ruling nobody actually signed.
+ */
+export function setImplementationSteps(matter: Matter, steps: string[]): Matter {
+  requireStatus(matter, OPEN_TO_PARAMETERS);
+
+  const cleaned = steps
+    .map((s) => (s ?? '').trim())
+    .filter(Boolean)
+    .map((s) => requireText(s, 'An implementation step', 3, 2_000));
+
+  return { ...matter, implementationSteps: cleaned };
+}
+
 export function setParameters(matter: Matter, parameters: RuleParameter[]): Matter {
   requireStatus(matter, OPEN_TO_PARAMETERS);
 

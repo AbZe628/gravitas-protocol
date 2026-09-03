@@ -347,7 +347,16 @@ audit export:**
     hex string.
   - Refusals, lapses and withdrawals get a document too. "The board did not
     approve this" is something the business needs in writing.
-- The **compliance manual entry** (IFSB GN-6), added as it takes effect
+- The **compliance manual** ✅ (IFSB GN-6) — every rule in force, its conditions,
+  **the steps by which it is implemented**, its limits and its sources.
+  **Derived, never stored.** There is no manual table and no "generate manual"
+  that writes a second copy of the truth; it is computed from the rules in force
+  each time it is asked for, so it cannot drift the way a hand-kept one does.
+  Live and superseded rules never share a section — a compliance officer who
+  checks a desk against a withdrawn ruling has checked nothing. And an entry
+  missing something GN-6 asks for **says so**: a document presenting every entry
+  as finished would be comfortable and useless, since the point of holding a
+  manual is to find what is missing before a regulator does.
 - The **regulator submission** for an SNC
 - The **annual report**, assembled from the year, opinion blank
 
@@ -431,8 +440,9 @@ than a form.
 
 ### Block 2 — the record becomes a product
 
-**Fatwa document ✅** · PostgreSQL + RLS behind `Store` · JWT + OAuth ·
-compliance manual · annual report assembly · calendar feed · digests · @mentions
+**Fatwa document ✅** · **compliance manual ✅** · PostgreSQL + RLS behind
+`Store` · JWT + OAuth · annual report assembly · calendar feed · digests ·
+@mentions
 
 ### Block 3 — the chain
 
