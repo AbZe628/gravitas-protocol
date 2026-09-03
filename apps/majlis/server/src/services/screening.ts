@@ -29,9 +29,15 @@
  * that does not exist.
  */
 
-/** Amounts are scaled to this many decimal places internally. */
-const SCALE = 8n;
-const SCALE_FACTOR = 10n ** SCALE;
+import { formatAmount, parseAmount } from './money.js';
+
+/*
+ * The exact-decimal machinery moved to `money.ts` when a second calculation
+ * needed it. Re-exported here because callers and tests already import these
+ * names from this module, and moving a file should not break a name.
+ */
+export { BadFigure, formatAmount, parseAmount } from './money.js';
+
 const BPS = 10_000n;
 
 export type RatioKey = 'debt' | 'liquidity' | 'income';
@@ -96,46 +102,6 @@ export interface Figures {
   cashAndInterestBearingSecurities: string;
   totalRevenue: string;
   nonPermissibleIncome: string;
-}
-
-export class BadFigure extends Error {
-  readonly code = 'bad_figure';
-  constructor(readonly field: string, message: string) {
-    super(message);
-    this.name = 'BadFigure';
-  }
-}
-
-/**
- * Exact decimal, from a string, without ever becoming a number.
- *
- * Rejects rather than guesses. A figure that arrives as "approx 4.2bn" is not a
- * figure, and coercing it to something would put an invented number in front of
- * a board.
- */
-export function parseAmount(raw: string, field: string): bigint {
-  const text = (raw ?? '').trim().replace(/[\s_,]/g, '');
-  if (!/^-?\d+(\.\d+)?$/.test(text)) {
-    throw new BadFigure(field, `"${raw}" is not a plain decimal figure.`);
-  }
-  const negative = text.startsWith('-');
-  const [whole, fraction = ''] = (negative ? text.slice(1) : text).split('.');
-
-  if (fraction.length > Number(SCALE)) {
-    throw new BadFigure(field, `More than ${SCALE} decimal places in "${raw}".`);
-  }
-  const padded = (fraction + '0'.repeat(Number(SCALE))).slice(0, Number(SCALE));
-  const value = BigInt(whole) * SCALE_FACTOR + BigInt(padded || '0');
-  return negative ? -value : value;
-}
-
-/** Back to a string, trailing zeroes trimmed, for display and for the record. */
-export function formatAmount(value: bigint): string {
-  const negative = value < 0n;
-  const abs = negative ? -value : value;
-  const whole = abs / SCALE_FACTOR;
-  const fraction = (abs % SCALE_FACTOR).toString().padStart(Number(SCALE), '0').replace(/0+$/, '');
-  return `${negative ? '-' : ''}${whole}${fraction ? '.' + fraction : ''}`;
 }
 
 export interface RatioResult extends RatioDefinition {
