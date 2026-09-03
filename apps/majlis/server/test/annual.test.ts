@@ -253,3 +253,31 @@ describe('the page', () => {
     expect(page).toContain('&lt;script&gt;');
   });
 });
+
+describe('the document rounds what the structure keeps', () => {
+  it('prints whole days, so screen and paper do not disagree', () => {
+    const r = build({
+      matters: [
+        matter({ id: 'a', arrivedAt: '2026-02-01T09:00:00.000Z', settledAt: '2026-02-08T21:00:00.000Z' }),
+        matter({ id: 'b', arrivedAt: '2026-04-01T09:00:00.000Z', settledAt: '2026-04-04T15:00:00.000Z' }),
+      ],
+    });
+    const page = renderAnnualReport(r);
+
+    // The structure keeps the tenths; the page does not show them.
+    expect(page).not.toMatch(/\d+\.\d+ days/);
+    expect(page).toMatch(/\d+ days/);
+  });
+
+  it('says "under a day" rather than rounding a fast board to nothing', () => {
+    const r = build({
+      matters: [matter({ id: 'a', arrivedAt: '2026-02-01T09:00:00.000Z', settledAt: '2026-02-01T15:00:00.000Z' })],
+    });
+    expect(renderAnnualReport(r)).toContain('under a day');
+    expect(renderAnnualReport(r)).not.toContain('0 days');
+  });
+
+  it('leaves a dash where there is nothing to report', () => {
+    expect(renderAnnualReport(build())).toContain('<span>—</span>');
+  });
+});

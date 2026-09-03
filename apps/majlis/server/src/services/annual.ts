@@ -299,6 +299,22 @@ function date(iso: string | null): string {
   return Number.isNaN(d.getTime()) ? esc(iso) : d.toISOString().slice(0, 10);
 }
 
+/**
+ * Whole days, for the document.
+ *
+ * The arithmetic produces tenths and the structure keeps them, but printing
+ * "76.5 days" in a report a regulator reads invites more trust in the figure
+ * than it has earned — nothing a board does turns on half a day, and the wait
+ * is measured from dates that are themselves approximate. The interface rounds
+ * for the same reason; a figure that reads one way on screen and another on
+ * paper is worse than either.
+ */
+function dayFigure(n: number | null): string {
+  if (n === null) return '—';
+  if (n < 1) return 'under a day';
+  return `${Math.round(n)} days`;
+}
+
 const OUTCOME_WORDS: Record<ReportedDecision['outcome'], string> = {
   approved: 'Approved',
   refused: 'Not approved',
@@ -421,9 +437,9 @@ ${report.composition.map((m) => `      <tr><td>${esc(m.name)}</td><td>${esc(m.ti
   <section>
     <h2>Time taken</h2>
     <div class="figures">
-      <div><span>Median time from arrival to decision</span><span>${report.pace.medianDays === null ? '—' : `${report.pace.medianDays} days`}</span></div>
-      <div><span>Fastest</span><span>${report.pace.fastestDays === null ? '—' : `${report.pace.fastestDays} days`}</span></div>
-      <div><span>Slowest</span><span>${report.pace.slowestDays === null ? '—' : `${report.pace.slowestDays} days`}</span></div>
+      <div><span>Median time from arrival to decision</span><span>${dayFigure(report.pace.medianDays)}</span></div>
+      <div><span>Fastest</span><span>${dayFigure(report.pace.fastestDays)}</span></div>
+      <div><span>Slowest</span><span>${dayFigure(report.pace.slowestDays)}</span></div>
     </div>
 ${report.pace.approximate ? '    <p class="none">Some figures cover only the part of the wait this system witnessed.</p>' : ''}
   </section>

@@ -4,11 +4,16 @@ import { api, type Matter } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { Card, DateText, ErrorText, Loading, Section, Sources, Tag } from '../components/ui.js';
 import Deliberation from '../components/Deliberation.js';
+import { oversight } from '../lib/api.js';
 import Evidence from '../components/Evidence.js';
 import Precedent from '../components/Precedent.js';
 import Terms from '../components/Terms.js';
+import { DocumentLink } from '../components/Documents.js';
 import VotePanel from '../components/VotePanel.js';
 import { mayDeliberate, useIdentity } from '../lib/identity.js';
+
+/** The statuses a document exists for. Mirrors SETTLED in services/fatwa.ts. */
+const DECIDED = ['in_force', 'timelock', 'rejected', 'lapsed', 'withdrawn'];
 
 export default function MatterDetail() {
   const { id } = useParams<{ id: string }>();
@@ -47,8 +52,32 @@ export default function MatterDetail() {
         <DateText iso={matter.openedAt} />
       </div>
 
-      <div className="mb-7 rounded-lg border border-line bg-surface/60 px-4 py-3 text-[13px] leading-relaxed text-muted">
+      <div className="mb-5 rounded-lg border border-line bg-surface/60 px-4 py-3 text-[13px] leading-relaxed text-muted">
         {t(`matter.direction.${matter.direction}Note`)}
+      </div>
+
+      {/*
+        The document, at the moment of decision. High on the page because for
+        anyone arriving after the board has ruled — the business unit, the
+        auditor, the regulator — it is the only thing they came for.
+
+        A matter still being decided produces no document at all, and the space
+        says why rather than hiding: a page that looked final for an open
+        question would be acted on.
+      */}
+      <div className="mb-7">
+        {DECIDED.includes(matter.status) ? (
+          <DocumentLink
+            emphasis
+            href={oversight.hrefs.fatwa(matter.id)}
+            label={t('doc.fatwa')}
+            note={t(matter.status === 'timelock' ? 'doc.fatwaPending' : 'doc.fatwaNote')}
+          />
+        ) : (
+          <p className="rounded-lg border border-line/60 px-4 py-3 text-[12.5px] leading-relaxed text-muted">
+            {t('doc.fatwaNotYet')}
+          </p>
+        )}
       </div>
 
       <Section title={t('matter.proposal')}>

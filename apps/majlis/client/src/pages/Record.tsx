@@ -1,13 +1,15 @@
 import { useEffect, useState } from 'react';
-import { api, type AssistantExchange, type Health } from '../lib/api.js';
+import { api, oversight, type AssistantExchange, type Health } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { Card, DateText, Tag } from '../components/ui.js';
+import { DocumentLink, YearPicker } from '../components/Documents.js';
 
 export default function Record() {
   const { t } = useI18n();
   const [log, setLog] = useState<AssistantExchange[]>([]);
   const [health, setHealth] = useState<Health | null>(null);
   const [exporting, setExporting] = useState(false);
+  const [year, setYear] = useState(new Date().getUTCFullYear());
 
   useEffect(() => {
     api.assistantLog().then(setLog).catch(() => setLog([]));
@@ -44,6 +46,24 @@ export default function Record() {
           <p className="mt-1 text-[12.5px] leading-relaxed text-muted">{t('record.notDurable')}</p>
         </div>
       )}
+
+      {/*
+        The year's work, assembled. Above the raw export because it is the
+        document a person reads; the JSON below it is what a system consumes,
+        and offering the machine-readable one first would have the priorities
+        the wrong way round.
+      */}
+      <div className="mb-4">
+        <div className="mb-2 flex items-center gap-2 text-[13px] text-muted">
+          <span>{t('doc.year')}</span>
+          <YearPicker year={year} onChange={setYear} />
+        </div>
+        <DocumentLink
+          href={oversight.hrefs.annual(year)}
+          label={t('doc.annual')}
+          note={t('doc.annualNote')}
+        />
+      </div>
 
       <Card>
         <div className="text-[15px] font-medium">{t('record.export')}</div>
