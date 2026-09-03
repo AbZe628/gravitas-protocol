@@ -7,7 +7,9 @@ import {
   hashPassword,
   mayAnswerAsLiaison,
   mayDeliberate,
+  mayConvene,
   mayOpenMatter,
+  mayRecordInstitutionAct,
   mayVote,
   parseMembers,
   verifyPassword,
@@ -159,5 +161,62 @@ describe('over HTTP', () => {
 
     await request(app).get('/api/boards').set('Authorization', auth('member-a', 'a board credential')).expect(200);
     await request(app).get('/api/boards').set('Authorization', auth('board', 'shared secret')).expect(200);
+  });
+});
+
+describe('an office is held, not ranked', () => {
+  const h = hashPassword('a board credential');
+
+  it('parses role+office without changing how any older entry reads', () => {
+    const m = parseMembers(`member-a:signatory+chair:${h}\nmember-b:signatory:${h}`);
+    expect(m.authenticate('member-a', 'a board credential')?.office).toBe('chair');
+    expect(m.authenticate('member-b', 'a board credential')?.office).toBeUndefined();
+  });
+
+  it('reads an office alongside an institution', () => {
+    const m = parseMembers(`alpha/member-a:signatory+secretary:${h}`);
+    const who = m.authenticate('alpha/member-a', 'a board credential');
+    expect(who?.scholarId).toBe('member-a');
+    expect(who?.institutionId).toBe('alpha');
+    expect(who?.office).toBe('secretary');
+  });
+
+  it('refuses a chair who could not carry a vote', () => {
+    expect(() => parseMembers(`member-a:advisory+chair:${h}`)).toThrow(/must be a signatory/);
+    expect(() => parseMembers(`member-a:observer+chair:${h}`)).toThrow(/must be a signatory/);
+  });
+
+  it('allows a secretary who does not vote, because the office is not a vote', () => {
+    expect(parseMembers(`member-a:advisory+secretary:${h}`).size).toBe(1);
+  });
+
+  it('refuses an office it does not recognise', () => {
+    expect(() => parseMembers(`member-a:signatory+president:${h}`)).toThrow(/is not an office/);
+  });
+
+  it('refuses two members holding the same office', () => {
+    expect(() => parseMembers(`member-a:signatory+chair:${h}\nmember-b:signatory+chair:${h}`))
+      .toThrow(/Only one member may hold an office/);
+  });
+
+  it('lets two institutions each have their own chair', () => {
+    const m = parseMembers(`alpha/member-a:signatory+chair:${h}\nbeta/member-a:signatory+chair:${h}`);
+    expect(m.size).toBe(2);
+  });
+
+  it('gives the institution’s own steps to the secretary and the liaison, and nobody else', () => {
+    expect(mayRecordInstitutionAct('advisory', 'secretary')).toBe(true);
+    expect(mayRecordInstitutionAct('liaison')).toBe(true);
+    expect(mayRecordInstitutionAct('signatory')).toBe(false);
+    expect(mayRecordInstitutionAct('signatory', 'chair')).toBe(false);
+    expect(mayRecordInstitutionAct('observer')).toBe(false);
+  });
+
+  it('gives the chair procedure and nothing more', () => {
+    expect(mayConvene('chair')).toBe(true);
+    expect(mayConvene('secretary')).toBe(false);
+    expect(mayConvene()).toBe(false);
+    // The office widens nothing about deciding.
+    expect(mayVote('advisory')).toBe(false);
   });
 });

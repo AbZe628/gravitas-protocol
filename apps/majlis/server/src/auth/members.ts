@@ -37,6 +37,29 @@ export type Role = 'signatory' | 'advisory' | 'liaison' | 'observer';
 
 export const ROLES: readonly Role[] = ['signatory', 'advisory', 'liaison', 'observer'];
 
+/**
+ * An office is held *by* a member. It is not a level above them.
+ *
+ * Conflating the two is the usual mistake: a chair becomes a super-user who can
+ * approve things alone, which no governance framework gives them. Resolutions
+ * carry by the board's threshold, and the chair's authority is procedural —
+ * convening, the agenda, and being the person named when something is stuck.
+ *
+ * **The casting vote deliberately has no implementation here.** Frameworks that
+ * give a chair one are describing a majority-of-attending-members model, where
+ * a tie is possible. This board decides by reaching a fixed threshold of
+ * signatures, and a threshold is either met or it is not — there is no tie for
+ * a casting vote to break. Building the mechanism anyway would put a power in
+ * the record that can never legitimately fire.
+ *
+ * The secretary matters more in practice. Four of the nine steps of a
+ * non-compliance belong to the institution rather than to the board, and
+ * somebody has to record them.
+ */
+export type Office = 'chair' | 'secretary';
+
+export const OFFICES: readonly Office[] = ['chair', 'secretary'];
+
 export interface Member {
   /**
    * What the member types. `institution/member` where the entry names one,
@@ -50,6 +73,8 @@ export interface Member {
    */
   scholarId: string;
   role: Role;
+  /** Held, not ranked. Absent for most members, which is the normal case. */
+  office?: Office;
   /** From an `institution/member` id. Absent in the shorter form. */
   institutionId?: string;
   /** scrypt$saltHex$hashHex */
@@ -59,6 +84,8 @@ export interface Member {
 export interface Identity {
   scholarId: string;
   role: Role;
+  /** Absent for most members. Never widens what they may decide. */
+  office?: Office;
   /**
    * Which institution this member belongs to.
    *
@@ -126,6 +153,7 @@ export class Members {
     return {
       scholarId: member.scholarId,
       role: member.role,
+      office: member.office,
       institutionId: member.institutionId,
     };
   }
@@ -152,6 +180,8 @@ export function parseMembers(raw: string): Members {
     .map((l) => l.trim())
     .filter((l) => l.length > 0 && !l.startsWith('#'));
 
+  const offices = new Map<string, string>();
+
   for (const line of lines) {
     const first = line.indexOf(':');
     const second = line.indexOf(':', first + 1);
@@ -163,8 +193,16 @@ export function parseMembers(raw: string): Members {
     }
 
     const rawId = line.slice(0, first);
-    const role = line.slice(first + 1, second) as Role;
+    const rawRole = line.slice(first + 1, second);
     const secret = line.slice(second + 1);
+
+    /*
+     * `role+office` names both. The plus is not part of any role, so every
+     * entry written before this parses to exactly the same member.
+     */
+    const plus = rawRole.indexOf('+');
+    const role = (plus > 0 ? rawRole.slice(0, plus) : rawRole) as Role;
+    const office = plus > 0 ? (rawRole.slice(plus + 1) as Office) : undefined;
 
     /*
      * `institution/member` names both; a bare `member` belongs to whichever
@@ -186,6 +224,20 @@ export function parseMembers(raw: string): Members {
         `"${role}" is not a role. Expected one of: ${ROLES.join(', ')}.`
       );
     }
+    if (office !== undefined && !OFFICES.includes(office)) {
+      throw new MemberConfigError(
+        `"${office}" is not an office. Expected one of: ${OFFICES.join(', ')}.`
+      );
+    }
+    /*
+     * A chair who cannot vote could not carry the board on any question, and a
+     * board would discover that at the worst possible moment.
+     */
+    if (office === 'chair' && role !== 'signatory') {
+      throw new MemberConfigError(
+        `${scholarId} is named chair but is ${role}. A chair must be a signatory.`
+      );
+    }
     if (!secret.startsWith('scrypt$')) {
       throw new MemberConfigError(
         `The secret for ${scholarId} is not a hash. Never put a password here — ` +
@@ -196,8 +248,27 @@ export function parseMembers(raw: string): Members {
       throw new MemberConfigError(`${rawId} appears twice. Which entry wins is not a guess worth making.`);
     }
 
+    /*
+     * Two chairs is not a configuration, it is a question nobody has settled.
+     * Scoped per institution, because two institutions in one deployment each
+     * have their own.
+     */
+    if (office) {
+      const scope = institutionId ?? '';
+      const key = scope + ' ' + office;
+      const held = offices.get(key);
+      if (held) {
+        throw new MemberConfigError(
+          `Both ${held} and ${scholarId} are named ${office}` +
+            (institutionId ? ` for ${institutionId}` : '') +
+            '. Only one member may hold an office.'
+        );
+      }
+      offices.set(key, scholarId);
+    }
+
     seen.add(rawId);
-    members.push({ loginId: rawId, scholarId, role, secret, institutionId });
+    members.push({ loginId: rawId, scholarId, role, office, secret, institutionId });
   }
 
   return new Members(members);
@@ -228,4 +299,24 @@ export function mayAnswerAsLiaison(role: Role): boolean {
 /** Opening a matter is not a vote; anyone who deliberates may raise one. */
 export function mayOpenMatter(role: Role): boolean {
   return mayDeliberate(role);
+}
+
+/**
+ * Who may record a step that belongs to the institution rather than the board.
+ *
+ * Filing a rectification plan, recording that the Directors approved, that the
+ * regulator was notified, that purification was paid — none of these are the
+ * board's acts, and none of them may be recorded by the board deciding to. They
+ * are the institution's, and the secretary is the institution's person here.
+ *
+ * A liaison may too. In a small board there is often no secretary, and the
+ * liaison is already the member who carries facts in from outside.
+ */
+export function mayRecordInstitutionAct(role: Role, office?: Office): boolean {
+  return office === 'secretary' || role === 'liaison';
+}
+
+/** Procedural, and deliberately narrow. See the note on `Office`. */
+export function mayConvene(office?: Office): boolean {
+  return office === 'chair';
 }

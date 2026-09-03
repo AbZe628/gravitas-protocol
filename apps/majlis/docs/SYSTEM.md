@@ -131,9 +131,19 @@ hold*. They are orthogonal and must stay so.
 
 An office is held *by* a member; it is not a level above them.
 
-- **Chair** — convenes, sets the agenda, **casting vote on a tie only**
-- **Secretary** — raises administrative matters, manages deadlines, exports the
-  audit, invites members. **Never votes by virtue of the office.**
+- **Chair** — convenes and sets the agenda. Must be a signatory, because a
+  chair who could not carry a vote would discover it at the worst moment.
+- **Secretary** — records the steps of a matter that belong to the
+  **institution** rather than to the board: a rectification plan filed, the
+  Directors' approval, the regulator notified, purification paid. Four of the
+  nine steps of a non-compliance are not the board's acts, and the board must
+  not be able to record them by deciding to.
+
+> **The casting vote is deliberately not implemented.** Frameworks that give a
+> chair one are describing a majority-of-attending-members model, where a tie
+> can occur. This board decides by reaching a fixed threshold of signatures, and
+> a threshold is either met or it is not. Building the mechanism anyway would
+> put a power in the record that can never legitimately fire.
 
 **Rejected:** `Executor` as a role. Signing on chain is a capability of a
 member's wallet, not a seat on the board.
@@ -164,9 +174,17 @@ The three AAOIFI SS-21 ratios:
 them.** A failing ratio is a fact; what follows is a ruling. When new figures
 cross a threshold the system **raises a matter** — it does not re-rule.
 
-> ✎ The seed data teaches a **30% tangible-asset ratio**, which AAOIFI Shariah
-> Standard No. 59 revised. Illustrative data that quietly teaches a superseded
-> rule is the same fault class as a document claiming what the code does not do.
+> An earlier draft of this document asserted that the seed data teaches a
+> superseded **30% tangible-asset ratio**. It does not. The demonstration rule
+> is a **51% majority-tangibility test for secondary trading of mixed pools**,
+> which is a different rule serving a different purpose, and the seed already
+> labels its own source as fabricated for demonstration. The claim was wrong and
+> is withdrawn rather than quietly deleted — a document that corrects itself
+> silently is the thing this repository keeps finding and fixing.
+>
+> ✚ What the seed genuinely lacks is any figures to screen. Now that the ratios
+> are computed, the demonstration data should carry a balance sheet to compute
+> them from.
 
 ### 3.3 Non-compliance (SNC) — ✚ new, and the largest gap
 
@@ -386,7 +404,7 @@ than a form.
 4. **Periodic review** — review dates set on effect, raised when due
 5. **`office`** — chair and secretary, casting vote on a tie
 6. **Screening ratios** — computed, arithmetic shown, never concluded
-7. **Seed correction** — the superseded tangible-asset ratio
+7. **Seed figures** — a balance sheet for the screening ratios to work on
 
 ### Block 2 — the record becomes a product
 

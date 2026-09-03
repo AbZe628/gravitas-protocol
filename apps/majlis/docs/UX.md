@@ -359,16 +359,21 @@ drafting operative terms, reading at length, and producing an export.
 
 ---
 
-## 12. A correction to our own seed data
+## 12. A correction to this document
 
-The demonstration record uses a **30% tangible-asset ratio** as a screening
-threshold. That was an AAOIFI requirement and **Shariah Standard No. 59 on the
-Sale of Debt revised it.**
+An earlier draft said the demonstration record teaches a superseded **30%
+tangible-asset ratio**. It does not. The seeded rule is a **51%
+majority-tangibility test for secondary trading of mixed pools** — a different
+rule, for a different purpose — and the seed already labels its own source as
+fabricated for demonstration rather than presenting it as an AAOIFI position.
 
-Illustrative data that quietly teaches a superseded rule is the same class of
-fault as a document claiming something the code does not do. The three ratios of
-Standard 21 are the better illustration: current, and they show the arithmetic
-the software should be doing.
+The claim is withdrawn here rather than deleted, because a document that
+corrects itself silently is exactly the fault this project keeps finding in
+other people's documents.
+
+What the demonstration data genuinely lacks is a balance sheet. The three
+ratios of Standard 21 are now computed by the software, and there are no
+figures in the record for them to be computed from.
 
 ---
 

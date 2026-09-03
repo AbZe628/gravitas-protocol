@@ -429,3 +429,109 @@ describe('the pace of the board, over HTTP', () => {
     expect(res.body.error).toBe('not_found');
   });
 });
+
+describe('reviews and screening, over HTTP', () => {
+  it('reports the seeded rules that nothing will ever raise', async () => {
+    const res = await request(app)
+      .get('/api/reviews')
+      .set('Authorization', as('member-a'))
+      .expect(200);
+
+    // The seed predates review intervals, so every rule in force is
+    // unscheduled — which the list says rather than reporting all clear.
+    expect(res.body.unscheduled).toBeGreaterThan(0);
+    expect(res.body.items.every((i: { state: string }) => i.state === 'unscheduled')).toBe(true);
+    expect(res.body.items[0].note).toContain('Nothing will bring this back');
+  });
+
+  it('says where one rule stands, and 404s for one that is not there', async () => {
+    const rules = (await request(app).get('/api/rules').set('Authorization', as('member-a'))).body;
+    const id = (Array.isArray(rules) ? rules : rules.rules)[0].id;
+
+    const res = await request(app)
+      .get(`/api/rules/${id}/review`)
+      .set('Authorization', as('member-a'))
+      .expect(200);
+    expect(res.body.ruleId).toBe(id);
+
+    await request(app).get('/api/rules/no-such-rule/review').set('Authorization', as('member-a')).expect(404);
+  });
+
+  it('computes the three ratios and shows the arithmetic', async () => {
+    const res = await request(app)
+      .post('/api/screening')
+      .set('Authorization', as('member-a'))
+      .send({
+        figures: {
+          asOf: '2026-06-30', source: 'Treasury', currency: 'USD',
+          marketCapitalisation: '1000', interestBearingDebt: '200',
+          cashAndInterestBearingSecurities: '100',
+          totalRevenue: '500', nonPermissibleIncome: '10',
+        },
+      })
+      .expect(200);
+
+    expect(res.body.assessment.ratios).toHaveLength(3);
+    expect(res.body.assessment.ratios[0].workings).toContain('200 ÷ 1000');
+    expect(res.body.assessment.note).toContain('ruling for the board');
+    expect(res.body.crossings).toEqual([]);
+  });
+
+  it('names the field it could not read rather than guessing at a figure', async () => {
+    const res = await request(app)
+      .post('/api/screening')
+      .set('Authorization', as('member-a'))
+      .send({
+        figures: {
+          asOf: '2026-06-30', source: 'Treasury', currency: 'USD',
+          marketCapitalisation: 'about four billion', interestBearingDebt: '200',
+          cashAndInterestBearingSecurities: '100',
+          totalRevenue: '500', nonPermissibleIncome: '10',
+        },
+      })
+      .expect(400);
+
+    expect(res.body.error).toBe('bad_figure');
+    expect(res.body.field).toBe('marketCapitalisation');
+  });
+
+  it('asks the drift question when a ratio has changed side', async () => {
+    const send = (debt: string) =>
+      request(app).post('/api/screening').set('Authorization', as('member-a')).send({
+        figures: {
+          asOf: '2026-06-30', source: 'Treasury', currency: 'USD',
+          marketCapitalisation: '1000', interestBearingDebt: debt,
+          cashAndInterestBearingSecurities: '100',
+          totalRevenue: '500', nonPermissibleIncome: '10',
+        },
+      });
+
+    const march = (await send('200')).body.assessment;
+    const july = await request(app)
+      .post('/api/screening')
+      .set('Authorization', as('member-a'))
+      .send({
+        previous: march,
+        figures: {
+          asOf: '2026-09-30', source: 'Treasury', currency: 'USD',
+          marketCapitalisation: '1000', interestBearingDebt: '340',
+          cashAndInterestBearingSecurities: '100',
+          totalRevenue: '500', nonPermissibleIncome: '10',
+        },
+      })
+      .expect(200);
+
+    expect(july.body.crossings).toHaveLength(1);
+    expect(july.body.crossings[0].direction).toBe('into_breach');
+    expect(july.body.crossings[0].questionForBoard).toContain('?');
+  });
+
+  it('refuses a screening request with no figures at all', async () => {
+    const res = await request(app)
+      .post('/api/screening')
+      .set('Authorization', as('member-a'))
+      .send({})
+      .expect(400);
+    expect(res.body.error).toBe('no_figures');
+  });
+});

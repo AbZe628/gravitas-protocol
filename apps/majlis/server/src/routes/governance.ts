@@ -40,6 +40,8 @@ import {
 } from '../services/lifecycle.js';
 import { attentionList } from '../services/attention.js';
 import { paceOf, waitingNow } from '../services/clocks.js';
+import { reviewStatus, reviewsDue } from '../services/review.js';
+import { BadFigure, assess, crossings, type Assessment, type Figures } from '../services/screening.js';
 import { search, type SearchFilters } from '../services/search.js';
 import { relatedTo } from '../services/precedent.js';
 import { NotFound, type Store } from '../store/index.js';
@@ -605,6 +607,83 @@ export function governanceRoutes(store: Store, now: () => string = () => new Dat
         boards: scoped.map((b) => paceOf(b, matters, at)),
         waiting: waitingNow(scoped, matters, at),
       });
+    }),
+  );
+
+  /**
+   * Which rules are due back before the board.
+   *
+   * The only kind of work with no external trigger: nothing arrives to make a
+   * periodic review happen, so it slips, and a ruling quietly goes on governing
+   * a structure that changed. This computes a date and asks a question. It does
+   * not re-rule, and an overdue rule is still in force — compliance lapsing
+   * because nobody opened an application would be worse than the problem.
+   */
+  router.get(
+    '/reviews',
+    handle(async (req, res) => {
+      const at = now();
+      const board = typeof req.query.board === 'string' ? req.query.board : undefined;
+      const rules = await store.rules(board);
+
+      const due = reviewsDue(rules, at);
+      res.json({
+        asOf: at,
+        due: due.filter((r) => r.state === 'due').length,
+        unscheduled: due.filter((r) => r.state === 'unscheduled').length,
+        items: due,
+      });
+    }),
+  );
+
+  /** Where one rule stands, including one that is not due. */
+  router.get(
+    '/rules/:id/review',
+    handle(async (req, res) => {
+      const rule = await store.rule(req.params.id);
+      if (!rule) {
+        res.status(404).json({ error: 'not_found', message: 'No such rule.' });
+        return;
+      }
+      res.json(reviewStatus(rule, now()));
+    }),
+  );
+
+  /**
+   * The three screening ratios of AAOIFI Standard 21.
+   *
+   * Stateless on purpose: figures come from the institution and are not this
+   * system's to hold until a board has decided to attach them to something.
+   * Supplying a previous assessment asks the second question — what changed
+   * side since the board last looked — which is where the value is, because
+   * screening drifts silently and boards find out at the audit.
+   *
+   * It computes and it asks. It never concludes: whether an instrument is
+   * permissible is a ruling, and no ratio answers it.
+   */
+  router.post(
+    '/screening',
+    handle(async (req, res) => {
+      const body = req.body as { figures?: Figures; previous?: Assessment };
+      if (!body?.figures) {
+        res.status(400).json({
+          error: 'no_figures',
+          message: 'Send the figures to compute from, under "figures".',
+        });
+        return;
+      }
+
+      try {
+        const current = assess(body.figures);
+        const changed = body.previous ? crossings(body.previous, current) : [];
+        res.json({ assessment: current, crossings: changed });
+      } catch (e) {
+        if (e instanceof BadFigure) {
+          res.status(400).json({ error: e.code, field: e.field, message: e.message });
+          return;
+        }
+        throw e;
+      }
     }),
   );
 

@@ -112,6 +112,25 @@ export interface Rule {
   parameterHash: string;
   version: number;
   inForceFrom: string | null;
+
+  /**
+   * How often this rule returns to the board, in months.
+   *
+   * Set when the rule takes effect, because that is the only moment anyone is
+   * thinking about it. A rule with no interval is reviewed when somebody
+   * happens to remember, which is the failure this field exists to end.
+   *
+   * Optional: rules recorded before this existed have none, and are reported as
+   * unscheduled rather than quietly given a default nobody chose.
+   */
+  reviewEveryMonths?: number;
+  /**
+   * When the board last looked at it, whatever it concluded. Absent until the
+   * first review, after which the interval runs from here rather than from
+   * `inForceFrom`.
+   */
+  lastReviewedAt?: string;
+
   supersededBy: string | null;
   supersedes: string | null;
   sources: SourceRef[];
