@@ -46,6 +46,8 @@ import { assemble, render } from '../services/fatwa.js';
 import { assembleAnnualReport, renderAnnualReport } from '../services/annual.js';
 import { buildCalendar, toICalendar } from '../services/calendar.js';
 import { buildRegister, readComposition, standingOf } from '../services/register.js';
+import { checklistFor, recordFinding, setStructure } from '../services/structure.js';
+import { structures } from '../data/structures.js';
 import { buildManual, renderManual } from '../services/manual.js';
 import { reviewStatus, reviewsDue } from '../services/review.js';
 import { BadFigure, assess, crossings, type Assessment, type Figures } from '../services/screening.js';
@@ -147,6 +149,14 @@ const assetSchema = z.object({
 });
 
 const retireSchema = z.object({ reason: z.string().min(3).max(2_000) });
+
+const findingSchema = z.object({
+  conditionId: z.string().min(1).max(120),
+  holds: z.enum(['met', 'not_met', 'not_applicable']),
+  reason: reasonSchema,
+});
+
+const structureSchema = z.object({ structureId: z.string().min(1).max(120).nullable() });
 
 const stepsSchema = z.object({
   steps: z.array(z.string().min(3).max(2_000)).max(60),
@@ -692,6 +702,85 @@ export function governanceRoutes(store: Store, now: () => string = () => new Dat
       res.json(
         await store.updateMatter(req.params.id, (current) =>
           setImplementationSteps(current, parsed.data.steps),
+        ),
+      );
+    }),
+  );
+
+  /**
+   * The contract shapes a board rules against.
+   *
+   * Reference material with its source named, not an assertion of what the
+   * Shariah requires — boards differ, and a system that shipped its own reading
+   * as settled would be ruling. What is binding is the board's finding.
+   */
+  router.get(
+    '/structures',
+    handle(async (_req, res) => {
+      res.json({
+        structures,
+        note:
+          'A draft checklist with its source named. The board adopts, amends or rules against ' +
+          'each condition; nothing here is binding until it does.',
+      });
+    }),
+  );
+
+  /** Where the board has got to on the shape this matter is judged against. */
+  router.get(
+    '/matters/:id/checklist',
+    handle(async (req, res) => {
+      const who = identityOf(req);
+      const matter = await store.matter(req.params.id);
+      if (!matter) {
+        res.status(404).json({ error: 'not_found', message: 'No such matter.' });
+        return;
+      }
+      res.json(checklistFor(matter, who.scholarId));
+    }),
+  );
+
+  /** Judge the matter against a shape, or stop judging it against one. */
+  router.put(
+    '/matters/:id/structure',
+    handle(async (req, res) => {
+      const who = identityOf(req);
+      if (!requireRole(res, mayDeliberate(who.role), 'set the contract shape')) return;
+
+      const parsed = structureSchema.safeParse(req.body);
+      if (!parsed.success) return badRequest(res, parsed.error.issues);
+
+      res.json(
+        await store.updateMatter(req.params.id, (current) =>
+          setStructure(current, parsed.data.structureId),
+        ),
+      );
+    }),
+  );
+
+  /**
+   * Record one finding on one condition.
+   *
+   * Open to anyone who deliberates, because reading a contract against its
+   * conditions is deliberation rather than voting — an advisory member's
+   * finding is worth having and does not move a threshold.
+   */
+  router.post(
+    '/matters/:id/findings',
+    handle(async (req, res) => {
+      const who = identityOf(req);
+      if (!requireRole(res, mayDeliberate(who.role), 'record a finding')) return;
+
+      const parsed = findingSchema.safeParse(req.body);
+      if (!parsed.success) return badRequest(res, parsed.error.issues);
+
+      const board = await boardFor(store, res, req.params.id);
+      if (!board) return;
+
+      const at = now();
+      res.status(201).json(
+        await store.updateMatter(req.params.id, (current) =>
+          recordFinding(board, current, { scholarId: who.scholarId, ...parsed.data }, at),
         ),
       );
     }),

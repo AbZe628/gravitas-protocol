@@ -892,3 +892,101 @@ describe('judging is one click', () => {
     expect(found.governedBy).toBe(id);
   });
 });
+
+describe('the structures, over HTTP', () => {
+  it('offers the library as a draft rather than as an authority', async () => {
+    const res = await request(app).get('/api/structures').set('Authorization', as('watcher')).expect(200);
+
+    expect(res.body.structures.map((s: { id: string }) => s.id)).toEqual([
+      'murabaha',
+      'ijara-mbt',
+      'mudaraba',
+    ]);
+    expect(res.body.note).toContain('nothing here is binding');
+  });
+
+  it('walks a product approval through its conditions', async () => {
+    const id = await openMatter('member-a', { direction: 'restrict' });
+
+    await request(app)
+      .put(`/api/matters/${id}/structure`)
+      .set('Authorization', as('member-a'))
+      .send({ structureId: 'murabaha' })
+      .expect(200);
+
+    const before = await request(app)
+      .get(`/api/matters/${id}/checklist`)
+      .set('Authorization', as('member-a'))
+      .expect(200);
+    expect(before.body.total).toBe(6);
+    expect(before.body.answered).toBe(0);
+
+    await request(app)
+      .post(`/api/matters/${id}/findings`)
+      .set('Authorization', as('member-a'))
+      .send({
+        conditionId: 'ownership-before-sale',
+        holds: 'met',
+        reason: 'The sale file shows the bank on title before the onward sale to the client.',
+      })
+      .expect(201);
+
+    const after = await request(app)
+      .get(`/api/matters/${id}/checklist`)
+      .set('Authorization', as('member-a'))
+      .expect(200);
+    expect(after.body.answered).toBe(1);
+    expect(after.body.conditions[0].finding.holds).toBe('met');
+  });
+
+  it('refuses a finding with no reasoning behind it', async () => {
+    const id = await openMatter();
+    await request(app).put(`/api/matters/${id}/structure`).set('Authorization', as('member-a')).send({ structureId: 'mudaraba' }).expect(200);
+
+    const res = await request(app)
+      .post(`/api/matters/${id}/findings`)
+      .set('Authorization', as('member-a'))
+      .send({ conditionId: 'no-guarantee', holds: 'met', reason: 'fine' })
+      .expect(400);
+    expect(res.body.error).toBe('no_reason_given');
+  });
+
+  it('lets an advisory member record one, and refuses an observer', async () => {
+    const id = await openMatter();
+    await request(app).put(`/api/matters/${id}/structure`).set('Authorization', as('member-a')).send({ structureId: 'mudaraba' }).expect(200);
+
+    await request(app)
+      .post(`/api/matters/${id}/findings`)
+      .set('Authorization', as('advisor-1'))
+      .send({
+        conditionId: 'no-guarantee',
+        holds: 'not_met',
+        reason: 'The liquidity undertaking from the affiliate is a guarantee in substance.',
+      })
+      .expect(201);
+
+    await request(app)
+      .post(`/api/matters/${id}/findings`)
+      .set('Authorization', as('watcher'))
+      .send({ conditionId: 'no-guarantee', holds: 'met', reason: 'A reason of sufficient length here.' })
+      .expect(403);
+  });
+
+  it('says so when a matter is judged against nothing', async () => {
+    const id = await openMatter();
+    const res = await request(app)
+      .get(`/api/matters/${id}/checklist`)
+      .set('Authorization', as('member-a'))
+      .expect(409);
+    expect(res.body.message).toContain('not being judged against a contract shape');
+  });
+
+  it('refuses a shape that is not in the library', async () => {
+    const id = await openMatter();
+    await request(app)
+      .put(`/api/matters/${id}/structure`)
+      .set('Authorization', as('member-a'))
+      .send({ structureId: 'nonesuch' })
+      .expect(409);
+  });
+});

@@ -331,6 +331,23 @@ export interface Matter {
    */
   assetIds?: string[];
 
+  /**
+   * The contract shape this is being judged against, if any.
+   *
+   * Optional, because plenty of matters are not product approvals. Where it is
+   * set, the board rules on the structure's conditions one at a time instead of
+   * composing the question from nothing.
+   */
+  structureId?: string;
+  /**
+   * Where the board has got to on each condition.
+   *
+   * Append-only like every other position here: a finding is superseded by a
+   * later one from the same member rather than overwritten, so how the board
+   * arrived at its view stays visible.
+   */
+  findings?: ConditionFinding[];
+
   proposedRule: Rule;
   simulation: Simulation | null;
   deliberation: Deliberation[];
@@ -687,3 +704,66 @@ export interface Attendance {
   /** Frameworks that set an attendance floor expect absence to be explicable. */
   note?: string;
 }
+
+/**
+ * A nominate contract, as a set of conditions a board rules against.
+ *
+ * The library is a **draft with its source named**, not an assertion of what
+ * the Shariah requires. Boards differ, and a system that shipped its own
+ * reading as settled would be ruling. What is binding is the board's finding;
+ * this is the prompt that makes the finding orderly.
+ */
+export interface Structure {
+  id: string;
+  name: string;
+  family: 'sale' | 'lease' | 'partnership' | 'agency' | 'security' | 'exchange' | 'gratuitous';
+  conditions: StructureCondition[];
+  /** Which calculations this shape normally attracts. */
+  calculations: CalculationKind[];
+  /** Where the conditions are drawn from, for the board to confirm. */
+  authority: string;
+}
+
+export interface StructureCondition {
+  id: string;
+  /** What must be true. */
+  requirement: string;
+  /**
+   * What goes wrong when it is not.
+   *
+   * A condition stated without its reason can only be accepted or rejected on
+   * authority. Stated with it, a scholar can disagree with the reasoning, which
+   * is the argument a board should be having.
+   */
+  why: string;
+  /** How it is shown: a document, an order of events, a figure, an undertaking. */
+  evidence: 'document' | 'sequence' | 'figure' | 'undertaking';
+  authority: string;
+}
+
+/**
+ * One board member's finding on one condition.
+ *
+ * `not_applicable` is a real answer rather than a way out — many conditions
+ * genuinely do not bear on a given product, and forcing a met/not-met choice
+ * would put a false finding in the record.
+ */
+export interface ConditionFinding {
+  conditionId: string;
+  holds: 'met' | 'not_met' | 'not_applicable';
+  /** Compulsory, in all three directions. A finding without a reason is a tick. */
+  reason: string;
+  scholarId: string;
+  at: string;
+  /** Set when a later finding from the same member replaced this one. */
+  supersededAt?: string | null;
+}
+
+/** What a calculation is for. The kinds the toolkit knows about. */
+export type CalculationKind =
+  | 'screening'
+  | 'purification'
+  | 'zakat'
+  | 'profit_distribution'
+  | 'tangibility'
+  | 'late_payment';
