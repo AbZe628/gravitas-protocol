@@ -261,7 +261,121 @@ const proposedRatioRule = rule(
   ],
 );
 
+/**
+ * A ruling in force over the mixed pool, carrying a term that says what part of
+ * a composition it is measured against.
+ *
+ * It exists so the demonstration record shows drift rather than only the
+ * machinery for it: the pool's tangible parts total 50.00% against the 51.00%
+ * this ruling requires, which is exactly the condition that goes unnoticed
+ * until an audit.
+ */
+export const poolRuling: Matter = {
+  id: 'matter-2026-04-02',
+  boardId: 'demo-board',
+  assetIds: ['asset-mixed-pool'],
+  title: 'Secondary trading of a mixed pool at market price',
+  origin: 'institution_request',
+  direction: 'permit',
+  status: 'in_force',
+  openedAt: '2026-03-18T09:00:00Z',
+  settledAt: '2026-03-30T14:20:00Z',
+  proposal:
+    'The desk asks whether units in a pool combining leased assets and trade receivables may ' +
+    'be traded in the secondary market at market price, and on what condition.',
+  notDecided: [
+    'This does not address redemption at net asset value, which is unaffected.',
+    'This does not approve any other pool, whatever its composition.',
+  ],
+  mechanism:
+    'Units are transferred between holders at a market price. The pool net asset value ' +
+    'breakdown is published each month end by the administrator.',
+  implementationSteps: [
+    'Read the tangible proportion from the published net asset value breakdown, not from the desk’s own file.',
+    'Where the proportion is below the recorded minimum, secondary transfers at market price do not execute.',
+    'Redemption at net asset value continues regardless.',
+  ],
+  interactsWith: ['rule-tangible-ratio'],
+  proposedRule: {
+    id: 'rule-pool-trading',
+    boardId: 'demo-board',
+    title: 'Secondary trading of a mixed pool at market price',
+    statement:
+      'Units may be traded at market price only while tangible assets and usufructs are the ' +
+      'majority of the value of the pool.',
+    parameters: [
+      {
+        key: 'minTangibleRatioBps',
+        value: '5100',
+        unit: 'basis points',
+        meaning: 'Tangible assets and usufructs must be at least 51.00% of pool value.',
+        watches: { kind: 'tangible', bound: 'minimum' },
+      },
+      {
+        key: 'onBreach',
+        value: 'block_secondary_market_trades',
+        meaning:
+          'While the proportion is below the threshold, secondary transfers at market price do ' +
+          'not execute. Redemption at net asset value is unaffected.',
+      },
+    ],
+    parameterHash: '',
+    version: 1,
+    inForceFrom: '2026-04-02T00:00:00Z',
+    reviewEveryMonths: 6,
+    supersededBy: null,
+    supersedes: null,
+    sources: [
+      {
+        kind: 'document',
+        label: 'Illustrative tradability principles (fabricated demonstration source)',
+        ref: 'docs/references/mixed-portfolio.md',
+      },
+    ],
+  },
+  simulation: null,
+  deliberation: [],
+  reasoning: [
+    {
+      scholarId: 'member-a',
+      position: 'for',
+      reason:
+        'While the tangible majority holds, what is traded is a share in assets rather than in ' +
+        'a receivable, and the price may be what a buyer will pay.',
+      at: '2026-03-29T10:05:00Z',
+    },
+    {
+      scholarId: 'member-b',
+      position: 'for',
+      reason:
+        'Subject to the threshold being read from the published breakdown rather than from the ' +
+        'desk, which is where the last dispute came from.',
+      at: '2026-03-29T15:40:00Z',
+    },
+    {
+      scholarId: 'member-c',
+      position: 'for',
+      reason:
+        'The condition is workable and the breach behaviour is stated, which is what was missing ' +
+        'when this was last before us.',
+      at: '2026-03-30T09:12:00Z',
+    },
+  ],
+  timelockStartedAt: '2026-03-30T14:20:00Z',
+  timelockEndsAt: '2026-04-01T14:20:00Z',
+  objections: [],
+  inForceAt: '2026-04-02T00:00:00Z',
+  sources: [
+    {
+      kind: 'document',
+      label: 'Illustrative tradability principles (fabricated demonstration source)',
+      ref: 'docs/references/mixed-portfolio.md',
+    },
+  ],
+};
+
 export const matters: Matter[] = [
+  poolRuling,
   {
     id: 'matter-2026-07-03',
     assetIds: ['asset-mixed-pool'],

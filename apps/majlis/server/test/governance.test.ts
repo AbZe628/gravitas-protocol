@@ -599,10 +599,19 @@ describe('the compliance manual, over HTTP', () => {
       .expect(200);
 
     expect(res.body.entries.length).toBeGreaterThan(0);
-    // The seed predates implementation steps and review intervals, so every
-    // entry is incomplete — which the manual says rather than reporting all well.
-    expect(res.body.incomplete).toBe(res.body.entries.length);
-    expect(res.body.entries[0].gaps.join(' ')).toContain('GN-6');
+
+    // The record holds both states, which is the point of the manual. The
+    // pool ruling was recorded with its steps, its limits, its sources and a
+    // review interval, so it is complete; the rest predate all four and the
+    // manual says so rather than reporting all well.
+    expect(res.body.incomplete).toBeGreaterThan(0);
+    expect(res.body.incomplete).toBeLessThan(res.body.entries.length);
+
+    const incomplete = res.body.entries.filter((e: { gaps: string[] }) => e.gaps.length > 0);
+    expect(incomplete[0].gaps.join(' ')).toContain('GN-6');
+
+    const complete = res.body.entries.find((e: { gaps: string[] }) => e.gaps.length === 0);
+    expect(complete.implementationSteps.length).toBeGreaterThan(0);
   });
 
   it('serves a printable page', async () => {
@@ -1040,5 +1049,50 @@ describe('purification from a holding, over HTTP', () => {
 
   it('refuses anonymously, like every other route', async () => {
     await request(app).post('/api/purification').send({}).expect(401);
+  });
+});
+
+describe('drift, over HTTP', () => {
+  it('finds the pool that has fallen below the threshold its own ruling set', async () => {
+    const res = await request(app).get('/api/drift').set('Authorization', as('watcher')).expect(200);
+
+    const found = res.body.drifting.find((d: { assetId: string }) => d.assetId === 'asset-mixed-pool');
+    expect(found).toBeTruthy();
+    expect(found.observed.percent).toBe('50.00');
+    expect(found.term.value).toBe('5100');
+    expect(found.matterId).toBe('matter-2026-04-02');
+  });
+
+  it('asks a question and states both figures, rather than concluding', async () => {
+    const res = await request(app).get('/api/drift').set('Authorization', as('member-a')).expect(200);
+    const q = res.body.drifting[0].questionForBoard;
+
+    expect(q).toContain('50.00%');
+    expect(q).toContain('51.00%');
+    expect(q).toContain('Does the standing ruling still hold?');
+    expect(q.toLowerCase()).not.toContain('impermissible');
+  });
+
+  it('changes nothing: the holding keeps the status the board gave it', async () => {
+    await request(app).get('/api/drift').set('Authorization', as('member-a')).expect(200);
+
+    const reg = await request(app).get('/api/register').set('Authorization', as('member-a')).expect(200);
+    const pool = reg.body.assets.find((a: { asset: { id: string } }) => a.asset.id === 'asset-mixed-pool');
+    // A ruling that expired because a number moved would be compliance lapsing
+    // by arithmetic, which is worse than the problem.
+    expect(pool.status).toBe('under_consideration');
+  });
+
+  it('reports a term nothing is checking as its own finding', async () => {
+    const res = await request(app).get('/api/drift').set('Authorization', as('member-a')).expect(200);
+    // onBreach says nothing about a composition, and is reported rather than
+    // silently ignored.
+    const found = res.body.unwatched.find((u: { key: string }) => u.key === 'onBreach');
+    expect(found).toBeTruthy();
+    expect(found.reason).toContain('nothing checks it');
+  });
+
+  it('refuses anonymously, like every other read', async () => {
+    await request(app).get('/api/drift').expect(401);
   });
 });

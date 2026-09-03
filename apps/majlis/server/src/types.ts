@@ -95,6 +95,25 @@ export interface RuleParameter {
   unit?: string;
   /** Plain-language statement of what this parameter does. */
   meaning: string;
+
+  /**
+   * What in a holding's composition this term is measured against, if anything.
+   *
+   * Stated by the board rather than inferred from the key. Keys are free text,
+   * and guessing that `minTangibleRatioBps` watches the tangible proportion
+   * would be the software reading a name and concluding — which is the one
+   * thing it must not do. Two boards will name the same term differently and a
+   * third will name a different term the same way.
+   *
+   * Absent on everything recorded before this existed, and absent by choice on
+   * terms that watch nothing. Where it is absent the drift service reports the
+   * term as unwatched rather than quietly watching nothing.
+   */
+  watches?: {
+    kind: CompositionPart['kind'];
+    /** Whether the value is a floor or a ceiling. The difference is the whole test. */
+    bound: 'minimum' | 'maximum';
+  };
 }
 
 export interface Rule {

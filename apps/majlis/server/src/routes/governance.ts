@@ -48,6 +48,7 @@ import { buildCalendar, toICalendar } from '../services/calendar.js';
 import { buildRegister, readComposition, standingOf } from '../services/register.js';
 import { checklistFor, recordFinding, setStructure } from '../services/structure.js';
 import { PURIFICATION_METHODS, purify, type PurificationInput } from '../services/purification.js';
+import { driftReport } from '../services/drift.js';
 import { structures } from '../data/structures.js';
 import { buildManual, renderManual } from '../services/manual.js';
 import { reviewStatus, reviewsDue } from '../services/review.js';
@@ -817,6 +818,30 @@ export function governanceRoutes(store: Store, now: () => string = () => new Dat
           recordFinding(board, current, { scholarId: who.scholarId, ...parsed.data }, at),
         ),
       );
+    }),
+  );
+
+  /**
+   * What has moved under a ruling.
+   *
+   * The only thing here that goes looking rather than waiting to be opened. It
+   * compares the terms the board set against the composition as it now stands,
+   * and asks the question — it does not re-rule, and it does not raise the
+   * matter itself. A member raises it in one click from the holding, as they do
+   * from the register.
+   *
+   * That restraint is deliberate: an automation that wrote matters into the
+   * record on its own would be one mis-specified feed away from burying a board
+   * under questions nobody asked, and attention is the scarcest thing here.
+   *
+   * Open to observers. An auditor asking what has drifted is asking this.
+   */
+  router.get(
+    '/drift',
+    handle(async (_req, res) => {
+      const at = now();
+      const [assets, matters] = await Promise.all([store.assets(), store.matters()]);
+      res.json(driftReport(assets, matters, at));
     }),
   );
 
