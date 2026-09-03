@@ -831,3 +831,64 @@ describe('the register, over HTTP', () => {
       .expect(400);
   });
 });
+
+describe('judging is one click', () => {
+  it('opens a matter that already names the asset, and the register sees it', async () => {
+    const res = await request(app)
+      .post('/api/matters')
+      .set('Authorization', as('member-a'))
+      .send({
+        boardId: 'demo-board',
+        title: 'Treatment of the cash-backed settlement token',
+        proposal: 'The board is asked to rule on this holding.',
+        direction: 'permit',
+        origin: 'institution_request',
+        assetIds: ['asset-cash-backed'],
+      })
+      .expect(201);
+
+    expect(res.body.assetIds).toEqual(['asset-cash-backed']);
+
+    // The asset moves out of never-examined without anything else being done.
+    const reg = await request(app).get('/api/register').set('Authorization', as('member-a')).expect(200);
+    const found = reg.body.assets.find(
+      (a: { asset: { id: string } }) => a.asset.id === 'asset-cash-backed',
+    );
+    expect(found.status).toBe('under_consideration');
+    expect(found.openMatters).toEqual([res.body.id]);
+  });
+
+  it('accepts a matter about nothing in the register, which is a real thing a board does', async () => {
+    const res = await request(app)
+      .post('/api/matters')
+      .set('Authorization', as('member-a'))
+      .send({
+        boardId: 'demo-board',
+        title: 'Whether the board may sit with fewer than three members',
+        proposal: 'A question about the process rather than about a holding.',
+        direction: 'permit',
+        origin: 'protocol_change',
+      })
+      .expect(201);
+
+    expect(res.body.assetIds).toEqual([]);
+  });
+
+  it('carries the asset into the document once the board has decided', async () => {
+    const id = await openMatter('member-a', {
+      direction: 'restrict',
+      assetIds: ['asset-staking-wrapper'],
+    });
+    await say(id, 'member-a');
+    await request(app).post(`/api/matters/${id}/voting`).set('Authorization', as('member-a')).expect(200);
+    for (const who of ['member-a', 'member-b']) await vote(id, who).expect(201);
+    await request(app).post(`/api/matters/${id}/close`).set('Authorization', as('member-a')).expect(200);
+
+    const reg = await request(app).get('/api/register').set('Authorization', as('member-a')).expect(200);
+    const found = reg.body.assets.find(
+      (a: { asset: { id: string } }) => a.asset.id === 'asset-staking-wrapper',
+    );
+    expect(found.status).toBe('restricted');
+    expect(found.governedBy).toBe(id);
+  });
+});

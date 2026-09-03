@@ -88,6 +88,11 @@ const openSchema = z.object({
   mechanism: z.string().max(20_000).default(''),
   notDecided: z.array(z.string().max(2_000)).max(50).default([]),
   interactsWith: z.array(z.string().max(120)).max(50).default([]),
+  /**
+   * What this is about. The link that makes the fatwa and the registry entry
+   * refer to the same object rather than to two hand-typed strings.
+   */
+  assetIds: z.array(z.string().min(1).max(120)).max(20).default([]),
 });
 
 const saySchema = z.object({
@@ -188,6 +193,7 @@ export function governanceRoutes(store: Store, now: () => string = () => new Dat
         notDecided: parsed.data.notDecided,
         mechanism: parsed.data.mechanism,
         interactsWith: parsed.data.interactsWith,
+        assetIds: parsed.data.assetIds,
         // The rule is drafted alongside the matter and carries no parameters
         // until they are proposed. An empty hash is honest; a fabricated one
         // would be the exact failure this system exists to prevent.

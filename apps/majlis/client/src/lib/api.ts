@@ -367,6 +367,8 @@ export const governance = {
     origin: string;
     mechanism?: string;
     notDecided?: string[];
+    /** What it is about. The link that makes the two outputs one thing. */
+    assetIds?: string[];
   }) => send<Matter>('/api/matters', input),
 
   openDeliberation: (id: string) => send<Matter>(`/api/matters/${id}/open`),
@@ -622,6 +624,13 @@ export const oversight = {
   calendar: () => get<Calendar>('/api/calendar'),
   settings: () => get<Settings>('/api/settings'),
 
+  register: () => get<Register>('/api/register'),
+  asset: (id: string) => get<AssetDetail>(`/api/assets/${id}`),
+  addAsset: (input: { kind: AssetKind; name: string; identifiers: AssetIdentifier[] }) =>
+    send<Asset>('/api/assets', input),
+  retireAsset: (id: string, reason: string) =>
+    send<Asset>(`/api/assets/${id}/retire`, { reason }),
+
   incidents: () => get<IncidentList>('/api/incidents'),
   incident: (id: string) => get<Incident>(`/api/incidents/${id}`),
 
@@ -726,4 +735,70 @@ export interface Settings {
   /** Where the board record and the credential file disagree. Empty is the goal. */
   mismatches: Mismatch[];
   fixIn: string;
+}
+
+// ── the register ──────────────────────────────────────────────────────────
+
+export type AssetKind = 'token' | 'pool' | 'security' | 'instrument' | 'product';
+
+export type AssetStatus =
+  | 'never_examined'
+  | 'under_consideration'
+  | 'permitted'
+  | 'restricted'
+  | 'lapsed'
+  | 'retired';
+
+export interface AssetIdentifier {
+  scheme: 'chain' | 'isin' | 'ticker' | 'internal';
+  value: string;
+  network?: string;
+}
+
+export interface Asset {
+  id: string;
+  institutionId: string;
+  kind: AssetKind;
+  name: string;
+  identifiers: AssetIdentifier[];
+  source: 'registry' | 'institution' | 'member';
+  addedAt: string;
+  addedBy: string | null;
+  retiredAt: string | null;
+  retiredReason: string | null;
+}
+
+export interface AssetStanding {
+  asset: Asset;
+  status: AssetStatus;
+  /** The ruling that decides the status, where one does. */
+  governedBy: string | null;
+  openMatters: string[];
+  history: string[];
+  note: string;
+}
+
+/** A composition read out with its arithmetic. Never a conclusion. */
+export interface CompositionReading {
+  asOf: string;
+  source: string;
+  parts: { label: string; kind: string; bps: number; percent: string }[];
+  byKind: { kind: string; bps: number; percent: string }[];
+  incomplete: boolean;
+  total: number;
+  note: string;
+}
+
+export interface AssetDetail extends AssetStanding {
+  composition: CompositionReading | null;
+}
+
+export interface Register {
+  asOf: string;
+  institutionId: string | null;
+  assets: AssetStanding[];
+  counts: Record<AssetStatus, number>;
+  /** How much of the universe has never been looked at. */
+  neverExamined: number;
+  total: number;
 }

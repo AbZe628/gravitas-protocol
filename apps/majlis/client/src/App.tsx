@@ -4,7 +4,9 @@ import { LANGS } from './locales/index.js';
 import Dashboard from './pages/Dashboard.js';
 import MatterDetail from './pages/MatterDetail.js';
 import Rules from './pages/Rules.js';
+import AssetDetail from './pages/AssetDetail.js';
 import Calendar from './pages/Calendar.js';
+import Register from './pages/Register.js';
 import Settings from './pages/Settings.js';
 import Incidents from './pages/Incidents.js';
 import IncidentDetail from './pages/IncidentDetail.js';
@@ -22,6 +24,9 @@ function Nav() {
     { to: '/', label: t('nav.matters'), end: true },
     // Finding a matter is the same errand as reading one, so it sits beside it.
     { to: '/search', label: t('nav.search') },
+    // The domain, before the questions raised about it. A scholar looking for
+    // the work starts here; everything else lists work already started.
+    { to: '/register', label: t('nav.register') },
     { to: '/rules', label: t('nav.rules') },
     // A reported breach is not a proposal and does not belong in the list of
     // them. It has its own clock, which is the whole difference.
@@ -104,6 +109,8 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/matters/:id" element={<MatterDetail />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/register/:id" element={<AssetDetail />} />
           <Route path="/rules" element={<Rules />} />
           <Route path="/calendar" element={<Calendar />} />
           <Route path="/incidents" element={<Incidents />} />
