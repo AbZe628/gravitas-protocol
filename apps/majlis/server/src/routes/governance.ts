@@ -44,6 +44,7 @@ import { attentionList } from '../services/attention.js';
 import { paceOf, waitingNow } from '../services/clocks.js';
 import { assemble, render } from '../services/fatwa.js';
 import { assembleAnnualReport, renderAnnualReport } from '../services/annual.js';
+import { buildCalendar, toICalendar } from '../services/calendar.js';
 import { buildManual, renderManual } from '../services/manual.js';
 import { reviewStatus, reviewsDue } from '../services/review.js';
 import { BadFigure, assess, crossings, type Assessment, type Figures } from '../services/screening.js';
@@ -669,6 +670,70 @@ export function governanceRoutes(store: Store, now: () => string = () => new Dat
           setImplementationSteps(current, parsed.data.steps),
         ),
       );
+    }),
+  );
+
+  /**
+   * What is coming.
+   *
+   * Every date the board is held to, in order, derived from the clocks rather
+   * than kept as a list. Open to observers: an auditor asking what is
+   * outstanding is asking exactly this.
+   */
+  router.get(
+    '/calendar',
+    handle(async (req, res) => {
+      const at = now();
+      const boardId = typeof req.query.board === 'string' ? req.query.board : undefined;
+
+      const [boards, matters, rules, incidents] = await Promise.all([
+        store.boards(),
+        store.matters(boardId),
+        store.rules(boardId),
+        store.incidents(boardId),
+      ]);
+
+      if (boardId && !boards.some((b) => b.id === boardId)) {
+        res.status(404).json({ error: 'not_found', message: 'No such board.' });
+        return;
+      }
+
+      res.json(buildCalendar({ boards, matters, rules, incidents, now: at, boardId }));
+    }),
+  );
+
+  /**
+   * The same dates, as a feed.
+   *
+   * A deadline that exists only inside an application is a deadline somebody
+   * has to remember to go and look for, which is the failure this whole system
+   * was built against. This puts them in the calendar a scholar already checks.
+   *
+   * **What is honest about it today:** the file downloads and imports, and the
+   * dates land correctly. A live *subscription* — a calendar re-fetching this
+   * every few hours — cannot authenticate against a credential a person types,
+   * so it would need a per-member feed token. That is not built, and putting a
+   * password in a subscription URL is not a substitute for it.
+   */
+  router.get(
+    '/calendar.ics',
+    handle(async (req, res) => {
+      const at = now();
+      const boardId = typeof req.query.board === 'string' ? req.query.board : undefined;
+
+      const [boards, matters, rules, incidents] = await Promise.all([
+        store.boards(),
+        store.matters(boardId),
+        store.rules(boardId),
+        store.incidents(boardId),
+      ]);
+
+      const calendar = buildCalendar({ boards, matters, rules, incidents, now: at, boardId });
+      const host = req.get('host') ?? 'majlis.local';
+
+      res.type('text/calendar; charset=utf-8');
+      res.setHeader('Content-Disposition', 'attachment; filename="majlis.ics"');
+      res.send(toICalendar(calendar, host));
     }),
   );
 

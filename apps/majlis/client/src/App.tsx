@@ -4,6 +4,7 @@ import { LANGS } from './locales/index.js';
 import Dashboard from './pages/Dashboard.js';
 import MatterDetail from './pages/MatterDetail.js';
 import Rules from './pages/Rules.js';
+import Calendar from './pages/Calendar.js';
 import Incidents from './pages/Incidents.js';
 import IncidentDetail from './pages/IncidentDetail.js';
 import Briefings from './pages/Briefings.js';
@@ -24,6 +25,7 @@ function Nav() {
     // A reported breach is not a proposal and does not belong in the list of
     // them. It has its own clock, which is the whole difference.
     { to: '/incidents', label: t('nav.incidents') },
+    { to: '/calendar', label: t('nav.calendar') },
     { to: '/briefings', label: t('nav.briefings') },
     // Offering a page that can only refuse is worse than not offering it.
     ...(health?.assistantKind === 'off' ? [] : [{ to: '/assistant', label: t('nav.assistant') }]),
@@ -101,6 +103,7 @@ export default function App() {
           <Route path="/" element={<Dashboard />} />
           <Route path="/matters/:id" element={<MatterDetail />} />
           <Route path="/rules" element={<Rules />} />
+          <Route path="/calendar" element={<Calendar />} />
           <Route path="/incidents" element={<Incidents />} />
           <Route path="/incidents/:id" element={<IncidentDetail />} />
           <Route path="/briefings" element={<Briefings />} />

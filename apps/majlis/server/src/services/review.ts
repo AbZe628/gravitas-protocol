@@ -134,11 +134,13 @@ export function reviewStatus(rule: Rule, now: string): ReviewStatus {
     dueAt,
     daysUntilDue: days,
     overdue,
+    // Whole days in the sentence, for the reason set out in incident.ts: a
+    // countdown expressed to a tenth reads as a measurement.
     note: overdue
-      ? `Review was due ${Math.abs(days)} days ago. The rule remains in force; what is missing is the board looking at it.`
+      ? `Review was due ${Math.round(Math.abs(days))} days ago. The rule remains in force; what is missing is the board looking at it.`
       : due
         ? `Review is due today, ${rule.reviewEveryMonths} months from ${since}.`
-        : `Next review in ${days} days, ${rule.reviewEveryMonths} months from ${since}.`,
+        : `Next review in ${Math.round(days)} days, ${rule.reviewEveryMonths} months from ${since}.`,
   };
 }
 

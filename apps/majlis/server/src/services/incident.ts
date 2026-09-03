@@ -266,13 +266,23 @@ export function rectificationClock(incident: Incident, now: string): Rectificati
   const planFiled = currentPlan(incident) !== null;
   const overdue = remaining < 0;
 
+  /*
+   * The field keeps the tenth; the sentence does not.
+   *
+   * "10.3 days left of thirty" invites more trust in the figure than it has
+   * earned, and this sentence is shown in three places — the list, the file
+   * itself, and the calendar. A deadline expressed to a tenth of a day reads as
+   * a measurement when it is a countdown.
+   */
+  const whole = Math.max(0, Math.round(remaining));
+
   const note = planFiled
     ? overdue
       ? `The plan was filed after the thirty days had run. The overrun is part of the record.`
-      : `A plan is filed with ${days} of the thirty days remaining.`
+      : `A plan is filed with ${whole} of the thirty days remaining.`
     : overdue
       ? `The thirty days have run and no rectification plan has been filed. This is a second failure on top of the original.`
-      : `${days} day${days === 1 ? '' : 's'} left of thirty to file a rectification plan.`;
+      : `${whole} day${whole === 1 ? '' : 's'} left of thirty to file a rectification plan.`;
 
   return { deadline, daysRemaining: days, overdue, planFiled, note };
 }

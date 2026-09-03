@@ -619,6 +619,7 @@ export interface Manual {
 export const oversight = {
   pace: () => get<PaceResponse>('/api/pace'),
   reviews: () => get<ReviewsResponse>('/api/reviews'),
+  calendar: () => get<Calendar>('/api/calendar'),
 
   incidents: () => get<IncidentList>('/api/incidents'),
   incident: (id: string) => get<Incident>(`/api/incidents/${id}`),
@@ -655,5 +656,33 @@ export const oversight = {
     fatwa: (id: string) => `/api/matters/${id}/fatwa`,
     manual: () => '/api/manual',
     annual: (year: number) => `/api/annual?year=${year}`,
+    calendarFeed: () => '/api/calendar.ics',
   },
 };
+
+// ── the calendar ──────────────────────────────────────────────────────────
+
+export type EntryKind =
+  | 'timelock_ends'
+  | 'ratification_due'
+  | 'rectification_due'
+  | 'review_due';
+
+export interface CalendarEntry {
+  id: string;
+  kind: EntryKind;
+  at: string;
+  title: string;
+  subject: string;
+  note: string;
+  overdue: boolean;
+  waitingOn: string[];
+}
+
+export interface Calendar {
+  asOf: string;
+  boardId: string | null;
+  entries: CalendarEntry[];
+  /** What the record cannot put on a calendar. Shown, not footnoted. */
+  gaps: string[];
+}
