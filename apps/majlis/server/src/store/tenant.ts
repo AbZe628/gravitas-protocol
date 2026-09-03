@@ -1,6 +1,7 @@
 import type {
   AssistantExchange,
   Board,
+  Asset,
   Briefing,
   Incident,
   Institution,
@@ -165,6 +166,44 @@ export class TenantStore implements Store {
       const next = change(current);
       if (next.boardId !== current.boardId) {
         throw new OutsideInstitution('move an incident to', next.boardId);
+      }
+      return next;
+    });
+  }
+
+  // ── the register ────────────────────────────────────────────────────────
+  //
+  // Simpler than everything above it: an asset carries its institution
+  // directly rather than inheriting one through a board, so the check is a
+  // comparison rather than a lookup. The rules are the same — absence rather
+  // than refusal on a read, loud refusal on a write.
+
+  async assets(): Promise<Asset[]> {
+    const all = await this.inner.assets();
+    return all.filter((a) => a.institutionId === this.institutionId);
+  }
+
+  async asset(id: string): Promise<Asset | null> {
+    const found = await this.inner.asset(id);
+    return found?.institutionId === this.institutionId ? found : null;
+  }
+
+  async createAsset(asset: Asset): Promise<Asset> {
+    if (asset.institutionId !== this.institutionId) {
+      throw new OutsideInstitution('add an asset to', asset.institutionId);
+    }
+    return this.inner.createAsset(asset);
+  }
+
+  async updateAsset(id: string, change: (current: Asset) => Asset): Promise<Asset> {
+    const found = await this.inner.asset(id);
+    // Indistinguishable from one that does not exist, deliberately.
+    if (!found || found.institutionId !== this.institutionId) throw new NotFound('asset', id);
+
+    return this.inner.updateAsset(id, (current) => {
+      const next = change(current);
+      if (next.institutionId !== current.institutionId) {
+        throw new OutsideInstitution('move an asset to', next.institutionId);
       }
       return next;
     });

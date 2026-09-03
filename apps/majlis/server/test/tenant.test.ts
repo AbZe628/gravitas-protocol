@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import type { Board, Incident, Institution, Matter, Rule } from '../src/types.js';
+import type { Asset, Board, Incident, Institution, Matter, Rule } from '../src/types.js';
 import { MemoryStore } from '../src/store/memory.js';
 import { TenantStore, OutsideInstitution } from '../src/store/tenant.js';
 import { NotFound } from '../src/store/store.js';
@@ -56,6 +56,7 @@ const both = () =>
       incident('alpha-incident', 'alpha-board', 'Something Alpha stopped'),
       incident('beta-incident', 'beta-board', 'Something Beta stopped'),
     ],
+    assets: [asset('alpha-asset', 'alpha-bank'), asset('beta-asset', 'beta-bank')],
     briefings: [],
   });
 
@@ -66,6 +67,15 @@ function incident(id: string, boardId: string, title: string): Incident {
     stage: 'reported', concurrences: [], determinedAt: null, actual: null,
     stopped: [], plans: [], directorsApprovedAt: null,
     submittedToRegulatorAt: null, purification: null, closedAt: null, sources: [],
+  };
+}
+
+function asset(id: string, institutionId: string): Asset {
+  return {
+    id, institutionId, kind: 'token', name: id,
+    identifiers: [{ scheme: 'internal', value: id }],
+    source: 'institution', addedAt: T0, addedBy: null,
+    composition: null, retiredAt: null, retiredReason: null,
   };
 }
 
@@ -292,5 +302,47 @@ describe('a reported non-compliance does not leave its institution', () => {
       }),
     ).rejects.toThrow('changed my mind');
     expect((await store.incident('alpha-incident'))?.stage).toBe('reported');
+  });
+});
+
+/*
+ * An asset carries its institution directly rather than through a board, so the
+ * check is a comparison. The rules are the same as everywhere: absence on a
+ * read, a loud refusal on a write.
+ */
+describe('the register does not leave its institution', () => {
+  it('lists only its own', async () => {
+    expect((await alpha().assets()).map((a) => a.id)).toEqual(['alpha-asset']);
+  });
+
+  it('answers for another institution’s asset as absence, not refusal', async () => {
+    expect(await alpha().asset('beta-asset')).toBeNull();
+    expect(await alpha().asset('no-such-asset')).toBeNull();
+  });
+
+  it('refuses an asset added to another institution, loudly', async () => {
+    await expect(alpha().createAsset(asset('x', 'beta-bank'))).rejects.toBeInstanceOf(
+      OutsideInstitution,
+    );
+  });
+
+  it('refuses a change to another institution’s asset as not found', async () => {
+    await expect(alpha().updateAsset('beta-asset', (a) => a)).rejects.toBeInstanceOf(NotFound);
+  });
+
+  it('will not let a change move an asset to another institution', async () => {
+    await expect(
+      alpha().updateAsset('alpha-asset', (a) => ({ ...a, institutionId: 'beta-bank' })),
+    ).rejects.toBeInstanceOf(OutsideInstitution);
+  });
+
+  it('writes nothing when a change is refused', async () => {
+    const store = alpha();
+    await expect(
+      store.updateAsset('alpha-asset', () => {
+        throw new Error('changed my mind');
+      }),
+    ).rejects.toThrow('changed my mind');
+    expect((await store.asset('alpha-asset'))?.retiredAt).toBeNull();
   });
 });

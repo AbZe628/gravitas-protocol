@@ -20,6 +20,7 @@
  */
 
 import type {
+  Asset,
   AssistantExchange,
   Board,
   Briefing,
@@ -97,6 +98,25 @@ export interface Store {
    *         nothing is written.
    */
   updateIncident(id: string, change: (current: Incident) => Incident): Promise<Incident>;
+
+  // ── the register ───────────────────────────────────────────────────────
+  //
+  // What the board rules on. Scoped by institution directly rather than through
+  // a board, because an asset belongs to the institution that holds it and not
+  // to the committee that ruled on it — two boards of one bank look at the same
+  // universe.
+
+  assets(): Promise<Asset[]>;
+  asset(id: string): Promise<Asset | null>;
+
+  /** @throws if an asset with this id already exists. */
+  createAsset(asset: Asset): Promise<Asset>;
+
+  /**
+   * Read, change and write one asset atomically.
+   * @throws NotFound if there is no such asset.
+   */
+  updateAsset(id: string, change: (current: Asset) => Asset): Promise<Asset>;
 
   // ── the assistant log ──────────────────────────────────────────────────
   //

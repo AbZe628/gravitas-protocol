@@ -32,6 +32,7 @@
 import { appendFileSync, mkdirSync, readFileSync, renameSync, writeFileSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import type {
+  Asset,
   AssistantExchange,
   Board,
   Briefing,
@@ -46,6 +47,7 @@ import {
   institutions as seedInstitutions,
   matters as seedMatters,
   rules as seedRules,
+  assets as seedAssets,
 } from '../data/seed.js';
 import { ASSISTANT_LOG_MAX, NotFound, type Store } from './store.js';
 
@@ -75,6 +77,13 @@ interface Document {
    * to do.
    */
   incidents?: Incident[];
+  /**
+   * Absent from every document written before the register existed, and
+   * normalised in memory on the way in rather than migrated on disk. A store
+   * that rewrites a bank's record because the code moved on is doing something
+   * nobody asked it to do.
+   */
+  assets?: Asset[];
   briefings: Briefing[];
 }
 
@@ -156,6 +165,7 @@ export class FileStore implements Store {
       // Older documents have no incidents. Filled in memory, written only when
       // something is actually stored.
       loaded.incidents ??= [];
+      loaded.assets ??= [];
       this.doc = loaded;
       return;
     }
@@ -163,7 +173,7 @@ export class FileStore implements Store {
     const startedAt = new Date().toISOString();
     this.doc =
       opts.seedIfEmpty === false
-        ? { version: 1, startedAt, boards: [], rules: [], matters: [], incidents: [], briefings: [] }
+        ? { version: 1, startedAt, boards: [], rules: [], matters: [], incidents: [], assets: [], briefings: [] }
         : {
             version: 1,
             startedAt,
@@ -174,6 +184,7 @@ export class FileStore implements Store {
             // Nothing seeded: a demonstration record that opens with a breach
             // the board never reported would be a strange thing to show anyone.
             incidents: [],
+            assets: copy(seedAssets),
             briefings: copy(seedBriefings),
           };
     this.persist();
@@ -299,6 +310,40 @@ export class FileStore implements Store {
       // Runs against a copy and before persist(), so a refusal writes nothing.
       const next = change(copy(this.doc.incidents[index]));
       this.doc.incidents[index] = copy(next);
+      this.persist();
+      return copy(next);
+    });
+  }
+
+  async assets(): Promise<Asset[]> {
+    return copy(this.doc.assets ?? []);
+  }
+
+  async asset(id: string): Promise<Asset | null> {
+    return copy((this.doc.assets ?? []).find((a) => a.id === id) ?? null);
+  }
+
+  async createAsset(asset: Asset): Promise<Asset> {
+    return this.serialise(() => {
+      this.doc.assets ??= [];
+      if (this.doc.assets.some((a) => a.id === asset.id)) {
+        throw new Error(`An asset with id ${asset.id} already exists.`);
+      }
+      this.doc.assets.push(copy(asset));
+      this.persist();
+      return copy(asset);
+    });
+  }
+
+  async updateAsset(id: string, change: (current: Asset) => Asset): Promise<Asset> {
+    return this.serialise(() => {
+      this.doc.assets ??= [];
+      const index = this.doc.assets.findIndex((a) => a.id === id);
+      if (index === -1) throw new NotFound('Asset', id);
+
+      // Runs against a copy and before persist(), so a refusal writes nothing.
+      const next = change(copy(this.doc.assets[index]));
+      this.doc.assets[index] = copy(next);
       this.persist();
       return copy(next);
     });

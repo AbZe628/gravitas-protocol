@@ -45,6 +45,7 @@ import { paceOf, waitingNow } from '../services/clocks.js';
 import { assemble, render } from '../services/fatwa.js';
 import { assembleAnnualReport, renderAnnualReport } from '../services/annual.js';
 import { buildCalendar, toICalendar } from '../services/calendar.js';
+import { buildRegister, readComposition, standingOf } from '../services/register.js';
 import { buildManual, renderManual } from '../services/manual.js';
 import { reviewStatus, reviewsDue } from '../services/review.js';
 import { BadFigure, assess, crossings, type Assessment, type Figures } from '../services/screening.js';
@@ -124,6 +125,23 @@ const parametersSchema = z.object({
     )
     .max(60),
 });
+
+const assetSchema = z.object({
+  kind: z.enum(['token', 'pool', 'security', 'instrument', 'product']),
+  name: z.string().min(2).max(300),
+  identifiers: z
+    .array(
+      z.object({
+        scheme: z.enum(['chain', 'isin', 'ticker', 'internal']),
+        value: z.string().min(1).max(200),
+        network: z.string().max(60).optional(),
+      }),
+    )
+    .min(1)
+    .max(10),
+});
+
+const retireSchema = z.object({ reason: z.string().min(3).max(2_000) });
 
 const stepsSchema = z.object({
   steps: z.array(z.string().min(3).max(2_000)).max(60),
@@ -669,6 +687,125 @@ export function governanceRoutes(store: Store, now: () => string = () => new Dat
         await store.updateMatter(req.params.id, (current) =>
           setImplementationSteps(current, parsed.data.steps),
         ),
+      );
+    }),
+  );
+
+  /**
+   * The register — what the board rules on.
+   *
+   * The one question a bank ever asks is what the status of a holding is, and
+   * until this existed the record could not answer it. Status is derived from
+   * the rules in force and the matters open against each asset, never stored:
+   * a stored status is a second copy of the truth and a rule withdrawn leaves
+   * the badge green.
+   *
+   * Ordered with the never-examined first, because that is the only state no
+   * other screen in this application can show — every other one lists work
+   * somebody already started.
+   */
+  router.get(
+    '/register',
+    handle(async (req, res) => {
+      const at = now();
+      const [assets, matters, boards] = await Promise.all([
+        store.assets(),
+        store.matters(),
+        store.boards(),
+      ]);
+
+      const institutionId =
+        typeof req.query.institution === 'string' ? req.query.institution : boards[0]?.institutionId;
+
+      res.json(buildRegister(assets, matters, at, institutionId));
+    }),
+  );
+
+  /** One asset: where it stands, everything decided about it, what it holds. */
+  router.get(
+    '/assets/:id',
+    handle(async (req, res) => {
+      const asset = await store.asset(req.params.id);
+      if (!asset) {
+        res.status(404).json({ error: 'not_found', message: 'No such asset.' });
+        return;
+      }
+
+      const standing = standingOf(asset, await store.matters(), now());
+      res.json({
+        ...standing,
+        composition: asset.composition ? readComposition(asset.composition) : null,
+      });
+    }),
+  );
+
+  /**
+   * Add one by hand.
+   *
+   * The register is normally supplied — from the protocol's own registry, or
+   * from the institution's universe — but a member who notices a holding
+   * nobody has entered must be able to enter it. `source` records that it came
+   * from a person, because "nobody has ruled on this" and "nobody has even told
+   * us about it" are different states.
+   */
+  router.post(
+    '/assets',
+    handle(async (req, res) => {
+      const who = identityOf(req);
+      if (!requireRole(res, mayDeliberate(who.role), 'add to the register')) return;
+
+      const parsed = assetSchema.safeParse(req.body);
+      if (!parsed.success) return badRequest(res, parsed.error.issues);
+
+      const boards = await store.boards();
+      const institutionId = boards[0]?.institutionId;
+      if (!institutionId) {
+        res.status(404).json({ error: 'not_found', message: 'No board, so no institution to add to.' });
+        return;
+      }
+
+      const at = now();
+      res.status(201).json(
+        await store.createAsset({
+          id: `asset-${at.replace(/[^0-9]/g, '').slice(0, 14)}-${Math.random().toString(36).slice(2, 8)}`,
+          institutionId,
+          kind: parsed.data.kind,
+          name: parsed.data.name,
+          identifiers: parsed.data.identifiers,
+          source: 'member',
+          addedAt: at,
+          addedBy: who.scholarId,
+          composition: null,
+          retiredAt: null,
+          retiredReason: null,
+        }),
+      );
+    }),
+  );
+
+  /**
+   * Withdraw one from the universe.
+   *
+   * Retired, never deleted. A holding that is gone still has a history the
+   * board is answerable for, and delisting is a fact rather than a ruling —
+   * whether a ruling survives it is a separate question for the board.
+   */
+  router.post(
+    '/assets/:id/retire',
+    handle(async (req, res) => {
+      const who = identityOf(req);
+      if (!requireRole(res, mayDeliberate(who.role), 'retire an asset')) return;
+
+      const parsed = retireSchema.safeParse(req.body);
+      if (!parsed.success) return badRequest(res, parsed.error.issues);
+
+      const at = now();
+      res.json(
+        await store.updateAsset(req.params.id, (current) => ({
+          ...current,
+          retiredAt: at,
+          retiredReason: parsed.data.reason,
+        })),
       );
     }),
   );

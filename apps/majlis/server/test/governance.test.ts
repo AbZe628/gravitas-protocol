@@ -731,3 +731,103 @@ describe('the annual report, over HTTP', () => {
     await request(app).get('/api/annual?board=nope').set('Authorization', as('member-a')).expect(404);
   });
 });
+
+describe('the register, over HTTP', () => {
+  it('shows the universe with the never-examined first', async () => {
+    const res = await request(app).get('/api/register').set('Authorization', as('watcher')).expect(200);
+
+    expect(res.body.total).toBeGreaterThan(0);
+    // The seed links two matters to two assets; the rest have never been put to
+    // anybody, which is the ordinary condition of a register.
+    expect(res.body.neverExamined).toBeGreaterThan(0);
+    expect(res.body.assets[0].status).toBe('never_examined');
+  });
+
+  it('derives a status from what the board actually did', async () => {
+    const res = await request(app).get('/api/register').set('Authorization', as('member-a')).expect(200);
+    const byId = new Map(res.body.assets.map((a: { asset: { id: string } }) => [a.asset.id, a]));
+
+    // matter-2026-07-03 is in deliberation and names the pool.
+    expect((byId.get('asset-mixed-pool') as { status: string }).status).toBe('under_consideration');
+    // matter-2026-06-19 is a restriction in force and names the token. It
+    // becomes 'lapsed' only once the sweep finds its ratification window
+    // closed, which has not run against a store this fresh.
+    expect((byId.get('asset-restructured-token') as { status: string }).status).toBe('restricted');
+  });
+
+  it('reads out one asset with its composition, and never a verdict', async () => {
+    const res = await request(app)
+      .get('/api/assets/asset-mixed-pool')
+      .set('Authorization', as('member-a'))
+      .expect(200);
+
+    expect(res.body.asset.name).toContain('Mixed pool');
+    expect(res.body.composition.byKind.find((k: { kind: string }) => k.kind === 'tangible').percent).toBe('50.00');
+    expect(JSON.stringify(res.body).toLowerCase()).not.toContain('permissible');
+  });
+
+  it('says so for an asset with nothing to read out', async () => {
+    const res = await request(app)
+      .get('/api/assets/asset-cash-backed')
+      .set('Authorization', as('member-a'))
+      .expect(200);
+    expect(res.body.composition).toBeNull();
+    expect(res.body.status).toBe('never_examined');
+  });
+
+  it('404s for an asset that is not there', async () => {
+    await request(app).get('/api/assets/no-such-asset').set('Authorization', as('member-a')).expect(404);
+  });
+
+  it('lets a member add one, and records that a person did', async () => {
+    const res = await request(app)
+      .post('/api/assets')
+      .set('Authorization', as('member-a'))
+      .send({ kind: 'token', name: 'A token nobody entered', identifiers: [{ scheme: 'ticker', value: 'NEW' }] })
+      .expect(201);
+
+    expect(res.body.source).toBe('member');
+    expect(res.body.addedBy).toBe('member-a');
+    expect(res.body.retiredAt).toBeNull();
+  });
+
+  it('refuses an observer adding to the register', async () => {
+    await request(app)
+      .post('/api/assets')
+      .set('Authorization', as('watcher'))
+      .send({ kind: 'token', name: 'Something', identifiers: [{ scheme: 'ticker', value: 'X' }] })
+      .expect(403);
+  });
+
+  it('refuses an asset with no identifier at all', async () => {
+    await request(app)
+      .post('/api/assets')
+      .set('Authorization', as('member-a'))
+      .send({ kind: 'token', name: 'Nameless', identifiers: [] })
+      .expect(400);
+  });
+
+  it('retires rather than deletes, and keeps the reason', async () => {
+    const res = await request(app)
+      .post('/api/assets/asset-leveraged-index/retire')
+      .set('Authorization', as('member-a'))
+      .send({ reason: 'Delisted by the issuer on 1 September.' })
+      .expect(200);
+
+    expect(res.body.retiredAt).toBeTruthy();
+    expect(res.body.retiredReason).toContain('Delisted');
+
+    // Still in the register, under its own state.
+    const reg = await request(app).get('/api/register').set('Authorization', as('member-a')).expect(200);
+    const found = reg.body.assets.find((a: { asset: { id: string } }) => a.asset.id === 'asset-leveraged-index');
+    expect(found.status).toBe('retired');
+  });
+
+  it('needs a reason to retire one', async () => {
+    await request(app)
+      .post('/api/assets/asset-sukuk-ijara/retire')
+      .set('Authorization', as('member-a'))
+      .send({ reason: 'no' })
+      .expect(400);
+  });
+});

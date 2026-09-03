@@ -1,4 +1,5 @@
-import type { Board, Institution, Matter, Briefing, Rule } from '../types.js';
+import type {
+  Asset, Board, Institution, Matter, Briefing, Rule } from '../types.js';
 import { hashParameters } from '../services/hash.js';
 
 /**
@@ -263,6 +264,7 @@ const proposedRatioRule = rule(
 export const matters: Matter[] = [
   {
     id: 'matter-2026-07-03',
+    assetIds: ['asset-mixed-pool'],
     boardId: 'demo-board',
     title: 'Treatment of a tangible asset ratio breached by drift rather than by act',
     origin: 'compliance_concern',
@@ -368,6 +370,7 @@ export const matters: Matter[] = [
   },
   {
     id: 'matter-2026-06-19',
+    assetIds: ['asset-restructured-token'],
     boardId: 'demo-board',
     title: 'Suspension of an asset following a change in its underlying structure',
     origin: 'protocol_change',
@@ -502,5 +505,134 @@ export const briefings: Briefing[] = [
       'be recorded as a rule in its own right?',
     sources: [{ kind: 'document', label: 'Settlement finality', ref: 'docs/references/finality.md' }],
     raisedBy: 'board_member',
+  },
+];
+
+/**
+ * The universe the board rules on.
+ *
+ * Illustrative, like everything else here. What it is shaped to demonstrate is
+ * the state that matters most and that no board can currently see: **most of a
+ * universe has never been examined.** Two of these carry a ruling; the rest
+ * have never been put to anybody, which is the ordinary condition of a register
+ * and the reason one is worth keeping.
+ */
+export const assets: Asset[] = [
+  {
+    id: 'asset-mixed-pool',
+    institutionId: 'demo-institution',
+    kind: 'pool',
+    name: 'Mixed pool — leased equipment and trade finance',
+    identifiers: [
+      { scheme: 'chain', value: '0x4a1f…c209', network: 'arbitrum-sepolia' },
+      { scheme: 'internal', value: 'POOL-MIX-01' },
+    ],
+    source: 'registry',
+    addedAt: '2026-03-02T00:00:00Z',
+    addedBy: null,
+    composition: {
+      asOf: '2026-06-30T00:00:00Z',
+      source: 'Pool net asset value breakdown (illustrative)',
+      parts: [
+        { label: 'Leased equipment', bps: 3100, kind: 'tangible' },
+        { label: 'Leased property', bps: 1900, kind: 'tangible' },
+        { label: 'Trade receivables', bps: 3300, kind: 'receivable' },
+        { label: 'Cash', bps: 1700, kind: 'cash' },
+      ],
+    },
+    retiredAt: null,
+    retiredReason: null,
+  },
+  {
+    id: 'asset-restructured-token',
+    institutionId: 'demo-institution',
+    kind: 'token',
+    name: 'Token whose underlying structure changed after approval',
+    identifiers: [{ scheme: 'chain', value: '0x9f2c…a41e', network: 'arbitrum-sepolia' }],
+    source: 'registry',
+    addedAt: '2026-01-14T00:00:00Z',
+    addedBy: null,
+    composition: null,
+    retiredAt: null,
+    retiredReason: null,
+  },
+  {
+    id: 'asset-cash-backed',
+    institutionId: 'demo-institution',
+    kind: 'token',
+    name: 'Cash-backed settlement token',
+    identifiers: [
+      { scheme: 'chain', value: '0xaf88…5831', network: 'arbitrum-sepolia' },
+      { scheme: 'ticker', value: 'USDC' },
+    ],
+    source: 'registry',
+    addedAt: '2026-01-14T00:00:00Z',
+    addedBy: null,
+    composition: null,
+    retiredAt: null,
+    retiredReason: null,
+  },
+  {
+    id: 'asset-staking-wrapper',
+    institutionId: 'demo-institution',
+    kind: 'token',
+    name: 'Wrapped staking position',
+    identifiers: [{ scheme: 'chain', value: '0x5979…8ce8', network: 'arbitrum-sepolia' }],
+    source: 'registry',
+    addedAt: '2026-05-21T00:00:00Z',
+    addedBy: null,
+    composition: null,
+    retiredAt: null,
+    retiredReason: null,
+  },
+  {
+    id: 'asset-sukuk-ijara',
+    institutionId: 'demo-institution',
+    kind: 'security',
+    name: 'Sukuk al-ijara, five year',
+    identifiers: [
+      { scheme: 'isin', value: 'XS0000000000' },
+      { scheme: 'internal', value: 'SUK-IJ-05' },
+    ],
+    source: 'institution',
+    addedAt: '2026-04-08T00:00:00Z',
+    addedBy: null,
+    composition: {
+      asOf: '2026-06-30T00:00:00Z',
+      source: 'Issuer report (illustrative)',
+      parts: [
+        { label: 'Leased assets', bps: 7200, kind: 'tangible' },
+        { label: 'Receivables', bps: 2100, kind: 'receivable' },
+        { label: 'Cash', bps: 700, kind: 'cash' },
+      ],
+    },
+    retiredAt: null,
+    retiredReason: null,
+  },
+  {
+    id: 'asset-commodity-murabaha',
+    institutionId: 'demo-institution',
+    kind: 'product',
+    name: 'Commodity murabaha for retail deposits',
+    identifiers: [{ scheme: 'internal', value: 'PRD-CM-RETAIL' }],
+    source: 'institution',
+    addedAt: '2026-08-19T00:00:00Z',
+    addedBy: null,
+    composition: null,
+    retiredAt: null,
+    retiredReason: null,
+  },
+  {
+    id: 'asset-leveraged-index',
+    institutionId: 'demo-institution',
+    kind: 'instrument',
+    name: 'Leveraged index instrument',
+    identifiers: [{ scheme: 'ticker', value: 'LVX3' }],
+    source: 'member',
+    addedAt: '2026-08-27T00:00:00Z',
+    addedBy: 'member-c',
+    composition: null,
+    retiredAt: null,
+    retiredReason: null,
   },
 ];

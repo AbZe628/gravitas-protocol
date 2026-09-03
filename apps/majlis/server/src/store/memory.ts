@@ -12,6 +12,7 @@
  */
 
 import type {
+  Asset,
   AssistantExchange,
   Board,
   Briefing,
@@ -26,6 +27,7 @@ import {
   institutions as seedInstitutions,
   matters as seedMatters,
   rules as seedRules,
+  assets as seedAssets,
 } from '../data/seed.js';
 import { ASSISTANT_LOG_MAX, NotFound, type Store } from './store.js';
 
@@ -37,6 +39,7 @@ export interface MemorySeed {
   rules?: Rule[];
   matters?: Matter[];
   incidents?: Incident[];
+  assets?: Asset[];
   briefings?: Briefing[];
 }
 
@@ -49,6 +52,7 @@ export class MemoryStore implements Store {
   private readonly _rules: Rule[];
   private readonly _matters: Map<string, Matter>;
   private readonly _incidents: Map<string, Incident>;
+  private readonly _assets: Map<string, Asset>;
   private readonly _briefings: Briefing[];
   private readonly _log: AssistantExchange[] = [];
 
@@ -61,6 +65,7 @@ export class MemoryStore implements Store {
     // No seeded incidents: a demonstration record that opens with a breach the
     // board never reported would be a strange thing to show anyone.
     this._incidents = new Map((seed.incidents ?? []).map((i) => [i.id, copy(i)]));
+    this._assets = new Map((seed.assets ?? seedAssets).map((a) => [a.id, copy(a)]));
   }
 
   async institutions(): Promise<Institution[]> {
@@ -148,6 +153,32 @@ export class MemoryStore implements Store {
 
     const next = change(copy(current));
     this._incidents.set(id, copy(next));
+    return copy(next);
+  }
+
+  async assets(): Promise<Asset[]> {
+    return copy([...this._assets.values()]);
+  }
+
+  async asset(id: string): Promise<Asset | null> {
+    const found = this._assets.get(id);
+    return found ? copy(found) : null;
+  }
+
+  async createAsset(asset: Asset): Promise<Asset> {
+    if (this._assets.has(asset.id)) {
+      throw new Error(`An asset with id ${asset.id} already exists.`);
+    }
+    this._assets.set(asset.id, copy(asset));
+    return copy(asset);
+  }
+
+  async updateAsset(id: string, change: (current: Asset) => Asset): Promise<Asset> {
+    const current = this._assets.get(id);
+    if (!current) throw new NotFound('Asset', id);
+
+    const next = change(copy(current));
+    this._assets.set(id, copy(next));
     return copy(next);
   }
 
