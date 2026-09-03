@@ -228,14 +228,22 @@ amends, or **withdraws**.
 A scholar learns six screens once. Anything that does not fit one of them does
 not get a seventh screen; it gets cut.
 
-| # | Surface | Answers |
-|---|---|---|
-| 1 | **Attention** | What needs me, by when — and am I finished? |
-| 2 | **Matter** | Everything about one decision |
-| 3 | **Record** | What has this board decided, and why? |
-| 4 | **Rules** | What is in force right now? |
-| 5 | **Calendar** | What is coming? |
-| 6 | **Settings** | Who is on this board, and how does it decide? |
+| # | Surface | Answers | |
+|---|---|---|---|
+| 1 | **Attention** | What needs me, by when — and am I finished? | ✅ |
+| 2 | **Matter** | Everything about one decision | ✅ |
+| 3 | **Record** | What has this board decided, and why? | ✅ |
+| 4 | **Rules** | What is in force right now? | ✅ |
+| 5 | **Calendar** | What is coming? | ✅ |
+| 6 | **Settings** | Who is on this board, and how does it decide? | ✅ |
+
+> ✎ **The rule above is not currently kept, and the count is seven.** Navigation
+> offers Search, Events and Briefings beyond the six. Events has earned its
+> place: a reported breach is one of the four kinds of work and cannot live
+> inside a list of proposals, so the table above is short by one. Search and
+> Briefings are the two that could fold into the Record. Recorded here rather
+> than quietly reconciled, because a document that describes six while the
+> application offers eight is the fault this repository keeps finding elsewhere.
 
 ### 4.1 Attention — the home screen
 
@@ -450,8 +458,18 @@ than a form.
 ### Block 2 — the record becomes a product
 
 **Fatwa document ✅** · **compliance manual ✅** · **annual report ✅** ·
-PostgreSQL + RLS behind `Store` · JWT + OAuth · calendar feed · digests ·
-@mentions
+**calendar and .ics feed ✅** · **board configuration, with the credential
+check ✅** · PostgreSQL + RLS behind `Store` · JWT + OAuth · digests · @mentions
+
+The three that remain each wait on a decision rather than on work: which
+database provider, an application registered with Google and Microsoft, and an
+email provider. @mentions are the exception — they need no provider, since a
+mention that surfaces in Attention is the useful half and email is the
+convenience.
+
+**Not claimed:** the calendar feed downloads and imports. A live subscription
+would need a per-member feed token, which is not built, and a password in a
+subscription URL is not a substitute for one.
 
 ### Block 3 — the chain
 
