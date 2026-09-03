@@ -990,3 +990,55 @@ describe('the structures, over HTTP', () => {
       .expect(409);
   });
 });
+
+describe('purification from a holding, over HTTP', () => {
+  const figures = {
+    periodFrom: '2026-01-01',
+    periodTo: '2026-12-31',
+    currency: 'USD',
+    source: 'Issuer annual report, audited',
+    basis: 'Income only, gross',
+    unitsHeld: '10000',
+    nonPermissibleIncome: '3200000',
+    totalIncome: '100000000',
+    incomeReceived: '25000',
+  };
+
+  it('applies the method the board approved and shows the sum', async () => {
+    const res = await request(app)
+      .post('/api/purification')
+      .set('Authorization', as('member-a'))
+      .send({ ...figures, method: 'per_dividend' })
+      .expect(200);
+
+    expect(res.body.amount).toBe('800');
+    expect(res.body.steps[0].working).toBe('3200000 ÷ 100000000');
+    expect(res.body.note).toContain('the board’s to decide');
+  });
+
+  it('refuses to pick a method, and names the three', async () => {
+    const res = await request(app)
+      .post('/api/purification')
+      .set('Authorization', as('member-a'))
+      .send(figures)
+      .expect(400);
+
+    expect(res.body.error).toBe('no_method');
+    expect(res.body.methods).toEqual(['per_share', 'per_dividend', 'per_unit']);
+    expect(res.body.message).toContain('choosing among');
+  });
+
+  it('refuses a missing figure rather than purifying nothing', async () => {
+    const res = await request(app)
+      .post('/api/purification')
+      .set('Authorization', as('member-a'))
+      .send({ ...figures, method: 'per_unit' })
+      .expect(400);
+
+    expect(res.body.message).toContain('discharge an obligation nobody computed');
+  });
+
+  it('refuses anonymously, like every other route', async () => {
+    await request(app).post('/api/purification').send({}).expect(401);
+  });
+});

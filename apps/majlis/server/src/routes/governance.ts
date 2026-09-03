@@ -47,6 +47,7 @@ import { assembleAnnualReport, renderAnnualReport } from '../services/annual.js'
 import { buildCalendar, toICalendar } from '../services/calendar.js';
 import { buildRegister, readComposition, standingOf } from '../services/register.js';
 import { checklistFor, recordFinding, setStructure } from '../services/structure.js';
+import { PURIFICATION_METHODS, purify, type PurificationInput } from '../services/purification.js';
 import { structures } from '../data/structures.js';
 import { buildManual, renderManual } from '../services/manual.js';
 import { reviewStatus, reviewsDue } from '../services/review.js';
@@ -704,6 +705,39 @@ export function governanceRoutes(store: Store, now: () => string = () => new Dat
           setImplementationSteps(current, parsed.data.steps),
         ),
       );
+    }),
+  );
+
+  /**
+   * What must be given away from a holding that passed screening.
+   *
+   * Not the purification in an incident — that follows a breach and comes out
+   * of a ledger. This one runs every period for as long as the holding is held,
+   * and the three methods give three different answers on the same figures,
+   * which is why the method is supplied here and never inferred.
+   *
+   * Stateless on purpose, like the screening ratios: figures come from the
+   * institution and are not this system's to hold until a board attaches them
+   * to something.
+   */
+  router.post(
+    '/purification',
+    handle(async (req, res) => {
+      const body = req.body as Partial<PurificationInput>;
+
+      if (!body?.method || !PURIFICATION_METHODS.includes(body.method)) {
+        res.status(400).json({
+          error: 'no_method',
+          message:
+            'Send the method the board approved, under "method": per_share, per_dividend or ' +
+            'per_unit. They give different answers on the same figures, and choosing among ' +
+            'them is a ruling.',
+          methods: PURIFICATION_METHODS,
+        });
+        return;
+      }
+
+      res.json(purify(body as PurificationInput));
     }),
   );
 
