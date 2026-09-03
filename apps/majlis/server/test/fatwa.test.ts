@@ -57,6 +57,9 @@ function matter(over: Partial<Matter> = {}): Matter {
   };
 }
 
+/** The renderer, named so the assertions read as what they check. */
+const renderMatter = render;
+
 const code = (fn: () => unknown): string | null => {
   try { fn(); return null; } catch (e) { return e instanceof Refused ? e.code : `threw ${String(e)}`; }
 };
@@ -245,5 +248,91 @@ describe('the page', () => {
 
   it('states that nothing in it was composed', () => {
     expect(html()).toContain('nothing here is summarised or composed');
+  });
+});
+
+describe('the document carries what the board found on each condition', () => {
+  const judged = (over: Partial<Matter> = {}) =>
+    matter({
+      structureId: 'murabaha',
+      findings: [
+        {
+          conditionId: 'ownership-before-sale',
+          holds: 'met',
+          reason: 'The sale file shows the bank on title before the onward sale.',
+          scholarId: 's1',
+          at: T0,
+          supersededAt: null,
+        },
+        {
+          conditionId: 'no-late-increase',
+          holds: 'not_met',
+          reason: 'The schedule takes a late charge to income rather than to charity.',
+          scholarId: 's3',
+          at: T0,
+          supersededAt: null,
+        },
+      ],
+      ...over,
+    });
+
+  it('names the shape and its source', () => {
+    const f = assemble(board, judged(), NOW);
+    expect(f.structure?.name).toContain('Murabaha');
+    expect(f.structure?.authority).toContain('Standard No. 8');
+  });
+
+  it('carries each finding in the member’s own words, under their name', () => {
+    const f = assemble(board, judged(), NOW);
+    expect(f.structure?.findings).toHaveLength(2);
+    expect(f.structure?.findings[0]).toMatchObject({ holds: 'met', name: 'Mufti One' });
+    expect(f.structure?.findings[1].reason).toContain('rather than to charity');
+  });
+
+  it('names the conditions nobody answered rather than dropping them', () => {
+    const f = assemble(board, judged(), NOW);
+    expect(f.structure?.unanswered).toHaveLength(4);
+    expect(renderMatter(f)).toContain('Not answered by the board');
+  });
+
+  it('leaves out a superseded finding, keeping what the board held when it decided', () => {
+    const m = judged({
+      findings: [
+        {
+          conditionId: 'cost-disclosed',
+          holds: 'met',
+          reason: 'An earlier reading of the schedule, since revised.',
+          scholarId: 's1',
+          at: T0,
+          supersededAt: NOW,
+        },
+        {
+          conditionId: 'cost-disclosed',
+          holds: 'not_met',
+          reason: 'The mark-up is stated as a rate rather than as an amount.',
+          scholarId: 's1',
+          at: NOW,
+          supersededAt: null,
+        },
+      ],
+    });
+    const f = assemble(board, m, NOW);
+    expect(f.structure?.findings).toHaveLength(1);
+    expect(f.structure?.findings[0].holds).toBe('not_met');
+  });
+
+  it('says nothing at all where the matter was judged against no shape', () => {
+    const f = assemble(board, matter(), NOW);
+    expect(f.structure).toBeNull();
+    expect(renderMatter(f)).not.toContain('Conditions of');
+  });
+
+  it('prints a finding of not met without turning it into a verdict', () => {
+    const page = renderMatter(assemble(board, judged(), NOW));
+    expect(page).toContain('Not met');
+    expect(page).toContain('rather than to charity');
+    // The document reports the board's findings; it does not add up to one.
+    expect(page.toLowerCase()).not.toContain('conditions satisfied');
+    expect(page.toLowerCase()).not.toContain('therefore permissible');
   });
 });

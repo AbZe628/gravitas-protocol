@@ -9,6 +9,7 @@ import Evidence from '../components/Evidence.js';
 import Precedent from '../components/Precedent.js';
 import Terms from '../components/Terms.js';
 import { DocumentLink } from '../components/Documents.js';
+import Checklist from '../components/Checklist.js';
 import Screening from '../components/Screening.js';
 import VotePanel from '../components/VotePanel.js';
 import { mayDeliberate, useIdentity } from '../lib/identity.js';
@@ -192,6 +193,16 @@ export default function MatterDetail() {
         After the evidence and before the vote: what the board already decided
         about this is part of what a member should have in front of them.
       */}
+      {/*
+        The shape, before the arithmetic and before the vote. A board handed the
+        conditions it recognises spends its time on the judgement rather than on
+        composing the question, which is the whole compression argument applied
+        to a single product.
+      */}
+      <Section title={t('chk.title')}>
+        <Checklist matterId={matter.id} canRule={mayDeliberate(identity?.role)} />
+      </Section>
+
       {/*
         A tool, not a finding. It sits beside the evidence because that is what
         the arithmetic is: something the board looks at before ruling, in the

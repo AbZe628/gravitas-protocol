@@ -625,6 +625,15 @@ export const oversight = {
   settings: () => get<Settings>('/api/settings'),
 
   register: () => get<Register>('/api/register'),
+
+  structures: () => get<{ structures: Structure[]; note: string }>('/api/structures'),
+  checklist: (id: string) => get<Checklist>(`/api/matters/${id}/checklist`),
+  setStructure: (id: string, structureId: string | null) =>
+    send<Matter>(`/api/matters/${id}/structure`, { structureId }, 'PUT'),
+  recordFinding: (
+    id: string,
+    finding: { conditionId: string; holds: ConditionFinding['holds']; reason: string },
+  ) => send<Matter>(`/api/matters/${id}/findings`, finding),
   asset: (id: string) => get<AssetDetail>(`/api/assets/${id}`),
   addAsset: (input: { kind: AssetKind; name: string; identifiers: AssetIdentifier[] }) =>
     send<Asset>('/api/assets', input),
@@ -801,4 +810,53 @@ export interface Register {
   /** How much of the universe has never been looked at. */
   neverExamined: number;
   total: number;
+}
+
+// ── the contract shapes ───────────────────────────────────────────────────
+
+export interface StructureCondition {
+  id: string;
+  requirement: string;
+  /** What goes wrong when it is not met. The part a scholar can argue with. */
+  why: string;
+  evidence: 'document' | 'sequence' | 'figure' | 'undertaking';
+  authority: string;
+}
+
+export interface Structure {
+  id: string;
+  name: string;
+  family: string;
+  conditions: StructureCondition[];
+  calculations: string[];
+  authority: string;
+}
+
+export interface ConditionFinding {
+  conditionId: string;
+  holds: 'met' | 'not_met' | 'not_applicable';
+  reason: string;
+  scholarId: string;
+  at: string;
+  supersededAt?: string | null;
+}
+
+export interface ConditionState {
+  condition: StructureCondition;
+  /** This member's standing finding, where they have one. */
+  finding: ConditionFinding | null;
+  /** Every finding on it, newest first, superseded ones included. */
+  history: ConditionFinding[];
+  answeredBy: string[];
+}
+
+export interface Checklist {
+  structure: Structure;
+  conditions: ConditionState[];
+  unanswered: string[];
+  /** Conditions where standing findings disagree. Not a fault — a discussion. */
+  contested: string[];
+  answered: number;
+  total: number;
+  note: string;
 }

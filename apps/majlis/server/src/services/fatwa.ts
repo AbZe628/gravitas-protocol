@@ -31,6 +31,7 @@
  * approved it, and the document says so in place of the reassuring hex string.
  */
 
+import { structureById } from '../data/structures.js';
 import { hashParameters, verifyParameters } from './hash.js';
 import { quorumFor, ratificationDeadline } from './lifecycle.js';
 import { Refused } from './lifecycle.js';
@@ -66,6 +67,16 @@ export interface FatwaSignature {
   onDifferentTerms: boolean;
 }
 
+export interface FatwaFinding {
+  requirement: string;
+  why: string;
+  authority: string;
+  holds: 'met' | 'not_met' | 'not_applicable';
+  reason: string;
+  scholarId: string;
+  name: string;
+}
+
 export interface Fatwa {
   kind: FatwaKind;
   /** How the institution refers to this decision. */
@@ -96,6 +107,26 @@ export interface Fatwa {
    * what the board pictured.
    */
   implementationSteps: string[];
+
+  /**
+   * The contract shape and what the board found on each of its conditions.
+   *
+   * Null where the matter was not judged against one. Where it was, this is the
+   * part of the document a reader checks first: not that the board approved,
+   * but which conditions it examined, what it held on each, and on what
+   * reasoning. Without it the checklist is an exercise that never leaves the
+   * screen.
+   *
+   * Superseded findings are left out. The record keeps them; the document
+   * carries what the board held when it decided.
+   */
+  structure: {
+    name: string;
+    authority: string;
+    findings: FatwaFinding[];
+    /** Conditions nobody answered. Named rather than omitted. */
+    unanswered: string[];
+  } | null;
 
   /** The operative terms, as approved. */
   parameters: RuleParameter[];
@@ -154,6 +185,44 @@ function signature(board: Board, r: Reasoning, hashInForce: string): FatwaSignat
 }
 
 /**
+ * What the board found against the shape it judged this by.
+ *
+ * Only standing findings: a member who changed their view leaves both in the
+ * record, and the document carries the one they held when the board decided.
+ * Conditions nobody answered are named rather than dropped, because a checklist
+ * that quietly omitted them would read as complete.
+ */
+function structureOf(board: Board, matter: Matter): Fatwa['structure'] {
+  const structure = matter.structureId ? structureById(matter.structureId) : undefined;
+  if (!structure) return null;
+
+  const all = matter.findings ?? [];
+  const findings: FatwaFinding[] = [];
+  const unanswered: string[] = [];
+
+  for (const condition of structure.conditions) {
+    const standing = all.filter((f) => f.conditionId === condition.id && !f.supersededAt);
+    if (standing.length === 0) {
+      unanswered.push(condition.requirement);
+      continue;
+    }
+    for (const f of standing) {
+      findings.push({
+        requirement: condition.requirement,
+        why: condition.why,
+        authority: condition.authority,
+        holds: f.holds,
+        reason: f.reason,
+        scholarId: f.scholarId,
+        name: board.members.find((m) => m.id === f.scholarId)?.name ?? f.scholarId,
+      });
+    }
+  }
+
+  return { name: structure.name, authority: structure.authority, findings, unanswered };
+}
+
+/**
  * Build the document from the record.
  *
  * @throws Refused when the matter has not been decided. A document for an open
@@ -195,6 +264,8 @@ export function assemble(board: Board, matter: Matter, generatedAt: string): Fat
     title: matter.title,
     boardName: board.name,
     institutionId: board.institutionId,
+
+    structure: structureOf(board, matter),
 
     question: matter.proposal,
     mechanism: matter.mechanism,
@@ -399,6 +470,15 @@ ${fatwa.evidence
   .mono { font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace; font-size: 9pt; word-break: break-all; }
   .unit { color: #5b6b65; }
   .none { color: #5b6b65; font-style: italic; }
+  .authority { font-size: 9pt; color: #5b6b65; margin-top: -1mm; }
+  .finding { border-left: 2px solid #cfdad5; padding-left: 4mm; margin-bottom: 4mm; break-inside: avoid; }
+  .finding.not_met { border-left-color: #9c3325; }
+  .finding.met { border-left-color: #0e5b4b; }
+  .finding .req { font-size: 10.5pt; margin-bottom: 1mm; }
+  .finding .held { font-size: 10pt; margin-bottom: 1mm; }
+  .finding .reason { font-size: 10pt; color: #43524d; margin: 0; }
+  .unanswered { border: 1px solid #9c3325; padding: 3mm 4mm; font-size: 10pt; }
+  .unanswered ul { margin: 1.5mm 0 0; padding-left: 5mm; }
   .steps { padding-left: 6mm; }
   .steps li { margin-bottom: 2mm; }
   .sig { margin-bottom: 5mm; padding-left: 4mm; border-left: 2px solid #cfdad5; break-inside: avoid; }
@@ -447,6 +527,20 @@ ${fatwa.mechanism ? `    <section>
     </section>` : ''}
 
 ${notDecided}
+
+${fatwa.structure ? `    <section>
+      <h2>Conditions of ${esc(fatwa.structure.name)}</h2>
+      <p class="authority">${esc(fatwa.structure.authority)}</p>
+${fatwa.structure.findings.map((f) => `      <div class="finding ${f.holds}">
+        <p class="req">${esc(f.requirement)}</p>
+        <p class="held"><strong>${f.holds === 'met' ? 'Met' : f.holds === 'not_met' ? 'Not met' : 'Does not apply'}</strong> — ${esc(f.name)}</p>
+        <p class="reason">${esc(f.reason)}</p>
+      </div>`).join('\n')}
+${fatwa.structure.unanswered.length ? `      <div class="unanswered">
+        <strong>Not answered by the board:</strong>
+        <ul>${fatwa.structure.unanswered.map((u) => `<li>${esc(u)}</li>`).join('')}</ul>
+      </div>` : ''}
+    </section>` : ''}
 
 ${fatwa.implementationSteps.length ? `    <section>
       <h2>How it is implemented</h2>
