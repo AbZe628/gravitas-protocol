@@ -378,3 +378,122 @@ export interface RegistrySnapshot {
   owner?: string;
   error?: string;
 }
+
+/**
+ * A reported Shariah non-compliance event.
+ *
+ * Deliberately not a `Matter`. A matter is a proposal to change a rule and
+ * carries a proposed rule, operative parameters and a direction; this is a
+ * report of something that has already happened, and what the board does with
+ * it is a **determination**, not a vote on terms. Forcing it through the
+ * product-approval shape would lose the one thing that makes it different:
+ * from the moment the board says the event is actual, a clock runs that the
+ * institution is judged on, and nothing about a rule change has that property.
+ *
+ * The system's authority ends at step two. It may record a determination, run
+ * the clock, assemble the submission and total the purification. It may never
+ * decide that an event was not actual, and it may never close a determination
+ * on the board's behalf.
+ */
+export interface Incident {
+  id: string;
+  boardId: string;
+  /** How the institution refers to it in its own files. */
+  reference: string;
+  title: string;
+  /** What happened, as reported, with no evaluation in it. */
+  report: string;
+  reportedBy: string;
+  reportedAt: string;
+
+  stage: IncidentStage;
+
+  /** Each signatory's view on whether this is an actual non-compliance. */
+  concurrences: Concurrence[];
+  /** Set once the board reaches the threshold, either way. */
+  determinedAt: string | null;
+  /** Null until determined. True is the finding that starts every clock. */
+  actual: boolean | null;
+
+  /**
+   * What stopped, and everything like it.
+   *
+   * Recorded at determination rather than left to the bank to remember. A
+   * determination that does not name what stops is an opinion, not a finding.
+   */
+  stopped: string[];
+
+  /**
+   * Every plan filed, in order, including those the board sent back.
+   *
+   * A list rather than a field because a plan the board rejected is part of how
+   * the institution responded, and replacing it in place would leave a record
+   * in which the institution appears to have got it right first time.
+   */
+  plans: RectificationPlan[];
+  /** The Board of Directors is not this board; it approves after endorsement. */
+  directorsApprovedAt: string | null;
+  submittedToRegulatorAt: string | null;
+  purification: Purification | null;
+
+  closedAt: string | null;
+  sources: SourceRef[];
+}
+
+export type IncidentStage =
+  /** With the board, not yet determined. */
+  | 'reported'
+  /** Determined not to be a non-compliance. Terminal, and only the board may reach it. */
+  | 'not_actual'
+  /** Determined actual. The activity has stopped and the clock runs. */
+  | 'determined'
+  /** The institution has filed a plan to rectify. */
+  | 'plan_filed'
+  /** The board has endorsed the plan. */
+  | 'endorsed'
+  /** The Board of Directors has approved it. */
+  | 'approved'
+  /** Filed with the regulator. */
+  | 'submitted'
+  /** Rectified and purified. Terminal. */
+  | 'closed';
+
+/** One signatory's view on whether an event is an actual non-compliance. */
+export interface Concurrence {
+  scholarId: string;
+  actual: boolean;
+  /** Compulsory either way. "Not a breach" needs a reason as much as "breach" does. */
+  reason: string;
+  at: string;
+}
+
+export interface RectificationPlan {
+  filedBy: string;
+  filedAt: string;
+  /** What the institution will do, in order. */
+  steps: string[];
+  /** When the institution says it will be complete. */
+  completeBy: string;
+  endorsedBy: string[];
+  endorsedAt: string | null;
+  /** Present when the board sent it back. A refusal has to say why. */
+  returnedReason: string | null;
+}
+
+/**
+ * Income earned in breach, and where the board directs it.
+ *
+ * Amounts are strings. Money that has to reconcile with a bank's ledger and
+ * appear in an annual disclosure cannot be held in a binary float, and the
+ * board prescribes a figure rather than the system computing one.
+ */
+export interface Purification {
+  amount: string;
+  currency: string;
+  /** Where it goes. The board decides this; the institution does not. */
+  destination: string;
+  prescribedAt: string;
+  paidAt: string | null;
+  /** The institution's own reference for the payment. */
+  paidReference: string | null;
+}
