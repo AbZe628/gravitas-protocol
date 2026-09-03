@@ -20,9 +20,10 @@
  *   where the vote becomes the signature.
  */
 
-import { Router, type Request, type Response } from 'express';
+import { Router, type Response } from 'express';
+import { badRequest, handle, identityOf, requireRole } from './http.js';
 import { z } from 'zod';
-import { mayDeliberate, mayOpenMatter, mayVote, type Identity } from '../auth/members.js';
+import { mayDeliberate, mayOpenMatter, mayVote } from '../auth/members.js';
 import {
   Refused,
   bringIntoForce,
@@ -44,57 +45,9 @@ import { reviewStatus, reviewsDue } from '../services/review.js';
 import { BadFigure, assess, crossings, type Assessment, type Figures } from '../services/screening.js';
 import { search, type SearchFilters } from '../services/search.js';
 import { relatedTo } from '../services/precedent.js';
-import { NotFound, type Store } from '../store/index.js';
+import type { Store } from '../store/index.js';
 import type { Deliberation, Matter, SourceKind } from '../types.js';
 import { SOURCE_KINDS } from '../types.js';
-
-/**
- * A refusal is not an error in the server. It is the system doing its job, and
- * the status should say which kind of "no" the caller received.
- */
-const STATUS: Record<string, number> = {
-  no_reason_given: 400,
-  not_a_signatory: 403,
-  not_on_this_board: 403,
-  // Everything else is a conflict with the state the matter is actually in.
-};
-
-function sendRefusal(res: Response, error: Refused): void {
-  res.status(STATUS[error.code] ?? 409).json({ error: error.code, message: error.message });
-}
-
-/** Wrap a handler so refusals, missing matters and faults each read correctly. */
-function handle(fn: (req: Request, res: Response) => Promise<void>) {
-  return async (req: Request, res: Response): Promise<void> => {
-    try {
-      await fn(req, res);
-    } catch (error) {
-      if (error instanceof Refused) return sendRefusal(res, error);
-      if (error instanceof NotFound) {
-        res.status(404).json({ error: 'not_found', message: error.message });
-        return;
-      }
-      console.error('governance error:', error);
-      res.status(500).json({ error: 'internal', message: 'The change was not made.' });
-    }
-  };
-}
-
-/** Who is making this request. Absent only if auth is off entirely. */
-function identityOf(req: Request): Identity {
-  return req.identity ?? { scholarId: 'anonymous', role: 'observer' };
-}
-
-function requireRole(res: Response, allowed: boolean, what: string): boolean {
-  if (allowed) return true;
-  res.status(403).json({
-    error: 'role_not_permitted',
-    message:
-      `This credential may not ${what}. Voting and objecting belong to signatories; ` +
-      'deliberating is open to the board; a shared credential only reads.',
-  });
-  return false;
-}
 
 /**
  * The board a matter belongs to, or a 404 already sent.
@@ -173,10 +126,6 @@ const sourceSchema = z.object({
   ref: z.string().min(1).max(2_000),
   note: z.string().max(2_000).optional(),
 });
-
-function badRequest(res: Response, issues: unknown): void {
-  res.status(400).json({ error: 'invalid_request', detail: issues });
-}
 
 export function governanceRoutes(store: Store, now: () => string = () => new Date().toISOString()): Router {
   const router = Router();

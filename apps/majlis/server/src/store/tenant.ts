@@ -2,6 +2,7 @@ import type {
   AssistantExchange,
   Board,
   Briefing,
+  Incident,
   Institution,
   Matter,
   Rule,
@@ -123,6 +124,47 @@ export class TenantStore implements Store {
       // A change may not move a matter out of the institution it belongs to.
       if (next.boardId !== current.boardId) {
         throw new OutsideInstitution('move a matter to', next.boardId);
+      }
+      return next;
+    });
+  }
+
+  // ── incidents ───────────────────────────────────────────────────────────
+  //
+  // Scoped exactly as matters are, and for a sharper reason. A reported
+  // non-compliance names an activity a bank has stopped, an amount it owes to
+  // charity and a filing it has made to its regulator. There is very little in
+  // an institution's record it would rather a competitor could not read.
+
+  async incidents(boardId?: string): Promise<Incident[]> {
+    if (boardId && !(await this.owns(boardId))) return [];
+    const mine = await this.ownBoardIds();
+    const incidents = await this.inner.incidents(boardId);
+    return incidents.filter((i) => mine.has(i.boardId));
+  }
+
+  async incident(id: string): Promise<Incident | null> {
+    const incident = await this.inner.incident(id);
+    if (!incident) return null;
+    return (await this.owns(incident.boardId)) ? incident : null;
+  }
+
+  async createIncident(incident: Incident): Promise<Incident> {
+    if (!(await this.owns(incident.boardId))) {
+      throw new OutsideInstitution('report an incident on', incident.boardId);
+    }
+    return this.inner.createIncident(incident);
+  }
+
+  async updateIncident(id: string, change: (current: Incident) => Incident): Promise<Incident> {
+    const incident = await this.inner.incident(id);
+    // Indistinguishable from one that does not exist, deliberately.
+    if (!incident || !(await this.owns(incident.boardId))) throw new NotFound('incident', id);
+
+    return this.inner.updateIncident(id, (current) => {
+      const next = change(current);
+      if (next.boardId !== current.boardId) {
+        throw new OutsideInstitution('move an incident to', next.boardId);
       }
       return next;
     });

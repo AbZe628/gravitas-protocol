@@ -127,7 +127,7 @@ hold*. They are orthogonal and must stay so.
 | `liaison` | answer questions of mechanism **inside the deliberation, where the board can see and disagree** |
 | `observer` | read only — the auditor, the regulator, the stakeholder |
 
-**Axis 2 — office** ✚ new: `office: 'chair' | 'secretary' | null`
+**Axis 2 — office** ✅ built: `role+office` in a member entry
 
 An office is held *by* a member; it is not a level above them.
 
@@ -160,7 +160,7 @@ approval shape.
 
 The twelve steps in [UX.md §7.1](UX.md). Nothing to add except the clock.
 
-### 3.2 Screening — ✚ new
+### 3.2 Screening — ✅ built
 
 The three AAOIFI SS-21 ratios:
 
@@ -206,7 +206,14 @@ The one that cannot wait for a quarter, and today does.
 may never close the determination itself. Steps 3–9 are what the bank is judged
 on, and every one of them is arithmetic and assembly.
 
-### 3.4 Periodic review — ✚ new
+An incident is its own type, its own store methods and its own route module
+(`routes/incidents.ts`), scoped by institution at the store boundary exactly as
+matters are. The four steps that belong to the **institution** — the plan, the
+Directors, the regulator, the payment — require a secretary or a liaison, and a
+signatory attempting one is refused. Plans are a list, so a plan the board sent
+back stays in the record with the reason.
+
+### 3.4 Periodic review — ✅ built
 
 No external trigger, so it slips, and a fatwa quietly governs a structure it no
 longer describes. **The most valuable thing to automate**, because it is the only
@@ -392,7 +399,7 @@ visible outside the board.
 Not five phases over twelve months. Four blocks, ordered by what actually blocks
 a pilot.
 
-### Block 1 — the kernel
+### Block 1 — the kernel · ✅ complete
 
 Everything here is domain work against the existing store. No infrastructure
 dependency, no unanswered question, and it is what makes the system an OS rather

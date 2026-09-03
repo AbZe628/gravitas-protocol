@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import type { Board, Institution, Matter, Rule } from '../src/types.js';
+import type { Board, Incident, Institution, Matter, Rule } from '../src/types.js';
 import { MemoryStore } from '../src/store/memory.js';
 import { TenantStore, OutsideInstitution } from '../src/store/tenant.js';
 import { NotFound } from '../src/store/store.js';
@@ -52,8 +52,22 @@ const both = () =>
       matter('alpha-matter', 'alpha-board', 'Something Alpha is deciding'),
       matter('beta-matter', 'beta-board', 'Something Beta is deciding'),
     ],
+    incidents: [
+      incident('alpha-incident', 'alpha-board', 'Something Alpha stopped'),
+      incident('beta-incident', 'beta-board', 'Something Beta stopped'),
+    ],
     briefings: [],
   });
+
+function incident(id: string, boardId: string, title: string): Incident {
+  return {
+    id, boardId, reference: id.toUpperCase(), title,
+    report: 'An account of what happened.', reportedBy: 'someone', reportedAt: T0,
+    stage: 'reported', concurrences: [], determinedAt: null, actual: null,
+    stopped: [], plans: [], directorsApprovedAt: null,
+    submittedToRegulatorAt: null, purification: null, closedAt: null, sources: [],
+  };
+}
 
 const alpha = () => new TenantStore(both(), 'alpha-bank');
 
@@ -228,5 +242,55 @@ describe('the guarantee holds without the routes knowing about it', () => {
 
     expect((await b.matters()).map((m) => m.id)).toEqual(['beta-matter']);
     expect((await a.matters()).map((m) => m.id).sort()).toEqual(['alpha-matter', 'only-alpha']);
+  });
+});
+
+/*
+ * An incident carries more that an institution would not want read than almost
+ * anything else in the record: an activity it has stopped, an amount it owes to
+ * charity, and a filing it has made to its regulator.
+ */
+describe('a reported non-compliance does not leave its institution', () => {
+  it('lists only its own', async () => {
+    const seen = await alpha().incidents();
+    expect(seen.map((i) => i.id)).toEqual(['alpha-incident']);
+  });
+
+  it('answers for another institution’s incident as absence, not refusal', async () => {
+    expect(await alpha().incident('beta-incident')).toBeNull();
+    expect(await alpha().incident('no-such-incident')).toBeNull();
+  });
+
+  it('treats another institution’s board as an empty one', async () => {
+    expect(await alpha().incidents('beta-board')).toEqual([]);
+    expect(await alpha().incidents('alpha-board')).toHaveLength(1);
+  });
+
+  it('refuses a report aimed at another institution, loudly', async () => {
+    await expect(
+      alpha().createIncident(incident('x', 'beta-board', 'Not yours')),
+    ).rejects.toBeInstanceOf(OutsideInstitution);
+  });
+
+  it('refuses a change to another institution’s incident as not found', async () => {
+    await expect(
+      alpha().updateIncident('beta-incident', (i) => i),
+    ).rejects.toBeInstanceOf(NotFound);
+  });
+
+  it('will not let a change move an incident to another institution', async () => {
+    await expect(
+      alpha().updateIncident('alpha-incident', (i) => ({ ...i, boardId: 'beta-board' })),
+    ).rejects.toBeInstanceOf(OutsideInstitution);
+  });
+
+  it('writes nothing when a change is refused', async () => {
+    const store = alpha();
+    await expect(
+      store.updateIncident('alpha-incident', () => {
+        throw new Error('changed my mind');
+      }),
+    ).rejects.toThrow('changed my mind');
+    expect((await store.incident('alpha-incident'))?.stage).toBe('reported');
   });
 });

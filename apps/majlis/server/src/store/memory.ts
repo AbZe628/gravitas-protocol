@@ -11,7 +11,15 @@
  * accident, and the bug that produces surfaces far away from the cause.
  */
 
-import type { AssistantExchange, Board, Briefing, Institution, Matter, Rule } from '../types.js';
+import type {
+  AssistantExchange,
+  Board,
+  Briefing,
+  Incident,
+  Institution,
+  Matter,
+  Rule,
+} from '../types.js';
 import {
   boards as seedBoards,
   briefings as seedBriefings,
@@ -28,6 +36,7 @@ export interface MemorySeed {
   boards?: Board[];
   rules?: Rule[];
   matters?: Matter[];
+  incidents?: Incident[];
   briefings?: Briefing[];
 }
 
@@ -39,6 +48,7 @@ export class MemoryStore implements Store {
   private readonly _boards: Board[];
   private readonly _rules: Rule[];
   private readonly _matters: Map<string, Matter>;
+  private readonly _incidents: Map<string, Incident>;
   private readonly _briefings: Briefing[];
   private readonly _log: AssistantExchange[] = [];
 
@@ -48,6 +58,9 @@ export class MemoryStore implements Store {
     this._rules = copy(seed.rules ?? seedRules);
     this._briefings = copy(seed.briefings ?? seedBriefings);
     this._matters = new Map((seed.matters ?? seedMatters).map((m) => [m.id, copy(m)]));
+    // No seeded incidents: a demonstration record that opens with a breach the
+    // board never reported would be a strange thing to show anyone.
+    this._incidents = new Map((seed.incidents ?? []).map((i) => [i.id, copy(i)]));
   }
 
   async institutions(): Promise<Institution[]> {
@@ -108,6 +121,33 @@ export class MemoryStore implements Store {
     // through cannot leave the stored matter half-modified.
     const next = change(copy(current));
     this._matters.set(id, copy(next));
+    return copy(next);
+  }
+
+  async incidents(boardId?: string): Promise<Incident[]> {
+    const all = [...this._incidents.values()];
+    return copy(boardId ? all.filter((i) => i.boardId === boardId) : all);
+  }
+
+  async incident(id: string): Promise<Incident | null> {
+    const found = this._incidents.get(id);
+    return found ? copy(found) : null;
+  }
+
+  async createIncident(incident: Incident): Promise<Incident> {
+    if (this._incidents.has(incident.id)) {
+      throw new Error(`An incident with id ${incident.id} already exists.`);
+    }
+    this._incidents.set(incident.id, copy(incident));
+    return copy(incident);
+  }
+
+  async updateIncident(id: string, change: (current: Incident) => Incident): Promise<Incident> {
+    const current = this._incidents.get(id);
+    if (!current) throw new NotFound('Incident', id);
+
+    const next = change(copy(current));
+    this._incidents.set(id, copy(next));
     return copy(next);
   }
 

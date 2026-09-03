@@ -31,7 +31,15 @@
 
 import { appendFileSync, mkdirSync, readFileSync, renameSync, writeFileSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
-import type { AssistantExchange, Board, Briefing, Institution, Matter, Rule } from '../types.js';
+import type {
+  AssistantExchange,
+  Board,
+  Briefing,
+  Incident,
+  Institution,
+  Matter,
+  Rule,
+} from '../types.js';
 import {
   boards as seedBoards,
   briefings as seedBriefings,
@@ -59,6 +67,14 @@ interface Document {
   boards: Board[];
   rules: Rule[];
   matters: Matter[];
+  /**
+   * Absent from every document written before incidents existed, which is why
+   * nothing here assumes it. A record loaded from an older file is normalised
+   * on the way in rather than migrated on disk: a store that rewrites a bank's
+   * record merely because the code moved on is doing something nobody asked it
+   * to do.
+   */
+  incidents?: Incident[];
   briefings: Briefing[];
 }
 
@@ -137,6 +153,9 @@ export class FileStore implements Store {
         writeLog(this.logFile, this.log);
         delete loaded.assistantLog;
       }
+      // Older documents have no incidents. Filled in memory, written only when
+      // something is actually stored.
+      loaded.incidents ??= [];
       this.doc = loaded;
       return;
     }
@@ -144,7 +163,7 @@ export class FileStore implements Store {
     const startedAt = new Date().toISOString();
     this.doc =
       opts.seedIfEmpty === false
-        ? { version: 1, startedAt, boards: [], rules: [], matters: [], briefings: [] }
+        ? { version: 1, startedAt, boards: [], rules: [], matters: [], incidents: [], briefings: [] }
         : {
             version: 1,
             startedAt,
@@ -152,6 +171,9 @@ export class FileStore implements Store {
             boards: copy(seedBoards),
             rules: copy(seedRules),
             matters: copy(seedMatters),
+            // Nothing seeded: a demonstration record that opens with a breach
+            // the board never reported would be a strange thing to show anyone.
+            incidents: [],
             briefings: copy(seedBriefings),
           };
     this.persist();
@@ -242,6 +264,41 @@ export class FileStore implements Store {
       // runs before persist(), a refusal writes nothing at all.
       const next = change(copy(this.doc.matters[index]));
       this.doc.matters[index] = copy(next);
+      this.persist();
+      return copy(next);
+    });
+  }
+
+  async incidents(boardId?: string): Promise<Incident[]> {
+    const all = this.doc.incidents ?? [];
+    return copy(boardId ? all.filter((i) => i.boardId === boardId) : all);
+  }
+
+  async incident(id: string): Promise<Incident | null> {
+    return copy((this.doc.incidents ?? []).find((i) => i.id === id) ?? null);
+  }
+
+  async createIncident(incident: Incident): Promise<Incident> {
+    return this.serialise(() => {
+      this.doc.incidents ??= [];
+      if (this.doc.incidents.some((i) => i.id === incident.id)) {
+        throw new Error(`An incident with id ${incident.id} already exists.`);
+      }
+      this.doc.incidents.push(copy(incident));
+      this.persist();
+      return copy(incident);
+    });
+  }
+
+  async updateIncident(id: string, change: (current: Incident) => Incident): Promise<Incident> {
+    return this.serialise(() => {
+      this.doc.incidents ??= [];
+      const index = this.doc.incidents.findIndex((i) => i.id === id);
+      if (index === -1) throw new NotFound('Incident', id);
+
+      // Runs against a copy and before persist(), so a refusal writes nothing.
+      const next = change(copy(this.doc.incidents[index]));
+      this.doc.incidents[index] = copy(next);
       this.persist();
       return copy(next);
     });

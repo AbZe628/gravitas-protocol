@@ -18,6 +18,7 @@ import { Limiter, REFUSAL_MESSAGES } from './services/limits.js';
 import { basicAuth, authFromEnv } from './middleware/basicAuth.js';
 import { LoginLimiter, loginThrottle } from './middleware/loginLimit.js';
 import { governanceRoutes } from './routes/governance.js';
+import { incidentRoutes } from './routes/incidents.js';
 
 
 /**
@@ -290,6 +291,7 @@ export function createApp(
 
   // ---- governance ------------------------------------------------------
   app.use('/api', governanceRoutes(store));
+  app.use('/api', incidentRoutes(store));
 
   // ---- audit export ----------------------------------------------------
   app.get('/api/export/:boardId', async (req, res) => {

@@ -19,7 +19,15 @@
  * so they drop straight in.
  */
 
-import type { AssistantExchange, Board, Briefing, Institution, Matter, Rule } from '../types.js';
+import type {
+  AssistantExchange,
+  Board,
+  Briefing,
+  Incident,
+  Institution,
+  Matter,
+  Rule,
+} from '../types.js';
 
 export class NotFound extends Error {
   constructor(what: string, id: string) {
@@ -66,6 +74,29 @@ export interface Store {
    *         untouched and nothing is written.
    */
   updateMatter(id: string, change: (current: Matter) => Matter): Promise<Matter>;
+
+  // ── reported non-compliance ────────────────────────────────────────────
+  //
+  // Kept apart from matters because it is not one. A matter is a proposal to
+  // change a rule; an incident is an account of something that already
+  // happened, and the board's act on it is a determination rather than a vote
+  // on terms. The same shape would have hidden the difference that matters:
+  // once the board finds an event actual, a clock runs that the institution is
+  // judged on.
+
+  incidents(boardId?: string): Promise<Incident[]>;
+  incident(id: string): Promise<Incident | null>;
+
+  /** @throws if an incident with this id already exists. */
+  createIncident(incident: Incident): Promise<Incident>;
+
+  /**
+   * Read, change and write one incident atomically.
+   * @throws NotFound if there is no such incident.
+   * @throws whatever `change` throws — a refusal passes through untouched and
+   *         nothing is written.
+   */
+  updateIncident(id: string, change: (current: Incident) => Incident): Promise<Incident>;
 
   // ── the assistant log ──────────────────────────────────────────────────
   //
