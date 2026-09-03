@@ -188,7 +188,7 @@ export interface Calculation {
 }
 ```
 
-### 4.1 Screening — ✅ built
+### 4.1 Screening — ✅ built, on the screen
 
 The three AAOIFI SS-21 ratios, computed exactly, arithmetic shown, thresholds
 tested by cross-multiplication so no display rounding can flip an answer.
@@ -198,7 +198,7 @@ side.
 **What is missing:** it is attached to nothing. It needs to hang off an asset in
 the register so a change in the figures raises a matter about a specific holding.
 
-### 4.2 Purification — ✚ and it is two different things
+### 4.2 Purification — ✅ built, server only. And it is two different things
 
 **From a breach.** The bank earned income from an activity the board found
 non-compliant. The amount is not a ratio: it comes out of the bank's ledger. The
@@ -223,10 +223,12 @@ The board chooses once, in a fatwa. Majlis then computes it every period, shows
 the working, tracks prescribed against paid, and carries the total into the
 annual report — where it already has a place.
 
-### 4.3 Zakat — ✚ named as a gap in the annual report and never built
+### 4.3 Zakat — ✅ built, server only
 
-The annual report already tells the board it cannot state zakat, because nothing
-here holds it. What it needs:
+Built on 2026-09-03. The base, the rate and who bears it are all supplied and
+never inferred, and every sum is shown. The annual report still names a gap,
+and the gap is now narrower and exactly stated: the computation is here,
+somewhere to record one against a period is not. What it needed:
 
 - **Whose obligation** — the institution's, or the shareholders'. That is a
   disclosure in its own right and the report asks for it.
@@ -239,11 +241,13 @@ here holds it. What it needs:
 - **The hawl** — the date the year turns, which is a clock like every other
   clock here.
 
-### 4.4 Profit distribution — ✚
+### 4.4 Profit distribution — ✅ built, server only
 
 The annual report's opinion must address whether profit allocation and loss
-charging on investment accounts followed the basis the board approved. Nothing
-here can support that sentence today.
+charging on investment accounts followed the basis the board approved. PER and
+IRR are computed in the right order — PER pre-split so both bear it, IRR
+post-split so only the depositors do — with the smoothing disclosure that
+follows from using them.
 
 What it needs: the **profit-sharing ratio** as approved; the actual profit; the
 mudarib's share; what went to or came from the **profit equalisation reserve**
@@ -254,7 +258,7 @@ what was actually done.*
 Reserves are where displaced commercial risk hides, which is why the working
 matters more here than anywhere else.
 
-### 4.5 Tangibility and tradability — ✚
+### 4.5 Tangibility and tradability — ◐ the watching is built, the tradability rule is not
 
 Whether a sukuk or a mixed pool may be traded at market price, and at what point
 it may only be redeemed at par. Draws on the composition already designed in
@@ -436,3 +440,36 @@ Meetings, @mentions and the per-asset document from
    require the board to confirm it on adoption.
 3. **Profit distribution needs a practitioner.** The variants in reserve
    treatment are wide and I would not encode them from reading alone.
+
+---
+
+## 9. Where the build stands
+
+*As of 2026-09-03. Update this when it stops being true.*
+
+All four calculations exist and are tested. **Three of them cannot be reached
+from the application.** Screening has a screen; purification, profit
+distribution and zakat are server routes with nothing in front of them, so a
+scholar signed into Majlis today cannot compute what the toolkit says the
+toolkit is for.
+
+| | server | screen |
+|---|---|---|
+| Screening (SS-21) | ✅ | ✅ |
+| Purification | ✅ | — |
+| Profit distribution (PER/IRR) | ✅ | — |
+| Zakat | ✅ | — |
+| Drift over a standing ruling | ✅ | ✅ |
+| Asset register | ✅ | ✅ |
+| Structure checklist | ✅ | ✅ |
+
+**The next block is the calculations surface** — one place where a scholar
+computes purification, distribution and zakat, with the working shown and the
+method named as the board's. That closes §4 and is the difference between a
+toolkit that exists and a toolkit that is in use.
+
+After that, in order: the rest of the structure library (§3), then meetings as
+record, @mentions and the per-asset document, then durable storage — which is
+what blocks upload, which is what blocks the PDF extraction in §4a.
+
+799 server tests, 69 client. Nothing here signs.
