@@ -11,6 +11,7 @@
 import type { Request, Response } from 'express';
 import type { Identity } from '../auth/members.js';
 import { Refused } from '../services/lifecycle.js';
+import { BadFigure } from '../services/money.js';
 import { NotFound } from '../store/index.js';
 
 const STATUS: Record<string, number> = {
@@ -34,6 +35,13 @@ export function handle(fn: (req: Request, res: Response) => Promise<void>) {
       await fn(req, res);
     } catch (error) {
       if (error instanceof Refused) return sendRefusal(res, error);
+      // A figure that is not a figure is the caller's, not a fault here. It
+      // reached this layer from any calculation route, so it is answered once
+      // rather than caught separately at each of them.
+      if (error instanceof BadFigure) {
+        res.status(400).json({ error: error.code, field: error.field, message: error.message });
+        return;
+      }
       if (error instanceof NotFound) {
         res.status(404).json({ error: 'not_found', message: error.message });
         return;

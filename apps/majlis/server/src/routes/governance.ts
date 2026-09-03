@@ -48,11 +48,17 @@ import { buildCalendar, toICalendar } from '../services/calendar.js';
 import { buildRegister, readComposition, standingOf } from '../services/register.js';
 import { checklistFor, recordFinding, setStructure } from '../services/structure.js';
 import { PURIFICATION_METHODS, purify, type PurificationInput } from '../services/purification.js';
+import {
+  ZAKAT_METHODS,
+  ZAKAT_YEARS,
+  computeZakat,
+  type ZakatInput,
+} from '../services/zakat.js';
 import { driftReport } from '../services/drift.js';
 import { structures } from '../data/structures.js';
 import { buildManual, renderManual } from '../services/manual.js';
 import { reviewStatus, reviewsDue } from '../services/review.js';
-import { BadFigure, assess, crossings, type Assessment, type Figures } from '../services/screening.js';
+import { assess, crossings, type Assessment, type Figures } from '../services/screening.js';
 import { search, type SearchFilters } from '../services/search.js';
 import { relatedTo } from '../services/precedent.js';
 import type { Store } from '../store/index.js';
@@ -671,17 +677,11 @@ export function governanceRoutes(store: Store, now: () => string = () => new Dat
         return;
       }
 
-      try {
-        const current = assess(body.figures);
-        const changed = body.previous ? crossings(body.previous, current) : [];
-        res.json({ assessment: current, crossings: changed });
-      } catch (e) {
-        if (e instanceof BadFigure) {
-          res.status(400).json({ error: e.code, field: e.field, message: e.message });
-          return;
-        }
-        throw e;
-      }
+      // A bad figure is answered in `handle`, the same way it is answered for
+      // purification and zakat.
+      const current = assess(body.figures);
+      const changed = body.previous ? crossings(body.previous, current) : [];
+      res.json({ assessment: current, crossings: changed });
     }),
   );
 
@@ -739,6 +739,62 @@ export function governanceRoutes(store: Store, now: () => string = () => new Dat
       }
 
       res.json(purify(body as PurificationInput));
+    }),
+  );
+
+  /**
+   * What is due, and from whom.
+   *
+   * The base, the rate and who bears it are all the board's, and none of the
+   * three is inferred here. Two bases on one balance sheet do not have to
+   * agree, a solar year carries a different rate from a lunar one, and an
+   * institution computing zakat its shareholders are due to pay has computed a
+   * figure and discharged nothing — so all three are sent, and all three come
+   * back stated in words beside the answer.
+   *
+   * Stateless like screening and purification: the figures are the
+   * institution's and are not held here until a board attaches them to
+   * something.
+   */
+  router.post(
+    '/zakat',
+    handle(async (req, res) => {
+      const body = req.body as Partial<ZakatInput>;
+
+      if (!body?.method || !ZAKAT_METHODS.includes(body.method)) {
+        res.status(400).json({
+          error: 'no_method',
+          message:
+            'Send the base the board approved, under "method": net_assets or ' +
+            'net_invested_funds. On one balance sheet they do not have to agree, and choosing ' +
+            'between them is a ruling.',
+          methods: ZAKAT_METHODS,
+        });
+        return;
+      }
+
+      if (!body.year || !ZAKAT_YEARS.includes(body.year)) {
+        res.status(400).json({
+          error: 'no_year',
+          message:
+            'Send the year the institution keeps, under "year": lunar or solar. They carry ' +
+            'different rates, and nothing here guesses which is kept.',
+          years: ZAKAT_YEARS,
+        });
+        return;
+      }
+
+      if (!body.borneBy) {
+        res.status(400).json({
+          error: 'no_bearer',
+          message:
+            'Send who bears it, under "borneBy": institution, shareholders or both. The annual ' +
+            'report asks for this, and a figure without it does not say whether anyone owes it.',
+        });
+        return;
+      }
+
+      res.json(computeZakat(body as ZakatInput));
     }),
   );
 

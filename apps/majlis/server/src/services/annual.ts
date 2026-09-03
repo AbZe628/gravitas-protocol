@@ -248,8 +248,9 @@ function gapsIn(report: AnnualReport): string[] {
   const gaps: string[] = [
     'The number of meetings held and each member’s attendance is not recorded by this system. ' +
       'GS-1 expects both, and frameworks that set an attendance floor expect it stated.',
-    'Zakat is not in this record. Whether it is the institution’s obligation or the ' +
-      'shareholders’, and how it was computed, must be supplied.',
+    'Zakat is not in this record. It can be computed here — the base, the rate and who bears ' +
+      'it are all stated with the working — but nothing records a computation against a period, ' +
+      'so the figure and whose obligation it is must be supplied.',
     'The findings of the institution’s own Shariah review and Shariah audit functions are not ' +
       'held here. The board’s opinion normally rests on them.',
   ];

@@ -1050,6 +1050,107 @@ describe('purification from a holding, over HTTP', () => {
   it('refuses anonymously, like every other route', async () => {
     await request(app).post('/api/purification').send({}).expect(401);
   });
+
+  // Before this was answered in one place, a figure a bank's spreadsheet had
+  // typed as text came back a 500 saying the change was not made — a fault
+  // that did not happen, about a change that was not being made.
+  it("answers a figure that is not a figure as the caller’s mistake", async () => {
+    const res = await request(app)
+      .post('/api/purification')
+      .set('Authorization', as('member-a'))
+      .send({ ...figures, method: 'per_dividend', unitsHeld: 'ten thousand' })
+      .expect(400);
+
+    expect(res.body.error).toBe('bad_figure');
+    expect(res.body.field).toBe('unitsHeld');
+  });
+});
+
+describe('zakat, over HTTP', () => {
+  const figures = {
+    year: 'lunar',
+    borneBy: 'institution',
+    hawlEndsOn: '2026-12-31',
+    currency: 'AED',
+    source: 'Audited financial statements',
+    cash: '4000000',
+    receivables: '2500000',
+    tradeGoods: '1500000',
+    zakatableInvestments: '2000000',
+    shortTermLiabilities: '2000000',
+  };
+
+  const post = (body: Record<string, unknown>) =>
+    request(app).post('/api/zakat').set('Authorization', as('member-a')).send(body);
+
+  it('applies the base and the rate the board approved, and shows every sum', async () => {
+    const res = await post({ ...figures, method: 'net_assets' }).expect(200);
+
+    expect(res.body.base).toBe('8000000');
+    expect(res.body.due).toBe('200000');
+    expect(res.body.rateStated).toBe('2.5%');
+    expect(res.body.steps.map((s: { label: string }) => s.label)).toContain('Zakatable assets');
+  });
+
+  it('holds the solar rate exactly rather than rounding it into basis points', async () => {
+    const res = await post({ ...figures, method: 'net_assets', year: 'solar' }).expect(200);
+    // 258 basis points would give 206 400. The rate is 2.577%, not 2.58%.
+    expect(res.body.due).toBe('206160');
+  });
+
+  it('refuses to pick the base, and names both', async () => {
+    const res = await post(figures).expect(400);
+
+    expect(res.body.error).toBe('no_method');
+    expect(res.body.methods).toEqual(['net_assets', 'net_invested_funds']);
+    expect(res.body.message).toContain('do not have to agree');
+  });
+
+  it('refuses to guess which year the institution keeps', async () => {
+    const res = await post({ ...figures, method: 'net_assets', year: undefined }).expect(400);
+
+    expect(res.body.error).toBe('no_year');
+    expect(res.body.years).toEqual(['lunar', 'solar']);
+  });
+
+  it('refuses a figure without saying whether anyone owes it', async () => {
+    const res = await post({ ...figures, method: 'net_assets', borneBy: undefined }).expect(400);
+
+    expect(res.body.error).toBe('no_bearer');
+    expect(res.body.message).toContain('does not say whether anyone owes it');
+  });
+
+  it('says plainly that computing it discharges nothing for the shareholders', async () => {
+    const res = await post({ ...figures, method: 'net_assets', borneBy: 'shareholders' }).expect(200);
+    expect(res.body.borneByStated).toContain('discharges nothing');
+  });
+
+  it('refuses a missing figure rather than treating the gap as a zero', async () => {
+    const res = await post({ ...figures, method: 'net_assets', cash: undefined }).expect(400);
+    expect(res.body.message).toContain('understates an obligation nobody checked');
+  });
+
+  it("answers a figure that is not a figure as the caller’s mistake", async () => {
+    const res = await post({ ...figures, method: 'net_assets', cash: 'about four million' }).expect(400);
+
+    expect(res.body.error).toBe('bad_figure');
+    expect(res.body.field).toBe('cash');
+  });
+
+  it('is nothing due rather than a negative obligation', async () => {
+    const res = await post({
+      ...figures,
+      method: 'net_assets',
+      shortTermLiabilities: '15000000',
+    }).expect(200);
+
+    expect(res.body.due).toBe('0');
+    expect(res.body.baseIsNegative).toBe(true);
+  });
+
+  it('refuses anonymously, like every other route', async () => {
+    await request(app).post('/api/zakat').send({}).expect(401);
+  });
 });
 
 describe('drift, over HTTP', () => {
