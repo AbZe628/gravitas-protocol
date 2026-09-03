@@ -239,6 +239,8 @@ export interface AttentionItem {
 export interface Attention {
   scholarId: string;
   role: Role;
+  /** Held, not ranked. Null for most members, which is the normal case. */
+  office?: 'chair' | 'secretary' | null;
   outstanding: number;
   overdue: number;
   items: AttentionItem[];

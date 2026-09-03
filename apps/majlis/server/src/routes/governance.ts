@@ -526,6 +526,10 @@ export function governanceRoutes(store: Store, now: () => string = () => new Dat
       res.json({
         scholarId: who.scholarId,
         role: who.role,
+        // The interface needs the office to know whether to offer the steps
+        // that belong to the institution. It widens nothing: the route refuses
+        // on its own regardless of what the interface chose to show.
+        office: who.office ?? null,
         outstanding: items.length,
         overdue: items.filter((i) => i.overdue).length,
         items,

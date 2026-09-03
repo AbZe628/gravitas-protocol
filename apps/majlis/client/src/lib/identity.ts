@@ -18,9 +18,13 @@ import { governance, type Role } from './api.js';
  * offer buttons that then vanish.
  */
 
+export type Office = 'chair' | 'secretary' | null;
+
 export interface Identity {
   scholarId: string;
   role: Role;
+  /** Held, not ranked. Null for most members, which is the normal case. */
+  office: Office;
 }
 
 export function useIdentity(): { identity: Identity | null; loading: boolean } {
@@ -34,7 +38,7 @@ export function useIdentity(): { identity: Identity | null; loading: boolean } {
       .then((a) => {
         if (!live) return;
         if (a && typeof a.scholarId === 'string' && typeof a.role === 'string') {
-          setIdentity({ scholarId: a.scholarId, role: a.role });
+          setIdentity({ scholarId: a.scholarId, role: a.role, office: a.office ?? null });
         }
       })
       .catch(() => {
@@ -56,3 +60,15 @@ export const mayDeliberate = (role: Role | undefined): boolean =>
   role === 'signatory' || role === 'advisory' || role === 'liaison';
 
 export const mayVote = (role: Role | undefined): boolean => role === 'signatory';
+
+/**
+ * Whether to offer a step that belongs to the institution rather than the board.
+ *
+ * Filing a rectification plan, minuting the Directors, recording that the
+ * regulator was notified, recording that purification was paid. A board that
+ * could record these would be producing a document saying something nobody
+ * outside the room ever said, so the buttons are not shown to one — and the
+ * route refuses regardless of what is shown.
+ */
+export const mayRecordInstitutionAct = (role: Role | undefined, office: Office | undefined): boolean =>
+  office === 'secretary' || role === 'liaison';
