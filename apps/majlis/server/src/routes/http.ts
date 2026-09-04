@@ -21,6 +21,11 @@ const STATUS: Record<string, number> = {
   bad_figure: 400,
   no_steps: 400,
   nothing_prescribed: 400,
+  // A calculation that cannot be found later is not a record, and a figure
+  // with no source is one somebody typed. Both are the caller's to fix.
+  no_period: 400,
+  no_source: 400,
+  no_such_prior: 400,
   // Everything else is a conflict with the state the record is actually in.
 };
 

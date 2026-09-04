@@ -732,7 +732,40 @@ describe('the annual report, over HTTP', () => {
 
     const gaps = res.body.gaps.join(' ');
     expect(gaps).toContain('meetings');
-    expect(gaps).toContain('Zakat');
+    // Named while nothing has been noted, and only while.
+    expect(gaps).toContain('No zakat calculation was noted');
+  });
+
+  it('stops naming zakat once a board has noted one, and carries the figure', async () => {
+    await request(app)
+      .post('/api/computations')
+      .set('Authorization', as('member-a'))
+      .send({
+        kind: 'zakat',
+        boardId: 'demo-board',
+        periodFrom: '2026-01-01',
+        periodTo: '2026-12-31',
+        method: 'net_assets',
+        methodStated: 'Zakatable assets less liabilities falling due within the year.',
+        currency: 'AED',
+        source: 'Audited financial statements',
+        figures: { cash: '4000000' },
+        headline: 'Due',
+        amount: '200000',
+        steps: [{ label: 'At 2.5%', working: '2.5% of 8000000', value: '200000 AED' }],
+        note: 'Whether the base is the right one is not answered here.',
+      })
+      .expect(201);
+
+    const res = await request(app)
+      .get('/api/annual?year=2026&format=json')
+      .set('Authorization', as('member-a'))
+      .expect(200);
+
+    expect(res.body.gaps.join(' ')).not.toContain('No zakat calculation was noted');
+    expect(res.body.calculations.map((c: { amount: string }) => c.amount)).toEqual(['200000']);
+    // And the opinion is still the board's to write.
+    expect(res.body.opinion).toBeNull();
   });
 
   it('refuses a year that is not one, and a board that is not there', async () => {

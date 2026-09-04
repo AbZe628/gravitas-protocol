@@ -786,3 +786,100 @@ export type CalculationKind =
   | 'profit_distribution'
   | 'tangibility'
   | 'late_payment';
+
+/**
+ * A calculation, recorded against a period.
+ *
+ * The four calculations compute statelessly, and that was the right default:
+ * the figures belong to the institution, and a system that held them would be
+ * asserting numbers it cannot audit. But it left the annual report unable to
+ * state zakat, the calendar unable to carry a hawl, and a scholar unable to
+ * point at what the board was shown last quarter.
+ *
+ * ── what this is, and what it is not ──────────────────────────────────────
+ *
+ * It is a record **that the board was shown these figures, from this source,
+ * and that this arithmetic followed from them.** It is not a claim the figures
+ * are true — the same line the record already takes with evidence, where a
+ * source is held with its citation and never restated as this system's own.
+ *
+ * And recording is **not approving**. A computation is a fact; whether the
+ * method was the right one is a ruling, and a ruling goes through the ordinary
+ * process. Nothing here says a board agreed with what it noted.
+ *
+ * ── append-only, like everything else in the record ───────────────────────
+ *
+ * A corrected figure does not edit a computation. It produces a new one naming
+ * the old in `supersedes`, and the old one stays — because somebody may have
+ * acted on it. Which computations are superseded is derived by looking, never
+ * stored, so the two can never disagree.
+ *
+ * Withdrawal is separate and rarer: a computation recorded against the wrong
+ * holding cannot be superseded by a right one, since they are about different
+ * things. It is marked withdrawn, with a reason and a name, and never deleted.
+ */
+export interface Computation {
+  id: string;
+  kind: CalculationKind;
+  boardId: string;
+  /**
+   * The holding it concerns, where it concerns one.
+   *
+   * Screening and purification are about a holding. Zakat and profit
+   * distribution are about the institution, and carry null rather than being
+   * attached to an arbitrary asset to make the shape uniform.
+   */
+  assetId: string | null;
+
+  /**
+   * What period it covers.
+   *
+   * Required, and the reason the whole record exists: a computation with no
+   * period cannot be compared with the one before it, cannot be found when the
+   * annual report asks for the year, and cannot be shown to have been done.
+   */
+  periodFrom: string;
+  periodTo: string;
+
+  /** The method the board applied: the key it was sent as, and in words. */
+  method: string;
+  methodStated: string;
+
+  currency: string;
+  /** Who supplied the figures, in their words. Never restated as this system's. */
+  source: string;
+
+  /**
+   * The figures as supplied.
+   *
+   * Held so the arithmetic can be checked, and so a later reader can run it
+   * again and see whether the answer still comes out the same. A difference
+   * would be a finding rather than a fault: either the service changed or the
+   * record did.
+   */
+  figures: Record<string, string | number | boolean | null>;
+
+  /**
+   * The answer and its working, exactly as the service produced them.
+   *
+   * Stored rather than recomputed on read, because what matters for an audit is
+   * what the board was actually shown. If a later version of the arithmetic
+   * disagrees, the record must still say what was in front of them at the time.
+   */
+  headline: string;
+  amount: string;
+  steps: { label: string; working: string; value: string }[];
+  /** The sentence saying what the calculation did not answer. */
+  note: string;
+
+  recordedBy: string;
+  recordedAt: string;
+
+  /** The computation this replaces. The replaced one is not removed. */
+  supersedes: string | null;
+
+  /** Withdrawn rather than deleted, like a released vote or a cited source. */
+  withdrawnAt: string | null;
+  withdrawnBy: string | null;
+  withdrawalReason: string | null;
+}

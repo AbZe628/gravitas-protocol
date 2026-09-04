@@ -36,6 +36,7 @@ import type {
   AssistantExchange,
   Board,
   Briefing,
+  Computation,
   Incident,
   Institution,
   Matter,
@@ -84,6 +85,7 @@ interface Document {
    * nobody asked it to do.
    */
   assets?: Asset[];
+  computations?: Computation[];
   briefings: Briefing[];
 }
 
@@ -166,6 +168,7 @@ export class FileStore implements Store {
       // something is actually stored.
       loaded.incidents ??= [];
       loaded.assets ??= [];
+      loaded.computations ??= [];
       this.doc = loaded;
       return;
     }
@@ -173,7 +176,17 @@ export class FileStore implements Store {
     const startedAt = new Date().toISOString();
     this.doc =
       opts.seedIfEmpty === false
-        ? { version: 1, startedAt, boards: [], rules: [], matters: [], incidents: [], assets: [], briefings: [] }
+        ? {
+            version: 1,
+            startedAt,
+            boards: [],
+            rules: [],
+            matters: [],
+            incidents: [],
+            assets: [],
+            briefings: [],
+            computations: [],
+          }
         : {
             version: 1,
             startedAt,
@@ -185,6 +198,7 @@ export class FileStore implements Store {
             // the board never reported would be a strange thing to show anyone.
             incidents: [],
             assets: copy(seedAssets),
+            computations: [],
             briefings: copy(seedBriefings),
           };
     this.persist();
@@ -344,6 +358,52 @@ export class FileStore implements Store {
       // Runs against a copy and before persist(), so a refusal writes nothing.
       const next = change(copy(this.doc.assets[index]));
       this.doc.assets[index] = copy(next);
+      this.persist();
+      return copy(next);
+    });
+  }
+
+  async computations(filter: { boardId?: string; kind?: string; assetId?: string } = {}): Promise<Computation[]> {
+    return copy(
+      (this.doc.computations ?? []).filter(
+        (c) =>
+          (filter.boardId === undefined || c.boardId === filter.boardId) &&
+          (filter.kind === undefined || c.kind === filter.kind) &&
+          (filter.assetId === undefined || c.assetId === filter.assetId),
+      ),
+    );
+  }
+
+  async computation(id: string): Promise<Computation | null> {
+    return copy((this.doc.computations ?? []).find((c) => c.id === id) ?? null);
+  }
+
+  async recordComputation(computation: Computation): Promise<Computation> {
+    return this.serialise(() => {
+      this.doc.computations ??= [];
+      if (this.doc.computations.some((c) => c.id === computation.id)) {
+        throw new Error(`A computation with id ${computation.id} already exists.`);
+      }
+      this.doc.computations.push(copy(computation));
+      this.persist();
+      return copy(computation);
+    });
+  }
+
+  async withdrawComputation(id: string, by: string, reason: string, at: string): Promise<Computation> {
+    return this.serialise(() => {
+      this.doc.computations ??= [];
+      const index = this.doc.computations.findIndex((c) => c.id === id);
+      if (index === -1) throw new NotFound('Computation', id);
+
+      // The arithmetic is untouched. Only the withdrawal is written.
+      const next = {
+        ...copy(this.doc.computations[index]),
+        withdrawnAt: at,
+        withdrawnBy: by,
+        withdrawalReason: reason,
+      };
+      this.doc.computations[index] = copy(next);
       this.persist();
       return copy(next);
     });

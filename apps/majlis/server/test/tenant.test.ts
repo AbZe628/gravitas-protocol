@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import type { Asset, Board, Incident, Institution, Matter, Rule } from '../src/types.js';
+import type { Asset, Board, Computation, Incident, Institution, Matter, Rule } from '../src/types.js';
 import { MemoryStore } from '../src/store/memory.js';
 import { TenantStore, OutsideInstitution } from '../src/store/tenant.js';
 import { NotFound } from '../src/store/store.js';
@@ -43,6 +43,20 @@ function matter(id: string, boardId: string, title: string): Matter {
   };
 }
 
+function computation(id: string, boardId: string): Computation {
+  return {
+    id, kind: 'zakat', boardId, assetId: null,
+    periodFrom: '2026-01-01', periodTo: '2026-12-31',
+    method: 'net_assets', methodStated: '', currency: 'AED',
+    source: 'Audited financial statements',
+    figures: { cash: '4000000' },
+    headline: 'Due', amount: '200000',
+    steps: [{ label: 'At 2.5%', working: '2.5% of 8000000', value: '200000 AED' }],
+    note: '', recordedBy: 'someone', recordedAt: T0,
+    supersedes: null, withdrawnAt: null, withdrawnBy: null, withdrawalReason: null,
+  };
+}
+
 const both = () =>
   new MemoryStore({
     institutions,
@@ -57,6 +71,10 @@ const both = () =>
       incident('beta-incident', 'beta-board', 'Something Beta stopped'),
     ],
     assets: [asset('alpha-asset', 'alpha-bank'), asset('beta-asset', 'beta-bank')],
+    computations: [
+      computation('alpha-zakat', 'alpha-board'),
+      computation('beta-zakat', 'beta-board'),
+    ],
     briefings: [],
   });
 
@@ -80,6 +98,7 @@ function asset(id: string, institutionId: string): Asset {
 }
 
 const alpha = () => new TenantStore(both(), 'alpha-bank');
+const beta = () => new TenantStore(both(), 'beta-bank');
 
 // ── reading ───────────────────────────────────────────────────────────────
 
@@ -174,6 +193,33 @@ describe('a write aimed outside the institution is refused loudly', () => {
  * among the most sensitive text this record holds. Before this it carried no
  * institution at all, so it could not be scoped.
  */
+describe('a recorded calculation carries figures, so it is scoped like everything else', () => {
+  it('sees only its own', async () => {
+    expect((await alpha().computations()).map((c) => c.id)).toEqual(['alpha-zakat']);
+    expect((await beta().computations()).map((c) => c.id)).toEqual(['beta-zakat']);
+  });
+
+  it('answers absence rather than refusal for another institution’s', async () => {
+    // Refusing would confirm it exists, and a balance sheet is worth probing for.
+    expect(await alpha().computation('beta-zakat')).toBeNull();
+    expect(await alpha().computations({ boardId: 'beta-board' })).toEqual([]);
+  });
+
+  it('refuses loudly to record one for another institution’s board', async () => {
+    await expect(
+      alpha().recordComputation(computation('new-one', 'beta-board')),
+    ).rejects.toBeInstanceOf(OutsideInstitution);
+  });
+
+  it('cannot withdraw another institution’s, and cannot tell it apart from absence', async () => {
+    await expect(
+      alpha().withdrawComputation('beta-zakat', 'someone', 'a reason', T0),
+    ).rejects.toBeInstanceOf(NotFound);
+    // Untouched.
+    expect((await beta().computation('beta-zakat'))?.withdrawnAt).toBeNull();
+  });
+});
+
 describe('the assistant log is scoped too', () => {
   const exchange = (id: string) => ({
     id, at: T0, scholarId: 's1', question: 'What does pausing do?',

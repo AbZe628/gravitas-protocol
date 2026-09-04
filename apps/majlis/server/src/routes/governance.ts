@@ -1202,13 +1202,22 @@ export function governanceRoutes(store: Store, now: () => string = () => new Dat
         return;
       }
 
-      const [matters, rules, incidents] = await Promise.all([
+      const [matters, rules, incidents, computations] = await Promise.all([
         store.matters(board.id),
         store.rules(board.id),
         store.incidents(board.id),
+        store.computations({ boardId: board.id }),
       ]);
 
-      const report = assembleAnnualReport({ year: raw, board, matters, rules, incidents, generatedAt: at });
+      const report = assembleAnnualReport({
+        year: raw,
+        board,
+        matters,
+        rules,
+        incidents,
+        computations,
+        generatedAt: at,
+      });
 
       if (req.query.format === 'json') {
         res.json(report);

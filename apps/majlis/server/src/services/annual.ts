@@ -30,9 +30,27 @@
  */
 
 import { disclosureFor, type Disclosure } from './incident.js';
+import { forYear } from './computation.js';
 import { paceOf } from './clocks.js';
 import { reviewStatus } from './review.js';
-import type { Board, Incident, Matter, MatterOrigin, Rule, Scholar } from '../types.js';
+import type { Board, CalculationKind, Computation, Incident, Matter, MatterOrigin, Rule, Scholar } from '../types.js';
+
+export interface ReportedCalculation {
+  kind: CalculationKind;
+  /** The holding it concerns, where it concerns one. */
+  assetId: string | null;
+  periodFrom: string;
+  periodTo: string;
+  methodStated: string;
+  currency: string;
+  source: string;
+  amount: string;
+  headline: string;
+  /** The sentence saying what the calculation did not answer. Carried, not rewritten. */
+  note: string;
+  recordedBy: string;
+  recordedAt: string;
+}
 
 export interface ReportedDecision {
   reference: string;
@@ -89,6 +107,15 @@ export interface AnnualReport {
   /** Nature, amount, count and rectification. Assembled, never summarised. */
   nonCompliance: Disclosure;
 
+  /**
+   * What the board noted during the year.
+   *
+   * Not a claim any of it was approved. A recorded calculation says the board
+   * was shown these figures and that this arithmetic followed from them; the
+   * opinion above is still the board's to write.
+   */
+  calculations: ReportedCalculation[];
+
   decisions: ReportedDecision[];
 
   /**
@@ -125,6 +152,30 @@ const OPINION_MUST_ADDRESS = [
   'The board’s own independence, and whether it received the information and access it needed.',
 ];
 
+/**
+ * The year's standing calculations, flattened for the document.
+ *
+ * Superseded and withdrawn ones are already out — `forYear` takes what stands
+ * — because a report is the current picture. The history of revisions is on
+ * the calculation's own page, where a reader looking for it will be.
+ */
+function computationsFor(year: number, all: Computation[]): ReportedCalculation[] {
+  return forYear(all, year).map((c) => ({
+    kind: c.kind,
+    assetId: c.assetId,
+    periodFrom: c.periodFrom,
+    periodTo: c.periodTo,
+    methodStated: c.methodStated,
+    currency: c.currency,
+    source: c.source,
+    amount: c.amount,
+    headline: c.headline,
+    note: c.note,
+    recordedBy: c.recordedBy,
+    recordedAt: c.recordedAt,
+  }));
+}
+
 function yearOf(iso: string | null | undefined): number | null {
   if (!iso) return null;
   const d = new Date(iso);
@@ -154,6 +205,12 @@ export function assembleAnnualReport(params: {
   matters: Matter[];
   rules: Rule[];
   incidents: Incident[];
+  /**
+   * Optional, so an installation with nothing recorded still produces a
+   * report — and so the gap it names about itself stays true rather than
+   * becoming a crash.
+   */
+  computations?: Computation[];
   generatedAt: string;
 }): AnnualReport {
   const { year, board, generatedAt } = params;
@@ -224,6 +281,17 @@ export function assembleAnnualReport(params: {
 
     nonCompliance: disclosureFor(year, incidents),
 
+    /**
+     * What the board noted during the year, and nothing more.
+     *
+     * These are facts assembled like every other fact here: the board was
+     * shown these figures, from a named source, on a date. The report carries
+     * them so the opinion has something under it, and carries each one's own
+     * note so the sentence saying what a calculation did not answer travels
+     * with the figure into the document.
+     */
+    calculations: computationsFor(year, params.computations ?? []),
+
     decisions,
 
     opinion: null,
@@ -248,12 +316,31 @@ function gapsIn(report: AnnualReport): string[] {
   const gaps: string[] = [
     'The number of meetings held and each member’s attendance is not recorded by this system. ' +
       'GS-1 expects both, and frameworks that set an attendance floor expect it stated.',
-    'Zakat is not in this record. It can be computed here — the base, the rate and who bears ' +
-      'it are all stated with the working — but nothing records a computation against a period, ' +
-      'so the figure and whose obligation it is must be supplied.',
     'The findings of the institution’s own Shariah review and Shariah audit functions are not ' +
       'held here. The board’s opinion normally rests on them.',
   ];
+
+  /**
+   * Zakat is a gap only while nothing has been noted.
+   *
+   * The report used to say this unconditionally, which stopped being true the
+   * moment a board could record a computation. A gap that outlives its cause
+   * teaches a board to stop reading the gaps.
+   */
+  if (!report.calculations.some((c) => c.kind === 'zakat')) {
+    gaps.push(
+      'No zakat calculation was noted for this year. It can be worked out and recorded, and ' +
+        'until one is, the figure and whose obligation it is must be supplied by hand.',
+    );
+  }
+
+  if (!report.calculations.some((c) => c.kind === 'profit_distribution')) {
+    gaps.push(
+      'No profit distribution was noted for this year. The opinion is asked whether allocation ' +
+        'and loss charging followed the approved basis, and nothing here supports that sentence ' +
+        'until one is recorded.',
+    );
+  }
 
   if (report.reviews.unscheduled > 0) {
     gaps.push(
@@ -316,6 +403,15 @@ function dayFigure(n: number | null): string {
   return `${Math.round(n)} days`;
 }
 
+const CALCULATION_WORDS: Record<CalculationKind, string> = {
+  screening: 'Screening ratios',
+  purification: 'Purification',
+  zakat: 'Zakat',
+  profit_distribution: 'Profit distribution',
+  tangibility: 'Tangibility',
+  late_payment: 'Late payment',
+};
+
 const OUTCOME_WORDS: Record<ReportedDecision['outcome'], string> = {
   approved: 'Approved',
   refused: 'Not approved',
@@ -353,6 +449,31 @@ export function renderAnnualReport(report: AnnualReport): string {
         )
         .join('')}</tbody></table>`
     : '<p>No event was determined to be an actual non-compliance during this period.</p>';
+
+  /**
+   * What the board noted, with the source beside each figure.
+   *
+   * The source is in the table rather than a footnote because it is the part
+   * that makes the figure checkable, and each calculation's own note follows
+   * the table — the sentence saying what a calculation did not answer has to
+   * reach the page the shareholders read, not stop at the screen.
+   */
+  const calculations = report.calculations.length
+    ? `<table><thead><tr><th>Calculation</th><th>Period</th><th>Amount</th><th>Source</th></tr></thead><tbody>${report.calculations
+        .map(
+          (c) =>
+            `<tr><td>${esc(CALCULATION_WORDS[c.kind] ?? c.kind)}${
+              c.assetId ? `<br><span class="ref">${esc(c.assetId)}</span>` : ''
+            }</td><td class="mono">${esc(c.periodFrom)} – ${esc(c.periodTo)}</td><td class="mono">${esc(
+              c.amount,
+            )} ${esc(c.currency)}</td><td>${esc(c.source)}</td></tr>`,
+        )
+        .join('')}</tbody></table>
+    <p class="none">Recorded as noted by the board. Noting a calculation is not approval of the method used, which is a ruling and is made in the ordinary way.</p>
+${report.calculations
+  .map((c) => `    <p class="none">${esc(CALCULATION_WORDS[c.kind] ?? c.kind)}: ${esc(c.note)}</p>`)
+  .join('\n')}`
+    : '<p class="none">The board noted no calculations in this period.</p>';
 
   const signatures = report.composition
     .filter((m) => m.signatory)
@@ -458,6 +579,11 @@ ${report.pace.approximate ? '    <p class="none">Some figures cover only the par
       <div><span>Overdue at the period end</span><span>${report.reviews.overdueAtYearEnd}</span></div>
       <div><span>In force with no review scheduled</span><span>${report.reviews.unscheduled}</span></div>
     </div>
+  </section>
+
+  <section>
+    <h2>Calculations noted in the period</h2>
+    ${calculations}
   </section>
 
   <section>

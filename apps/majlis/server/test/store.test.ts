@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import type { Matter } from '../src/types.js';
+import type { Computation, Matter } from '../src/types.js';
 import { MemoryStore } from '../src/store/memory.js';
 import { FileStore, StorePathError } from '../src/store/file.js';
 import { NotFound, type Store } from '../src/store/store.js';
@@ -33,6 +33,22 @@ function newMatter(id: string, over: Partial<Matter> = {}): Matter {
     simulation: null, deliberation: [], reasoning: [],
     timelockStartedAt: null, timelockEndsAt: null, objections: [],
     inForceAt: null, sources: [],
+    ...over,
+  };
+}
+
+function newComputation(id: string, over: Partial<Computation> = {}): Computation {
+  return {
+    id, kind: 'zakat', boardId: 'demo-board', assetId: null,
+    periodFrom: '2026-01-01', periodTo: '2026-12-31',
+    method: 'net_assets', methodStated: 'Zakatable assets less what is owed within the year.',
+    currency: 'AED', source: 'Audited financial statements',
+    figures: { cash: '4000000' },
+    headline: 'Due', amount: '200000',
+    steps: [{ label: 'At 2.5%', working: '2.5% of 8000000', value: '200000 AED' }],
+    note: 'Not answered here.',
+    recordedBy: 'scholar-a', recordedAt: T0,
+    supersedes: null, withdrawnAt: null, withdrawnBy: null, withdrawalReason: null,
     ...over,
   };
 }
@@ -153,6 +169,54 @@ describe.each(backends)('%s store', (_name, make) => {
       }));
     }
     expect((await store.matter('m-seq'))?.reasoning.map((r) => r.scholarId)).toEqual(['s1', 's2', 's3']);
+  });
+
+  // ── recorded calculations ───────────────────────────────────────────────
+
+  it('records one and hands it back', async () => {
+    await store.recordComputation(newComputation('c1'));
+
+    expect((await store.computation('c1'))?.amount).toBe('200000');
+    expect((await store.computations()).map((c) => c.id)).toEqual(['c1']);
+  });
+
+  it('refuses a second one under the same id, rather than overwriting a figure', async () => {
+    await store.recordComputation(newComputation('c1'));
+    await expect(store.recordComputation(newComputation('c1'))).rejects.toThrow(/already exists/);
+  });
+
+  it('filters by board, kind and holding', async () => {
+    await store.recordComputation(newComputation('c1', { kind: 'zakat', assetId: null }));
+    await store.recordComputation(newComputation('c2', { kind: 'purification', assetId: 'a-1' }));
+    await store.recordComputation(newComputation('c3', { kind: 'purification', assetId: 'a-2' }));
+
+    expect((await store.computations({ kind: 'purification' })).map((c) => c.id)).toEqual(['c2', 'c3']);
+    expect((await store.computations({ assetId: 'a-2' })).map((c) => c.id)).toEqual(['c3']);
+    expect((await store.computations({ boardId: 'nobody' }))).toEqual([]);
+  });
+
+  it('withdraws without deleting, and without touching the arithmetic', async () => {
+    await store.recordComputation(newComputation('c1'));
+    const gone = await store.withdrawComputation('c1', 'scholar-a', 'Wrong holding.', T0);
+
+    expect(gone.withdrawnAt).toBe(T0);
+    expect(gone.withdrawnBy).toBe('scholar-a');
+    expect(gone.withdrawalReason).toBe('Wrong holding.');
+    // Still there, and still says what it said.
+    expect((await store.computation('c1'))?.amount).toBe('200000');
+    expect((await store.computations())).toHaveLength(1);
+  });
+
+  it('refuses to withdraw one that is not there', async () => {
+    await expect(store.withdrawComputation('nope', 'scholar-a', 'r', T0)).rejects.toThrow(NotFound);
+  });
+
+  it('hands out copies, so a caller cannot edit the record by accident', async () => {
+    await store.recordComputation(newComputation('c1'));
+    const first = await store.computation('c1');
+    first!.amount = '999999999';
+
+    expect((await store.computation('c1'))?.amount).toBe('200000');
   });
 
   // ── the assistant log ───────────────────────────────────────────────────

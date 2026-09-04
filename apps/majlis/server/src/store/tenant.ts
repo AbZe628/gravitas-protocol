@@ -3,6 +3,7 @@ import type {
   Board,
   Asset,
   Briefing,
+  Computation,
   Incident,
   Institution,
   Matter,
@@ -207,6 +208,40 @@ export class TenantStore implements Store {
       }
       return next;
     });
+  }
+
+  // ── recorded calculations ───────────────────────────────────────────────
+  //
+  // Scoped through the board, like an incident. A recorded computation carries
+  // the figures an institution supplied, which makes leaking one across a
+  // tenant boundary worse than leaking a ruling: a ruling is reasoning, and
+  // this is a balance sheet.
+
+  async computations(filter: { boardId?: string; kind?: string; assetId?: string } = {}): Promise<Computation[]> {
+    if (filter.boardId && !(await this.owns(filter.boardId))) return [];
+    const mine = await this.ownBoardIds();
+    const all = await this.inner.computations(filter);
+    return all.filter((c) => mine.has(c.boardId));
+  }
+
+  async computation(id: string): Promise<Computation | null> {
+    const found = await this.inner.computation(id);
+    if (!found) return null;
+    return (await this.owns(found.boardId)) ? found : null;
+  }
+
+  async recordComputation(computation: Computation): Promise<Computation> {
+    if (!(await this.owns(computation.boardId))) {
+      throw new OutsideInstitution('record a calculation for', computation.boardId);
+    }
+    return this.inner.recordComputation(computation);
+  }
+
+  async withdrawComputation(id: string, by: string, reason: string, at: string): Promise<Computation> {
+    const found = await this.inner.computation(id);
+    // Indistinguishable from one that does not exist, deliberately.
+    if (!found || !(await this.owns(found.boardId))) throw new NotFound('computation', id);
+    return this.inner.withdrawComputation(id, by, reason, at);
   }
 
   // ── briefings ───────────────────────────────────────────────────────────

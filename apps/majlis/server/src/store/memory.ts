@@ -2,7 +2,7 @@
  * The in-memory store.
  *
  * This is what the tests run against and what `npm run dev` uses when no
- * database file is configured. It is also the reference: the SQLite store is
+ * record file is configured. It is also the reference: the file-backed store is
  * held to the same contract suite, so a disagreement between them is a failing
  * test rather than a surprise in production.
  *
@@ -16,6 +16,7 @@ import type {
   AssistantExchange,
   Board,
   Briefing,
+  Computation,
   Incident,
   Institution,
   Matter,
@@ -41,6 +42,7 @@ export interface MemorySeed {
   incidents?: Incident[];
   assets?: Asset[];
   briefings?: Briefing[];
+  computations?: Computation[];
 }
 
 export class MemoryStore implements Store {
@@ -54,6 +56,7 @@ export class MemoryStore implements Store {
   private readonly _incidents: Map<string, Incident>;
   private readonly _assets: Map<string, Asset>;
   private readonly _briefings: Briefing[];
+  private readonly _computations: Map<string, Computation>;
   private readonly _log: AssistantExchange[] = [];
 
   constructor(seed: MemorySeed = {}) {
@@ -66,6 +69,9 @@ export class MemoryStore implements Store {
     // board never reported would be a strange thing to show anyone.
     this._incidents = new Map((seed.incidents ?? []).map((i) => [i.id, copy(i)]));
     this._assets = new Map((seed.assets ?? seedAssets).map((a) => [a.id, copy(a)]));
+    // Nothing seeded: a demonstration record opening with a zakat somebody
+    // already computed would be putting a figure in a board's mouth.
+    this._computations = new Map((seed.computations ?? []).map((c) => [c.id, copy(c)]));
   }
 
   async institutions(): Promise<Institution[]> {
@@ -179,6 +185,39 @@ export class MemoryStore implements Store {
 
     const next = change(copy(current));
     this._assets.set(id, copy(next));
+    return copy(next);
+  }
+
+  async computations(filter: { boardId?: string; kind?: string; assetId?: string } = {}): Promise<Computation[]> {
+    return copy(
+      [...this._computations.values()].filter(
+        (c) =>
+          (filter.boardId === undefined || c.boardId === filter.boardId) &&
+          (filter.kind === undefined || c.kind === filter.kind) &&
+          (filter.assetId === undefined || c.assetId === filter.assetId),
+      ),
+    );
+  }
+
+  async computation(id: string): Promise<Computation | null> {
+    const found = this._computations.get(id);
+    return found ? copy(found) : null;
+  }
+
+  async recordComputation(computation: Computation): Promise<Computation> {
+    if (this._computations.has(computation.id)) {
+      throw new Error(`A computation with id ${computation.id} already exists.`);
+    }
+    this._computations.set(computation.id, copy(computation));
+    return copy(computation);
+  }
+
+  async withdrawComputation(id: string, by: string, reason: string, at: string): Promise<Computation> {
+    const current = this._computations.get(id);
+    if (!current) throw new NotFound('Computation', id);
+
+    const next = { ...copy(current), withdrawnAt: at, withdrawnBy: by, withdrawalReason: reason };
+    this._computations.set(id, copy(next));
     return copy(next);
   }
 

@@ -24,6 +24,7 @@ import type {
   AssistantExchange,
   Board,
   Briefing,
+  Computation,
   Incident,
   Institution,
   Matter,
@@ -117,6 +118,27 @@ export interface Store {
    * @throws NotFound if there is no such asset.
    */
   updateAsset(id: string, change: (current: Asset) => Asset): Promise<Asset>;
+
+  // ── recorded calculations ──────────────────────────────────────────────
+  //
+  // Append-only. There is deliberately no update: a corrected figure is a new
+  // computation naming the old in `supersedes`, and which are superseded is
+  // derived by looking rather than stored, so the two can never disagree.
+  //
+  // Withdrawal is the one exception and is not an edit of the arithmetic: it
+  // marks a record as withdrawn, with a name and a reason, and removes nothing.
+
+  computations(filter?: { boardId?: string; kind?: string; assetId?: string }): Promise<Computation[]>;
+  computation(id: string): Promise<Computation | null>;
+
+  /** @throws if a computation with this id already exists. */
+  recordComputation(computation: Computation): Promise<Computation>;
+
+  /**
+   * Mark one withdrawn. The record stays and the arithmetic is untouched.
+   * @throws NotFound if there is no such computation.
+   */
+  withdrawComputation(id: string, by: string, reason: string, at: string): Promise<Computation>;
 
   // ── the assistant log ──────────────────────────────────────────────────
   //

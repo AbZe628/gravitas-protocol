@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import type { Board, Incident, Matter, Rule } from '../src/types.js';
+import type { Computation, Board, Incident, Matter, Rule } from '../src/types.js';
 import { assembleAnnualReport, renderAnnualReport } from '../src/services/annual.js';
 
 const board: Board = {
@@ -196,11 +196,86 @@ describe('non-compliance in the year', () => {
 });
 
 describe('what the draft cannot state', () => {
-  it('always names meetings, zakat and the review functions', () => {
+  it('always names meetings and the review functions', () => {
     const text = build().gaps.join(' ');
     expect(text).toContain('number of meetings');
-    expect(text).toContain('Zakat');
     expect(text).toContain('Shariah review and Shariah audit');
+  });
+
+  it('names zakat and profit distribution while nothing has been noted', () => {
+    const text = build().gaps.join(' ');
+    expect(text).toContain('No zakat calculation was noted');
+    expect(text).toContain('No profit distribution was noted');
+  });
+});
+
+describe('a gap that outlives its cause teaches a board to stop reading the gaps', () => {
+  const noted = (kind: 'zakat' | 'profit_distribution', over: Partial<Computation> = {}): Computation => ({
+    id: kind, kind, boardId: board.id, assetId: null,
+    periodFrom: '2026-01-01', periodTo: '2026-12-31',
+    method: 'net_assets', methodStated: 'Zakatable assets less what is owed within the year.',
+    currency: 'AED', source: 'Audited financial statements',
+    figures: { cash: '4000000' },
+    headline: 'Due', amount: '200000',
+    steps: [{ label: 'At 2.5%', working: '2.5% of 8000000', value: '200000 AED' }],
+    note: 'Whether the base is the right one is not answered here.',
+    recordedBy: 'scholar-a', recordedAt: '2027-01-15T09:00:00Z',
+    supersedes: null, withdrawnAt: null, withdrawnBy: null, withdrawalReason: null,
+    ...over,
+  });
+
+  it('stops naming zakat once one has been noted for the year', () => {
+    const r = build({ computations: [noted('zakat')] });
+    expect(r.gaps.join(' ')).not.toContain('No zakat calculation was noted');
+    expect(r.calculations.map((c) => c.amount)).toEqual(['200000']);
+  });
+
+  it('keeps naming it when the only one noted was for a different year', () => {
+    const r = build({
+      computations: [noted('zakat', { periodFrom: '2025-01-01', periodTo: '2025-12-31' })],
+    });
+    expect(r.gaps.join(' ')).toContain('No zakat calculation was noted');
+    expect(r.calculations).toEqual([]);
+  });
+
+  it('keeps naming it when the one noted was withdrawn', () => {
+    const r = build({ computations: [noted('zakat', { withdrawnAt: '2027-02-01T00:00:00Z' })] });
+    expect(r.gaps.join(' ')).toContain('No zakat calculation was noted');
+  });
+
+  it('carries the corrected figure and not the one it replaced', () => {
+    const first = noted('zakat');
+    const second = noted('zakat', { id: 'corrected', amount: '210000', supersedes: first.id });
+
+    const r = build({ computations: [first, second] });
+    expect(r.calculations.map((c) => c.amount)).toEqual(['210000']);
+  });
+
+  it('carries each calculation’s own note into the document', () => {
+    const r = build({ computations: [noted('zakat')] });
+    expect(r.calculations[0].note).toContain('not answered here');
+  });
+
+  it('puts the figure, its source and its note on the printed page', () => {
+    const page = renderAnnualReport(build({ computations: [noted('zakat')] }));
+
+    expect(page).toContain('Calculations noted in the period');
+    expect(page).toContain('200000 AED');
+    expect(page).toContain('Audited financial statements');
+    // The sentence saying what the calculation did not answer reaches the page
+    // the shareholders read, not only the screen.
+    expect(page).toContain('not answered here');
+    expect(page).toContain('is not approval of the method');
+  });
+
+  it('says plainly when the board noted none, rather than showing an empty table', () => {
+    expect(renderAnnualReport(build())).toContain('noted no calculations in this period');
+  });
+
+  it('still leaves the opinion blank, because noting is not concluding', () => {
+    const r = build({ computations: [noted('zakat'), noted('profit_distribution')] });
+    expect(r.opinion).toBeNull();
+    expect(r.gaps.join(' ')).not.toContain('No zakat calculation was noted');
   });
 
   it('names rules nothing will bring back to the board', () => {
