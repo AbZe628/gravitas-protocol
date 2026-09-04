@@ -488,7 +488,7 @@ a state worth naming: a tested service nobody can reach is not a feature.
 | Asset register | ✅ | ✅ |
 | Structure checklist | ✅ | ✅ |
 | Contract library (19 shapes) | ✅ | ✅ |
-| Adoption of the library by the board | — | — |
+| Adoption of the library by the board | ✅ | ✅ |
 
 **And a calculation can now be noted against a period.** The calculations
 themselves stay stateless; noting one is a second and deliberate act, because a
@@ -505,16 +505,25 @@ deleted. Which are superseded is derived by looking, never stored.
 The annual report's zakat gap is therefore conditional now rather than
 permanent, and the figure, its source and its own note reach the printed page.
 
-**The structure library is complete** — nineteen shapes across ten families,
-89 conditions, each with its reason and its source (§3). What is still missing
-around it is **adoption**: in the design a board approves the library once, as
-a matter like any other, and thereafter amends its own copy. Until that exists,
-this is reference material a board reads and rules beside, and no part of the
-application treats a condition as binding. The gap is named in the library's
-own file rather than left to be discovered.
+**The structure library is complete and a board can take it as its own.**
+Nineteen shapes across ten families, 89 conditions (§3) — and adoption, which
+is what turns them from somebody else's reading into the standard this board
+judges by.
 
-Next, in order: adoption of the library, then meetings as record, @mentions and
-the per-asset document, then durable storage — which is what blocks upload,
-which is what blocks the PDF extraction in §4a.
+A shape is adopted **one at a time**, **under a decision of the board that
+carried and is in force**, and what is adopted is a **copy** — so a later
+revision of the shipped library does not move under a board that took it two
+years ago. A board may amend a shape or rule against using it, and either way
+says why. The checklist then runs against the board's version and says on its
+face which version it ran against, because a checklist built on the draft and
+one built on an adopted shape are different acts.
 
-889 server tests, 103 client. Nothing here signs.
+Requiring a ruling in force is the load-bearing part. Without it adoption would
+be a switch a signatory could flip, and the timelock — the window in which a
+signatory objects before a ruling takes effect — would be skipped.
+
+Next, in order: meetings as record, @mentions and the per-asset document, then
+durable storage — which is what blocks upload, which is what blocks the PDF
+extraction in §4a.
+
+950 server tests, 120 client. Nothing here signs.

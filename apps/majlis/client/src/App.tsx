@@ -6,6 +6,7 @@ import MatterDetail from './pages/MatterDetail.js';
 import Rules from './pages/Rules.js';
 import AssetDetail from './pages/AssetDetail.js';
 import Calculations from './pages/Calculations.js';
+import Library from './pages/Library.js';
 import Calendar from './pages/Calendar.js';
 import Register from './pages/Register.js';
 import Settings from './pages/Settings.js';
@@ -29,6 +30,9 @@ function Nav() {
     // the work starts here; everything else lists work already started.
     { to: '/register', label: t('nav.register') },
     { to: '/rules', label: t('nav.rules') },
+    // What the board holds, beside what it has decided. The library is the
+    // standard a matter is judged against; the rules are what came out of it.
+    { to: '/library', label: t('nav.library') },
     // The arithmetic, beside the rules it is done under. A scholar computing
     // purification is doing the ordinary work of a ruling already in force.
     { to: '/calculations', label: t('nav.calculations') },
@@ -44,9 +48,15 @@ function Nav() {
   ];
   return (
     <nav className="sticky bottom-0 z-20 border-t border-line bg-surface/95 backdrop-blur md:static md:border-b md:border-t-0">
-      <ul className="mx-auto flex max-w-reading items-stretch justify-between px-2 md:justify-start md:gap-1 md:px-5">
+      {/*
+        Scrollable on a narrow screen, and it has needed to be for a while: at
+        ten items the labels already wanted about 670px in a 375px viewport, so
+        the last of them were simply cut off with no way to reach them. Sharing
+        the width equally would have made every label unreadable instead.
+      */}
+      <ul className="mx-auto flex max-w-reading items-stretch gap-1 overflow-x-auto px-2 [scrollbar-width:none] md:justify-start md:overflow-visible md:px-5">
         {items.map((i) => (
-          <li key={i.to} className="flex-1 md:flex-none">
+          <li key={i.to} className="shrink-0">
             <NavLink
               to={i.to}
               end={i.end}
@@ -116,6 +126,7 @@ export default function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/register/:id" element={<AssetDetail />} />
           <Route path="/rules" element={<Rules />} />
+          <Route path="/library" element={<Library />} />
           <Route path="/calculations" element={<Calculations />} />
           <Route path="/calendar" element={<Calendar />} />
           <Route path="/incidents" element={<Incidents />} />

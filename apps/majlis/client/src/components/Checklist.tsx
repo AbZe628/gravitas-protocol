@@ -314,8 +314,30 @@ export default function Checklist({ matterId, canRule }: { matterId: string; can
 
   return (
     <div>
-      <div className="mb-1 text-[14px] font-medium">{data.structure.name}</div>
-      <p className="mb-3 text-[12px] text-muted">{data.structure.authority}</p>
+      <div className="mb-1 flex flex-wrap items-center gap-2">
+        <span className="text-[14px] font-medium">{data.structure.name}</span>
+        {/*
+          Whose conditions these are, on the face of the checklist.
+          A board judging a matter beside somebody else's reading and a board
+          judging it against its own are different acts, and an interface that
+          showed them identically would let the first be mistaken for the
+          second.
+        */}
+        <Tag tone={data.declined ? 'warn' : data.source === 'draft' ? 'gold' : 'ok'}>
+          {t(data.declined ? 'adopt.declined' : `adopt.${data.source}`)}
+        </Tag>
+      </div>
+      <p className="mb-2 text-[12px] text-muted">{data.structure.authority}</p>
+
+      {/* The server's own sentence about what that means. Not restated here. */}
+      <p
+        className={
+          'mb-3 rounded border px-3 py-2 text-[12px] leading-relaxed ' +
+          (data.declined ? 'border-warn/50 text-warn' : 'border-line text-muted')
+        }
+      >
+        {data.sourceNote}
+      </p>
 
       {/*
         A count, not a score. No bar and no percentage: a figure that filled up

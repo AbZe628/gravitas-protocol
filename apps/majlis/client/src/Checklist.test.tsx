@@ -29,6 +29,12 @@ const checklist = (over: Record<string, unknown> = {}) => ({
   conditions: [
     { condition: condition(), finding: null, history: [], answeredBy: [] },
   ],
+  // Whose conditions these are. The server always says; a fixture that left it
+  // out would let a test pass against a shape nobody had taken.
+  source: 'draft',
+  declined: false,
+  sourceNote:
+    'This is the shipped draft. This board has not adopted this shape, so its conditions are a starting point offered for the board to rule beside. They are binding on nobody.',
   unanswered: ['ownership-before-sale'],
   contested: [],
   answered: 0,
@@ -280,5 +286,55 @@ describe('choosing the shape, out of a library that is no longer short', () => {
       expect(screen.getByText(/not being judged against a contract shape/)).toBeInTheDocument(),
     );
     expect(screen.queryByText('Sukuk')).toBeNull();
+  });
+});
+
+/**
+ * A checklist built against the shipped draft and one built against what the
+ * board adopted are different acts. An interface that showed them identically
+ * would let the first be mistaken for the second.
+ */
+describe('the checklist says whose conditions it is counting', () => {
+  it('says plainly when they are the shipped draft, and that they bind nobody', async () => {
+    stub(checklist());
+    show();
+
+    await waitFor(() => expect(screen.getByText('Shipped draft')).toBeInTheDocument());
+    expect(screen.getByText(/binding on nobody/)).toBeInTheDocument();
+  });
+
+  it('says when they are the board’s own', async () => {
+    stub(
+      checklist({
+        source: 'adopted',
+        sourceNote: 'This is the board’s own version, taken under the decision named.',
+      }),
+    );
+    show();
+
+    await waitFor(() => expect(screen.getByText('Taken as the board’s')).toBeInTheDocument());
+    expect(screen.getByText(/the board’s own version/)).toBeInTheDocument();
+  });
+
+  it('says when they are the board’s own with changes', async () => {
+    stub(checklist({ source: 'amended', sourceNote: 'The board amended this shape.' }));
+    show();
+    await waitFor(() => expect(screen.getByText('Taken with changes')).toBeInTheDocument());
+  });
+
+  it('warns on the checklist itself where the board ruled against the shape', async () => {
+    stub(
+      checklist({
+        declined: true,
+        sourceNote:
+          'This board considered this shape and ruled against using it. A matter judged against it is being judged against something the board has already declined.',
+      }),
+    );
+    show();
+
+    await waitFor(() => expect(screen.getByText('Ruled against')).toBeInTheDocument());
+    expect(screen.getByText(/already declined/)).toBeInTheDocument();
+    // And the conditions are still shown: a board should see both facts at once.
+    expect(screen.getByText(/turns the sale into a financing/)).toBeInTheDocument();
   });
 });

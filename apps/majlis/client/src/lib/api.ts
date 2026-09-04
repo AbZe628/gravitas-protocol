@@ -847,6 +847,21 @@ export const oversight = {
   drift: () => get<DriftReport>('/api/drift'),
 
   structures: () => get<{ structures: Structure[]; note: string }>('/api/structures'),
+
+  /**
+   * The library as this board holds it, and taking a shape as its own.
+   *
+   * `structures` above is the shipped draft; this is what the board has done
+   * about it. Both are needed: the picker offers shapes, and this says which of
+   * them the board has actually taken.
+   */
+  library: () => get<Library>('/api/adoptions'),
+  adoptionHistory: (structureId: string) =>
+    get<{ history: { adoption: AdoptedStructure; replacedBy: string | null }[] }>(
+      `/api/adoptions/${structureId}/history`,
+    ),
+  adopt: (input: AdoptInput) =>
+    send<{ adoption: AdoptedStructure; note: string }>('/api/adoptions', input),
   checklist: (id: string) => get<Checklist>(`/api/matters/${id}/checklist`),
   setStructure: (id: string, structureId: string | null) =>
     send<Matter>(`/api/matters/${id}/structure`, { structureId }, 'PUT'),
@@ -1101,6 +1116,18 @@ export interface ConditionState {
 
 export interface Checklist {
   structure: Structure;
+  /**
+   * Whether these conditions are the board's own or the shipped draft.
+   *
+   * The difference matters enough to be on the screen: a checklist built
+   * against the draft is a board judging a matter beside somebody else's
+   * reading, and one built against an adopted shape is a board judging it
+   * against its own.
+   */
+  source: 'adopted' | 'amended' | 'draft';
+  /** True where the board considered this shape and ruled against using it. */
+  declined: boolean;
+  sourceNote: string;
   conditions: ConditionState[];
   unanswered: string[];
   /** Conditions where standing findings disagree. Not a fault — a discussion. */
@@ -1108,6 +1135,50 @@ export interface Checklist {
   answered: number;
   total: number;
   note: string;
+}
+
+// ── the library as this board holds it ────────────────────────────────────
+
+export interface AdoptedStructure {
+  id: string;
+  boardId: string;
+  structureId: string;
+  standing: 'adopted' | 'amended' | 'declined';
+  conditions: StructureCondition[];
+  /** What the board changed and why, or why it declined. */
+  amendments: string[];
+  /** The settled matter it was decided in. Checked on the server. */
+  matterId: string;
+  decidedBy: string;
+  decidedAt: string;
+  supersedes: string | null;
+}
+
+export interface HeldStructure {
+  structure: Structure;
+  source: 'adopted' | 'amended' | 'draft';
+  adoption: AdoptedStructure | null;
+  declined: boolean;
+  note: string;
+}
+
+export interface Library {
+  boardId: string;
+  library: HeldStructure[];
+  adopted: number;
+  declined: number;
+  total: number;
+  notes: { draft: string; adopted: string; declined: string };
+}
+
+export interface AdoptInput {
+  structureId: string;
+  boardId: string;
+  standing: 'adopted' | 'amended' | 'declined';
+  matterId: string;
+  amendments?: string[];
+  conditions?: StructureCondition[];
+  supersedes?: string | null;
 }
 
 // ── drift ─────────────────────────────────────────────────────────────────
