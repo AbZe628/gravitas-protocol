@@ -587,6 +587,152 @@ export interface Crossing {
   questionForBoard: string;
 }
 
+// ── the calculations a board runs on its own figures ──────────────────────
+
+/**
+ * All three share a shape, and the shape is the argument.
+ *
+ * Every one of them returns `steps` — the sums written out — and a `note`
+ * saying what it did not answer. Nothing returns a verdict, and nothing here
+ * assembles one from the parts.
+ */
+export interface CalcStep {
+  label: string;
+  working: string;
+  value: string;
+}
+
+export type PurificationMethod = 'per_share' | 'per_dividend' | 'per_unit';
+
+export interface PurificationInput {
+  method: PurificationMethod;
+  periodFrom: string;
+  periodTo: string;
+  currency: string;
+  source: string;
+  basis: string;
+  unitsHeld: string;
+  nonPermissibleIncome?: string;
+  sharesOutstanding?: string;
+  totalIncome?: string;
+  incomeReceived?: string;
+  ratePerUnit?: string;
+  apportionByHoldingPeriod?: boolean;
+  daysHeld?: number;
+  daysInPeriod?: number;
+}
+
+export interface Purified {
+  method: PurificationMethod;
+  methodStated: string;
+  basis: string;
+  periodFrom: string;
+  periodTo: string;
+  currency: string;
+  source: string;
+  amount: string;
+  perUnit: string | null;
+  proportionOfReceiptsBps: number | null;
+  steps: CalcStep[];
+  note: string;
+}
+
+export type ZakatMethod = 'net_assets' | 'net_invested_funds';
+export type ZakatYear = 'lunar' | 'solar';
+export type BorneBy = 'institution' | 'shareholders' | 'both';
+
+export interface ZakatInput {
+  method: ZakatMethod;
+  year: ZakatYear;
+  borneBy: BorneBy;
+  hawlEndsOn: string;
+  currency: string;
+  source: string;
+  cash?: string;
+  receivables?: string;
+  tradeGoods?: string;
+  zakatableInvestments?: string;
+  shortTermLiabilities?: string;
+  paidUpCapital?: string;
+  reserves?: string;
+  retainedEarnings?: string;
+  netProfit?: string;
+  fixedAssets?: string;
+  longTermInvestments?: string;
+  accumulatedLosses?: string;
+}
+
+export interface Zakat {
+  method: ZakatMethod;
+  methodStated: string;
+  year: ZakatYear;
+  rateStated: string;
+  rateWhy: string;
+  borneBy: BorneBy;
+  borneByStated: string;
+  hawlEndsOn: string;
+  currency: string;
+  source: string;
+  base: string;
+  due: string;
+  baseIsNegative: boolean;
+  steps: CalcStep[];
+  note: string;
+}
+
+export interface DistributionInput {
+  periodFrom: string;
+  periodTo: string;
+  currency: string;
+  source: string;
+  grossProfit: string;
+  mudaribShareBps: number;
+  perDeductionBps: number;
+  perBalance: string;
+  perCap: string;
+  irrDeductionBps: number;
+  irrBalance: string;
+  irrCap: string;
+  depositorFunds?: string;
+}
+
+export interface Smoothing {
+  withoutSmoothing: string;
+  paid: string;
+  difference: string;
+  direction: 'raised' | 'lowered' | 'none';
+  rateWithoutSmoothingBps: number | null;
+  ratePaidBps: number | null;
+  note: string;
+}
+
+export interface Reserve {
+  name: 'PER' | 'IRR';
+  openingBalance: string;
+  movement: string;
+  closingBalance: string;
+  cap: string;
+  cappedAt: boolean;
+  headroom: string;
+}
+
+export interface Distribution {
+  periodFrom: string;
+  periodTo: string;
+  currency: string;
+  source: string;
+  method: string;
+  grossProfit: string;
+  distributableProfit: string;
+  mudaribShare: string;
+  depositorsShare: string;
+  paidToDepositors: string;
+  reserves: Reserve[];
+  steps: CalcStep[];
+  smoothing: Smoothing;
+  note: string;
+}
+
 // ── the manual ────────────────────────────────────────────────────────────
 
 export interface ManualEntry {
@@ -667,6 +813,17 @@ export const oversight = {
 
   screen: (figures: Figures, previous?: Assessment) =>
     send<{ assessment: Assessment; crossings: Crossing[] }>('/api/screening', { figures, previous }),
+
+  /**
+   * The three that had no screen until now.
+   *
+   * Each is stateless on the server: figures go in, arithmetic comes back, and
+   * nothing is stored. So nothing here caches a result either — a figure held
+   * from a previous period and shown as current would be worse than no figure.
+   */
+  purify: (input: PurificationInput) => send<Purified>('/api/purification', input),
+  zakat: (input: ZakatInput) => send<Zakat>('/api/zakat', input),
+  distribute: (input: DistributionInput) => send<Distribution>('/api/distribution', input),
 
   setImplementation: (id: string, steps: string[]) =>
     send<Matter>(`/api/matters/${id}/implementation`, { steps }),

@@ -48,6 +48,7 @@ import { buildCalendar, toICalendar } from '../services/calendar.js';
 import { buildRegister, readComposition, standingOf } from '../services/register.js';
 import { checklistFor, recordFinding, setStructure } from '../services/structure.js';
 import { PURIFICATION_METHODS, purify, type PurificationInput } from '../services/purification.js';
+import { distribute, type DistributionInput } from '../services/distribution.js';
 import {
   ZAKAT_METHODS,
   ZAKAT_YEARS,
@@ -739,6 +740,57 @@ export function governanceRoutes(store: Store, now: () => string = () => new Dat
       }
 
       res.json(purify(body as PurificationInput));
+    }),
+  );
+
+  /**
+   * What the depositors are actually paid, and what smoothing did to it.
+   *
+   * The annual report's opinion must address whether profit allocation and
+   * loss charging on investment accounts followed the basis the board
+   * approved. This is the arithmetic under that sentence.
+   *
+   * No model of a bank is needed for it, only the order of operations, which
+   * is the whole point: PER comes out of gross profit before the split, so
+   * both parties bear it; IRR comes out after the split, from the depositors'
+   * share alone. Getting that order wrong moves real money between the bank
+   * and its depositors, and nothing in a spreadsheet says which way round it
+   * was done.
+   *
+   * The rates and the caps are the board's, sent with the figures. Nothing
+   * here has a default for them — a default deduction rate is a decision about
+   * somebody's returns.
+   */
+  router.post(
+    '/distribution',
+    handle(async (req, res) => {
+      const body = req.body as Partial<DistributionInput>;
+
+      const missing = (['grossProfit', 'currency', 'source'] as const).filter(
+        (k) => !body?.[k] || String(body[k]).trim() === '',
+      );
+      if (missing.length > 0) {
+        res.status(400).json({
+          error: 'no_figures',
+          message:
+            `Send ${missing.join(', ')}. A distribution without a source is a set of numbers ` +
+            'somebody typed, and the annual report rests on this one.',
+          missing,
+        });
+        return;
+      }
+
+      if (typeof body.mudaribShareBps !== 'number') {
+        res.status(400).json({
+          error: 'no_ratio',
+          message:
+            'Send the approved profit-sharing ratio, under "mudaribShareBps". It is the term the ' +
+            'board approved and nothing here has a default for it.',
+        });
+        return;
+      }
+
+      res.json(distribute(body as DistributionInput));
     }),
   );
 

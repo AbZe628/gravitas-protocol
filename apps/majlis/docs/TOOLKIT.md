@@ -445,31 +445,32 @@ Meetings, @mentions and the per-asset document from
 
 ## 9. Where the build stands
 
-*As of 2026-09-03. Update this when it stops being true.*
+*As of 2026-09-04. Update this when it stops being true.*
 
-All four calculations exist and are tested. **Three of them cannot be reached
-from the application.** Screening has a screen; purification, profit
-distribution and zakat are server routes with nothing in front of them, so a
-scholar signed into Majlis today cannot compute what the toolkit says the
-toolkit is for.
+All four calculations exist, are tested, and are reachable from the
+application at `/calculations`. Profit distribution had no HTTP route at all
+until this block — the service was written and nothing could call it, which is
+a state worth naming: a tested service nobody can reach is not a feature.
 
 | | server | screen |
 |---|---|---|
 | Screening (SS-21) | ✅ | ✅ |
-| Purification | ✅ | — |
-| Profit distribution (PER/IRR) | ✅ | — |
-| Zakat | ✅ | — |
+| Purification | ✅ | ✅ |
+| Profit distribution (PER/IRR) | ✅ | ✅ |
+| Zakat | ✅ | ✅ |
 | Drift over a standing ruling | ✅ | ✅ |
 | Asset register | ✅ | ✅ |
 | Structure checklist | ✅ | ✅ |
 
-**The next block is the calculations surface** — one place where a scholar
-computes purification, distribution and zakat, with the working shown and the
-method named as the board's. That closes §4 and is the difference between a
-toolkit that exists and a toolkit that is in use.
+**What the surface still cannot do is record anything.** All four are
+stateless by design, so a scholar who computes zakat and closes the tab has
+computed nothing anybody can point to later, and the annual report still says
+zakat is not in the record. The page says so about itself rather than leaving
+it to be discovered. Somewhere to record a computation against a period is one
+piece of work for all four, and it is the next one.
 
 After that, in order: the rest of the structure library (§3), then meetings as
 record, @mentions and the per-asset document, then durable storage — which is
 what blocks upload, which is what blocks the PDF extraction in §4a.
 
-799 server tests, 69 client. Nothing here signs.
+805 server tests, 84 client. Nothing here signs.

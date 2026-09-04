@@ -5,6 +5,7 @@ import Dashboard from './pages/Dashboard.js';
 import MatterDetail from './pages/MatterDetail.js';
 import Rules from './pages/Rules.js';
 import AssetDetail from './pages/AssetDetail.js';
+import Calculations from './pages/Calculations.js';
 import Calendar from './pages/Calendar.js';
 import Register from './pages/Register.js';
 import Settings from './pages/Settings.js';
@@ -28,6 +29,9 @@ function Nav() {
     // the work starts here; everything else lists work already started.
     { to: '/register', label: t('nav.register') },
     { to: '/rules', label: t('nav.rules') },
+    // The arithmetic, beside the rules it is done under. A scholar computing
+    // purification is doing the ordinary work of a ruling already in force.
+    { to: '/calculations', label: t('nav.calculations') },
     // A reported breach is not a proposal and does not belong in the list of
     // them. It has its own clock, which is the whole difference.
     { to: '/incidents', label: t('nav.incidents') },
@@ -112,6 +116,7 @@ export default function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/register/:id" element={<AssetDetail />} />
           <Route path="/rules" element={<Rules />} />
+          <Route path="/calculations" element={<Calculations />} />
           <Route path="/calendar" element={<Calendar />} />
           <Route path="/incidents" element={<Incidents />} />
           <Route path="/incidents/:id" element={<IncidentDetail />} />

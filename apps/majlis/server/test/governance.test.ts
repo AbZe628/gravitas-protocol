@@ -1066,6 +1066,70 @@ describe('purification from a holding, over HTTP', () => {
   });
 });
 
+describe('profit distribution, over HTTP', () => {
+  const figures = {
+    periodFrom: '2026-01-01',
+    periodTo: '2026-03-31',
+    currency: 'AED',
+    source: 'Treasury, unaudited management accounts',
+    grossProfit: '1000000',
+    mudaribShareBps: 3000,
+    perDeductionBps: 500,
+    perBalance: '0',
+    perCap: '10000000',
+    irrDeductionBps: 200,
+    irrBalance: '0',
+    irrCap: '10000000',
+    depositorFunds: '100000000',
+  };
+
+  const post = (body: Record<string, unknown>) =>
+    request(app).post('/api/distribution').set('Authorization', as('member-a')).send(body);
+
+  it('takes PER before the split and IRR after it, and shows the order', async () => {
+    const res = await post(figures).expect(200);
+
+    expect(res.body.distributableProfit).toBe('950000');
+    expect(res.body.mudaribShare).toBe('285000');
+    expect(res.body.depositorsShare).toBe('665000');
+    expect(res.body.paidToDepositors).toBe('651700');
+    expect(res.body.method).toContain('before the split');
+    expect(res.body.method).toContain('after the split');
+  });
+
+  it('states what smoothing did to the payout rather than hiding it in a rate', async () => {
+    const res = await post(figures).expect(200);
+
+    expect(res.body.smoothing.direction).toBe('lowered');
+    expect(res.body.smoothing.withoutSmoothing).toBe('700000');
+    expect(res.body.smoothing.paid).toBe('651700');
+  });
+
+  it('refuses without a source, because the annual report rests on this', async () => {
+    const res = await post({ ...figures, source: '' }).expect(400);
+
+    expect(res.body.error).toBe('no_figures');
+    expect(res.body.missing).toEqual(['source']);
+    expect(res.body.message).toContain('somebody typed');
+  });
+
+  it('has no default for the approved ratio, because a default is a decision', async () => {
+    const res = await post({ ...figures, mudaribShareBps: undefined }).expect(400);
+
+    expect(res.body.error).toBe('no_ratio');
+    expect(res.body.message).toContain('nothing here has a default');
+  });
+
+  it('answers a figure that is not a figure as the caller’s mistake', async () => {
+    const res = await post({ ...figures, grossProfit: 'a million or so' }).expect(400);
+    expect(res.body.error).toBe('bad_figure');
+  });
+
+  it('refuses anonymously, like every other route', async () => {
+    await request(app).post('/api/distribution').send({}).expect(401);
+  });
+});
+
 describe('zakat, over HTTP', () => {
   const figures = {
     year: 'lunar',
