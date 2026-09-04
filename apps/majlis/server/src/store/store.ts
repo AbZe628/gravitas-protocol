@@ -6,9 +6,11 @@
  * writes, and a governance record that disappears on restart is not a record.
  *
  * Everything goes through this interface so the backend is a decision that can
- * be revisited. Today it is a SQLite file, which costs nothing and needs no
- * account. Before mainnet it wants automatic backups, and that is a different
- * implementation of these same methods rather than a different application.
+ * be revisited. Today it is a JSON document written atomically, which costs
+ * nothing, needs no account and needs no build toolchain — `file.ts` explains
+ * why SQLite was tried and abandoned. Before mainnet it wants automatic
+ * backups, and that is a different implementation of these same methods rather
+ * than a different application.
  *
  * `updateMatter` takes a function rather than a finished object on purpose.
  * A board of five people will, sooner or later, have two of them close the same
@@ -29,6 +31,7 @@ import type {
   Incident,
   Institution,
   Matter,
+  Meeting,
   Rule,
 } from '../types.js';
 
@@ -141,17 +144,25 @@ export interface Store {
    */
   withdrawComputation(id: string, by: string, reason: string, at: string): Promise<Computation>;
 
-  // ── the library as each board holds it ─────────────────────────────────
+  // ── meetings ───────────────────────────────────────────────────────────
   //
-  // Append-only, like the recorded calculations and for the same reason: a
-  // board amends a shape by superseding its adoption, and the earlier version
-  // stays because findings were recorded against it.
+  // Not append-only, and it is the exception that proves the rule. A meeting
+  // is convened before it happens and filled in afterwards — attendance, then
+  // the minute — so it has to be writable while it is open. Closing it is the
+  // board approving the minute, and after that nothing changes: there is no
+  // route to amend a closed one.
 
-  adoptions(boardId?: string): Promise<AdoptedStructure[]>;
-  adoption(id: string): Promise<AdoptedStructure | null>;
+  meetings(boardId?: string): Promise<Meeting[]>;
+  meeting(id: string): Promise<Meeting | null>;
 
-  /** @throws if an adoption with this id already exists. */
-  recordAdoption(adoption: AdoptedStructure): Promise<AdoptedStructure>;
+  /** @throws if a meeting with this id already exists. */
+  createMeeting(meeting: Meeting): Promise<Meeting>;
+
+  /**
+   * Read, change and write one meeting atomically.
+   * @throws NotFound if there is no such meeting.
+   */
+  updateMeeting(id: string, change: (current: Meeting) => Meeting): Promise<Meeting>;
 
   // ── the library as each board holds it ─────────────────────────────────
   //

@@ -21,6 +21,7 @@ import type {
   Incident,
   Institution,
   Matter,
+  Meeting,
   Rule,
 } from '../types.js';
 import {
@@ -45,6 +46,7 @@ export interface MemorySeed {
   briefings?: Briefing[];
   computations?: Computation[];
   adoptions?: AdoptedStructure[];
+  meetings?: Meeting[];
 }
 
 export class MemoryStore implements Store {
@@ -60,6 +62,7 @@ export class MemoryStore implements Store {
   private readonly _briefings: Briefing[];
   private readonly _computations: Map<string, Computation>;
   private readonly _adoptions: Map<string, AdoptedStructure>;
+  private readonly _meetings: Map<string, Meeting>;
   private readonly _log: AssistantExchange[] = [];
 
   constructor(seed: MemorySeed = {}) {
@@ -78,6 +81,7 @@ export class MemoryStore implements Store {
     // Nothing seeded: a demonstration record where the library was already
     // adopted would be showing a decision no board in it ever took.
     this._adoptions = new Map((seed.adoptions ?? []).map((a) => [a.id, copy(a)]));
+    this._meetings = new Map((seed.meetings ?? []).map((m) => [m.id, copy(m)]));
   }
 
   async institutions(): Promise<Institution[]> {
@@ -243,6 +247,33 @@ export class MemoryStore implements Store {
     }
     this._adoptions.set(adoption.id, copy(adoption));
     return copy(adoption);
+  }
+
+  async meetings(boardId?: string): Promise<Meeting[]> {
+    const all = [...this._meetings.values()];
+    return copy(boardId === undefined ? all : all.filter((m) => m.boardId === boardId));
+  }
+
+  async meeting(id: string): Promise<Meeting | null> {
+    const found = this._meetings.get(id);
+    return found ? copy(found) : null;
+  }
+
+  async createMeeting(meeting: Meeting): Promise<Meeting> {
+    if (this._meetings.has(meeting.id)) {
+      throw new Error(`A meeting with id ${meeting.id} already exists.`);
+    }
+    this._meetings.set(meeting.id, copy(meeting));
+    return copy(meeting);
+  }
+
+  async updateMeeting(id: string, change: (current: Meeting) => Meeting): Promise<Meeting> {
+    const current = this._meetings.get(id);
+    if (!current) throw new NotFound('Meeting', id);
+
+    const next = change(copy(current));
+    this._meetings.set(id, copy(next));
+    return copy(next);
   }
 
   async appendAssistantExchange(exchange: AssistantExchange): Promise<void> {

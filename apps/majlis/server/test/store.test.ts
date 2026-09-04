@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import type { AdoptedStructure, Computation, Matter } from '../src/types.js';
+import type { AdoptedStructure, Computation, Matter, Meeting } from '../src/types.js';
 import { MemoryStore } from '../src/store/memory.js';
 import { FileStore, StorePathError } from '../src/store/file.js';
 import { NotFound, type Store } from '../src/store/store.js';
@@ -64,6 +64,17 @@ function newAdoption(id: string, over: Partial<AdoptedStructure> = {}): AdoptedS
     }],
     amendments: [], matterId: 'matter-2026-04-02',
     decidedBy: 's1', decidedAt: T0, supersedes: null,
+    ...over,
+  };
+}
+
+function newMeeting(id: string, over: Partial<Meeting> = {}): Meeting {
+  return {
+    id, boardId: 'demo-board', at: T0, joinUrl: null,
+    agenda: [{ item: 'The sukuk conditions' }],
+    attendance: [{ scholarId: 's1', present: true }],
+    minute: 'The board read the conditions and asked about the tangible ratio.',
+    recordedBy: 's1', closedAt: null,
     ...over,
   };
 }
@@ -264,6 +275,51 @@ describe.each(backends)('%s store', (_name, make) => {
     got!.conditions[0].requirement = 'tampered';
 
     expect((await store.adoption('a1'))?.conditions[0].requirement).not.toBe('tampered');
+  });
+
+  // ── meetings ────────────────────────────────────────────────────────────
+
+  it('creates a meeting and reads it back whole', async () => {
+    const created = await store.createMeeting(newMeeting('mt1'));
+    expect(await store.meeting('mt1')).toEqual(created);
+    expect((await store.meetings('demo-board')).map((m) => m.id)).toEqual(['mt1']);
+    expect(await store.meetings('another-board')).toEqual([]);
+  });
+
+  it('refuses to create the same meeting twice', async () => {
+    await store.createMeeting(newMeeting('mt1'));
+    await expect(store.createMeeting(newMeeting('mt1'))).rejects.toThrow(/already exists/);
+  });
+
+  it('updates through a function, which is how a minute is written', async () => {
+    await store.createMeeting(newMeeting('mt1'));
+    const updated = await store.updateMeeting('mt1', (m) => ({ ...m, closedAt: T0 }));
+
+    expect(updated.closedAt).toBe(T0);
+    expect((await store.meeting('mt1'))?.closedAt).toBe(T0);
+  });
+
+  it('reports a missing meeting rather than creating one', async () => {
+    await expect(store.updateMeeting('ghost', (m) => m)).rejects.toBeInstanceOf(NotFound);
+  });
+
+  it('writes nothing when the change throws part way', async () => {
+    await store.createMeeting(newMeeting('mt1', { minute: 'original' }));
+    await expect(
+      store.updateMeeting('mt1', (m) => {
+        m.minute = 'half written';
+        throw new Error('gave up half way');
+      }),
+    ).rejects.toThrow(/gave up half way/);
+
+    expect((await store.meeting('mt1'))?.minute).toBe('original');
+  });
+
+  it('hands out copies, so a caller cannot edit the record by accident', async () => {
+    await store.createMeeting(newMeeting('mt1'));
+    const got = await store.meeting('mt1');
+    got!.minute = 'tampered';
+    expect((await store.meeting('mt1'))?.minute).not.toBe('tampered');
   });
 
   // ── the assistant log ───────────────────────────────────────────────────

@@ -26,6 +26,11 @@ const STATUS: Record<string, number> = {
   no_period: 400,
   no_source: 400,
   no_such_prior: 400,
+  // A meeting convened around nothing, or minuted with nothing, is the
+  // caller's to fix rather than a conflict with the record.
+  no_agenda: 400,
+  no_minute: 400,
+  no_such_matter: 400,
   // Adopting names a decision. A missing or unfinished one is the caller's to fix.
   not_in_library: 400,
   no_matter: 400,

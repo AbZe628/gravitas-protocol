@@ -114,9 +114,18 @@ describe('what the record can put on a calendar', () => {
 });
 
 describe('what it cannot put on a calendar', () => {
-  it('always says meetings are not recorded', () => {
-    expect(build().gaps.join(' ')).toContain('Meetings are not recorded');
-    expect(build().gaps.join(' ')).toContain('regulatory floor');
+  /**
+   * Meeting cadence is the sixth clock and was the only one with nothing to
+   * count from. It is a gap while no meeting has been recorded, and a dated
+   * entry once one has.
+   */
+  it('says there is nothing to count the cadence from, while there is not', () => {
+    const gaps = build().gaps.join(' ');
+    expect(gaps).toContain('nothing to count the cadence from');
+    // And says plainly that this is an absence here rather than a finding
+    // about the board, which may have met for years without this system.
+    expect(gaps).toContain('rather than a finding about the board');
+    expect(build().entries.some((e) => e.kind === 'meeting_due')).toBe(false);
   });
 
   it('names rules that will never appear on any calendar', () => {

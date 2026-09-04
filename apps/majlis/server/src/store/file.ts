@@ -41,6 +41,7 @@ import type {
   Incident,
   Institution,
   Matter,
+  Meeting,
   Rule,
 } from '../types.js';
 import {
@@ -88,6 +89,7 @@ interface Document {
   assets?: Asset[];
   computations?: Computation[];
   adoptions?: AdoptedStructure[];
+  meetings?: Meeting[];
   briefings: Briefing[];
 }
 
@@ -172,6 +174,7 @@ export class FileStore implements Store {
       loaded.assets ??= [];
       loaded.computations ??= [];
       loaded.adoptions ??= [];
+      loaded.meetings ??= [];
       this.doc = loaded;
       return;
     }
@@ -190,6 +193,7 @@ export class FileStore implements Store {
             briefings: [],
             computations: [],
             adoptions: [],
+            meetings: [],
           }
         : {
             version: 1,
@@ -204,6 +208,7 @@ export class FileStore implements Store {
             assets: copy(seedAssets),
             computations: [],
             adoptions: [],
+            meetings: [],
             briefings: copy(seedBriefings),
           };
     this.persist();
@@ -432,6 +437,41 @@ export class FileStore implements Store {
       this.doc.adoptions.push(copy(adoption));
       this.persist();
       return copy(adoption);
+    });
+  }
+
+  async meetings(boardId?: string): Promise<Meeting[]> {
+    const all = this.doc.meetings ?? [];
+    return copy(boardId === undefined ? all : all.filter((m) => m.boardId === boardId));
+  }
+
+  async meeting(id: string): Promise<Meeting | null> {
+    return copy((this.doc.meetings ?? []).find((m) => m.id === id) ?? null);
+  }
+
+  async createMeeting(meeting: Meeting): Promise<Meeting> {
+    return this.serialise(() => {
+      this.doc.meetings ??= [];
+      if (this.doc.meetings.some((m) => m.id === meeting.id)) {
+        throw new Error(`A meeting with id ${meeting.id} already exists.`);
+      }
+      this.doc.meetings.push(copy(meeting));
+      this.persist();
+      return copy(meeting);
+    });
+  }
+
+  async updateMeeting(id: string, change: (current: Meeting) => Meeting): Promise<Meeting> {
+    return this.serialise(() => {
+      this.doc.meetings ??= [];
+      const index = this.doc.meetings.findIndex((m) => m.id === id);
+      if (index === -1) throw new NotFound('Meeting', id);
+
+      // Runs against a copy and before persist(), so a refusal writes nothing.
+      const next = change(copy(this.doc.meetings[index]));
+      this.doc.meetings[index] = copy(next);
+      this.persist();
+      return copy(next);
     });
   }
 

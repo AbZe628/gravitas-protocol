@@ -341,3 +341,19 @@ export function mayRecordInstitutionAct(role: Role, office?: Office): boolean {
 export function mayConvene(office?: Office): boolean {
   return office === 'chair';
 }
+
+/**
+ * Who keeps the minute.
+ *
+ * The chair, who convened the meeting, or the secretary, whose office this
+ * ordinarily is. Narrower than deliberating on purpose: a minute is the record
+ * of what a board did, and a record several hands can rewrite is a record
+ * nobody can rely on.
+ *
+ * A board with neither office configured cannot keep minutes here, and that is
+ * the honest outcome rather than a hole — convening is already the chair's, so
+ * such a board has no meeting to minute in the first place.
+ */
+export function mayKeepMinutes(_role: Role, office?: Office): boolean {
+  return office === 'chair' || office === 'secretary';
+}

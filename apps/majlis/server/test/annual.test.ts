@@ -196,10 +196,15 @@ describe('non-compliance in the year', () => {
 });
 
 describe('what the draft cannot state', () => {
-  it('always names meetings and the review functions', () => {
+  it('always names the review functions, which nothing here holds', () => {
+    expect(build().gaps.join(' ')).toContain('Shariah review and Shariah audit');
+  });
+
+  it('names meetings while none has been recorded for the year', () => {
     const text = build().gaps.join(' ');
-    expect(text).toContain('number of meetings');
-    expect(text).toContain('Shariah review and Shariah audit');
+    expect(text).toContain('No meeting was recorded for this year');
+    expect(text).toContain('attendance floor');
+    expect(build().meetings.held).toBe(0);
   });
 
   it('names zakat and profit distribution while nothing has been noted', () => {

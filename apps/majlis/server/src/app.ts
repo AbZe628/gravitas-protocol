@@ -22,6 +22,7 @@ import { LoginLimiter, loginThrottle } from './middleware/loginLimit.js';
 import { governanceRoutes } from './routes/governance.js';
 import { adoptionRoutes } from './routes/adoption.js';
 import { computationRoutes } from './routes/computations.js';
+import { meetingRoutes } from './routes/meetings.js';
 import { incidentRoutes } from './routes/incidents.js';
 
 
@@ -329,6 +330,7 @@ export function createApp(
   app.use('/api', incidentRoutes(store));
   app.use('/api', computationRoutes(store));
   app.use('/api', adoptionRoutes(store));
+  app.use('/api', meetingRoutes(store));
 
   // ---- audit export ----------------------------------------------------
   app.get('/api/export/:boardId', async (req, res) => {

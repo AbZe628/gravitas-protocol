@@ -786,7 +786,7 @@ describe('the annual report, over HTTP', () => {
       .expect(200);
 
     const gaps = res.body.gaps.join(' ');
-    expect(gaps).toContain('meetings');
+    expect(gaps).toContain('No meeting was recorded');
     // Named while nothing has been noted, and only while.
     expect(gaps).toContain('No zakat calculation was noted');
   });

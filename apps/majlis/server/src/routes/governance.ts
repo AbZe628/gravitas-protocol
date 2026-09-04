@@ -1089,11 +1089,12 @@ export function governanceRoutes(store: Store, now: () => string = () => new Dat
       const at = now();
       const boardId = typeof req.query.board === 'string' ? req.query.board : undefined;
 
-      const [boards, matters, rules, incidents] = await Promise.all([
+      const [boards, matters, rules, incidents, meetings] = await Promise.all([
         store.boards(),
         store.matters(boardId),
         store.rules(boardId),
         store.incidents(boardId),
+        store.meetings(boardId),
       ]);
 
       if (boardId && !boards.some((b) => b.id === boardId)) {
@@ -1101,7 +1102,7 @@ export function governanceRoutes(store: Store, now: () => string = () => new Dat
         return;
       }
 
-      res.json(buildCalendar({ boards, matters, rules, incidents, now: at, boardId }));
+      res.json(buildCalendar({ boards, matters, rules, incidents, meetings, now: at, boardId }));
     }),
   );
 
@@ -1124,14 +1125,15 @@ export function governanceRoutes(store: Store, now: () => string = () => new Dat
       const at = now();
       const boardId = typeof req.query.board === 'string' ? req.query.board : undefined;
 
-      const [boards, matters, rules, incidents] = await Promise.all([
+      const [boards, matters, rules, incidents, meetings] = await Promise.all([
         store.boards(),
         store.matters(boardId),
         store.rules(boardId),
         store.incidents(boardId),
+        store.meetings(boardId),
       ]);
 
-      const calendar = buildCalendar({ boards, matters, rules, incidents, now: at, boardId });
+      const calendar = buildCalendar({ boards, matters, rules, incidents, meetings, now: at, boardId });
       const host = req.get('host') ?? 'majlis.local';
 
       res.type('text/calendar; charset=utf-8');
@@ -1206,11 +1208,12 @@ export function governanceRoutes(store: Store, now: () => string = () => new Dat
         return;
       }
 
-      const [matters, rules, incidents, computations] = await Promise.all([
+      const [matters, rules, incidents, computations, meetings] = await Promise.all([
         store.matters(board.id),
         store.rules(board.id),
         store.incidents(board.id),
         store.computations({ boardId: board.id }),
+        store.meetings(board.id),
       ]);
 
       const report = assembleAnnualReport({
@@ -1220,6 +1223,7 @@ export function governanceRoutes(store: Store, now: () => string = () => new Dat
         rules,
         incidents,
         computations,
+        meetings,
         generatedAt: at,
       });
 

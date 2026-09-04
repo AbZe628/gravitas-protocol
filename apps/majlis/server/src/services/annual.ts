@@ -31,9 +31,20 @@
 
 import { disclosureFor, type Disclosure } from './incident.js';
 import { forYear } from './computation.js';
+import { attendanceAcross, type AttendanceSummary } from './meeting.js';
 import { paceOf } from './clocks.js';
 import { reviewStatus } from './review.js';
-import type { Board, CalculationKind, Computation, Incident, Matter, MatterOrigin, Rule, Scholar } from '../types.js';
+import type {
+  Board,
+  CalculationKind,
+  Computation,
+  Incident,
+  Matter,
+  MatterOrigin,
+  Meeting,
+  Rule,
+  Scholar,
+} from '../types.js';
 
 export interface ReportedCalculation {
   kind: CalculationKind;
@@ -106,6 +117,18 @@ export interface AnnualReport {
 
   /** Nature, amount, count and rectification. Assembled, never summarised. */
   nonCompliance: Disclosure;
+
+  /**
+   * How often the board met, and who was there.
+   *
+   * GS-1 expects both, and frameworks that set an attendance floor expect
+   * absence to be explicable — so where a board gave a reason for an absence,
+   * the reason travels here with it rather than being reduced to a count.
+   */
+  meetings: {
+    held: number;
+    attendance: AttendanceSummary[];
+  };
 
   /**
    * What the board noted during the year.
@@ -211,6 +234,12 @@ export function assembleAnnualReport(params: {
    * becoming a crash.
    */
   computations?: Computation[];
+  /**
+   * Optional, like the computations, so an installation with nothing recorded
+   * still produces a report — and the gap it names about itself stays true
+   * rather than becoming a crash.
+   */
+  meetings?: Meeting[];
   generatedAt: string;
 }): AnnualReport {
   const { year, board, generatedAt } = params;
@@ -244,6 +273,13 @@ export function assembleAnnualReport(params: {
   const pace = paceOf(board, settledThisYear, periodTo);
 
   const statuses = rules.map((r) => reviewStatus(r, periodTo));
+
+  // Only meetings this board actually held, and only in this year. One
+  // convened for next month is not a meeting held, and a report that counted
+  // it would be reporting the future.
+  const meetingsThisYear = (params.meetings ?? []).filter(
+    (m) => m.boardId === board.id && m.closedAt && yearOf(m.at) === year,
+  );
 
   const report: AnnualReport = {
     year,
@@ -281,6 +317,11 @@ export function assembleAnnualReport(params: {
 
     nonCompliance: disclosureFor(year, incidents),
 
+    meetings: {
+      held: meetingsThisYear.length,
+      attendance: attendanceAcross(meetingsThisYear, board),
+    },
+
     /**
      * What the board noted during the year, and nothing more.
      *
@@ -314,11 +355,29 @@ export function assembleAnnualReport(params: {
  */
 function gapsIn(report: AnnualReport): string[] {
   const gaps: string[] = [
-    'The number of meetings held and each member’s attendance is not recorded by this system. ' +
-      'GS-1 expects both, and frameworks that set an attendance floor expect it stated.',
     'The findings of the institution’s own Shariah review and Shariah audit functions are not ' +
       'held here. The board’s opinion normally rests on them.',
   ];
+
+  /**
+   * Meetings are a gap only while none has been recorded.
+   *
+   * The report named this unconditionally from the day it was written, which
+   * stopped being true the moment a board could minute one. A gap that
+   * outlives its cause teaches a board to stop reading the gaps.
+   */
+  if (report.meetings.held === 0) {
+    gaps.push(
+      'No meeting was recorded for this year, so the number held and each member’s attendance ' +
+        'cannot be stated. GS-1 expects both, and frameworks that set an attendance floor expect ' +
+        'it stated.',
+    );
+  } else if (report.meetings.attendance.some((a) => a.attended === 0)) {
+    gaps.push(
+      'A member is recorded as having attended none of this year’s meetings. That may be correct ' +
+        'and it may be an attendance nobody recorded; the report cannot tell which.',
+    );
+  }
 
   /**
    * Zakat is a gap only while nothing has been noted.
@@ -475,6 +534,30 @@ ${report.calculations
   .join('\n')}`
     : '<p class="none">The board noted no calculations in this period.</p>';
 
+  /**
+   * How often the board met, and who was there.
+   *
+   * Attendance is per member and not an average. A board that met four times
+   * with one member at none of them is a different board from one where
+   * everybody attended three, and a single percentage hides exactly that.
+   *
+   * Where the board explained an absence, the explanation is printed. A
+   * framework that sets an attendance floor expects absence to be explicable,
+   * and a count with no reason beside it is the thing such a floor is meant to
+   * make impossible.
+   */
+  const meetings = report.meetings.held
+    ? `<p>Meetings held during the period: <strong>${report.meetings.held}</strong>.</p>
+    <table><thead><tr><th>Member</th><th>Attended</th><th>Noted</th></tr></thead><tbody>${report.meetings.attendance
+      .map(
+        (a) =>
+          `<tr><td>${esc(a.name)}</td><td class="mono">${a.attended} of ${a.of}</td><td>${
+            a.notes.length ? esc(a.notes.join('; ')) : ''
+          }</td></tr>`,
+      )
+      .join('')}</tbody></table>`
+    : '<p class="none">No meeting was recorded for this period.</p>';
+
   const signatures = report.composition
     .filter((m) => m.signatory)
     .map(
@@ -579,6 +662,11 @@ ${report.pace.approximate ? '    <p class="none">Some figures cover only the par
       <div><span>Overdue at the period end</span><span>${report.reviews.overdueAtYearEnd}</span></div>
       <div><span>In force with no review scheduled</span><span>${report.reviews.unscheduled}</span></div>
     </div>
+  </section>
+
+  <section>
+    <h2>Meetings and attendance</h2>
+    ${meetings}
   </section>
 
   <section>

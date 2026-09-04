@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import type { AdoptedStructure, Asset, Board, Computation, Incident, Institution, Matter, Rule } from '../src/types.js';
+import type { AdoptedStructure, Asset, Board, Computation, Incident, Institution, Matter, Meeting, Rule } from '../src/types.js';
 import { MemoryStore } from '../src/store/memory.js';
 import { TenantStore, OutsideInstitution } from '../src/store/tenant.js';
 import { NotFound } from '../src/store/store.js';
@@ -71,6 +71,14 @@ function adoption(id: string, boardId: string): AdoptedStructure {
   };
 }
 
+function meeting(id: string, boardId: string): Meeting {
+  return {
+    id, boardId, at: T0, joinUrl: null,
+    agenda: [{ item: 'What this board is looking at' }],
+    attendance: [], minute: '', recordedBy: 'someone', closedAt: null,
+  };
+}
+
 const both = () =>
   new MemoryStore({
     institutions,
@@ -90,6 +98,7 @@ const both = () =>
       computation('beta-zakat', 'beta-board'),
     ],
     adoptions: [adoption('alpha-adoption', 'alpha-board'), adoption('beta-adoption', 'beta-board')],
+    meetings: [meeting('alpha-meeting', 'alpha-board'), meeting('beta-meeting', 'beta-board')],
     briefings: [],
   });
 
@@ -250,6 +259,31 @@ describe('an institution’s amendments to a shape are its own reasoning', () =>
     await expect(
       alpha().recordAdoption(adoption('new-one', 'beta-board')),
     ).rejects.toBeInstanceOf(OutsideInstitution);
+  });
+});
+
+describe('a minute is what a board said to itself, so it is scoped too', () => {
+  it('sees only its own', async () => {
+    expect((await alpha().meetings()).map((m) => m.id)).toEqual(['alpha-meeting']);
+    expect((await beta().meetings()).map((m) => m.id)).toEqual(['beta-meeting']);
+  });
+
+  it('answers absence rather than refusal for another institution’s', async () => {
+    expect(await alpha().meeting('beta-meeting')).toBeNull();
+    expect(await alpha().meetings('beta-board')).toEqual([]);
+  });
+
+  it('refuses loudly to convene one for another institution’s board', async () => {
+    await expect(
+      alpha().createMeeting(meeting('new-one', 'beta-board')),
+    ).rejects.toBeInstanceOf(OutsideInstitution);
+  });
+
+  it('cannot minute another institution’s, and cannot tell it apart from absence', async () => {
+    await expect(
+      alpha().updateMeeting('beta-meeting', (m) => ({ ...m, minute: 'read by the wrong board' })),
+    ).rejects.toBeInstanceOf(NotFound);
+    expect((await beta().meeting('beta-meeting'))?.minute).toBe('');
   });
 });
 

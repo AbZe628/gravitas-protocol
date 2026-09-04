@@ -27,7 +27,8 @@
 import { rectificationClock } from './incident.js';
 import { ratificationDeadline, quorumFor, tally } from './lifecycle.js';
 import { reviewStatus } from './review.js';
-import type { Board, Incident, Matter, Rule } from '../types.js';
+import { cadence } from './meeting.js';
+import type { Board, Incident, Matter, Meeting, Rule } from '../types.js';
 
 export type EntryKind =
   /** A permit's timelock ends and it can be brought into force. */
@@ -37,7 +38,14 @@ export type EntryKind =
   /** Thirty days from a finding of actual non-compliance. */
   | 'rectification_due'
   /** A ruling returns to the board. */
-  | 'review_due';
+  | 'review_due'
+  /**
+   * The board is due to meet.
+   *
+   * The one deadline with a regulatory floor behind it, and the last of the
+   * six clocks to get anything to count from.
+   */
+  | 'meeting_due';
 
 export interface CalendarEntry {
   /** Stable across regenerations, so a subscribed calendar updates rather than duplicates. */
@@ -81,6 +89,11 @@ export function buildCalendar(params: {
   matters: Matter[];
   rules: Rule[];
   incidents: Incident[];
+  /**
+   * Optional, so an installation with none still gets a calendar — and the
+   * gap it names about itself stays true rather than becoming a crash.
+   */
+  meetings?: Meeting[];
   now: string;
   boardId?: string;
 }): Calendar {
@@ -163,10 +176,37 @@ export function buildCalendar(params: {
 
   entries.sort((a, b) => a.at.localeCompare(b.at));
 
-  const gaps = [
-    'Meetings are not recorded by this system, so the six-month cadence — the one deadline ' +
-      'with a regulatory floor behind it — cannot appear here.',
-  ];
+  /**
+   * The sixth clock, which until now had nothing to count from.
+   *
+   * One entry per board, for the boards this calendar covers. The interval
+   * belongs to whoever supervises the board rather than to this system, and
+   * `cadence()` says so in the note it carries.
+   */
+  const gaps: string[] = [];
+  for (const board of boards) {
+    const c = cadence(params.meetings ?? [], board.id, now);
+    if (!c.dueBy) {
+      gaps.push(`${board.name}: ${c.note}`);
+      continue;
+    }
+    entries.push({
+      // Stable across regenerations, so a subscribed calendar updates this
+      // entry rather than adding a second one every time the board meets.
+      id: `meet:${board.id}`,
+      kind: 'meeting_due',
+      at: c.dueBy,
+      title: board.name,
+      subject: board.id,
+      overdue: c.overdue,
+      waitingOn: [],
+      note: c.nextConvenedAt
+        ? `${c.note} A meeting is already convened for ${c.nextConvenedAt.slice(0, 10)}.`
+        : `${c.note} No meeting is convened.`,
+    });
+  }
+
+  entries.sort((a, b) => a.at.localeCompare(b.at));
   const unscheduled = mine(params.rules).filter((r) => reviewStatus(r, now).state === 'unscheduled');
   if (unscheduled.length) {
     gaps.push(
@@ -241,6 +281,7 @@ const HEADING: Record<EntryKind, string> = {
   ratification_due: 'Ratify or it lapses',
   rectification_due: 'Rectification plan due',
   review_due: 'Review due',
+  meeting_due: 'The board is due to meet',
 };
 
 /**

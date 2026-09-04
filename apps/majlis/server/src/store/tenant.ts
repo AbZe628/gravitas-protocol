@@ -8,6 +8,7 @@ import type {
   Incident,
   Institution,
   Matter,
+  Meeting,
   Rule,
 } from '../types.js';
 import { NotFound, type Store } from './store.js';
@@ -243,6 +244,46 @@ export class TenantStore implements Store {
     // Indistinguishable from one that does not exist, deliberately.
     if (!found || !(await this.owns(found.boardId))) throw new NotFound('computation', id);
     return this.inner.withdrawComputation(id, by, reason, at);
+  }
+
+  // ── meetings ────────────────────────────────────────────────────────────
+  //
+  // Scoped through the board, like an incident. A minute carries what a board
+  // said to itself before it decided anything, which is the most private thing
+  // in the record.
+
+  async meetings(boardId?: string): Promise<Meeting[]> {
+    if (boardId && !(await this.owns(boardId))) return [];
+    const mine = await this.ownBoardIds();
+    const all = await this.inner.meetings(boardId);
+    return all.filter((m) => mine.has(m.boardId));
+  }
+
+  async meeting(id: string): Promise<Meeting | null> {
+    const found = await this.inner.meeting(id);
+    if (!found) return null;
+    return (await this.owns(found.boardId)) ? found : null;
+  }
+
+  async createMeeting(meeting: Meeting): Promise<Meeting> {
+    if (!(await this.owns(meeting.boardId))) {
+      throw new OutsideInstitution('convene a meeting of', meeting.boardId);
+    }
+    return this.inner.createMeeting(meeting);
+  }
+
+  async updateMeeting(id: string, change: (current: Meeting) => Meeting): Promise<Meeting> {
+    const found = await this.inner.meeting(id);
+    // Indistinguishable from one that does not exist, deliberately.
+    if (!found || !(await this.owns(found.boardId))) throw new NotFound('meeting', id);
+
+    return this.inner.updateMeeting(id, (current) => {
+      const next = change(current);
+      if (next.boardId !== current.boardId) {
+        throw new OutsideInstitution('move a meeting to', next.boardId);
+      }
+      return next;
+    });
   }
 
   // ── the library as each board holds it ──────────────────────────────────
