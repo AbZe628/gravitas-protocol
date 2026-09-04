@@ -108,6 +108,57 @@ describe('a request cannot say whose vote it carries', () => {
 
 // ── who may do what ───────────────────────────────────────────────────────
 
+describe('naming a colleague in the deliberation', () => {
+  it('resolves the names on the server, so no second parser can disagree', async () => {
+    const id = await openMatter();
+    await say(id, 'member-a', 'Does @member-b agree the ratio holds at each transaction?').expect(201);
+
+    const res = await request(app).get(`/api/matters/${id}`).set('Authorization', as('member-a')).expect(200);
+    const entry = res.body.deliberation[0];
+
+    expect(entry.segments.map((x: { text: string }) => x.text).join('')).toBe(entry.body);
+    expect(entry.segments.find((x: { scholarId?: string }) => x.scholarId)?.scholarId).toBe('member-b');
+  });
+
+  it('offers the board as the only names that can be used', async () => {
+    const id = await openMatter();
+    const res = await request(app).get(`/api/matters/${id}`).set('Authorization', as('member-a')).expect(200);
+
+    expect(res.body.mentionable.length).toBeGreaterThan(0);
+    expect(res.body.mentionable.map((m: { id: string }) => m.id)).toContain('member-b');
+  });
+
+  it('leaves a name nobody on the board answers to as ordinary text', async () => {
+    const id = await openMatter();
+    await say(id, 'member-a', 'A note about treasury@member-b.example and @nobody at all.').expect(201);
+
+    const res = await request(app).get(`/api/matters/${id}`).set('Authorization', as('member-a')).expect(200);
+    const entry = res.body.deliberation[0];
+    expect(entry.segments.some((x: { scholarId?: string }) => x.scholarId)).toBe(false);
+  });
+
+  it('puts the matter on the named member’s attention, with no clock on it', async () => {
+    const id = await openMatter();
+    await say(id, 'member-a', 'Does @member-b agree?').expect(201);
+
+    const mine = await request(app).get('/api/attention').set('Authorization', as('member-b')).expect(200);
+    const mention = mine.body.items.find((i: { kind: string }) => i.kind === 'mentioned_you');
+
+    expect(mention.matterId).toBe(id);
+    expect(mention.deadline).toBeNull();
+    expect(mention.note).toContain('a colleague asking');
+  });
+
+  it('goes once the member has spoken after it', async () => {
+    const id = await openMatter();
+    await say(id, 'member-a', 'Does @member-b agree?').expect(201);
+    await say(id, 'member-b', 'It does, for the reason set out above.').expect(201);
+
+    const mine = await request(app).get('/api/attention').set('Authorization', as('member-b')).expect(200);
+    expect(mine.body.items.some((i: { kind: string }) => i.kind === 'mentioned_you')).toBe(false);
+  });
+});
+
 describe('roles', () => {
   it('an observer may read and may not write', async () => {
     await request(app).get('/api/matters').set('Authorization', as('watcher')).expect(200);

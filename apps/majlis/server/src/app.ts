@@ -21,6 +21,7 @@ import { TIMELOCK_HOURS } from './types.js';
 import { LoginLimiter, loginThrottle } from './middleware/loginLimit.js';
 import { governanceRoutes } from './routes/governance.js';
 import { adoptionRoutes } from './routes/adoption.js';
+import { segmentsOf } from './services/mentions.js';
 import { computationRoutes } from './routes/computations.js';
 import { meetingRoutes } from './routes/meetings.js';
 import { incidentRoutes } from './routes/incidents.js';
@@ -197,8 +198,25 @@ export function createApp(
   app.get('/api/matters/:id', async (req, res) => {
     const matter = await store.matter(req.params.id);
     if (!matter) return res.status(404).json({ error: 'matter not found' });
+
+    /*
+     * Names in the deliberation are resolved here rather than in the browser.
+     *
+     * The rule — an `@` followed by the id of somebody on this board — is small
+     * enough that an interface could apply it itself, and that is exactly how
+     * two copies of a rule come to disagree. One parser, on the side that knows
+     * who is on the board.
+     */
+    const board = await store.board(matter.boardId);
+    const deliberation = board
+      ? matter.deliberation.map((d) => ({ ...d, segments: segmentsOf(d.body, board) }))
+      : matter.deliberation;
+
     res.json({
       ...matter,
+      deliberation,
+      /** Who may be named here. The composer offers these and nothing else. */
+      mentionable: board?.members.map((m) => ({ id: m.id, name: m.name, title: m.title })) ?? [],
       proposedRule: {
         ...matter.proposedRule,
         parameterHashVerified: verifyParameters(

@@ -24,6 +24,8 @@ export function dirFor(lang: Lang): 'ltr' | 'rtl' {
 type Dict = Record<string, string>;
 
 const en: Dict = {
+  "say.ask": "Ask someone",
+  "attention.mentioned_you": "A colleague named you",
   "cal.kind.meeting_due": "The board is due to meet",
   "nav.meetings": "Meetings",
   "meet.title": "Meetings",
@@ -740,6 +742,8 @@ const en: Dict = {
 };
 
 const ar: Dict = {
+  "say.ask": "اسأل أحدهم",
+  "attention.mentioned_you": "زميل ذكرك",
   "cal.kind.meeting_due": "موعد انعقاد المجلس",
   "nav.meetings": "الجلسات",
   "meet.title": "جلسات المجلس",
@@ -1189,6 +1193,8 @@ const ar: Dict = {
 };
 
 const ur: Dict = {
+  "say.ask": "کسی سے پوچھیں",
+  "attention.mentioned_you": "ایک رفیق نے آپ کا نام لیا",
   "cal.kind.meeting_due": "بورڈ کا اجلاس واجب",
   "nav.meetings": "اجلاس",
   "meet.title": "اجلاسات",

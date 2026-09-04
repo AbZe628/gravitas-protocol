@@ -20,6 +20,7 @@
  */
 
 import { quorumFor, ratificationDeadline, tally, timelockElapsed } from './lifecycle.js';
+import { noteFor, outstandingFor } from './mentions.js';
 import type { Board, Matter } from '../types.js';
 
 export type AttentionKind =
@@ -28,7 +29,15 @@ export type AttentionKind =
   | 'objection_window_open'
   | 'ready_to_take_effect'
   | 'awaiting_ratification'
-  | 'overdue';
+  | 'overdue'
+  /**
+   * A colleague named you in the deliberation.
+   *
+   * The only kind here that is not a step the process is waiting on. It
+   * carries no deadline and nothing lapses if it is left, which is what
+   * being asked a question by a colleague actually is.
+   */
+  | 'mentioned_you';
 
 export interface AttentionItem {
   matterId: string;
@@ -192,8 +201,35 @@ export function attentionList(
   for (const matter of matters) {
     const board = byId.get(matter.boardId);
     if (!board) continue;
+
     const found = attentionFor(board, matter, opts);
     if (found) out.push(found);
+
+    /*
+     * A mention is listed alongside whatever the process wants, rather than
+     * instead of it. A scholar who owes a vote and has also been asked a
+     * question needs both: the question is very often why the vote has not
+     * been cast, and showing only the duty hides the reason for it.
+     *
+     * One item per matter however many mentions stand. The list is a place to
+     * start reading, not the thread itself.
+     */
+    const mentions = outstandingFor(opts.scholarId, matter, board);
+    if (mentions.length > 0) {
+      const latest = mentions[mentions.length - 1];
+      out.push(
+        item(
+          matter,
+          'mentioned_you',
+          mentions.length === 1
+            ? noteFor(latest, board)
+            : `${noteFor(latest, board)} ${mentions.length} entries name you and are unanswered.`,
+          // No deadline, deliberately. Nothing here is a clock.
+          null,
+          opts.now ?? new Date().toISOString(),
+        ),
+      );
+    }
   }
 
   return out.sort((a, b) => {

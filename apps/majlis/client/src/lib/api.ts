@@ -41,6 +41,20 @@ export interface Simulation {
   note: string;
 }
 
+/**
+ * A piece of the body, with the names in it already resolved.
+ *
+ * Parsed on the server rather than here. The rule — an `@` starting a word,
+ * followed by the id of somebody on this board — is small enough that an
+ * interface could apply it itself, and that is exactly how two copies of a
+ * rule come to disagree.
+ */
+export interface Segment {
+  text: string;
+  /** Set where this segment names somebody on the board. */
+  scholarId?: string;
+}
+
 export interface Deliberation {
   id: string;
   scholarId: string;
@@ -48,6 +62,8 @@ export interface Deliberation {
   at: string;
   replyTo: string | null;
   liaisonAnswer: boolean;
+  /** Absent on entries loaded from a list rather than from one matter. */
+  segments?: Segment[];
 }
 
 export type SourceKind = 'standard' | 'ruling' | 'document' | 'external' | 'code' | 'test' | 'chain';
@@ -88,6 +104,13 @@ export interface Reasoning {
 
 export interface Matter extends MatterSummary {
   boardId: string;
+  /**
+   * Who may be named in this deliberation.
+   *
+   * The composer offers these and nothing else. A free-text `@` that named
+   * nobody would look like a question asked and answered by nobody.
+   */
+  mentionable?: { id: string; name: string; title: string }[];
   proposal: string;
   notDecided: string[];
   mechanism: string;
@@ -221,7 +244,9 @@ export type AttentionKind =
   | 'objection_window_open'
   | 'ready_to_take_effect'
   | 'awaiting_ratification'
-  | 'overdue';
+  | 'overdue'
+  /** A colleague named you. The one kind here with no clock behind it. */
+  | 'mentioned_you';
 
 export interface AttentionItem {
   matterId: string;

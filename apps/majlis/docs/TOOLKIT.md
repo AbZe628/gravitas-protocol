@@ -488,6 +488,7 @@ a state worth naming: a tested service nobody can reach is not a feature.
 | Asset register | ✅ | ✅ |
 | Structure checklist | ✅ | ✅ |
 | Meetings, attendance and the minute | ✅ | ✅ |
+| Naming a colleague in the deliberation | ✅ | ✅ |
 | Contract library (19 shapes) | ✅ | ✅ |
 | Adoption of the library by the board | ✅ | ✅ |
 
@@ -540,10 +541,22 @@ Closing a meeting is the board approving the minute, and after that nothing
 about it changes. There is no route to amend a closed one; a correction
 belongs in the next meeting's minute.
 
-Next, in order: @mentions and the per-asset document, then durable storage —
-which is what blocks upload, which is what blocks the PDF extraction in §4a.
+**A scholar can name a colleague in the deliberation**, and it reaches them
+where they already look. There is no email here and no push — a mention that
+claimed to notify while doing nothing would be worse than no mention at all —
+so it arrives on the named member's attention list, alongside whatever the
+process wants rather than instead of it. The question is very often why the
+vote has not been cast.
 
-1023 server tests, 136 client. Nothing here signs.
+It is derived from the text and never stored, it carries no deadline because
+being asked by a colleague is not a duty with a clock, and it stops standing
+once that member says anything afterwards — one answer closes every question
+that preceded it, which is what a conversation actually does.
+
+Next, in order: the per-asset document, then durable storage — which is what
+blocks upload, which is what blocks the PDF extraction in §4a.
+
+1052 server tests, 145 client. Nothing here signs.
 
 ### Found and fixed
 

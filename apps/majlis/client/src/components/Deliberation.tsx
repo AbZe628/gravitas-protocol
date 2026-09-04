@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Refused, governance, type Deliberation as Entry, type Matter } from '../lib/api.js';
+import { useIdentity } from '../lib/identity.js';
 import { useI18n } from '../lib/i18n.js';
 import { DateText, Tag } from './ui.js';
 
@@ -26,11 +27,14 @@ interface Props {
 function Composer({
   matterId,
   replyTo,
+  mentionable,
   onDone,
   onCancel,
 }: {
   matterId: string;
   replyTo: string | null;
+  /** Who may be named here. Empty where the matter did not say. */
+  mentionable: { id: string; name: string; title: string }[];
   onDone: (m: Matter) => void;
   onCancel?: () => void;
 }) {
@@ -65,6 +69,28 @@ function Composer({
         rows={replyTo ? 2 : 3}
         className="w-full resize-y rounded bg-transparent text-[14px] leading-relaxed outline-none placeholder:text-muted"
       />
+      {/*
+        The board, offered by name and inserted as an id. Names are ambiguous
+        and change; ids are what the record uses. Nobody should have to type
+        the id, and nobody should be able to name somebody who is not here.
+      */}
+      {mentionable.length > 0 && (
+        <div className="mt-1 flex flex-wrap items-center gap-1.5">
+          <span className="text-[11px] uppercase tracking-wider text-muted">{t('say.ask')}</span>
+          {mentionable.map((m) => (
+            <button
+              key={m.id}
+              type="button"
+              title={m.title}
+              onClick={() => setBody((was) => (was.endsWith(' ') || was === '' ? was : was + ' ') + '@' + m.id + ' ')}
+              className="rounded border border-line px-2 py-0.5 text-[11.5px] text-muted hover:border-muted hover:text-paper"
+            >
+              {m.name}
+            </button>
+          ))}
+        </div>
+      )}
+
       {refusal && <p className="mt-2 text-[12px] leading-relaxed text-amber-300">{refusal}</p>}
       <div className="mt-2 flex items-center gap-2">
         <button
@@ -89,16 +115,55 @@ function Composer({
   );
 }
 
+/**
+ * The entry, with any names in it marked.
+ *
+ * The segments come from the server already resolved. Where they are absent —
+ * an entry loaded from somewhere that does not send them — the body is shown
+ * as it is, which is the right failure: text a reader can still read, rather
+ * than a second parser here quietly disagreeing with the first.
+ */
+function Body({ entry }: { entry: Entry }) {
+  const { identity } = useIdentity();
+  if (!entry.segments) return <>{entry.body}</>;
+
+  return (
+    <>
+      {entry.segments.map((part, i) =>
+        part.scholarId ? (
+          <span
+            key={i}
+            className={
+              // Their own name is marked more strongly, because the useful
+              // question when reading a long thread is whether any of it was
+              // addressed to you.
+              part.scholarId === identity?.scholarId
+                ? 'rounded bg-gold/20 px-1 text-goldsoft'
+                : 'text-goldsoft'
+            }
+          >
+            {part.text}
+          </span>
+        ) : (
+          <span key={i}>{part.text}</span>
+        ),
+      )}
+    </>
+  );
+}
+
 function Entry({
   entry,
   replies,
   matterId,
+  mentionable,
   canSpeak,
   onChanged,
 }: {
   entry: Entry;
   replies: Entry[];
   matterId: string;
+  mentionable: { id: string; name: string; title: string }[];
   canSpeak: boolean;
   onChanged: (m: Matter) => void;
 }) {
@@ -114,7 +179,9 @@ function Entry({
           <DateText iso={entry.at} />
         </span>
       </div>
-      <p className="text-[14px] leading-relaxed">{entry.body}</p>
+      <p className="text-[14px] leading-relaxed">
+        <Body entry={entry} />
+      </p>
 
       {canSpeak && !replying && (
         <button
@@ -134,6 +201,7 @@ function Entry({
           <Composer
             matterId={matterId}
             replyTo={entry.id}
+            mentionable={mentionable}
             onDone={onChanged}
             onCancel={() => setReplying(false)}
           />
@@ -183,6 +251,7 @@ export default function Deliberation({ matter, canSpeak, onChanged }: Props) {
               entry={entry}
               replies={repliesFor(entry.id)}
               matterId={matter.id}
+              mentionable={matter.mentionable ?? []}
               canSpeak={canSpeak && open}
               onChanged={onChanged}
             />
@@ -190,7 +259,14 @@ export default function Deliberation({ matter, canSpeak, onChanged }: Props) {
         </ul>
       )}
 
-      {canSpeak && open && <Composer matterId={matter.id} replyTo={null} onDone={onChanged} />}
+      {canSpeak && open && (
+        <Composer
+          matterId={matter.id}
+          replyTo={null}
+          mentionable={matter.mentionable ?? []}
+          onDone={onChanged}
+        />
+      )}
       {entries.length === 0 && !canSpeak && (
         <p className="text-[13px] text-muted">{t('matter.noDeliberation')}</p>
       )}
