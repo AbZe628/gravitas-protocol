@@ -620,3 +620,31 @@ hundred strings of precise Islamic-finance terminology in two languages, and
 the file already says the Arabic and Urdu it does have needs a native reviewer
 with knowledge of the subject before any board uses it. It needs a decision
 about who writes and reviews them, not an afternoon.
+
+**The upload cannot be exercised in a demonstration.** Attaching a document
+needs a member credential and a mounted volume, and the development run has
+neither. The behaviour that matters without them is live and correct — health
+says `documents: none` and the control is absent rather than lying — but the
+working path is covered by tests rather than by anything a reader can click.
+
+---
+
+## 10. Where the next session starts
+
+*As of 2026-09-04. 1111 server tests, 156 client, typecheck clean.*
+
+**The whole of the §9 order is built.** Register, judging in one click,
+composition and drift, meetings as record, naming a colleague, a document per
+holding — and now somewhere for a document to actually go.
+
+**Next is the PDF extraction in §4a**, which durable storage was blocking. The
+design there is already written and its one rule is the load-bearing part:
+**extraction proposes and never fills anything in.** A figure read out of a
+PDF arrives as a candidate carrying the quote it came from, where in the
+document it was found, and who confirmed it — and nothing enters a calculation
+until a person says so. A system that typed a bank figure into a board
+calculation on its own would be the one place in Majlis where a machine
+decided something.
+
+Read §4a before starting. It settles where figures come from; what it does not
+settle is cadence, which is named in §8 as still open.
