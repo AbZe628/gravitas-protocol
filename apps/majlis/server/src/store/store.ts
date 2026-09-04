@@ -20,6 +20,7 @@
  */
 
 import type {
+  AdoptedStructure,
   Asset,
   AssistantExchange,
   Board,
@@ -139,6 +140,30 @@ export interface Store {
    * @throws NotFound if there is no such computation.
    */
   withdrawComputation(id: string, by: string, reason: string, at: string): Promise<Computation>;
+
+  // ── the library as each board holds it ─────────────────────────────────
+  //
+  // Append-only, like the recorded calculations and for the same reason: a
+  // board amends a shape by superseding its adoption, and the earlier version
+  // stays because findings were recorded against it.
+
+  adoptions(boardId?: string): Promise<AdoptedStructure[]>;
+  adoption(id: string): Promise<AdoptedStructure | null>;
+
+  /** @throws if an adoption with this id already exists. */
+  recordAdoption(adoption: AdoptedStructure): Promise<AdoptedStructure>;
+
+  // ── the library as each board holds it ─────────────────────────────────
+  //
+  // Append-only, like the recorded calculations and for the same reason: a
+  // board amends a shape by superseding its adoption, and the earlier version
+  // stays because findings were recorded against it.
+
+  adoptions(boardId?: string): Promise<AdoptedStructure[]>;
+  adoption(id: string): Promise<AdoptedStructure | null>;
+
+  /** @throws if an adoption with this id already exists. */
+  recordAdoption(adoption: AdoptedStructure): Promise<AdoptedStructure>;
 
   // ── the assistant log ──────────────────────────────────────────────────
   //

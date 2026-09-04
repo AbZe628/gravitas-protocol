@@ -1,4 +1,5 @@
 import type {
+  AdoptedStructure,
   AssistantExchange,
   Board,
   Asset,
@@ -242,6 +243,32 @@ export class TenantStore implements Store {
     // Indistinguishable from one that does not exist, deliberately.
     if (!found || !(await this.owns(found.boardId))) throw new NotFound('computation', id);
     return this.inner.withdrawComputation(id, by, reason, at);
+  }
+
+  // ── the library as each board holds it ──────────────────────────────────
+  //
+  // Scoped through the board. One institution's amendments to a contract
+  // shape are its own reasoning about its own products, and are no more
+  // shareable than a ruling.
+
+  async adoptions(boardId?: string): Promise<AdoptedStructure[]> {
+    if (boardId && !(await this.owns(boardId))) return [];
+    const mine = await this.ownBoardIds();
+    const all = await this.inner.adoptions(boardId);
+    return all.filter((a) => mine.has(a.boardId));
+  }
+
+  async adoption(id: string): Promise<AdoptedStructure | null> {
+    const found = await this.inner.adoption(id);
+    if (!found) return null;
+    return (await this.owns(found.boardId)) ? found : null;
+  }
+
+  async recordAdoption(adoption: AdoptedStructure): Promise<AdoptedStructure> {
+    if (!(await this.owns(adoption.boardId))) {
+      throw new OutsideInstitution('adopt a contract shape for', adoption.boardId);
+    }
+    return this.inner.recordAdoption(adoption);
   }
 
   // ── briefings ───────────────────────────────────────────────────────────

@@ -26,6 +26,10 @@ const STATUS: Record<string, number> = {
   no_period: 400,
   no_source: 400,
   no_such_prior: 400,
+  // Adopting names a decision. A missing or unfinished one is the caller's to fix.
+  not_in_library: 400,
+  no_matter: 400,
+  no_conditions: 400,
   // Everything else is a conflict with the state the record is actually in.
 };
 

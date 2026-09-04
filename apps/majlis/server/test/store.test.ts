@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import type { Computation, Matter } from '../src/types.js';
+import type { AdoptedStructure, Computation, Matter } from '../src/types.js';
 import { MemoryStore } from '../src/store/memory.js';
 import { FileStore, StorePathError } from '../src/store/file.js';
 import { NotFound, type Store } from '../src/store/store.js';
@@ -49,6 +49,21 @@ function newComputation(id: string, over: Partial<Computation> = {}): Computatio
     note: 'Not answered here.',
     recordedBy: 'scholar-a', recordedAt: T0,
     supersedes: null, withdrawnAt: null, withdrawnBy: null, withdrawalReason: null,
+    ...over,
+  };
+}
+
+function newAdoption(id: string, over: Partial<AdoptedStructure> = {}): AdoptedStructure {
+  return {
+    id, boardId: 'demo-board', structureId: 'murabaha', standing: 'adopted',
+    conditions: [{
+      id: 'ownership-before-sale',
+      requirement: 'The institution owns the asset before selling it on.',
+      why: 'Selling what one does not own turns the sale into a financing of money by money.',
+      evidence: 'sequence', authority: 'This board',
+    }],
+    amendments: [], matterId: 'matter-2026-04-02',
+    decidedBy: 's1', decidedAt: T0, supersedes: null,
     ...over,
   };
 }
@@ -217,6 +232,38 @@ describe.each(backends)('%s store', (_name, make) => {
     first!.amount = '999999999';
 
     expect((await store.computation('c1'))?.amount).toBe('200000');
+  });
+
+  // ── the library as each board holds it ──────────────────────────────────
+
+  it('records an adoption and reads it back whole', async () => {
+    await store.recordAdoption(newAdoption('a1'));
+
+    expect((await store.adoption('a1'))?.structureId).toBe('murabaha');
+    expect((await store.adoptions()).map((a) => a.id)).toEqual(['a1']);
+    expect((await store.adoptions('demo-board')).map((a) => a.id)).toEqual(['a1']);
+    expect(await store.adoptions('another-board')).toEqual([]);
+  });
+
+  it('refuses a second one under the same id, rather than overwriting a decision', async () => {
+    await store.recordAdoption(newAdoption('a1'));
+    await expect(store.recordAdoption(newAdoption('a1'))).rejects.toThrow(/already exists/);
+  });
+
+  it('keeps the replaced one, because findings were recorded against it', async () => {
+    await store.recordAdoption(newAdoption('a1'));
+    await store.recordAdoption(newAdoption('a2', { supersedes: 'a1', standing: 'amended' }));
+
+    expect((await store.adoptions()).map((a) => a.id)).toEqual(['a1', 'a2']);
+    expect((await store.adoption('a1'))?.standing).toBe('adopted');
+  });
+
+  it('hands out copies, so a caller cannot edit the record by accident', async () => {
+    await store.recordAdoption(newAdoption('a1'));
+    const got = await store.adoption('a1');
+    got!.conditions[0].requirement = 'tampered';
+
+    expect((await store.adoption('a1'))?.conditions[0].requirement).not.toBe('tampered');
   });
 
   // ── the assistant log ───────────────────────────────────────────────────

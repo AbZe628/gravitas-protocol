@@ -25,7 +25,15 @@
 
 import { Refused } from './lifecycle.js';
 import { structureById } from '../data/structures.js';
-import type { Board, ConditionFinding, Matter, Structure, StructureCondition } from '../types.js';
+import { effectiveFor } from './adoption.js';
+import type {
+  AdoptedStructure,
+  Board,
+  ConditionFinding,
+  Matter,
+  Structure,
+  StructureCondition,
+} from '../types.js';
 
 const MIN_REASON_CHARS = 20;
 
@@ -44,6 +52,19 @@ export interface ConditionState {
 
 export interface Checklist {
   structure: Structure;
+  /**
+   * Whether these conditions are the board's own or the shipped draft.
+   *
+   * A checklist built against the draft is not the same thing as one built
+   * against what the board adopted, and a surface that showed them
+   * identically would let a board believe it had settled a question it had
+   * only been offered.
+   */
+  source: 'adopted' | 'amended' | 'draft';
+  /** True where the board considered this shape and ruled against using it. */
+  declined: boolean;
+  /** What the source means, in the words the adoption service holds. */
+  sourceNote: string;
   conditions: ConditionState[];
   /** Conditions no member has answered. The list a chair reads. */
   unanswered: string[];
@@ -73,9 +94,23 @@ export const NOT_A_CONCLUSION =
  * @throws Refused where the matter names a structure that does not exist. A
  *         silent empty checklist would read as a product with no conditions.
  */
-export function checklistFor(matter: Matter, scholarId?: string): Checklist {
-  const structure = matter.structureId ? structureById(matter.structureId) : undefined;
-  if (!structure) {
+export function checklistFor(
+  matter: Matter,
+  scholarId?: string,
+  /**
+   * Everything this board has adopted.
+   *
+   * Optional so a caller with no store — a test, or a surface that only wants
+   * the shipped shape — still works, and gets the draft with the draft said
+   * plainly rather than an error.
+   */
+  adoptions: AdoptedStructure[] = [],
+): Checklist {
+  const effective = matter.structureId
+    ? effectiveFor(matter.structureId, matter.boardId, adoptions)
+    : null;
+  const structure = effective?.structure;
+  if (!structure || !effective) {
     throw new Refused(
       'not_found' as never,
       matter.structureId
@@ -115,6 +150,9 @@ export function checklistFor(matter: Matter, scholarId?: string): Checklist {
 
   return {
     structure,
+    source: effective.source,
+    declined: effective.declined,
+    sourceNote: effective.note,
     conditions,
     unanswered,
     contested,

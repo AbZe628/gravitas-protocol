@@ -902,3 +902,71 @@ export interface Computation {
   withdrawnBy: string | null;
   withdrawalReason: string | null;
 }
+
+/**
+ * A shape as the board took it, rather than as it was shipped.
+ *
+ * The library is a draft. Until a board has done something with a shape, its
+ * conditions are somebody else's reading — offered so a scholar stops composing
+ * a question from an empty box, and binding on nobody.
+ *
+ * Adoption is what changes that. The board takes a shape, amends what it
+ * disagrees with, and thereafter the checklist runs against **their** version.
+ * Nothing in the library moves; what changes is which version a matter is
+ * judged by.
+ *
+ * ── one shape at a time, and always under a decision ──────────────────────
+ *
+ * **Per shape.** No board approves nineteen contracts in a sitting. They adopt
+ * the ones they use, and a system that made it all-or-nothing would either be
+ * ignored or waved through.
+ *
+ * **Under a matter.** "As a matter like any other" is the whole design: a
+ * settled decision of this board is named, and one that is still being argued
+ * about is not enough. Without that, adoption would be a switch anybody on the
+ * board could flip, and the library would become binding by administration.
+ *
+ * ── and it is append-only, like everything else here ──────────────────────
+ *
+ * An amendment does not edit an adoption. It supersedes it, naming the one it
+ * replaces and the matter that decided it, and the earlier version stays —
+ * because findings were recorded against it and a reader has to be able to see
+ * what the board was working from at the time.
+ */
+export interface AdoptedStructure {
+  id: string;
+  boardId: string;
+  /** The library shape this is the board's version of. */
+  structureId: string;
+
+  /**
+   * How the board took it.
+   *
+   * `adopted` — taken as shipped. `amended` — taken with changes, which are in
+   * `conditions`. `declined` — the board ruled against using this shape, and
+   * the checklist should not offer it as though nothing had been said.
+   */
+  standing: 'adopted' | 'amended' | 'declined';
+
+  /**
+   * The conditions as the board holds them.
+   *
+   * Empty on a decline. On an adoption without changes this is a copy of the
+   * library's conditions at the time — copied rather than referenced, so a
+   * later change to the shipped library cannot silently change what a board
+   * adopted two years ago.
+   */
+  conditions: StructureCondition[];
+
+  /** What the board changed and why, in their words. Empty on a plain adoption. */
+  amendments: string[];
+
+  /** The settled matter this was decided in. Required, and checked. */
+  matterId: string;
+
+  decidedBy: string;
+  decidedAt: string;
+
+  /** The adoption this replaces. The replaced one stays. */
+  supersedes: string | null;
+}

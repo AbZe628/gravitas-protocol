@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import type { Asset, Board, Computation, Incident, Institution, Matter, Rule } from '../src/types.js';
+import type { AdoptedStructure, Asset, Board, Computation, Incident, Institution, Matter, Rule } from '../src/types.js';
 import { MemoryStore } from '../src/store/memory.js';
 import { TenantStore, OutsideInstitution } from '../src/store/tenant.js';
 import { NotFound } from '../src/store/store.js';
@@ -57,6 +57,20 @@ function computation(id: string, boardId: string): Computation {
   };
 }
 
+function adoption(id: string, boardId: string): AdoptedStructure {
+  return {
+    id, boardId, structureId: 'murabaha', standing: 'amended',
+    conditions: [{
+      id: 'ownership-before-sale',
+      requirement: 'The institution owns the asset before selling it on.',
+      why: 'Selling what one does not own turns the sale into a financing of money by money.',
+      evidence: 'sequence', authority: 'This board',
+    }],
+    amendments: ['Reworded for this institution’s own products.'],
+    matterId: 'alpha-matter', decidedBy: 'someone', decidedAt: T0, supersedes: null,
+  };
+}
+
 const both = () =>
   new MemoryStore({
     institutions,
@@ -75,6 +89,7 @@ const both = () =>
       computation('alpha-zakat', 'alpha-board'),
       computation('beta-zakat', 'beta-board'),
     ],
+    adoptions: [adoption('alpha-adoption', 'alpha-board'), adoption('beta-adoption', 'beta-board')],
     briefings: [],
   });
 
@@ -217,6 +232,24 @@ describe('a recorded calculation carries figures, so it is scoped like everythin
     ).rejects.toBeInstanceOf(NotFound);
     // Untouched.
     expect((await beta().computation('beta-zakat'))?.withdrawnAt).toBeNull();
+  });
+});
+
+describe('an institution’s amendments to a shape are its own reasoning', () => {
+  it('sees only its own', async () => {
+    expect((await alpha().adoptions()).map((a) => a.id)).toEqual(['alpha-adoption']);
+    expect((await beta().adoptions()).map((a) => a.id)).toEqual(['beta-adoption']);
+  });
+
+  it('answers absence rather than refusal for another institution’s', async () => {
+    expect(await alpha().adoption('beta-adoption')).toBeNull();
+    expect(await alpha().adoptions('beta-board')).toEqual([]);
+  });
+
+  it('refuses loudly to adopt for another institution’s board', async () => {
+    await expect(
+      alpha().recordAdoption(adoption('new-one', 'beta-board')),
+    ).rejects.toBeInstanceOf(OutsideInstitution);
   });
 });
 

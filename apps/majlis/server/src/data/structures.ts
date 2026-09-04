@@ -18,12 +18,15 @@
  * only be accepted or rejected on authority; stated with it, a scholar can
  * disagree with the reasoning, which is the argument a board should be having.
  *
- * ── what is not built ─────────────────────────────────────────────────────
+ * ── this file is the draft, and a board may take it ───────────────────────
  *
- * **Adoption.** In the design a board approves this library once, as a matter
- * like any other, and thereafter amends its own copy. That workflow does not
- * exist. Until it does, this is reference material a board reads and rules
- * beside, and no part of the application treats a condition as binding.
+ * A board adopts a shape from here under a decision that carried, and may
+ * amend it or rule against using it — see `services/adoption.ts`. What they
+ * adopt is a **copy**, so a later revision of anything below does not move
+ * under a board that took it two years ago.
+ *
+ * Until a board has adopted a shape, its conditions here are binding on
+ * nobody, and every checklist built against them says so on its face.
  */
 
 import type { Structure } from '../types.js';

@@ -12,6 +12,7 @@
  */
 
 import type {
+  AdoptedStructure,
   Asset,
   AssistantExchange,
   Board,
@@ -43,6 +44,7 @@ export interface MemorySeed {
   assets?: Asset[];
   briefings?: Briefing[];
   computations?: Computation[];
+  adoptions?: AdoptedStructure[];
 }
 
 export class MemoryStore implements Store {
@@ -57,6 +59,7 @@ export class MemoryStore implements Store {
   private readonly _assets: Map<string, Asset>;
   private readonly _briefings: Briefing[];
   private readonly _computations: Map<string, Computation>;
+  private readonly _adoptions: Map<string, AdoptedStructure>;
   private readonly _log: AssistantExchange[] = [];
 
   constructor(seed: MemorySeed = {}) {
@@ -72,6 +75,9 @@ export class MemoryStore implements Store {
     // Nothing seeded: a demonstration record opening with a zakat somebody
     // already computed would be putting a figure in a board's mouth.
     this._computations = new Map((seed.computations ?? []).map((c) => [c.id, copy(c)]));
+    // Nothing seeded: a demonstration record where the library was already
+    // adopted would be showing a decision no board in it ever took.
+    this._adoptions = new Map((seed.adoptions ?? []).map((a) => [a.id, copy(a)]));
   }
 
   async institutions(): Promise<Institution[]> {
@@ -219,6 +225,24 @@ export class MemoryStore implements Store {
     const next = { ...copy(current), withdrawnAt: at, withdrawnBy: by, withdrawalReason: reason };
     this._computations.set(id, copy(next));
     return copy(next);
+  }
+
+  async adoptions(boardId?: string): Promise<AdoptedStructure[]> {
+    const all = [...this._adoptions.values()];
+    return copy(boardId === undefined ? all : all.filter((a) => a.boardId === boardId));
+  }
+
+  async adoption(id: string): Promise<AdoptedStructure | null> {
+    const found = this._adoptions.get(id);
+    return found ? copy(found) : null;
+  }
+
+  async recordAdoption(adoption: AdoptedStructure): Promise<AdoptedStructure> {
+    if (this._adoptions.has(adoption.id)) {
+      throw new Error(`An adoption with id ${adoption.id} already exists.`);
+    }
+    this._adoptions.set(adoption.id, copy(adoption));
+    return copy(adoption);
   }
 
   async appendAssistantExchange(exchange: AssistantExchange): Promise<void> {

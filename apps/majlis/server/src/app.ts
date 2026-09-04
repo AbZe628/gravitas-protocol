@@ -20,6 +20,7 @@ import { buildSettings } from './services/settings.js';
 import { TIMELOCK_HOURS } from './types.js';
 import { LoginLimiter, loginThrottle } from './middleware/loginLimit.js';
 import { governanceRoutes } from './routes/governance.js';
+import { adoptionRoutes } from './routes/adoption.js';
 import { computationRoutes } from './routes/computations.js';
 import { incidentRoutes } from './routes/incidents.js';
 
@@ -327,6 +328,7 @@ export function createApp(
   app.use('/api', governanceRoutes(store));
   app.use('/api', incidentRoutes(store));
   app.use('/api', computationRoutes(store));
+  app.use('/api', adoptionRoutes(store));
 
   // ---- audit export ----------------------------------------------------
   app.get('/api/export/:boardId', async (req, res) => {

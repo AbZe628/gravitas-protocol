@@ -32,6 +32,7 @@
 import { appendFileSync, mkdirSync, readFileSync, renameSync, writeFileSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import type {
+  AdoptedStructure,
   Asset,
   AssistantExchange,
   Board,
@@ -86,6 +87,7 @@ interface Document {
    */
   assets?: Asset[];
   computations?: Computation[];
+  adoptions?: AdoptedStructure[];
   briefings: Briefing[];
 }
 
@@ -169,6 +171,7 @@ export class FileStore implements Store {
       loaded.incidents ??= [];
       loaded.assets ??= [];
       loaded.computations ??= [];
+      loaded.adoptions ??= [];
       this.doc = loaded;
       return;
     }
@@ -186,6 +189,7 @@ export class FileStore implements Store {
             assets: [],
             briefings: [],
             computations: [],
+            adoptions: [],
           }
         : {
             version: 1,
@@ -199,6 +203,7 @@ export class FileStore implements Store {
             incidents: [],
             assets: copy(seedAssets),
             computations: [],
+            adoptions: [],
             briefings: copy(seedBriefings),
           };
     this.persist();
@@ -406,6 +411,27 @@ export class FileStore implements Store {
       this.doc.computations[index] = copy(next);
       this.persist();
       return copy(next);
+    });
+  }
+
+  async adoptions(boardId?: string): Promise<AdoptedStructure[]> {
+    const all = this.doc.adoptions ?? [];
+    return copy(boardId === undefined ? all : all.filter((a) => a.boardId === boardId));
+  }
+
+  async adoption(id: string): Promise<AdoptedStructure | null> {
+    return copy((this.doc.adoptions ?? []).find((a) => a.id === id) ?? null);
+  }
+
+  async recordAdoption(adoption: AdoptedStructure): Promise<AdoptedStructure> {
+    return this.serialise(() => {
+      this.doc.adoptions ??= [];
+      if (this.doc.adoptions.some((a) => a.id === adoption.id)) {
+        throw new Error(`An adoption with id ${adoption.id} already exists.`);
+      }
+      this.doc.adoptions.push(copy(adoption));
+      this.persist();
+      return copy(adoption);
     });
   }
 

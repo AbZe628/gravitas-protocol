@@ -879,7 +879,11 @@ export function governanceRoutes(store: Store, now: () => string = () => new Dat
         res.status(404).json({ error: 'not_found', message: 'No such matter.' });
         return;
       }
-      res.json(checklistFor(matter, who.scholarId));
+      // Judged against the board's own version where they have adopted one,
+      // and against the shipped draft where they have not — with the checklist
+      // saying which, because the two are not the same thing.
+      const adoptions = await store.adoptions(matter.boardId);
+      res.json(checklistFor(matter, who.scholarId, adoptions));
     }),
   );
 
