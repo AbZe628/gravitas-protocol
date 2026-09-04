@@ -40,6 +40,9 @@ function linkFor(entry: CalendarEntry): string | null {
     return `/matters/${entry.subject}`;
   }
   if (entry.kind === 'rectification_due') return '/incidents';
+  // The cadence entry is about the board rather than about a rule, and sending
+  // it to the rules would be the one link on this page that lied.
+  if (entry.kind === 'meeting_due') return '/meetings';
   return '/rules';
 }
 

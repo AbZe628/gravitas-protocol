@@ -856,6 +856,23 @@ export const oversight = {
    * them the board has actually taken.
    */
   library: () => get<Library>('/api/adoptions'),
+
+  /**
+   * Meetings, and what they owe the calendar.
+   *
+   * The cadence comes back with the list rather than behind a second request:
+   * "when did we last meet" and "when are we next due" are one question a
+   * chair asks in one glance.
+   */
+  meetings: () => get<Meetings>('/api/meetings'),
+  meeting: (id: string) => get<MeetingRow>(`/api/meetings/${id}`),
+  convene: (input: { boardId: string; at: string; joinUrl?: string | null; agenda: AgendaItem[] }) =>
+    send<Meeting>('/api/meetings', input),
+  recordAttendance: (id: string, attendance: Attendance[]) =>
+    send<Meeting>(`/api/meetings/${id}/attendance`, { attendance }, 'PUT'),
+  writeMinute: (id: string, minute: string) =>
+    send<Meeting>(`/api/meetings/${id}/minute`, { minute }, 'PUT'),
+  closeMeeting: (id: string) => send<Meeting>(`/api/meetings/${id}/close`),
   adoptionHistory: (structureId: string) =>
     get<{ history: { adoption: AdoptedStructure; replacedBy: string | null }[] }>(
       `/api/adoptions/${structureId}/history`,
@@ -949,7 +966,9 @@ export type EntryKind =
   | 'timelock_ends'
   | 'ratification_due'
   | 'rectification_due'
-  | 'review_due';
+  | 'review_due'
+  /** The sixth clock, and the last to get anything to count from. */
+  | 'meeting_due';
 
 export interface CalendarEntry {
   id: string;
@@ -1179,6 +1198,73 @@ export interface AdoptInput {
   amendments?: string[];
   conditions?: StructureCondition[];
   supersedes?: string | null;
+}
+
+// ── meetings ──────────────────────────────────────────────────────────────
+
+/**
+ * A meeting, as a record rather than a room.
+ *
+ * Majlis does not host the call. What it holds is the agenda, who was there
+ * and the minute — and the agenda links each item to the matter where the
+ * decision actually lives, because a meeting decides nothing.
+ */
+export interface AgendaItem {
+  item: string;
+  /** Set where the item is a matter already before the board. */
+  matterId?: string;
+}
+
+export interface Attendance {
+  scholarId: string;
+  present: boolean;
+  /** Frameworks that set an attendance floor expect absence to be explicable. */
+  note?: string;
+}
+
+export interface Meeting {
+  id: string;
+  boardId: string;
+  at: string;
+  joinUrl: string | null;
+  agenda: AgendaItem[];
+  attendance: Attendance[];
+  minute: string;
+  recordedBy: string;
+  closedAt: string | null;
+}
+
+/** Derived on the server from what is recorded, never stored on the meeting. */
+export type MeetingState = 'convened' | 'held' | 'minuted' | 'closed';
+
+export interface MeetingRow {
+  meeting: Meeting;
+  state: MeetingState;
+  /** Members with no attendance entry. Reported rather than marked absent. */
+  unaccountedFor: string[];
+}
+
+export interface AttendanceSummary {
+  scholarId: string;
+  name: string;
+  attended: number;
+  of: number;
+  notes: string[];
+}
+
+export interface Cadence {
+  lastHeldAt: string | null;
+  dueBy: string | null;
+  overdue: boolean;
+  nextConvenedAt: string | null;
+  note: string;
+}
+
+export interface Meetings {
+  boardId: string;
+  meetings: MeetingRow[];
+  attendance: AttendanceSummary[];
+  cadence: Cadence;
 }
 
 // ── drift ─────────────────────────────────────────────────────────────────

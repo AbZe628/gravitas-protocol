@@ -487,6 +487,7 @@ a state worth naming: a tested service nobody can reach is not a feature.
 | Drift over a standing ruling | ✅ | ✅ |
 | Asset register | ✅ | ✅ |
 | Structure checklist | ✅ | ✅ |
+| Meetings, attendance and the minute | ✅ | ✅ |
 | Contract library (19 shapes) | ✅ | ✅ |
 | Adoption of the library by the board | ✅ | ✅ |
 
@@ -522,11 +523,27 @@ Requiring a ruling in force is the load-bearing part. Without it adoption would
 be a switch a signatory could flip, and the timelock — the window in which a
 signatory objects before a ruling takes effect — would be skipped.
 
-Next, in order: meetings as record, @mentions and the per-asset document, then
-durable storage — which is what blocks upload, which is what blocks the PDF
-extraction in §4a.
+**Meetings are a record, and they close the last two gaps the record named
+about itself.** Majlis does not host the call: what it holds is the agenda,
+who was there, and the minute — and the agenda links each item to the matter
+where the decision lives, because a meeting decides nothing.
 
-957 server tests, 120 client. Nothing here signs.
+The annual report can now state the number of meetings held and each member's
+attendance, per member rather than averaged, with the reason a board gave for
+an absence beside it. And the calendar's sixth clock — meeting cadence, the
+one deadline with a regulatory floor behind it — finally has a date to count
+from. Where a board has recorded nothing, both say that is an absence in this
+record rather than a finding about a board that may have met for years
+without it.
+
+Closing a meeting is the board approving the minute, and after that nothing
+about it changes. There is no route to amend a closed one; a correction
+belongs in the next meeting's minute.
+
+Next, in order: @mentions and the per-asset document, then durable storage —
+which is what blocks upload, which is what blocks the PDF extraction in §4a.
+
+1023 server tests, 136 client. Nothing here signs.
 
 ### Found and fixed
 

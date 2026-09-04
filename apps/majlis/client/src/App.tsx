@@ -8,6 +8,7 @@ import AssetDetail from './pages/AssetDetail.js';
 import Calculations from './pages/Calculations.js';
 import Library from './pages/Library.js';
 import Calendar from './pages/Calendar.js';
+import Meetings from './pages/Meetings.js';
 import Register from './pages/Register.js';
 import Settings from './pages/Settings.js';
 import Incidents from './pages/Incidents.js';
@@ -40,6 +41,9 @@ function Nav() {
     // them. It has its own clock, which is the whole difference.
     { to: '/incidents', label: t('nav.incidents') },
     { to: '/calendar', label: t('nav.calendar') },
+    // Beside the calendar, because the cadence is one of its six clocks and a
+    // reader looking for when the board last met is looking at dates.
+    { to: '/meetings', label: t('nav.meetings') },
     { to: '/briefings', label: t('nav.briefings') },
     // Offering a page that can only refuse is worse than not offering it.
     ...(health?.assistantKind === 'off' ? [] : [{ to: '/assistant', label: t('nav.assistant') }]),
@@ -129,6 +133,7 @@ export default function App() {
           <Route path="/library" element={<Library />} />
           <Route path="/calculations" element={<Calculations />} />
           <Route path="/calendar" element={<Calendar />} />
+          <Route path="/meetings" element={<Meetings />} />
           <Route path="/incidents" element={<Incidents />} />
           <Route path="/incidents/:id" element={<IncidentDetail />} />
           <Route path="/briefings" element={<Briefings />} />
