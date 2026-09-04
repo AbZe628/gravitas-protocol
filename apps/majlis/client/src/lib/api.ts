@@ -82,6 +82,15 @@ export interface SourceRef {
   note?: string;
   /** Set when withdrawn. It stops counting and stays visible. */
   withdrawnAt?: string | null;
+  /**
+   * Set where the source is an uploaded document rather than a citation.
+   *
+   * `key` is the SHA-256 of the bytes, which is also the reference: it names
+   * the file and proves what it holds. It is never a URL — a document is
+   * reached through the source that cites it, so one institution cannot read
+   * another's by holding a key.
+   */
+  file?: { name: string; bytes: number; mediaType: string; key: string } | null;
 }
 
 export interface RuleParameter {
@@ -187,6 +196,14 @@ export interface Health {
    */
   enforcement?: 'none' | 'gravitas-registry';
   assistantKind?: 'off' | 'anthropic';
+  /**
+   * Whether a document can be kept at all.
+   *
+   * Read before offering to take one. An upload control on an installation
+   * with no volume is a control that lies, and the lie is only discovered when
+   * a board tries to cite what it uploaded.
+   */
+  documents?: 'disk' | 'none';
 }
 
 export interface EnforcementSnapshot {
@@ -412,9 +429,52 @@ export const governance = {
   attachSource: (id: string, source: { kind: SourceKind; label: string; ref: string; note?: string }) =>
     send<Matter>(`/api/matters/${id}/sources`, source),
 
+  /**
+   * Attach a document rather than a citation.
+   *
+   * The bytes go up raw with their type in the header — one file per request,
+   * which is what the route takes. What comes back is an ordinary source of
+   * kind 'document' carrying the file, so everything already written about
+   * sources applies to it without a second path through the record.
+   */
+  async attachDocument(
+    id: string,
+    file: File,
+    label: string,
+    note?: string,
+  ): Promise<Matter> {
+    const query = new URLSearchParams({ label, name: file.name });
+    if (note?.trim()) query.set('note', note.trim());
+
+    const res = await fetch(`/api/matters/${id}/sources/file?${query.toString()}`, {
+      method: 'POST',
+      headers: { 'Content-Type': file.type },
+      body: file,
+    });
+
+    if (!res.ok) {
+      let payload: { error?: string; message?: string } = {};
+      try {
+        payload = (await res.json()) as typeof payload;
+      } catch {
+        // A response with no JSON body: fall through to the status.
+      }
+      throw new Refused(
+        payload.error ?? 'unknown',
+        payload.message ?? `The document was not attached (${res.status}).`,
+        res.status,
+      );
+    }
+    return (await res.json()) as Matter;
+  },
+
   /** Withdraw one you attached. Withdrawn, not deleted. */
   withdrawSource: (id: string, sourceId: string) =>
     send<Matter>(`/api/matters/${id}/sources/${sourceId}`, undefined, 'DELETE'),
+
+  /** Where a document lives. Opened, never fetched — it downloads. */
+  documentHref: (matterId: string, sourceId: string) =>
+    `/api/matters/${matterId}/sources/${sourceId}/file`,
 
   /** Set the operative terms. Refused once a vote is open. */
   setParameters: (id: string, parameters: RuleParameter[]) =>

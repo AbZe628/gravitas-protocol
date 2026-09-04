@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { governance, Refused, SOURCE_KINDS, type Matter, type SourceKind } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
+import { useHealth } from '../lib/health.js';
 import { DateText } from './ui.js';
 
 /**
@@ -14,6 +15,16 @@ import { DateText } from './ui.js';
  * Withdrawn rather than removed, and only by whoever attached it. One member
  * deleting another's citation is not a correction — it is an argument conducted
  * by deletion, and the deliberation exists for the other kind.
+ *
+ * ── a document, where there is somewhere to keep one ──────────────────────
+ *
+ * The bank sends a term sheet as a PDF, and until now the board could cite it
+ * and not hold it. Attaching one produces an ordinary source of kind
+ * 'document', so withdrawal and attribution work on it unchanged.
+ *
+ * The control appears only where the installation can actually keep a file.
+ * An upload offered on a deployment with no volume is a control that lies, and
+ * the lie is discovered later, by a board citing something that is gone.
  */
 
 interface Props {
@@ -36,9 +47,29 @@ export default function Evidence({ matter, scholarId, canAttach, onChanged }: Pr
   const [ref, setRef] = useState('');
   const [note, setNote] = useState('');
 
+  const health = useHealth();
+  const chooser = useRef<HTMLInputElement>(null);
+
+  async function upload(file: File) {
+    // The label is what a reader scans for; without one the record fills with
+    // "scan.pdf". The filename is a reasonable first suggestion and the
+    // scholar is asked rather than having it chosen for them.
+    const chosen = label.trim() || file.name;
+    await run(() => governance.attachDocument(matter.id, file, chosen, note), () => {
+      setAdding(false);
+      setLabel('');
+      setNote('');
+    });
+  }
+
   const sources = matter.sources ?? [];
   const stillOpen = OPEN.includes(matter.status);
   const mayAdd = canAttach && stillOpen;
+
+  // Only where a file can actually be kept. The server refuses otherwise, and
+  // an interface that made the offer anyway would be putting a scholar through
+  // choosing a document to be told no.
+  const mayAttachDocument = mayAdd && health?.documents === 'disk';
 
   async function run(action: () => Promise<Matter>, after?: () => void) {
     if (busy) return;
@@ -114,7 +145,25 @@ export default function Evidence({ matter, scholarId, canAttach, onChanged }: Pr
                 <div className={'text-[14px] ' + (withdrawn ? 'text-muted' : 'text-paper')}>
                   {s.label}
                 </div>
-                <div className="mt-0.5 break-words font-mono text-[12px] text-muted">{s.ref}</div>
+                {/*
+                  A document shows its name and size rather than its key. The
+                  key is the SHA-256 and it is the reference, but a reader
+                  scanning a list of citations is looking for a document, not
+                  for a hash.
+                */}
+                {s.file ? (
+                  <a
+                    href={governance.documentHref(matter.id, s.id ?? '')}
+                    className="mt-0.5 inline-block break-words text-[12.5px] underline underline-offset-2 hover:text-fg"
+                  >
+                    {s.file.name}{' '}
+                    <span className="font-mono text-[11.5px] text-muted">
+                      {(s.file.bytes / 1024).toFixed(0)} kB
+                    </span>
+                  </a>
+                ) : (
+                  <div className="mt-0.5 break-words font-mono text-[12px] text-muted">{s.ref}</div>
+                )}
                 {s.note && (
                   <p className="mt-1.5 text-[13px] leading-relaxed text-muted">{s.note}</p>
                 )}
@@ -148,16 +197,47 @@ export default function Evidence({ matter, scholarId, canAttach, onChanged }: Pr
       )}
 
       {mayAdd && !adding && (
-        <button
-          type="button"
-          onClick={() => {
-            setRefusal(null);
-            setAdding(true);
-          }}
-          className="rounded border border-line px-3 py-1.5 text-[12px] hover:bg-surface/60"
-        >
-          {t('evidence.add')}
-        </button>
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              setRefusal(null);
+              setAdding(true);
+            }}
+            className="rounded border border-line px-3 py-1.5 text-[12px] hover:bg-surface/60"
+          >
+            {t('evidence.add')}
+          </button>
+
+          {mayAttachDocument && (
+            <>
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() => {
+                  setRefusal(null);
+                  chooser.current?.click();
+                }}
+                className="rounded border border-line px-3 py-1.5 text-[12px] hover:bg-surface/60 disabled:opacity-40"
+              >
+                {t('evidence.attachDocument')}
+              </button>
+              <input
+                ref={chooser}
+                type="file"
+                hidden
+                accept=".pdf,.png,.jpg,.jpeg,.webp,.txt,.csv"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  // Cleared either way, so choosing the same file twice after a
+                  // refusal still fires.
+                  e.target.value = '';
+                  if (file) void upload(file);
+                }}
+              />
+            </>
+          )}
+        </div>
       )}
 
       {mayAdd && adding && (

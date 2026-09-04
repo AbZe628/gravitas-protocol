@@ -490,6 +490,7 @@ a state worth naming: a tested service nobody can reach is not a feature.
 | Meetings, attendance and the minute | ✅ | ✅ |
 | Naming a colleague in the deliberation | ✅ | ✅ |
 | A document for every holding | ✅ | ✅ |
+| Attaching a document to a matter | ✅ | ✅ |
 | Contract library (19 shapes) | ✅ | ✅ |
 | Adoption of the library by the board | ✅ | ✅ |
 
@@ -568,10 +569,27 @@ footnote: a page headed with a token's name and showing nothing under its
 rulings reads as an absence of problems, which is the most misreadable thing
 this system could produce.
 
-Next: durable storage — which is what blocks upload, which is what blocks the
-PDF extraction in §4a.
+**A board can attach a document.** SourceRef.file had been declared and unused
+since the register was built, with a comment saying why: a feature that
+silently loses a scholar’s document is worse than one that does not exist. It
+keeps that rule — where there is nowhere durable to put a file it refuses to
+take one, says so on /api/health, and the interface stops offering the control
+rather than offering one that lies.
 
-1076 server tests, 145 client. Nothing here signs.
+Files live beside the record on the same volume, keyed by the SHA-256 of their
+bytes, and nothing is ever deleted: a source is withdrawn rather than removed,
+and a withdrawn citation pointing at nothing would be worse than no citation.
+A document is reached through the source that cites it and never by key, so
+one institution cannot read another’s by structure rather than by the key being
+hard to guess.
+
+Object storage — R2, S3, Supabase — is another implementation of three methods
+behind the same interface, and is a decision about accounts rather than about
+code.
+
+Next: the PDF extraction in §4a, which this unblocks.
+
+1111 server tests, 156 client. Nothing here signs.
 
 ### Found and fixed
 
