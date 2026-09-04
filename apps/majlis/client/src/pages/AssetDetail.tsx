@@ -5,6 +5,7 @@ import { useI18n } from '../lib/i18n.js';
 import { DateText, ErrorText, Loading, Section, Tag } from '../components/ui.js';
 import { mayDeliberate, useIdentity } from '../lib/identity.js';
 import { DriftForAsset } from '../components/Drift.js';
+import Recorded from '../components/Recorded.js';
 
 /**
  * One holding: where it stands, what the board has said about it, what it is
@@ -213,6 +214,16 @@ export default function AssetDetail() {
             ))}
           </ul>
         )}
+      </Section>
+
+      {/*
+        What has been worked out on this holding, and when. A scholar looking
+        at a holding is the reader most likely to want last period's
+        purification, and having to go to another page to find it is how a
+        figure gets computed twice.
+      */}
+      <Section title={t('reg.calculations')}>
+        <Recorded assetId={a.id} />
       </Section>
 
       {a.retiredAt && (

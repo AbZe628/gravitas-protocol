@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useI18n } from '../lib/i18n.js';
 import Distribution from '../components/Distribution.js';
 import Purification from '../components/Purification.js';
+import Recorded from '../components/Recorded.js';
 import Screening from '../components/Screening.js';
 import Zakat from '../components/Zakat.js';
 
@@ -21,22 +22,25 @@ import Zakat from '../components/Zakat.js';
  * wants to run the ratios on something before raising it should not have to
  * raise it first.
  *
- * ── and what this page cannot do ──────────────────────────────────────────
+ * ── computing and recording are different acts ────────────────────────────
  *
- * **Nothing computed here is recorded.** Every one of these is stateless by
- * design: the figures are the institution's, and holding them would mean this
- * system asserting a set of numbers it cannot audit. The consequence is real
- * and is stated on the page rather than discovered — a scholar who computes
- * zakat here and closes the tab has computed nothing anybody can point to
- * later, and the annual report still says zakat is not in the record.
+ * The calculations themselves stay stateless: figures go in, arithmetic comes
+ * back, nothing is held. What a board may then do is **note** the result
+ * against a period, which is a second and deliberate act with its own button.
  *
- * Somewhere to record a computation against a period is the next piece of
- * work, and it is one piece of work for all four.
+ * The distinction is the point. A calculation that recorded itself would put
+ * every trial run into the record, and a scholar trying two purification
+ * methods to see how far apart they came out would have filed both. Noting one
+ * is a decision to say: the board was shown this.
+ *
+ * And noting is not approving. Whether the method was the right one is a
+ * ruling, made in the ordinary way with a vote at the end of it. The sentence
+ * saying so comes from the server and is shown before the panel offers to act.
  */
 
-type Tab = 'screening' | 'purification' | 'zakat' | 'distribution';
+type Tab = 'screening' | 'purification' | 'zakat' | 'distribution' | 'recorded';
 
-const TABS: Tab[] = ['screening', 'purification', 'zakat', 'distribution'];
+const TABS: Tab[] = ['screening', 'purification', 'zakat', 'distribution', 'recorded'];
 
 export default function Calculations() {
   const { t } = useI18n();
@@ -85,14 +89,16 @@ export default function Calculations() {
         {tab === 'purification' && <Purification />}
         {tab === 'zakat' && <Zakat />}
         {tab === 'distribution' && <Distribution />}
+        {tab === 'recorded' && <Recorded />}
       </div>
 
       {/*
-        Said on the page, not discovered afterwards. A scholar who assumes this
-        was filed has been misled by the interface rather than by the record.
+        Said on the page rather than discovered afterwards. A scholar who works
+        something out and assumes it was filed has been misled by the interface
+        rather than by the record.
       */}
       <p className="mt-4 rounded border border-line px-3 py-2.5 text-[12.5px] leading-relaxed text-muted">
-        {t('calc.notRecorded')}
+        {t('calc.recordingIsSeparate')}
       </p>
     </div>
   );

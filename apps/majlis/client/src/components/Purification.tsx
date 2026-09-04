@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { oversight, type PurificationInput, type PurificationMethod, type Purified } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { Choice, Compute, Money, Note, Refusal, Result, Text, useCalc } from './calc.js';
+import RecordCalculation from './RecordCalculation.js';
 
 /**
  * What must be given away from a holding that passed screening.
@@ -207,6 +208,27 @@ export default function Purification() {
         </Result>
       )}
       {result && <Note>{result.note}</Note>}
+
+      {/* Purification is about a holding, so the panel asks which one. */}
+      {result && (
+        <RecordCalculation
+          wantsHolding
+          input={{
+            kind: 'purification',
+            method: result.method,
+            methodStated: result.methodStated,
+            currency: result.currency,
+            source: result.source,
+            figures: { ...f, method: result.method, basis: result.basis },
+            headline: 'To be given away',
+            amount: result.amount,
+            steps: result.steps,
+            note: result.note,
+            periodFrom: result.periodFrom,
+            periodTo: result.periodTo,
+          }}
+        />
+      )}
     </form>
   );
 }

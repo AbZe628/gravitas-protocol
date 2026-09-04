@@ -238,9 +238,11 @@ describe('a refusal is shown in the server’s words, because that is the teachi
 });
 
 describe('what the page says about itself', () => {
-  it('says nothing computed here is recorded, on the page rather than after it', () => {
+  it('says on the page that working something out does not record it', () => {
     show();
-    expect(screen.getByText(/Nothing computed on this page is recorded/)).toBeInTheDocument();
+    expect(screen.getByText(/Working something out does not record it/)).toBeInTheDocument();
+    // And that noting one is not approving the method.
+    expect(screen.getByText(/not approval of the method/)).toBeInTheDocument();
   });
 
   it('offers all four calculations, screening included', () => {

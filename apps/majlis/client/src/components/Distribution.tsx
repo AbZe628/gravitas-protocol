@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { oversight, type Distribution as Result_, type DistributionInput, type Reserve } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { Compute, Money, Note, Rate, Refusal, Result, Text, useCalc } from './calc.js';
+import RecordCalculation from './RecordCalculation.js';
 
 /**
  * What the depositors are actually paid, and what smoothing did to it.
@@ -203,6 +204,30 @@ export default function Distribution() {
         </Result>
       )}
       {result && <Note>{result.note}</Note>}
+
+      {result && (
+        <RecordCalculation
+          input={{
+            kind: 'profit_distribution',
+            method: 'per_and_irr',
+            methodStated: result.method,
+            currency: result.currency,
+            source: result.source,
+            figures: {
+              ...f,
+              mudaribShareBps: mudarib,
+              perDeductionBps: per,
+              irrDeductionBps: irr,
+            },
+            headline: 'Paid to depositors',
+            amount: result.paidToDepositors,
+            steps: result.steps,
+            note: result.note,
+            periodFrom: result.periodFrom,
+            periodTo: result.periodTo,
+          }}
+        />
+      )}
     </form>
   );
 }

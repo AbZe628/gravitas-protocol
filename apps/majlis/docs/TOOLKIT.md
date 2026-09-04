@@ -458,19 +458,28 @@ a state worth naming: a tested service nobody can reach is not a feature.
 | Purification | ✅ | ✅ |
 | Profit distribution (PER/IRR) | ✅ | ✅ |
 | Zakat | ✅ | ✅ |
+| A calculation noted against a period | ✅ | ✅ |
 | Drift over a standing ruling | ✅ | ✅ |
 | Asset register | ✅ | ✅ |
 | Structure checklist | ✅ | ✅ |
 
-**What the surface still cannot do is record anything.** All four are
-stateless by design, so a scholar who computes zakat and closes the tab has
-computed nothing anybody can point to later, and the annual report still says
-zakat is not in the record. The page says so about itself rather than leaving
-it to be discovered. Somewhere to record a computation against a period is one
-piece of work for all four, and it is the next one.
+**And a calculation can now be noted against a period.** The calculations
+themselves stay stateless; noting one is a second and deliberate act, because a
+calculation that recorded itself would file every trial run. What is recorded
+is that the board was shown these figures, from a named source, on a date —
+the same line the record already takes with evidence. Noting is not approving:
+whether the method was right is a ruling, made in the ordinary way.
 
-After that, in order: the rest of the structure library (§3), then meetings as
+The record is append-only. A correction is a new computation naming the old,
+and the old one stays because somebody may have acted on it; one recorded
+against the wrong holding is withdrawn with a reason and a name rather than
+deleted. Which are superseded is derived by looking, never stored.
+
+The annual report's zakat gap is therefore conditional now rather than
+permanent, and the figure, its source and its own note reach the printed page.
+
+Next, in order: the rest of the structure library (§3), then meetings as
 record, @mentions and the per-asset document, then durable storage — which is
 what blocks upload, which is what blocks the PDF extraction in §4a.
 
-805 server tests, 84 client. Nothing here signs.
+879 server tests, 98 client. Nothing here signs.

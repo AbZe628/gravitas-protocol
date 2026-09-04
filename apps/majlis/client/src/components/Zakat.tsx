@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { oversight, type BorneBy, type Zakat as Result_, type ZakatInput, type ZakatMethod, type ZakatYear } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { Choice, Compute, Money, Note, Refusal, Result, Text, useCalc } from './calc.js';
+import RecordCalculation from './RecordCalculation.js';
 
 /**
  * What is due, and from whom.
@@ -166,6 +167,29 @@ export default function Zakat() {
         </Result>
       )}
       {result && <Note>{result.note}</Note>}
+
+      {/*
+        The period is asked for rather than derived from the hawl date. A year
+        could be worked back from it, but which year — lunar or solar — is
+        exactly what the board chose above, and deriving it would choose again.
+      */}
+      {result && (
+        <RecordCalculation
+          input={{
+            kind: 'zakat',
+            method: result.method,
+            methodStated: result.methodStated,
+            currency: result.currency,
+            source: result.source,
+            figures: { ...f, method: result.method, year: result.year, borneBy: result.borneBy },
+            headline: 'Due',
+            amount: result.due,
+            steps: result.steps,
+            note: result.note,
+            periodTo: result.hawlEndsOn,
+          }}
+        />
+      )}
     </form>
   );
 }

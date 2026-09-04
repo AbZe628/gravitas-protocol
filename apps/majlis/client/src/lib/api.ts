@@ -733,6 +733,79 @@ export interface Distribution {
   note: string;
 }
 
+// ── a calculation, recorded against a period ──────────────────────────────
+
+/**
+ * The record that turns four calculators into evidence.
+ *
+ * Recording is **not** approving: a computation is a fact, and whether the
+ * method was the right one is a ruling made in the ordinary way. The server
+ * sends `whatRecordingMeans` with every response saying so, and it is shown
+ * rather than restated here.
+ */
+export type CalculationKind =
+  | 'screening'
+  | 'purification'
+  | 'zakat'
+  | 'profit_distribution'
+  | 'tangibility'
+  | 'late_payment';
+
+export interface Computation {
+  id: string;
+  kind: CalculationKind;
+  boardId: string;
+  assetId: string | null;
+  periodFrom: string;
+  periodTo: string;
+  method: string;
+  methodStated: string;
+  currency: string;
+  source: string;
+  figures: Record<string, string | number | boolean | null>;
+  headline: string;
+  amount: string;
+  steps: CalcStep[];
+  note: string;
+  recordedBy: string;
+  recordedAt: string;
+  supersedes: string | null;
+  withdrawnAt: string | null;
+  withdrawnBy: string | null;
+  withdrawalReason: string | null;
+}
+
+export interface HistoryEntry {
+  computation: Computation;
+  state: 'standing' | 'superseded' | 'withdrawn';
+  replacedBy: string | null;
+}
+
+export interface ComputationList {
+  history: HistoryEntry[];
+  /** The ids a reader should act on. Derived on the server, never stored. */
+  standing: string[];
+  whatRecordingMeans: string;
+}
+
+export interface RecordInput {
+  kind: CalculationKind;
+  boardId: string;
+  assetId?: string | null;
+  periodFrom: string;
+  periodTo: string;
+  method: string;
+  methodStated: string;
+  currency: string;
+  source: string;
+  figures: Record<string, string | number | boolean | null>;
+  headline: string;
+  amount: string;
+  steps: CalcStep[];
+  note: string;
+  supersedes?: string | null;
+}
+
 // ── the manual ────────────────────────────────────────────────────────────
 
 export interface ManualEntry {
@@ -824,6 +897,24 @@ export const oversight = {
   purify: (input: PurificationInput) => send<Purified>('/api/purification', input),
   zakat: (input: ZakatInput) => send<Zakat>('/api/zakat', input),
   distribute: (input: DistributionInput) => send<Distribution>('/api/distribution', input),
+
+  /**
+   * Recording one, and reading what has been recorded.
+   *
+   * The history includes the superseded and the withdrawn. A board that
+   * revised a figure twice should be able to see that it did, and a list
+   * showing only the survivor hides the revision.
+   */
+  computations: (q: { kind?: string; assetId?: string } = {}) => {
+    const search = new URLSearchParams(
+      Object.entries(q).filter(([, v]) => v !== undefined) as [string, string][],
+    ).toString();
+    return get<ComputationList>('/api/computations' + (search ? '?' + search : ''));
+  },
+  recordComputation: (input: RecordInput) =>
+    send<{ computation: Computation; whatRecordingMeans: string }>('/api/computations', input),
+  withdrawComputation: (id: string, reason: string) =>
+    send<{ computation: Computation }>(`/api/computations/${id}/withdraw`, { reason }),
 
   setImplementation: (id: string, steps: string[]) =>
     send<Matter>(`/api/matters/${id}/implementation`, { steps }),
