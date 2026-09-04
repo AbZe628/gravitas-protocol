@@ -22,6 +22,7 @@ import { LoginLimiter, loginThrottle } from './middleware/loginLimit.js';
 import { governanceRoutes } from './routes/governance.js';
 import { adoptionRoutes } from './routes/adoption.js';
 import { segmentsOf } from './services/mentions.js';
+import { vaultFromEnv, type Vault } from './store/vault.js';
 import { computationRoutes } from './routes/computations.js';
 import { meetingRoutes } from './routes/meetings.js';
 import { incidentRoutes } from './routes/incidents.js';
@@ -58,6 +59,14 @@ export function createApp(
    */
   enforcement: Enforcement = enforcementFromEnv(),
   comprehension: Comprehension = comprehensionFromEnv(),
+  /**
+   * Where a scholar's document goes.
+   *
+   * Chosen once, like everything else an institution might or might not have.
+   * With no volume this is the vault that refuses, and the interface is told
+   * so rather than offering an upload that cannot be kept.
+   */
+  vault: Vault = vaultFromEnv(),
 ): Express {
   const app = express();
 
@@ -134,6 +143,14 @@ export function createApp(
       recordSince: store.startedAt ?? null,
       // What this installation is, rather than what the default one is.
       enforcement: enforcement.kind,
+      /*
+       * Whether a document can be kept at all.
+       *
+       * The interface reads this before offering to take one. An upload
+       * control on an installation with no volume is a control that lies, and
+       * the lie is only discovered when a board tries to cite what it uploaded.
+       */
+      documents: vault.kind,
       assistantKind: comprehension.kind,
       assistant: limiter.status(),
     });
@@ -344,7 +361,7 @@ export function createApp(
   });
 
   // ---- governance ------------------------------------------------------
-  app.use('/api', governanceRoutes(store));
+  app.use('/api', governanceRoutes(store, undefined, vault));
   app.use('/api', incidentRoutes(store));
   app.use('/api', computationRoutes(store));
   app.use('/api', adoptionRoutes(store));

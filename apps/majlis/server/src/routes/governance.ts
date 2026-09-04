@@ -20,7 +20,7 @@
  *   where the vote becomes the signature.
  */
 
-import { Router, type Response } from 'express';
+import express, { Router, type Response } from 'express';
 import { badRequest, handle, identityOf, requireRole } from './http.js';
 import { z } from 'zod';
 import { mayDeliberate, mayOpenMatter, mayVote } from '../auth/members.js';
@@ -57,6 +57,7 @@ import {
 } from '../services/zakat.js';
 import { driftReport } from '../services/drift.js';
 import { assembleDossier, renderDossier } from '../services/dossier.js';
+import { ACCEPTED, MAX_BYTES, NoVault, UnacceptableFile, type Vault } from '../store/vault.js';
 import { structures } from '../data/structures.js';
 import { buildManual, renderManual } from '../services/manual.js';
 import { reviewStatus, reviewsDue } from '../services/review.js';
@@ -179,7 +180,18 @@ const sourceSchema = z.object({
   note: z.string().max(2_000).optional(),
 });
 
-export function governanceRoutes(store: Store, now: () => string = () => new Date().toISOString()): Router {
+export function governanceRoutes(
+  store: Store,
+  now: () => string = () => new Date().toISOString(),
+  /**
+   * Where a document goes.
+   *
+   * Passed in like the store, so a test hands over a temporary directory and a
+   * development run with no volume gets the one that refuses. An upload
+   * surface offered where nothing can be kept is a surface that lies.
+   */
+  vault: Vault = new NoVault(),
+): Router {
   const router = Router();
 
   /** Open a matter. Not a vote, so anyone who deliberates may raise one. */
@@ -333,6 +345,140 @@ export function governanceRoutes(store: Store, now: () => string = () => new Dat
       );
 
       res.status(201).json(updated);
+    }),
+  );
+
+  /**
+   * Attach a document rather than a citation.
+   *
+   * The bytes arrive raw with their type in the header: one file per request,
+   * no multipart parser and no dependency for it. What comes back is an
+   * ordinary source of kind 'document' carrying `file`, so everything already
+   * written about sources — withdrawal, duplication, who attached it — applies
+   * without a second path through the record.
+   *
+   * The file is stored first and the source is attached second. A source
+   * pointing at a file that failed to write would be a citation pointing at
+   * nothing, and that is the one outcome this feature exists to avoid.
+   */
+  router.post(
+    '/matters/:id/sources/file',
+    express.raw({ type: Object.keys(ACCEPTED), limit: MAX_BYTES }),
+    handle(async (req, res) => {
+      const who = identityOf(req);
+      if (!requireRole(res, mayDeliberate(who.role), 'attach a document', who.role)) return;
+
+      if (vault.kind === 'none') {
+        res.status(503).json({
+          error: 'no_vault',
+          message:
+            'This installation has nowhere durable to keep a document, so it will not take one. ' +
+            'A file accepted into storage that does not survive a restart is worse than a file ' +
+            'refused: the board would cite it, and the citation would point at nothing.',
+        });
+        return;
+      }
+
+      const label = typeof req.query.label === 'string' ? req.query.label.trim() : '';
+      const filename = typeof req.query.name === 'string' ? req.query.name.trim() : '';
+      if (label.length < 3 || filename.length < 1) {
+        res.status(400).json({
+          error: 'no_label',
+          message:
+            'A document needs a label and a filename. A record full of "scan.pdf" is a record ' +
+            'nobody can search, and the label is what a reader scans for.',
+        });
+        return;
+      }
+
+      const bytes = Buffer.isBuffer(req.body) ? req.body : Buffer.alloc(0);
+      const mediaType = (req.get('content-type') ?? '').split(';')[0].trim();
+
+      let stored;
+      try {
+        stored = await vault.put({ bytes, mediaType });
+      } catch (e) {
+        if (e instanceof UnacceptableFile) {
+          res.status(e.code === 'too_large' ? 413 : 400).json({ error: e.code, message: e.message });
+          return;
+        }
+        throw e;
+      }
+
+      const at = now();
+      const id = `s-${at.replace(/[^0-9]/g, '').slice(0, 14)}-${Math.random().toString(36).slice(2, 8)}`;
+
+      const updated = await store.updateMatter(req.params.id, (matter) =>
+        attachSource(
+          matter,
+          {
+            scholarId: who.scholarId,
+            source: {
+              kind: 'document',
+              label,
+              // The key is the reference. It is the SHA-256 of the bytes, so it
+              // is also the proof of what was attached.
+              ref: stored.key,
+              note: typeof req.query.note === 'string' ? req.query.note.slice(0, 2_000) : undefined,
+              file: { name: filename.slice(0, 300), bytes: stored.bytes, mediaType, key: stored.key },
+            },
+          },
+          at,
+          id,
+        ),
+      );
+
+      res.status(201).json(updated);
+    }),
+  );
+
+  /**
+   * Read one back.
+   *
+   * Reached through the source that cites it, on the matter that carries that
+   * source — never by key alone. The store is already scoped to one
+   * institution, so a document belonging to another is unreachable by
+   * structure rather than by the key being hard to guess.
+   *
+   * A withdrawn source still serves its file. A board that cited something and
+   * thought better of it is part of how it reasoned, and a withdrawn citation
+   * pointing at nothing would be worse than no citation.
+   */
+  router.get(
+    '/matters/:id/sources/:sourceId/file',
+    handle(async (req, res) => {
+      const matter = await store.matter(req.params.id);
+      if (!matter) {
+        res.status(404).json({ error: 'not_found', message: 'No such matter.' });
+        return;
+      }
+
+      const source = matter.sources.find((x) => x.id === req.params.sourceId);
+      if (!source?.file) {
+        res.status(404).json({ error: 'not_found', message: 'That source is not a document.' });
+        return;
+      }
+
+      const bytes = await vault.get(source.file.key);
+      if (!bytes) {
+        res.status(404).json({
+          error: 'not_found',
+          message:
+            'The record cites a document this installation cannot find. That is a missing file ' +
+            'rather than a missing citation, and the citation stays.',
+        });
+        return;
+      }
+
+      res.type(source.file.mediaType);
+      // Served as an attachment, never inline. A record that renders a
+      // supplied document in its own origin is a record that can be written
+      // into by whoever supplied it.
+      res.setHeader(
+        'Content-Disposition',
+        `attachment; filename="${source.file.name.replace(/[^\w. -]/g, '_')}"`,
+      );
+      res.send(bytes);
     }),
   );
 
