@@ -527,3 +527,30 @@ durable storage — which is what blocks upload, which is what blocks the PDF
 extraction in §4a.
 
 950 server tests, 120 client. Nothing here signs.
+
+### Found and named, not yet fixed
+
+Three things noticed while building the blocks above. None blocks the next
+piece of work; all three are small and all three are real.
+
+1. **The 403 a scholar sees is a rulebook, not a diagnosis.** Every route
+   shares one message — *"Voting, objecting and determining belong to
+   signatories; deliberating is open to the board; the steps that belong to
+   the institution are recorded by its secretary or liaison; a shared
+   credential only reads."* It is true as a summary of all four rules and it
+   makes the reader find their own case in a list. It reads worst on recording
+   a calculation, which is deliberately **not** a signatory's act, so the
+   sentence a reader's eye lands on first is the one that does not apply.
+
+2. **Arabic and Urdu are about two hundred strings short.** English carries
+   564 keys, Arabic 374, Urdu 363. The missing ones fall back to English
+   silently, which is the right failure mode and the wrong outcome in a
+   product whose point is that a board can work in Arabic. The file already
+   says the Arabic and Urdu it does have needs a native reviewer with
+   knowledge of the subject.
+
+3. **No seeded matter is judged against a contract shape.** So the checklist,
+   and now the adopted-or-draft line above it, cannot be seen in a
+   demonstration record without a member credential and three clicks. The
+   register seeds seven assets to avoid exactly this; the matters should seed
+   a `structureId` for the same reason.
