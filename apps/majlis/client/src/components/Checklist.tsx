@@ -190,6 +190,76 @@ function Condition({
   );
 }
 
+/**
+ * Choosing the shape a matter is judged against.
+ *
+ * The library grew from three shapes to nineteen, and a flat row of nineteen
+ * buttons is a wall rather than a list. Grouped by family, because that is how
+ * a scholar already thinks about it: whatever this arrangement is, it is a
+ * sale, or a lease, or a partnership, and the question is which one.
+ *
+ * Combining contracts is deliberately its own family rather than a note under
+ * the others. Most arrangements that fail do so as a combination — each part
+ * passes and the sequence produces what the parts were chosen to avoid — and a
+ * board looking for that has to be able to pick it as the shape.
+ */
+const FAMILIES = [
+  'sale',
+  'lease',
+  'partnership',
+  'agency',
+  'security',
+  'exchange',
+  'support',
+  'protection',
+  'gratuitous',
+  'combination',
+] as const;
+
+function Picker({
+  structures,
+  onChoose,
+}: {
+  structures: Structure[];
+  onChoose: (id: string) => void;
+}) {
+  const { t } = useI18n();
+
+  // Any family the library gains and this list has not caught up with still
+  // appears, at the end, rather than silently vanishing from the picker.
+  const known = new Set<string>(FAMILIES);
+  const order = [...FAMILIES, ...structures.map((s) => s.family).filter((f) => !known.has(f))];
+
+  return (
+    <div className="space-y-3">
+      {order.map((family) => {
+        const inFamily = structures.filter((s) => s.family === family);
+        if (inFamily.length === 0) return null;
+
+        return (
+          <div key={family}>
+            <div className="mb-1.5 text-[11px] uppercase tracking-wider text-muted">
+              {t(`family.${family}`)}
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {inFamily.map((s) => (
+                <button
+                  key={s.id}
+                  type="button"
+                  onClick={() => onChoose(s.id)}
+                  className="rounded border border-line px-3 py-1.5 text-left text-[12.5px] text-muted transition-colors hover:border-muted hover:text-paper"
+                >
+                  {s.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function Checklist({ matterId, canRule }: { matterId: string; canRule: boolean }) {
   const { t } = useI18n();
   const [data, setData] = useState<ChecklistData | null>(null);
@@ -235,20 +305,7 @@ export default function Checklist({ matterId, canRule }: { matterId: string; can
     return (
       <div>
         <p className="mb-3 text-[13px] leading-relaxed text-muted">{t('chk.noShape')}</p>
-        {canRule && structures && (
-          <div className="flex flex-wrap gap-2">
-            {structures.map((s) => (
-              <button
-                key={s.id}
-                type="button"
-                onClick={() => choose(s.id)}
-                className="rounded border border-line px-3 py-1.5 text-[12.5px] text-muted hover:border-muted"
-              >
-                {s.name}
-              </button>
-            ))}
-          </div>
-        )}
+        {canRule && structures && <Picker structures={structures} onChoose={choose} />}
       </div>
     );
   }

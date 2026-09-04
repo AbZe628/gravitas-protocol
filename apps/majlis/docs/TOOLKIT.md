@@ -113,16 +113,41 @@ ruling.
 So the library ships as a draft the board approves once, like any other matter.
 After that it is theirs.
 
-### What the library covers
+### What the library covers — built, as of 2026-09-04
 
-Sale and its variants — **murabaha**, commodity murabaha and **tawarruq**,
-**musawama**, **salam**, **istisna'** and parallel istisna'. Leases —
-**ijara** and **ijara muntahia bittamleek**. Partnerships — **mudaraba**,
-**musharaka**, **diminishing musharaka**. Agency — **wakala**, investment
-wakala. Securities — **sukuk**, asset-backed and asset-based. Support contracts
-— **kafala**, **rahn**, **hawala**, **wa'd** and bilateral promise, **qard
-hasan**. Exchange — **sarf**. Protection — **takaful**. And the standard on
-**combining contracts**, which is where most structures actually fail.
+**Nineteen shapes, 89 conditions, ten families.** Every condition carries what
+must be true, why it matters in terms of what goes wrong without it, how it is
+shown, and where it is drawn from.
+
+| Family | Shapes |
+|---|---|
+| Sale | murabaha (with commodity murabaha and tawarruq), musawama, salam, istisna' (with parallel istisna') |
+| Lease | ijara, ijara muntahia bittamleek |
+| Partnership | mudaraba, musharaka, diminishing musharaka |
+| Agency | investment wakala |
+| Securities | sukuk |
+| Exchange | sarf |
+| Securing and moving an obligation | kafala, rahn, hawala, wa'd |
+| Protection | takaful |
+| Given without return | qard hasan |
+| Combining contracts | combining contracts in one arrangement |
+
+Five of the shapes the earlier draft listed separately are **conditions inside
+another shape rather than entries of their own**, because that is where a board
+actually meets them: tawarruq and commodity murabaha are conditions of
+murabaha; parallel istisna' is a condition of istisna'; the bilateral promise
+is a condition of wa'd; and the asset-backed / asset-based distinction is the
+first condition of sukuk rather than two sukuk. Splitting them would have made
+a board choose between two shapes before knowing which one they had.
+
+**Combining contracts is its own family with one member**, and it earns the
+family. Most arrangements that fail do so as a combination — every part passes
+on its own and the sequence produces the fixed return the parts were chosen to
+avoid — so a board has to be able to pick it as the shape being judged.
+
+The picker groups by family for the same reason: nineteen buttons in a row is a
+wall, and a scholar already thinks *whatever this is, it is a sale, or a lease,
+or a partnership*.
 
 Each carries its conditions. To make the shape concrete rather than a list of
 names, two examples in full:
@@ -462,6 +487,8 @@ a state worth naming: a tested service nobody can reach is not a feature.
 | Drift over a standing ruling | ✅ | ✅ |
 | Asset register | ✅ | ✅ |
 | Structure checklist | ✅ | ✅ |
+| Contract library (19 shapes) | ✅ | ✅ |
+| Adoption of the library by the board | — | — |
 
 **And a calculation can now be noted against a period.** The calculations
 themselves stay stateless; noting one is a second and deliberate act, because a
@@ -478,8 +505,16 @@ deleted. Which are superseded is derived by looking, never stored.
 The annual report's zakat gap is therefore conditional now rather than
 permanent, and the figure, its source and its own note reach the printed page.
 
-Next, in order: the rest of the structure library (§3), then meetings as
-record, @mentions and the per-asset document, then durable storage — which is
-what blocks upload, which is what blocks the PDF extraction in §4a.
+**The structure library is complete** — nineteen shapes across ten families,
+89 conditions, each with its reason and its source (§3). What is still missing
+around it is **adoption**: in the design a board approves the library once, as
+a matter like any other, and thereafter amends its own copy. Until that exists,
+this is reference material a board reads and rules beside, and no part of the
+application treats a condition as binding. The gap is named in the library's
+own file rather than left to be discovered.
 
-879 server tests, 98 client. Nothing here signs.
+Next, in order: adoption of the library, then meetings as record, @mentions and
+the per-asset document, then durable storage — which is what blocks upload,
+which is what blocks the PDF extraction in §4a.
+
+889 server tests, 103 client. Nothing here signs.

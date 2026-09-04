@@ -735,7 +735,26 @@ export interface Attendance {
 export interface Structure {
   id: string;
   name: string;
-  family: 'sale' | 'lease' | 'partnership' | 'agency' | 'security' | 'exchange' | 'gratuitous';
+  /**
+   * Grouped so a board picking a shape reads a short list rather than a wall.
+   *
+   * 'support' is the cluster that secures or moves an obligation without being
+   * the transaction itself — guarantee, pledge, assignment, promise. 'combination'
+   * has one member and earns it: combining contracts is where most structures
+   * actually fail, and it is a shape in its own right rather than a note on the
+   * others.
+   */
+  family:
+    | 'sale'
+    | 'lease'
+    | 'partnership'
+    | 'agency'
+    | 'security'
+    | 'exchange'
+    | 'gratuitous'
+    | 'support'
+    | 'protection'
+    | 'combination';
   conditions: StructureCondition[];
   /** Which calculations this shape normally attracts. */
   calculations: CalculationKind[];

@@ -4,6 +4,7 @@ import type { Express } from 'express';
 import { createApp } from '../src/app.js';
 import { MemoryStore } from '../src/store/index.js';
 import { hashPassword } from '../src/auth/members.js';
+import { structures } from '../src/data/structures.js';
 
 /**
  * The whole of Stage Two, over HTTP, with real credentials.
@@ -939,12 +940,27 @@ describe('the structures, over HTTP', () => {
   it('offers the library as a draft rather than as an authority', async () => {
     const res = await request(app).get('/api/structures').set('Authorization', as('watcher')).expect(200);
 
-    expect(res.body.structures.map((s: { id: string }) => s.id)).toEqual([
-      'murabaha',
-      'ijara-mbt',
-      'mudaraba',
-    ]);
+    // Not a frozen list: the library grows, and a test pinning its exact
+    // contents would fail on every addition while checking nothing. What the
+    // route owes a caller is the whole library and the sentence about it.
+    const ids = res.body.structures.map((s: { id: string }) => s.id);
+    expect(ids).toEqual(structures.map((s) => s.id));
+    expect(ids).toContain('murabaha');
+    expect(ids).toContain('sukuk');
     expect(res.body.note).toContain('nothing here is binding');
+  });
+
+  it('sends every condition with its reason and its source, not only the headings', async () => {
+    const res = await request(app).get('/api/structures').set('Authorization', as('watcher')).expect(200);
+
+    for (const s of res.body.structures) {
+      expect(s.conditions.length).toBeGreaterThan(0);
+      for (const c of s.conditions) {
+        expect(c.requirement.length).toBeGreaterThan(10);
+        expect(c.why.length).toBeGreaterThan(40);
+        expect(c.authority.length).toBeGreaterThan(3);
+      }
+    }
   });
 
   it('walks a product approval through its conditions', async () => {

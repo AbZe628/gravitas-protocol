@@ -82,6 +82,117 @@ describe('the library is a prompt, not an authority', () => {
   it('links a shape to the calculations it attracts', () => {
     expect(structureById('mudaraba')?.calculations).toContain('profit_distribution');
     expect(structureById('murabaha')?.calculations).toContain('late_payment');
+    // A traded pool is where the tangibility question actually lives.
+    expect(structureById('sukuk')?.calculations).toContain('tangibility');
+  });
+});
+
+/**
+ * With three shapes the library could be read; with nineteen it has to be
+ * checked. These are the invariants that keep it usable rather than long.
+ */
+describe('the library holds together as a whole', () => {
+  it('gives every shape a distinct id, so a matter can name one without ambiguity', () => {
+    const ids = structures.map((s) => s.id);
+    expect(new Set(ids).size).toBe(ids.length);
+  });
+
+  it('gives every condition within a shape a distinct id, so a finding lands on one', () => {
+    for (const s of structures) {
+      const ids = s.conditions.map((c) => c.id);
+      expect(new Set(ids).size, `${s.id} has a repeated condition id`).toBe(ids.length);
+    }
+  });
+
+  it('asks for at least three conditions, because a shape with one is a heading', () => {
+    for (const s of structures) {
+      expect(s.conditions.length, `${s.id}`).toBeGreaterThanOrEqual(3);
+    }
+  });
+
+  it('names only calculations that exist, so a link cannot go nowhere', () => {
+    const known = [
+      'screening',
+      'purification',
+      'zakat',
+      'profit_distribution',
+      'tangibility',
+      'late_payment',
+    ];
+    for (const s of structures) {
+      for (const k of s.calculations) expect(known, `${s.id}`).toContain(k);
+    }
+  });
+
+  it('records how each condition is shown, so a board knows what to ask for', () => {
+    const kinds = ['document', 'sequence', 'figure', 'undertaking'];
+    for (const s of structures) {
+      for (const c of s.conditions) expect(kinds, `${s.id}/${c.id}`).toContain(c.evidence);
+    }
+  });
+
+  it('covers the families a bank actually uses', () => {
+    const families = new Set(structures.map((s) => s.family));
+    for (const f of [
+      'sale',
+      'lease',
+      'partnership',
+      'agency',
+      'security',
+      'exchange',
+      'support',
+      'protection',
+      'combination',
+    ]) {
+      expect(families, `no shape in the ${f} family`).toContain(f);
+    }
+  });
+
+  it('carries the shapes the toolkit says it covers', () => {
+    for (const id of [
+      'murabaha',
+      'musawama',
+      'salam',
+      'istisna',
+      'ijara',
+      'ijara-mbt',
+      'mudaraba',
+      'musharaka',
+      'diminishing-musharaka',
+      'wakala-investment',
+      'sukuk',
+      'sarf',
+      'kafala',
+      'rahn',
+      'hawala',
+      'wad',
+      'qard-hasan',
+      'takaful',
+      'combining-contracts',
+    ]) {
+      expect(structureById(id), `${id} is named in TOOLKIT.md and is not here`).toBeTruthy();
+    }
+  });
+
+  it('keeps combining contracts as a shape rather than a footnote on the others', () => {
+    // It is where most arrangements actually fail, and a board has to be able
+    // to judge the whole rather than only the parts.
+    const combining = structureById('combining-contracts');
+    expect(combining?.family).toBe('combination');
+    expect(combining?.conditions.map((c) => c.id)).toContain('not-a-route-to-what-is-otherwise-refused');
+    expect(combining?.conditions.map((c) => c.id)).toContain('each-contract-valid-on-its-own');
+  });
+
+  it('never says a shape is settled, only where its conditions are drawn from', () => {
+    const text = JSON.stringify(structures).toLowerCase();
+    for (const claim of [
+      'is approved',
+      'the board must find',
+      'this is required by shariah',
+      'settled law',
+    ]) {
+      expect(text).not.toContain(claim);
+    }
   });
 });
 

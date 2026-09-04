@@ -24,6 +24,16 @@ export function dirFor(lang: Lang): 'ltr' | 'rtl' {
 type Dict = Record<string, string>;
 
 const en: Dict = {
+  "family.sale": "Sale",
+  "family.lease": "Lease",
+  "family.partnership": "Partnership",
+  "family.agency": "Agency",
+  "family.security": "Securities",
+  "family.exchange": "Exchange",
+  "family.support": "Securing and moving an obligation",
+  "family.protection": "Protection",
+  "family.gratuitous": "Given without return",
+  "family.combination": "Combining contracts",
   "reg.calculations": "Calculations noted on this holding",
   "noteCalc.title": "Note this calculation",
   "calc.tab.recorded": "Recorded",
@@ -672,6 +682,16 @@ const en: Dict = {
 };
 
 const ar: Dict = {
+  "family.sale": "البيع",
+  "family.lease": "الإجارة",
+  "family.partnership": "الشركة",
+  "family.agency": "الوكالة",
+  "family.security": "الصكوك والأوراق",
+  "family.exchange": "الصرف",
+  "family.support": "توثيق الالتزام ونقله",
+  "family.protection": "التكافل",
+  "family.gratuitous": "التبرعات",
+  "family.combination": "اجتماع العقود",
   "reg.calculations": "الحسابات المقيَّدة على هذا الأصل",
   "noteCalc.title": "تقييد هذا الحساب",
   "calc.tab.recorded": "المسجَّل",
@@ -1053,6 +1073,16 @@ const ar: Dict = {
 };
 
 const ur: Dict = {
+  "family.sale": "بیع",
+  "family.lease": "اجارہ",
+  "family.partnership": "شراکت",
+  "family.agency": "وکالت",
+  "family.security": "صکوک و اوراق",
+  "family.exchange": "صرف",
+  "family.support": "ذمہ داری کی توثیق و منتقلی",
+  "family.protection": "تکافل",
+  "family.gratuitous": "بلا عوض",
+  "family.combination": "عقود کا اجتماع",
   "reg.calculations": "اس ملکیت پر درج حسابات",
   "noteCalc.title": "یہ حساب درج کریں",
   "calc.tab.recorded": "درج شدہ",

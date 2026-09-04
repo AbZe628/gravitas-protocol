@@ -39,6 +39,10 @@ const checklist = (over: Record<string, unknown> = {}) => ({
 
 const posted: { url: string; body: unknown }[] = [];
 
+/** A slice of the library, enough to have more than one family in it. */
+let library: { id: string; name: string; family: string }[] = [];
+
+
 function stub(body: unknown) {
   posted.length = 0;
   vi.stubGlobal(
@@ -52,7 +56,7 @@ function stub(body: unknown) {
         posted.push({ url, body: init.body ? JSON.parse(String(init.body)) : null });
         return json({});
       }
-      if (url.includes('/structures')) return json({ structures: [], note: '' });
+      if (url.includes('/structures')) return json({ structures: library, note: '' });
       return json(body);
     }),
   );
@@ -200,5 +204,81 @@ describe('what it does when it cannot show a checklist', () => {
 
     await waitFor(() => expect(screen.getByText(/turns the sale into a financing/)).toBeInTheDocument());
     expect(screen.queryByRole('button', { name: /Record a finding/ })).toBeNull();
+  });
+});
+
+/**
+ * The library grew from three shapes to nineteen. A flat row of nineteen
+ * buttons is a wall, so the picker groups them the way a scholar already
+ * thinks: whatever this arrangement is, it is a sale, or a lease, or a
+ * partnership, and the question is which one.
+ */
+describe('choosing the shape, out of a library that is no longer short', () => {
+  const someOfEach = [
+    { id: 'murabaha', name: 'Murabaha', family: 'sale' },
+    { id: 'salam', name: 'Salam', family: 'sale' },
+    { id: 'ijara', name: 'Ijara', family: 'lease' },
+    { id: 'sukuk', name: 'Sukuk', family: 'security' },
+    { id: 'combining-contracts', name: 'Combining contracts in one arrangement', family: 'combination' },
+  ];
+
+  it('groups the shapes by family, with the family named', async () => {
+    library = someOfEach;
+    stub([]);
+    show();
+
+    await waitFor(() => expect(screen.getByText('Sale')).toBeInTheDocument());
+    expect(screen.getByText('Lease')).toBeInTheDocument();
+    expect(screen.getByText('Securities')).toBeInTheDocument();
+    // Its own family, not a footnote under the others: most arrangements that
+    // fail do so as a combination. The family heading and the shape are named
+    // separately, so a board sees a group and a choice rather than one word twice.
+    expect(screen.getByText('Combining contracts')).toBeInTheDocument();
+    expect(screen.getByText('Combining contracts in one arrangement')).toBeInTheDocument();
+  });
+
+  it('shows a family only when the library has something in it', async () => {
+    library = [{ id: 'murabaha', name: 'Murabaha', family: 'sale' }];
+    stub([]);
+    show();
+
+    await waitFor(() => expect(screen.getByText('Sale')).toBeInTheDocument());
+    expect(screen.queryByText('Lease')).toBeNull();
+    expect(screen.queryByText('Protection')).toBeNull();
+  });
+
+  it('still shows a shape whose family the picker has never heard of', async () => {
+    // The failure this guards: the library gains a family, this list does not
+    // catch up, and a shape quietly disappears from the only place it can be
+    // chosen.
+    library = [{ id: 'novel', name: 'Something new', family: 'not-in-the-list' }];
+    stub([]);
+    show();
+
+    await waitFor(() => expect(screen.getByText('Something new')).toBeInTheDocument());
+  });
+
+  it('sets the shape the board picked and asks for the checklist again', async () => {
+    library = someOfEach;
+    stub([]);
+    show();
+
+    await waitFor(() => screen.getByText('Sukuk'));
+    fireEvent.click(screen.getByText('Sukuk'));
+
+    await waitFor(() => expect(posted).toHaveLength(1));
+    expect(posted[0].url).toContain('/matters/m1/structure');
+    expect(posted[0].body).toEqual({ structureId: 'sukuk' });
+  });
+
+  it('offers an observer no shape to pick, because setting one is deliberating', async () => {
+    library = someOfEach;
+    stub([]);
+    show(false);
+
+    await waitFor(() =>
+      expect(screen.getByText(/not being judged against a contract shape/)).toBeInTheDocument(),
+    );
+    expect(screen.queryByText('Sukuk')).toBeNull();
   });
 });
