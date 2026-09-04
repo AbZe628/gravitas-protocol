@@ -56,6 +56,7 @@ import {
   type ZakatInput,
 } from '../services/zakat.js';
 import { driftReport } from '../services/drift.js';
+import { assembleDossier, renderDossier } from '../services/dossier.js';
 import { structures } from '../data/structures.js';
 import { buildManual, renderManual } from '../services/manual.js';
 import { reviewStatus, reviewsDue } from '../services/review.js';
@@ -1002,6 +1003,44 @@ export function governanceRoutes(store: Store, now: () => string = () => new Dat
         ...standing,
         composition: asset.composition ? readComposition(asset.composition) : null,
       });
+    }),
+  );
+
+  /**
+   * Everything the board ever decided about one holding, as a page.
+   *
+   * The register answers where a holding stands today. This answers the
+   * question an auditor asks, which is how it got there — and it is handed to
+   * somebody outside Majlis, so it prints and carries its own dates.
+   */
+  router.get(
+    '/assets/:id/document',
+    handle(async (req, res) => {
+      const asset = await store.asset(req.params.id);
+      if (!asset) {
+        res.status(404).json({ error: 'not_found', message: 'No such asset.' });
+        return;
+      }
+
+      const [matters, rules, computations] = await Promise.all([
+        store.matters(),
+        store.rules(),
+        store.computations({ assetId: asset.id }),
+      ]);
+
+      const dossier = assembleDossier({
+        asset,
+        matters,
+        rules,
+        computations,
+        generatedAt: now(),
+      });
+
+      if (req.query.format === 'json') {
+        res.json(dossier);
+        return;
+      }
+      res.type('html').send(renderDossier(dossier));
     }),
   );
 

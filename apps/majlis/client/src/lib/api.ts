@@ -981,6 +981,8 @@ export const oversight = {
     fatwa: (id: string) => `/api/matters/${id}/fatwa`,
     manual: () => '/api/manual',
     annual: (year: number) => `/api/annual?year=${year}`,
+    /** Everything the board ever decided about one holding, as a page. */
+    holding: (assetId: string) => `/api/assets/${assetId}/document`,
     calendarFeed: () => '/api/calendar.ics',
   },
 };

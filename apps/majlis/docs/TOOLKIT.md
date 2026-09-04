@@ -489,6 +489,7 @@ a state worth naming: a tested service nobody can reach is not a feature.
 | Structure checklist | ✅ | ✅ |
 | Meetings, attendance and the minute | ✅ | ✅ |
 | Naming a colleague in the deliberation | ✅ | ✅ |
+| A document for every holding | ✅ | ✅ |
 | Contract library (19 shapes) | ✅ | ✅ |
 | Adoption of the library by the board | ✅ | ✅ |
 
@@ -553,10 +554,24 @@ being asked by a colleague is not a duty with a clock, and it stops standing
 once that member says anything afterwards — one answer closes every question
 that preceded it, which is what a conversation actually does.
 
-Next, in order: the per-asset document, then durable storage — which is what
-blocks upload, which is what blocks the PDF extraction in §4a.
+**Every holding has a document.** The register answers where a holding stands
+today; this answers the question an auditor asks, which is how it got there.
+One page, printable, handed to somebody outside Majlis: what the board decided
+and when, the terms in force with the meaning the board actually read, what the
+holding is made of, what has moved under a ruling, and every calculation noted
+against it.
 
-1052 server tests, 145 client. Nothing here signs.
+It assembles and concludes nothing — every figure comes from the service that
+already computed it, carrying that service's own sentence about what it does
+not answer. And it names what it cannot say inside the frame rather than in a
+footnote: a page headed with a token's name and showing nothing under its
+rulings reads as an absence of problems, which is the most misreadable thing
+this system could produce.
+
+Next: durable storage — which is what blocks upload, which is what blocks the
+PDF extraction in §4a.
+
+1076 server tests, 145 client. Nothing here signs.
 
 ### Found and fixed
 

@@ -24,6 +24,8 @@ export function dirFor(lang: Lang): 'ltr' | 'rtl' {
 type Dict = Record<string, string>;
 
 const en: Dict = {
+  "doc.holding": "The record of this holding",
+  "doc.holdingNote": "Everything this board ever decided about it, on one page, with what the record cannot say named rather than left blank. Opens as a tab you can save as a PDF.",
   "say.ask": "Ask someone",
   "attention.mentioned_you": "A colleague named you",
   "cal.kind.meeting_due": "The board is due to meet",
@@ -742,6 +744,8 @@ const en: Dict = {
 };
 
 const ar: Dict = {
+  "doc.holding": "سجل هذا الأصل",
+  "doc.holdingNote": "كل ما قرره هذا المجلس بشأنه، في صفحة واحدة، مع تسمية ما لا يستطيع السجل قوله بدل تركه فارغاً. يُفتح في صفحة يمكن حفظها كملف PDF.",
   "say.ask": "اسأل أحدهم",
   "attention.mentioned_you": "زميل ذكرك",
   "cal.kind.meeting_due": "موعد انعقاد المجلس",
@@ -1193,6 +1197,8 @@ const ar: Dict = {
 };
 
 const ur: Dict = {
+  "doc.holding": "اس ملکیت کا ریکارڈ",
+  "doc.holdingNote": "جو کچھ اس بورڈ نے کبھی اس بارے میں طے کیا، ایک صفحے پر، اور جو ریکارڈ نہیں کہہ سکتا اسے خالی چھوڑنے کے بجائے نام دیا گیا۔ ایک صفحے میں کھلتا ہے جسے PDF کے طور پر محفوظ کیا جا سکتا ہے۔",
   "say.ask": "کسی سے پوچھیں",
   "attention.mentioned_you": "ایک رفیق نے آپ کا نام لیا",
   "cal.kind.meeting_due": "بورڈ کا اجلاس واجب",

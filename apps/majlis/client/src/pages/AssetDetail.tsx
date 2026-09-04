@@ -5,6 +5,7 @@ import { useI18n } from '../lib/i18n.js';
 import { DateText, ErrorText, Loading, Section, Tag } from '../components/ui.js';
 import { mayDeliberate, useIdentity } from '../lib/identity.js';
 import { DriftForAsset } from '../components/Drift.js';
+import { DocumentLink } from '../components/Documents.js';
 import Recorded from '../components/Recorded.js';
 
 /**
@@ -112,6 +113,21 @@ export default function AssetDetail() {
         once what the board set rather than assembling it from two places.
       */}
       <DriftForAsset assetId={a.id} />
+
+      {/*
+        The page an auditor is handed.
+        Offered here rather than only in the record, because the question it
+        answers — how did this holding get where it is — is asked while looking
+        at the holding. It is a link, not a fetch: the browser opens it as a tab
+        the reader can save as a PDF, which is what a scholar actually wants.
+      */}
+      <div className="mb-7">
+        <DocumentLink
+          href={oversight.hrefs.holding(a.id)}
+          label={t('doc.holding')}
+          note={t('doc.holdingNote')}
+        />
+      </div>
 
       {canRaise && (
         <button

@@ -284,7 +284,11 @@ becomes the unit of subject.**
 3. **Composition and drift** — `crossings()` attached, raising the question itself
 4. **Meetings as record** — attendance, agenda, minute, the six-month clock
 5. **@mentions** — a mention surfaces in Attention; email is only the convenience
-6. **A document per asset** — everything the board ever decided about this one
+6. **A document per asset** — everything the board ever decided about this one.
+   Built: `services/dossier.ts`, served at `/api/assets/:id/document`, linked
+   from the holding's own page. It says what it cannot say inside the frame,
+   because an empty section under a token's name reads as an absence of
+   problems rather than as an absence of rulings.
 
 ---
 
