@@ -137,7 +137,7 @@ export function computationRoutes(
     '/computations',
     handle(async (req, res) => {
       const who = identityOf(req);
-      if (!requireRole(res, mayDeliberate(who.role), 'record a calculation')) return;
+      if (!requireRole(res, mayDeliberate(who.role), 'record a calculation', who.role)) return;
 
       const parsed = recordSchema.safeParse(req.body);
       if (!parsed.success) return badRequest(res, parsed.error.issues);
@@ -170,7 +170,7 @@ export function computationRoutes(
     '/computations/:id/withdraw',
     handle(async (req, res) => {
       const who = identityOf(req);
-      if (!requireRole(res, mayDeliberate(who.role), 'withdraw a recorded calculation')) return;
+      if (!requireRole(res, mayDeliberate(who.role), 'withdraw a recorded calculation', who.role)) return;
 
       const parsed = withdrawSchema.safeParse(req.body);
       if (!parsed.success) return badRequest(res, parsed.error.issues);

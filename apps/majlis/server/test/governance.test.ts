@@ -118,6 +118,60 @@ describe('roles', () => {
     expect(res.body.error).toBe('role_not_permitted');
   });
 
+  /**
+   * A refusal should diagnose the credential in front of it, not recite the
+   * rulebook. The earlier message listed all four rules at once, so the
+   * sentence a reader's eye landed on first was often not the reason.
+   */
+  it('says what this credential is, rather than what every other one may do', async () => {
+    const refused = async (who: string) => {
+      const res = await request(app)
+        .post('/api/matters')
+        .set('Authorization', as(who))
+        .send({ boardId: 'demo-board', title: 'A matter', proposal: 'x', direction: 'permit', origin: 'protocol_change' });
+      return res.body.message as string;
+    };
+
+    const observer = await refused('watcher');
+    expect(observer).toContain('may not open a matter');
+    expect(observer).toContain('reads and does not write');
+    // Not told about voting, which is not why they were refused.
+    expect(observer).not.toContain('belong to signatories');
+  });
+
+  it('tells an advisory member the rule that actually applies to them', async () => {
+    const id = await openMatter();
+    await say(id, 'member-a');
+    await request(app).post(`/api/matters/${id}/voting`).set('Authorization', as('member-a'));
+
+    const res = await vote(id, 'advisor-1');
+    expect(res.status).toBe(403);
+    expect(res.body.message).toContain('may not vote');
+    expect(res.body.message).toContain('An advisory member deliberates');
+    expect(res.body.message).toContain('belong to signatories');
+  });
+
+  it('tells a signatory why an act of the institution is not theirs', async () => {
+    // The one case where a signatory is refused: it is not a matter of rank.
+    const reported = await request(app)
+      .post('/api/incidents')
+      .set('Authorization', as('member-a'))
+      .send({
+        boardId: 'demo-board',
+        reference: 'SNC-2026-009',
+        title: 'Something the institution reported',
+        report: 'An account of what happened.',
+      })
+      .expect(201);
+
+    const res = await request(app)
+      .post(`/api/incidents/${reported.body.id}/directors`)
+      .set('Authorization', as('member-a'));
+
+    expect(res.status).toBe(403);
+    expect(res.body.message).toContain('must not be able to record them by deciding to');
+  });
+
   it('an advisory member deliberates but does not vote', async () => {
     const id = await openMatter();
     await say(id, 'advisor-1').expect(201);

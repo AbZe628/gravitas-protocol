@@ -526,31 +526,34 @@ Next, in order: meetings as record, @mentions and the per-asset document, then
 durable storage — which is what blocks upload, which is what blocks the PDF
 extraction in §4a.
 
-950 server tests, 120 client. Nothing here signs.
+957 server tests, 120 client. Nothing here signs.
 
-### Found and named, not yet fixed
+### Found and fixed
 
-Three things noticed while building the blocks above. None blocks the next
-piece of work; all three are small and all three are real.
+Two of the three things named here have been dealt with.
 
-1. **The 403 a scholar sees is a rulebook, not a diagnosis.** Every route
-   shares one message — *"Voting, objecting and determining belong to
-   signatories; deliberating is open to the board; the steps that belong to
-   the institution are recorded by its secretary or liaison; a shared
-   credential only reads."* It is true as a summary of all four rules and it
-   makes the reader find their own case in a list. It reads worst on recording
-   a calculation, which is deliberately **not** a signatory's act, so the
-   sentence a reader's eye lands on first is the one that does not apply.
+1. **The 403 was a rulebook and is now a diagnosis.** It recited all four
+   rules at once, so the sentence a reader's eye landed on first was often not
+   the reason — an advisory member refused from recording a calculation was
+   told first that voting belongs to signatories, which is correct and not
+   why. It now says what the credential in front of it **is**, and what would
+   be needed instead.
 
-2. **Arabic and Urdu are about two hundred strings short.** English carries
-   564 keys, Arabic 374, Urdu 363. The missing ones fall back to English
-   silently, which is the right failure mode and the wrong outcome in a
-   product whose point is that a board can work in Arabic. The file already
-   says the Arabic and Urdu it does have needs a native reviewer with
-   knowledge of the subject.
+2. **A seeded matter is judged against a shape.** `matter-2026-07-03` names
+   sukuk, because the condition it turns on — the proportion of tangible
+   assets in a traded pool — is a sukuk condition. No findings are seeded
+   against it: an empty checklist is the true state of a matter still in
+   deliberation, and a seeded finding would put words in the mouth of a board
+   that never met. The checklist and the adopted-or-draft line above it are
+   now visible in a demonstration without a member credential.
 
-3. **No seeded matter is judged against a contract shape.** So the checklist,
-   and now the adopted-or-draft line above it, cannot be seen in a
-   demonstration record without a member credential and three clicks. The
-   register seeds seven assets to avoid exactly this; the matters should seed
-   a `structureId` for the same reason.
+### Still open
+
+**Arabic and Urdu are about two hundred strings short.** English carries 564
+keys, Arabic 374, Urdu 363. The missing ones fall back to English silently,
+which is the right failure mode and the wrong outcome in a product whose point
+is that a board can work in Arabic. This is not a quick fix — it is two
+hundred strings of precise Islamic-finance terminology in two languages, and
+the file already says the Arabic and Urdu it does have needs a native reviewer
+with knowledge of the subject before any board uses it. It needs a decision
+about who writes and reviews them, not an afternoon.

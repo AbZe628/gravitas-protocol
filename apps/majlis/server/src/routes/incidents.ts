@@ -98,7 +98,7 @@ export function incidentRoutes(store: Store, now: () => string = () => new Date(
     '/incidents',
     handle(async (req, res) => {
       const who = identityOf(req);
-      if (!requireRole(res, mayDeliberate(who.role), 'report an event')) return;
+      if (!requireRole(res, mayDeliberate(who.role), 'report an event', who.role)) return;
 
       const parsed = reportSchema.safeParse(req.body);
       if (!parsed.success) return badRequest(res, parsed.error.issues);
@@ -181,7 +181,7 @@ export function incidentRoutes(store: Store, now: () => string = () => new Date(
     '/incidents/:id/concurrence',
     handle(async (req, res) => {
       const who = identityOf(req);
-      if (!requireRole(res, mayVote(who.role), 'determine whether an event is a non-compliance')) return;
+      if (!requireRole(res, mayVote(who.role), 'determine whether an event is a non-compliance', who.role)) return;
 
       const parsed = concurSchema.safeParse(req.body);
       if (!parsed.success) return badRequest(res, parsed.error.issues);
@@ -202,7 +202,7 @@ export function incidentRoutes(store: Store, now: () => string = () => new Date(
     '/incidents/:id/stopped',
     handle(async (req, res) => {
       const who = identityOf(req);
-      if (!requireRole(res, mayVote(who.role), 'record what a finding stops')) return;
+      if (!requireRole(res, mayVote(who.role), 'record what a finding stops', who.role)) return;
 
       const parsed = stoppedSchema.safeParse(req.body);
       if (!parsed.success) return badRequest(res, parsed.error.issues);
@@ -219,7 +219,7 @@ export function incidentRoutes(store: Store, now: () => string = () => new Date(
     '/incidents/:id/plan/endorse',
     handle(async (req, res) => {
       const who = identityOf(req);
-      if (!requireRole(res, mayVote(who.role), 'endorse a rectification plan')) return;
+      if (!requireRole(res, mayVote(who.role), 'endorse a rectification plan', who.role)) return;
 
       const board = await boardFor(res, req.params.id);
       if (!board) return;
@@ -238,7 +238,7 @@ export function incidentRoutes(store: Store, now: () => string = () => new Date(
     '/incidents/:id/plan/return',
     handle(async (req, res) => {
       const who = identityOf(req);
-      if (!requireRole(res, mayVote(who.role), 'return a rectification plan')) return;
+      if (!requireRole(res, mayVote(who.role), 'return a rectification plan', who.role)) return;
 
       const parsed = z.object({ reason: reasonSchema }).safeParse(req.body);
       if (!parsed.success) return badRequest(res, parsed.error.issues);
@@ -254,7 +254,7 @@ export function incidentRoutes(store: Store, now: () => string = () => new Date(
     '/incidents/:id/purification',
     handle(async (req, res) => {
       const who = identityOf(req);
-      if (!requireRole(res, mayVote(who.role), 'prescribe purification')) return;
+      if (!requireRole(res, mayVote(who.role), 'prescribe purification', who.role)) return;
 
       const parsed = purificationSchema.safeParse(req.body);
       if (!parsed.success) return badRequest(res, parsed.error.issues);
@@ -272,7 +272,7 @@ export function incidentRoutes(store: Store, now: () => string = () => new Date(
     '/incidents/:id/close',
     handle(async (req, res) => {
       const who = identityOf(req);
-      if (!requireRole(res, mayVote(who.role), 'close a reported event')) return;
+      if (!requireRole(res, mayVote(who.role), 'close a reported event', who.role)) return;
 
       const at = now();
       res.json(await store.updateIncident(req.params.id, (current) => close(current, at)));
@@ -290,7 +290,7 @@ export function incidentRoutes(store: Store, now: () => string = () => new Date(
     '/incidents/:id/plan',
     handle(async (req, res) => {
       const who = identityOf(req);
-      if (!requireRole(res, mayRecordInstitutionAct(who.role, who.office), 'file a rectification plan')) return;
+      if (!requireRole(res, mayRecordInstitutionAct(who.role, who.office), 'file a rectification plan', who.role)) return;
 
       const parsed = planSchema.safeParse(req.body);
       if (!parsed.success) return badRequest(res, parsed.error.issues);
@@ -307,7 +307,7 @@ export function incidentRoutes(store: Store, now: () => string = () => new Date(
     '/incidents/:id/directors',
     handle(async (req, res) => {
       const who = identityOf(req);
-      if (!requireRole(res, mayRecordInstitutionAct(who.role, who.office), 'record the Directors’ approval')) return;
+      if (!requireRole(res, mayRecordInstitutionAct(who.role, who.office), 'record the Directors’ approval', who.role)) return;
       res.json(await store.updateIncident(req.params.id, (c) => recordDirectorsApproval(c, now())));
     }),
   );
@@ -316,7 +316,7 @@ export function incidentRoutes(store: Store, now: () => string = () => new Date(
     '/incidents/:id/submission',
     handle(async (req, res) => {
       const who = identityOf(req);
-      if (!requireRole(res, mayRecordInstitutionAct(who.role, who.office), 'record a submission to the regulator')) return;
+      if (!requireRole(res, mayRecordInstitutionAct(who.role, who.office), 'record a submission to the regulator', who.role)) return;
       res.json(await store.updateIncident(req.params.id, (c) => recordRegulatorSubmission(c, now())));
     }),
   );
@@ -325,7 +325,7 @@ export function incidentRoutes(store: Store, now: () => string = () => new Date(
     '/incidents/:id/purification/paid',
     handle(async (req, res) => {
       const who = identityOf(req);
-      if (!requireRole(res, mayRecordInstitutionAct(who.role, who.office), 'record a purification payment')) return;
+      if (!requireRole(res, mayRecordInstitutionAct(who.role, who.office), 'record a purification payment', who.role)) return;
 
       const parsed = paidSchema.safeParse(req.body);
       if (!parsed.success) return badRequest(res, parsed.error.issues);

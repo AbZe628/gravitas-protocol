@@ -3,6 +3,7 @@ import type { Board, Matter, Rule } from '../src/types.js';
 import { Refused } from '../src/services/lifecycle.js';
 import { checklistFor, recordFinding, setStructure } from '../src/services/structure.js';
 import { structureById, structures } from '../src/data/structures.js';
+import { matters as seedMatters } from '../src/data/seed.js';
 
 const T0 = '2026-09-04T09:00:00.000Z';
 const later = (h: number) => new Date(new Date(T0).getTime() + h * 3_600_000).toISOString();
@@ -349,5 +350,44 @@ describe('changing the shape keeps what was already reasoned', () => {
 
   it('allows a matter to have no shape at all', () => {
     expect(setStructure(matter(), null).structureId).toBeUndefined();
+  });
+});
+
+/**
+ * The demonstration record has to be able to show this.
+ *
+ * The register seeds seven holdings so a board opening Majlis for the first
+ * time sees a domain rather than an empty page. The same reasoning applies to
+ * the checklist: a matter judged against nothing shows nothing, and the
+ * feature is then invisible to anyone who has not been shown where to click.
+ */
+describe('the seeded record can show a checklist', () => {
+  it('judges at least one matter still in deliberation against a shape', () => {
+    const judged = seedMatters.filter((m) => m.structureId && m.status === 'deliberation');
+    expect(judged.length, 'no seeded matter is judged against a contract shape').toBeGreaterThan(0);
+  });
+
+  it('names a shape that is actually in the library', () => {
+    for (const m of seedMatters.filter((m) => m.structureId)) {
+      expect(structureById(m.structureId as string), `${m.id} names ${m.structureId}`).toBeTruthy();
+    }
+  });
+
+  it('seeds no findings against it, because a board that never met has said nothing', () => {
+    for (const m of seedMatters.filter((m) => m.structureId)) {
+      expect(m.findings ?? []).toEqual([]);
+    }
+  });
+
+  it('produces a checklist with every condition unanswered', () => {
+    const judged = seedMatters.find((m) => m.structureId && m.status === 'deliberation')!;
+    const c = checklistFor(judged);
+
+    expect(c.total).toBeGreaterThan(0);
+    expect(c.answered).toBe(0);
+    expect(c.unanswered).toHaveLength(c.total);
+    // And it says the conditions are the shipped draft, because no board in the
+    // seed has adopted anything.
+    expect(c.source).toBe('draft');
   });
 });

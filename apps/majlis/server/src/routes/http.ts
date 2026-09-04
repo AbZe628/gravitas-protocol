@@ -72,14 +72,52 @@ export function identityOf(req: Request): Identity {
   return req.identity ?? { scholarId: 'anonymous', role: 'observer' };
 }
 
-export function requireRole(res: Response, allowed: boolean, what: string): boolean {
+/**
+ * What each role is, said to the person holding it.
+ *
+ * The message this replaces recited all four rules at once, which was true as
+ * a summary and left the reader to find their own case in a list. It read
+ * worst where the applicable rule was last: an advisory member refused from
+ * recording a calculation was told first that voting belongs to signatories,
+ * which is both correct and not the reason.
+ *
+ * So the refusal now says what this credential **is**. The act it was refused
+ * is already in the first sentence; the second says why that credential could
+ * not do it, and what would.
+ */
+const ROLE_MEANS: Record<string, string> = {
+  observer:
+    'This session is signed in with a shared or unrecognised credential, which reads and does ' +
+    'not write. Taking part needs a member’s own credential, because an act nobody can be named ' +
+    'for is not a record of anything.',
+  advisory:
+    'An advisory member deliberates, records findings and notes calculations. Voting, objecting ' +
+    'and determining belong to signatories.',
+  liaison:
+    'A liaison deliberates, answers on mechanism, and records the steps that belong to the ' +
+    'institution. Voting, objecting and determining belong to signatories.',
+  signatory:
+    'A signatory votes, objects and determines. The steps that belong to the institution — the ' +
+    'plan, the Directors, the regulator, the payment — are recorded by its secretary or liaison, ' +
+    'and the board must not be able to record them by deciding to.',
+};
+
+export function requireRole(
+  res: Response,
+  allowed: boolean,
+  what: string,
+  /** Optional so an older caller still gets a usable refusal rather than none. */
+  role?: string,
+): boolean {
   if (allowed) return true;
   res.status(403).json({
     error: 'role_not_permitted',
     message:
-      `This credential may not ${what}. Voting, objecting and determining belong to ` +
-      'signatories; deliberating is open to the board; the steps that belong to the ' +
-      'institution are recorded by its secretary or liaison; a shared credential only reads.',
+      `This credential may not ${what}. ` +
+      (ROLE_MEANS[role ?? ''] ??
+        'Voting, objecting and determining belong to signatories; deliberating is open to the ' +
+          'board; the steps that belong to the institution are recorded by its secretary or ' +
+          'liaison; a shared credential only reads.'),
   });
   return false;
 }

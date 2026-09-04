@@ -121,7 +121,7 @@ export function adoptionRoutes(
     '/adoptions',
     handle(async (req, res) => {
       const who = identityOf(req);
-      if (!requireRole(res, mayVote(who.role), 'adopt a contract shape')) return;
+      if (!requireRole(res, mayVote(who.role), 'adopt a contract shape', who.role)) return;
 
       const parsed = adoptSchema.safeParse(req.body);
       if (!parsed.success) return badRequest(res, parsed.error.issues);

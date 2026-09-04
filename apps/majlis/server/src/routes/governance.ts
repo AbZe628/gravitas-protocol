@@ -186,7 +186,7 @@ export function governanceRoutes(store: Store, now: () => string = () => new Dat
     '/matters',
     handle(async (req, res) => {
       const who = identityOf(req);
-      if (!requireRole(res, mayOpenMatter(who.role), 'open a matter')) return;
+      if (!requireRole(res, mayOpenMatter(who.role), 'open a matter', who.role)) return;
 
       const parsed = openSchema.safeParse(req.body);
       if (!parsed.success) return badRequest(res, parsed.error.issues);
@@ -248,7 +248,7 @@ export function governanceRoutes(store: Store, now: () => string = () => new Dat
     '/matters/:id/deliberation',
     handle(async (req, res) => {
       const who = identityOf(req);
-      if (!requireRole(res, mayDeliberate(who.role), 'deliberate')) return;
+      if (!requireRole(res, mayDeliberate(who.role), 'deliberate', who.role)) return;
 
       const parsed = saySchema.safeParse(req.body);
       if (!parsed.success) return badRequest(res, parsed.error.issues);
@@ -295,7 +295,7 @@ export function governanceRoutes(store: Store, now: () => string = () => new Dat
     '/matters/:id/parameters',
     handle(async (req, res) => {
       const who = identityOf(req);
-      if (!requireRole(res, mayDeliberate(who.role), 'set the operative terms')) return;
+      if (!requireRole(res, mayDeliberate(who.role), 'set the operative terms', who.role)) return;
 
       const parsed = parametersSchema.safeParse(req.body);
       if (!parsed.success) return badRequest(res, parsed.error.issues);
@@ -319,7 +319,7 @@ export function governanceRoutes(store: Store, now: () => string = () => new Dat
     '/matters/:id/sources',
     handle(async (req, res) => {
       const who = identityOf(req);
-      if (!requireRole(res, mayDeliberate(who.role), 'attach a source')) return;
+      if (!requireRole(res, mayDeliberate(who.role), 'attach a source', who.role)) return;
 
       const parsed = sourceSchema.safeParse(req.body);
       if (!parsed.success) return badRequest(res, parsed.error.issues);
@@ -342,7 +342,7 @@ export function governanceRoutes(store: Store, now: () => string = () => new Dat
     '/matters/:id/sources/:sourceId',
     handle(async (req, res) => {
       const who = identityOf(req);
-      if (!requireRole(res, mayDeliberate(who.role), 'withdraw a source')) return;
+      if (!requireRole(res, mayDeliberate(who.role), 'withdraw a source', who.role)) return;
 
       const at = now();
       const updated = await store.updateMatter(req.params.id, (matter) =>
@@ -362,7 +362,7 @@ export function governanceRoutes(store: Store, now: () => string = () => new Dat
     '/matters/:id/reopen',
     handle(async (req, res) => {
       const who = identityOf(req);
-      if (!requireRole(res, mayVote(who.role), 'return a matter to deliberation')) return;
+      if (!requireRole(res, mayVote(who.role), 'return a matter to deliberation', who.role)) return;
 
       const parsed = objectSchema.safeParse(req.body);
       if (!parsed.success) return badRequest(res, parsed.error.issues);
@@ -404,7 +404,7 @@ export function governanceRoutes(store: Store, now: () => string = () => new Dat
     '/matters/:id/open',
     handle(async (req, res) => {
       const who = identityOf(req);
-      if (!requireRole(res, mayDeliberate(who.role), 'open deliberation')) return;
+      if (!requireRole(res, mayDeliberate(who.role), 'open deliberation', who.role)) return;
       res.json(await store.updateMatter(req.params.id, (m) => openDeliberation(m, now())));
     }),
   );
@@ -414,7 +414,7 @@ export function governanceRoutes(store: Store, now: () => string = () => new Dat
     '/matters/:id/voting',
     handle(async (req, res) => {
       const who = identityOf(req);
-      if (!requireRole(res, mayVote(who.role), 'open a vote')) return;
+      if (!requireRole(res, mayVote(who.role), 'open a vote', who.role)) return;
       res.json(await store.updateMatter(req.params.id, openVoting));
     }),
   );
@@ -424,7 +424,7 @@ export function governanceRoutes(store: Store, now: () => string = () => new Dat
     '/matters/:id/vote',
     handle(async (req, res) => {
       const who = identityOf(req);
-      if (!requireRole(res, mayVote(who.role), 'vote')) return;
+      if (!requireRole(res, mayVote(who.role), 'vote', who.role)) return;
 
       const parsed = voteSchema.safeParse(req.body);
       if (!parsed.success) return badRequest(res, parsed.error.issues);
@@ -445,7 +445,7 @@ export function governanceRoutes(store: Store, now: () => string = () => new Dat
     '/matters/:id/close',
     handle(async (req, res) => {
       const who = identityOf(req);
-      if (!requireRole(res, mayVote(who.role), 'close a vote')) return;
+      if (!requireRole(res, mayVote(who.role), 'close a vote', who.role)) return;
 
       const board = await boardFor(store, res, req.params.id);
       if (!board) return;
@@ -465,7 +465,7 @@ export function governanceRoutes(store: Store, now: () => string = () => new Dat
     '/matters/:id/object',
     handle(async (req, res) => {
       const who = identityOf(req);
-      if (!requireRole(res, mayVote(who.role), 'object')) return;
+      if (!requireRole(res, mayVote(who.role), 'object', who.role)) return;
 
       const parsed = objectSchema.safeParse(req.body);
       if (!parsed.success) return badRequest(res, parsed.error.issues);
@@ -486,7 +486,7 @@ export function governanceRoutes(store: Store, now: () => string = () => new Dat
     '/matters/:id/force',
     handle(async (req, res) => {
       const who = identityOf(req);
-      if (!requireRole(res, mayVote(who.role), 'bring a change into force')) return;
+      if (!requireRole(res, mayVote(who.role), 'bring a change into force', who.role)) return;
       res.json(await store.updateMatter(req.params.id, (m) => bringIntoForce(m, now())));
     }),
   );
@@ -496,7 +496,7 @@ export function governanceRoutes(store: Store, now: () => string = () => new Dat
     '/matters/:id/withdraw',
     handle(async (req, res) => {
       const who = identityOf(req);
-      if (!requireRole(res, mayDeliberate(who.role), 'withdraw a matter')) return;
+      if (!requireRole(res, mayDeliberate(who.role), 'withdraw a matter', who.role)) return;
       const at = new Date().toISOString();
       res.json(await store.updateMatter(req.params.id, (m) => withdraw(m, at)));
     }),
@@ -697,7 +697,7 @@ export function governanceRoutes(store: Store, now: () => string = () => new Dat
     '/matters/:id/implementation',
     handle(async (req, res) => {
       const who = identityOf(req);
-      if (!requireRole(res, mayDeliberate(who.role), 'set implementation steps')) return;
+      if (!requireRole(res, mayDeliberate(who.role), 'set implementation steps', who.role)) return;
 
       const parsed = stepsSchema.safeParse(req.body);
       if (!parsed.success) return badRequest(res, parsed.error.issues);
@@ -892,7 +892,7 @@ export function governanceRoutes(store: Store, now: () => string = () => new Dat
     '/matters/:id/structure',
     handle(async (req, res) => {
       const who = identityOf(req);
-      if (!requireRole(res, mayDeliberate(who.role), 'set the contract shape')) return;
+      if (!requireRole(res, mayDeliberate(who.role), 'set the contract shape', who.role)) return;
 
       const parsed = structureSchema.safeParse(req.body);
       if (!parsed.success) return badRequest(res, parsed.error.issues);
@@ -916,7 +916,7 @@ export function governanceRoutes(store: Store, now: () => string = () => new Dat
     '/matters/:id/findings',
     handle(async (req, res) => {
       const who = identityOf(req);
-      if (!requireRole(res, mayDeliberate(who.role), 'record a finding')) return;
+      if (!requireRole(res, mayDeliberate(who.role), 'record a finding', who.role)) return;
 
       const parsed = findingSchema.safeParse(req.body);
       if (!parsed.success) return badRequest(res, parsed.error.issues);
@@ -1018,7 +1018,7 @@ export function governanceRoutes(store: Store, now: () => string = () => new Dat
     '/assets',
     handle(async (req, res) => {
       const who = identityOf(req);
-      if (!requireRole(res, mayDeliberate(who.role), 'add to the register')) return;
+      if (!requireRole(res, mayDeliberate(who.role), 'add to the register', who.role)) return;
 
       const parsed = assetSchema.safeParse(req.body);
       if (!parsed.success) return badRequest(res, parsed.error.issues);
@@ -1060,7 +1060,7 @@ export function governanceRoutes(store: Store, now: () => string = () => new Dat
     '/assets/:id/retire',
     handle(async (req, res) => {
       const who = identityOf(req);
-      if (!requireRole(res, mayDeliberate(who.role), 'retire an asset')) return;
+      if (!requireRole(res, mayDeliberate(who.role), 'retire an asset', who.role)) return;
 
       const parsed = retireSchema.safeParse(req.body);
       if (!parsed.success) return badRequest(res, parsed.error.issues);

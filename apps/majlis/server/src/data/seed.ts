@@ -379,6 +379,18 @@ export const matters: Matter[] = [
   {
     id: 'matter-2026-07-03',
     assetIds: ['asset-mixed-pool'],
+    /**
+     * Judged against a shape, so the checklist is reachable in a demonstration.
+     *
+     * Sukuk rather than anything else because the condition this matter turns
+     * on — the proportion of tangible assets in a pool that is traded — is a
+     * sukuk condition, and this is the shape a board would actually reach for.
+     *
+     * No findings are seeded against it. An empty checklist is the true state
+     * of a matter still in deliberation, and a seeded finding would be putting
+     * words in the mouth of a board that never met.
+     */
+    structureId: 'sukuk',
     boardId: 'demo-board',
     title: 'Treatment of a tangible asset ratio breached by drift rather than by act',
     origin: 'compliance_concern',
