@@ -9,6 +9,7 @@ import Pace, { WaitingFor } from '../components/Pace.js';
 import WhoYouAre from '../components/WhoYouAre.js';
 import RaiseMatter from '../components/RaiseMatter.js';
 import { mayDeliberate, useIdentity } from '../lib/identity.js';
+import WhatThisIs from '../components/WhatThisIs.js';
 
 export default function Dashboard() {
   const { t } = useI18n();
@@ -19,6 +20,24 @@ export default function Dashboard() {
   const [waits, setWaits] = useState<Map<string, Wait>>(new Map());
   const [failed, setFailed] = useState(false);
   const { identity } = useIdentity();
+  const [intro, setIntro] = useState(() => {
+    try {
+      return localStorage.getItem('majlis.intro.read') !== 'yes';
+    } catch {
+      return true;
+    }
+  });
+
+  const toggleIntro = () =>
+    setIntro((was) => {
+      try {
+        localStorage.setItem('majlis.intro.read', was ? 'yes' : 'no');
+      } catch {
+        // A browser that will not store it shows the panel again next time,
+        // which is a smaller cost than failing to render the page.
+      }
+      return !was;
+    });
 
   useEffect(() => {
     api.matters().then(setMatters).catch(() => setFailed(true));
@@ -47,6 +66,9 @@ export default function Dashboard() {
         they go looking for the buttons, not after.
       */}
       <WhoYouAre />
+
+      {/* What this is, before the work. Folded once somebody has read it. */}
+      <WhatThisIs open={intro} onToggle={toggleIntro} />
 
       <Attention />
 
