@@ -3,6 +3,7 @@ import { oversight, type PurificationInput, type PurificationMethod, type Purifi
 import { useI18n } from '../lib/i18n.js';
 import { Choice, Compute, Money, Note, Refusal, Result, Text, useCalc } from './calc.js';
 import RecordCalculation from './RecordCalculation.js';
+import ReadDocument from './ReadDocument.js';
 
 /**
  * What must be given away from a holding that passed screening.
@@ -33,6 +34,34 @@ import RecordCalculation from './RecordCalculation.js';
 
 const METHODS: PurificationMethod[] = ['per_share', 'per_dividend', 'per_unit'];
 
+/**
+ * Which figures a document can be asked for, per method.
+ *
+ * The same list the form shows, because asking a document for a figure this
+ * method does not use would put a number into a field the calculation ignores
+ * — and a scholar who confirmed it would have checked something for nothing.
+ *
+ * The dates and the currency are not here. They are the period the board is
+ * computing for, which is a decision made before any document is opened.
+ */
+const READABLE: Record<PurificationMethod, { key: keyof PurificationInput; label: string }[]> = {
+  per_share: [
+    { key: 'unitsHeld', label: 'purify.unitsHeld' },
+    { key: 'nonPermissibleIncome', label: 'purify.nonPermissibleIncome' },
+    { key: 'sharesOutstanding', label: 'purify.sharesOutstanding' },
+  ],
+  per_dividend: [
+    { key: 'unitsHeld', label: 'purify.unitsHeld' },
+    { key: 'nonPermissibleIncome', label: 'purify.nonPermissibleIncome' },
+    { key: 'totalIncome', label: 'purify.totalIncome' },
+    { key: 'incomeReceived', label: 'purify.incomeReceived' },
+  ],
+  per_unit: [
+    { key: 'unitsHeld', label: 'purify.unitsHeld' },
+    { key: 'ratePerUnit', label: 'purify.ratePerUnit' },
+  ],
+};
+
 const EMPTY: PurificationInput = {
   method: 'per_share',
   periodFrom: '',
@@ -51,6 +80,14 @@ export default function Purification() {
   const { result, error, busy, compute } = useCalc<PurificationInput, Purified>(oversight.purify);
 
   const set = (k: keyof PurificationInput) => (v: string) => setF({ ...f, [k]: v });
+
+  /** A confirmed candidate fills its field and appends its provenance. */
+  const takeCandidate = (field: string, value: string, provenance: string) =>
+    setF((was) => ({
+      ...was,
+      [field]: value,
+      source: was.source.trim() ? `${was.source.trim()} ${provenance}` : provenance,
+    }));
 
   return (
     <form
@@ -75,6 +112,16 @@ export default function Purification() {
       {/* Nothing is asked for until the board has said which arithmetic to do. */}
       {method && (
         <>
+          {/*
+            After the method, for the same reason the fields are. The three
+            methods want different figures, and a panel offering all nine would
+            invite confirming figures this calculation will not use.
+          */}
+          <ReadDocument
+            fields={READABLE[method].map((r) => ({ key: r.key as string, label: t(r.label) }))}
+            onConfirm={takeCandidate}
+          />
+
           <div className="flex gap-2">
             <div className="flex-1">
               <Text label={t('calc.from')} type="date" value={f.periodFrom} onChange={set('periodFrom')} />

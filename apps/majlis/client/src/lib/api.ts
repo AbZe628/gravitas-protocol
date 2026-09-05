@@ -204,6 +204,13 @@ export interface Health {
    * a board tries to cite what it uploaded.
    */
   documents?: 'disk' | 'none';
+  /**
+   * Whether an attached document may be read by a model.
+   *
+   * A separate decision from whether there is an assistant, and separately off.
+   * The control appears only where this says it can work.
+   */
+  reading?: 'off' | 'anthropic';
 }
 
 export interface EnforcementSnapshot {
@@ -949,6 +956,19 @@ export const oversight = {
    * "when did we last meet" and "when are we next due" are one question a
    * chair asks in one glance.
    */
+  /** Every document this board has been given, across all its matters. */
+  documents: () => get<{ documents: BoardDocument[] }>('/api/documents'),
+
+  /**
+   * Read figures out of one.
+   *
+   * Returns candidates and writes nothing. The fields are named by the caller:
+   * a model that chose which figures the board wanted would be choosing what
+   * the board was asking.
+   */
+  readDocument: (matterId: string, sourceId: string, fields: string[]) =>
+    send<Extraction>(`/api/matters/${matterId}/sources/${sourceId}/extract`, { fields }),
+
   meetings: () => get<Meetings>('/api/meetings'),
   meeting: (id: string) => get<MeetingRow>(`/api/meetings/${id}`),
   convene: (input: { boardId: string; at: string; joinUrl?: string | null; agenda: AgendaItem[] }) =>
@@ -1285,6 +1305,58 @@ export interface AdoptInput {
   amendments?: string[];
   conditions?: StructureCondition[];
   supersedes?: string | null;
+}
+
+// ── reading figures out of a document ─────────────────────────────────────
+
+export interface BoardDocument {
+  matterId: string;
+  matterTitle: string;
+  sourceId: string;
+  label: string;
+  name: string;
+  bytes: number;
+  mediaType: string;
+  addedBy: string | null;
+  at: string | null;
+  /** The citation was withdrawn. The document is still here. */
+  withdrawn: boolean;
+}
+
+/**
+ * A figure proposed out of a document, not a figure.
+ *
+ * Nothing here enters a calculation until a member confirms it against the
+ * quote beside it. Extraction never sets `confirmedBy` — a model cannot
+ * confirm on a scholar's behalf, and cannot be allowed to say that it did.
+ */
+export interface FigureCandidate {
+  field: string;
+  value: string | null;
+  /** The sentence it came from, verbatim. */
+  quote: string | null;
+  locator: { page: number; label?: string } | null;
+  /**
+   * Whether the quote was matched against the document's own text.
+   *
+   * False for a PDF, where the file itself was sent and there was no text to
+   * check against — so the quote is the model's account of the document rather
+   * than an excerpt anybody verified.
+   */
+  quoteVerified: boolean;
+  confirmedBy: string | null;
+  confirmedAt: string | null;
+  /** Not in the document. Never a zero. */
+  notFound: boolean;
+}
+
+export interface Extraction {
+  documentName: string;
+  fields: string[];
+  candidates: FigureCandidate[];
+  /** Thrown away before anyone saw them, and why. Shown, not hidden. */
+  discarded: { field: string; reason: string }[];
+  note: string;
 }
 
 // ── meetings ──────────────────────────────────────────────────────────────

@@ -3,6 +3,7 @@ import { oversight, type BorneBy, type Zakat as Result_, type ZakatInput, type Z
 import { useI18n } from '../lib/i18n.js';
 import { Choice, Compute, Money, Note, Refusal, Result, Text, useCalc } from './calc.js';
 import RecordCalculation from './RecordCalculation.js';
+import ReadDocument from './ReadDocument.js';
 
 /**
  * What is due, and from whom.
@@ -61,6 +62,14 @@ export default function Zakat() {
   const set = (k: keyof ZakatInput) => (v: string) => setF({ ...f, [k]: v });
   const fields = method === 'net_invested_funds' ? INVESTED : NET_ASSETS;
 
+  /** A confirmed candidate fills its field and appends its provenance. */
+  const takeCandidate = (field: string, value: string, provenance: string) =>
+    setF((was) => ({
+      ...was,
+      [field]: value,
+      source: was.source.trim() ? `${was.source.trim()} ${provenance}` : provenance,
+    }));
+
   return (
     <form
       onSubmit={(e) => {
@@ -108,6 +117,16 @@ export default function Zakat() {
       {/* The figures follow the base, because the two bases want different ones. */}
       {method && (
         <>
+          {/*
+            The figures the base wants and no others. These are balance sheet
+            lines by name — the closest this application comes to a case where
+            reading beats typing, and the case the whole feature was built for.
+          */}
+          <ReadDocument
+            fields={fields.map((k) => ({ key: k as string, label: t(`zakat.${k}`) }))}
+            onConfirm={takeCandidate}
+          />
+
           <div className="flex gap-2">
             <div className="flex-1">
               <Text

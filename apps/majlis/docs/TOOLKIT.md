@@ -223,7 +223,7 @@ side.
 **What is missing:** it is attached to nothing. It needs to hang off an asset in
 the register so a change in the figures raises a matter about a specific holding.
 
-### 4.2 Purification — ✅ built, server only. And it is two different things
+### 4.2 Purification — ✅ built, on the screen. And it is two different things
 
 **From a breach.** The bank earned income from an activity the board found
 non-compliant. The amount is not a ratio: it comes out of the bank's ledger. The
@@ -248,7 +248,7 @@ The board chooses once, in a fatwa. Majlis then computes it every period, shows
 the working, tracks prescribed against paid, and carries the total into the
 annual report — where it already has a place.
 
-### 4.3 Zakat — ✅ built, server only
+### 4.3 Zakat — ✅ built, on the screen
 
 Built on 2026-09-03. The base, the rate and who bears it are all supplied and
 never inferred, and every sum is shown. The annual report still names a gap,
@@ -266,7 +266,7 @@ somewhere to record one against a period is not. What it needed:
 - **The hawl** — the date the year turns, which is a clock like every other
   clock here.
 
-### 4.4 Profit distribution — ✅ built, server only
+### 4.4 Profit distribution — ✅ built, on the screen
 
 The annual report's opinion must address whether profit allocation and loss
 charging on investment accounts followed the basis the board approved. PER and
@@ -607,7 +607,53 @@ code.
 
 Next: the PDF extraction in §4a, which this unblocks.
 
-1111 server tests, 156 client. Nothing here signs.
+### Reading figures out of a document — ✅ server and screen
+
+The rule §4a set is the one the implementation had to hold: **extraction
+proposes and never fills anything in.** A figure arrives as a candidate with
+the sentence it came from, where in the document it was found, and nothing
+else. `confirmedBy` is never set by extraction — the model cannot confirm on a
+scholar's behalf and cannot be allowed to say that it did.
+
+Three things the screening rules do, and each of them was a bug first:
+
+- **The value has to be in the quote, and the quote has to be in the document.**
+  A model that quotes a sentence the document does not contain has invented its
+  own provenance, which is worse than no provenance. Where there is no text to
+  check against — a PDF, sent as a file — `quoteVerified` is **false** and the
+  screen says the quote is the assistant's account of the document rather than
+  an excerpt anybody verified.
+- **A discarded candidate comes back as a gap, not as silence.** The first
+  version marked a field answered before validating it, so a candidate thrown
+  away vanished from the list entirely. A shorter list is the thing nobody
+  notices. Discards are now shown, with the reason.
+- **The output gate runs on the model's own words.** Quotes are exempt from it
+  and held to the document-match test instead — otherwise quoting a bank's own
+  sentence containing "non-compliant" would trip the constraint, and the gate
+  would be unable to catch the one thing §4a said it must: a model that reaches
+  for a verdict of its own. It now stops that and lets the quote through.
+
+**On the screen**, the panel is on all four calculations, and each asks only for
+the figures its chosen method uses — the three purification methods want
+different numbers, and offering all nine would invite confirming figures the
+calculation will not read. Profit distribution offers the amounts and
+deliberately **not** the rates: the mudarib's share and the two reserve
+deductions are terms the board agreed in a contract, not figures sitting in an
+accounts pack.
+
+There is no "confirm all", and there will not be. A scholar checking five
+figures against five quotes is doing the work the feature exists for; a control
+that took all five at once would turn that into a signature, and the record
+would then say a person checked something nobody read. The quote sits beside
+the value on the same screen so the check can be made without opening anything.
+
+Off unless the institution turned it on, and **not inferred from a key being
+present** — the assistant infers from an existing key so an upgrade removes
+nothing in use, but nothing here has ever been on, and a bank's accounts are
+not something to start sending by default. Where it is off the panel is
+**absent**, and the figures are typed in exactly as they always were.
+
+1152 server tests, 170 client. Nothing here signs.
 
 ### Found and fixed
 
@@ -639,30 +685,46 @@ the file already says the Arabic and Urdu it does have needs a native reviewer
 with knowledge of the subject before any board uses it. It needs a decision
 about who writes and reviews them, not an afternoon.
 
-**The upload cannot be exercised in a demonstration.** Attaching a document
-needs a member credential and a mounted volume, and the development run has
-neither. The behaviour that matters without them is live and correct — health
-says `documents: none` and the control is absent rather than lying — but the
-working path is covered by tests rather than by anything a reader can click.
+**The upload and the reading cannot be exercised in a demonstration.**
+Attaching a document needs a member credential and a mounted volume; reading one
+needs both of those and `MAJLIS_READING=anthropic` besides. The development run
+has none of them. The behaviour that matters without them is live and correct —
+health says `documents: none` and `reading: off`, and both controls are absent
+rather than lying — but the working paths are covered by tests rather than by
+anything a reader can click.
+
+This is worth saying plainly rather than working around: the two newest features
+are the two a demonstration cannot show. What a reader can see is that the
+application does not pretend to have them.
 
 ---
 
 ## 10. Where the next session starts
 
-*As of 2026-09-04. 1111 server tests, 156 client, typecheck clean.*
+*As of 2026-09-05. 1152 server tests, 170 client, typecheck clean, build clean.*
 
-**The whole of the §9 order is built.** Register, judging in one click,
-composition and drift, meetings as record, naming a colleague, a document per
-holding — and now somewhere for a document to actually go.
+**The whole of the §9 order is built**, §4a included. Register, judging in one
+click, composition and drift, meetings as record, naming a colleague, a document
+per holding, durable storage, and now reading figures out of a document — server
+and screen both.
 
-**Next is the PDF extraction in §4a**, which durable storage was blocking. The
-design there is already written and its one rule is the load-bearing part:
-**extraction proposes and never fills anything in.** A figure read out of a
-PDF arrives as a candidate carrying the quote it came from, where in the
-document it was found, and who confirmed it — and nothing enters a calculation
-until a person says so. A system that typed a bank figure into a board
-calculation on its own would be the one place in Majlis where a machine
-decided something.
+**What is left is not a feature.** Two things, and neither is an afternoon:
 
-Read §4a before starting. It settles where figures come from; what it does not
-settle is cadence, which is named in §8 as still open.
+1. **Arabic and Urdu are about two hundred strings short** — 564 English keys
+   against 374 Arabic and 363 Urdu. The missing ones fall back to English
+   silently, which is the right failure mode and the wrong outcome in a product
+   whose point is that a board can work in Arabic. It needs a decision about who
+   writes and reviews them.
+
+2. **The two newest paths cannot be shown.** Upload needs a member credential
+   and a mounted volume; reading needs those and a key besides. Both are covered
+   by tests and both are honestly absent in a demonstration rather than present
+   and refusing.
+
+From §4 the unbuilt calculations remain: **4.5 tradability** (the watching is
+built, the rule is not) and **4.6 late payment**, which is small and feeds
+purification. Neither is blocked by anything.
+
+The one thing worth reading before touching any of it is §6 — what this is
+honestly not. Every feature since has been easier to get right by being clear
+about what it refuses to do than by adding to what it does.

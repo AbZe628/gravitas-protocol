@@ -1207,6 +1207,49 @@ export function governanceRoutes(
    * other screen in this application can show — every other one lists work
    * somebody already started.
    */
+  /**
+   * Every document this board has been given, across all its matters.
+   *
+   * A scholar filling in a purification is not looking at the matter the bank's
+   * statement happens to be attached to — they are looking at a form with six
+   * empty fields. The document has to be reachable from there, so it is listed
+   * once rather than hunted for.
+   *
+   * Withdrawn sources are included and say so. A citation the board thought
+   * better of still points at a real document, and a scholar reading figures
+   * out of last quarter's accounts should be told the citation was withdrawn
+   * rather than have the document disappear.
+   */
+  router.get(
+    '/documents',
+    handle(async (req, res) => {
+      const boardId = typeof req.query.board === 'string' ? req.query.board : undefined;
+      const matters = await store.matters(boardId);
+
+      const documents = matters.flatMap((matter) =>
+        matter.sources
+          .filter((s) => s.file && s.id)
+          .map((s) => ({
+            matterId: matter.id,
+            matterTitle: matter.title,
+            sourceId: s.id as string,
+            label: s.label,
+            name: s.file!.name,
+            bytes: s.file!.bytes,
+            mediaType: s.file!.mediaType,
+            addedBy: s.addedBy ?? null,
+            at: s.at ?? null,
+            withdrawn: Boolean(s.withdrawnAt),
+          })),
+      );
+
+      // Newest first: a board reading figures is almost always reading the
+      // statement that arrived this week.
+      documents.sort((a, b) => (b.at ?? '').localeCompare(a.at ?? ''));
+      res.json({ documents });
+    }),
+  );
+
   router.get(
     '/register',
     handle(async (req, res) => {

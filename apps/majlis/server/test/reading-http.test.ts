@@ -245,3 +245,47 @@ describe('what it will not read', () => {
       .expect(401);
   });
 });
+
+describe('the documents a board has been given', () => {
+  it('lists them across matters, so a form does not have to hunt for one', async () => {
+    const ids = await withDocument();
+    const res = await request(app).get('/api/documents').set('Authorization', as('watcher')).expect(200);
+
+    expect(res.body.documents).toHaveLength(1);
+    expect(res.body.documents[0]).toMatchObject({
+      matterId: ids.matterId,
+      sourceId: ids.sourceId,
+      name: 'accounts.txt',
+      label: 'Interim accounts',
+      withdrawn: false,
+    });
+  });
+
+  it('keeps a withdrawn one and says so, rather than losing the document', async () => {
+    const ids = await withDocument();
+    await request(app)
+      .delete(`/api/matters/${ids.matterId}/sources/${ids.sourceId}`)
+      .set('Authorization', as('member-a'))
+      .expect(200);
+
+    const res = await request(app).get('/api/documents').set('Authorization', as('member-a')).expect(200);
+    expect(res.body.documents[0].withdrawn).toBe(true);
+  });
+
+  it('lists nothing where no document has been attached', async () => {
+    const res = await request(app).get('/api/documents').set('Authorization', as('watcher')).expect(200);
+    expect(res.body.documents).toEqual([]);
+  });
+
+  it('leaves out an ordinary citation, which is not a document', async () => {
+    const ids = await withDocument();
+    await request(app)
+      .post(`/api/matters/${ids.matterId}/sources`)
+      .set('Authorization', as('member-a'))
+      .send({ kind: 'standard', label: 'AAOIFI SS 21', ref: 'SS-21' })
+      .expect(201);
+
+    const res = await request(app).get('/api/documents').set('Authorization', as('member-a')).expect(200);
+    expect(res.body.documents).toHaveLength(1);
+  });
+});

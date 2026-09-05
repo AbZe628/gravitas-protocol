@@ -3,6 +3,7 @@ import { oversight, type Distribution as Result_, type DistributionInput, type R
 import { useI18n } from '../lib/i18n.js';
 import { Compute, Money, Note, Rate, Refusal, Result, Text, useCalc } from './calc.js';
 import RecordCalculation from './RecordCalculation.js';
+import ReadDocument from './ReadDocument.js';
 
 /**
  * What the depositors are actually paid, and what smoothing did to it.
@@ -79,6 +80,14 @@ export default function Distribution() {
 
   const set = (k: keyof DistributionInput) => (v: string) => setF({ ...f, [k]: v });
 
+  /** A confirmed candidate fills its field and appends its provenance. */
+  const takeCandidate = (field: string, value: string, provenance: string) =>
+    setF((was) => ({
+      ...was,
+      [field]: value,
+      source: was.source.trim() ? `${was.source.trim()} ${provenance}` : provenance,
+    }));
+
   return (
     <form
       onSubmit={(e) => {
@@ -94,6 +103,25 @@ export default function Distribution() {
         });
       }}
     >
+      {/*
+        The amounts, and deliberately not the rates.
+
+        The mudarib's share and the two reserve deductions are terms the board
+        agreed in a contract. They are not figures sitting in an accounts pack
+        waiting to be read out of it, and offering them here would invite
+        confirming a rate against a sentence that was never the agreement.
+      */}
+      <ReadDocument
+        fields={[
+          { key: 'grossProfit', label: t('dist.grossProfit') },
+          { key: 'perBalance', label: `${t('dist.perTitle')} — ${t('dist.balance')}` },
+          { key: 'perCap', label: `${t('dist.perTitle')} — ${t('dist.cap')}` },
+          { key: 'irrBalance', label: `${t('dist.irrTitle')} — ${t('dist.balance')}` },
+          { key: 'irrCap', label: `${t('dist.irrTitle')} — ${t('dist.cap')}` },
+        ]}
+        onConfirm={takeCandidate}
+      />
+
       <div className="flex gap-2">
         <div className="flex-1">
           <Text label={t('calc.from')} type="date" value={f.periodFrom} onChange={set('periodFrom')} />

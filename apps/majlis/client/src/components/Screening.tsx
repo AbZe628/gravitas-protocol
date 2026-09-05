@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { oversight, type Assessment, type Figures, type RatioResult } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
+import ReadDocument from './ReadDocument.js';
 
 /**
  * The three screening ratios of AAOIFI Standard 21.
@@ -112,8 +113,29 @@ export default function Screening() {
     }
   }
 
+  /**
+   * A confirmed candidate fills its field and appends its provenance.
+   *
+   * Appended rather than replacing: a scholar may confirm three figures from a
+   * document and type the other two, and the source line has to say both. A
+   * figure with no provenance is the ordinary case this feature improves on,
+   * not one it refuses to work beside.
+   */
+  const takeCandidate = (field: string, value: string, provenance: string) => {
+    setFigures((was) => ({
+      ...was,
+      [field]: value,
+      source: was.source.trim() ? `${was.source.trim()} ${provenance}` : provenance,
+    }));
+  };
+
   return (
     <div className="rounded-lg border border-line bg-surface p-4">
+      <ReadDocument
+        fields={FIELDS.map((f) => ({ key: f.key as string, label: t(f.label) }))}
+        onConfirm={takeCandidate}
+      />
+
       <form onSubmit={compute}>
         <div className="mb-3 flex gap-2">
           <label className="flex-1">
