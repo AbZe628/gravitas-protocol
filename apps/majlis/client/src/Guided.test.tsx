@@ -129,16 +129,26 @@ describe('one thing asks to be done', () => {
     }
   });
 
-  it('shows no navigation over it', async () => {
+  it('keeps the navigation grouped rather than a row of equal links', async () => {
     stub();
     show();
 
     await waitFor(() => expect(screen.getByText(/Open it/)).toBeInTheDocument());
 
-    // Twelve items under a page whose point is that one thing needs you
-    // contradicts the page.
-    expect(screen.queryByRole('link', { name: 'Register' })).toBeNull();
-    expect(screen.queryByRole('link', { name: 'Library' })).toBeNull();
+    /*
+     * This reverses an earlier rule, and the reversal is the point.
+     *
+     * Hiding the navigation on this screen was right when it was twelve equal
+     * links across the top — a list to read rather than a structure to learn,
+     * competing with the one thing that needed doing. It is now a grouped rail
+     * that is part of the application's frame, and a frame should be permanent:
+     * a reader learns where the navigation lives once and stops thinking about
+     * it. What must stay true is that the *work area* leads with one act, which
+     * the tests above hold.
+     */
+    expect(screen.getByText('The work')).toBeInTheDocument();
+    expect(screen.getByText('What we hold')).toBeInTheDocument();
+    expect(screen.getAllByRole('link', { name: 'Register' }).length).toBeGreaterThan(0);
   });
 
   it('says nothing waiting as an answer rather than a blank', async () => {
@@ -189,10 +199,12 @@ describe('nothing was removed', () => {
     stub();
     show('/more');
 
-    await waitFor(() => expect(screen.getByText('What we decided')).toBeInTheDocument());
-    expect(screen.getByText('What we hold')).toBeInTheDocument();
+    // getAllBy: the rail carries the same group names, which is the point —
+    // the drawer and the frame agree about how the application is divided.
+    await waitFor(() => expect(screen.getAllByText('What we decided').length).toBeGreaterThan(0));
+    expect(screen.getAllByText('What we hold').length).toBeGreaterThan(0);
     expect(screen.getByText('Working something out')).toBeInTheDocument();
-    expect(screen.getByText('The board itself')).toBeInTheDocument();
+    expect(screen.getAllByText('The board itself').length).toBeGreaterThan(0);
   });
 
   it('leaves out a page this installation cannot honour', async () => {
