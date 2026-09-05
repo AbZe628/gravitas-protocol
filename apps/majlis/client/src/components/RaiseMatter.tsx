@@ -38,6 +38,7 @@ export default function RaiseMatter({ boardId }: { boardId: string }) {
   const [direction, setDirection] = useState<'permit' | 'restrict' | null>(null);
   const [origin, setOrigin] = useState<(typeof ORIGINS)[number]>('protocol_change');
   const [notDecided, setNotDecided] = useState('');
+  const [arrivedAt, setArrivedAt] = useState('');
   const [busy, setBusy] = useState(false);
   const [refusal, setRefusal] = useState<string | null>(null);
 
@@ -58,6 +59,14 @@ export default function RaiseMatter({ boardId }: { boardId: string }) {
           .split('\n')
           .map((line) => line.trim())
           .filter(Boolean),
+        /*
+         * Sent only where it was given, never defaulted to today.
+         *
+         * A date input yields a day; the record wants an instant, so it is the
+         * start of that day — which understates the wait by up to a few hours
+         * rather than overstating it by any.
+         */
+        ...(arrivedAt ? { arrivedAt: new Date(arrivedAt + 'T00:00:00Z').toISOString() } : {}),
       });
       navigate(`/matters/${created.id}`);
     } catch (error) {
@@ -120,6 +129,21 @@ export default function RaiseMatter({ boardId }: { boardId: string }) {
           </option>
         ))}
       </select>
+
+      {/*
+        When the institution asked, which is not when somebody found time to
+        type it in. Left empty the wait is reported as covering this system's
+        part only — an understated figure that says so beats a confident wrong
+        one, and this is the number people put in front of a board.
+      */}
+      <label className="mb-1 block text-[12px] text-muted">{t('raise.arrivedAt')}</label>
+      <p className="mb-1.5 text-[11.5px] leading-relaxed text-muted">{t('raise.arrivedAtHelp')}</p>
+      <input
+        type="date"
+        value={arrivedAt}
+        onChange={(e) => setArrivedAt(e.target.value)}
+        className={field + ' mb-3'}
+      />
 
       <label className="mb-1 block text-[12px] text-muted">{t('raise.notDecided')}</label>
       <p className="mb-1.5 text-[11.5px] leading-relaxed text-muted">{t('raise.notDecidedHelp')}</p>

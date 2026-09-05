@@ -1594,3 +1594,57 @@ describe('drift, over HTTP', () => {
     await request(app).get('/api/drift').expect(401);
   });
 });
+
+describe('when the institution asked', () => {
+  const open = (body: Record<string, unknown>) =>
+    request(app)
+      .post('/api/matters')
+      .set('Authorization', as('member-a'))
+      .send({
+        boardId: 'demo-board',
+        title: 'A product the desk cannot launch without a ruling',
+        proposal: 'The desk asks whether this may be offered.',
+        direction: 'permit',
+        origin: 'institution_request',
+        ...body,
+      });
+
+  it('records it, so the wait is measured from the right moment', async () => {
+    const res = await open({ arrivedAt: '2026-07-01T00:00:00.000Z' }).expect(201);
+
+    /*
+     * `clocks.ts` and `passage.ts` read this field from the day they were
+     * written and nothing could set it, so every matter reported its wait as
+     * partial. The number this product is sold on started when somebody found
+     * time to type the question in.
+     */
+    expect(res.body.arrivedAt).toBe('2026-07-01T00:00:00.000Z');
+
+    const passage = await request(app)
+      .get(`/api/matters/${res.body.id}/passage`)
+      .set('Authorization', as('member-a'))
+      .expect(200);
+
+    expect(passage.body.waiting.note).toContain('since the institution asked');
+    expect(passage.body.waiting.note).not.toContain('may have asked earlier');
+  });
+
+  it('leaves it absent where nobody knows, rather than defaulting to today', async () => {
+    const res = await open({}).expect(201);
+
+    // Filling it with the moment somebody typed the matter in would turn an
+    // understated figure that admits it into a confident wrong one.
+    expect(res.body.arrivedAt).toBeUndefined();
+
+    const passage = await request(app)
+      .get(`/api/matters/${res.body.id}/passage`)
+      .set('Authorization', as('member-a'))
+      .expect(200);
+
+    expect(passage.body.waiting.note).toContain('may have asked earlier');
+  });
+
+  it('refuses a date that is not an instant', async () => {
+    await open({ arrivedAt: 'last Tuesday' }).expect(400);
+  });
+});

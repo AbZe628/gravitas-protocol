@@ -109,6 +109,22 @@ const openSchema = z.object({
   proposal: z.string().min(1).max(20_000),
   direction: z.enum(['permit', 'restrict']),
   origin: z.enum(['institution_request', 'protocol_change', 'periodic_review', 'compliance_concern']),
+  /**
+   * When the institution actually asked, where anybody knows.
+   *
+   * `clocks.ts` and `passage.ts` have read this field since they were written
+   * and nothing could ever set it, so every matter reported its wait as
+   * `partial` and said the institution may have asked earlier. That was honest
+   * and it measured the wrong thing: the number this product is sold on — how
+   * long the business has been waiting — started when somebody found time to
+   * type the question in.
+   *
+   * Optional, and it stays optional. A secretary who does not know when the
+   * desk first asked should leave it empty and get the partial figure, rather
+   * than put in the date they opened the matter and make an understated number
+   * look like a complete one.
+   */
+  arrivedAt: z.string().datetime().optional(),
   mechanism: z.string().max(20_000).default(''),
   notDecided: z.array(z.string().max(2_000)).max(50).default([]),
   interactsWith: z.array(z.string().max(120)).max(50).default([]),
@@ -251,6 +267,15 @@ export function governanceRoutes(
         direction: parsed.data.direction,
         status: 'draft',
         openedAt: at,
+        /*
+         * Left undefined where it was not given, never defaulted to `at`.
+         *
+         * `clocks.ts` reports a wait as partial precisely when this is absent,
+         * and filling it with the moment somebody typed the matter in would
+         * turn an understated figure that admits it into a confident wrong one
+         * — on the number this product is sold on.
+         */
+        ...(parsed.data.arrivedAt ? { arrivedAt: parsed.data.arrivedAt } : {}),
         proposal: parsed.data.proposal,
         notDecided: parsed.data.notDecided,
         mechanism: parsed.data.mechanism,

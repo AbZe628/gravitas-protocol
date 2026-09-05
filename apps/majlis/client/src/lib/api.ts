@@ -416,6 +416,8 @@ export const governance = {
     origin: string;
     mechanism?: string;
     notDecided?: string[];
+  /** When the institution asked. Absent where nobody knows, never defaulted. */
+  arrivedAt?: string;
     /** What it is about. The link that makes the two outputs one thing. */
     assetIds?: string[];
   }) => send<Matter>('/api/matters', input),
