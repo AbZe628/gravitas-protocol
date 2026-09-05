@@ -7,6 +7,7 @@ import { z } from 'zod';
 import { storeFromEnv, type Store } from './store/index.js';
 
 import { enforcementFromEnv, type Enforcement } from './services/enforcement.js';
+import { buildCarrying } from './services/carrying.js';
 import {
   AssistantUnavailable,
   comprehensionFromEnv,
@@ -304,6 +305,20 @@ export function createApp(
   };
   app.get('/api/enforcement', enforcementRoute);
   app.get('/api/registry', enforcementRoute);
+
+  // What these particular terms will do once the board has ruled, and when
+  // they get tested. Assembled from the matter and the adapter, never from a
+  // model: the application already knows this, and routing a certainty through
+  // a language model would make it possible to get wrong and unavailable in
+  // the installations that have no assistant.
+  app.get('/api/matters/:id/carrying', async (req: Request, res: Response) => {
+    const matter = await store.matter(req.params.id);
+    if (!matter) {
+      res.status(404).json({ error: 'not_found', message: 'No such matter.' });
+      return;
+    }
+    res.json(buildCarrying(matter, await enforcement.snapshot()));
+  });
 
   // ---- assistant -------------------------------------------------------
   const askSchema = z.object({

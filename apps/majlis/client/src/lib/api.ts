@@ -636,6 +636,41 @@ export interface IncidentList {
   incidents: Incident[];
 }
 
+// ── what the terms will do once ruled ─────────────────────────────────────
+
+/** When a term is tested against reality. The distinction the panel is for. */
+/**
+ * `CheckCadence`, not `Cadence`.
+ *
+ * Meetings already own that name for how often a board must sit, and the two
+ * are different clocks. TypeScript caught the collision, which the i18n
+ * dictionaries would not have.
+ */
+export type CheckCadence = 'before_every_transaction' | 'when_someone_looks' | 'unknown';
+
+export interface TermCarried {
+  key: string;
+  value: string;
+  unit?: string;
+  /** The board's own words. Never rewritten. */
+  meaning: string;
+  /** What this term does when it is not met, where the term says so. */
+  onBreach: string | null;
+}
+
+export interface Carrying {
+  matterId: string;
+  attached: boolean;
+  /** What carries it out, in its own words. Null where nothing is attached. */
+  carrier: string | null;
+  cadence: CheckCadence;
+  whenChecked: string;
+  drift: string;
+  terms: TermCarried[];
+  /** What Majlis cannot see about this, named rather than glossed. */
+  limits: string[];
+}
+
 // ── the passage a matter makes ────────────────────────────────────────────
 
 export type StepState = 'done' | 'open' | 'ahead' | 'skipped' | 'not_applicable';
@@ -1169,6 +1204,15 @@ export const oversight = {
    * board's judgement.
    */
   passage: (matterId: string) => get<Passage>(`/api/matters/${matterId}/passage`),
+
+  /**
+   * What these terms will do once the board has ruled, and when they are tested.
+   *
+   * Assembled from the matter and the enforcement adapter. Nothing here is
+   * generated, so it is available in the installations that have no assistant —
+   * which is most of them.
+   */
+  carrying: (matterId: string) => get<Carrying>(`/api/matters/${matterId}/carrying`),
 
   screen: (figures: Figures, previous?: Assessment) =>
     send<{ assessment: Assessment; crossings: Crossing[] }>('/api/screening', { figures, previous }),

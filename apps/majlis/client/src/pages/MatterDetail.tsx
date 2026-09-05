@@ -14,6 +14,7 @@ import Screening from '../components/Screening.js';
 import VotePanel from '../components/VotePanel.js';
 import { mayDeliberate, useIdentity } from '../lib/identity.js';
 import Passage from '../components/Passage.js';
+import Carrying from '../components/Carrying.js';
 
 /** The statuses a document exists for. Mirrors SETTLED in services/fatwa.ts. */
 const DECIDED = ['in_force', 'timelock', 'rejected', 'lapsed', 'withdrawn'];
@@ -109,6 +110,13 @@ export default function MatterDetail() {
       <Section title={t('matter.mechanism')}>
         <p>{matter.mechanism}</p>
       </Section>
+
+      {/*
+        What the terms will do, immediately above the terms themselves. A
+        scholar is about to set a number, and when it gets tested changes what
+        setting it means.
+      */}
+      <Carrying matterId={matter.id} />
 
       <Section title={t('matter.parameters')}>
         <Card>

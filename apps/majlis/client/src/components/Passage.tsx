@@ -94,10 +94,16 @@ export default function Passage({ matterId }: { matterId: string }) {
     let live = true;
     oversight
       .passage(matterId)
-      .then((p) => live && setPassage(p))
-      // Not knowing is a state the interface handles. The matter below is
-      // readable without this panel, and a broken spine should not take the
-      // page with it.
+      /*
+       * The shape is checked, not assumed.
+       *
+       * Not knowing is a state the interface handles: the matter below is
+       * readable without this panel, and a broken spine must not take the page
+       * with it. That means guarding against a 200 carrying something else —
+       * an older server, a proxy's error page — as well as against a failed
+       * request, because only one of the two arrives in `catch`.
+       */
+      .then((p) => live && Array.isArray(p?.shaping) && Array.isArray(p?.deciding) && setPassage(p))
       .catch(() => undefined);
     return () => {
       live = false;
