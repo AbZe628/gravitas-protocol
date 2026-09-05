@@ -636,6 +636,60 @@ export interface IncidentList {
   incidents: Incident[];
 }
 
+// ── late payment ──────────────────────────────────────────────────────────
+
+export type LateMethod = 'stipulated_amount' | 'rate_on_overdue';
+
+/** Whether the board permits the institution to keep anything at all. */
+export type Retention = 'nothing' | 'evidenced_costs';
+
+/** What the board established about the debtor. Recorded, never acted on. */
+export type Solvency = 'able_and_delaying' | 'unable' | 'not_determined';
+
+export interface CollectionCost {
+  description: string;
+  amount: string;
+}
+
+export interface LatePaymentInput {
+  method: LateMethod;
+  currency: string;
+  source: string;
+  obligation: string;
+  dueOn: string;
+  paidOn: string;
+  solvency: Solvency;
+  retention: Retention;
+  stipulated?: string;
+  outstanding?: string;
+  rateBps?: number | null;
+  dayCount?: 360 | 365;
+  costs?: CollectionCost[];
+}
+
+export interface LatePayment {
+  method: LateMethod;
+  methodStated: string;
+  currency: string;
+  source: string;
+  obligation: string;
+  dueOn: string;
+  paidOn: string;
+  daysLate: number;
+  solvency: Solvency;
+  solvencyStated: string;
+  /** Present where the answer means the charge may not be due at all. */
+  solvencyWarning: string | null;
+  retention: Retention;
+  retentionStated: string;
+  charged: string;
+  retained: string;
+  /** Everything not retained. This is the figure purification takes. */
+  toBeGivenAway: string;
+  steps: CalcStep[];
+  note: string;
+}
+
 // ── tradability ───────────────────────────────────────────────────────────
 
 export type PartKind = 'tangible' | 'debt' | 'cash' | 'receivable' | 'other';
@@ -1098,6 +1152,15 @@ export const oversight = {
    * arithmetic succeeded and it is the rule that has the hole.
    */
   tradability: (input: TradabilityInput) => send<Tradability>('/api/tradability', input),
+
+  /**
+   * An increase taken on a late debt, and where the board directed it.
+   *
+   * Comes back as an amount and a destination. What is not retained against
+   * evidenced collection cost is to be given away — there is no response field
+   * that would let an unevidenced amount stay with the institution.
+   */
+  latePayment: (input: LatePaymentInput) => send<LatePayment>('/api/late-payment', input),
 
   /**
    * Recording one, and reading what has been recorded.

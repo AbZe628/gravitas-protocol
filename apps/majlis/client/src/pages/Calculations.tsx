@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useI18n } from '../lib/i18n.js';
 import Distribution from '../components/Distribution.js';
+import LatePayment from '../components/LatePayment.js';
 import Purification from '../components/Purification.js';
 import Recorded from '../components/Recorded.js';
 import Screening from '../components/Screening.js';
@@ -39,9 +40,9 @@ import Zakat from '../components/Zakat.js';
  * saying so comes from the server and is shown before the panel offers to act.
  */
 
-type Tab = 'screening' | 'purification' | 'zakat' | 'distribution' | 'tradability' | 'recorded';
+type Tab = 'screening' | 'purification' | 'zakat' | 'distribution' | 'tradability' | 'late' | 'recorded';
 
-const TABS: Tab[] = ['screening', 'purification', 'zakat', 'distribution', 'tradability', 'recorded'];
+const TABS: Tab[] = ['screening', 'purification', 'zakat', 'distribution', 'tradability', 'late', 'recorded'];
 
 export default function Calculations() {
   const { t } = useI18n();
@@ -91,6 +92,7 @@ export default function Calculations() {
         {tab === 'zakat' && <Zakat />}
         {tab === 'distribution' && <Distribution />}
         {tab === 'tradability' && <Tradability />}
+        {tab === 'late' && <LatePayment />}
         {tab === 'recorded' && <Recorded />}
       </div>
 

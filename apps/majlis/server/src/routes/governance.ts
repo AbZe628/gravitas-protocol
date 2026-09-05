@@ -51,6 +51,13 @@ import { PURIFICATION_METHODS, purify, type PurificationInput } from '../service
 import { distribute, type DistributionInput } from '../services/distribution.js';
 import { assessTradability, type TradabilityInput } from '../services/tradability.js';
 import {
+  LATE_METHODS,
+  RETENTIONS,
+  SOLVENCIES,
+  computeLatePayment,
+  type LatePaymentInput,
+} from '../services/late.js';
+import {
   ZAKAT_METHODS,
   ZAKAT_YEARS,
   computeZakat,
@@ -1120,6 +1127,64 @@ export function governanceRoutes(
       }
 
       res.json(assessTradability(body as TradabilityInput));
+    }),
+  );
+
+  /**
+   * An increase taken on a late debt, and where the board directed it.
+   *
+   * Three things are the board's and none of them is inferred: how the amount
+   * is computed, whether the institution may retain evidenced collection cost,
+   * and what was established about the debtor. The last of those is recorded
+   * rather than acted on — a charge on somebody who could not pay is what the
+   * standard forbids, and that is a ruling.
+   *
+   * Stateless like the other four. What comes back is an amount and a
+   * destination; purification is where it goes from here.
+   */
+  router.post(
+    '/late-payment',
+    handle(async (req, res) => {
+      const body = req.body as Partial<LatePaymentInput>;
+
+      if (!body?.method || !LATE_METHODS.includes(body.method)) {
+        res.status(400).json({
+          error: 'no_method',
+          message:
+            'Send how the amount is computed, under "method": stipulated_amount or ' +
+            'rate_on_overdue. A stipulated figure does not scale with how late the payment ' +
+            'was and a rate does, and which the contract uses is a term.',
+          methods: LATE_METHODS,
+        });
+        return;
+      }
+
+      if (!body.retention || !RETENTIONS.includes(body.retention)) {
+        res.status(400).json({
+          error: 'no_retention',
+          message:
+            'Send whether this board permits the institution to retain evidenced collection ' +
+            'cost, under "retention": nothing or evidenced_costs. Boards differ and the ' +
+            'difference is a ruling — nothing here defaults to letting an institution keep ' +
+            'part of a charge.',
+          retentions: RETENTIONS,
+        });
+        return;
+      }
+
+      if (!body.solvency || !SOLVENCIES.includes(body.solvency)) {
+        res.status(400).json({
+          error: 'no_solvency',
+          message:
+            'Send what was established about the debtor, under "solvency": able_and_delaying, ' +
+            'unable or not_determined. A charge on a debtor who could not pay is what AAOIFI ' +
+            'SS-3 forbids, and this is recorded beside the figure rather than assumed away.',
+          solvencies: SOLVENCIES,
+        });
+        return;
+      }
+
+      res.json(computeLatePayment(body as LatePaymentInput));
     }),
   );
 

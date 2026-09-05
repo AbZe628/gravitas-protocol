@@ -1461,6 +1461,95 @@ describe('tradability, over HTTP', () => {
   });
 });
 
+describe('late payment, over HTTP', () => {
+  const charge = {
+    method: 'stipulated_amount',
+    currency: 'AED',
+    source: 'Collections ledger, entry 4471',
+    obligation: 'Murabaha instalment 7 of 24, contract MB-2025-0113',
+    dueOn: '2026-04-01',
+    paidOn: '2026-07-01',
+    solvency: 'able_and_delaying',
+    retention: 'nothing',
+    stipulated: '5000',
+  };
+
+  const post = (body: Record<string, unknown>) =>
+    request(app).post('/api/late-payment').set('Authorization', as('member-a')).send(body);
+
+  it('computes the amount and sends the whole of it away', async () => {
+    const res = await post(charge).expect(200);
+
+    expect(res.body.charged).toBe('5000');
+    expect(res.body.retained).toBe('0');
+    expect(res.body.toBeGivenAway).toBe('5000');
+    expect(res.body.daysLate).toBe(91);
+  });
+
+  it('refuses to decide whether the institution may keep anything', async () => {
+    const { retention, ...without } = charge;
+    void retention;
+    const res = await post(without).expect(400);
+
+    expect(res.body.error).toBe('no_retention');
+    expect(res.body.message).toContain('nothing here defaults to letting an institution keep');
+    expect(res.body.retentions).toEqual(['nothing', 'evidenced_costs']);
+  });
+
+  it('refuses to assume the debtor was merely delaying', async () => {
+    const { solvency, ...without } = charge;
+    void solvency;
+    const res = await post(without).expect(400);
+
+    expect(res.body.error).toBe('no_solvency');
+    expect(res.body.message).toContain('SS-3');
+  });
+
+  it('warns rather than refusing where the debtor could not pay', async () => {
+    const res = await post({ ...charge, solvency: 'unable' }).expect(200);
+
+    // Still computed. Refusing would be the software ruling that no charge is
+    // due, which is the board's to say.
+    expect(res.body.charged).toBe('5000');
+    expect(res.body.solvencyWarning).toContain('not a finding that anything is due');
+  });
+
+  it('retains evidenced cost only where the board permits it', async () => {
+    const costs = [{ description: 'Court filing fee', amount: '1200' }];
+
+    const permitted = await post({ ...charge, retention: 'evidenced_costs', costs }).expect(200);
+    expect(permitted.body.retained).toBe('1200');
+    expect(permitted.body.toBeGivenAway).toBe('3800');
+
+    // The same evidence, a board that permits nothing. Sending the field does
+    // not override the ruling.
+    const not = await post({ ...charge, costs }).expect(200);
+    expect(not.body.retained).toBe('0');
+  });
+
+  it('refuses a charge on a payment that was not late', async () => {
+    const res = await post({ ...charge, paidOn: '2026-03-01' }).expect(400);
+    expect(res.body.error).toBe('bad_figure');
+    expect(res.body.message).toContain('before it fell due');
+  });
+
+  it('refuses a missing rate rather than reading it as zero', async () => {
+    const res = await post({
+      ...charge,
+      method: 'rate_on_overdue',
+      stipulated: undefined,
+      outstanding: '1000000',
+      dayCount: 365,
+    }).expect(400);
+
+    expect(res.body.message).toContain('not the same as not having');
+  });
+
+  it('refuses anonymously, like every other route', async () => {
+    await request(app).post('/api/late-payment').send({}).expect(401);
+  });
+});
+
 describe('drift, over HTTP', () => {
   it('finds the pool that has fallen below the threshold its own ruling set', async () => {
     const res = await request(app).get('/api/drift').set('Authorization', as('watcher')).expect(200);

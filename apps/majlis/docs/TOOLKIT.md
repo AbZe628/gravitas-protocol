@@ -325,11 +325,41 @@ integer and there is nothing to round. What the parts must do is **sum to the
 whole**, and the form says what is undescribed while it is being typed rather
 than refusing afterwards.
 
-### 4.6 Late payment — ✚
+### 4.6 Late payment — ✅ built, on the screen
 
 An increase taken on a late debt may not go to income. Small, and it belongs
 here because it is the same shape: an amount identified, a method for computing
 it, and a destination the board prescribes. It feeds purification.
+
+The arithmetic is a multiplication. What the file is actually for is keeping one
+sentence true — **this is not income** — and there turned out to be three ways
+it could stop being true:
+
+- **By retention having a default.** Whether the institution may keep evidenced
+  collection cost is a ruling and boards differ: some permit it as an expense
+  incurred, some require the whole amount given away and treat collection as the
+  institution's own cost. Nothing is pre-selected, and evidence sent where the
+  board permits nothing is retained at zero — a payload does not override a
+  ruling.
+- **By retaining more than was charged.** An institution that spent more
+  collecting than it charged bore a loss; that is not a claim on what is given
+  away. `retained` is capped at `charged`, and the step says why.
+- **By an unevidenced amount staying.** There is no field for one. Nothing is
+  retained against a cost that is not listed with a description of what it was.
+
+And one thing it will not decide: **whether the debtor could pay.** A charge on
+somebody in difficulty is what SS-3 forbids, and *"if the debtor is in
+difficulty, then grant him time"* is not a question arithmetic reaches. It is
+asked before any figure, recorded with the result, and where the answer is
+*unable* or *not determined* the warning sits **above** the amount. The figure
+is still computed — refusing would be the software ruling that nothing is due,
+and a board deciding what to permit needs the figure the contract would have
+produced in front of it.
+
+The day count is asked rather than assumed: 360 and 365 give different answers
+on the same debt. And the division happens once, at the end — taking the rate
+first and the day fraction second would truncate twice, and this figure is being
+taken off somebody.
 
 ---
 
@@ -733,33 +763,39 @@ application does not pretend to have them.
 
 ## 10. Where the next session starts
 
-*As of 2026-09-05. 1184 server tests, 184 client, typecheck clean, build clean.*
+*As of 2026-09-05. 1216 server tests, 196 client, typecheck clean, build clean.*
 
-**The §9 order is built, §4a included, and §4.5 with it.** Register, judging in
-one click, composition and drift, meetings as record, naming a colleague, a
-document per holding, durable storage, reading figures out of a document, and
-tradability — server and screen for every one.
+**Every calculation in §4 is built, and every item in the §9 order with it.**
+Screening, purification, zakat, profit distribution, tangibility and tradability,
+late payment — six, each with a server and a screen. Register, judging in one
+click, composition and drift, meetings as record, naming a colleague, a document
+per holding, durable storage, and reading figures out of a document.
 
-**One calculation is left: §4.6 late payment.** Small, and it is the same shape
-as the rest — an amount identified, a method the board prescribes, and a
-destination. It feeds purification, which is already built, so it has somewhere
-to go the day it exists.
+**There is no unbuilt feature left in this document.** That is a real state and
+worth saying plainly rather than inventing the next thing to do.
 
-**And two things that are not features.** Neither is an afternoon:
+**What is left is three things, and none of them is code.**
 
-1. **Arabic and Urdu are short** — 564 English keys and the other two behind it.
-   The missing ones fall back to English silently, which is the right failure
-   mode and the wrong outcome in a product whose point is that a board can work
-   in Arabic. It needs a decision about who writes and reviews them.
+1. **Arabic and Urdu are short.** English carries the most keys and the other two
+   are behind. The missing ones fall back to English silently, which is the right
+   failure mode and the wrong outcome in a product whose point is that a board can
+   work in Arabic. It needs a decision about who writes and reviews them — the
+   file already says the Arabic and Urdu it has needs a native reviewer with
+   knowledge of the subject before any board uses it.
 
-2. **The two newest paths cannot be shown.** Upload needs a member credential
-   and a mounted volume; reading needs those and a key besides. Both are covered
-   by tests and both are honestly absent in a demonstration rather than present
-   and refusing.
+2. **The two newest paths cannot be shown.** Upload needs a member credential and
+   a mounted volume; reading needs those and a key besides. Both are covered by
+   tests and both are honestly absent in a demonstration rather than present and
+   refusing.
+
+3. **Nothing here has been used by a board.** Every design decision in this
+   document is an argument, and the arguments are good ones, but a scholar sitting
+   in front of the tradability screen for the first time is the test none of this
+   has had.
 
 The one thing worth reading before touching any of it is §6 — what this is
-honestly not. Every feature since has been easier to get right by being clear
-about what it refuses to do than by adding to what it does, and §4.5 is the
-sharpest case: the useful answer and the forbidden one are the same sentence,
-and the whole design is the distance between quoting the board and composing a
-permission.
+honestly not. Every feature has been easier to get right by being clear about
+what it refuses to do than by adding to what it does. §4.5 was the sharpest case,
+where the useful answer and the forbidden one are the same sentence; §4.6 was the
+smallest file and had the most ways to go wrong, all of them in the destination
+rather than the arithmetic.
