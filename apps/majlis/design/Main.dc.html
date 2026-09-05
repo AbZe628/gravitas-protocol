@@ -1,0 +1,258 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,300;6..72,400;6..72,500&family=Manrope:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Amiri:wght@400&display=swap">
+  <style>
+    body { margin: 0; -webkit-font-smoothing: antialiased; }
+    a { color: #164470; text-decoration: none; }
+    a:hover { color: #0F3255; }
+  </style>
+</helmet>
+
+<div style="position: relative; width: 1440px; height: 900px; background: #FBF8F1; font-family: Manrope, system-ui, sans-serif; color: #191713; overflow: hidden; display: flex;">
+
+  <!-- ── the sweep: one continuous curve, the whole ornament ────── -->
+  <svg width="1440" height="900" viewBox="0 0 1440 900" style="position: absolute; inset: 0; pointer-events: none;">
+    <defs>
+      <linearGradient id="sweepA" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#164470" stop-opacity="0.055"/>
+        <stop offset="55%" stop-color="#164470" stop-opacity="0.018"/>
+        <stop offset="100%" stop-color="#164470" stop-opacity="0"/>
+      </linearGradient>
+      <linearGradient id="sweepB" x1="1" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#B08430" stop-opacity="0.075"/>
+        <stop offset="70%" stop-color="#B08430" stop-opacity="0"/>
+      </linearGradient>
+      <radialGradient id="glow" cx="0.72" cy="0.06" r="0.6">
+        <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.9"/>
+        <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <rect width="1440" height="900" fill="url(#glow)"/>
+    <path d="M268 -40 C 700 90, 980 210, 1440 150 L1440 -40 Z" fill="url(#sweepA)"/>
+    <path d="M1440 60 C 1120 190, 900 250, 700 470 C 560 640, 620 820, 700 940 L1440 940 Z" fill="url(#sweepB)"/>
+    <path d="M268 34 C 720 138, 1010 230, 1440 178" fill="none" stroke="#164470" stroke-opacity="0.10" stroke-width="1"/>
+    <path d="M268 52 C 720 158, 1010 250, 1440 198" fill="none" stroke="#B08430" stroke-opacity="0.13" stroke-width="1"/>
+  </svg>
+
+  <!-- ── rail ──────────────────────────────────────────────────── -->
+  <div style="position: relative; width: 272px; flex-shrink: 0; background: rgba(247,243,234,0.72); backdrop-filter: blur(20px); display: flex; flex-direction: column; box-shadow: 1px 0 0 rgba(25,23,19,0.055);">
+
+    <div style="padding: 26px 24px 22px;">
+      <div style="display: flex; align-items: center; gap: 13px;">
+        <svg width="36" height="41" viewBox="0 0 36 41" fill="none">
+          <path d="M18 1.2 C26.9 1.2 33.6 8.3 33.6 17.6 L33.6 37.6 C33.6 38.7 32.7 39.6 31.6 39.6 L4.4 39.6 C3.3 39.6 2.4 38.7 2.4 37.6 L2.4 17.6 C2.4 8.3 9.1 1.2 18 1.2 Z" fill="#FFFFFF" stroke="#164470" stroke-width="1.3"/>
+          <path d="M18 10.6 L20.6 16.6 L26.6 19.2 L20.6 21.8 L18 27.8 L15.4 21.8 L9.4 19.2 L15.4 16.6 Z" fill="#B08430"/>
+        </svg>
+        <div>
+          <div style="font-family: Newsreader, serif; font-size: 22px; font-weight: 500; letter-spacing: -0.018em; line-height: 1;">Majlis</div>
+          <div style="font-family: Amiri, serif; font-size: 13.5px; color: #9C9284; margin-top: 4px; line-height: 1;">مجلس الرقابة الشرعية</div>
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 8px; margin-top: 18px;">
+        <span style="width: 6px; height: 6px; border-radius: 999px; background: #2C6B57; box-shadow: 0 0 0 3px rgba(44,107,87,0.13);"></span>
+        <span style="font-size: 12px; color: #635C52; letter-spacing: 0.005em;">Rakbank Shariah Board</span>
+      </div>
+    </div>
+
+    <div style="flex: 1; display: flex; flex-direction: column; gap: 26px; padding: 6px 14px; overflow: hidden;">
+
+      <div>
+        <div style="font-size: 10px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: #B3A896; padding: 0 12px 10px;">The work</div>
+        <div style="display: flex; flex-direction: column; gap: 3px;">
+          <div style="position: relative; display: flex; align-items: center; justify-content: space-between; padding: 11px 14px; border-radius: 12px; background: #FFFFFF; box-shadow: 0 0 0 0.5px rgba(25,23,19,0.05), 0 1px 2px rgba(25,23,19,0.05), 0 6px 14px -8px rgba(25,23,19,0.13);">
+            <span style="font-size: 13.5px; font-weight: 600; letter-spacing: -0.005em;">What needs you</span>
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #FFFFFF; background: #9A3830; border-radius: 999px; padding: 2px 8px; font-weight: 500; letter-spacing: 0;">2</span>
+          </div>
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 11px 14px; border-radius: 12px;">
+            <span style="font-size: 13.5px; color: #4E483F;">Events</span>
+          </div>
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 11px 14px; border-radius: 12px;">
+            <span style="font-size: 13.5px; color: #4E483F;">Coming</span>
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #B3A896;">3</span>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size: 10px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: #B3A896; padding: 0 12px 10px;">What stands</div>
+        <div style="display: flex; flex-direction: column; gap: 3px;">
+          <div style="padding: 11px 14px; border-radius: 12px;"><span style="font-size: 13.5px; color: #4E483F;">Rulings in force</span></div>
+          <div style="padding: 11px 14px; border-radius: 12px;"><span style="font-size: 13.5px; color: #4E483F;">The record</span></div>
+          <div style="padding: 11px 14px; border-radius: 12px;"><span style="font-size: 13.5px; color: #4E483F;">Search</span></div>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size: 10px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: #B3A896; padding: 0 12px 10px;">What we hold</div>
+        <div style="display: flex; flex-direction: column; gap: 3px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 11px 14px; border-radius: 12px;">
+            <span style="font-size: 13.5px; color: #4E483F;">Register</span>
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #B08430; font-weight: 500;">5</span>
+          </div>
+          <div style="padding: 11px 14px; border-radius: 12px;"><span style="font-size: 13.5px; color: #4E483F;">Contract library</span></div>
+          <div style="padding: 11px 14px; border-radius: 12px;"><span style="font-size: 13.5px; color: #4E483F;">Calculations</span></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div style="padding: 18px 26px 24px; margin: 0 14px; border-top: 1px solid rgba(25,23,19,0.06);">
+      <div style="display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px;">
+        <span style="width: 5px; height: 5px; border-radius: 999px; background: #2C6B57; margin-top: 6px; flex-shrink: 0;"></span>
+        <span style="font-size: 11.5px; line-height: 1.45; color: #7C7466;">Terms read before every transaction</span>
+      </div>
+      <div style="display: flex; align-items: flex-start; gap: 10px;">
+        <span style="width: 5px; height: 5px; border-radius: 999px; background: #D5CBB8; margin-top: 6px; flex-shrink: 0;"></span>
+        <span style="font-size: 11.5px; line-height: 1.45; color: #7C7466;">No assistant configured</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── work area ─────────────────────────────────────────────── -->
+  <div style="position: relative; flex: 1; display: flex; flex-direction: column; min-width: 0;">
+
+    <div style="height: 66px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 40px;">
+      <div style="display: flex; align-items: center; gap: 10px; font-size: 13px; color: #B3A896;">
+        <span>Rakbank</span><span style="color: #DCD3C2;">/</span><span style="color: #4E483F;">Shariah Board</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 22px;">
+        <div style="display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.8); border-radius: 11px; padding: 8px 14px; width: 224px; box-shadow: 0 0 0 0.5px rgba(25,23,19,0.06);">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B3A896" stroke-width="2.1" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+          <span style="font-size: 12.5px; color: #B3A896;">Search the record</span>
+        </div>
+        <div style="display: flex; gap: 2px; background: rgba(25,23,19,0.045); border-radius: 10px; padding: 3px;">
+          <div style="font-size: 11.5px; padding: 5px 11px; border-radius: 7px; background: #FFFFFF; color: #191713; font-weight: 600; box-shadow: 0 1px 2px rgba(25,23,19,0.08);">EN</div>
+          <div style="font-family: Amiri, serif; font-size: 13.5px; padding: 4px 11px; border-radius: 7px; color: #7C7466;">العربية</div>
+          <div style="font-family: Amiri, serif; font-size: 13.5px; padding: 4px 11px; border-radius: 7px; color: #7C7466;">اردو</div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="text-align: right;">
+            <div style="font-size: 12.5px; line-height: 1.35; font-weight: 600; letter-spacing: -0.005em;">Mufti A. Omarjee</div>
+            <div style="font-size: 11px; line-height: 1.35; color: #9C9284;">Signatory · may vote</div>
+          </div>
+          <div style="width: 36px; height: 36px; border-radius: 999px; background: linear-gradient(150deg, #1E5A8A, #133A5F); display: flex; align-items: center; justify-content: center; font-family: Amiri, serif; font-size: 17px; color: #F2DFB5; box-shadow: 0 2px 6px -1px rgba(19,58,95,0.35);">ع</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="flex: 1; padding: 22px 40px 34px; overflow: hidden;">
+
+      <div style="display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 26px;">
+        <div>
+          <h1 style="font-family: Newsreader, serif; font-size: 36px; font-weight: 400; line-height: 1.06; margin: 0; letter-spacing: -0.026em;">Two things need you</h1>
+          <div style="font-size: 13.5px; color: #9C9284; margin-top: 9px;">The first is below. The rest can wait their turn.</div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 9px; background: linear-gradient(150deg, #1E5A8A, #143E67); border-radius: 12px; padding: 11px 20px; box-shadow: 0 1px 2px rgba(19,58,95,0.2), 0 8px 18px -8px rgba(19,58,95,0.45);">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          <span style="font-size: 13.5px; color: #FFFFFF; font-weight: 600; letter-spacing: -0.005em;">Put something to the board</span>
+        </div>
+      </div>
+
+      <!-- the one thing -->
+      <div style="position: relative; background: #FFFFFF; border-radius: 22px; padding: 28px 32px 28px 36px; box-shadow: 0 0 0 0.5px rgba(25,23,19,0.055), 0 1px 2px rgba(25,23,19,0.045), 0 12px 24px -14px rgba(25,23,19,0.16), 0 40px 64px -40px rgba(25,23,19,0.24); margin-bottom: 30px; overflow: hidden;">
+
+        <!-- a tapering sweep, not a flat rule -->
+        <svg width="14" height="220" viewBox="0 0 14 220" style="position: absolute; left: 0; top: 0;">
+          <path d="M0 0 C 6 26, 6 60, 4.5 108 C 3.4 150, 2 182, 0 220 Z" fill="#9A3830"/>
+        </svg>
+
+        <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 30px;">
+          <div style="min-width: 0;">
+            <div style="display: flex; align-items: center; gap: 11px; margin-bottom: 13px;">
+              <span style="font-size: 10.5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #9A3830; background: #FCF0EE; border-radius: 999px; padding: 4px 12px; box-shadow: 0 0 0 0.5px rgba(154,56,48,0.18);">Ratification overdue</span>
+              <span style="font-size: 12px; color: #B3A896;">restricting · opened 14 Aug</span>
+            </div>
+            <div style="font-family: Newsreader, serif; font-size: 28px; font-weight: 400; line-height: 1.2; letter-spacing: -0.02em; max-width: 28ch;">Suspension of leveraged index instruments</div>
+            <div style="font-size: 14px; line-height: 1.65; color: #635C52; margin-top: 13px; max-width: 56ch;">The window has closed. Without ratification by the full quorum this restriction lapses and the instruments return to their previous standing.</div>
+
+            <div style="display: flex; align-items: center; gap: 28px; margin-top: 24px;">
+              <div style="display: flex; align-items: center; gap: 9px; background: linear-gradient(150deg, #C29438, #A67A28); border-radius: 12px; padding: 11px 22px; box-shadow: 0 1px 2px rgba(166,122,40,0.24), 0 8px 18px -8px rgba(166,122,40,0.5);">
+                <span style="font-size: 14px; font-weight: 700; color: #FFFFFF; letter-spacing: -0.005em;">Open it</span>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h13M12 5l7 7-7 7"/></svg>
+              </div>
+              <div style="display: flex; align-items: center;">
+                <div style="display: flex;">
+                  <div style="width: 28px; height: 28px; border-radius: 999px; background: linear-gradient(150deg, #35806A, #24594A); border: 2px solid #FFFFFF; display: flex; align-items: center; justify-content: center; font-family: Newsreader, serif; font-size: 12px; color: #FFFFFF;">B</div>
+                  <div style="width: 28px; height: 28px; border-radius: 999px; background: linear-gradient(150deg, #35806A, #24594A); border: 2px solid #FFFFFF; margin-left: -9px; display: flex; align-items: center; justify-content: center; font-family: Newsreader, serif; font-size: 12px; color: #FFFFFF;">C</div>
+                  <div style="width: 28px; height: 28px; border-radius: 999px; background: #FBF8F1; border: 2px dashed #D5CBB8; margin-left: -9px; display: flex; align-items: center; justify-content: center; font-family: Amiri, serif; font-size: 13px; color: #B3A896;">ع</div>
+                </div>
+                <span style="font-size: 12.5px; color: #9C9284; margin-left: 14px;">2 of 4 ratified · you have not</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="text-align: right; flex-shrink: 0;">
+            <div style="font-family: Newsreader, serif; font-size: 56px; line-height: 0.9; color: #9A3830; font-variant-numeric: tabular-nums; letter-spacing: -0.03em;">2</div>
+            <div style="font-size: 11.5px; color: #9C9284; margin-top: 9px;">days past</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- after that -->
+      <div style="margin-bottom: 30px;">
+        <div style="font-size: 10px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: #B3A896; margin-bottom: 13px;">After that</div>
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 20px; background: rgba(255,255,255,0.72); border-radius: 16px; padding: 16px 20px; box-shadow: 0 0 0 0.5px rgba(25,23,19,0.05);">
+          <div style="display: flex; align-items: center; gap: 14px; min-width: 0;">
+            <span style="width: 7px; height: 7px; border-radius: 999px; background: #B08430; box-shadow: 0 0 0 3.5px rgba(176,132,48,0.14); flex-shrink: 0;"></span>
+            <span style="font-family: Newsreader, serif; font-size: 19px; letter-spacing: -0.012em;">Treatment of a tangible ratio breached by drift</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 18px; flex-shrink: 0;">
+            <span style="font-size: 12.5px; color: #9C9284;">your position not recorded</span>
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; color: #B08430; font-weight: 500;">4h left</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- what the board is doing -->
+      <div>
+        <div style="font-size: 10px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: #B3A896; margin-bottom: 15px;">What the board is doing</div>
+        <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px;">
+
+          <div style="background: rgba(255,255,255,0.72); border-radius: 18px; padding: 22px 24px; box-shadow: 0 0 0 0.5px rgba(25,23,19,0.05);">
+            <div style="display: flex; align-items: baseline; gap: 11px;">
+              <span style="font-family: Newsreader, serif; font-size: 40px; line-height: 0.92; color: #164470; font-variant-numeric: tabular-nums; letter-spacing: -0.028em;">3</span>
+              <span style="font-size: 12px; color: #2C6B57; font-weight: 600;">↑ 1 this week</span>
+            </div>
+            <div style="font-size: 13px; color: #9C9284; margin-top: 12px; line-height: 1.5;">questions before the board</div>
+          </div>
+
+          <div style="background: rgba(255,255,255,0.72); border-radius: 18px; padding: 22px 24px; box-shadow: 0 0 0 0.5px rgba(176,132,48,0.22);">
+            <div style="display: flex; align-items: baseline; gap: 11px;">
+              <span style="font-family: Newsreader, serif; font-size: 40px; line-height: 0.92; color: #B08430; font-variant-numeric: tabular-nums; letter-spacing: -0.028em;">1</span>
+              <span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #B08430;">50.00 / 51.00</span>
+            </div>
+            <div style="font-size: 13px; color: #9C9284; margin-top: 12px; line-height: 1.5;">holding has moved under a standing ruling</div>
+          </div>
+
+          <div style="background: rgba(255,255,255,0.72); border-radius: 18px; padding: 22px 24px; box-shadow: 0 0 0 0.5px rgba(25,23,19,0.05);">
+            <div style="display: flex; align-items: baseline; gap: 11px;">
+              <span style="font-family: Newsreader, serif; font-size: 40px; line-height: 0.92; font-variant-numeric: tabular-nums; letter-spacing: -0.028em;">5</span>
+              <span style="font-size: 12px; color: #B3A896;">of 7</span>
+            </div>
+            <div style="font-size: 13px; color: #9C9284; margin-top: 12px; line-height: 1.5;">holdings never put to this board</div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div style="position: absolute; right: 30px; bottom: 28px; display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.9); backdrop-filter: blur(12px); border-radius: 999px; padding: 11px 20px; box-shadow: 0 0 0 0.5px rgba(25,23,19,0.06), 0 6px 20px -6px rgba(25,23,19,0.18);">
+    <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 1 L9.6 6.4 L15 8 L9.6 9.6 L8 15 L6.4 9.6 L1 8 L6.4 6.4 Z" fill="#B08430"/></svg>
+    <span style="font-size: 13px; color: #4E483F; font-weight: 600; letter-spacing: -0.005em;">Guide</span>
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>

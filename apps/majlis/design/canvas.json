@@ -1,0 +1,13 @@
+{
+  "artboards": [
+    { "file": "Main.dc.html", "x": 0, "y": 0, "w": 1440, "h": 900, "title": "Arrival — what needs you" },
+    { "file": "Matter.dc.html", "x": 1560, "y": 0, "w": 1440, "h": 980, "title": "One matter — the question and the act" },
+    { "file": "Phone.dc.html", "x": 3120, "y": 0, "w": 390, "h": 844, "title": "Arrival on a phone" }
+  ],
+  "annotations": [
+    { "id": "note-light", "x": 0, "y": -230, "w": 640, "text": "Light is the material.\n\nVellum ground, a white sheet lifted off it by shadow rather than fenced by a border: hairlines are half a pixel, elevation is a stack of three soft shadows, and surfaces beside the sheet are translucent and blurred. Colour still carries meaning and nothing else — lapis is the board's own acts, gold is the mark and what is running out, green is what holds, madder is overdue or refused." },
+    { "id": "note-geometry", "x": 1560, "y": -230, "w": 640, "text": "Zaha, not ornament.\n\nOne continuous curve crosses each screen — the pointed arch opened out until it is a sweep — carrying light from one corner and never a line the eye has to read. The rule at the edge of a card tapers the way a nib lifts. The eight-point khatam appears once, as the board's mark. Everything else was removed: no pattern fills, no tinted panels, no borders that could be a shadow instead." },
+    { "id": "note-phone", "x": 3120, "y": -230, "w": 400, "text": "The phone is not a small desktop.\n\nOne card, thumb-reachable, a 52px primary control, four tabs on a blurred bar above the home indicator. A board member reads this between two other things." }
+  ],
+  "launch": { "view": "canvas" }
+}

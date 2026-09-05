@@ -1,0 +1,237 @@
+# Where Majlis stands
+
+Last written **6 September 2026, 01:20**. Read this first.
+
+Everything below is what is *true*, not what is planned. Where something is
+unfinished it says so, and where something is broken it says how it breaks.
+
+---
+
+## Verified this session
+
+```
+server   50 files   1300 tests   passed
+client   19 files    214 tests   passed
+```
+
+`npm test` from `apps/majlis`. CI is green. Nothing is skipped or pending.
+
+**Three commits are local only and have never been pushed:**
+
+```
+58e9d77  Majlis: an application frame, not a document
+93ccd05  Majlis: a palette that means something, and a guide on every screen
+fdeba54  Majlis: putting a question in the words the person putting it uses
+```
+
+Plus whatever this session's save adds. Pushing needs asking first.
+
+---
+
+## 1. The backend
+
+### Complete and tested
+
+Every calculation in `TOOLKIT.md` §4 is built, server-side and on screen. Exact
+decimal `BigInt` arithmetic throughout, `SCALE = 8`, one division at the end of
+each formula so rounding happens once.
+
+| service | what it does | the rule it refuses to break |
+|---|---|---|
+| `services/screening.ts` | SS-21 ratios | the board states the ratio; Majlis never picks one |
+| `services/purification.ts` | income to be given away | — |
+| `services/sarf.ts` | SS-1 exchange | both legs in the same session or nothing |
+| `services/tradability.ts` | SS-59 / SS-17 bands | refuses overlapping bands: *choosing between them is a ruling* |
+| `services/late.ts` | SS-3 late payment | `NOT_INCOME`; retention is `nothing` or `evidenced_costs` |
+| `services/clocks.ts` | what is running out | derived from `arrivedAt`, never stored |
+| `services/passage.ts` | the order of work | `shaping` is a set, `deciding` is a sequence; only `deliberation` is `enforced` |
+| `services/carrying.ts` | when terms get checked | **deliberately not a model call**; doubt goes in `limits` |
+| `services/inherit.ts` | precedent from settled matters | proposals never findings; own board only; same `structureId` |
+| `services/guide.ts` | the in-app guide | 18 topics; the ruling gate runs **first and without exception** |
+| `services/dictation.ts` | speech to text | off by default, because the browser sends audio away |
+| `src/env.ts` | loads `.env` | its own module, because ESM imports hoist above `dotenv.config()` |
+
+### The one thing in the backend that is actually broken
+
+**`server/src/services/assistant.ts:522` will 400 on any current model.**
+
+```ts
+thinking: { type: 'enabled', budget_tokens: ASSISTANT_THINKING_BUDGET },
+```
+
+`budget_tokens` is deprecated on Opus 4.6 / Sonnet 4.6 and **rejected outright**
+on Opus 5, Opus 4.8, Opus 4.7, Sonnet 5 and Fable 5/5.1. The replacement is
+`thinking: { type: 'adaptive' }` with effort carried on `output_config`.
+
+Two more staleness problems sit with it:
+
+- `assistant.ts:26` — `ASSISTANT_MODEL` defaults to `claude-sonnet-4-6`, and
+  `EXTRACTION_MODEL` does the same. Previous generation. Should be
+  `claude-opus-5`.
+- `server/package.json:19` — `"@anthropic-ai/sdk": "^0.65.0"`. That version has
+  no types for `adaptive` or `output_config`, so **the SDK has to be upgraded
+  before the call can be fixed**, not after.
+
+Order of work: upgrade the SDK → change the two model defaults → replace the
+thinking block → run the three gates' tests (they are the thing most likely to
+notice a changed model).
+
+This has been diagnosed but deliberately not touched, because it cannot be
+verified without a live key, and keys are the user's to handle.
+
+### Backend things that exist but have never been exercised
+
+- **Upload and document reading.** `ReadDocument.tsx` and its endpoint are
+  written and unit-tested, but no real document has gone through them, and
+  `DEMO.md` says plainly that they cannot be shown in a demonstration.
+- **Dictation.** Off by default and never switched on, for the stated reason.
+- **The assistant itself**, for the reason above.
+
+---
+
+## 2. The features
+
+### The rules that hold everything together
+
+These are not preferences. Breaking one is a defect, and there are tests that
+say so.
+
+1. **Computes, never concludes.** The method is always the board's. Majlis
+   quotes the board's own sentence back; it never infers a ruling.
+2. **Derived, never stored.** Status, standing, drift, passage, inheritance are
+   all computed on read.
+3. **Append-only.** Corrections supersede. What stands follows the supersession
+   chain, *never* timestamps.
+4. **Nothing binding by administration.** Changing a standard needs a ruling in
+   force, not a button.
+5. **Says what it cannot do.** A gap is named in place. A control that cannot
+   be honoured is **absent**, not disabled.
+6. **Three assistant gates** — lexical in, semantic, lexical out. The guide sits
+   behind its own gate and answers about the *application*, never about rulings.
+
+### The six paths, end to end
+
+Written up in `docs/PATHS.md`. All six work today.
+
+### What is short
+
+**Translation.** Counted this session, from `client/src/locales/index.ts`:
+
+```
+en   430 keys
+ar   240 keys   190 missing
+ur   229 keys   201 missing
+```
+
+The missing keys start at the very top (`app.name`, `app.stage`,
+`dash.registryReachable`, `dash.registryUnreachable`, `dash.stageNotice`), so
+the gap is not confined to new screens — it is everywhere.
+
+This is blocked on a decision that is not a coding decision: **who writes the
+Arabic and Urdu, and who reviews it.** A Shariah board reading a machine
+translation of its own terminology is worse than reading English. Nothing
+should be filled in until that is answered.
+
+Watch for **key collisions** when adding: a duplicate key overrides silently,
+and can strike in one language only.
+
+---
+
+## 3. The interface
+
+### Where it got to
+
+Three passes were rejected outright before the direction landed. The verdicts,
+kept because they are the specification: *too complicated*, *illogical*, *the
+paths are wrong*, *terribly cheap*, *I saw nothing change*, *change it from the
+foundations — only the tools stay.*
+
+The honest diagnosis that turned it around: for a scholar, the application was
+**harder than getting on a Zoom call and producing a PDF**. That is written up
+in `docs/USING.md` and it is the bar. Minutes, no learning, no nonsense, for
+every contract the bank does.
+
+### The design canvas — settled
+
+**https://claude.ai/code/artifact/05e2cfc1-89ff-4a56-9e23-6c143ce1d5e1**
+
+Three artboards, direction accepted by the user and then refined once more:
+
+- `design/Main.dc.html` — 1440×900, arrival: *what needs you*
+- `design/Matter.dc.html` — 1440×980, one matter: the question and the act
+- `design/Phone.dc.html` — 390×844, arrival on a phone
+- `design/canvas.json` — layout and the three notes
+
+The language is written down in full in **`docs/DESIGN.md`** — palette,
+elevation, the sweep, the type scale, and the list of things that were removed
+and stay removed. Read that before touching any of it.
+
+To change an artboard: edit the `.dc.html`, re-seed with the `design` skill's
+`seed-canvas.mjs`, republish to the **same URL** with `contract: "0.1.31"`.
+The working copies live in two places — `apps/majlis/design/` (committed) and
+`C:\Users\Abdusamed\Desktop\Website_demo_gravitas\design\` (where the seeder
+runs, and where the 2.5 MB seeded `majlis-interface.html` sits uncommitted).
+Keep them in step.
+
+### Not drawn yet
+
+**Calculations, contract library, register.** The user's phrase for what they
+have to be: *powerful with all the tools, but not thrown together.* They were
+deliberately left undrawn until the palette was confirmed, which it now is.
+
+### Not applied yet — this is the big one
+
+The canvas is settled. **The application does not look like it.**
+
+- `client/src/components/kit.tsx` — written, correct in shape, wrong palette,
+  and **imported by nothing**.
+- `client/tailwind.config.js` and `client/src/design/tokens.css` — still hold a
+  **dark** ground from an earlier pass (`ink #0B0C10 / surface #14161C /
+  raised #1C1F27`).
+- `client/src/components/Shell.tsx` — the frame is right (260px grouped rail,
+  top bar with identity and role, mobile drawer). The **content inside it is
+  still flat**.
+
+Those three move together or the application ends up speaking two languages at
+once. That is the next real piece of work on the interface.
+
+### What already exists on screen
+
+`Shell.tsx`, `Guide.tsx` (on every page), `Inherited.tsx`, `SmartRaise.tsx`,
+`Dictate.tsx`, `Passage.tsx`, `Carrying.tsx`, `WhatThisIs.tsx`,
+`ReadDocument.tsx`; pages `Guided.tsx`, `More.tsx`, `MatterAction.tsx`,
+`WhatStands.tsx`. The Classic dashboard is **unchanged on purpose** — that is
+the premise, and tests enforce it. SmartRaise is guided-only.
+
+---
+
+## 4. Traps that have already cost time
+
+- **Never put prose or a regex into `node -e`.** The shell eats backticks and
+  strips regex escapes (`/^\/matters\/[^/]+$/` became `/^/matters/[^/]+$/`).
+  Write a script file.
+- **Files are CRLF.** Any patch that splits on `\n` and rejoins misses.
+- **`.env` lives at `apps/majlis/`, the server cwd is `apps/majlis/server/`.**
+  An unset variable is *valid*, so the server ran on defaults and reported
+  healthy while reading nothing. `src/env.ts` loads both paths; do not
+  "simplify" it.
+- **A guard test will catch its own disclaimer.** Scan generated prose only;
+  exempt the constant, which is asserted verbatim elsewhere.
+- **`useHealth` caches at module level** — one test file per installation shape.
+- **A 200 with the wrong shape crashes the whole matter page.** `Passage.tsx`
+  and `Carrying.tsx` now `Array.isArray(...)` before setting state. New fetches
+  must do the same.
+
+---
+
+## 5. What to pick up first, in order
+
+1. **Draw the three remaining screens** on the canvas — calculations, contract
+   library, register — in the language `DESIGN.md` records. The direction is
+   confirmed; this is no longer a risk.
+2. **Bring the application to the canvas**: tokens + tailwind config +
+   `kit.tsx`, together, then the content inside `Shell.tsx`.
+3. **Fix the Anthropic integration**: SDK upgrade, then models, then the
+   thinking block.
+4. **Decide who writes the Arabic and Urdu.** Not a coding task, and it blocks
+   390 strings.
