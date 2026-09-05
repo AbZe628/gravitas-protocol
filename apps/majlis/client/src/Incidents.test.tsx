@@ -144,6 +144,16 @@ describe('what the sequence shows', () => {
     );
     show();
     await waitFor(() => expect(screen.getByText(/Overdue by 15/)).toBeInTheDocument());
-    expect(screen.queryByText(/-15/)).toBeNull();
+
+    /*
+     * A negative count, not the digits.
+     *
+     * This used to look for `-15` anywhere on the page, which passed until the
+     * deadline happened to fall on the fifteenth: the date `2026-08-15` renders
+     * on this card and contains it. The test was calendar-dependent and said
+     * nothing on the days it passed. What it means is that the clock reads
+     * "Overdue by 15 days" rather than "-15 days", so that is what it asks.
+     */
+    expect(screen.queryByText(/-15\s*day/i)).toBeNull();
   });
 });
