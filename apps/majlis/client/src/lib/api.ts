@@ -211,6 +211,16 @@ export interface Health {
    * The control appears only where this says it can work.
    */
   reading?: 'off' | 'anthropic';
+  /**
+   * Whether a member may speak their reasoning rather than type it.
+   *
+   * Off unless the institution chose it, because the browser sends the
+   * recording away to be transcribed and a stated reason for a vote is more
+   * sensitive than a question to the assistant.
+   */
+  dictation?: 'off' | 'browser';
+  /** Where the audio goes, in the server's words. Shown before the first use. */
+  dictationNote?: string;
 }
 
 export interface EnforcementSnapshot {

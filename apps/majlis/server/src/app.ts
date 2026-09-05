@@ -8,6 +8,7 @@ import { storeFromEnv, type Store } from './store/index.js';
 
 import { enforcementFromEnv, type Enforcement } from './services/enforcement.js';
 import { buildCarrying } from './services/carrying.js';
+import { dictationFromEnv, WHERE_THE_AUDIO_GOES } from './services/dictation.js';
 import {
   AssistantUnavailable,
   comprehensionFromEnv,
@@ -164,6 +165,10 @@ export function createApp(
        * control only where this says it can work.
        */
       reading: reading.kind,
+      // Off unless the institution chose it, because the browser sends the
+      // audio away to be transcribed. Absent rather than disabled where off.
+      dictation: dictationFromEnv(),
+      dictationNote: WHERE_THE_AUDIO_GOES,
       assistantKind: comprehension.kind,
       assistant: limiter.status(),
     });

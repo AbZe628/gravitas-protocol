@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Refused, governance, type Matter, type Tally } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
+import Dictate from './Dictate.js';
 import { Card, Tag } from './ui.js';
 
 /**
@@ -175,6 +176,17 @@ export default function VotePanel({ matter, role, scholarId, onChanged }: Props)
             className="w-full resize-y rounded border border-line bg-transparent p-2 text-[14px] leading-relaxed outline-none"
           />
           <p className="mt-1.5 text-[11.5px] leading-relaxed text-muted">{t('vote.reasonHelp')}</p>
+
+          {/*
+            Speaking it rather than typing it. The words stay the member's own —
+            nothing here is pre-filled, suggested or inherited — and the control
+            is absent unless the institution turned dictation on, because the
+            browser sends the recording away to be transcribed.
+          */}
+          <Dictate
+            onText={(said) => setReason((was) => (was.trim() ? `${was.trim()} ${said}` : said))}
+          />
+
           <Refusal message={refusal} />
 
           <div className="mt-2">
