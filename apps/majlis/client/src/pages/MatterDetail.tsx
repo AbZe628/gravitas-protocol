@@ -15,6 +15,7 @@ import VotePanel from '../components/VotePanel.js';
 import { mayDeliberate, useIdentity } from '../lib/identity.js';
 import Passage from '../components/Passage.js';
 import Carrying from '../components/Carrying.js';
+import Inherited from '../components/Inherited.js';
 
 /** The statuses a document exists for. Mirrors SETTLED in services/fatwa.ts. */
 const DECIDED = ['in_force', 'timelock', 'rejected', 'lapsed', 'withdrawn'];
@@ -67,6 +68,13 @@ export default function MatterDetail() {
         was nearly decided or barely begun.
       */}
       <Passage matterId={matter.id} />
+
+      {/*
+        What the board already decided about a question of this shape, above
+        the work rather than at the bottom with the related reading. This is
+        the panel that turns authoring into correcting.
+      */}
+      <Inherited matterId={matter.id} canRule={mayDeliberate(identity?.role)} />
 
       {/*
         The document, at the moment of decision. High on the page because for

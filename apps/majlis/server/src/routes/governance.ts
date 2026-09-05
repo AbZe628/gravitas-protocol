@@ -75,6 +75,7 @@ import { assess, crossings, type Assessment, type Figures } from '../services/sc
 import { search, type SearchFilters } from '../services/search.js';
 import { relatedTo } from '../services/precedent.js';
 import { buildPassage } from '../services/passage.js';
+import { buildInheritance, checklistStanding } from '../services/inherit.js';
 import type { Store } from '../store/index.js';
 import type { Deliberation, Matter, SourceKind } from '../types.js';
 import { PART_KINDS, SOURCE_KINDS } from '../types.js';
@@ -837,6 +838,36 @@ export function governanceRoutes(
         : null;
 
       res.json(buildPassage(board, matter, structure, new Date().toISOString()));
+    }),
+  );
+
+  /**
+   * What this board already decided about a question of this shape.
+   *
+   * Returns proposals and writes nothing. Accepting one is a separate act by a
+   * scholar, recorded under their name at today's date — the whole point being
+   * that inherited and unreviewed is a different state from decided.
+   */
+  router.get(
+    '/matters/:id/inheritance',
+    handle(async (req, res) => {
+      const matter = await store.matter(req.params.id);
+      if (!matter) {
+        res.status(404).json({ error: 'not_found', message: 'No such matter.' });
+        return;
+      }
+
+      const structure = matter.structureId
+        ? (structures.find((s) => s.id === matter.structureId) ?? null)
+        : null;
+
+      const inheritance = buildInheritance(matter, await store.matters(), structure);
+
+      res.json({
+        ...inheritance,
+        // The sentence the checklist should carry while a draft is unread.
+        checklist: checklistStanding(structure, matter, inheritance),
+      });
     }),
   );
 

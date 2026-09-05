@@ -638,6 +638,33 @@ export interface IncidentList {
   incidents: Incident[];
 }
 
+// ── what this board already decided about a question of this shape ────────
+
+export type ProposalKind = 'condition' | 'term' | 'not_decided' | 'mechanism';
+
+export interface Proposal {
+  kind: ProposalKind;
+  /** Which condition, or which term. Absent for prose. */
+  key?: string;
+  /** What the board said last time, verbatim. */
+  value: string;
+  holds?: 'met' | 'not_met' | 'not_applicable';
+  unit?: string;
+}
+
+export interface Inheritance {
+  matterId: string;
+  from: { id: string; title: string; decidedAt: string | null } | null;
+  /** Why that matter and not another. Named, never a resemblance. */
+  because: string | null;
+  /** Including the one being drafted: "the fourth this board has ruled on". */
+  timesRuled: number;
+  proposals: Proposal[];
+  note: string;
+  /** What the checklist should say while a draft is unread. */
+  checklist: string;
+}
+
 // ── what the terms will do once ruled ─────────────────────────────────────
 
 /** When a term is tested against reality. The distinction the panel is for. */
@@ -1215,6 +1242,14 @@ export const oversight = {
    * which is most of them.
    */
   carrying: (matterId: string) => get<Carrying>(`/api/matters/${matterId}/carrying`),
+
+  /**
+   * What this board already decided about a question of this shape.
+   *
+   * Proposals, never findings. Accepting one is a separate act recorded under
+   * the scholar's own name at today's date.
+   */
+  inheritance: (matterId: string) => get<Inheritance>(`/api/matters/${matterId}/inheritance`),
 
   screen: (figures: Figures, previous?: Assessment) =>
     send<{ assessment: Assessment; crossings: Crossing[] }>('/api/screening', { figures, previous }),

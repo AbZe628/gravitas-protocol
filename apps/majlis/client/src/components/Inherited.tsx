@@ -1,0 +1,246 @@
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { oversight, type Inheritance, type Proposal } from '../lib/api.js';
+import { useI18n } from '../lib/i18n.js';
+
+/**
+ * What this board already decided about a question of this shape.
+ *
+ * The verdict this exists to answer: *doing it here is harder than getting on
+ * Zoom and making a PDF.* It was right, and the cause was that Majlis asked a
+ * scholar to author everything into empty boxes. The fourth murabaha of the
+ * year opened the same blank checklist as the first, and the board had answered
+ * those conditions three times already.
+ *
+ * So this panel makes the work **reading and correcting** rather than writing
+ * from nothing — which is the thing a scholar trained for, and the thing the
+ * call does not save them from, because somebody still has to write the PDF
+ * afterwards.
+ *
+ * ── accepting is an act ───────────────────────────────────────────────────
+ *
+ * There is no "accept all", for the same reason there is none on a document
+ * reading. A scholar taking four inherited answers in one click has reviewed
+ * nothing, and the record would then say they found four things they never
+ * read. Each is taken on its own, and taking one records it as **their**
+ * finding, under their name, at today's date.
+ *
+ * ── and it never looks decided ────────────────────────────────────────────
+ *
+ * Every proposal says where it came from and that nobody has looked at it.
+ * *Inherited and unreviewed* is a different state from *decided*, and a draft
+ * that read as authored would make this a machine for producing rulings nobody
+ * read — worse than the call by every measure that matters.
+ *
+ * ── the first of a kind gets the honest answer ────────────────────────────
+ *
+ * Where there is no precedent the panel does not disappear. It says so, and
+ * says that a first of its kind costs the whole apparatus and that this is
+ * right. A scholar who was expecting help and got silence would conclude the
+ * feature was broken.
+ */
+
+function Item({
+  proposal,
+  onTake,
+  taken,
+  busy,
+}: {
+  proposal: Proposal;
+  onTake: () => void;
+  taken: boolean;
+  busy: boolean;
+}) {
+  const { t } = useI18n();
+
+  return (
+    <li className="rounded border border-line px-3 py-2.5">
+      <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+        <span className="text-[11px] uppercase tracking-wider text-muted">
+          {t(`inherit.kind.${proposal.kind}`)}
+        </span>
+        {proposal.key && <span className="font-mono text-[12px]">{proposal.key}</span>}
+        {proposal.holds && (
+          <span
+            className={
+              'rounded border px-1.5 py-px text-[10.5px] uppercase tracking-wider ' +
+              (proposal.holds === 'met' ? 'border-gold/50 text-goldsoft' : 'border-line text-muted')
+            }
+          >
+            {t(`inherit.holds.${proposal.holds}`)}
+          </span>
+        )}
+      </div>
+
+      {/* The board's own words from its own past ruling. Never rewritten. */}
+      <p className="mt-1 text-[12.5px] leading-relaxed">
+        {proposal.value}
+        {proposal.unit && <span className="ms-1 text-[11.5px] text-muted">{proposal.unit}</span>}
+      </p>
+
+      {taken ? (
+        <p className="mt-2 text-[12px] text-muted">{t('inherit.taken')}</p>
+      ) : (
+        <button
+          type="button"
+          onClick={onTake}
+          disabled={busy}
+          className="mt-2 rounded border border-line px-3 py-1 text-[12px] text-muted transition-colors hover:border-muted hover:text-paper disabled:opacity-40"
+        >
+          {t('inherit.take')}
+        </button>
+      )}
+    </li>
+  );
+}
+
+export default function Inherited({
+  matterId,
+  canRule,
+  onChanged,
+}: {
+  matterId: string;
+  canRule: boolean;
+  onChanged?: () => void;
+}) {
+  const { t } = useI18n();
+  const [inheritance, setInheritance] = useState<Inheritance | null>(null);
+  const [taken, setTaken] = useState<Set<string>>(new Set());
+  const [busy, setBusy] = useState(false);
+  const [refusal, setRefusal] = useState<string | null>(null);
+
+  useEffect(() => {
+    let live = true;
+    oversight
+      .inheritance(matterId)
+      // The shape is checked rather than assumed: a panel that explains the
+      // matter must not be able to take the page down with it.
+      .then((i) => live && Array.isArray(i?.proposals) && setInheritance(i))
+      .catch(() => undefined);
+    return () => {
+      live = false;
+    };
+  }, [matterId]);
+
+  if (!inheritance) return null;
+
+  const idOf = (p: Proposal, i: number) => `${p.kind}:${p.key ?? i}`;
+
+  async function take(proposal: Proposal, id: string) {
+    // Only a condition can be recorded as a finding today. The others are
+    // shown so a scholar can read what the board said and carry it across
+    // deliberately; offering a button that wrote a term or a line of prose
+    // without a stated reason would be recording an edit as a ruling.
+    if (proposal.kind !== 'condition' || !proposal.key || !proposal.holds) return;
+
+    setBusy(true);
+    setRefusal(null);
+    try {
+      await oversight.recordFinding(matterId, {
+        conditionId: proposal.key,
+        holds: proposal.holds,
+        reason: proposal.value,
+      });
+      setTaken((was) => new Set(was).add(id));
+      onChanged?.();
+    } catch (e) {
+      setRefusal(e instanceof Error ? e.message : String(e));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  const conditions = inheritance.proposals.filter((p) => p.kind === 'condition');
+  const rest = inheritance.proposals.filter((p) => p.kind !== 'condition');
+
+  return (
+    <div className="mb-6 rounded-lg border border-line bg-surface/60 px-4 py-3.5">
+      <div className="mb-1 text-[11px] uppercase tracking-wider text-muted">
+        {t('inherit.title')}
+      </div>
+
+      {inheritance.from ? (
+        <>
+          {/*
+            The sentence that answers "why not just get on a call". A board
+            hearing that it has ruled on this three times, and being shown what
+            it said, is being handed the thing a call cannot give it.
+          */}
+          <p className="text-[14px] leading-snug">
+            {t('inherit.times').replace('{n}', String(inheritance.timesRuled))}
+          </p>
+          <p className="mt-1 text-[12.5px] leading-relaxed text-muted">
+            <Link to={`/matters/${inheritance.from.id}`} className="underline underline-offset-4">
+              {inheritance.from.title}
+            </Link>
+            {inheritance.from.decidedAt && (
+              <span> — {new Date(inheritance.from.decidedAt).toISOString().slice(0, 10)}</span>
+            )}
+            {inheritance.because && <span>. {inheritance.because}</span>}
+          </p>
+        </>
+      ) : (
+        <p className="text-[12.5px] leading-relaxed text-muted">{inheritance.note}</p>
+      )}
+
+      {inheritance.proposals.length > 0 && (
+        <>
+          <p className="mt-3 max-w-prose text-[12px] leading-relaxed text-muted">
+            {inheritance.note}
+          </p>
+
+          {refusal && (
+            <p className="mt-2 rounded border border-warn/50 px-3 py-2 text-[12.5px] leading-relaxed text-warn">
+              {refusal}
+            </p>
+          )}
+
+          {conditions.length > 0 && (
+            <ul className="mt-3 space-y-2">
+              {conditions.map((p, i) => {
+                const id = idOf(p, i);
+                return (
+                  <Item
+                    key={id}
+                    proposal={p}
+                    taken={taken.has(id)}
+                    busy={busy || !canRule}
+                    onTake={() => void take(p, id)}
+                  />
+                );
+              })}
+            </ul>
+          )}
+
+          {/*
+            Terms, what was held outside the question, and the mechanism. Read
+            rather than taken: each of these belongs in a field a scholar edits
+            with their own reason beside it, and a button that copied one in
+            would record an edit as though it were a ruling.
+          */}
+          {rest.length > 0 && (
+            <div className="mt-3 border-t border-line pt-3">
+              <div className="mb-1.5 text-[11px] uppercase tracking-wider text-muted">
+                {t('inherit.alsoSaid')}
+              </div>
+              <ul className="space-y-2">
+                {rest.map((p, i) => (
+                  <li key={idOf(p, i)} className="rounded border border-line px-3 py-2">
+                    <div className="text-[11px] uppercase tracking-wider text-muted">
+                      {t(`inherit.kind.${p.kind}`)}
+                      {p.key && <span className="ms-2 font-mono normal-case">{p.key}</span>}
+                    </div>
+                    <p className="mt-1 text-[12.5px] leading-relaxed">
+                      {p.value}
+                      {p.unit && <span className="ms-1 text-[11.5px] text-muted">{p.unit}</span>}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
