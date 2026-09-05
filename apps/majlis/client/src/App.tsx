@@ -5,6 +5,7 @@ import Dashboard from './pages/Dashboard.js';
 import Guided from './pages/Guided.js';
 import MatterAction from './pages/MatterAction.js';
 import More from './pages/More.js';
+import WhatStands from './pages/WhatStands.js';
 import MatterDetail from './pages/MatterDetail.js';
 import Rules from './pages/Rules.js';
 import AssetDetail from './pages/AssetDetail.js';
@@ -166,7 +167,8 @@ export default function App() {
           <Route path="/classic" element={<Dashboard />} />
           <Route path="/register" element={<Register />} />
           <Route path="/register/:id" element={<AssetDetail />} />
-          <Route path="/rules" element={<Rules />} />
+          <Route path="/rules" element={<WhatStands />} />
+          <Route path="/classic/rules" element={<Rules />} />
           <Route path="/library" element={<Library />} />
           <Route path="/calculations" element={<Calculations />} />
           <Route path="/calendar" element={<Calendar />} />
@@ -176,7 +178,13 @@ export default function App() {
           <Route path="/briefings" element={<Briefings />} />
           <Route path="/assistant" element={<Assistant />} />
           <Route path="/search" element={<Search />} />
-          <Route path="/record" element={<Record />} />
+          {/*
+            What we decided and what stands, in one place. Two pages that were
+            always two answers to one question, neither of them changed — the
+            classic paths still reach each on its own.
+          */}
+          <Route path="/record" element={<WhatStands />} />
+          <Route path="/classic/record" element={<Record />} />
           <Route path="/settings" element={<Settings />} />
         </Routes>
       </main>

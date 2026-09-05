@@ -35,7 +35,7 @@ export default function More() {
     {
       title: t('more.decided'),
       entries: [
-        { to: '/record', label: t('nav.record'), note: t('more.record.note') },
+        { to: '/record', label: t('stands.title'), note: t('more.record.note') },
         { to: '/search', label: t('nav.search'), note: t('more.search.note') },
         { to: '/classic', label: t('more.allMatters'), note: t('more.allMatters.note') },
       ],

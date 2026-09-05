@@ -60,6 +60,15 @@ function stub(over: Record<string, unknown> = {}) {
 
       if (url.includes('/api/health')) return json({ ok: true, stage: 2, assistantKind: 'off' });
       if (url.includes('/api/attention')) return json({ ...ATTENTION, ...over });
+
+      /*
+       * A list where a list is expected. The pages behind the drawer read
+       * arrays and map over them, and an object would crash the subtree —
+       * which is what an empty body in these tests turned out to mean.
+       */
+      if (/\/(rules|boards|matters|briefings|log)$/.test(new URL(url, 'http://x').pathname)) {
+        return json([]);
+      }
       return json({});
     }),
   );
@@ -150,7 +159,7 @@ describe('nothing was removed', () => {
 
     // getAllBy rather than getBy: each entry carries a sentence saying what it
     // is for, and some of those sentences name the thing too.
-    for (const label of ['Register', 'Library', 'Record', 'Search', 'Meetings', 'Board']) {
+    for (const label of ['Register', 'Library', 'what stands', 'Search', 'Meetings', 'Board']) {
       expect(
         screen.getAllByRole('link', { name: new RegExp(label) }).length,
         `${label} is not reachable from here`,
@@ -185,5 +194,43 @@ describe('nothing was removed', () => {
     await waitFor(() =>
       expect(screen.getByText(/it was moved off it/)).toBeInTheDocument(),
     );
+  });
+});
+
+describe('what we decided and what stands are one screen', () => {
+  it('opens on the decisions, and reaches the rules in one press', async () => {
+    stub();
+    show('/record');
+
+    await waitFor(() => expect(screen.getByRole('tab', { name: /What we decided/ })).toBeInTheDocument());
+
+    // The decided one leads: a board arriving here is more often looking for a
+    // decision it made than for the list of what is operative.
+    expect(screen.getByRole('tab', { name: /What we decided/ })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
+    expect(screen.getByRole('tab', { name: /In force today/ })).toHaveAttribute(
+      'aria-selected',
+      'false',
+    );
+  });
+
+  it('reaches the same screen from the rules path, because they were one question', async () => {
+    stub();
+    show('/rules');
+
+    await waitFor(() => expect(screen.getByRole('tab', { name: /In force today/ })).toBeInTheDocument());
+  });
+
+  it('leaves each page reachable on its own', async () => {
+    stub();
+    const { unmount } = show('/classic/record');
+    await waitFor(() => expect(screen.queryByRole('tab')).toBeNull());
+    unmount();
+
+    show('/classic/rules');
+    // Unchanged and still there. The merge rearranged; it removed nothing.
+    await waitFor(() => expect(screen.queryByRole('tab')).toBeNull());
   });
 });
