@@ -4,6 +4,8 @@ import { governance, type Attention as Attention_, type AttentionItem } from '..
 import { useI18n } from '../lib/i18n.js';
 import { useIdentity } from '../lib/identity.js';
 import WhoYouAre from '../components/WhoYouAre.js';
+import SmartRaise from '../components/SmartRaise.js';
+import { mayDeliberate } from '../lib/identity.js';
 
 /**
  * One thing, one action.
@@ -202,6 +204,17 @@ export default function Guided() {
       ) : (
         // An answer, not a blank. Being told the board is clear is information.
         <p className="mb-4 max-w-prose text-[13.5px] leading-relaxed">{t('guided.clear')}</p>
+      )}
+
+      {/*
+        Putting something to the board is not a thing asking to be done — it is
+        a thing somebody came here to start — so it sits quietly below the card
+        rather than beside it. Absent for anyone who could not open a matter.
+      */}
+      {mayDeliberate(identity?.role) && (
+        <div className="mt-7">
+          <SmartRaise boardId="demo-board" />
+        </div>
       )}
 
       {/*

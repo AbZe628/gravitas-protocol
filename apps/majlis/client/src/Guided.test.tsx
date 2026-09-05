@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import App from './App.js';
 import { I18nProvider } from './lib/i18n.js';
@@ -232,5 +232,74 @@ describe('what we decided and what stands are one screen', () => {
     show('/classic/rules');
     // Unchanged and still there. The merge rearranged; it removed nothing.
     await waitFor(() => expect(screen.queryByRole('tab')).toBeNull());
+  });
+});
+
+describe('putting something to the board', () => {
+  it('asks what kind of decision in the words a secretary uses', async () => {
+    stub();
+    show();
+
+    await waitFor(() => expect(screen.getByText(/Put something to the board/)).toBeInTheDocument());
+    fireEvent.click(screen.getByRole('button', { name: /Put something to the board/ }));
+
+    /*
+     * Nobody receiving an email from the treasury desk thinks "this is a
+     * permitting change of institution-request origin". They think the desk
+     * wants to launch something and needs a ruling.
+     */
+    expect(screen.getByText('A desk wants to do something new')).toBeInTheDocument();
+    expect(screen.getByText('Something should be stopped or narrowed')).toBeInTheDocument();
+    expect(screen.getByText('A ruling has come round for review')).toBeInTheDocument();
+    expect(screen.getByText(/Somebody thinks a rule is being breached/)).toBeInTheDocument();
+  });
+
+  it('says what each choice records, before it is chosen', async () => {
+    stub();
+    show();
+
+    await waitFor(() => expect(screen.getByText(/Put something to the board/)).toBeInTheDocument());
+    fireEvent.click(screen.getByRole('button', { name: /Put something to the board/ }));
+
+    // The direction decides the quorum, the delay and whether it is ratified
+    // afterwards. Somebody choosing in a hurry should see that rather than
+    // discover it.
+    expect(screen.getByText(/Recorded as permitting, at the institution’s request/)).toBeInTheDocument();
+    expect(screen.getByText(/Recorded as restricting, following a change/)).toBeInTheDocument();
+  });
+
+  it('asks nothing else until a kind is chosen', async () => {
+    stub();
+    show();
+
+    await waitFor(() => expect(screen.getByText(/Put something to the board/)).toBeInTheDocument());
+    fireEvent.click(screen.getByRole('button', { name: /Put something to the board/ }));
+
+    expect(screen.queryByText('What is being asked')).toBeNull();
+
+    fireEvent.click(screen.getByText('A desk wants to do something new'));
+    expect(screen.getByText('What is being asked')).toBeInTheDocument();
+  });
+
+  it('says sending it decides nothing', async () => {
+    stub();
+    show();
+
+    await waitFor(() => expect(screen.getByText(/Put something to the board/)).toBeInTheDocument());
+    fireEvent.click(screen.getByRole('button', { name: /Put something to the board/ }));
+    fireEvent.click(screen.getByText('A desk wants to do something new'));
+
+    // It opens as a draft. The shape, the terms and what is not being decided
+    // are the board's, and a form that filled them would put words in the mouth
+    // of a board that has not met.
+    expect(screen.getByText(/Nothing is decided by sending this/)).toBeInTheDocument();
+  });
+
+  it('is absent for somebody who could not open a matter', async () => {
+    stub({ role: 'observer' });
+    show();
+
+    await waitFor(() => expect(screen.getByText(/The board is clear|Open it/)).toBeInTheDocument());
+    expect(screen.queryByText(/Put something to the board/)).toBeNull();
   });
 });
