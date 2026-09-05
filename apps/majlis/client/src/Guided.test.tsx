@@ -145,8 +145,26 @@ describe('one thing asks to be done', () => {
     stub({ items: [], outstanding: 0, overdue: 0 });
     show();
 
-    await waitFor(() => expect(screen.getByText(/The board is clear/)).toBeInTheDocument());
-    expect(screen.getByText(/that is an answer, not an empty page/)).toBeInTheDocument();
+    /*
+     * Set large, in the display face, because for most people opening this it
+     * is the whole of the first question's answer. The sentence that explained
+     * that it was an answer rather than a blank has gone: it was explaining
+     * what the typography now says.
+     */
+    await waitFor(() => expect(screen.getByText('Nothing needs you.')).toBeInTheDocument());
+  });
+
+  it('shows what the board is doing even when nothing needs anybody', async () => {
+    stub({ items: [], outstanding: 0, overdue: 0 });
+    show();
+
+    /*
+     * The screen that asked only what needs *you* was empty for an observer, an
+     * auditor, and anybody looking before they have credentials — which is
+     * everybody, the first time. A front page that says nothing is waiting and
+     * stops has told a first-time reader there is nothing here.
+     */
+    await waitFor(() => expect(screen.getByText('What the board is doing')).toBeInTheDocument());
   });
 });
 

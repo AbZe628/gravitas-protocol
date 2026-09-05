@@ -9,6 +9,7 @@ import { storeFromEnv, type Store } from './store/index.js';
 import { enforcementFromEnv, type Enforcement } from './services/enforcement.js';
 import { buildCarrying } from './services/carrying.js';
 import { dictationFromEnv, WHERE_THE_AUDIO_GOES } from './services/dictation.js';
+import { askTheGuide, guideTopics } from './services/guide.js';
 import {
   AssistantUnavailable,
   comprehensionFromEnv,
@@ -308,6 +309,39 @@ export function createApp(
   const enforcementRoute = async (_req: Request, res: Response) => {
     res.json(await enforcement.snapshot());
   };
+  /*
+   * How this application works, asked from anywhere.
+   *
+   * Not the assistant: nothing here is generated, no question leaves the
+   * building, and the subject is Majlis itself rather than any financial
+   * mechanism. It answers instantly and it works where there is no assistant,
+   * which is most installations.
+   *
+   * A question that seeks a ruling is refused here as it is everywhere else. A
+   * guide is a likelier place to be asked than the assistant, because it is the
+   * thing that looks like it will answer anything.
+   */
+  /*
+   * A GET, because it reads and changes nothing.
+   *
+   * It was written as a POST out of habit and the mutating-route guard caught
+   * it, correctly: every POST this application exposes has to be on an
+   * allowlist somebody added on purpose, and a route that only answers a
+   * question does not belong on it.
+   */
+  app.get('/api/guide', (req: Request, res: Response) => {
+    const question = typeof req.query.q === 'string' ? req.query.q : '';
+    if (question.trim().length < 2) {
+      res.status(400).json({ error: 'no_question', message: 'Ask something.' });
+      return;
+    }
+    res.json(askTheGuide(question));
+  });
+
+  app.get('/api/guide/topics', (_req: Request, res: Response) => {
+    res.json({ topics: guideTopics() });
+  });
+
   app.get('/api/enforcement', enforcementRoute);
   app.get('/api/registry', enforcementRoute);
 

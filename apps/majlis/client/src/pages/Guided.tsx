@@ -1,60 +1,52 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { governance, type Attention as Attention_, type AttentionItem } from '../lib/api.js';
+import {
+  api,
+  governance,
+  oversight,
+  type Attention as Attention_,
+  type AttentionItem,
+  type MatterSummary,
+} from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
-import { useIdentity } from '../lib/identity.js';
-import WhoYouAre from '../components/WhoYouAre.js';
+import { mayDeliberate, useIdentity } from '../lib/identity.js';
 import SmartRaise from '../components/SmartRaise.js';
-import { mayDeliberate } from '../lib/identity.js';
+import { Block, Display, Label, Note, Why } from '../components/type.js';
 
 /**
- * One thing, one action.
+ * Arrival.
  *
- * The verdict this exists to answer: *a board would come in once, say we do not
- * need this, and go back to how they worked before.* The application had twelve
- * navigation items, six panels on its first screen, and no answer to the only
- * question a scholar arrives with — **is there anything here for me.**
+ * Two questions, because the screen that asked only the first was empty for
+ * most of the people who opened it. **What needs me** is the reason a member
+ * signs in. **What is the board doing** is what everybody else came for — an
+ * observer, an auditor, a scholar looking before they have been given
+ * credentials — and for them the honest answer to the first question is
+ * *nothing*, forever. A product whose front page says *nothing is waiting for
+ * you* and stops has told a first-time reader that there is nothing here.
  *
- * So this screen answers that and stops. One card, the one act that is
- * outstanding, and how long it has been waiting. Everything below it is a
- * reminder without a button. Everything else in Majlis is behind one link, and
- * the link is at the bottom because a scholar who wants the register knows they
- * want the register.
+ * So the second half is always present, drawn from the record rather than
+ * invented: matters open, what has drifted under a standing ruling, holdings
+ * never put to the board. Three numbers a scholar recognises, each a link into
+ * the thing it counts.
  *
- * ── it does not put the vote on the card ──────────────────────────────────
+ * ── the apology is one line ───────────────────────────────────────────────
  *
- * The obvious next move is a pair of approve and refuse buttons here, and it is
- * wrong. A position in this record is taken on **specific terms** — every one
- * carries the hash of exactly the terms it was cast on, so that *"did this
- * member approve these words"* is a comparison rather than a recollection.
- * Voting from a summary card is voting on a headline, and the honest answer to
- * the regulator afterwards would be that the member approved a notification.
+ * The credential notice used to be ninety of the hundred and thirty words on
+ * this page: the largest, brightest object on a scholar's first screen was an
+ * explanation of something they cannot fix, addressed to whoever installed
+ * this. It is a sentence now, with the rest behind a disclosure.
  *
- * The card is one tap from the vote, and the vote screen can be fifteen
- * seconds. The speed belongs there; the button does not belong here.
+ * ── and one thing is large ────────────────────────────────────────────────
  *
- * ── nothing waiting is an answer ──────────────────────────────────────────
- *
- * Not a blank. A scholar who opens this and sees that the board is clear has
- * been told something, and that is worth a sentence rather than an empty page.
- *
- * ── it is a shell, not a replacement ──────────────────────────────────────
- *
- * Every service, route and refusal underneath is the one that was already
- * there. Classic is one link away and unchanged. Nothing is removed; what
- * changes is what a person sees first.
+ * The outstanding act is set in the display face at reading size, and
+ * everything else on the page is smaller than it. That is the whole of the
+ * hierarchy, and it is what the screen previously had none of.
  */
 
-const TONE: Record<string, string> = {
-  overdue: 'border-warn/60',
-  soon: 'border-gold/60',
-  ordinary: 'border-line',
-};
-
-function urgency(item: AttentionItem): keyof typeof TONE {
-  if (item.overdue) return 'overdue';
-  if (item.hoursRemaining !== null && item.hoursRemaining <= 48) return 'soon';
-  return 'ordinary';
+function urgencyRule(item: AttentionItem): string {
+  if (item.overdue) return 'border-warn';
+  if (item.hoursRemaining !== null && item.hoursRemaining <= 48) return 'border-gold';
+  return 'border-line';
 }
 
 /** How long is left, in the largest unit that is still honest. */
@@ -74,19 +66,17 @@ function TheOneThing({ item }: { item: AttentionItem }) {
     <Link
       to={`/matters/${item.matterId}`}
       className={
-        'block rounded-lg border bg-surface/60 px-4 py-4 transition-colors hover:border-muted ' +
-        TONE[urgency(item)]
+        'group block border-s-[3px] ps-5 transition-colors hover:border-gold ' + urgencyRule(item)
       }
     >
-      <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-        <span className="text-[11px] uppercase tracking-wider text-muted">
+      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+        <Label>
           {t(item.kind === 'overdue' ? 'attention.overdueKind' : `attention.${item.kind}`)}
-        </span>
+        </Label>
         {left && (
           <span
             className={
-              'font-mono text-[12.5px] tabular-nums ' +
-              (item.overdue ? 'text-warn' : 'text-goldsoft')
+              'font-mono text-[12.5px] tabular-nums ' + (item.overdue ? 'text-warn' : 'text-gold')
             }
           >
             {left}
@@ -94,19 +84,28 @@ function TheOneThing({ item }: { item: AttentionItem }) {
         )}
       </div>
 
-      <div className="mt-1.5 text-[17px] leading-snug">{item.title}</div>
+      {/* The one large thing on the page. */}
+      <div className="mt-2 font-display text-[24px] leading-[1.2] text-paper sm:text-[28px]">
+        {item.title}
+      </div>
 
-      {/* The server's sentence, unchanged. It says what the act actually is. */}
-      <p className="mt-1.5 max-w-prose text-[12.5px] leading-relaxed text-muted">{item.note}</p>
+      <Note className="mt-2">{item.note}</Note>
 
-      {/*
-        One tap to the matter, where the terms are. Not a vote button: a
-        position is taken on specific terms and carries their hash, and a vote
-        cast from a summary is a vote on a headline.
-      */}
-      <span className="mt-3 inline-block rounded border border-gold/60 px-3.5 py-1.5 text-[13px] text-goldsoft">
-        {t('guided.open')}
+      <span className="mt-3 inline-block text-[13px] text-gold transition-transform group-hover:translate-x-0.5">
+        {t('guided.open')} →
       </span>
+    </Link>
+  );
+}
+
+/** One number, what it counts, and where it goes. */
+function Count({ n, of, to }: { n: number; of: string; to: string }) {
+  return (
+    <Link to={to} className="group block">
+      <div className="font-display text-[32px] leading-none tabular-nums text-paper transition-colors group-hover:text-gold">
+        {n}
+      </div>
+      <Note className="mt-1.5 max-w-[22ch]">{of}</Note>
     </Link>
   );
 }
@@ -115,120 +114,135 @@ export default function Guided() {
   const { t } = useI18n();
   const { identity } = useIdentity();
   const [attention, setAttention] = useState<Attention_ | null>(null);
+  const [matters, setMatters] = useState<MatterSummary[] | null>(null);
+  const [drifting, setDrifting] = useState<number | null>(null);
+  const [unexamined, setUnexamined] = useState<number | null>(null);
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
     let live = true;
+
     governance
       .attention()
       .then((a) => live && Array.isArray(a?.items) && setAttention(a))
       .catch(() => live && setFailed(true));
+
+    /*
+     * Each of the three counts fails alone.
+     *
+     * They are what the board is doing, not what the reader must act on, so a
+     * register that will not answer takes its own number off the page and
+     * leaves the rest of the screen standing.
+     */
+    api
+      .matters()
+      .then((m) => live && Array.isArray(m) && setMatters(m))
+      .catch(() => undefined);
+    oversight
+      .drift()
+      .then((d) => live && setDrifting((d.drifting ?? []).length))
+      .catch(() => undefined);
+    oversight
+      .register()
+      // The register already counts this and says what it means; deriving it
+      // again here would be a second definition of the same word.
+      .then((r) => live && setUnexamined(r.neverExamined))
+      .catch(() => undefined);
+
     return () => {
       live = false;
     };
   }, []);
 
-  if (failed) return <p className="text-[13px] text-muted">{t('guided.unreachable')}</p>;
+  if (failed) return <Note>{t('guided.unreachable')}</Note>;
   if (!attention) return null;
 
-  /*
-   * Overdue first, then by how little is left. A matter with no deadline sorts
-   * last rather than first: it needs doing and nothing is running out on it.
-   */
   const items = [...attention.items].sort((a, b) => {
     if (a.overdue !== b.overdue) return a.overdue ? -1 : 1;
     return (a.hoursRemaining ?? Infinity) - (b.hoursRemaining ?? Infinity);
   });
 
   const [first, ...rest] = items;
+  const open = (matters ?? []).filter((m) => m.status !== 'in_force' && m.status !== 'lapsed').length;
+  const reading = !identity || identity.role === 'observer';
 
   return (
     <div>
-      {/*
-        Whether this session can act at all, before anything asks it to. A
-        person who cannot vote should learn that here rather than by pressing
-        something that is not there.
-      */}
-      <WhoYouAre />
+      {reading && (
+        <div className="mb-10">
+          <Note>{t('whoami.observerShort')}</Note>
+          <Why label={t('whoami.observerWhy')}>{t('whoami.observerBody')}</Why>
+        </div>
+      )}
 
-      <h1 className="mb-1 text-[19px] font-semibold tracking-tight">
-        {/*
-          Named only where there is a name. The shared credential resolves to an
-          observer with no member behind it, and greeting somebody as anonymous
-          is worse than not greeting them.
-        */}
-        {identity && identity.role !== 'observer'
-          ? t('guided.greetingNamed').replace('{who}', identity.scholarId)
-          : t('guided.greeting')}
-      </h1>
+      <Block>
+        <Label className="mb-3">{t('guided.greeting')}</Label>
 
-      {first ? (
-        <>
-          <p className="mb-4 text-[13px] leading-relaxed text-muted">
-            {items.length === 1
-              ? t('guided.oneThing')
-              : t('guided.someThings').replace('{n}', String(items.length))}
-          </p>
+        {first ? (
+          <>
+            <TheOneThing item={first} />
 
-          <TheOneThing item={first} />
-
-          {/*
-            Everything else is listed without a control. A second button beside
-            the first is two things asking to be done, which is the state this
-            screen exists to remove.
-          */}
-          {rest.length > 0 && (
-            <div className="mt-5">
-              <div className="mb-2 text-[11px] uppercase tracking-wider text-muted">
-                {t('guided.after')}
-              </div>
-              <ul className="space-y-1.5">
+            {rest.length > 0 && (
+              <ul className="mt-8 space-y-3">
                 {rest.map((item) => (
                   <li key={`${item.matterId}:${item.kind}`}>
                     <Link
                       to={`/matters/${item.matterId}`}
-                      className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5 rounded border border-line px-3 py-2 text-[12.5px] transition-colors hover:border-muted"
+                      className="group flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-line pb-3 transition-colors hover:border-muted"
                     >
-                      <span>{item.title}</span>
-                      <span className="text-[11.5px] text-muted">
-                        {t(item.kind === 'overdue' ? 'attention.overdueKind' : `attention.${item.kind}`)}
+                      <span className="font-display text-[16px] text-sand transition-colors group-hover:text-paper">
+                        {item.title}
+                      </span>
+                      <span className="text-[12px] text-muted">
+                        {t(
+                          item.kind === 'overdue'
+                            ? 'attention.overdueKind'
+                            : `attention.${item.kind}`,
+                        )}
                         {remaining(item, t) && <span> · {remaining(item, t)}</span>}
                       </span>
                     </Link>
                   </li>
                 ))}
               </ul>
-            </div>
+            )}
+          </>
+        ) : (
+          // An answer, not a blank — and set large, because for most people
+          // opening this it is the whole of the first question's answer.
+          <Display className="max-w-[20ch] text-sand">{t('guided.clearShort')}</Display>
+        )}
+      </Block>
+
+      {/*
+        What the board is doing, always. The screen that asked only what needs
+        *you* was empty for an observer, an auditor, and anybody looking before
+        they have credentials — which is everybody, the first time.
+      */}
+      <Block label={t('guided.whatIsHappening')}>
+        <div className="grid gap-8 sm:grid-cols-3">
+          {matters !== null && <Count n={open} of={t('guided.countOpen')} to="/classic" />}
+          {drifting !== null && <Count n={drifting} of={t('guided.countDrift')} to="/register" />}
+          {unexamined !== null && (
+            <Count n={unexamined} of={t('guided.countUnexamined')} to="/register" />
           )}
-        </>
-      ) : (
-        // An answer, not a blank. Being told the board is clear is information.
-        <p className="mb-4 max-w-prose text-[13.5px] leading-relaxed">{t('guided.clear')}</p>
-      )}
-
-      {/*
-        Putting something to the board is not a thing asking to be done — it is
-        a thing somebody came here to start — so it sits quietly below the card
-        rather than beside it. Absent for anyone who could not open a matter.
-      */}
-      {mayDeliberate(identity?.role) && (
-        <div className="mt-7">
-          <SmartRaise boardId="demo-board" />
         </div>
+      </Block>
+
+      {mayDeliberate(identity?.role) && (
+        <Block>
+          <SmartRaise boardId="demo-board" />
+        </Block>
       )}
 
-      {/*
-        Everything else, behind one link. A scholar who wants the register knows
-        they want the register, and nothing is removed by not showing it here.
-      */}
-      <div className="mt-8 border-t border-line pt-4">
+      <Block className="border-t border-line pt-5">
         <Link
           to="/more"
-          className="text-[12.5px] text-muted underline decoration-line underline-offset-4 transition-colors hover:text-paper"
+          className="text-[13px] text-muted underline decoration-line underline-offset-4 transition-colors hover:text-paper"
         >
-          {t('guided.everything')}
+          {t('guided.everything')} →
         </Link>
-      </div>
+      </Block>
     </div>
   );
 }

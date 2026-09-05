@@ -14,15 +14,27 @@
 
 :root {
   /* Palette — the same values as the site and the protocol application. */
-  --g-ink: #0E1017;
-  --g-surface: #171A24;
-  --g-deep: #1E2230;
+  --g-ink: #0B0C10;
+  --g-surface: #14161C;
+  --g-deep: #1C1F27;
   --g-line: rgba(255, 255, 255, 0.11);
-  --g-muted: #7F8192;
-  --g-paper: #F5F4F1;
-  --g-sand: #B0B1BE;
-  --g-gold: #F7CC74;
-  --g-gold-soft: #E8964A;
+  --g-muted: #71747F;
+  --g-paper: #F6F5F2;
+  --g-sand: #A8ABB8;
+  --g-gold: #F2C464;
+  --g-gold-soft: #D9A648;
+
+  /*
+   * State, which the palette did not have.
+   *
+   * Everything that held — a condition met, a ruling in force, a position
+   * recorded — rendered in the same grey as its surroundings, and the alarm
+   * shared a hex with the accent so neither said anything. One colour per
+   * role, spent on that role only.
+   */
+  --g-settled: #6FBF9B;
+  --g-attention: #E8A33D;
+  --g-breach: #DB6A5A;
 
   /* Derived states */
   --g-surface-raised: var(--g-deep);

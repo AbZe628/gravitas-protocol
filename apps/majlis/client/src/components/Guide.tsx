@@ -1,0 +1,195 @@
+import { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useI18n } from '../lib/i18n.js';
+
+/**
+ * The guide, present on every screen.
+ *
+ * The complaint this answers: *an application full of good solutions nobody
+ * will ever discover.* A board member meets words Majlis never explains —
+ * matter, direction, timelock, drift, standing, adoption — and screens whose
+ * purpose is obvious only to whoever built them. Documentation nobody opens is
+ * not an answer, so the application can be asked about itself from wherever
+ * somebody happens to be standing.
+ *
+ * ── it is not the assistant, and the difference is the point ──────────────
+ *
+ * Nothing here is generated and no question leaves the building. The subject is
+ * **Majlis** — what a screen is for, what a word means, what an act does, what
+ * happens next. That is knowledge the codebase has, so the answer is instant,
+ * identical every time, and available in the installations that have no
+ * assistant, which is most of them.
+ *
+ * It does not say whether anything is permissible. A guide is a likelier place
+ * to be asked than the assistant is, because it is the thing that looks like it
+ * will answer anything — so the refusal is on the server, ahead of any
+ * matching, and it offers what the guide can properly do rather than stopping.
+ *
+ * ── open, it is a panel and not a takeover ────────────────────────────────
+ *
+ * Anchored to the corner, sized to be read, and it closes on Escape. A reader
+ * asking what a word means has not stopped doing the thing they were doing.
+ */
+
+interface Answer {
+  topic: string | null;
+  answer: string;
+  goTo: { label: string; path: string } | null;
+  seeAlso: string[];
+  refused: boolean;
+}
+
+/** Openers, so a reader need not compose a question to get anything. */
+const STARTERS = ['start', 'matter', 'vote', 'drift'] as const;
+
+export default function Guide() {
+  const { t } = useI18n();
+  const [open, setOpen] = useState(false);
+  const [question, setQuestion] = useState('');
+  const [answer, setAnswer] = useState<Answer | null>(null);
+  const [busy, setBusy] = useState(false);
+  const box = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    box.current?.focus();
+    const escape = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false);
+    window.addEventListener('keydown', escape);
+    return () => window.removeEventListener('keydown', escape);
+  }, [open]);
+
+  async function ask(asked: string) {
+    if (asked.trim().length < 2 || busy) return;
+    setBusy(true);
+    try {
+      // A read, so a GET. Nothing here changes anything.
+      const res = await fetch('/api/guide?q=' + encodeURIComponent(asked));
+      if (res.ok) setAnswer((await res.json()) as Answer);
+    } catch {
+      // Nothing is lost: the reader can ask again, and the page they were on
+      // is untouched.
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  if (!open) {
+    return (
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="fixed bottom-5 end-5 z-40 flex items-center gap-2 rounded-full border border-line bg-raised px-4 py-2.5 text-[13px] text-sand shadow-lift transition-all hover:-translate-y-px hover:text-paper"
+      >
+        <span aria-hidden className="text-gold">?</span>
+        {t('guide.open')}
+      </button>
+    );
+  }
+
+  return (
+    <div className="fixed bottom-5 end-5 z-40 w-[min(26rem,calc(100vw-2.5rem))]">
+      <div className="rounded-card border border-line bg-raised shadow-lift">
+        <div className="flex items-center justify-between border-b border-line px-4 py-3">
+          <div>
+            <div className="text-[13px] font-medium text-paper">{t('guide.title')}</div>
+            {/* What it is for, and what it is not, in one line. */}
+            <div className="mt-0.5 text-[11.5px] text-muted">{t('guide.scope')}</div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setOpen(false)}
+            aria-label={t('guide.close')}
+            className="text-[18px] leading-none text-muted transition-colors hover:text-paper"
+          >
+            ×
+          </button>
+        </div>
+
+        <div className="max-h-[22rem] overflow-y-auto px-4 py-3.5">
+          {answer ? (
+            <>
+              <p
+                className={
+                  'text-[13.5px] leading-[1.6] ' + (answer.refused ? 'text-attention' : 'text-sand')
+                }
+              >
+                {answer.answer}
+              </p>
+
+              {answer.goTo && (
+                <Link
+                  to={answer.goTo.path}
+                  onClick={() => setOpen(false)}
+                  className="mt-3 inline-block text-[13px] text-gold underline decoration-gold/40 underline-offset-4"
+                >
+                  {answer.goTo.label} →
+                </Link>
+              )}
+
+              {/* What a reader is likely to want next, asked with one press. */}
+              {answer.seeAlso.length > 0 && (
+                <div className="mt-4 flex flex-wrap gap-1.5">
+                  {answer.seeAlso.map((next) => (
+                    <button
+                      key={next}
+                      type="button"
+                      onClick={() => {
+                        setQuestion(t(`guide.ask.${next}`));
+                        void ask(t(`guide.ask.${next}`));
+                      }}
+                      className="rounded-full border border-line px-2.5 py-1 text-[12px] text-muted transition-colors hover:border-muted hover:text-paper"
+                    >
+                      {t(`guide.ask.${next}`)}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </>
+          ) : (
+            <>
+              <p className="text-[13.5px] leading-[1.6] text-sand">{t('guide.intro')}</p>
+              <div className="mt-3.5 flex flex-wrap gap-1.5">
+                {STARTERS.map((s) => (
+                  <button
+                    key={s}
+                    type="button"
+                    onClick={() => {
+                      setQuestion(t(`guide.ask.${s}`));
+                      void ask(t(`guide.ask.${s}`));
+                    }}
+                    className="rounded-full border border-line px-2.5 py-1 text-[12px] text-muted transition-colors hover:border-muted hover:text-paper"
+                  >
+                    {t(`guide.ask.${s}`)}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            void ask(question);
+          }}
+          className="flex gap-2 border-t border-line px-4 py-3"
+        >
+          <input
+            ref={box}
+            value={question}
+            onChange={(e) => setQuestion(e.target.value)}
+            placeholder={t('guide.placeholder')}
+            className="w-full rounded-lg border border-line bg-transparent px-3 py-2 text-[13.5px] outline-none transition-colors focus:border-muted"
+          />
+          <button
+            type="submit"
+            disabled={busy || question.trim().length < 2}
+            className="rounded-lg bg-gold px-3.5 text-[13px] font-medium text-ink transition-opacity disabled:opacity-30"
+          >
+            {t('guide.ask')}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+}

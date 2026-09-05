@@ -22,6 +22,7 @@ import Assistant from './pages/Assistant.js';
 import Record from './pages/Record.js';
 import Search from './pages/Search.js';
 import SignedInAs from './components/SignedInAs.js';
+import Guide from './components/Guide.js';
 import { useHealth } from './lib/health.js';
 
 function Nav() {
@@ -194,6 +195,13 @@ export default function App() {
           <Nav />
         </div>
       )}
+
+      {/*
+        On every screen, because the question "what does this mean" arrives
+        wherever somebody happens to be standing — and an application that keeps
+        its explanations on a page of their own has explanations nobody reads.
+      */}
+      <Guide />
     </div>
   );
 }
