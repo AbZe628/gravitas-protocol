@@ -58,6 +58,8 @@ import {
 import { driftReport } from '../services/drift.js';
 import { assembleDossier, renderDossier } from '../services/dossier.js';
 import { ACCEPTED, MAX_BYTES, NoVault, UnacceptableFile, type Vault } from '../store/vault.js';
+import { ExtractionRefused } from '../services/extraction.js';
+import { ReadingOff, ReadingUnavailable, type Reading } from '../services/reading.js';
 import { structures } from '../data/structures.js';
 import { buildManual, renderManual } from '../services/manual.js';
 import { reviewStatus, reviewsDue } from '../services/review.js';
@@ -161,6 +163,17 @@ const assetSchema = z.object({
 
 const retireSchema = z.object({ reason: z.string().min(3).max(2_000) });
 
+/**
+ * What to look for in a document.
+ *
+ * Named by the caller and never chosen by the model. A model that decided which
+ * figures the board wanted would be deciding what the board was asking, which
+ * is the one thing extraction must never do.
+ */
+const extractSchema = z.object({
+  fields: z.array(z.string().min(1).max(120)).min(1).max(40),
+});
+
 const findingSchema = z.object({
   conditionId: z.string().min(1).max(120),
   holds: z.enum(['met', 'not_met', 'not_applicable']),
@@ -191,6 +204,14 @@ export function governanceRoutes(
    * surface offered where nothing can be kept is a surface that lies.
    */
   vault: Vault = new NoVault(),
+  /**
+   * Whether a document may be read by a model.
+   *
+   * Its own switch and separately off, because sending a member's question
+   * somewhere and sending the bank's accounts somewhere are decisions of
+   * different size.
+   */
+  reading: Reading = new ReadingOff(),
 ): Router {
   const router = Router();
 
@@ -479,6 +500,75 @@ export function governanceRoutes(
         `attachment; filename="${source.file.name.replace(/[^\w. -]/g, '_')}"`,
       );
       res.send(bytes);
+    }),
+  );
+
+  /**
+   * Read figures out of an attached document.
+   *
+   * Proposes and fills nothing in. What comes back is candidates, each with the
+   * sentence it came from, and nothing enters a calculation until a member
+   * confirms it — which is why this returns rather than writes, and why it
+   * takes no board and no calculation.
+   *
+   * Stateless like the calculations themselves. Nothing is stored: the figures
+   * are the institution's, and a proposal nobody confirmed is not a record of
+   * anything.
+   */
+  router.post(
+    '/matters/:id/sources/:sourceId/extract',
+    handle(async (req, res) => {
+      const who = identityOf(req);
+      if (!requireRole(res, mayDeliberate(who.role), 'read a document', who.role)) return;
+
+      const parsed = extractSchema.safeParse(req.body);
+      if (!parsed.success) return badRequest(res, parsed.error.issues);
+
+      const matter = await store.matter(req.params.id);
+      if (!matter) {
+        res.status(404).json({ error: 'not_found', message: 'No such matter.' });
+        return;
+      }
+
+      const source = matter.sources.find((x) => x.id === req.params.sourceId);
+      if (!source?.file) {
+        res.status(404).json({ error: 'not_found', message: 'That source is not a document.' });
+        return;
+      }
+
+      const bytes = await vault.get(source.file.key);
+      if (!bytes) {
+        res.status(404).json({
+          error: 'not_found',
+          message:
+            'The record cites a document this installation cannot find, so there is nothing to ' +
+            'read. That is a missing file rather than a missing citation.',
+        });
+        return;
+      }
+
+      try {
+        res.json(
+          await reading.read({
+            bytes,
+            mediaType: source.file.mediaType,
+            documentName: source.file.name,
+            fields: parsed.data.fields,
+          }),
+        );
+      } catch (e) {
+        if (e instanceof ReadingUnavailable) {
+          // A setting rather than a fault, and the difference matters: the
+          // figures can be typed in, which is what they always were.
+          res.status(501).json({ error: e.code, message: e.message });
+          return;
+        }
+        if (e instanceof ExtractionRefused) {
+          res.status(502).json({ error: e.code, message: e.message });
+          return;
+        }
+        throw e;
+      }
     }),
   );
 

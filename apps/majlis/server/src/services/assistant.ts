@@ -362,6 +362,17 @@ const OUTPUT_VIOLATIONS: RegExp[] = [
   // ---- English ------------------------------------------------------------
   /\b(?:this|it|that)\s+(?:is|would\s+be|appears\s+to\s+be|seems\s+to\s+be|seems)\s+(?:halal|haram|permissible|impermissible|shariah[- ]compliant|non[- ]compliant|acceptable|unobjectionable|sound)\b/i,
   /\bwould\s+be\s+(?:halal|haram|permissible|impermissible)\b/i,
+  /*
+   * The aside. "…3,200,000 AED, which is permissible" is a verdict wearing a
+   * subordinate clause, and the pattern above misses it because it wants a
+   * pronoun in front.
+   *
+   * Deliberately the unambiguous vocabulary only. "which is acceptable" and
+   * "which is sound" occur in ordinary mechanical answers — a boolean that is
+   * acceptable input to a guard — and catching those would refuse the
+   * technical questions this assistant exists for.
+   */
+  /\b(?:which|that)\s+(?:is|are|would\s+be)\s+(?:halal|haram|permissible|impermissible|shariah[- ]compliant|non[- ]compliant)\b/i,
   /\bi\s+(?:would\s+)?(?:recommend|suggest|advise)\s+(?:approving|rejecting|permitting|refusing)\b/i,
   /\bfrom\s+a\s+shariah\s+perspective,?\s+(?:this|it)\s+(?:is|would\s+be)\b/i,
   /\bscholars\s+(?:generally\s+)?(?:hold|agree|consider|maintain|are\s+of\s+the\s+view)\b/i,

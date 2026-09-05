@@ -386,10 +386,28 @@ So: extraction is off by default, configured per institution, and **the manual
 path can never be removed.** A bank that will not send its accounts anywhere
 types the figures in and loses nothing but time.
 
-The three gates apply unchanged. Extraction is transcription and not a ruling,
-so it passes the first two — but a model that offered *"non-permissible income
-is 3.2%, which is within the threshold"* would be stopped by the third, and
-should be.
+The three gates apply, and building it refined how. Extraction is transcription
+and not a ruling, so it passes the first two. The third — the output check —
+runs on **the model’s own words rather than on the whole response**, and the
+distinction turned out to be the more interesting half of the design.
+
+A model that writes *"non-permissible income is 3.2%, which is within the
+threshold"* has stopped transcribing and started ruling: the whole response is
+refused, not filtered, because one that reached for a verdict once is not one
+to take the rest of the page from. The same sentence **inside a quote** is a
+prospectus talking, and refusing it would be refusing to transcribe what the
+page says.
+
+So quotes are exempt from the third gate and held to a different test: they
+must appear in the document. A verdict smuggled in as a quote is discarded for
+not matching — and where there is no text to match against, the candidate
+carries `quoteVerified: false`, which is the interface saying these are the
+model’s words about the document rather than words anybody checked.
+
+Building it also found a real hole in the shared gate: it caught *"this is
+permissible"* and missed *"which is permissible"*, which is exactly the aside
+form. Fixed for the assistant too, and deliberately only for the unambiguous
+vocabulary — *"which is acceptable"* occurs in ordinary mechanical answers.
 
 ---
 
