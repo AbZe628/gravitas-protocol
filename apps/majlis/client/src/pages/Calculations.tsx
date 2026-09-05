@@ -4,6 +4,7 @@ import Distribution from '../components/Distribution.js';
 import Purification from '../components/Purification.js';
 import Recorded from '../components/Recorded.js';
 import Screening from '../components/Screening.js';
+import Tradability from '../components/Tradability.js';
 import Zakat from '../components/Zakat.js';
 
 /**
@@ -38,9 +39,9 @@ import Zakat from '../components/Zakat.js';
  * saying so comes from the server and is shown before the panel offers to act.
  */
 
-type Tab = 'screening' | 'purification' | 'zakat' | 'distribution' | 'recorded';
+type Tab = 'screening' | 'purification' | 'zakat' | 'distribution' | 'tradability' | 'recorded';
 
-const TABS: Tab[] = ['screening', 'purification', 'zakat', 'distribution', 'recorded'];
+const TABS: Tab[] = ['screening', 'purification', 'zakat', 'distribution', 'tradability', 'recorded'];
 
 export default function Calculations() {
   const { t } = useI18n();
@@ -89,6 +90,7 @@ export default function Calculations() {
         {tab === 'purification' && <Purification />}
         {tab === 'zakat' && <Zakat />}
         {tab === 'distribution' && <Distribution />}
+        {tab === 'tradability' && <Tradability />}
         {tab === 'recorded' && <Recorded />}
       </div>
 

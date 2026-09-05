@@ -636,6 +636,60 @@ export interface IncidentList {
   incidents: Incident[];
 }
 
+// ── tradability ───────────────────────────────────────────────────────────
+
+export type PartKind = 'tangible' | 'debt' | 'cash' | 'receivable' | 'other';
+
+export const PART_KINDS: readonly PartKind[] = ['tangible', 'debt', 'cash', 'receivable', 'other'];
+
+export interface CompositionPart {
+  label: string;
+  /** Basis points. The parts must sum to 10 000. */
+  bps: number;
+  kind: PartKind;
+}
+
+/**
+ * One band of the board's rule, in the board's own words.
+ *
+ * `fromBps` inclusive, `toBps` exclusive, so adjacent bands meet without
+ * overlapping and a proportion on a boundary belongs to the band above.
+ */
+export interface TradabilityBand {
+  fromBps: number;
+  toBps: number;
+  /** What the board said happens here. Quoted, never paraphrased. */
+  consequence: string;
+}
+
+export interface TradabilityInput {
+  asOf: string;
+  source: string;
+  parts: CompositionPart[];
+  /** Which kinds this board counts on the tangible side. Never inferred. */
+  countsAsTangible: PartKind[];
+  bands: TradabilityBand[];
+  authority: string;
+}
+
+export interface Tradability {
+  asOf: string;
+  source: string;
+  authority: string;
+  countsAsTangible: PartKind[];
+  byKind: { kind: PartKind; bps: number; percent: string }[];
+  countedBps: number;
+  countedPercent: string;
+  /** The board's sentence for this band, or null where the rule does not reach. */
+  band: TradabilityBand | null;
+  /** Said when `band` is null. Names the hole rather than filling it. */
+  unstated: string | null;
+  steps: CalcStep[];
+  /** Standards governing this composition whatever the proportion says. */
+  alsoGovernedBy: string[];
+  note: string;
+}
+
 // ── screening ─────────────────────────────────────────────────────────────
 
 export interface Figures {
@@ -1034,6 +1088,16 @@ export const oversight = {
   purify: (input: PurificationInput) => send<Purified>('/api/purification', input),
   zakat: (input: ZakatInput) => send<Zakat>('/api/zakat', input),
   distribute: (input: DistributionInput) => send<Distribution>('/api/distribution', input),
+
+  /**
+   * Where a composition falls, and what this board said about that band.
+   *
+   * The proportion is arithmetic; the consequence is the board's own sentence,
+   * carried back verbatim. A composition landing outside every band comes back
+   * with `band: null` and the gap named in `unstated` — a 200, because the
+   * arithmetic succeeded and it is the rule that has the hole.
+   */
+  tradability: (input: TradabilityInput) => send<Tradability>('/api/tradability', input),
 
   /**
    * Recording one, and reading what has been recorded.

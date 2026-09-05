@@ -1371,6 +1371,96 @@ describe('zakat, over HTTP', () => {
   });
 });
 
+describe('tradability, over HTTP', () => {
+  const composition = {
+    asOf: '2026-07-01',
+    source: 'Trustee composition report, 1 July 2026',
+    authority: 'Board resolution of 12 March 2026, on AAOIFI SS-59',
+    parts: [
+      { label: 'Leased aircraft', bps: 5400, kind: 'tangible' },
+      { label: 'Murabaha receivables', bps: 3600, kind: 'receivable' },
+      { label: 'Cash at bank', bps: 1000, kind: 'cash' },
+    ],
+    countsAsTangible: ['tangible'],
+    bands: [
+      { fromBps: 0, toBps: 5100, consequence: 'Redemption at par only.' },
+      { fromBps: 5100, toBps: 10000, consequence: 'May be traded at a negotiated price.' },
+    ],
+  };
+
+  const post = (body: Record<string, unknown>) =>
+    request(app).post('/api/tradability').set('Authorization', as('member-a')).send(body);
+
+  it('computes the proportion and hands back the board’s own sentence', async () => {
+    const res = await post(composition).expect(200);
+
+    expect(res.body.countedPercent).toBe('54.00');
+    expect(res.body.band.consequence).toBe('May be traded at a negotiated price.');
+    expect(res.body.unstated).toBeNull();
+  });
+
+  it('refuses to say what counts as tangible, and names the kinds', async () => {
+    const res = await post({ ...composition, countsAsTangible: [] }).expect(400);
+
+    expect(res.body.error).toBe('no_counted_side');
+    expect(res.body.message).toContain('classification question');
+    // An API client cannot send a kind it was never told about.
+    expect(res.body.kinds).toContain('tangible');
+    expect(res.body.kinds).toContain('receivable');
+  });
+
+  it('names the gap where the board’s rule does not reach the composition', async () => {
+    const res = await post({
+      ...composition,
+      bands: [{ fromBps: 5100, toBps: 10000, consequence: 'May be traded at a negotiated price.' }],
+      parts: [
+        { label: 'Leased aircraft', bps: 3000, kind: 'tangible' },
+        { label: 'Murabaha receivables', bps: 7000, kind: 'receivable' },
+      ],
+    }).expect(200);
+
+    // 200, not 400. The arithmetic succeeded; it is the board's rule that has
+    // the hole, and reporting that is the answer rather than a failure.
+    expect(res.body.band).toBeNull();
+    expect(res.body.unstated).toContain('hole in the rule');
+  });
+
+  it('refuses a composition that does not sum to the whole', async () => {
+    const res = await post({
+      ...composition,
+      parts: [{ label: 'Leased aircraft', bps: 5400, kind: 'tangible' }],
+    }).expect(400);
+
+    expect(res.body.error).toBe('bad_figure');
+    expect(res.body.message).toContain('proportion of an unknown');
+  });
+
+  it('refuses where two bands cover the same proportion', async () => {
+    const res = await post({
+      ...composition,
+      bands: [
+        { fromBps: 0, toBps: 5100, consequence: 'Par only.' },
+        { fromBps: 3000, toBps: 10000, consequence: 'Tradable.' },
+      ],
+    }).expect(400);
+
+    expect(res.body.message).toContain('choosing between them is a ruling');
+  });
+
+  it('points at the standard that governs a pool holding only debt', async () => {
+    const res = await post({
+      ...composition,
+      parts: [{ label: 'Deferred instalments', bps: 10000, kind: 'debt' }],
+    }).expect(200);
+
+    expect(res.body.alsoGovernedBy.join(' ')).toContain('SS-59');
+  });
+
+  it('refuses anonymously, like every other route', async () => {
+    await request(app).post('/api/tradability').send({}).expect(401);
+  });
+});
+
 describe('drift, over HTTP', () => {
   it('finds the pool that has fallen below the threshold its own ruling set', async () => {
     const res = await request(app).get('/api/drift').set('Authorization', as('watcher')).expect(200);

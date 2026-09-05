@@ -49,6 +49,7 @@ import { buildRegister, readComposition, standingOf } from '../services/register
 import { checklistFor, recordFinding, setStructure } from '../services/structure.js';
 import { PURIFICATION_METHODS, purify, type PurificationInput } from '../services/purification.js';
 import { distribute, type DistributionInput } from '../services/distribution.js';
+import { assessTradability, type TradabilityInput } from '../services/tradability.js';
 import {
   ZAKAT_METHODS,
   ZAKAT_YEARS,
@@ -68,7 +69,7 @@ import { search, type SearchFilters } from '../services/search.js';
 import { relatedTo } from '../services/precedent.js';
 import type { Store } from '../store/index.js';
 import type { Deliberation, Matter, SourceKind } from '../types.js';
-import { SOURCE_KINDS } from '../types.js';
+import { PART_KINDS, SOURCE_KINDS } from '../types.js';
 
 /**
  * The board a matter belongs to, or a 404 already sent.
@@ -1084,6 +1085,41 @@ export function governanceRoutes(
       }
 
       res.json(computeZakat(body as ZakatInput));
+    }),
+  );
+
+  /**
+   * Whether a pool trades at its price, or is redeemed at par.
+   *
+   * The proportion is arithmetic and the consequence is the board's. What comes
+   * back is where the composition falls and the sentence this board wrote about
+   * that band, quoted — never a permission composed here. A composition landing
+   * outside every band the board described comes back with the gap named and
+   * nothing concluded from it, which is a more useful answer than the nearest
+   * band would have been.
+   *
+   * Stateless like the other three. The composition is the trustee's and is not
+   * held here until a board attaches it to something.
+   */
+  router.post(
+    '/tradability',
+    handle(async (req, res) => {
+      const body = req.body as Partial<TradabilityInput>;
+
+      if (!Array.isArray(body?.countsAsTangible) || body.countsAsTangible.length === 0) {
+        res.status(400).json({
+          error: 'no_counted_side',
+          message:
+            'Send which parts this board counts on the tangible side, under ' +
+            '"countsAsTangible". Some boards count usufruct there and some do not, and ' +
+            'reading it off the labels would settle a classification question that is the ' +
+            'board’s to settle.',
+          kinds: PART_KINDS,
+        });
+        return;
+      }
+
+      res.json(assessTradability(body as TradabilityInput));
     }),
   );
 

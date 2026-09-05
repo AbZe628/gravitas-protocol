@@ -283,15 +283,47 @@ what was actually done.*
 Reserves are where displaced commercial risk hides, which is why the working
 matters more here than anywhere else.
 
-### 4.5 Tangibility and tradability — ◐ the watching is built, the tradability rule is not
+### 4.5 Tangibility and tradability — ✅ built, on the screen
 
 Whether a sukuk or a mixed pool may be traded at market price, and at what point
 it may only be redeemed at par. Draws on the composition already designed in
 [REGISTER.md](REGISTER.md) §5: parts in basis points, totalled by kind, the
-ratio computed and the threshold the board set applied.
+proportion computed and the board's own rule applied to it.
 
 This is also where the **drift** matters most — a pool crosses the line by
-rebalancing, without anybody acting.
+rebalancing, without anybody acting. `drift.ts` already watches for that; this
+is the calculation a board runs deliberately.
+
+**It holds the line in the hardest place.** The sentence a board wants out of
+this is a permission — *may we trade this?* — and the temptation to have the
+software answer is strongest exactly where the question is most useful. So the
+board states its rule as **bands**: a proportion, and the sentence the board
+itself wrote about that proportion. Majlis computes where the composition falls
+and repeats the board's sentence back, quoted and attributed. That is not a
+verdict; it is the same relation zakat has to the base the board chose.
+
+Three things follow, and each is the point rather than a limitation:
+
+- **What counts as the tangible side is supplied.** Reading `kind: 'tangible'`
+  and making it the numerator would settle a classification question. Some
+  boards count usufruct there, some count receivables against, some treat cash
+  as neither. Nothing is ticked by default on the screen.
+- **A proportion in no band is a gap, named in place.** Not rounded into the
+  nearest band and not answered. A board that set a floor and never said what
+  happens below it has a hole in its rule, and being told so is worth more than
+  a consequence nobody wrote.
+- **Two bands over the same proportion is a refusal.** Not first-match, not a
+  precedence rule. Both sentences apply and choosing between them is a ruling.
+
+A pool that is entirely debt or entirely cash is pointed at the standard that
+actually governs it — SS-59 or SS-1 — rather than left to infer it from a
+tangible ratio of 0.00%. That is a fact beside the band, never instead of it.
+
+There is no cross-multiplication here and its absence is not an omission: parts
+arrive in basis points against a whole of 10 000, so the test is integer against
+integer and there is nothing to round. What the parts must do is **sum to the
+whole**, and the form says what is undescribed while it is being typed rather
+than refusing afterwards.
 
 ### 4.6 Late payment — ✚
 
@@ -701,30 +733,33 @@ application does not pretend to have them.
 
 ## 10. Where the next session starts
 
-*As of 2026-09-05. 1152 server tests, 170 client, typecheck clean, build clean.*
+*As of 2026-09-05. 1184 server tests, 184 client, typecheck clean, build clean.*
 
-**The whole of the §9 order is built**, §4a included. Register, judging in one
-click, composition and drift, meetings as record, naming a colleague, a document
-per holding, durable storage, and now reading figures out of a document — server
-and screen both.
+**The §9 order is built, §4a included, and §4.5 with it.** Register, judging in
+one click, composition and drift, meetings as record, naming a colleague, a
+document per holding, durable storage, reading figures out of a document, and
+tradability — server and screen for every one.
 
-**What is left is not a feature.** Two things, and neither is an afternoon:
+**One calculation is left: §4.6 late payment.** Small, and it is the same shape
+as the rest — an amount identified, a method the board prescribes, and a
+destination. It feeds purification, which is already built, so it has somewhere
+to go the day it exists.
 
-1. **Arabic and Urdu are about two hundred strings short** — 564 English keys
-   against 374 Arabic and 363 Urdu. The missing ones fall back to English
-   silently, which is the right failure mode and the wrong outcome in a product
-   whose point is that a board can work in Arabic. It needs a decision about who
-   writes and reviews them.
+**And two things that are not features.** Neither is an afternoon:
+
+1. **Arabic and Urdu are short** — 564 English keys and the other two behind it.
+   The missing ones fall back to English silently, which is the right failure
+   mode and the wrong outcome in a product whose point is that a board can work
+   in Arabic. It needs a decision about who writes and reviews them.
 
 2. **The two newest paths cannot be shown.** Upload needs a member credential
    and a mounted volume; reading needs those and a key besides. Both are covered
    by tests and both are honestly absent in a demonstration rather than present
    and refusing.
 
-From §4 the unbuilt calculations remain: **4.5 tradability** (the watching is
-built, the rule is not) and **4.6 late payment**, which is small and feeds
-purification. Neither is blocked by anything.
-
 The one thing worth reading before touching any of it is §6 — what this is
 honestly not. Every feature since has been easier to get right by being clear
-about what it refuses to do than by adding to what it does.
+about what it refuses to do than by adding to what it does, and §4.5 is the
+sharpest case: the useful answer and the forbidden one are the same sentence,
+and the whole design is the distance between quoting the board and composing a
+permission.
