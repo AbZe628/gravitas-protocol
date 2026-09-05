@@ -290,6 +290,16 @@ becomes the unit of subject.**
    because an empty section under a token's name reads as an absence of
    problems rather than as an absence of rulings.
 
+All six are built, server and screen.
+
+One thing has been added to §5 since it was written: the drift in that section
+watches for a threshold being crossed while nobody is looking, and TOOLKIT §4.5
+is now the calculation a board runs deliberately against the same composition.
+The board states its rule as bands — a proportion, and the sentence the board
+itself wrote about it — and Majlis computes where the composition falls and
+quotes that sentence back. Neither of them concludes; the difference is that
+drift goes looking and tradability is asked.
+
 ---
 
 ## 10. Still open
