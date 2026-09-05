@@ -1,7 +1,8 @@
-import { NavLink, Route, Routes } from 'react-router-dom';
+import { NavLink, Route, Routes, useLocation } from 'react-router-dom';
 import { useI18n } from './lib/i18n.js';
 import { LANGS } from './locales/index.js';
 import Dashboard from './pages/Dashboard.js';
+import Guided from './pages/Guided.js';
 import MatterDetail from './pages/MatterDetail.js';
 import Rules from './pages/Rules.js';
 import AssetDetail from './pages/AssetDetail.js';
@@ -104,6 +105,14 @@ function LangSwitch() {
 
 export default function App() {
   const { t } = useI18n();
+
+  /*
+   * Twelve navigation items under a screen whose whole point is that one thing
+   * needs you contradicts the screen. There, a scholar has one link — everything
+   * else — and it goes to Classic, where the nav belongs and is unchanged.
+   */
+  const guided = useLocation().pathname === '/';
+
   return (
     <div className="min-h-dvh bg-ink text-paper font-sans flex flex-col">
       <header className="border-b border-line bg-surface">
@@ -119,13 +128,22 @@ export default function App() {
         </div>
       </header>
 
-      <div className="hidden md:block">
-        <Nav />
-      </div>
+      {!guided && (
+        <div className="hidden md:block">
+          <Nav />
+        </div>
+      )}
 
       <main className="mx-auto w-full max-w-reading flex-1 px-5 py-6 pb-24 md:pb-10">
         <Routes>
-          <Route path="/" element={<Dashboard />} />
+          {/*
+            Guided answers the only question a scholar arrives with — is there
+            anything here for me — and stops. Classic is the same Dashboard,
+            unchanged, one link away: nothing was removed, and what changed is
+            what a person sees first.
+          */}
+          <Route path="/" element={<Guided />} />
+          <Route path="/classic" element={<Dashboard />} />
           <Route path="/matters/:id" element={<MatterDetail />} />
           <Route path="/register" element={<Register />} />
           <Route path="/register/:id" element={<AssetDetail />} />
@@ -144,9 +162,11 @@ export default function App() {
         </Routes>
       </main>
 
-      <div className="md:hidden">
-        <Nav />
-      </div>
+      {!guided && (
+        <div className="md:hidden">
+          <Nav />
+        </div>
+      )}
     </div>
   );
 }

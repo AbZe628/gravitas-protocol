@@ -314,7 +314,8 @@ describe('raising a matter', () => {
   function renderDashboard() {
     return render(
       <I18nProvider>
-        <MemoryRouter initialEntries={['/']}>
+        {/* Raising a matter lives on the Dashboard, which is now at /classic. */}
+        <MemoryRouter initialEntries={['/classic']}>
           <App />
         </MemoryRouter>
       </I18nProvider>,

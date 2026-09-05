@@ -127,13 +127,18 @@ describe('shell', () => {
     expect(await screen.findAllByText(/nothing here signs/i)).not.toHaveLength(0);
   });
 
+  /*
+   * At /classic, because / now answers the one question a scholar arrives with
+   * and stops. The Dashboard is unchanged and one link away, and these two hold
+   * that nothing was removed by moving it.
+   */
   it('shows matters before the board', async () => {
-    renderApp();
+    renderApp('/classic');
     await waitFor(() => expect(screen.getByText('Test matter')).toBeInTheDocument());
   });
 
   it('surfaces the number of affected transactions on the list', async () => {
-    renderApp();
+    renderApp('/classic');
     await waitFor(() => expect(screen.getByText(/47/)).toBeInTheDocument());
   });
 
