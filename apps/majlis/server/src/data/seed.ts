@@ -274,6 +274,86 @@ export const poolRuling: Matter = {
   id: 'matter-2026-04-02',
   boardId: 'demo-board',
   assetIds: ['asset-mixed-pool'],
+  /**
+   * Judged against the sukuk shape, and answered.
+   *
+   * It always was a sukuk question — a pool of leased assets and receivables,
+   * traded at market price, turning on the proportion that is tangible — and
+   * `matter-2026-07-03` already names sukuk for exactly that reason. Saying so
+   * here costs nothing and makes the pair what a board's year actually looks
+   * like: a question decided, and a second one of the same shape arriving
+   * months later.
+   *
+   * The findings are seeded because this matter is **in force**. A board that
+   * brought a permission into force having answered nothing is the gap the
+   * passage panel now reports, and leaving it that way would have kept a hole
+   * in the record for the sake of a rule about matters still being deliberated.
+   * The reasons below are this demonstration board's, in the register of a real
+   * one, and the whole file is marked illustrative.
+   */
+  structureId: 'sukuk',
+  findings: [
+    {
+      conditionId: 'holders-own-the-assets',
+      holds: 'met',
+      reason:
+        'The trust deed passes an undivided share in the leased assets to unitholders, and the ' +
+        'administrator confirms the assets are held outside the originator’s balance sheet.',
+      scholarId: 'member-a',
+      at: '2026-03-27T10:15:00Z',
+    },
+    {
+      conditionId: 'no-purchase-undertaking-at-face-value',
+      holds: 'met',
+      reason:
+        'The originator’s undertaking is at the net asset value on the day of exercise. We saw ' +
+        'the clause; it is not at par and not at outstanding principal.',
+      scholarId: 'member-b',
+      at: '2026-03-27T11:40:00Z',
+    },
+    {
+      conditionId: 'tangible-ratio-for-trading',
+      holds: 'met',
+      reason:
+        'Tangible assets and usufructs are the majority of pool value, and the threshold is set ' +
+        'in the operative terms of this ruling rather than assumed. It is measured monthly from ' +
+        'the administrator’s published breakdown.',
+      scholarId: 'member-a',
+      at: '2026-03-28T09:05:00Z',
+    },
+    {
+      conditionId: 'returns-from-the-assets',
+      holds: 'met',
+      reason:
+        'Distributions are the lease rentals net of costs. The liquidity facility is disclosed ' +
+        'separately and is not a term of the units.',
+      scholarId: 'member-c',
+      at: '2026-03-28T14:22:00Z',
+    },
+    {
+      conditionId: 'proceeds-used-as-stated',
+      holds: 'met',
+      reason: 'The assets are identified by serial number in the schedule to the prospectus.',
+      scholarId: 'member-b',
+      at: '2026-03-29T08:30:00Z',
+    },
+    {
+      /*
+       * Not met, and deliberately. A demonstration where the board agreed with
+       * everything teaches nothing, and a ruling can be brought into force on
+       * conditions the board found against — that is what the operative terms
+       * are for.
+       */
+      conditionId: 'income-screened-where-mixed',
+      holds: 'not_met',
+      reason:
+        'The administrator does not presently report income by source, so the non-permissible ' +
+        'proportion cannot be worked out. Permission is given on the condition that this ' +
+        'reporting begins, and purification is computed from it each period.',
+      scholarId: 'member-a',
+      at: '2026-03-29T09:50:00Z',
+    },
+  ],
   title: 'Secondary trading of a mixed pool at market price',
   origin: 'institution_request',
   direction: 'permit',

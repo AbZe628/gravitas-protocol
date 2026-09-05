@@ -373,9 +373,28 @@ describe('the seeded record can show a checklist', () => {
     }
   });
 
-  it('seeds no findings against it, because a board that never met has said nothing', () => {
-    for (const m of seedMatters.filter((m) => m.structureId)) {
-      expect(m.findings ?? []).toEqual([]);
+  it('seeds no findings on one still being deliberated, because nobody has met', () => {
+    for (const m of seedMatters.filter((m) => m.structureId && m.status === 'deliberation')) {
+      expect(m.findings ?? [], `${m.id} answers conditions no board has met about`).toEqual([]);
+    }
+  });
+
+  it('does seed them on one in force, because that board did meet and did decide', () => {
+    /*
+     * The narrower rule, and the one originally meant.
+     *
+     * A permission brought into force with nothing answered is a hole in the
+     * record — `passage.ts` now reports exactly that — and leaving the seed
+     * that way would have preserved the hole for the sake of a rule about
+     * matters still open. It also means a demonstration can show the thing this
+     * record exists to accumulate: a second question of the same shape opening
+     * with what the board said the first time.
+     */
+    const decided = seedMatters.filter((m) => m.structureId && m.status === 'in_force');
+    expect(decided.length, 'no seeded matter is both decided and judged against a shape').toBeGreaterThan(0);
+
+    for (const m of decided) {
+      expect((m.findings ?? []).length, `${m.id} is in force and answers nothing`).toBeGreaterThan(0);
     }
   });
 

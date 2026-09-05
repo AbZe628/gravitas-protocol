@@ -166,8 +166,15 @@ export default function Inherited({
             hearing that it has ruled on this three times, and being shown what
             it said, is being handed the thing a call cannot give it.
           */}
+          {/*
+            Counted as previous rulings rather than as an ordinal for this one.
+            'the 2th question' was wrong in English and an ordinal does not
+            survive translation into Arabic or Urdu at all.
+          */}
           <p className="text-[14px] leading-snug">
-            {t('inherit.times').replace('{n}', String(inheritance.timesRuled))}
+            {inheritance.timesRuled > 2
+              ? t('inherit.timesMany').replace('{n}', String(inheritance.timesRuled - 1))
+              : t('inherit.timesOnce')}
           </p>
           <p className="mt-1 text-[12.5px] leading-relaxed text-muted">
             <Link to={`/matters/${inheritance.from.id}`} className="underline underline-offset-4">
