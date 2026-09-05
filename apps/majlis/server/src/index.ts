@@ -1,4 +1,6 @@
-import 'dotenv/config';
+// First, and it must stay first: it loads the env file the rest of this
+// module's imports are about to read defaults from.
+import './env.js';
 import { createApp } from './app.js';
 import { assertConfiguredForProduction } from './middleware/basicAuth.js';
 import { scopeToInstitution } from './store/index.js';

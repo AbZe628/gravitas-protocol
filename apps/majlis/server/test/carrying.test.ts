@@ -203,3 +203,20 @@ describe('it describes what will happen, never whether it is right', () => {
     }
   });
 });
+
+describe('the prose is prose', () => {
+  it('carries no markdown, because nothing renders it', () => {
+    const both = [buildCarrying(matter(TERMS), attached()), buildCarrying(matter(TERMS), none())];
+
+    /*
+     * Found on the screen: asterisks printed as asterisks. Emphasis is the
+     * interface's job rather than the record's, and the badge above the
+     * sentence already carries it.
+     */
+    for (const c of both) {
+      for (const line of [c.whenChecked, c.drift, ...c.limits]) {
+        expect(line).not.toMatch(/\*\*|__|\[.+\]\(.+\)/);
+      }
+    }
+  });
+});

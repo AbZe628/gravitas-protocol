@@ -175,8 +175,13 @@ export function buildCarrying(matter: Matter, snapshot: EnforcementSnapshot): Ca
   const unreachable = snapshot.reachable === false;
   const paused = snapshot.paused === true;
 
+  /*
+   * No markdown. Nothing renders it, so asterisks printed as asterisks on the
+   * screen — and emphasis is the interface's job rather than the record's. The
+   * badge above this sentence already carries it.
+   */
   const whenChecked =
-    `These terms are read by ${carrier} **before every transaction that depends on them**. ` +
+    `These terms are read by ${carrier} before every transaction that depends on them. ` +
     'A transaction that would breach one does not execute — it is refused at the point of ' +
     'attempt rather than found afterwards.';
 
