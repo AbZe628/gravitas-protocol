@@ -34,10 +34,18 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 20
+          # Off deliberately, and it has to be said out loud.
+          #
+          # From setup-node v5 the action caches on its own when it finds a
+          # `packageManager` field, and apps/web/package.json has one. This is
+          # the job whose lockfile is wrong on Linux — see the note below — so
+          # a cache keyed on that lockfile is the last thing it needs. Silence
+          # here would have turned the version bump into a behaviour change.
+          package-manager-cache: false
 
       - name: Install the application
         working-directory: apps/web
@@ -78,7 +86,7 @@ jobs:
           grep -q 'href="/app/dashboard"' _pages/index.html || { echo "the marketing page does not point at the application"; exit 1; }
           grep -q '/app/assets/' _pages/app/index.html || { echo "the application was built for the wrong base path"; exit 1; }
 
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: _pages
 
@@ -90,4 +98,4 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
