@@ -210,7 +210,7 @@ export default function Guided() {
       */}
       <div className="mt-8 border-t border-line pt-4">
         <Link
-          to="/classic"
+          to="/more"
           className="text-[12.5px] text-muted underline decoration-line underline-offset-4 transition-colors hover:text-paper"
         >
           {t('guided.everything')}

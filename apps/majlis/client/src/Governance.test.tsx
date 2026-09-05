@@ -97,7 +97,15 @@ function stub(setup: Setup = {}) {
 function renderMatter() {
   return render(
     <I18nProvider>
-      <MemoryRouter initialEntries={['/matters/m1']}>
+      {/*
+        The classic path, deliberately.
+
+        `/matters/:id` now shows one act at a time — the question, then the
+        position, then what happened — and these hold the page that shows
+        everything at once. That page is unchanged and still reachable, and
+        testing it here is what proves the guided screen removed nothing.
+      */}
+      <MemoryRouter initialEntries={['/classic/matters/m1']}>
         <App />
       </MemoryRouter>
     </I18nProvider>,

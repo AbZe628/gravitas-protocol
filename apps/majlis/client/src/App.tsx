@@ -3,6 +3,8 @@ import { useI18n } from './lib/i18n.js';
 import { LANGS } from './locales/index.js';
 import Dashboard from './pages/Dashboard.js';
 import Guided from './pages/Guided.js';
+import MatterAction from './pages/MatterAction.js';
+import More from './pages/More.js';
 import MatterDetail from './pages/MatterDetail.js';
 import Rules from './pages/Rules.js';
 import AssetDetail from './pages/AssetDetail.js';
@@ -107,11 +109,19 @@ export default function App() {
   const { t } = useI18n();
 
   /*
-   * Twelve navigation items under a screen whose whole point is that one thing
-   * needs you contradicts the screen. There, a scholar has one link — everything
-   * else — and it goes to Classic, where the nav belongs and is unchanged.
+   * The three guided screens carry no navigation.
+   *
+   * Twelve items under a screen whose whole point is that one thing needs you
+   * contradicts the screen. What needs me, one matter, and everything else each
+   * carry the single link they need instead.
+   *
+   * Every other page keeps it. Somebody who has gone into the register from
+   * 'everything else' needs a way out that is not the browser's back button,
+   * and that is where the nav has always earned its place.
    */
-  const guided = useLocation().pathname === '/';
+  const path = useLocation().pathname;
+  const guided =
+    path === '/' || path === '/more' || /^\/matters\/[^/]+$/.test(path);
 
   return (
     <div className="min-h-dvh bg-ink text-paper font-sans flex flex-col">
@@ -143,8 +153,17 @@ export default function App() {
             what a person sees first.
           */}
           <Route path="/" element={<Guided />} />
+          <Route path="/more" element={<More />} />
+
+          {/*
+            One matter, one act. `MatterDetail` puts twelve sections on a page
+            and a scholar scrolls past all of them to reach the thing they came
+            to do. Every section still exists, unchanged, at the classic path —
+            what changed is that they no longer compete with the act.
+          */}
+          <Route path="/matters/:id" element={<MatterAction />} />
+          <Route path="/classic/matters/:id" element={<MatterDetail />} />
           <Route path="/classic" element={<Dashboard />} />
-          <Route path="/matters/:id" element={<MatterDetail />} />
           <Route path="/register" element={<Register />} />
           <Route path="/register/:id" element={<AssetDetail />} />
           <Route path="/rules" element={<Rules />} />
