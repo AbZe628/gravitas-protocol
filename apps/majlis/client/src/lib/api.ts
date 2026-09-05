@@ -636,6 +636,38 @@ export interface IncidentList {
   incidents: Incident[];
 }
 
+// ── the passage a matter makes ────────────────────────────────────────────
+
+export type StepState = 'done' | 'open' | 'ahead' | 'skipped' | 'not_applicable';
+
+/** Whose act it is. Named on every step, because that is how matters stall. */
+export type Whose = 'board' | 'signatory' | 'liaison' | 'institution' | 'software' | 'clock';
+
+export interface PassageStep {
+  key: string;
+  act: string;
+  whose: Whose;
+  state: StepState;
+  at: string | null;
+  /** What is in the way, in plain words, or null. */
+  standing: string | null;
+  /** Whether the system actually refuses to go on without this. */
+  enforced: boolean;
+  why: string;
+}
+
+export interface Passage {
+  matterId: string;
+  /** A set. The order is the work's, not ours. */
+  shaping: PassageStep[];
+  /** A sequence. The lifecycle refuses to reorder it. */
+  deciding: PassageStep[];
+  /** The one act to do next, or null where the matter is settled. */
+  next: PassageStep | null;
+  waiting: { days: number; since: string; on: Whose; note: string } | null;
+  settled: string | null;
+}
+
 // ── late payment ──────────────────────────────────────────────────────────
 
 export type LateMethod = 'stipulated_amount' | 'rate_on_overdue';
@@ -1128,6 +1160,15 @@ export const oversight = {
   closeIncident: (id: string) => send<Incident>(`/api/incidents/${id}/close`),
 
   manual: () => get<Manual>('/api/manual?format=json'),
+
+  /**
+   * Where a matter stands, and what the next act is.
+   *
+   * Derived on read. It reports what is in the record and what is not, and
+   * never that the question is well enough put to be decided — that is the
+   * board's judgement.
+   */
+  passage: (matterId: string) => get<Passage>(`/api/matters/${matterId}/passage`),
 
   screen: (figures: Figures, previous?: Assessment) =>
     send<{ assessment: Assessment; crossings: Crossing[] }>('/api/screening', { figures, previous }),

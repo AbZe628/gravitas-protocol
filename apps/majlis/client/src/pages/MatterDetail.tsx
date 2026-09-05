@@ -13,6 +13,7 @@ import Checklist from '../components/Checklist.js';
 import Screening from '../components/Screening.js';
 import VotePanel from '../components/VotePanel.js';
 import { mayDeliberate, useIdentity } from '../lib/identity.js';
+import Passage from '../components/Passage.js';
 
 /** The statuses a document exists for. Mirrors SETTLED in services/fatwa.ts. */
 const DECIDED = ['in_force', 'timelock', 'rejected', 'lapsed', 'withdrawn'];
@@ -57,6 +58,14 @@ export default function MatterDetail() {
       <div className="mb-5 rounded-lg border border-line bg-surface/60 px-4 py-3 text-[13px] leading-relaxed text-muted">
         {t(`matter.direction.${matter.direction}Note`)}
       </div>
+
+      {/*
+        Where this stands and what is next, above everything else on the page.
+        Every panel below was already here; what was missing is the order, and
+        a member who has not done this before could not tell whether the matter
+        was nearly decided or barely begun.
+      */}
+      <Passage matterId={matter.id} />
 
       {/*
         The document, at the moment of decision. High on the page because for

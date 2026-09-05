@@ -74,6 +74,7 @@ import { reviewStatus, reviewsDue } from '../services/review.js';
 import { assess, crossings, type Assessment, type Figures } from '../services/screening.js';
 import { search, type SearchFilters } from '../services/search.js';
 import { relatedTo } from '../services/precedent.js';
+import { buildPassage } from '../services/passage.js';
 import type { Store } from '../store/index.js';
 import type { Deliberation, Matter, SourceKind } from '../types.js';
 import { PART_KINDS, SOURCE_KINDS } from '../types.js';
@@ -787,6 +788,33 @@ export function governanceRoutes(
    * interaction, the same operative term — never a resemblance. Offering a
    * scholar a coincidence as a precedent would invite them to treat it as one.
    */
+  /**
+   * Where this matter stands, and what the next act is.
+   *
+   * Read rather than stored. Everything it reports is already in the matter —
+   * what it adds is the order, which until now a scholar had to know before
+   * opening the page. UX.md §7.1 designed this and nothing built it.
+   *
+   * It says what is in the record and what is not. It does not say the question
+   * is well enough put to decide, which is the board's judgement and not a
+   * count this route may reach.
+   */
+  router.get(
+    '/matters/:id/passage',
+    handle(async (req, res) => {
+      const board = await boardFor(store, res, req.params.id);
+      if (!board) return;
+      const matter = await store.matter(req.params.id);
+      if (!matter) return;
+
+      const structure = matter.structureId
+        ? (structures.find((s) => s.id === matter.structureId) ?? null)
+        : null;
+
+      res.json(buildPassage(board, matter, structure, new Date().toISOString()));
+    }),
+  );
+
   router.get(
     '/matters/:id/related',
     handle(async (req, res) => {
