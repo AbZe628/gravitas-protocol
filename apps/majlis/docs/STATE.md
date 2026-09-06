@@ -51,33 +51,38 @@ each formula so rounding happens once.
 | `services/dictation.ts` | speech to text | off by default, because the browser sends audio away |
 | `src/env.ts` | loads `.env` | its own module, because ESM imports hoist above `dotenv.config()` |
 
-### The one thing in the backend that is actually broken
+### The assistant, which could not have answered anything — fixed
 
-**`server/src/services/assistant.ts:522` will 400 on any current model.**
+`thinking: { type: 'enabled', budget_tokens: 1536 }` is **rejected** by every
+current model: a 400, not a warning and not a degraded answer. The parameter is
+deprecated on 4.6 and refused on everything after it, so the call had been dead
+for as long as the models it was written against have been superseded — and
+1,300 tests passed the whole time, because a stubbed client accepts anything.
 
-```ts
-thinking: { type: 'enabled', budget_tokens: ASSISTANT_THINKING_BUDGET },
-```
+Fixed 6 September 2026:
 
-`budget_tokens` is deprecated on Opus 4.6 / Sonnet 4.6 and **rejected outright**
-on Opus 5, Opus 4.8, Opus 4.7, Sonnet 5 and Fable 5/5.1. The replacement is
-`thinking: { type: 'adaptive' }` with effort carried on `output_config`.
+- **SDK 0.65.0 → 0.124.0.** The older one has no type for `adaptive`, so the
+  upgrade had to come first. Nothing else needed changing for it: the server
+  typechecks and every test passes against the new one untouched.
+- **Adaptive thinking.** Better shaped than what it replaces — a fixed budget
+  spends the same on a definition and on an edge case.
+- **`max_tokens` 4,096 → 8,192**, because adaptive draws its reasoning from
+  inside the ceiling, and an answer squeezed out by it is reported here as a
+  *transport* failure — a fault that looks like the network rather than a
+  setting.
+- **Three model defaults** were a generation behind: assistant, extraction, and
+  `.env.example`, which had drifted behind the code and was missing
+  `EXTRACTION_MODEL` entirely. All on `claude-opus-5`. The classifier stays on
+  Haiku 4.5 by its full id — the small model in the current family is not an
+  old model.
+- **`test/request-shape.test.ts`** asserts what we *send* rather than what
+  comes back, which no test did. It cannot prove the API accepts the request —
+  that needs a key, and keys are the institution’s — but it holds the two
+  things that went stale in silence.
 
-Two more staleness problems sit with it:
-
-- `assistant.ts:26` — `ASSISTANT_MODEL` defaults to `claude-sonnet-4-6`, and
-  `EXTRACTION_MODEL` does the same. Previous generation. Should be
-  `claude-opus-5`.
-- `server/package.json:19` — `"@anthropic-ai/sdk": "^0.65.0"`. That version has
-  no types for `adaptive` or `output_config`, so **the SDK has to be upgraded
-  before the call can be fixed**, not after.
-
-Order of work: upgrade the SDK → change the two model defaults → replace the
-thinking block → run the three gates' tests (they are the thing most likely to
-notice a changed model).
-
-This has been diagnosed but deliberately not touched, because it cannot be
-verified without a live key, and keys are the user's to handle.
+**Still unproven:** none of this has been run against the live API. The shape
+is right by the SDK’s own types and by the current documentation; whether a
+real key returns a real answer is untested here on purpose.
 
 ### Backend things that exist but have never been exercised
 
@@ -434,11 +439,11 @@ the premise, and tests enforce it. SmartRaise is guided-only.
 
 ## 5. What to pick up first, in order
 
-1. **Fix the Anthropic integration**: SDK upgrade, then models, then the
-   thinking block. It is the only thing in the application that is broken
-   rather than unfinished.
-2. **Decide who writes the Arabic and Urdu.** Not a coding task, and it
+1. **Decide who writes the Arabic and Urdu.** Not a coding task, and it
    blocks 391 strings.
+2. **Run the assistant against a real key once.** Everything about the
+   request is right by the SDK types and the current documentation, and none
+   of it has met the API. That is the last unproven thing in the backend.
 3. **Draw the screens that have no artboard** — Coming, Meetings, Settings,
    the incident path — and check the built ones against the drawings again
    with fresh eyes. Every page is composed; whether every page is *right* is
