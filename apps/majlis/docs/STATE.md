@@ -196,21 +196,50 @@ Each of the three also states, on the screen, what it is **not**:
   Dates are shown but sort nothing. Superseded entries stay readable at 62%
   rather than hidden, because nothing here is deleted.
 
-### Not applied yet — this is the big one
+### Applied — the ground turned over
 
-The canvas is settled. **The application does not look like it.**
+The application is on the light palette. The move that made it cheap was not
+renaming a single class: 1,067 places in the markup already spoke the token
+vocabulary, so `tailwind.config.js` and `tokens.css` changed what each name
+**means** rather than what it is called. `ink` is still the page, `paper` is
+still the text; which of them is dark is all that moved.
 
-- `client/src/components/kit.tsx` — written, correct in shape, wrong palette,
-  and **imported by nothing**.
-- `client/tailwind.config.js` and `client/src/design/tokens.css` — still hold a
-  **dark** ground from an earlier pass (`ink #0B0C10 / surface #14161C /
-  raised #1C1F27`).
-- `client/src/components/Shell.tsx` — the frame is right (260px grouped rail,
-  top bar with identity and role, mobile drawer). The **content inside it is
-  still flat**.
+What that pass covered:
 
-Those three move together or the application ends up speaking two languages at
-once. That is the next real piece of work on the interface.
+- **No borders.** Nothing draws a one-pixel line any more. A surface is a
+  white sheet on vellum with a half-pixel ring and two soft shadows; the one
+  thing a screen is about carries a third (`shadow-lift`).
+- **Gold stopped being the accent.** It was on every control because it used
+  to mean the board’s authority. It now means the clock, and the board’s own
+  acts are `lapis` — a new token. Nineteen controls across fifteen files
+  moved; gold-ruled panels stayed, because a gold rule beside a quotation is
+  still the board’s own words.
+- **`kit.tsx` is used.** It was written and imported by nothing. It is now the
+  light language — `Card` with `lead` and `quiet`, `Edge` (the tapering rule),
+  `State`, `Act` in lapis or gold, `Figure` — and `pages/Guided.tsx` is built
+  from it.
+- **`Shell.tsx`** is translucent over a blurred vellum with the sweep beneath,
+  the mark at the head of the rail, and a segmented language control.
+
+Checked by looking, at 1440 and at 375, not only by testing. One real bug
+found that way: the top bar overflowed the right edge of a phone, because the
+language control and the identity block would not both fit. The identity text
+now stands down below `sm` and the avatar carries it alone.
+
+### Still not applied — what the next pass is
+
+- **Nineteen pages still carry the old flat markup.** They are light and
+  coherent now, because they inherited the tokens, but only `Guided` was
+  rebuilt on `kit`. The rest are prose in a column, not the canvas layouts.
+- **The work area is still `max-w-reading` (58rem), centred.** The canvas work
+  area is ~1,168px and holds a narrow list beside an open thing. A centred
+  928px column is the shape that made this read as a document in the first
+  place, and widening it needs the pages to be rebuilt in the same pass —
+  otherwise prose simply gets longer lines.
+- **The signed-in view has never been seen.** The lead card with the tapering
+  edge and the gold *Open it* only renders for a member, and member
+  credentials are the user’s to create (`npm run members -w server`). What was
+  verified in a browser is the observer view.
 
 ### What already exists on screen
 
@@ -243,8 +272,11 @@ the premise, and tests enforce it. SmartRaise is guided-only.
 
 ## 5. What to pick up first, in order
 
-1. **Bring the application to the canvas**: tokens + tailwind config +
-   `kit.tsx`, together, then the content inside `Shell.tsx`.
+1. **Rebuild the pages on `kit`, widening the work area in the same pass.**
+   Nineteen pages still hold prose in a centred 58rem column. Widen
+   `Shell`’s main to the canvas’ work-area width only together with the page
+   that fills it — widening alone just makes the lines longer. Start with the
+   three the canvas draws: calculations, library, register.
 2. **Fix the Anthropic integration**: SDK upgrade, then models, then the
    thinking block.
 3. **Decide who writes the Arabic and Urdu.** Not a coding task, and it blocks
