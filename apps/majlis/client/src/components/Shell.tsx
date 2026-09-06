@@ -1,8 +1,9 @@
-import { useState } from 'react';
+
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { useI18n } from '../lib/i18n.js';
 import { useIdentity } from '../lib/identity.js';
 import { useHealth } from '../lib/health.js';
+import { useBoardName } from '../lib/board.js';
 import { LANGS } from '../locales/index.js';
 
 /**
@@ -160,11 +161,110 @@ function atWorkArea(path: string): boolean {
   return WORK_AREA.includes(path) || path.startsWith('/classic/matters/');
 }
 
+/** The member, as a mark. Same in both mastheads, so it is written once. */
+function Avatar({ id }: { id?: string }) {
+  return (
+    <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-gradient-to-br from-lapissoft to-[#133A5F] font-display text-[15px] text-[#F2DFB5] shadow-[0_2px_6px_-1px_rgba(19,58,95,0.35)]">
+      {(id ?? '?').slice(0, 1).toUpperCase()}
+    </div>
+  );
+}
+
+/**
+ * The phone's navigation: four places, across the bottom, where a thumb is.
+ *
+ * This replaces a hamburger opening the desktop rail. Twelve destinations do
+ * not fit a phone and should not try to: the artboard reduces them to the four
+ * a member actually opens between two other things, and everything else is one
+ * tap away under *Everything else* on the arrival screen — which is what that
+ * screen is for.
+ *
+ * The guide is the fourth because it is the only one that is not a place. It
+ * opens the panel rather than navigating, so it is a button among links, and
+ * it says so to a screen reader by being one.
+ */
+function TabBar() {
+  const { t } = useI18n();
+
+  const tabs = [
+    { to: '/', label: t('tab.work'), end: true, icon: 'work' },
+    { to: '/record', label: t('nav.record'), icon: 'record' },
+    { to: '/calendar', label: t('nav.calendar'), icon: 'coming' },
+  ] as const;
+
+  const icon = (kind: string, active: boolean) => {
+    const stroke = active ? '#164470' : '#B3A896';
+    if (kind === 'work') {
+      return (
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke={stroke} strokeWidth="1.9" strokeLinecap="round">
+          <path d="M4 6h16M4 12h16M4 18h10" />
+        </svg>
+      );
+    }
+    if (kind === 'record') {
+      return (
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke={stroke} strokeWidth="1.9" strokeLinecap="round">
+          <rect x="4" y="4" width="16" height="16" rx="2.5" />
+          <path d="M9 9h6M9 14h4" />
+        </svg>
+      );
+    }
+    return (
+      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke={stroke} strokeWidth="1.9" strokeLinecap="round">
+        <circle cx="12" cy="12" r="8.5" />
+        <path d="M12 7.5v5l3.2 2" />
+      </svg>
+    );
+  };
+
+  return (
+    <nav
+      aria-label={t('shell.menu')}
+      className="fixed inset-x-0 bottom-0 z-40 flex items-start justify-around bg-raised/85 px-3 pt-2.5 shadow-[0_-0.5px_0_rgba(25,23,19,0.09)] backdrop-blur-xl lg:hidden"
+      style={{ paddingBottom: 'calc(0.5rem + env(safe-area-inset-bottom))' }}
+    >
+      {tabs.map((tab) => (
+        <NavLink
+          key={tab.to}
+          to={tab.to}
+          end={'end' in tab ? tab.end : undefined}
+          className="flex w-[74px] flex-col items-center gap-1.5 pb-1.5"
+        >
+          {({ isActive }) => (
+            <>
+              {icon(tab.icon, isActive)}
+              <span
+                className={
+                  'text-[10.5px] leading-none ' +
+                  (isActive ? 'font-bold text-lapis' : 'text-muted')
+                }
+              >
+                {tab.label}
+              </span>
+            </>
+          )}
+        </NavLink>
+      ))}
+
+      <button
+        type="button"
+        onClick={() => window.dispatchEvent(new CustomEvent('majlis:guide'))}
+        className="flex w-[74px] flex-col items-center gap-1.5 pb-1.5"
+      >
+        <svg width="21" height="21" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+          <path d="M8 1 L9.6 6.4 L15 8 L9.6 9.6 L8 15 L6.4 9.6 L1 8 L6.4 6.4 Z" fill="#B3A896" />
+        </svg>
+        <span className="text-[10.5px] leading-none text-muted">{t('guide.open')}</span>
+      </button>
+    </nav>
+  );
+}
+
 export default function Shell({ children }: { children: React.ReactNode }) {
   const { t, lang, setLang } = useI18n();
   const { identity } = useIdentity();
   const health = useHealth();
-  const [drawer, setDrawer] = useState(false);
+  const boardName = useBoardName();
   const path = useLocation().pathname;
 
   const groups: { title: string; items: Item[] }[] = [
@@ -240,45 +340,50 @@ export default function Shell({ children }: { children: React.ReactNode }) {
         {rail}
       </aside>
 
-      {/*
-        On a narrow screen the same rail slides in. A board reads this on a
-        phone between two other things, and a navigation that only exists at
-        1024px is a navigation half the board never sees.
-      */}
-      {drawer && (
-        <>
-          <button
-            type="button"
-            aria-label={t('shell.close')}
-            onClick={() => setDrawer(false)}
-            className="fixed inset-0 z-40 bg-paper/25 backdrop-blur-sm lg:hidden"
-          />
-          <aside className="fixed inset-y-0 start-0 z-50 w-[280px] overflow-y-auto bg-surface px-3 py-6 shadow-lift lg:hidden">
-            <div onClick={() => setDrawer(false)}>{rail}</div>
-          </aside>
-        </>
-      )}
-
       <div className="relative lg:ps-[260px]">
-        {/* ── the bar: where you are, who you are ─────────────────────── */}
-        <header className="sticky top-0 z-30 flex items-center justify-between gap-2 bg-ink/80 px-4 py-3 sm:gap-4 sm:px-5 shadow-[0_1px_0_rgba(25,23,19,0.055)] backdrop-blur-xl">
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => setDrawer(true)}
-              aria-label={t('shell.menu')}
-              className="rounded-xl bg-raised px-2.5 py-1.5 text-[13px] text-sand shadow-ring transition-colors hover:text-paper lg:hidden"
-            >
-              ☰
-            </button>
-            <span className="hidden text-[13px] text-muted sm:inline">{t('shell.where')}</span>
-          </div>
+        {/*
+          ── the phone's masthead ──────────────────────────────────────
+
+          Not a shrunken version of the wide bar. `design/Phone.dc.html`
+          draws the application naming itself and the board it belongs to,
+          with the member's avatar opposite — and no hamburger, because a
+          drawer holding the desktop rail is what makes a phone a small
+          desktop, which is the one thing the artboard note says it is not.
+
+          The board's name comes from the settings. Where it cannot be read
+          the line is simply absent: `app.stage` is a sentence about the
+          installation, and a truncated sentence where a name belongs reads
+          as a fault.
+        */}
+        <header className="sticky top-0 z-30 flex items-center justify-between gap-3 bg-ink/80 px-5 py-3 shadow-[0_1px_0_rgba(25,23,19,0.055)] backdrop-blur-xl lg:hidden">
+          <Link to="/" className="flex min-w-0 items-center gap-3">
+            <Mark />
+            <div className="min-w-0">
+              <div className="font-display text-[19px] leading-none tracking-[-0.016em]">
+                {t('app.name')}
+              </div>
+              {boardName && (
+                <div className="mt-1.5 truncate text-[11.5px] leading-none text-muted">
+                  {boardName}
+                </div>
+              )}
+            </div>
+          </Link>
+          <Avatar id={identity?.scholarId} />
+        </header>
+
+        {/* ── the wide bar: where you are, who you are ────────────────── */}
+        <header className="sticky top-0 z-30 hidden items-center justify-between gap-4 bg-ink/80 px-5 py-3 shadow-[0_1px_0_rgba(25,23,19,0.055)] backdrop-blur-xl lg:flex">
+          <span className="text-[13px] text-muted">{t('shell.where')}</span>
 
           <div className="flex items-center gap-4">
             {/*
               A segmented control: the container is the recess, the chosen one
               is a raised sheet. Three outlined buttons said nothing about
               which of them was in force.
+
+              It is only here. The phone masthead has no room for it, and on a
+              phone it lives on `/more`, which is that screen's whole job.
             */}
             <div className="flex gap-0.5 rounded-xl bg-paper/[0.045] p-[3px]">
               {LANGS.map((l) => (
@@ -288,7 +393,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
                   onClick={() => setLang(l.code)}
                   aria-pressed={lang === l.code}
                   className={
-                    'rounded-lg px-2 py-1 text-[12px] transition-all sm:px-2.5 ' +
+                    'rounded-lg px-2.5 py-1 text-[12px] transition-all ' +
                     (lang === l.code
                       ? 'bg-raised font-semibold text-paper shadow-[0_1px_2px_rgba(25,23,19,0.08)]'
                       : 'text-muted hover:text-sand')
@@ -302,7 +407,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
             {/* Who is here, and what they may do. It decides what half the
                 controls in this application are allowed to be. */}
             <div className="flex items-center gap-3">
-              <div className="hidden text-end sm:block">
+              <div className="text-end">
                 <div className="text-[12.5px] font-semibold leading-tight text-paper">
                   {identity?.scholarId ?? t('shell.anonymous')}
                 </div>
@@ -310,9 +415,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
                   {t(`role.${identity?.role ?? 'observer'}`)}
                 </div>
               </div>
-              <div className="grid h-9 w-9 place-items-center rounded-full bg-gradient-to-br from-lapissoft to-[#133A5F] font-display text-[15px] text-[#F2DFB5] shadow-[0_2px_6px_-1px_rgba(19,58,95,0.35)]">
-                {(identity?.scholarId ?? '?').slice(0, 1).toUpperCase()}
-              </div>
+              <Avatar id={identity?.scholarId} />
             </div>
           </div>
         </header>
@@ -320,7 +423,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
         <main
           key={path}
           className={
-            'mx-auto w-full px-5 py-8 pb-28 sm:px-8 sm:pb-24 ' +
+            'mx-auto w-full px-5 py-8 pb-[calc(6.5rem+env(safe-area-inset-bottom))] sm:px-8 lg:pb-24 ' +
             (atWorkArea(path) ? 'max-w-work' : 'max-w-reading')
           }
           style={{ animation: 'shellFade 220ms ease-out' }}
@@ -328,6 +431,8 @@ export default function Shell({ children }: { children: React.ReactNode }) {
           {children}
         </main>
       </div>
+
+      <TabBar />
 
       {/* A page change should be felt, not just happen. */}
       <style>{`@keyframes shellFade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}`}</style>

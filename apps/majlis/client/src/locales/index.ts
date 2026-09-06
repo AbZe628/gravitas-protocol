@@ -302,6 +302,8 @@ const en: Dict = {
   "action.home": "← Back to what needs me",
   "more.title": "Everything else",
   "more.intro": "Nothing here was removed from the first screen — it was moved off it, so that what needs you today is not competing with what the board keeps.",
+  "tab.work": "Work",
+  "more.language": "Language",
   "more.back": "← Back to what needs me",
   "more.decided": "What we decided",
   "more.hold": "What we hold",

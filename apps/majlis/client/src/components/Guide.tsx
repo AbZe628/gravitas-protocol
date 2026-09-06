@@ -58,6 +58,19 @@ export default function Guide() {
     return () => window.removeEventListener('keydown', escape);
   }, [open]);
 
+  /*
+   * The phone opens this from the tab bar rather than from a floating pill.
+   *
+   * An event rather than lifted state: the guide owns whether it is open, and
+   * hoisting that into the shell would put a panel's private business in the
+   * frame that every screen renders. The shell asks; this answers.
+   */
+  useEffect(() => {
+    const asked = () => setOpen(true);
+    window.addEventListener('majlis:guide', asked);
+    return () => window.removeEventListener('majlis:guide', asked);
+  }, []);
+
   async function ask(asked: string) {
     if (asked.trim().length < 2 || busy) return;
     setBusy(true);
@@ -78,7 +91,7 @@ export default function Guide() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="fixed bottom-5 end-5 z-40 flex items-center gap-2 rounded-full bg-raised px-4 py-2.5 text-[13px] font-medium text-sand shadow-[0_0_0_0.5px_rgba(25,23,19,0.08),0_2px_6px_rgba(25,23,19,0.09),0_14px_30px_-10px_rgba(25,23,19,0.3)] transition-all hover:-translate-y-px hover:text-paper"
+        className="fixed bottom-5 end-5 z-40 hidden items-center gap-2 rounded-full bg-raised lg:flex px-4 py-2.5 text-[13px] font-medium text-sand shadow-[0_0_0_0.5px_rgba(25,23,19,0.08),0_2px_6px_rgba(25,23,19,0.09),0_14px_30px_-10px_rgba(25,23,19,0.3)] transition-all hover:-translate-y-px hover:text-paper"
       >
         <svg aria-hidden width="14" height="14" viewBox="0 0 16 16" fill="none">
           <path d="M8 1 L9.6 6.4 L15 8 L9.6 9.6 L8 15 L6.4 9.6 L1 8 L6.4 6.4 Z" fill="#B08430" />
@@ -89,7 +102,7 @@ export default function Guide() {
   }
 
   return (
-    <div className="fixed bottom-5 end-5 z-40 w-[min(26rem,calc(100vw-2.5rem))]">
+    <div className="fixed bottom-[calc(4.75rem+env(safe-area-inset-bottom))] end-5 z-40 w-[min(26rem,calc(100vw-2.5rem))] lg:bottom-5">
       <div className="rounded-sheet bg-raised shadow-[0_0_0_0.5px_rgba(25,23,19,0.08),0_2px_6px_rgba(25,23,19,0.09),0_24px_48px_-16px_rgba(25,23,19,0.35)]">
         {/* `items-start` and a `shrink-0` close: on a phone the scope line
             wraps to two, and centred with a flexible close the × sat on top
