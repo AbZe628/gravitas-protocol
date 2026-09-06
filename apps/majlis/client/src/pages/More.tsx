@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useI18n } from '../lib/i18n.js';
 import { useHealth } from '../lib/health.js';
-import { LANGS } from '../locales/index.js';
 
 /**
  * Everything else, in one place, in the order a board would look for it.
@@ -29,7 +28,7 @@ interface Entry {
 }
 
 export default function More() {
-  const { t, lang, setLang } = useI18n();
+  const { t } = useI18n();
   const health = useHealth();
 
   const groups: { title: string; entries: Entry[] }[] = [
@@ -96,39 +95,6 @@ export default function More() {
           </section>
         ))}
       </div>
-
-      {/*
-        The language, on a phone.
-
-        The wide screen carries this in the bar. The phone masthead is the mark,
-        the application's name and the board's, and there is no room in it for
-        three more controls — so it belongs here, on the screen whose whole job
-        is everything the four tabs do not hold. It is shown only where the bar
-        is not, so it never appears twice.
-      */}
-      <section className="mt-8 lg:hidden">
-        <div className="mb-2.5 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
-          {t('more.language')}
-        </div>
-        <div className="flex gap-0.5 rounded-xl bg-paper/[0.045] p-[3px]">
-          {LANGS.map((l) => (
-            <button
-              key={l.code}
-              type="button"
-              onClick={() => setLang(l.code)}
-              aria-pressed={lang === l.code}
-              className={
-                'flex-1 rounded-lg px-3 py-2 text-[13px] transition-all ' +
-                (lang === l.code
-                  ? 'bg-raised font-semibold text-paper shadow-[0_1px_2px_rgba(25,23,19,0.08)]'
-                  : 'text-muted hover:text-sand')
-              }
-            >
-              {l.label}
-            </button>
-          ))}
-        </div>
-      </section>
 
       <div className="mt-8 border-t border-line pt-4">
         <Link

@@ -71,8 +71,8 @@ export class MemoryStore implements Store {
     this._rules = copy(seed.rules ?? seedRules);
     this._briefings = copy(seed.briefings ?? seedBriefings);
     this._matters = new Map((seed.matters ?? seedMatters).map((m) => [m.id, copy(m)]));
-    // No seeded incidents: a demonstration record that opens with a breach the
-    // board never reported would be a strange thing to show anyone.
+    // A bare store is an empty record, and stays one: what a board with
+    // nothing reported looks like is a thing worth being able to test.
     this._incidents = new Map((seed.incidents ?? []).map((i) => [i.id, copy(i)]));
     this._assets = new Map((seed.assets ?? seedAssets).map((a) => [a.id, copy(a)]));
     // Nothing seeded: a demonstration record opening with a zakat somebody

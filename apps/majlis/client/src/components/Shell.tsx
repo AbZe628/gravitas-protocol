@@ -4,7 +4,7 @@ import { useI18n } from '../lib/i18n.js';
 import { useIdentity } from '../lib/identity.js';
 import { useHealth } from '../lib/health.js';
 import { useBoardName } from '../lib/board.js';
-import { LANGS } from '../locales/index.js';
+import { LANGS, dirFor } from '../locales/index.js';
 
 /**
  * The application's frame.
@@ -190,6 +190,7 @@ function TabBar() {
     { to: '/', label: t('tab.work'), end: true, icon: 'work' },
     { to: '/record', label: t('nav.record'), icon: 'record' },
     { to: '/calendar', label: t('nav.calendar'), icon: 'coming' },
+    { to: '/more', label: t('tab.more'), icon: 'more' },
   ] as const;
 
   const icon = (kind: string, active: boolean) => {
@@ -209,10 +210,20 @@ function TabBar() {
         </svg>
       );
     }
+    if (kind === 'coming') {
+      return (
+        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke={stroke} strokeWidth="1.9" strokeLinecap="round">
+          <circle cx="12" cy="12" r="8.5" />
+          <path d="M12 7.5v5l3.2 2" />
+        </svg>
+      );
+    }
+    // Everything the four do not hold.
     return (
-      <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke={stroke} strokeWidth="1.9" strokeLinecap="round">
-        <circle cx="12" cy="12" r="8.5" />
-        <path d="M12 7.5v5l3.2 2" />
+      <svg width="21" height="21" viewBox="0 0 24 24" fill={stroke}>
+        <circle cx="5" cy="12" r="1.9" />
+        <circle cx="12" cy="12" r="1.9" />
+        <circle cx="19" cy="12" r="1.9" />
       </svg>
     );
   };
@@ -220,7 +231,7 @@ function TabBar() {
   return (
     <nav
       aria-label={t('shell.menu')}
-      className="fixed inset-x-0 bottom-0 z-40 flex items-start justify-around bg-raised/85 px-3 pt-2.5 shadow-[0_-0.5px_0_rgba(25,23,19,0.09)] backdrop-blur-xl lg:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 flex items-start bg-raised/85 px-1.5 pt-2.5 shadow-[0_-0.5px_0_rgba(25,23,19,0.09)] backdrop-blur-xl lg:hidden"
       style={{ paddingBottom: 'calc(0.5rem + env(safe-area-inset-bottom))' }}
     >
       {tabs.map((tab) => (
@@ -228,7 +239,7 @@ function TabBar() {
           key={tab.to}
           to={tab.to}
           end={'end' in tab ? tab.end : undefined}
-          className="flex w-[74px] flex-col items-center gap-1.5 pb-1.5"
+          className="flex flex-1 flex-col items-center gap-1.5 pb-1.5"
         >
           {({ isActive }) => (
             <>
@@ -249,7 +260,7 @@ function TabBar() {
       <button
         type="button"
         onClick={() => window.dispatchEvent(new CustomEvent('majlis:guide'))}
-        className="flex w-[74px] flex-col items-center gap-1.5 pb-1.5"
+        className="flex flex-1 flex-col items-center gap-1.5 pb-1.5"
       >
         <svg width="21" height="21" viewBox="0 0 16 16" fill="none" aria-hidden="true">
           <path d="M8 1 L9.6 6.4 L15 8 L9.6 9.6 L8 15 L6.4 9.6 L1 8 L6.4 6.4 Z" fill="#B3A896" />
@@ -372,6 +383,29 @@ export default function Shell({ children }: { children: React.ReactNode }) {
           <Avatar id={identity?.scholarId} />
         </header>
 
+        {/* The language, before anything else, because a reader who cannot
+            read the screen needs this before they need the screen. */}
+        <div className="sticky top-[60px] z-20 flex justify-end bg-ink/80 px-5 pb-2.5 backdrop-blur-xl lg:hidden">
+          <div className="flex gap-0.5 rounded-xl bg-paper/[0.045] p-[3px]">
+            {LANGS.map((l) => (
+              <button
+                key={l.code}
+                type="button"
+                onClick={() => setLang(l.code)}
+                aria-pressed={lang === l.code}
+                className={
+                  'rounded-lg px-3 py-1 text-[12px] transition-all ' +
+                  (lang === l.code
+                    ? 'bg-raised font-semibold text-paper shadow-[0_1px_2px_rgba(25,23,19,0.08)]'
+                    : 'text-muted')
+                }
+              >
+                {l.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* ── the wide bar: where you are, who you are ────────────────── */}
         <header className="sticky top-0 z-30 hidden items-center justify-between gap-4 bg-ink/80 px-5 py-3 shadow-[0_1px_0_rgba(25,23,19,0.055)] backdrop-blur-xl lg:flex">
           <span className="text-[13px] text-muted">{t('shell.where')}</span>
@@ -428,6 +462,25 @@ export default function Shell({ children }: { children: React.ReactNode }) {
           }
           style={{ animation: 'shellFade 220ms ease-out' }}
         >
+          {/*
+            Said once, at the top, and only in the language it is about.
+
+            Arabic is 190 keys short of English and Urdu 201. A reader who
+            switches and meets an English sentence three screens in has been
+            left to work out whether the software is broken; a board would
+            reasonably conclude it is. This says which of the two it is
+            looking at, in its own language, before it has to guess — and it
+            does not appear in English, where there is nothing to explain.
+          */}
+          {dirFor(lang) === 'rtl' && (
+            <div className="mb-8 rounded-sheet bg-raised/70 px-6 py-5 shadow-ring">
+              <div className="font-display text-[17px] leading-snug">{t('lang.notReady')}</div>
+              <p className="mt-2.5 max-w-[62ch] text-[13px] leading-[1.7] text-muted">
+                {t('lang.notReadyBody')}
+              </p>
+            </div>
+          )}
+
           {children}
         </main>
       </div>

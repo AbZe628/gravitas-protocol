@@ -13,6 +13,7 @@
 
 import { FileStore } from './file.js';
 import { MemoryStore } from './memory.js';
+import { incidents as seedIncidents, meetings as seedMeetings } from '../data/seed.js';
 import { TenantStore } from './tenant.js';
 import type { Store } from './store.js';
 
@@ -72,5 +73,18 @@ export function storeFromEnv(): Store {
     );
   }
 
-  return new MemoryStore();
+  /*
+   * The demonstration record, not a bare store.
+   *
+   * A bare `new MemoryStore()` is deliberately empty — a board with nothing
+   * reported and no meeting held is a real state, and eight tests are about
+   * it. But a scholar opening this application is not testing an empty
+   * state; they are trying to see what it does, and three of the screens
+   * they would open had nothing on them at all.
+   *
+   * Nobody is being quoted. This board is called 'Demonstration Board
+   * (illustrative data only)' and every member in it is an unnamed
+   * placeholder; see the header of data/seed.ts.
+   */
+  return new MemoryStore({ incidents: seedIncidents, meetings: seedMeetings });
 }

@@ -1,5 +1,5 @@
 import type {
-  Asset, Board, Institution, Matter, Briefing, Rule } from '../types.js';
+  Asset, Board, Institution, Matter, Briefing, Rule, Incident, Meeting } from '../types.js';
 import { hashParameters } from '../services/hash.js';
 
 /**
@@ -840,5 +840,143 @@ export const assets: Asset[] = [
     composition: null,
     retiredAt: null,
     retiredReason: null,
+  },
+];
+
+/**
+ * One reported event, mid-flow, and one meeting that happened.
+ *
+ * ── why these are here, when they deliberately were not ───────────────────
+ *
+ * `store/memory.ts` refused to seed either, and gave a good reason: a record
+ * that opens with a breach the board never reported would be putting words in
+ * a board's mouth. That reason is answered by the board these belong to. It is
+ * called *Demonstration Board (illustrative data only)*, every member is an
+ * unnamed placeholder, and the header of this file says in as many words that
+ * nothing in it represents any real scholar. Nobody is being quoted.
+ *
+ * What was left instead was three screens — events, meetings and what is
+ * coming — that a scholar opens to find nothing, which teaches them the
+ * application does nothing. The non-compliance path is nine steps long and four
+ * of them belong to the institution rather than the board; it cannot be
+ * understood from an empty page and a paragraph.
+ *
+ * So: one event far enough along to show the shape, with the thirty-day clock
+ * running and purification prescribed and unpaid, and one meeting recorded so
+ * the cadence has something to count from.
+ */
+export const incidents: Incident[] = [
+  {
+    id: 'incident-2026-08-14',
+    boardId: 'demo-board',
+    reference: 'SNC-2026-004',
+    title: 'Profit paid on a deposit before the underlying sale settled',
+    report:
+      'Retail term deposits maturing between 3 and 11 August were credited with their profit share on the maturity date. For 214 of them the underlying commodity sale had not completed at that point; it completed between one and four days later. The amounts were correct. What was early was the entitlement, not the arithmetic.',
+    reportedBy: 'liaison-1',
+    reportedAt: '2026-08-14T09:20:00Z',
+
+    stage: 'endorsed',
+
+    concurrences: [
+      {
+        scholarId: 'member-a',
+        actual: true,
+        reason:
+          'Profit on a murabaha is earned when the sale completes. Paying it before that is paying on a contract that does not yet exist, and the fact that the figure later turned out right does not make the entitlement have existed.',
+        at: '2026-08-18T10:05:00Z',
+      },
+      {
+        scholarId: 'member-b',
+        actual: true,
+        reason:
+          'Concur. I would add that the number of deposits is not what makes this actual — one would have been enough. It is the sequence.',
+        at: '2026-08-18T11:40:00Z',
+      },
+      {
+        scholarId: 'member-c',
+        actual: true,
+        reason:
+          'Actual, and the operations note attached to the report is the part the board should keep: the settlement lag is a known feature of the commodity desk, not an incident of these 214.',
+        at: '2026-08-18T14:12:00Z',
+      },
+    ],
+    determinedAt: '2026-08-18T14:12:00Z',
+    actual: true,
+
+    stopped: [
+      'Crediting profit on a term deposit before the underlying sale is confirmed settled',
+      'Every retail term deposit product using the same commodity desk',
+    ],
+
+    plans: [
+      {
+        filedBy: 'liaison-1',
+        filedAt: '2026-08-24T08:00:00Z',
+        steps: [
+          'Hold the profit credit until the desk confirms settlement, rather than on the maturity date.',
+          'Reconcile the 214 deposits and identify the profit attributable to the days before settlement.',
+          'Report the reconciled figure to the board for a purification direction.',
+          'Add a settlement check to the product release list so a new product cannot ship without one.',
+        ],
+        completeBy: '2026-09-17T00:00:00Z',
+        endorsedBy: ['member-a', 'member-b', 'member-c'],
+        endorsedAt: '2026-08-27T15:30:00Z',
+        returnedReason: null,
+      },
+    ],
+    directorsApprovedAt: null,
+    submittedToRegulatorAt: null,
+
+    purification: {
+      amount: '41280.00',
+      currency: 'AED',
+      destination:
+        'A charitable purpose chosen by the board, disbursed by the institution and evidenced to the board. Not to be applied against any cost of the institution.',
+      prescribedAt: '2026-08-27T15:30:00Z',
+      paidAt: null,
+      paidReference: null,
+    },
+
+    closedAt: null,
+    sources: [
+      { kind: 'standard', ref: 'AAOIFI SS-8 Murabaha, 4/2', label: 'When profit on a murabaha is earned' },
+      { kind: 'standard', ref: 'AAOIFI GS-2 Shariah Review', label: 'What a review does when it finds something' },
+    ],
+  },
+];
+
+/**
+ * One meeting, recorded.
+ *
+ * The cadence panel counts from the last meeting and has never had one to
+ * count from, so it has always shown its own absence. This is the meeting the
+ * matters in this file were discussed at, which is also what makes the agenda
+ * worth reading: every item points at something else in the record.
+ */
+export const meetings: Meeting[] = [
+  {
+    id: 'meeting-2026-08-20',
+    boardId: 'demo-board',
+    at: '2026-08-20T13:00:00Z',
+    joinUrl: null,
+    agenda: [
+      { matterId: 'matter-2026-07-03', item: 'Tangible ratio breached by drift rather than by act' },
+      { item: 'Reported non-compliance SNC-2026-004 — determination' },
+      { item: 'The contract library: which shapes this board will take up first' },
+    ],
+    attendance: [
+      { scholarId: 'member-a', present: true },
+      { scholarId: 'member-b', present: true },
+      { scholarId: 'member-c', present: true },
+      { scholarId: 'member-d', present: false, note: 'Travelling; sent written comments on the first item.' },
+      { scholarId: 'member-e', present: true },
+      { scholarId: 'advisor-1', present: true },
+      { scholarId: 'liaison-1', present: true },
+    ],
+    minute:
+      'The drift matter was discussed and not put to a vote: the board asked for the operative terms to be drafted first, so that what is voted on is the terms rather than the intention. The reported non-compliance was determined actual, three signatories concurring, and the institution was asked to file a plan within ten days. On the library, the board agreed to take up the sale family first on the ground that most of what the institution offers sits in it, and left the rest untouched rather than adopting a list nobody had read.',
+    recordedBy: 'liaison-1',
+    closedAt: '2026-08-20T14:35:00Z',
   },
 ];

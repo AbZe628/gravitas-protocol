@@ -280,7 +280,7 @@ export default function Guided() {
         </Block>
       )}
 
-      <Block className="border-t border-line pt-5">
+      <Block className="border-t border-line pt-5 lg:block max-lg:hidden">
         <Link
           to="/more"
           className="text-[13px] text-muted underline decoration-line underline-offset-4 transition-colors hover:text-paper"

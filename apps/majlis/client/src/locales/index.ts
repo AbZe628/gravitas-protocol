@@ -24,6 +24,8 @@ export function dirFor(lang: Lang): 'ltr' | 'rtl' {
 type Dict = Record<string, string>;
 
 const en: Dict = {
+  "lang.notReady": "Arabic and Urdu are not finished.",
+  "lang.notReadyBody": "This application is complete and this language is not. About four fifths of it is translated; where a phrase has no translation yet you will see the English, laid out so it still reads correctly. Nothing about what the board can do is affected — only the words it is said in.",
   "read.open": "Read the figures from a document",
   "read.title": "Reading figures from a document",
   "read.intro": "What comes back is proposed, not entered. Each figure arrives with the sentence it came from, and nothing fills a field until you confirm it against that sentence.",
@@ -303,6 +305,7 @@ const en: Dict = {
   "more.title": "Everything else",
   "more.intro": "Nothing here was removed from the first screen — it was moved off it, so that what needs you today is not competing with what the board keeps.",
   "tab.work": "Work",
+  "tab.more": "More",
   "more.language": "Language",
   "more.back": "← Back to what needs me",
   "more.decided": "What we decided",
@@ -1010,6 +1013,11 @@ const en: Dict = {
 };
 
 const ar: Dict = {
+  "more.language": "اللغة",
+  "tab.work": "العمل",
+  "tab.more": "المزيد",
+  "lang.notReady": "العربية والأردية غير مكتملتين بعد.",
+  "lang.notReadyBody": "هذا التطبيق مكتمل، وهذه اللغة ليست كذلك. تُرجم نحو أربعة أخماسه، وحيث لا توجد ترجمة بعد سترى النص الإنجليزي، معروضاً بحيث يُقرأ على وجهه الصحيح. لا يتأثر شيء مما يستطيع المجلس فعله — إنما الألفاظ التي يُقال بها.",
   "read.open": "اقرأ الأرقام من مستند",
   "read.title": "قراءة الأرقام من مستند",
   "read.intro": "ما يعود مقترح لا مُدخل. يأتي كل رقم مع الجملة التي جاء منها، ولا يُملأ حقل حتى تؤكده في مقابل تلك الجملة.",
@@ -1724,6 +1732,11 @@ const ar: Dict = {
 };
 
 const ur: Dict = {
+  "more.language": "زبان",
+  "tab.work": "کام",
+  "tab.more": "مزید",
+  "lang.notReady": "عربی اور اردو ابھی مکمل نہیں ہیں۔",
+  "lang.notReadyBody": "یہ ایپلی کیشن مکمل ہے، یہ زبان نہیں۔ تقریباً چار پانچواں حصہ ترجمہ ہو چکا ہے؛ جہاں ترجمہ موجود نہیں وہاں آپ کو انگریزی نظر آئے گی، اس طرح ترتیب دی گئی کہ درست پڑھی جائے۔ مجلس جو کچھ کر سکتا ہے اس پر کوئی اثر نہیں — صرف الفاظ بدلتے ہیں۔",
   "read.open": "دستاویز سے اعداد پڑھیں",
   "read.title": "دستاویز سے اعداد کی قرات",
   "read.intro": "جو واپس آتا ہے وہ تجویز ہے، اندراج نہیں۔ ہر عدد اس جملے کے ساتھ آتا ہے جس سے لیا گیا، اور کوئی خانہ اس وقت تک پُر نہیں ہوتا جب تک آپ اسے اس جملے کے مقابل تصدیق نہ کریں۔",

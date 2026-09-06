@@ -277,7 +277,7 @@ export function Compute({ busy, label }: { busy: boolean; label: string }) {
     <button
       type="submit"
       disabled={busy}
-      className="rounded-xl shadow-[0_0_0_0.5px_rgba(176,132,48,0.24)] px-3.5 py-1.5 text-[13px] text-white font-semibold shadow-act transition-colors hover:bg-lapis disabled:opacity-50"
+      className="rounded-xl bg-gradient-to-br from-lapissoft to-[#143E67] px-4 py-2 text-[13px] font-semibold text-white shadow-act transition-colors hover:bg-lapis disabled:opacity-50"
     >
       {label}
     </button>
