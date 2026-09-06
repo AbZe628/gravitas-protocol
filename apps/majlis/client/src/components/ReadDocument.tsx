@@ -220,7 +220,7 @@ export default function ReadDocument({ fields, onConfirm }: ReadDocumentProps) {
             type="button"
             disabled={busy || !chosen}
             onClick={read}
-            className="rounded border border-gold/60 px-3.5 py-2 text-[13px] text-goldsoft disabled:opacity-40"
+            className="rounded border border-lapis/25 px-3.5 py-2 text-[13px] text-lapis font-medium disabled:opacity-40"
           >
             {t('read.read')}
           </button>

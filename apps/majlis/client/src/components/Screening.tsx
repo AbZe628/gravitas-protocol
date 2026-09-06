@@ -194,7 +194,7 @@ export default function Screening() {
           <button
             type="submit"
             disabled={busy}
-            className="rounded border border-gold/60 px-3 py-1.5 text-[13px] text-goldsoft disabled:opacity-50"
+            className="rounded border border-lapis/25 px-3 py-1.5 text-[13px] text-lapis font-medium disabled:opacity-50"
           >
             {t('screen.compute')}
           </button>

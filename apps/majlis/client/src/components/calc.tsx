@@ -277,7 +277,7 @@ export function Compute({ busy, label }: { busy: boolean; label: string }) {
     <button
       type="submit"
       disabled={busy}
-      className="rounded border border-gold/60 px-3.5 py-1.5 text-[13px] text-goldsoft transition-colors hover:bg-gold/10 disabled:opacity-50"
+      className="rounded border border-gold/60 px-3.5 py-1.5 text-[13px] text-white font-semibold shadow-act transition-colors hover:bg-lapis disabled:opacity-50"
     >
       {label}
     </button>

@@ -263,7 +263,7 @@ function MeetingCard({
                 type="button"
                 disabled={busy}
                 onClick={() => run(() => oversight.closeMeeting(m.id))}
-                className="rounded border border-gold/60 px-3.5 py-1.5 text-[13px] text-goldsoft hover:bg-gold/10 disabled:opacity-40"
+                className="rounded border border-gold/60 px-3.5 py-1.5 text-[13px] text-white font-semibold shadow-act hover:bg-lapis disabled:opacity-40"
               >
                 {t('meet.close')}
               </button>
@@ -451,7 +451,7 @@ export default function Meetings() {
             <button
               type="submit"
               disabled={busy || !at}
-              className="rounded border border-gold/60 px-3.5 py-1.5 text-[13px] text-goldsoft disabled:opacity-40"
+              className="rounded border border-lapis/25 px-3.5 py-1.5 text-[13px] text-lapis font-medium disabled:opacity-40"
             >
               {t('meet.conveneIt')}
             </button>

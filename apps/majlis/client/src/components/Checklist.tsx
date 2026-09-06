@@ -162,7 +162,7 @@ function Condition({
                   type="button"
                   onClick={submit}
                   disabled={!holds || busy}
-                  className="rounded border border-gold/60 px-3 py-1.5 text-[12.5px] text-goldsoft disabled:opacity-40"
+                  className="rounded border border-lapis/25 px-3 py-1.5 text-[12.5px] text-lapis font-medium disabled:opacity-40"
                 >
                   {t('chk.record')}
                 </button>

@@ -72,7 +72,7 @@ export default function Calculations() {
             className={
               'px-3 py-2 text-[13px] transition-colors ' +
               (tab === k
-                ? 'border-b-2 border-gold text-goldsoft'
+                ? 'border-b-2 border-lapis font-semibold text-lapis'
                 : 'border-b-2 border-transparent text-muted hover:text-paper')
             }
           >
@@ -81,7 +81,7 @@ export default function Calculations() {
         ))}
       </div>
 
-      <div className="rounded-lg border border-line bg-surface p-4">
+      <div className="g-panel-raised p-6">
         <h2 className="mb-1 text-[15px] font-semibold">{t(`calc.tab.${tab}`)}</h2>
         <p className="mb-4 max-w-prose text-[12.5px] leading-relaxed text-muted">
           {t(`calc.${tab}.about`)}
@@ -101,7 +101,7 @@ export default function Calculations() {
         something out and assumes it was filed has been misled by the interface
         rather than by the record.
       */}
-      <p className="mt-4 rounded border border-line px-3 py-2.5 text-[12.5px] leading-relaxed text-muted">
+      <p className="mt-4 rounded-card bg-surface/60 px-4 py-3 text-[12.5px] leading-relaxed text-muted shadow-ring">
         {t('calc.recordingIsSeparate')}
       </p>
     </div>

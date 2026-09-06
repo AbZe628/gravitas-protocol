@@ -72,7 +72,7 @@ export default function Record() {
           type="button"
           onClick={exportAudit}
           disabled={exporting}
-          className="mt-3 rounded bg-gold/20 px-4 py-2 text-[13px] text-goldsoft transition-colors hover:bg-gold/30 disabled:opacity-40"
+          className="mt-3 rounded bg-lapis px-4 py-2 text-[13px] text-white font-semibold shadow-act transition-colors hover:bg-lapis disabled:opacity-40"
         >
           {exporting ? t('common.loading') : t('record.export')}
         </button>

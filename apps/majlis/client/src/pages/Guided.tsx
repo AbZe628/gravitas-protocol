@@ -12,6 +12,7 @@ import { useI18n } from '../lib/i18n.js';
 import { mayDeliberate, useIdentity } from '../lib/identity.js';
 import SmartRaise from '../components/SmartRaise.js';
 import { Block, Display, Label, Note, Why } from '../components/type.js';
+import { Act, Card, Edge, Figure, State, type Tone } from '../components/kit.js';
 
 /**
  * Arrival.
@@ -38,15 +39,17 @@ import { Block, Display, Label, Note, Why } from '../components/type.js';
  *
  * ── and one thing is large ────────────────────────────────────────────────
  *
- * The outstanding act is set in the display face at reading size, and
- * everything else on the page is smaller than it. That is the whole of the
- * hierarchy, and it is what the screen previously had none of.
+ * The outstanding act is a raised sheet with a rule down its edge, and nothing
+ * else on the page carries that much shadow. Everything after it is a quiet
+ * translucent card. A reader's eye lands on the one thing before it reads a
+ * word, which is what the screen previously had no way of saying.
  */
 
-function urgencyRule(item: AttentionItem): string {
-  if (item.overdue) return 'border-warn';
-  if (item.hoursRemaining !== null && item.hoursRemaining <= 48) return 'border-gold';
-  return 'border-line';
+/** The one colour this item is entitled to. */
+function toneFor(item: AttentionItem): Tone {
+  if (item.overdue) return 'breach';
+  if (item.hoursRemaining !== null && item.hoursRemaining <= 48) return 'attention';
+  return 'plain';
 }
 
 /** How long is left, in the largest unit that is still honest. */
@@ -61,22 +64,20 @@ function remaining(item: AttentionItem, t: (k: string) => string): string | null
 function TheOneThing({ item }: { item: AttentionItem }) {
   const { t } = useI18n();
   const left = remaining(item, t);
+  const tone = toneFor(item);
+  const kind = t(item.kind === 'overdue' ? 'attention.overdueKind' : `attention.${item.kind}`);
 
   return (
-    <Link
-      to={`/matters/${item.matterId}`}
-      className={
-        'group block border-s-[3px] ps-5 transition-colors hover:border-gold ' + urgencyRule(item)
-      }
-    >
-      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-        <Label>
-          {t(item.kind === 'overdue' ? 'attention.overdueKind' : `attention.${item.kind}`)}
-        </Label>
+    <Card lead className="ps-8">
+      <Edge tone={tone} />
+
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+        <State tone={tone}>{kind}</State>
         {left && (
           <span
             className={
-              'font-mono text-[12.5px] tabular-nums ' + (item.overdue ? 'text-warn' : 'text-gold')
+              'font-mono text-[12.5px] tabular-nums ' +
+              (item.overdue ? 'text-breach' : 'text-gold')
             }
           >
             {left}
@@ -85,28 +86,30 @@ function TheOneThing({ item }: { item: AttentionItem }) {
       </div>
 
       {/* The one large thing on the page. */}
-      <div className="mt-2 font-display text-[24px] leading-[1.2] text-paper sm:text-[28px]">
+      <div className="mt-3.5 max-w-[28ch] font-display text-[26px] leading-[1.18] tracking-[-0.02em] text-paper sm:text-[30px]">
         {item.title}
       </div>
 
-      <Note className="mt-2">{item.note}</Note>
+      <Note className="mt-3">{item.note}</Note>
 
-      <span className="mt-3 inline-block text-[13px] text-gold transition-transform group-hover:translate-x-0.5">
-        {t('guided.open')} →
-      </span>
-    </Link>
+      <div className="mt-6">
+        <Act to={`/matters/${item.matterId}`} tone="gold">
+          {t('guided.open')}
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden="true">
+            <path d="M5 12h13M12 5l7 7-7 7" />
+          </svg>
+        </Act>
+      </div>
+    </Card>
   );
 }
 
 /** One number, what it counts, and where it goes. */
-function Count({ n, of, to }: { n: number; of: string; to: string }) {
+function Count({ n, of, to, tone = 'plain' }: { n: number; of: string; to: string; tone?: Tone }) {
   return (
-    <Link to={to} className="group block">
-      <div className="font-display text-[32px] leading-none tabular-nums text-paper transition-colors group-hover:text-gold">
-        {n}
-      </div>
-      <Note className="mt-1.5 max-w-[22ch]">{of}</Note>
-    </Link>
+    <Card to={to} tone="quiet">
+      <Figure n={n} of={of} tone={tone} />
+    </Card>
   );
 }
 
@@ -182,28 +185,61 @@ export default function Guided() {
           <>
             <TheOneThing item={first} />
 
+            {/*
+              After the one thing, the rest — quiet, translucent, and in the
+              order the sort put them. They are cards rather than rules across
+              the page so that a reader can see they are the same kind of thing
+              as the one above, only smaller.
+            */}
             {rest.length > 0 && (
-              <ul className="mt-8 space-y-3">
-                {rest.map((item) => (
-                  <li key={`${item.matterId}:${item.kind}`}>
-                    <Link
-                      to={`/matters/${item.matterId}`}
-                      className="group flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-line pb-3 transition-colors hover:border-muted"
-                    >
-                      <span className="font-display text-[16px] text-sand transition-colors group-hover:text-paper">
-                        {item.title}
-                      </span>
-                      <span className="text-[12px] text-muted">
-                        {t(
-                          item.kind === 'overdue'
-                            ? 'attention.overdueKind'
-                            : `attention.${item.kind}`,
-                        )}
-                        {remaining(item, t) && <span> · {remaining(item, t)}</span>}
-                      </span>
-                    </Link>
-                  </li>
-                ))}
+              <ul className="mt-6 space-y-2">
+                {rest.map((item) => {
+                  const left = remaining(item, t);
+                  const tone = toneFor(item);
+                  return (
+                    <li key={`${item.matterId}:${item.kind}`}>
+                      <Card to={`/matters/${item.matterId}`} tone="quiet" className="!py-4">
+                        <div className="flex flex-wrap items-center justify-between gap-x-5 gap-y-2">
+                          <div className="flex min-w-0 items-center gap-3.5">
+                            <span
+                              className={
+                                'h-[7px] w-[7px] shrink-0 rounded-full ' +
+                                (tone === 'breach'
+                                  ? 'bg-breach ring-[3.5px] ring-breach/15'
+                                  : tone === 'attention'
+                                    ? 'bg-gold ring-[3.5px] ring-gold/15'
+                                    : 'bg-line')
+                              }
+                            />
+                            <span className="font-display text-[18px] leading-snug tracking-[-0.012em] text-paper">
+                              {item.title}
+                            </span>
+                          </div>
+                          <span className="shrink-0 text-[12.5px] text-muted">
+                            {t(
+                              item.kind === 'overdue'
+                                ? 'attention.overdueKind'
+                                : `attention.${item.kind}`,
+                            )}
+                            {left && (
+                              <>
+                                {' · '}
+                                <span
+                                  className={
+                                    'font-mono tabular-nums ' +
+                                    (item.overdue ? 'text-breach' : 'text-gold')
+                                  }
+                                >
+                                  {left}
+                                </span>
+                              </>
+                            )}
+                          </span>
+                        </div>
+                      </Card>
+                    </li>
+                  );
+                })}
               </ul>
             )}
           </>
@@ -220,9 +256,18 @@ export default function Guided() {
         they have credentials — which is everybody, the first time.
       */}
       <Block label={t('guided.whatIsHappening')}>
-        <div className="grid gap-8 sm:grid-cols-3">
-          {matters !== null && <Count n={open} of={t('guided.countOpen')} to="/classic" />}
-          {drifting !== null && <Count n={drifting} of={t('guided.countDrift')} to="/register" />}
+        <div className="grid gap-4 sm:grid-cols-3">
+          {matters !== null && (
+            <Count n={open} of={t('guided.countOpen')} to="/classic" tone="lapis" />
+          )}
+          {drifting !== null && (
+            <Count
+              n={drifting}
+              of={t('guided.countDrift')}
+              to="/register"
+              tone={drifting > 0 ? 'attention' : 'plain'}
+            />
+          )}
           {unexamined !== null && (
             <Count n={unexamined} of={t('guided.countUnexamined')} to="/register" />
           )}

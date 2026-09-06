@@ -155,7 +155,7 @@ export default function RecordCalculation({ input, wantsHolding = false }: Recor
           type="button"
           disabled={busy}
           onClick={save}
-          className="rounded border border-gold/60 px-3.5 py-1.5 text-[13px] text-goldsoft transition-colors hover:bg-gold/10 disabled:opacity-50"
+          className="rounded border border-gold/60 px-3.5 py-1.5 text-[13px] text-white font-semibold shadow-act transition-colors hover:bg-lapis disabled:opacity-50"
         >
           {t('noteCalc.save')}
         </button>

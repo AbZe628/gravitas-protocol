@@ -272,7 +272,7 @@ export default function IncidentDetail() {
           <div className="flex flex-wrap gap-2">
             <button
               onClick={() => act(() => oversight.endorsePlan(id))}
-              className="rounded border border-gold/60 px-3 py-1.5 text-[13px] text-goldsoft"
+              className="rounded border border-lapis/25 px-3 py-1.5 text-[13px] text-lapis font-medium"
             >
               {t('snc.endorse')}
             </button>
@@ -453,7 +453,7 @@ function PrescribeForm({
 
   if (!open) {
     return (
-      <button onClick={() => setOpen(true)} className="rounded border border-gold/60 px-3 py-1.5 text-[13px] text-goldsoft">
+      <button onClick={() => setOpen(true)} className="rounded border border-lapis/25 px-3 py-1.5 text-[13px] text-lapis font-medium">
         {t('snc.prescribe')}
       </button>
     );
@@ -487,7 +487,7 @@ function PrescribeForm({
             await onSubmit(p);
             setOpen(false);
           }}
-          className="rounded border border-gold/60 px-3 py-1.5 text-[13px] text-goldsoft"
+          className="rounded border border-lapis/25 px-3 py-1.5 text-[13px] text-lapis font-medium"
         >
           {t('snc.prescribe')}
         </button>

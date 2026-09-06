@@ -76,7 +76,7 @@ export default function Assistant() {
             type="button"
             onClick={submit}
             disabled={busy || question.trim().length < 3}
-            className="self-end rounded bg-gold/20 px-4 py-2 text-[13px] text-goldsoft transition-colors hover:bg-gold/30 disabled:opacity-40"
+            className="self-end rounded bg-lapis px-4 py-2 text-[13px] text-white font-semibold shadow-act transition-colors hover:bg-lapis disabled:opacity-40"
           >
             {busy ? t('asst.thinking') : t('asst.send')}
           </button>

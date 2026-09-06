@@ -148,7 +148,7 @@ export default function Incidents() {
               {error && <p className="mb-3 text-[13px] text-warn">{error}</p>}
 
               <div className="flex gap-2">
-                <button type="submit" className="rounded border border-gold/60 px-3 py-1.5 text-[13px] text-goldsoft">
+                <button type="submit" className="rounded border border-lapis/25 px-3 py-1.5 text-[13px] text-lapis font-medium">
                   {t('snc.submitReport')}
                 </button>
                 <button

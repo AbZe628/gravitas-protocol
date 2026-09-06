@@ -184,7 +184,7 @@ export default function Guide() {
           <button
             type="submit"
             disabled={busy || question.trim().length < 2}
-            className="rounded-lg bg-gold px-3.5 text-[13px] font-medium text-ink transition-opacity disabled:opacity-30"
+            className="rounded-xl bg-lapis px-3.5 text-[13px] font-semibold text-white shadow-act transition-all hover:bg-lapissoft disabled:opacity-30"
           >
             {t('guide.ask')}
           </button>

@@ -161,7 +161,7 @@ export default function MatterAction() {
               <button
                 type="button"
                 onClick={() => setStep('act')}
-                className="rounded border border-gold/60 px-3.5 py-1.5 text-[13px] text-goldsoft transition-colors hover:bg-gold/10"
+                className="rounded border border-gold/60 px-3.5 py-1.5 text-[13px] text-white font-semibold shadow-act transition-colors hover:bg-lapis"
               >
                 {t('action.toAct')}
               </button>

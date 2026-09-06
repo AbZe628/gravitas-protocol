@@ -1,57 +1,74 @@
 /**
  * Gravitas design tokens — Majlis.
  *
- * The palette is the protocol's, to the value. It previously claimed to be
- * "strictly aligned with apps/web" while sharing not one colour with it: a
- * blue-black ground and a duller gold against the site's near-black and warm
- * gold. Three products in one family looked like three products.
+ * Majlis is a light interface: vellum ground, a white sheet lifted off it by
+ * shadow, and four colours that each say one thing. The reference is
+ * apps/majlis/design/*.dc.html and the rules are written out in
+ * docs/DESIGN.md — read that before changing a value here.
  *
- * What stays different is deliberate rather than left over. Majlis sets its
- * body text in a serif because a scholar reads long deliberation here, and it
- * runs denser because it is an instrument rather than a page to be persuaded
- * by. Same system, different job — which is not the same as a different system.
+ * These values mirror tailwind.config.js and must be kept in step by hand.
+ *
+ * The names did not change when the ground turned over. `--g-ink` is still the
+ * page and `--g-paper` is still the text; which of them is dark is what moved.
+ * Over a thousand places in the markup already speak this vocabulary, and
+ * renaming them would have been a thousand chances to break something in
+ * exchange for nothing a reader can see.
+ *
+ * What stays different from apps/web is deliberate rather than left over.
+ * Majlis sets deliberation in a serif because a scholar reads at length here,
+ * and it runs denser because it is an instrument rather than a page meant to
+ * persuade. Same system, different job.
  */
 
 :root {
-  /* Palette — the same values as the site and the protocol application. */
-  --g-ink: #0B0C10;
-  --g-surface: #14161C;
-  --g-deep: #1C1F27;
-  --g-line: rgba(255, 255, 255, 0.11);
-  --g-muted: #71747F;
-  --g-paper: #F6F5F2;
-  --g-sand: #A8ABB8;
-  --g-gold: #F2C464;
-  --g-gold-soft: #D9A648;
+  /* Grounds — vellum, a quiet surface, a white sheet. */
+  --g-ink: #FBF8F1;
+  --g-surface: #F7F3EA;
+  --g-deep: #FFFFFF;
+  --g-line: rgba(25, 23, 19, 0.08);
+
+  /* Text. */
+  --g-paper: #191713;
+  --g-sand: #4E483F;
+  --g-muted: #9C9284;
+  --g-faint: #B3A896;
+
+  /* The board's own acts. */
+  --g-lapis: #164470;
+  --g-lapis-soft: #1E5A8A;
+
+  /* The mark, and time running out. */
+  --g-gold: #B08430;
+  --g-gold-soft: #C29438;
 
   /*
-   * State, which the palette did not have.
+   * State. One colour per role, spent on that role only.
    *
-   * Everything that held — a condition met, a ruling in force, a position
-   * recorded — rendered in the same grey as its surroundings, and the alarm
-   * shared a hex with the accent so neither said anything. One colour per
-   * role, spent on that role only.
+   * `--g-attention` shares its hex with gold on purpose: gold is no longer the
+   * accent — lapis is — so it is free to mean the clock, which is the only
+   * thing it means on any artboard.
    */
-  --g-settled: #6FBF9B;
-  --g-attention: #E8A33D;
-  --g-breach: #DB6A5A;
+  --g-settled: #2C6B57;
+  --g-attention: #B08430;
+  --g-breach: #9A3830;
 
-  /* Derived states */
+  /* Derived */
   --g-surface-raised: var(--g-deep);
-  --g-paper-dim: rgba(245, 244, 241, 0.7);
-  --g-gold-wash: rgba(247, 204, 116, 0.08);
+  --g-paper-dim: rgba(25, 23, 19, 0.7);
+  --g-gold-wash: rgba(176, 132, 48, 0.08);
+  --g-lapis-wash: rgba(22, 68, 112, 0.06);
 
-  /* Typography — Institutional serif for display, neutral sans for UI. */
-  /*
-   * The serif carries the reading, which is what a scholar comes here to do.
-   * The interface around it and the monospace are the site's own faces, so the
-   * kinship is visible without pretending the two products have the same job.
-   */
+  /* Tinted pill grounds, one per state. */
+  --g-settled-tint: #EBF3EF;
+  --g-gold-tint: #FBF4E4;
+  --g-breach-tint: #FCF0EE;
+
+  /* Typography */
   --g-font-text: "Newsreader", "Iowan Old Style", "Palatino Linotype", Palatino, serif;
   --g-font-ui: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
   --g-font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
 
-  /* Scale — Fluid but dense for Majlis instrument usage. */
+  /* Scale — fluid, but dense: Majlis is an instrument. */
   --g-text-xs: clamp(0.8125rem, 0.8rem + 0.05vw, 0.875rem);
   --g-text-sm: clamp(0.875rem, 0.85rem + 0.1vw, 0.9375rem);
   --g-text-base: clamp(0.9375rem, 0.9rem + 0.15vw, 1rem);
@@ -59,10 +76,16 @@
   --g-text-xl: clamp(1.375rem, 1.25rem + 0.5vw, 1.625rem);
   --g-text-2xl: clamp(1.75rem, 1.5rem + 1vw, 2.25rem);
 
-  /* Density — Majlis is an instrument. */
+  /*
+   * Display type is set tight. At 36px a serif tracked at zero reads as loose
+   * on a light ground in a way it does not on a dark one.
+   */
+  --g-track-display: -0.024em;
+  --g-track-title: -0.018em;
+
   --g-leading-body: 1.62;
   --g-leading-tight: 1.25;
-  --g-measure: 76ch;
+  --g-measure: 62ch;
 
   --g-space-1: 0.25rem;
   --g-space-2: 0.5rem;
@@ -70,19 +93,33 @@
   --g-space-8: 2rem;
   --g-space-12: 3rem;
 
-  --g-radius: 8px;
-  --g-radius-lg: 16px;
+  --g-radius: 12px;
+  --g-radius-lg: 20px;
 
-  /* Hadid edges — subtle layering */
-  --g-layer-1: inset 0 1px 0 rgba(237, 234, 224, 0.05);
-  --g-layer-2: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
+  /*
+   * Elevation, not outline. The half-pixel ring is the first layer of each, so
+   * a surface never needs a border in order to be a surface.
+   */
+  --g-ring: 0 0 0 0.5px rgba(25, 23, 19, 0.05);
+  --g-layer-1:
+    0 0 0 0.5px rgba(25, 23, 19, 0.055),
+    0 1px 2px rgba(25, 23, 19, 0.045),
+    0 12px 24px -14px rgba(25, 23, 19, 0.16);
+  --g-layer-2:
+    0 0 0 0.5px rgba(25, 23, 19, 0.055),
+    0 1px 2px rgba(25, 23, 19, 0.045),
+    0 12px 24px -14px rgba(25, 23, 19, 0.16),
+    0 40px 64px -40px rgba(25, 23, 19, 0.24);
 }
 
-/* RTL Adjustments */
+/* RTL adjustments */
 [dir='rtl'] {
-  --g-font-ui: "Noto Sans Arabic", "Inter", sans-serif;
-  --g-font-text: "Noto Naskh Arabic", "Amiri", serif;
+  --g-font-ui: "Noto Sans Arabic", "Manrope", sans-serif;
+  --g-font-text: "Amiri", "Noto Naskh Arabic", serif;
   --g-leading-body: 1.85;
+  /* Arabic naskh does not take negative tracking. */
+  --g-track-display: 0;
+  --g-track-title: 0;
 }
 
 body {
@@ -96,29 +133,51 @@ body {
 
 .g-display {
   font-family: var(--g-font-text);
-  font-weight: 600;
+  font-weight: 400;
+  letter-spacing: var(--g-track-display);
   color: var(--g-paper);
 }
 
 .g-panel {
   background: var(--g-surface);
-  border: 1px solid var(--g-line);
   border-radius: var(--g-radius);
-  box-shadow: var(--g-layer-1);
+  box-shadow: var(--g-ring);
 }
 
 .g-panel-raised {
-  background: var(--g-surface-raised);
-  border: 1px solid var(--g-line);
+  background: var(--g-deep);
   border-radius: var(--g-radius-lg);
-  box-shadow: var(--g-layer-2);
+  box-shadow: var(--g-layer-1);
 }
 
 .g-label {
   font-family: var(--g-font-ui);
-  font-size: var(--g-text-xs);
-  letter-spacing: 0.05em;
+  font-size: 10px;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
   font-weight: 700;
-  color: var(--g-muted);
+  color: var(--g-faint);
+}
+
+/*
+ * The sweep — one continuous curve behind a screen, carrying light from a
+ * corner. It is the whole of the ornament, and it is never a line the eye has
+ * to read: two fills under 8% and nothing else.
+ */
+.g-sweep {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.g-sweep::before {
+  content: '';
+  position: absolute;
+  inset: -20% -10% auto -10%;
+  height: 70%;
+  background:
+    radial-gradient(60% 70% at 72% 0%, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 70%),
+    linear-gradient(150deg, rgba(22, 68, 112, 0.05), rgba(22, 68, 112, 0) 60%);
 }

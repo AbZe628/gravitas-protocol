@@ -180,7 +180,7 @@ export default function Dictate({ onText }: { onText: (text: string) => void }) 
                 setAsking(false);
                 start();
               }}
-              className="rounded border border-gold/60 px-3 py-1 text-[12px] text-goldsoft"
+              className="rounded border border-lapis/25 px-3 py-1 text-[12px] text-lapis font-medium"
             >
               {t('dictate.understood')}
             </button>

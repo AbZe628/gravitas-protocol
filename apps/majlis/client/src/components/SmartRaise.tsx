@@ -98,7 +98,7 @@ export default function SmartRaise({ boardId }: { boardId: string }) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="rounded border border-gold/60 px-3.5 py-1.5 text-[13px] text-goldsoft transition-colors hover:bg-gold/10"
+        className="rounded border border-gold/60 px-3.5 py-1.5 text-[13px] text-white font-semibold shadow-act transition-colors hover:bg-lapis"
       >
         {t('smart.open')}
       </button>
@@ -186,7 +186,7 @@ export default function SmartRaise({ boardId }: { boardId: string }) {
               type="button"
               onClick={submit}
               disabled={!ready || busy}
-              className="rounded border border-gold/60 px-3.5 py-1.5 text-[13px] text-goldsoft transition-colors hover:bg-gold/10 disabled:opacity-40"
+              className="rounded border border-gold/60 px-3.5 py-1.5 text-[13px] text-white font-semibold shadow-act transition-colors hover:bg-lapis disabled:opacity-40"
             >
               {t('smart.put')}
             </button>

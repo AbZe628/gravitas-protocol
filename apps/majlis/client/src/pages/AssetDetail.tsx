@@ -133,7 +133,7 @@ export default function AssetDetail() {
         <button
           onClick={putToTheBoard}
           disabled={busy}
-          className="mb-7 rounded border border-gold/60 px-4 py-2 text-[13px] text-goldsoft disabled:opacity-50"
+          className="mb-7 rounded border border-lapis/25 px-4 py-2 text-[13px] text-lapis font-medium disabled:opacity-50"
         >
           {t('reg.putToTheBoard')}
         </button>

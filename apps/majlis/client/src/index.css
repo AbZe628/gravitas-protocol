@@ -19,26 +19,41 @@
     font-size: var(--g-text-base);
     line-height: var(--g-leading-body);
   }
+  /*
+   * Display type is set tight. A serif tracked at zero reads loose at 30px on
+   * a light ground in a way it did not on the old dark one.
+   */
+  h1, h2, .font-display {
+    letter-spacing: var(--g-track-title);
+  }
   [dir='rtl'] {
     letter-spacing: 0;
   }
   ::selection {
-    @apply bg-gold/30;
+    @apply bg-gold/20;
   }
 }
 
 @layer components {
+  /*
+   * The primary act is lapis, because that is what the board's own acts are —
+   * putting a question, recording a position. It was gold, back when gold was
+   * the accent; gold now means the clock.
+   */
   .btn-action {
-    @apply inline-flex items-center justify-center px-4 py-2 bg-gold text-ink font-bold rounded-sm
-           hover:bg-goldsoft transition-all duration-150 active:scale-95 text-sm;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-lapis px-5 py-2.5
+           text-sm font-semibold text-white shadow-act transition-all duration-150
+           hover:bg-lapissoft active:scale-[0.98];
   }
 
   .btn-ghost {
-    @apply inline-flex items-center justify-center px-4 py-2 text-muted hover:text-paper hover:bg-surface transition-all text-sm;
+    @apply inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm text-sand
+           transition-all hover:bg-raised hover:shadow-ring;
   }
 
   .card-matter {
-    @apply g-panel p-6 hover:border-gold/30 transition-colors cursor-pointer;
+    @apply g-panel-raised cursor-pointer p-6 transition-all
+           hover:-translate-y-px hover:shadow-lift;
   }
 }
 
