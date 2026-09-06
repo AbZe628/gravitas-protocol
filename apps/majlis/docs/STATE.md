@@ -310,34 +310,44 @@ Compare composition, not palette. Every page below inherited the palette, the
 sheet, the type scale and the label style — and several of them still open as
 a single column of stacked sections, which is the shape that was thrown out.
 
-#### The largest gap: the phone has no chrome of its own
+#### The phone has its own chrome — done
 
-`design/Phone.dc.html` draws a masthead — the mark, **Majlis**, the board’s
-name, and the member’s avatar — and a four-item bar across the bottom on a
-blurred surface above the home indicator: **Work · Record · Coming · Guide**.
+The masthead (the mark, the application’s name, the board’s name from
+`/api/settings`, the member’s avatar) and the four-tab bar — Work, Record,
+Coming, Guide — as `design/Phone.dc.html` draws them. The hamburger and the
+drawer are gone. The language switch moved to `/more`, shown only below the
+breakpoint where the wide bar carries it.
 
-The application has none of it. On a phone it shows a hamburger, a language
-switcher and an avatar in the bar, and a drawer holding the desktop rail. That
-is a small desktop, which is the one thing the artboard note says the phone is
-not.
+#### The panels inside a matter — done
 
-Two things to settle while building it, because the drawing does not answer
-them and inventing an answer is how the earlier passes went wrong:
+These are what a member actually reads, and the same fault ran through all of
+them: **the board’s own words were the smallest type on the screen.** The
+passage’s act, the inherited finding, a member’s argument, a condition’s
+requirement, a recorded reasoning — all sans, all twelve to fourteen pixels,
+under explanations set larger than the thing explained. They are the serif
+now, at reading size.
 
-- **Where the language switch goes.** It exists only in the shell today. The
-  drawn masthead has no room for it. `/more` is the phone’s "everything else"
-  and is the obvious home.
-- **What the second masthead line says.** The drawing says *Rakbank Shariah
-  Board*. The application has no board name — the rail shows `app.stage`,
-  which is a sentence and will not fit. Either a name comes from the server or
-  the line is dropped; it should not be a truncated sentence.
+The vote reads as the artboard draws it: the count is the largest thing in the
+column, verdigris when the threshold is met, with the same fact repeated as a
+row of segments. The position is a chooser whose selection is a tinted ground
+inside a ring of its own colour, which survives greyscale where a border
+colour change does not.
 
-#### Pages composed on purpose
+#### No outlined box is left anywhere
 
-Guided, Register, Library, Calculations, the two matter pages, and **What we
-decided, and what stands** — which now names itself once and carries its two
-views as a segmented control beside the name, rather than opening with a strip
-of underlined tabs above a page that then titled itself second.
+The first sweep converted 149 and looked for `border border-line`. Fifty-one
+more were hiding three ways: edged in a colour rather than the hairline (34);
+`border` in the fixed part of a class expression with its colour in the branch
+(13); and two inside a template literal with an interpolation between them.
+
+Counted in the browser rather than in the source: **zero four-sided borders**
+on the matter page, twelve rules and dividers, which are the ones meant to be
+there. Two borders survive on purpose — the step markers in the passage are
+circles, and a ring is what a circle’s edge is.
+
+Along the way, every one of those was also wearing `warn`, which is gold,
+which is **a clock still running**. Overdue clocks, refusals and breached
+thresholds were all painted the colour for *there is still time*.
 
 #### Pages that still only inherited
 
@@ -396,18 +406,12 @@ the premise, and tests enforce it. SmartRaise is guided-only.
 
 ## 5. What to pick up first, in order
 
-1. **The phone’s own chrome.** The masthead and the four-tab bar the artboard
-   draws. This is the difference between the phone being designed and the
-   phone being the desktop at 375px. Settle the two open questions above
-   first — where the language switch lives, and what the second masthead line
-   says — rather than inventing an answer.
-2. **The rest of the pages, against their artboard**, in the order a scholar
-   meets them: Incidents, More, Search, Meetings, Settings, Calendar,
-   Briefings, AssetDetail, IncidentDetail, Assistant, Dashboard.
-3. **The panels inside a matter**: Passage, Carrying, Inherited, VotePanel,
-   Deliberation, Terms, Evidence, Checklist. These are what a member actually
-   reads, and they are still the flattest thing in the application.
-4. **Fix the Anthropic integration**: SDK upgrade, then models, then the
+1. **The rest of the pages, against their artboard**, in the order a scholar
+   meets them: Incidents, Search, Meetings, Settings, Calendar, Briefings,
+   AssetDetail, IncidentDetail, Assistant, Dashboard. They have the palette,
+   the sheet, the type scale and the label style; what several still lack is a
+   composition.
+2. **Fix the Anthropic integration**: SDK upgrade, then models, then the
    thinking block.
-5. **Decide who writes the Arabic and Urdu.** Not a coding task, and it blocks
+3. **Decide who writes the Arabic and Urdu.** Not a coding task, and it blocks
    391 strings.
