@@ -29,6 +29,96 @@
   [dir='rtl'] {
     letter-spacing: 0;
   }
+
+  /*
+   * Text the board and the institution gave us, on a right-to-left screen.
+   *
+   * A matter's title, an asset's name, a note, a member's reasoning: none of
+   * that goes through `translate`, so the isolate it adds to an untranslated
+   * label cannot help here. An English sentence dropped into an RTL paragraph
+   * gets its full stop moved to the start of the line — `.In the register and
+   * never put to the board` — and a board reading the Arabic build would put
+   * that down to the software rather than to the language of the record.
+   *
+   * `unicode-bidi: plaintext` is the same rule as `dir="auto"`, applied in the
+   * stylesheet: each block takes its direction from its own first strong
+   * character. Arabic content stays right to left, English content is laid out
+   * left to right inside it, and nothing in the markup has to know which it is
+   * about to be handed.
+   */
+  [dir='rtl'] p,
+  [dir='rtl'] h1,
+  [dir='rtl'] h2,
+  [dir='rtl'] h3,
+  [dir='rtl'] li,
+  [dir='rtl'] blockquote,
+  [dir='rtl'] td,
+  [dir='rtl'] th {
+    unicode-bidi: plaintext;
+  }
+
+  /*
+   * The script faces, by language.
+   *
+   * `tokens.css` has set `--g-font-text` and `--g-font-ui` for right-to-left
+   * since the palette was written, and nothing read them: the application sets
+   * its faces with Tailwind's `font-display` and `font-body` utilities, which
+   * come from `tailwind.config.js` and know nothing about a CSS variable. The
+   * Arabic build was rendering in whatever the machine had.
+   *
+   * These are ancestor-qualified utilities — `[lang] .font-display` is two
+   * selectors to Tailwind's one — so they win on specificity without
+   * `!important`, and only when the language is actually set.
+   */
+  /*
+   * The Latin face comes first in every one of these stacks, and that is not a
+   * preference — font fallback runs per glyph. A record is full of English:
+   * asset names, contract references, `0xaf88…5831`. With the script face
+   * first, Noto Sans Arabic and Nastaliq both draw Latin, and they draw it
+   * badly — Nastaliq's Latin is a condensed afterthought and an ISIN set in it
+   * is a chore to read. Naming Manrope first means Latin comes from Manrope
+   * and the Arabic-script glyphs it does not have fall through to the face
+   * that does.
+   */
+  [lang='ar'] body,
+  [lang='ar'] .font-body,
+  [lang='ar'] .font-sans {
+    font-family: Manrope, 'Noto Sans Arabic', system-ui, sans-serif;
+  }
+  [lang='ar'] h1,
+  [lang='ar'] h2,
+  [lang='ar'] .font-display,
+  [lang='ar'] .font-serif {
+    font-family: Newsreader, Amiri, 'Noto Naskh Arabic', serif;
+  }
+
+  /*
+   * Urdu is written in nastaliq. Noto Sans Arabic carries every Urdu glyph, so
+   * left to ordinary font fallback it would win and an Urdu reader would get a
+   * naskh sans — legible in the way a ransom note is legible. It is named
+   * first here for that reason, and given the line height the script needs:
+   * nastaliq descends steeply and at 1.6 the lines collide.
+   */
+  [lang='ur'] body,
+  [lang='ur'] .font-body,
+  [lang='ur'] .font-sans {
+    font-family: Manrope, 'Noto Nastaliq Urdu', serif;
+  }
+  [lang='ur'] h1,
+  [lang='ur'] h2,
+  [lang='ur'] .font-display,
+  [lang='ur'] .font-serif {
+    font-family: Newsreader, 'Noto Nastaliq Urdu', serif;
+  }
+  /* Nastaliq descends steeply; at 1.6 the lines collide. */
+  [lang='ur'] p,
+  [lang='ur'] li {
+    line-height: 2.1;
+  }
+  [lang='ur'] h1,
+  [lang='ur'] h2 {
+    line-height: 1.7;
+  }
   ::selection {
     @apply bg-gold/20;
   }
