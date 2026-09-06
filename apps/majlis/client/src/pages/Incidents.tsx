@@ -94,7 +94,7 @@ export default function Incidents() {
 
   return (
     <div>
-      <h1 className="mb-1 text-[19px] font-semibold">{t('snc.title')}</h1>
+      <h1 className="mb-1 font-display font-normal leading-[1.12] tracking-[-0.024em] text-[30px] sm:text-[34px]">{t('snc.title')}</h1>
       <p className="mb-5 text-[13px] leading-relaxed text-muted">{t('snc.intro')}</p>
 
       {incidents.length > 0 && (

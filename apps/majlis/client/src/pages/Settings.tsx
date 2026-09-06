@@ -43,7 +43,7 @@ export default function Settings() {
 
   return (
     <div>
-      <h1 className="mb-1 text-[19px] font-semibold">{data.boardName}</h1>
+      <h1 className="mb-1 font-display font-normal leading-[1.12] tracking-[-0.024em] text-[30px] sm:text-[34px]">{data.boardName}</h1>
       <p className="mb-6 text-[13px] text-muted">{t('set.intro')}</p>
 
       {/*
@@ -80,7 +80,7 @@ export default function Settings() {
         </div>
       )}
 
-      <h2 className="mb-3 text-[13px] font-semibold uppercase tracking-[0.14em] text-muted">
+      <h2 className="mb-3 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
         {t('set.whoIsHere')}
       </h2>
       <ul className="mb-8 space-y-2">
@@ -116,7 +116,7 @@ export default function Settings() {
         ))}
       </ul>
 
-      <h2 className="mb-3 text-[13px] font-semibold uppercase tracking-[0.14em] text-muted">
+      <h2 className="mb-3 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
         {t('set.howItDecides')}
       </h2>
       <Card>
@@ -139,7 +139,7 @@ export default function Settings() {
         </p>
       </Card>
 
-      <h2 className="mb-3 mt-8 text-[13px] font-semibold uppercase tracking-[0.14em] text-muted">
+      <h2 className="mb-3 mt-8 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
         {t('set.whatIsAttached')}
       </h2>
       <Card>

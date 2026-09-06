@@ -347,8 +347,8 @@ export default function Meetings() {
 
   return (
     <div>
-      <h1 className="mb-1 text-[19px] font-semibold tracking-tight">{t('meet.title')}</h1>
-      <p className="mb-4 max-w-prose text-[13px] leading-relaxed text-muted">{t('meet.intro')}</p>
+      <h1 className="mb-1 font-display font-normal leading-[1.12] tracking-[-0.024em] text-[30px] sm:text-[34px]">{t('meet.title')}</h1>
+      <p className="mb-4 max-w-[62ch] text-[13.5px] leading-[1.65] text-muted">{t('meet.intro')}</p>
 
       {/*
         The clock first. Cadence is the one deadline with a regulatory floor

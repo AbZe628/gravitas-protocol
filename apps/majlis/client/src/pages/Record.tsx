@@ -36,7 +36,7 @@ export default function Record() {
 
   return (
     <div>
-      <h1 className="mb-5 text-[19px] font-semibold">{t('record.title')}</h1>
+      <h1 className="mb-5 font-display font-normal leading-[1.12] tracking-[-0.024em] text-[30px] sm:text-[34px]">{t('record.title')}</h1>
 
       {health?.recordSince && (
         <div className="mb-5 rounded-card shadow-ring bg-raised px-4 py-3">
@@ -78,7 +78,7 @@ export default function Record() {
         </button>
       </Card>
 
-      <h2 className="mb-2 mt-8 text-[13px] font-semibold uppercase tracking-[0.14em] text-muted">
+      <h2 className="mb-2 mt-8 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
         {t('record.assistantLog')}
       </h2>
       <p className="mb-4 text-[13px] leading-relaxed text-muted">{t('record.assistantLogNote')}</p>

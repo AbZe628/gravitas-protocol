@@ -145,7 +145,7 @@ export default function MatterAction() {
               </div>
               <div className="mt-0.5 text-[14px] leading-snug">
                 {next.act}
-                <span className="ms-2 text-[12px] uppercase tracking-wider text-muted">
+                <span className="ms-2 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
                   {t(`passage.whose.${next.whose}`)}
                 </span>
               </div>

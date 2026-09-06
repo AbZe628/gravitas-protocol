@@ -90,7 +90,7 @@ export default function Dashboard() {
         {t('dash.stageNotice')}
       </div>
 
-      <h1 className="mb-4 text-[19px] font-semibold">{t('dash.title')}</h1>
+      <h1 className="mb-4 font-display font-normal leading-[1.12] tracking-[-0.024em] text-[30px] sm:text-[34px]">{t('dash.title')}</h1>
 
       {mayDeliberate(identity?.role) && <RaiseMatter boardId="demo-board" />}
 
@@ -137,7 +137,7 @@ export default function Dashboard() {
 
       {settled.length > 0 && (
         <>
-          <h2 className="mb-3 mt-8 text-[13px] font-semibold uppercase tracking-[0.14em] text-muted">
+          <h2 className="mb-3 mt-8 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
             {t('matter.status.in_force')}
           </h2>
           <ul className="space-y-2">

@@ -99,7 +99,7 @@ export default function AssetDetail() {
         </span>
       </div>
 
-      <h1 className="mb-2 text-[21px] font-semibold leading-tight">{a.name}</h1>
+      <h1 className="mb-2 font-display font-normal leading-[1.12] tracking-[-0.024em] text-[30px] sm:text-[34px]">{a.name}</h1>
       <p className="mb-5 text-[13px] leading-relaxed text-muted">{data.note}</p>
 
       {refusal && (

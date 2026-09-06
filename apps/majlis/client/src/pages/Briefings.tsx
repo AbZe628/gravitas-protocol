@@ -17,7 +17,7 @@ export default function Briefings() {
 
   return (
     <div>
-      <h1 className="mb-5 text-[19px] font-semibold">{t('nav.briefings')}</h1>
+      <h1 className="mb-5 font-display font-normal leading-[1.12] tracking-[-0.024em] text-[30px] sm:text-[34px]">{t('nav.briefings')}</h1>
       <ul className="space-y-5">
         {items.map((b) => (
           <li key={b.id}>
@@ -48,7 +48,7 @@ export default function Briefings() {
               )}
 
               <div className="mt-4 rounded border border-gold/40 bg-gold/[0.06] p-3">
-                <div className="text-[11px] uppercase tracking-wider text-goldsoft">
+                <div className="text-[10px] font-bold uppercase tracking-[0.15em] text-gold">
                   {t('brief.question')}
                 </div>
                 <p className="mt-1.5 text-[14px] leading-relaxed">{b.questionForBoard}</p>

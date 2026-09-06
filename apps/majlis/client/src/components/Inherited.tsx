@@ -63,8 +63,8 @@ function Item({
         {proposal.holds && (
           <span
             className={
-              'rounded border px-1.5 py-px text-[10.5px] uppercase tracking-wider ' +
-              (proposal.holds === 'met' ? 'border-gold/50 text-goldsoft' : 'border-line text-muted')
+              'rounded-full px-2.5 py-0.5 text-[10.5px] font-bold uppercase tracking-[0.1em] ' +
+              (proposal.holds === 'met' ? 'bg-[#EBF3EF] text-settled shadow-[0_0_0_0.5px_rgba(44,107,87,0.18)]' : 'bg-black/[0.045] text-sand')
             }
           >
             {t(`inherit.holds.${proposal.holds}`)}

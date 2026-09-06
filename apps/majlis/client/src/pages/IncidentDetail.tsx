@@ -383,7 +383,7 @@ export default function IncidentDetail() {
   return (
     <div>
       <div className="mb-1 font-mono text-[12px] text-muted">{i.reference}</div>
-      <h1 className="mb-2 text-[19px] font-semibold leading-snug">{i.title}</h1>
+      <h1 className="mb-2 font-display font-normal leading-[1.12] tracking-[-0.024em] text-[30px] sm:text-[34px]">{i.title}</h1>
 
       <div className="mb-4 flex flex-wrap items-center gap-2">
         <Tag tone={i.clock?.overdue ? 'warn' : i.stage === 'closed' ? 'ok' : undefined}>
@@ -411,7 +411,7 @@ export default function IncidentDetail() {
         </div>
       )}
 
-      <h2 className="mb-3 text-[13px] font-semibold uppercase tracking-[0.14em] text-muted">
+      <h2 className="mb-3 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
         {t('snc.sequence')}
       </h2>
 

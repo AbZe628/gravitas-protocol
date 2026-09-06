@@ -71,8 +71,8 @@ export default function More() {
 
   return (
     <div>
-      <h1 className="mb-1 text-[19px] font-semibold tracking-tight">{t('more.title')}</h1>
-      <p className="mb-6 max-w-prose text-[13px] leading-relaxed text-muted">{t('more.intro')}</p>
+      <h1 className="mb-1 font-display font-normal leading-[1.12] tracking-[-0.024em] text-[30px] sm:text-[34px]">{t('more.title')}</h1>
+      <p className="mb-6 max-w-[62ch] text-[13.5px] leading-[1.65] text-muted">{t('more.intro')}</p>
 
       <div className="space-y-6">
         {groups.map((group) => (

@@ -234,7 +234,7 @@ export function Result({
   return (
     <div className="mt-5 border-t border-line pt-4">
       <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
-        <span className="text-[12px] uppercase tracking-wider text-muted">{headline}</span>
+        <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted">{headline}</span>
         <span className="font-mono text-[19px] tabular-nums text-goldsoft">{amount}</span>
       </div>
       {children}

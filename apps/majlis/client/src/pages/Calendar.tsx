@@ -106,7 +106,7 @@ export default function Calendar() {
 
   return (
     <div>
-      <h1 className="mb-1 text-[19px] font-semibold">{t('cal.title')}</h1>
+      <h1 className="mb-1 font-display font-normal leading-[1.12] tracking-[-0.024em] text-[30px] sm:text-[34px]">{t('cal.title')}</h1>
       <p className="mb-5 text-[13px] leading-relaxed text-muted">{t('cal.intro')}</p>
 
       <a
@@ -127,7 +127,7 @@ export default function Calendar() {
       ) : (
         grouped.map((g) => (
           <section key={g.band} className="mb-7">
-            <h2 className="mb-3 text-[13px] font-semibold uppercase tracking-[0.14em] text-muted">
+            <h2 className="mb-3 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
               {t(`cal.band.${g.band}`)}
             </h2>
             <ul className="space-y-2.5">

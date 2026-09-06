@@ -74,10 +74,10 @@ export default function Carrying({ matterId }: { matterId: string }) {
         */}
         <span
           className={
-            'rounded border px-2 py-px text-[11px] uppercase tracking-wider ' +
+            'rounded-full px-2.5 py-0.5 text-[10.5px] font-bold uppercase tracking-[0.1em] ' +
             (carrying.attached
-              ? 'border-gold/60 text-goldsoft'
-              : 'border-line text-muted')
+              ? 'bg-[#EBF3EF] text-settled shadow-[0_0_0_0.5px_rgba(44,107,87,0.18)]'
+              : 'bg-black/[0.045] text-sand')
           }
         >
           {t(`carry.cadence.${carrying.cadence}`)}

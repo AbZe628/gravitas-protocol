@@ -71,7 +71,7 @@ function Step({ step, ordinal }: { step: PassageStep; ordinal?: number }) {
             <span className="text-[11px] text-gold/70">{t('passage.done')}</span>
           )}
           {step.enforced && step.state === 'open' && (
-            <span className="rounded border border-warn/50 px-1.5 py-px text-[10.5px] uppercase tracking-wider text-warn">
+            <span className="rounded-full px-2.5 py-0.5 text-[10.5px] font-bold uppercase tracking-[0.1em] bg-[#FBF4E4] text-gold shadow-[0_0_0_0.5px_rgba(176,132,48,0.22)]">
               {t('passage.enforced')}
             </span>
           )}
@@ -126,7 +126,7 @@ export default function Passage({ matterId }: { matterId: string }) {
             </div>
             <div className="mt-0.5 text-[15px] leading-snug">
               {passage.next.act}
-              <span className="ms-2 text-[12px] uppercase tracking-wider text-muted">
+              <span className="ms-2 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
                 {t(`passage.whose.${passage.next.whose}`)}
               </span>
             </div>

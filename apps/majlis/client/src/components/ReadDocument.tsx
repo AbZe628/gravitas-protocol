@@ -256,7 +256,7 @@ export default function ReadDocument({ fields, onConfirm }: ReadDocumentProps) {
           */}
           {result.discarded.length > 0 && (
             <div className="mt-3 rounded border border-warn/40 px-3 py-2.5">
-              <div className="mb-1 text-[11px] uppercase tracking-wider text-warn">
+              <div className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.15em] text-gold">
                 {t('read.discarded')}
               </div>
               <ul className="space-y-1">
