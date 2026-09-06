@@ -261,7 +261,7 @@ export default function LatePayment() {
             are what the method produces, not a finding that anything is due.
           */}
           {result.solvencyWarning && (
-            <p className="mt-5 rounded border border-warn/50 bg-warn/[0.05] px-3 py-2.5 text-[12.5px] leading-relaxed text-warn">
+            <p className="mt-5 rounded-xl shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)] bg-[#FCF0EE]] px-3 py-2.5 text-[12.5px] leading-relaxed text-breach">
               {result.solvencyWarning}
             </p>
           )}

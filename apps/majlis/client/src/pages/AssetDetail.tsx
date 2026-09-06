@@ -103,7 +103,7 @@ export default function AssetDetail() {
       <p className="mb-5 text-[13px] leading-relaxed text-muted">{data.note}</p>
 
       {refusal && (
-        <div className="mb-5 rounded-lg border border-warn/60 bg-warn/[0.06] px-4 py-3 text-[13px] leading-relaxed text-warn">
+        <div className="mb-5 rounded-card shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)] bg-[#FCF0EE]] px-4 py-3 text-[13px] leading-relaxed text-breach">
           {refusal}
         </div>
       )}
@@ -133,7 +133,7 @@ export default function AssetDetail() {
         <button
           onClick={putToTheBoard}
           disabled={busy}
-          className="mb-7 rounded border border-lapis/25 px-4 py-2 text-[13px] text-lapis font-medium disabled:opacity-50"
+          className="mb-7 rounded-xl bg-raised shadow-ring px-4 py-2 text-[13px] text-lapis font-medium disabled:opacity-50"
         >
           {t('reg.putToTheBoard')}
         </button>
@@ -210,7 +210,7 @@ export default function AssetDetail() {
               <li key={m}>
                 <Link
                   to={`/matters/${m}`}
-                  className="flex items-baseline gap-2 rounded-lg border border-gold/40 px-3 py-2 text-[13px] hover:border-gold/70"
+                  className="flex items-baseline gap-2 rounded-card shadow-[0_0_0_0.5px_rgba(176,132,48,0.24)] px-3 py-2 text-[13px]"
                 >
                   <Tag tone="gold">{t('reg.open')}</Tag>
                   <span className="font-mono text-[12px] break-all">{m}</span>

@@ -55,11 +55,16 @@ function Reason({
   const [busy, setBusy] = useState(false);
   const { t } = useI18n();
 
-  const border = tone === 'warn' ? 'border-warn/60 text-warn' : tone === 'gold' ? 'border-lapis/40 text-lapis' : 'border-line text-muted';
+  const skin =
+    tone === 'warn'
+      ? 'bg-raised text-breach shadow-[0_0_0_0.5px_rgba(154,56,48,0.25)]'
+      : tone === 'gold'
+        ? 'bg-raised font-medium text-lapis shadow-[0_0_0_0.5px_rgba(22,68,112,0.25)]'
+        : 'bg-raised text-sand shadow-ring';
 
   if (!open) {
     return (
-      <button onClick={() => setOpen(true)} className={`rounded border px-3 py-1.5 text-[13px] ${border}`}>
+      <button onClick={() => setOpen(true)} className={`rounded-xl px-4 py-2 text-[13px] ${skin}`}>
         {label}
       </button>
     );
@@ -86,7 +91,7 @@ function Reason({
               setBusy(false);
             }
           }}
-          className={`rounded border px-3 py-1.5 text-[13px] disabled:opacity-50 ${border}`}
+          className={`rounded-xl px-4 py-2 text-[13px] disabled:opacity-50 ${skin}`}
         >
           {label}
         </button>
@@ -272,7 +277,7 @@ export default function IncidentDetail() {
           <div className="flex flex-wrap gap-2">
             <button
               onClick={() => act(() => oversight.endorsePlan(id))}
-              className="rounded border border-lapis/25 px-3 py-1.5 text-[13px] text-lapis font-medium"
+              className="rounded-xl bg-raised shadow-ring px-3 py-1.5 text-[13px] text-lapis font-medium"
             >
               {t('snc.endorse')}
             </button>
@@ -395,8 +400,10 @@ export default function IncidentDetail() {
       {i.clock && (
         <p
           className={
-            'mb-5 rounded-lg border px-4 py-3 text-[13px] leading-relaxed ' +
-            (i.clock.overdue ? 'border-warn/60 bg-warn/[0.06] text-warn' : 'border-line bg-surface/60 text-muted')
+            'mb-5 rounded-card px-5 py-4 text-[13px] leading-[1.6] ' +
+            (i.clock.overdue
+              ? 'bg-[#FCF0EE] text-breach shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)]'
+              : 'bg-raised/60 text-muted shadow-ring')
           }
         >
           {i.clock.note}
@@ -406,7 +413,7 @@ export default function IncidentDetail() {
       <p className="mb-6 text-[15px] leading-relaxed">{i.report}</p>
 
       {refusal && (
-        <div className="mb-5 rounded-lg border border-warn/60 bg-warn/[0.06] px-4 py-3 text-[13px] leading-relaxed text-warn">
+        <div className="mb-5 rounded-card shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)] bg-[#FCF0EE]] px-4 py-3 text-[13px] leading-relaxed text-breach">
           {refusal}
         </div>
       )}
@@ -420,8 +427,12 @@ export default function IncidentDetail() {
           <li
             key={s.n}
             className={
-              'grid grid-cols-[28px_1fr] gap-3 rounded-lg border px-4 py-3 ' +
-              (s.current ? 'border-gold/50 bg-gold/[0.05]' : s.done ? 'border-line' : 'border-line/50 opacity-70')
+              'grid grid-cols-[28px_1fr] gap-3 rounded-card px-5 py-4 ' +
+              (s.current
+                ? 'bg-[#EAF1F7] shadow-[0_0_0_1.5px_#164470]'
+                : s.done
+                  ? 'bg-raised shadow-card'
+                  : 'bg-raised/60 opacity-70 shadow-ring')
             }
           >
             <div className="pt-0.5 font-mono text-[12px] text-muted tabular-nums">
@@ -453,7 +464,7 @@ function PrescribeForm({
 
   if (!open) {
     return (
-      <button onClick={() => setOpen(true)} className="rounded border border-lapis/25 px-3 py-1.5 text-[13px] text-lapis font-medium">
+      <button onClick={() => setOpen(true)} className="rounded-xl bg-raised shadow-ring px-3 py-1.5 text-[13px] text-lapis font-medium">
         {t('snc.prescribe')}
       </button>
     );
@@ -487,7 +498,7 @@ function PrescribeForm({
             await onSubmit(p);
             setOpen(false);
           }}
-          className="rounded border border-lapis/25 px-3 py-1.5 text-[13px] text-lapis font-medium"
+          className="rounded-xl bg-raised shadow-ring px-3 py-1.5 text-[13px] text-lapis font-medium"
         >
           {t('snc.prescribe')}
         </button>

@@ -37,7 +37,7 @@ function Row({ drift }: { drift: Drift }) {
   return (
     <li>
       <Link to={`/register/${drift.assetId}`} className="block">
-        <div className="rounded-lg border border-warn/50 bg-warn/[0.05] px-4 py-3 transition-colors hover:border-warn/70">
+        <div className="rounded-card shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)] bg-[#FCF0EE]] px-4 py-3 transition-colors">
           <div className="mb-1.5 flex flex-wrap items-center gap-2">
             <Tag tone="warn">{t(`drift.${drift.term.bound}`)}</Tag>
             {/*
@@ -161,7 +161,7 @@ export function DriftForAsset({ assetId }: { assetId: string }) {
   if (!drifting || drifting.length === 0) return null;
 
   return (
-    <div className="mb-6 rounded-lg border border-warn/60 bg-warn/[0.06] px-4 py-3.5">
+    <div className="mb-6 rounded-card shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)] bg-[#FCF0EE]] px-4 py-3.5">
       <div className="mb-2 text-[13px] font-semibold text-warn">{t('drift.onThisHolding')}</div>
       <ul className="space-y-2.5">
         {drifting.map((d) => (

@@ -53,13 +53,15 @@ function Entry({ entry }: { entry: CalendarEntry }) {
   const body = (
     <div
       className={
-        'rounded-lg border px-4 py-3 ' +
-        (entry.overdue ? 'border-warn/60 bg-warn/[0.06]' : 'border-line bg-surface')
+        'rounded-card px-5 py-4 ' +
+        (entry.overdue
+          ? 'bg-[#FCF0EE] shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)]'
+          : 'bg-raised shadow-ring')
       }
     >
       <div className="mb-1.5 flex flex-wrap items-center gap-2">
         <Tag tone={entry.overdue ? 'warn' : undefined}>{t(`cal.kind.${entry.kind}`)}</Tag>
-        <span className={entry.overdue ? 'text-[12px] text-warn' : 'text-[12px] text-muted'}>
+        <span className={entry.overdue ? 'text-[12px] font-semibold text-breach' : 'text-[12px] text-muted'}>
           <DateText iso={entry.at} />
         </span>
       </div>

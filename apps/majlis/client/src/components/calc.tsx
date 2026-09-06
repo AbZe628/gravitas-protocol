@@ -172,8 +172,8 @@ export function Choice<T extends string>({
           <label
             key={o.value}
             className={
-              'flex cursor-pointer gap-2.5 rounded border px-3 py-2.5 transition-colors ' +
-              (value === o.value ? 'border-gold/60 bg-gold/[0.06]' : 'border-line hover:border-muted')
+              'flex cursor-pointer gap-2.5 rounded-xl px-4 py-3 transition-all ' +
+              (value === o.value ? 'bg-[#EAF1F7] shadow-[0_0_0_1.5px_#164470]' : 'bg-raised shadow-ring hover:shadow-card')
             }
           >
             <input
@@ -266,7 +266,7 @@ export function Note({ children }: { children: string }) {
  */
 export function Refusal({ children }: { children: string }) {
   return (
-    <p className="mb-3 rounded border border-warn/50 bg-warn/[0.05] px-3 py-2.5 text-[12.5px] leading-relaxed text-warn">
+    <p className="mb-3 rounded-xl shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)] bg-[#FCF0EE]] px-3 py-2.5 text-[12.5px] leading-relaxed text-breach">
       {children}
     </p>
   );
@@ -277,7 +277,7 @@ export function Compute({ busy, label }: { busy: boolean; label: string }) {
     <button
       type="submit"
       disabled={busy}
-      className="rounded border border-gold/60 px-3.5 py-1.5 text-[13px] text-white font-semibold shadow-act transition-colors hover:bg-lapis disabled:opacity-50"
+      className="rounded-xl shadow-[0_0_0_0.5px_rgba(176,132,48,0.24)] px-3.5 py-1.5 text-[13px] text-white font-semibold shadow-act transition-colors hover:bg-lapis disabled:opacity-50"
     >
       {label}
     </button>

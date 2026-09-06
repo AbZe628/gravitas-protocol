@@ -119,12 +119,12 @@ export default function Evidence({ matter, scholarId, canAttach, onChanged }: Pr
               <li
                 key={s.id ?? `${s.ref}-${i}`}
                 className={
-                  'rounded-lg border p-3 ' +
-                  (withdrawn ? 'border-line/50 bg-surface/20' : 'border-line')
+                  'rounded-card px-5 py-4 ' +
+                  (withdrawn ? 'bg-raised/50 shadow-ring' : 'bg-raised shadow-card')
                 }
               >
-                <div className="mb-1 flex flex-wrap items-center gap-2 text-[11.5px]">
-                  <span className="rounded-xl shadow-ring px-1.5 py-0.5 uppercase tracking-wide text-muted">
+                <div className="mb-2.5 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[11.5px]">
+                  <span className="rounded-full bg-black/[0.045] px-2.5 py-0.5 text-[10.5px] font-bold uppercase tracking-[0.1em] text-sand">
                     {t(`evidence.kind.${s.kind}`)}
                   </span>
                   {s.addedBy && (
@@ -136,7 +136,7 @@ export default function Evidence({ matter, scholarId, canAttach, onChanged }: Pr
                     </span>
                   )}
                   {withdrawn && (
-                    <span className="rounded-xl shadow-ring px-1.5 py-0.5 uppercase tracking-wide text-muted">
+                    <span className="rounded-full bg-black/[0.045] px-2.5 py-0.5 text-[10.5px] font-bold uppercase tracking-[0.1em] text-sand">
                       {t('evidence.withdrawn')}
                     </span>
                   )}
@@ -251,10 +251,10 @@ export default function Evidence({ matter, scholarId, canAttach, onChanged }: Pr
                 type="button"
                 onClick={() => setKind(k)}
                 className={
-                  'rounded border px-2 py-1 text-[11.5px] uppercase tracking-wide ' +
+                  'rounded-full px-3 py-1 text-[10.5px] font-bold uppercase tracking-[0.1em] transition-all ' +
                   (kind === k
-                    ? 'border-lapis text-lapis'
-                    : 'border-line text-muted hover:text-paper')
+                    ? 'bg-[#EAF1F7] text-lapis shadow-[0_0_0_1.5px_#164470]'
+                    : 'bg-black/[0.045] text-sand hover:text-paper')
                 }
               >
                 {t(`evidence.kind.${k}`)}

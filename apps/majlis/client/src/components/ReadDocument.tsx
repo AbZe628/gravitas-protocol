@@ -220,7 +220,7 @@ export default function ReadDocument({ fields, onConfirm }: ReadDocumentProps) {
             type="button"
             disabled={busy || !chosen}
             onClick={read}
-            className="rounded border border-lapis/25 px-3.5 py-2 text-[13px] text-lapis font-medium disabled:opacity-40"
+            className="rounded-xl bg-raised shadow-ring px-3.5 py-2 text-[13px] text-lapis font-medium disabled:opacity-40"
           >
             {t('read.read')}
           </button>
@@ -229,7 +229,7 @@ export default function ReadDocument({ fields, onConfirm }: ReadDocumentProps) {
 
       {/* The refusal in the server's words: off is a setting, not a fault. */}
       {error && (
-        <p className="mt-3 rounded border border-warn/50 px-3 py-2 text-[12.5px] leading-relaxed text-warn">
+        <p className="mt-3 rounded-xl shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)] px-3 py-2 text-[12.5px] leading-relaxed text-breach">
           {error}
         </p>
       )}
@@ -255,7 +255,7 @@ export default function ReadDocument({ fields, onConfirm }: ReadDocumentProps) {
             thin one.
           */}
           {result.discarded.length > 0 && (
-            <div className="mt-3 rounded border border-warn/40 px-3 py-2.5">
+            <div className="mt-3 rounded-xl shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)] px-3 py-2.5">
               <div className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.15em] text-gold">
                 {t('read.discarded')}
               </div>

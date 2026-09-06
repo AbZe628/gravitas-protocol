@@ -248,7 +248,7 @@ function MeetingCard({
           </div>
 
           {error && (
-            <p className="rounded border border-warn/50 px-3 py-2 text-[12.5px] leading-relaxed text-warn">
+            <p className="rounded-xl shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)] px-3 py-2 text-[12.5px] leading-relaxed text-breach">
               {error}
             </p>
           )}
@@ -263,7 +263,7 @@ function MeetingCard({
                 type="button"
                 disabled={busy}
                 onClick={() => run(() => oversight.closeMeeting(m.id))}
-                className="rounded border border-gold/60 px-3.5 py-1.5 text-[13px] text-white font-semibold shadow-act hover:bg-lapis disabled:opacity-40"
+                className="rounded-xl shadow-[0_0_0_0.5px_rgba(176,132,48,0.24)] px-3.5 py-1.5 text-[13px] text-white font-semibold shadow-act hover:bg-lapis disabled:opacity-40"
               >
                 {t('meet.close')}
               </button>
@@ -356,8 +356,10 @@ export default function Meetings() {
       */}
       <div
         className={
-          'mb-5 rounded-lg border px-4 py-3 ' +
-          (data.cadence.overdue ? 'border-warn/60 bg-warn/[0.05]' : 'border-line')
+          'mb-5 rounded-card px-5 py-4 ' +
+          (data.cadence.overdue
+            ? 'bg-[#FCF0EE] text-breach shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)]'
+            : 'bg-raised shadow-ring')
         }
       >
         {data.cadence.dueBy ? (
@@ -442,7 +444,7 @@ export default function Meetings() {
           </label>
 
           {error && (
-            <p className="mb-2.5 rounded border border-warn/50 px-3 py-2 text-[12.5px] leading-relaxed text-warn">
+            <p className="mb-2.5 rounded-xl shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)] px-3 py-2 text-[12.5px] leading-relaxed text-breach">
               {error}
             </p>
           )}
@@ -451,7 +453,7 @@ export default function Meetings() {
             <button
               type="submit"
               disabled={busy || !at}
-              className="rounded border border-lapis/25 px-3.5 py-1.5 text-[13px] text-lapis font-medium disabled:opacity-40"
+              className="rounded-xl bg-raised shadow-ring px-3.5 py-1.5 text-[13px] text-lapis font-medium disabled:opacity-40"
             >
               {t('meet.conveneIt')}
             </button>

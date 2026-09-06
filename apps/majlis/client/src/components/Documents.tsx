@@ -32,10 +32,10 @@ export function DocumentLink({
       target="_blank"
       rel="noopener"
       className={
-        'block rounded-lg border px-4 py-3 transition-colors ' +
+        'block rounded-card px-5 py-4 transition-all ' +
         (emphasis
-          ? 'border-gold/60 bg-gold/[0.06] hover:bg-gold/[0.1]'
-          : 'border-line bg-surface hover:border-muted')
+          ? 'bg-raised shadow-card hover:shadow-lift'
+          : 'bg-raised/60 shadow-ring hover:shadow-card')
       }
     >
       <div className="flex items-baseline justify-between gap-3">

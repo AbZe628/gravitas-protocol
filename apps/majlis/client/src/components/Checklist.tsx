@@ -74,11 +74,15 @@ function Condition({
   return (
     <li
       className={
-        'rounded-lg border px-4 py-3 ' +
-        (contested ? 'border-gold/50 bg-gold/[0.04]' : mine ? 'border-line' : 'border-line/60')
+        'rounded-card px-5 py-4 ' +
+        (contested
+          ? 'bg-raised shadow-[0_0_0_1px_rgba(176,132,48,0.3),0_1px_2px_rgba(25,23,19,0.045),0_12px_24px_-14px_rgba(25,23,19,0.16)]'
+          : mine
+            ? 'bg-raised shadow-card'
+            : 'bg-raised/60 shadow-ring')
       }
     >
-      <div className="mb-1.5 flex flex-wrap items-center gap-2">
+      <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-2">
         {mine ? (
           <Tag tone={toneFor(mine.holds)}>{t(`chk.${mine.holds}`)}</Tag>
         ) : (
@@ -90,14 +94,14 @@ function Condition({
         </span>
       </div>
 
-      <p className="text-[14px] leading-relaxed">{c.requirement}</p>
+      <p className="max-w-[62ch] font-display text-[16px] leading-[1.55]">{c.requirement}</p>
 
       {/*
         The reason the condition exists, so a scholar can disagree with the
         reasoning rather than only with the citation.
       */}
-      <p className="mt-1.5 text-[12.5px] leading-relaxed text-muted">{c.why}</p>
-      <p className="mt-1 text-[11px] text-muted opacity-70">{c.authority}</p>
+      <p className="mt-2.5 max-w-[62ch] text-[12.5px] leading-[1.6] text-muted">{c.why}</p>
+      <p className="mt-1.5 text-[11.5px] text-muted">{c.authority}</p>
 
       {state.history.length > 0 && (
         <details className="mt-2.5">
@@ -108,10 +112,12 @@ function Condition({
             {state.history.map((f, i) => (
               <li
                 key={i}
-                className={'border-l-2 pl-3 ' + (f.supersededAt ? 'border-line/50 opacity-60' : 'border-line')}
+                className={'border-s-2 border-line ps-4 ' + (f.supersededAt ? 'opacity-60' : '')}
               >
                 <div className="text-[12px]">
-                  <span className={f.holds === 'not_met' ? 'text-warn' : ''}>{t(`chk.${f.holds}`)}</span>
+                  <span className={f.holds === 'not_met' ? 'font-semibold text-breach' : 'font-semibold text-settled'}>
+                    {t(`chk.${f.holds}`)}
+                  </span>
                   <span className="mx-1.5 opacity-40">·</span>
                   <span className="text-muted">{f.scholarId}</span>
                   {f.supersededAt && (
@@ -121,7 +127,9 @@ function Condition({
                     </>
                   )}
                 </div>
-                <p className="mt-0.5 text-[12.5px] leading-relaxed text-muted">{f.reason}</p>
+                <p className="mt-1.5 max-w-[62ch] font-display text-[14.5px] leading-[1.55] text-sand">
+                  {f.reason}
+                </p>
               </li>
             ))}
           </ul>
@@ -139,8 +147,10 @@ function Condition({
                     type="button"
                     onClick={() => setHolds(h)}
                     className={
-                      'rounded border px-3 py-1.5 text-[12px] ' +
-                      (holds === h ? 'border-lapis text-lapis' : 'border-line text-muted hover:border-muted')
+                      'rounded-xl px-4 py-2 text-[12.5px] transition-all ' +
+                      (holds === h
+                        ? 'bg-[#EAF1F7] font-bold text-lapis shadow-[0_0_0_1.5px_#164470]'
+                        : 'bg-raised text-sand shadow-ring hover:text-paper')
                     }
                   >
                     {t(`chk.${h}`)}
@@ -162,7 +172,7 @@ function Condition({
                   type="button"
                   onClick={submit}
                   disabled={!holds || busy}
-                  className="rounded border border-lapis/25 px-3 py-1.5 text-[12.5px] text-lapis font-medium disabled:opacity-40"
+                  className="rounded-xl bg-raised shadow-ring px-3 py-1.5 text-[12.5px] text-lapis font-medium disabled:opacity-40"
                 >
                   {t('chk.record')}
                 </button>
@@ -332,8 +342,10 @@ export default function Checklist({ matterId, canRule }: { matterId: string; can
       {/* The server's own sentence about what that means. Not restated here. */}
       <p
         className={
-          'mb-3 rounded border px-3 py-2 text-[12px] leading-relaxed ' +
-          (data.declined ? 'border-warn/50 text-warn' : 'border-line text-muted')
+          'mb-4 rounded-xl px-4 py-2.5 text-[12.5px] leading-[1.55] ' +
+          (data.declined
+            ? 'bg-[#FCF0EE] text-breach shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)]'
+            : 'bg-raised/60 text-muted shadow-ring')
         }
       >
         {data.sourceNote}

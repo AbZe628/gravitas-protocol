@@ -47,7 +47,7 @@ export default function Briefings() {
                 </div>
               )}
 
-              <div className="mt-4 rounded border border-gold/40 bg-gold/[0.06] p-3">
+              <div className="mt-4 rounded-xl shadow-[0_0_0_0.5px_rgba(176,132,48,0.24)] bg-[#FBF4E4]] p-3">
                 <div className="text-[10px] font-bold uppercase tracking-[0.15em] text-gold">
                   {t('brief.question')}
                 </div>

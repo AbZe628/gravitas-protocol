@@ -40,8 +40,8 @@ function Entry({ entry }: { entry: HistoryEntry }) {
   return (
     <li
       className={
-        'rounded-lg border px-4 py-3 ' +
-        (entry.state === 'standing' ? 'border-line' : 'border-line/60 opacity-75')
+        'rounded-card px-5 py-4 ' +
+        (entry.state === 'standing' ? 'bg-raised shadow-card' : 'bg-raised/60 opacity-75 shadow-ring')
       }
     >
       <div className="mb-1.5 flex flex-wrap items-center gap-2">
@@ -68,7 +68,7 @@ function Entry({ entry }: { entry: HistoryEntry }) {
         that vanished, so both are shown rather than filed behind a click.
       */}
       {entry.state === 'withdrawn' && (
-        <p className="mt-1.5 rounded border border-warn/40 px-2.5 py-1.5 text-[12px] leading-relaxed text-warn">
+        <p className="mt-1.5 rounded-xl shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)] px-2.5 py-1.5 text-[12px] leading-relaxed text-breach">
           {t('recorded.withdrawnBy')} {c.withdrawnBy} — {c.withdrawalReason}
         </p>
       )}

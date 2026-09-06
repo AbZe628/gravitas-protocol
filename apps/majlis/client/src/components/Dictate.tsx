@@ -143,10 +143,8 @@ export default function Dictate({ onText }: { onText: (text: string) => void }) 
         onClick={press}
         aria-pressed={listening}
         className={
-          'rounded border px-3 py-1 text-[12px] transition-colors ' +
-          (listening
-            ? 'border-lapis/40 text-lapis'
-            : 'border-line text-muted hover:border-muted hover:text-paper')
+          'rounded-xl px-3.5 py-2 text-[12.5px] transition-all ' +
+          (listening ? 'bg-[#EAF1F7] font-semibold text-lapis shadow-[0_0_0_1.5px_#164470]' : 'bg-raised text-sand shadow-ring hover:text-paper')
         }
       >
         {listening ? t('dictate.stop') : t('dictate.start')}
@@ -180,7 +178,7 @@ export default function Dictate({ onText }: { onText: (text: string) => void }) 
                 setAsking(false);
                 start();
               }}
-              className="rounded border border-lapis/25 px-3 py-1 text-[12px] text-lapis font-medium"
+              className="rounded-xl bg-raised shadow-ring px-3 py-1 text-[12px] text-lapis font-medium"
             >
               {t('dictate.understood')}
             </button>

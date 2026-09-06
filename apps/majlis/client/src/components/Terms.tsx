@@ -69,17 +69,22 @@ export default function Terms({ matter, canEdit, onChanged }: Props) {
         {rule.parameters.length === 0 ? (
           <p className="text-[13px] text-muted">{t('terms.none')}</p>
         ) : (
-          <ul className="space-y-2">
+          <ul className="space-y-2.5">
             {rule.parameters.map((p) => (
-              <li key={p.key} className="rounded-card shadow-ring p-3">
-                <div className="flex flex-wrap items-baseline gap-2">
-                  <span className="font-mono text-[12.5px] text-muted">{p.key}</span>
-                  <span className="text-[15px] font-medium text-paper tabular-nums">
-                    {p.value}
-                    {p.unit ? <span className="ml-1 text-[12px] text-muted">{p.unit}</span> : null}
-                  </span>
+              <li
+                key={p.key}
+                className="flex items-center justify-between gap-6 rounded-xl bg-ink px-5 py-3.5"
+              >
+                <div className="min-w-0">
+                  <div className="font-mono text-[12.5px]">{p.key}</div>
+                  <p className="mt-1.5 text-[12.5px] leading-[1.5] text-muted">{p.meaning}</p>
                 </div>
-                <p className="mt-1 text-[13px] leading-relaxed text-muted">{p.meaning}</p>
+                <div className="shrink-0 text-end">
+                  <div className="font-mono text-[18px] font-medium tabular-nums tracking-[-0.01em] text-lapis">
+                    {p.value}
+                  </div>
+                  {p.unit ? <div className="mt-0.5 text-[11px] text-muted">{p.unit}</div> : null}
+                </div>
               </li>
             ))}
           </ul>
@@ -89,10 +94,10 @@ export default function Terms({ matter, canEdit, onChanged }: Props) {
           The hash state is the honest signal here: empty means the terms can
           still move, and a value means the board is committed to exactly these.
         */}
-        <div className="rounded-card shadow-ring bg-raised p-3">
+        <div className="rounded-card bg-raised px-5 py-4 shadow-ring">
           {rule.parameterHash ? (
             <>
-              <div className="mb-1 text-[11.5px] uppercase tracking-wide text-muted">
+              <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
                 {t('terms.fixed')}
               </div>
               <div className="break-all font-mono text-[11.5px] text-lapis">
@@ -111,7 +116,7 @@ export default function Terms({ matter, canEdit, onChanged }: Props) {
           <button
             type="button"
             onClick={start}
-            className="rounded-xl shadow-ring px-3 py-1.5 text-[12px] hover:bg-raised"
+            className="rounded-xl bg-raised px-4 py-2 text-[12.5px] text-sand shadow-ring transition-colors hover:text-paper"
           >
             {rule.parameters.length ? t('terms.edit') : t('terms.set')}
           </button>

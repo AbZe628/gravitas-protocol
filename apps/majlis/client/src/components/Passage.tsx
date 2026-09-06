@@ -39,11 +39,11 @@ import { useI18n } from '../lib/i18n.js';
  */
 
 const DOT: Record<PassageStep['state'], string> = {
-  done: 'bg-gold/70',
-  open: 'bg-goldsoft ring-2 ring-gold/30',
+  done: 'bg-settled',
+  open: 'bg-gold ring-[3px] ring-gold/25',
   ahead: 'bg-line',
-  skipped: 'bg-transparent border border-warn/50',
-  not_applicable: 'bg-transparent border border-line',
+  skipped: 'border border-dashed border-muted/60',
+  not_applicable: 'border border-line',
 };
 
 function Step({ step, ordinal }: { step: PassageStep; ordinal?: number }) {

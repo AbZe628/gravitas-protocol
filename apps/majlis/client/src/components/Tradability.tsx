@@ -225,8 +225,8 @@ export default function Tradability() {
             <label
               key={k}
               className={
-                'flex cursor-pointer items-center gap-2 rounded border px-2.5 py-1.5 text-[12.5px] transition-colors ' +
-                (counts.includes(k) ? 'border-gold/60 bg-gold/[0.06]' : 'border-line hover:border-muted')
+                'flex cursor-pointer items-center gap-2 rounded-xl px-3 py-2 text-[12.5px] transition-all ' +
+                (counts.includes(k) ? 'bg-[#EAF1F7] shadow-[0_0_0_1.5px_#164470]' : 'bg-raised shadow-ring hover:shadow-card')
               }
             >
               <input type="checkbox" checked={counts.includes(k)} onChange={() => toggleKind(k)} />
@@ -338,7 +338,7 @@ export default function Tradability() {
             arithmetic worked, and it is the rule that needs finishing.
           */}
           {result.unstated && (
-            <p className="mb-3 rounded border border-warn/50 px-3 py-2.5 text-[12.5px] leading-relaxed text-warn">
+            <p className="mb-3 rounded-xl shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)] px-3 py-2.5 text-[12.5px] leading-relaxed text-breach">
               {result.unstated}
             </p>
           )}

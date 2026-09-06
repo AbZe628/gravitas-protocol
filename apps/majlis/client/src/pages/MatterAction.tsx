@@ -166,7 +166,7 @@ export default function MatterAction() {
               <button
                 type="button"
                 onClick={() => setStep('act')}
-                className="rounded border border-gold/60 px-3.5 py-1.5 text-[13px] text-white font-semibold shadow-act transition-colors hover:bg-lapis"
+                className="rounded-xl shadow-[0_0_0_0.5px_rgba(176,132,48,0.24)] px-3.5 py-1.5 text-[13px] text-white font-semibold shadow-act transition-colors hover:bg-lapis"
               >
                 {t('action.toAct')}
               </button>
@@ -224,7 +224,7 @@ export default function MatterAction() {
 
       {step === 'done' && (
         <>
-          <p className="mb-4 rounded-lg border border-gold/50 bg-gold/[0.05] px-4 py-3.5 text-[13.5px] leading-relaxed">
+          <p className="mb-4 rounded-card shadow-[0_0_0_0.5px_rgba(176,132,48,0.24)] bg-[#FBF4E4]] px-4 py-3.5 text-[13.5px] leading-relaxed">
             {t('action.recorded')}
           </p>
 

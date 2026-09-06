@@ -62,7 +62,7 @@ export default function Settings() {
         it untrue in a way the page cannot otherwise show.
       */}
       {mismatches.length > 0 && (
-        <div className="mb-7 rounded-lg border border-warn/60 bg-warn/[0.06] px-4 py-3.5">
+        <div className="mb-7 rounded-card shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)] bg-[#FCF0EE]] px-4 py-3.5">
           <div className="mb-2 text-[13px] font-semibold text-warn">
             {mismatches.length === 1 ? t('set.oneMismatch') : `${mismatches.length} ${t('set.mismatches')}`}
           </div>
