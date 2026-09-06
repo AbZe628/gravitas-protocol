@@ -59,7 +59,11 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { outputBreachesConstraint } from './assistant.js';
 
-export const EXTRACTION_MODEL = process.env.EXTRACTION_MODEL ?? 'claude-sonnet-4-6';
+/*
+ * Reading figures out of a document, where a misread number becomes a term
+ * a board votes on. Pinned to a previous generation, like the assistant was.
+ */
+export const EXTRACTION_MODEL = process.env.EXTRACTION_MODEL ?? 'claude-opus-5';
 
 /** Enough for a page of figures with their quotes, and no more. */
 const MAX_TOKENS = 4096;

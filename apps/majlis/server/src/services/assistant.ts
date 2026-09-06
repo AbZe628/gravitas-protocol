@@ -23,12 +23,29 @@ import type { AssistantExchange, SourceRef } from '../types.js';
  * orthographic variation does not open a hole.
  */
 
-export const ASSISTANT_MODEL = process.env.ASSISTANT_MODEL ?? 'claude-sonnet-4-6';
-export const CLASSIFIER_MODEL = process.env.CLASSIFIER_MODEL ?? 'claude-haiku-4-5';
+/*
+ * Which model answers, and which one guards the door.
+ *
+ * The assistant explains mechanism to jurists under a constraint it must not
+ * breach, so it gets the most capable model. The classifier answers one
+ * question with one word — does this seek a ruling — and a small fast model
+ * is the right instrument for that: the gate should not be the slow part of
+ * a refusal.
+ *
+ * Both were pinned to a previous generation. `claude-sonnet-4-6` still
+ * answers, so nothing failed loudly; it was simply the wrong model, quietly,
+ * for as long as nobody looked.
+ */
+export const ASSISTANT_MODEL = process.env.ASSISTANT_MODEL ?? 'claude-opus-5';
+export const CLASSIFIER_MODEL = process.env.CLASSIFIER_MODEL ?? 'claude-haiku-4-5-20251001';
 
-/** The thinking budget must leave real room for the answer that follows it. */
-const ASSISTANT_MAX_TOKENS = 4096;
-const ASSISTANT_THINKING_BUDGET = 1536;
+/*
+ * Adaptive thinking decides its own budget inside `max_tokens`, so the
+ * ceiling has to hold the reasoning *and* the answer. Four thousand held a
+ * fixed 1536-token budget and an answer; eight gives adaptive room to think
+ * longer about a hard question without eating the reply.
+ */
+const ASSISTANT_MAX_TOKENS = 8192;
 
 const SYSTEM_PROMPT = `You explain financial and blockchain technology to Shariah scholars who serve on the board governing the Gravitas Protocol policy registry.
 
@@ -519,7 +536,16 @@ export async function ask(opts: AskOptions): Promise<AskResult> {
         max_tokens: ASSISTANT_MAX_TOKENS,
         system: SYSTEM_PROMPT,
         messages: [{ role: 'user', content: userContent }],
-        thinking: { type: 'enabled', budget_tokens: ASSISTANT_THINKING_BUDGET },
+        /*
+         * `{ type: 'enabled', budget_tokens }` is rejected outright by every
+         * current model — a 400, not a warning — so this call had been dead
+         * for as long as the models it was written against have been
+         * superseded. Adaptive lets the model spend what the question needs:
+         * a definition costs little, and a question about how a mechanism
+         * behaves under an edge case costs more, which is exactly the
+         * distinction a fixed budget could not make.
+         */
+        thinking: { type: 'adaptive' },
       }),
     'assistant',
   );
