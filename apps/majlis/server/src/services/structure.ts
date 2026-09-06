@@ -65,6 +65,13 @@ export interface Checklist {
   declined: boolean;
   /** What the source means, in the words the adoption service holds. */
   sourceNote: string;
+  /**
+   * What this board said its conditions rest on, in its own words.
+   *
+   * Null where the board did not say, and there is nothing to fall back to:
+   * the shipped library names no standard, deliberately.
+   */
+  basis: string | null;
   conditions: ConditionState[];
   /** Conditions no member has answered. The list a chair reads. */
   unanswered: string[];
@@ -153,6 +160,7 @@ export function checklistFor(
     source: effective.source,
     declined: effective.declined,
     sourceNote: effective.note,
+    basis: effective.adoption?.basis ?? null,
     conditions,
     unanswered,
     contested,

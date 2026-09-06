@@ -43,6 +43,7 @@ import {
 import { attentionList } from '../services/attention.js';
 import { paceOf, waitingNow } from '../services/clocks.js';
 import { assemble, render } from '../services/fatwa.js';
+import { standingAdoptions } from '../services/adoption.js';
 import { assembleAnnualReport, renderAnnualReport } from '../services/annual.js';
 import { buildCalendar, toICalendar } from '../services/calendar.js';
 import { buildRegister, readComposition, standingOf } from '../services/register.js';
@@ -984,7 +985,12 @@ export function governanceRoutes(
   );
 
   /**
-   * The three screening ratios of AAOIFI Standard 21.
+   * The three screening ratios, against the limits this board set.
+   *
+   * The limits arrive with the figures, under `thresholds`, and there are no
+   * shipped ones to fall back on: a ratio sent with no limit is computed and
+   * reported untested. Which standard governs is each board's decision, and a
+   * default here would be that decision made silently on their behalf.
    *
    * Stateless on purpose: figures come from the institution and are not this
    * system's to hold until a board has decided to attach them to something.
@@ -1760,7 +1766,21 @@ export function governanceRoutes(
       const matter = await store.matter(req.params.id);
       if (!matter) return;
 
-      const fatwa = assemble(board, matter, now());
+      /*
+       * The board's own basis, where the board has adopted the shape.
+       *
+       * Nothing is fetched to fall back to: the library names no standard, so
+       * a matter judged against a shape this board never adopted carries no
+       * citation at all, and the document says that in words rather than
+       * leaving a blank line where a reader will assume one was intended.
+       */
+      const adoptions = matter.structureId ? await store.adoptions(matter.boardId) : [];
+      const adoption =
+        standingAdoptions(adoptions).find(
+          (a) => a.structureId === matter.structureId && a.standing !== 'declined',
+        ) ?? null;
+
+      const fatwa = assemble(board, matter, now(), adoption);
 
       if (req.query.format === 'json') {
         res.json(fatwa);

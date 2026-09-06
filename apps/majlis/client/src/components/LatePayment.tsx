@@ -25,9 +25,9 @@ import RecordCalculation from './RecordCalculation.js';
  * with nothing pre-selected — like the zakat base and the purification method.
  * A form that started on "keep the costs" would have made the ruling.
  *
- * **By letting the debtor's position go unasked.** A charge on somebody who
- * could not pay is what AAOIFI SS-3 forbids, and the answer is not something
- * arithmetic reaches. It is asked before any figure is, recorded with the
+ * **By letting the debtor's position go unasked.** Whether a charge may fall
+ * on somebody who could not pay is the first question a board answers here,
+ * and the answer is not something arithmetic reaches. It is asked before any figure is, recorded with the
  * result, and where the answer is *unable* or *not determined* the warning the
  * server wrote sits above the amount rather than below it.
  *

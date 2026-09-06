@@ -105,10 +105,16 @@ then carries.
 ### The library, and why it is a starting point rather than an authority
 
 The built-in structures are **seeded, and the board adopts, amends or replaces
-them.** Majlis must not assert what AAOIFI requires: boards differ, an AAOIFI
-board and a Bank Negara board and a bank's own house view will not agree on
-every condition, and a system that shipped its own reading as fact would be
-ruling.
+them.** Majlis must not assert what any standard requires: boards differ, and a
+board following one standard, a board following another and a bank's own house
+view will not agree on every condition. A system that shipped its own reading as
+fact would be ruling.
+
+**As of September 2026 the library names no standard at all.** Every condition
+used to carry the one it was drawn from; those are gone, and the removal is the
+point. The reasoning stayed — that is what a scholar argues with — and the only
+place a standard is ever named is `AdoptedStructure.basis`, which a
+board fills in, in its own words, when it adopts.
 
 So the library ships as a draft the board approves once, like any other matter.
 After that it is theirs.
@@ -215,8 +221,12 @@ export interface Calculation {
 
 ### 4.1 Screening — ✅ built, on the screen
 
-The three AAOIFI SS-21 ratios, computed exactly, arithmetic shown, thresholds
-tested by cross-multiplication so no display rounding can flip an answer.
+The three ratios, computed exactly, arithmetic shown, and the board's own limits
+tested by cross-multiplication so no display rounding can flip an answer. **The
+limits ship with nothing in them**: send no threshold and the ratio comes back
+computed and untested, carrying `unknownBecause: 'no_limit_set'`.
+Where the limit sits is a ruling.
+
 `crossings()` compares two assessments and raises the question when one changes
 side.
 
@@ -315,9 +325,9 @@ Three things follow, and each is the point rather than a limitation:
 - **Two bands over the same proportion is a refusal.** Not first-match, not a
   precedence rule. Both sentences apply and choosing between them is a ruling.
 
-A pool that is entirely debt or entirely cash is pointed at the standard that
-actually governs it — SS-59 or SS-1 — rather than left to infer it from a
-tangible ratio of 0.00%. That is a fact beside the band, never instead of it.
+A pool that is entirely debt or entirely cash is named as such — a sale of debt,
+or an exchange — rather than left to be inferred from a tangible ratio of 0.00%.
+Which standard governs either is the board's, and none is named here. That is a fact beside the band, never instead of it.
 
 There is no cross-multiplication here and its absence is not an omission: parts
 arrive in basis points against a whole of 10 000, so the test is integer against
@@ -347,9 +357,9 @@ it could stop being true:
 - **By an unevidenced amount staying.** There is no field for one. Nothing is
   retained against a cost that is not listed with a description of what it was.
 
-And one thing it will not decide: **whether the debtor could pay.** A charge on
-somebody in difficulty is what SS-3 forbids, and *"if the debtor is in
-difficulty, then grant him time"* is not a question arithmetic reaches. It is
+And one thing it will not decide: **whether the debtor could pay.** Whether a
+charge may fall on somebody in difficulty is the first question the board
+answers, and it is not one arithmetic reaches. It is
 asked before any figure, recorded with the result, and where the answer is
 *unable* or *not determined* the warning sits **above** the amount. The figure
 is still computed — refusing would be the software ruling that nothing is due,
@@ -559,7 +569,7 @@ a state worth naming: a tested service nobody can reach is not a feature.
 
 | | server | screen |
 |---|---|---|
-| Screening (SS-21) | ✅ | ✅ |
+| Screening | ✅ | ✅ |
 | Purification | ✅ | ✅ |
 | Profit distribution (PER/IRR) | ✅ | ✅ |
 | Zakat | ✅ | ✅ |

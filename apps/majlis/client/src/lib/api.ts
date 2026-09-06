@@ -861,6 +861,16 @@ export interface Figures {
   cashAndInterestBearingSecurities: string;
   totalRevenue: string;
   nonPermissibleIncome: string;
+  /** The limits this board set. There are no shipped ones to fall back on. */
+  thresholds?: Threshold[];
+}
+
+/** One limit, as this board set it. `basis` is the board's own words. */
+export interface Threshold {
+  key: 'debt' | 'liquidity' | 'income';
+  thresholdBps: number;
+  bound: 'at_or_below' | 'strictly_below';
+  basis?: string;
 }
 
 export interface RatioResult {
@@ -872,7 +882,11 @@ export interface RatioResult {
   percent: string | null;
   withinThreshold: boolean | null;
   workings: string;
-  authority: string;
+  thresholdBps: number | null;
+  bound: 'at_or_below' | 'strictly_below' | null;
+  basis: string | null;
+  /** Which silence this is: a figure that could not divide, or no limit given. */
+  unknownBecause: 'denominator_is_zero' | 'no_limit_set' | null;
 }
 
 export interface Assessment {
@@ -881,6 +895,8 @@ export interface Assessment {
   currency: string;
   ratios: RatioResult[];
   allWithinThresholds: boolean | null;
+  /** How many of the three this board has actually set a limit for. */
+  limitsSet: number;
   note: string;
 }
 
@@ -1469,7 +1485,6 @@ export interface StructureCondition {
   /** What goes wrong when it is not met. The part a scholar can argue with. */
   why: string;
   evidence: 'document' | 'sequence' | 'figure' | 'undertaking';
-  authority: string;
 }
 
 export interface Structure {
@@ -1478,7 +1493,6 @@ export interface Structure {
   family: string;
   conditions: StructureCondition[];
   calculations: string[];
-  authority: string;
 }
 
 export interface ConditionFinding {
@@ -1513,6 +1527,8 @@ export interface Checklist {
   /** True where the board considered this shape and ruled against using it. */
   declined: boolean;
   sourceNote: string;
+  /** What the board said these rest on. Null where it said nothing. */
+  basis: string | null;
   conditions: ConditionState[];
   unanswered: string[];
   /** Conditions where standing findings disagree. Not a fault — a discussion. */
@@ -1532,6 +1548,14 @@ export interface AdoptedStructure {
   conditions: StructureCondition[];
   /** What the board changed and why, or why it declined. */
   amendments: string[];
+  /**
+   * What this board says its conditions rest on, in its own words.
+   *
+   * Absent where the board did not say. The shipped library names no standard,
+   * so there is nothing to fall back to — which standard governs is each
+   * board's decision and no two need decide alike.
+   */
+  basis?: string;
   /** The settled matter it was decided in. Checked on the server. */
   matterId: string;
   decidedBy: string;

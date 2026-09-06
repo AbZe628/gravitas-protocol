@@ -43,10 +43,14 @@ const code = (fn: () => unknown): string | null => {
 };
 
 describe('the library is a prompt, not an authority', () => {
-  it('names where every condition comes from', () => {
+  it('names no standard anywhere, because which one governs is the board’s', () => {
+    const json = JSON.stringify(structures).toLowerCase();
+    for (const cite of ['aaoifi', 'shariah standard', 'ss 1', 'ss 8', 'ss 9', 'ss 17', 'ss 21']) {
+      expect(json).not.toContain(cite);
+    }
     for (const s of structures) {
-      expect(s.authority.length).toBeGreaterThan(3);
-      for (const c of s.conditions) expect(c.authority.length).toBeGreaterThan(3);
+      expect(s).not.toHaveProperty('authority');
+      for (const c of s.conditions) expect(c).not.toHaveProperty('authority');
     }
   });
 

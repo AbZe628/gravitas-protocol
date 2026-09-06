@@ -4,7 +4,7 @@ import { useI18n } from '../lib/i18n.js';
 import ReadDocument from './ReadDocument.js';
 
 /**
- * The three screening ratios of AAOIFI Standard 21.
+ * The three screening ratios, against limits this board set.
  *
  * **It computes and it never concludes**, and the interface has to carry that as
  * plainly as the service does. A panel that showed three green ticks and a
@@ -12,7 +12,7 @@ import ReadDocument from './ReadDocument.js';
  * would reasonably read it as one.
  *
  * So: the arithmetic is shown, not the answer. "1 240 000 ÷ 3 950 000 = 31.39%,
- * against a limit of ≤ 30%. Outside the threshold." is a fact a scholar can
+ * against this board’s limit of ≤ 30%. Outside it." is a fact a scholar can
  * check and disagree with. "Fails" is a conclusion they are being asked to
  * accept. The sentence under the result says the rest — that permissibility is
  * a ruling and that the business activity is a separate question no ratio
@@ -53,8 +53,12 @@ const EMPTY: Figures = {
  * belongs in the same piece of work as translating the documents.
  */
 function Ratio({ ratio }: { ratio: RatioResult }) {
-  // Within, outside, and could-not-be-computed are three states. Collapsing the
-  // third into "outside" would report a failure the figures do not support.
+  const { t } = useI18n();
+
+  // Within, outside, and not tested are three states. Collapsing the third
+  // into "outside" would report a failure the figures do not support — and the
+  // commonest reason for it now is that the board has not set a limit, which
+  // is not a fact about the company at all.
   const tone =
     ratio.withinThreshold === null
       ? 'shadow-ring text-muted'
@@ -74,7 +78,16 @@ function Ratio({ ratio }: { ratio: RatioResult }) {
       <p className="mt-1 font-mono text-[11.5px] leading-relaxed text-muted break-words">
         {ratio.workings}
       </p>
-      <p className="mt-1 text-[11px] text-muted opacity-80">{ratio.authority}</p>
+
+      {/*
+        Whose limit this was, and only where there was one.
+        A ratio with no limit set is a computed number and nothing more, and
+        the line under it has to say that rather than sit empty — an empty line
+        where a citation used to be reads as a citation that failed to load.
+      */}
+      <p className="mt-1 text-[11px] text-muted opacity-80">
+        {ratio.thresholdBps === null ? t('calc.screening.noLimit') : (ratio.basis ?? t('calc.screening.boardsLimit'))}
+      </p>
     </li>
   );
 }

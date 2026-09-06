@@ -24,6 +24,14 @@ export function dirFor(lang: Lang): 'ltr' | 'rtl' {
 type Dict = Record<string, string>;
 
 const en: Dict = {
+  "adopt.noBasis": "This board has not said what these rest on",
+  "calc.screening.noLimit": "No limit set by this board — the figure is shown, not tested",
+  "calc.screening.boardsLimit": "Against the limit this board set",
+  "calc.screening.setLimits": "Set this board’s limits",
+  "calc.screening.limitsHelp": "Majlis ships no thresholds and follows no standard. Where the limit sits, and whether it is inclusive, is this board’s ruling — so it is asked for rather than assumed. Leave one blank and that ratio is computed and reported untested.",
+  "calc.screening.basis": "What this limit rests on, in your words",
+  "calc.screening.basisHint": "A standard you follow, a resolution of your own, a supervisor’s circular",
+  "calc.screening.untested": "Not tested",
   "ends.title": "Where this ruling ends",
   "ends.document": "A document to send",
   "ends.enforced": "Read before every transaction",
@@ -195,7 +203,7 @@ const en: Dict = {
   "calc.tab.late": "Late payment",
   "calc.late.about": "An increase taken on a debt paid late, and where the board directed it. The amount is arithmetic; whether it was due turns on whether the debtor could have paid and chose not to, which is recorded here rather than computed. What is not retained against evidenced collection cost is to be given away — it does not become income by being received.",
   "late.solvency": "What the board established about the debtor",
-  "late.solvency.hint": "Asked before any figure, because whether a charge may be taken at all turns on it. AAOIFI SS-3 permits an amount to be required of a solvent debtor who delays; one in difficulty is to be granted time.",
+  "late.solvency.hint": "Asked before any figure, because whether a charge may be taken at all turns on it. Boards commonly distinguish a solvent debtor who delays from one in difficulty, who is granted time — but where this board draws that line is its own ruling.",
   "late.solvency.able_and_delaying": "Able to pay, and delayed",
   "late.solvency.able_and_delaying.meaning": "The board established that this debtor could have paid and did not.",
   "late.solvency.unable": "Unable to pay",
@@ -406,7 +414,7 @@ const en: Dict = {
   "shell.where": "Gravitas Majlis",
   "shell.anonymous": "Not signed in",
   "calc.tab.distribution": "Profit distribution",
-  "calc.screening.about": "The three ratios of AAOIFI Standard 21, computed exactly and compared by cross-multiplication so no display rounding can flip an answer.",
+  "calc.screening.about": "The three ratios, computed exactly and compared by cross-multiplication so no display rounding can flip an answer. The limits are this board’s own, and nothing is tested until they are set.",
   "calc.purification.about": "What must be given away from a holding that passed screening. Not the purification that follows a breach — that one belongs to an incident and is recorded there.",
   "calc.zakat.about": "The base, the rate and who bears it are three separate decisions, and this asks for all three before it computes anything.",
   "calc.distribution.about": "What the depositors are actually paid, and what the reserves did to it. PER comes out before the split so both parties bear it; IRR comes out after, from the depositors’ share alone.",
@@ -965,7 +973,7 @@ const en: Dict = {
     'A standard, a prior ruling, a document, a link. What the board is arguing from belongs ' +
     'beside the argument, not in someone\u2019s memory of the meeting.',
   'evidence.label': 'What it is',
-  'evidence.labelHint': 'AAOIFI Shariah Standard No. 21',
+  'evidence.labelHint': 'The standard, resolution or note you are arguing from',
   'evidence.ref': 'Where it is',
   'evidence.refHint': 'Clause 3/1, or a URL, or a matter id',
   'evidence.note': 'Why it is here',
@@ -1026,6 +1034,14 @@ const en: Dict = {
 };
 
 const ar: Dict = {
+  "adopt.noBasis": "لم يذكر هذا المجلس على أي شيء تقوم هذه الشروط",
+  "calc.screening.noLimit": "لم يحدّد هذا المجلس حدّاً — الرقم معروض ولم يُختبر",
+  "calc.screening.boardsLimit": "مقابل الحدّ الذي وضعه هذا المجلس",
+  "calc.screening.setLimits": "حدّد حدود هذا المجلس",
+  "calc.screening.limitsHelp": "لا يحمل مجلس حدوداً ولا يتبع معياراً. موضع الحدّ، وهل هو شامل للطرف أم لا، حكمٌ لهذا المجلس — فيُسأل عنه ولا يُفترض. واتركه فارغاً فيُحسب ذلك النسبة ويُعرض دون اختبار.",
+  "calc.screening.basis": "على أي شيء يقوم هذا الحدّ، بكلماتك",
+  "calc.screening.basisHint": "معيار تتبعه، أو قرار لكم، أو تعميم من الجهة الرقابية",
+  "calc.screening.untested": "لم يُختبر",
   "related.same_source": "استُدلّ بالمصدر نفسه",
   "related.declared": "أُعلن تقاطعهما",
   "related.same_parameter": "يحدّد الشرط نفسه",
@@ -1391,7 +1407,7 @@ const ar: Dict = {
   "calc.tab.late": "التأخر في السداد",
   "calc.late.about": "زيادة تؤخذ على دين سُدِّد متأخراً، وحيث وجّهها المجلس. المبلغ حساب؛ أما استحقاقه فيتوقف على كون المدين قادراً فامتنع، وهذا يُسجَّل هنا ولا يُحسب. وما لم يُستبقَ في مقابل تكلفة تحصيل مثبتة يُتصدَّق به — ولا يصير دخلاً بمجرد قبضه.",
   "late.solvency": "ما أثبته المجلس عن المدين",
-  "late.solvency.hint": "يُسأل قبل أي رقم، لأن جواز أخذ الزيادة أصلاً يتوقف عليه. يجيز معيار AAOIFI رقم 3 إلزام المدين الموسر المماطل بمبلغ؛ وأما المعسر فيُنظَر إلى ميسرة.",
+  "late.solvency.hint": "يُسأل قبل أي رقم، لأن جواز أخذ الزيادة أصلاً يتوقف عليه. وتفرّق المجالس عادةً بين المدين الموسر المماطل والمعسر الذي يُنظَر إلى ميسرة — وأما أين يضع هذا المجلس ذلك الحدّ فحكمه هو.",
   "late.solvency.able_and_delaying": "قادر وماطل",
   "late.solvency.able_and_delaying.meaning": "أثبت المجلس أن هذا المدين كان قادراً على السداد فلم يسدّد.",
   "late.solvency.unable": "معسر",
@@ -1949,6 +1965,14 @@ const ar: Dict = {
 };
 
 const ur: Dict = {
+  "adopt.noBasis": "اس بورڈ نے نہیں بتایا کہ یہ کس پر مبنی ہیں",
+  "calc.screening.noLimit": "اس بورڈ نے کوئی حد مقرر نہیں کی — عدد دکھایا گیا ہے، جانچا نہیں گیا",
+  "calc.screening.boardsLimit": "اُس حد کے مقابل جو اس بورڈ نے مقرر کی",
+  "calc.screening.setLimits": "اس بورڈ کی حدود مقرر کریں",
+  "calc.screening.limitsHelp": "مجلس کوئی حد نہیں رکھتا اور نہ کسی معیار کی پیروی کرتا ہے۔ حد کہاں ہو، اور آیا وہ شامل ہے یا نہیں — یہ اس بورڈ کا فیصلہ ہے، سو پوچھا جاتا ہے، فرض نہیں کیا جاتا۔ خالی چھوڑیں تو وہ نسبت شمار ہو کر بغیر جانچ کے دکھائی جائے گی۔",
+  "calc.screening.basis": "یہ حد کس پر مبنی ہے، آپ کے الفاظ میں",
+  "calc.screening.basisHint": "کوئی معیار جس کی آپ پیروی کرتے ہیں، اپنی کوئی قرارداد، یا نگران ادارے کا سرکلر",
+  "calc.screening.untested": "جانچا نہیں گیا",
   "dash.registry": "پالیسی رجسٹری",
   "matter.parameters": "نافذ معیارات",
   "matter.reasoning": "ووٹ اور وجوہ",
@@ -2108,7 +2132,7 @@ const ur: Dict = {
   "evidence.attach": "منسلک کریں",
   "evidence.help": "کوئی معیار، پہلا فیصلہ، دستاویز یا لنک۔ بورڈ جس چیز سے دلیل لے رہا ہے وہ دلیل کے ساتھ ہونی چاہیے، کسی کی یادداشت میں نہیں۔",
   "evidence.label": "یہ کیا ہے",
-  "evidence.labelHint": "AAOIFI شرعی معیار نمبر 21",
+  "evidence.labelHint": "وہ معیار، قرارداد یا نوٹ جس سے آپ دلیل لے رہے ہیں",
   "evidence.ref": "یہ کہاں ہے",
   "evidence.refHint": "شق 3/1، یا کوئی لنک، یا معاملے کی شناخت",
   "evidence.note": "یہ یہاں کیوں ہے",
@@ -2325,7 +2349,7 @@ const ur: Dict = {
   "calc.tab.late": "تاخیر سے ادائیگی",
   "calc.late.about": "دیر سے ادا ہونے والے قرض پر لی گئی زیادتی، اور بورڈ نے اسے کہاں بھیجا۔ رقم حساب ہے؛ واجب تھی یا نہیں اس کا انحصار اس پر ہے کہ مقروض ادا کر سکتا تھا اور نہ کیا، اور یہ یہاں درج ہوتا ہے، حساب نہیں کیا جاتا۔ جو ثابت شدہ وصولی لاگت کے مقابل نہیں رکھا جاتا وہ صدقہ کیا جاتا ہے — وصول ہو جانے سے وہ آمدنی نہیں بن جاتا۔",
   "late.solvency": "بورڈ نے مقروض کے بارے میں کیا ثابت کیا",
-  "late.solvency.hint": "کسی بھی عدد سے پہلے پوچھا جاتا ہے، کیونکہ سرے سے زیادتی لی جا سکتی ہے یا نہیں اسی پر موقوف ہے۔ AAOIFI SS-3 مالدار ٹال مٹول کرنے والے مقروض سے رقم لینے کی اجازت دیتا ہے؛ تنگ دست کو مہلت دی جائے۔",
+  "late.solvency.hint": "کسی بھی عدد سے پہلے پوچھا جاتا ہے، کیونکہ سرے سے زیادتی لی جا سکتی ہے یا نہیں اسی پر موقوف ہے۔ بورڈ عموماً مالدار ٹال مٹول کرنے والے مقروض اور تنگ دست میں فرق کرتے ہیں، جسے مہلت دی جاتی ہے — مگر یہ بورڈ وہ لکیر کہاں کھینچتا ہے، یہ اسی کا فیصلہ ہے۔",
   "late.solvency.able_and_delaying": "ادا کر سکتا تھا، اور ٹالتا رہا",
   "late.solvency.able_and_delaying.meaning": "بورڈ نے ثابت کیا کہ یہ مقروض ادا کر سکتا تھا اور نہیں کیا۔",
   "late.solvency.unable": "ادا کرنے سے قاصر",

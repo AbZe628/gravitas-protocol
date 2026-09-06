@@ -3,20 +3,29 @@
  *
  * ── what this is, and is not ──────────────────────────────────────────────
  *
- * **It is not an assertion of what the Shariah requires.** It is a draft
- * checklist with its source named, offered so that a board stops composing a
- * question from an empty box and starts judging a shape it recognises. An
- * AAOIFI board, a Bank Negara board and a bank's own house view will not agree
- * on every line below, and a system that shipped its reading as settled would
- * be ruling.
+ * **It is not an assertion of what the Shariah requires, and it names no
+ * standard.** It is a draft checklist, offered so that a board stops composing
+ * a question from an empty box and starts judging a shape it recognises.
  *
- * So every condition carries `authority` — where it is drawn from — and every
- * finding recorded against it carries the member who made it and their reason.
- * **The board's finding is the record; this is the prompt.**
+ * Every condition used to carry the standard it was drawn from. They no longer
+ * do, and the removal is the point rather than a tidy-up: **which standard
+ * governs is each board's to decide, and no two need decide alike.** A board
+ * following AAOIFI, one following Bank Negara and a bank's own house view will
+ * not agree on every line below, and a file that printed one of those readings
+ * beside every condition was answering, in the product's own voice, a question
+ * that belongs to the board. Where a board says what its conditions rest on,
+ * it says so itself, in its own words, on its own adoption — see
+ * `AdoptedStructure.basis`. Until it does, nothing here claims a source.
  *
- * `why` is not decoration either. A condition stated without its reason can
- * only be accepted or rejected on authority; stated with it, a scholar can
- * disagree with the reasoning, which is the argument a board should be having.
+ * What each condition does carry is the member's finding against it, with the
+ * member named and their reason compulsory. **The board's finding is the
+ * record; this is the prompt.**
+ *
+ * `why` is not decoration either, and it is what survives the citation. A
+ * condition stated without its reason can only be accepted or rejected on
+ * authority — which is exactly what is no longer here. Stated with it, a
+ * scholar can disagree with the reasoning, which is the argument a board
+ * should be having.
  *
  * ── this file is the draft, and a board may take it ───────────────────────
  *
@@ -36,7 +45,6 @@ export const structures: Structure[] = [
     id: 'murabaha',
     name: 'Murabaha, including commodity murabaha and tawarruq',
     family: 'sale',
-    authority: 'AAOIFI Shariah Standard No. 8; No. 30 on monetisation',
     calculations: ['late_payment', 'purification'],
     conditions: [
       {
@@ -46,7 +54,6 @@ export const structures: Structure[] = [
         why:
           'Selling what one does not own turns the sale into a financing of money by money, which is the thing the contract is chosen to avoid.',
         evidence: 'sequence',
-        authority: 'SS 8; SS 18 on possession',
       },
       {
         id: 'cost-disclosed',
@@ -54,7 +61,6 @@ export const structures: Structure[] = [
         why:
           'Murabaha is a sale of trust. Undisclosed cost makes it an ordinary sale at an unknown margin, and the buyer has agreed to something other than what was named.',
         evidence: 'document',
-        authority: 'SS 8',
       },
       {
         id: 'asset-identified',
@@ -62,7 +68,6 @@ export const structures: Structure[] = [
         why:
           'A sale of something unspecified is a sale of an expectation. The buyer cannot know what they have bought and neither can anyone reviewing it later.',
         evidence: 'document',
-        authority: 'SS 8',
       },
       {
         id: 'promise-one-sided',
@@ -71,7 +76,6 @@ export const structures: Structure[] = [
         why:
           'A promise binding on both sides before the asset exists is a sale contract in advance of ownership, wearing a promise’s clothes.',
         evidence: 'undertaking',
-        authority: 'SS 8; SS 49 on promise',
       },
       {
         id: 'no-late-increase',
@@ -80,7 +84,6 @@ export const structures: Structure[] = [
         why:
           'An increase for the passage of time on an established debt is riba, whatever it is called on the schedule.',
         evidence: 'document',
-        authority: 'SS 3 on the procrastinating debtor',
       },
       {
         id: 'tawarruq-real-commodity',
@@ -89,7 +92,6 @@ export const structures: Structure[] = [
         why:
           'A commodity that never moves and returns to the same seller is a circular sale. Nothing has been traded and the whole arrangement is a loan.',
         evidence: 'sequence',
-        authority: 'SS 30',
       },
     ],
   },
@@ -98,7 +100,6 @@ export const structures: Structure[] = [
     id: 'ijara',
     name: 'Ijara — lease of an asset or a service',
     family: 'lease',
-    authority: 'AAOIFI Shariah Standard No. 9',
     calculations: ['late_payment'],
     conditions: [
       {
@@ -108,7 +109,6 @@ export const structures: Structure[] = [
         why:
           'Rent is the price of a use. Leasing what one has no right to use sells something the lessor never held, and the lessee has paid for a permission nobody could give.',
         evidence: 'sequence',
-        authority: 'SS 9',
       },
       {
         id: 'rent-begins-on-delivery',
@@ -117,7 +117,6 @@ export const structures: Structure[] = [
         why:
           'Rent charged before delivery is a charge for the time between paying and receiving, which is a return on the amount advanced rather than on the use of anything.',
         evidence: 'sequence',
-        authority: 'SS 9',
       },
       {
         id: 'ownership-risk-with-lessor',
@@ -126,7 +125,6 @@ export const structures: Structure[] = [
         why:
           'Rent that continues after the use has ended is being paid for nothing. What is left is an obligation to keep paying an amount for a period.',
         evidence: 'document',
-        authority: 'SS 9',
       },
       {
         id: 'major-maintenance-and-insurance-on-lessor',
@@ -135,7 +133,6 @@ export const structures: Structure[] = [
         why:
           'These costs are what ownership actually consists of. A lessor relieved of them owns the asset on paper and is being paid for the balance outstanding.',
         evidence: 'document',
-        authority: 'SS 9',
       },
       {
         id: 'variable-rent-has-a-floor-and-ceiling',
@@ -144,7 +141,6 @@ export const structures: Structure[] = [
         why:
           'Rent tied to an open-ended external rate is not a price for the use; it is a rate applied to a balance. The bounds are what keep it a rent that both parties can see the limits of.',
         evidence: 'figure',
-        authority: 'SS 9',
       },
       {
         id: 'no-increase-on-late-rent-to-income',
@@ -153,7 +149,6 @@ export const structures: Structure[] = [
         why:
           'Once rent is due it is a debt. An increase on it for time is the same increase the contract form was chosen to avoid, and keeping it makes the delay profitable.',
         evidence: 'figure',
-        authority: 'SS 9; SS 3 on default',
       },
     ],
   },
@@ -162,7 +157,6 @@ export const structures: Structure[] = [
     id: 'ijara-mbt',
     name: 'Ijara, and ijara muntahia bittamleek',
     family: 'lease',
-    authority: 'AAOIFI Shariah Standard No. 9',
     calculations: [],
     conditions: [
       {
@@ -172,7 +166,6 @@ export const structures: Structure[] = [
         why:
           'Rent is earned by bearing the risk of the thing let. A lessor who bears none is lending, and the rent is interest under another name.',
         evidence: 'document',
-        authority: 'SS 9',
       },
       {
         id: 'lessor-maintains-and-insures',
@@ -181,7 +174,6 @@ export const structures: Structure[] = [
         why:
           'These are the costs of ownership. Passing them to the lessee removes the risk that justifies the rent.',
         evidence: 'document',
-        authority: 'SS 9; SS 26 on takaful',
       },
       {
         id: 'transfer-is-separate',
@@ -190,7 +182,6 @@ export const structures: Structure[] = [
         why:
           'A lease that is also a sale is two contracts in one contract, and the price of neither is determinate.',
         evidence: 'undertaking',
-        authority: 'SS 9; SS 25 on combining contracts',
       },
       {
         id: 'rent-after-delivery',
@@ -198,7 +189,6 @@ export const structures: Structure[] = [
         why:
           'Rent is the price of usufruct. There is no usufruct before delivery, so rent charged for that period is a charge for time alone.',
         evidence: 'sequence',
-        authority: 'SS 9',
       },
       {
         id: 'no-rent-when-unusable',
@@ -206,7 +196,6 @@ export const structures: Structure[] = [
           'Rent is not due for any period in which the asset is unusable through no fault of the lessee.',
         why: 'Same reason. What is being paid for has stopped existing for that period.',
         evidence: 'document',
-        authority: 'SS 9',
       },
       {
         id: 'lawful-usufruct',
@@ -214,7 +203,6 @@ export const structures: Structure[] = [
         why:
           'The lease conveys use. Where that use is unlawful the contract conveys the unlawful thing itself, whatever the paperwork is called.',
         evidence: 'document',
-        authority: 'SS 9',
       },
     ],
   },
@@ -223,7 +211,6 @@ export const structures: Structure[] = [
     id: 'mudaraba',
     name: 'Mudaraba',
     family: 'partnership',
-    authority: 'AAOIFI Shariah Standard No. 13',
     calculations: ['profit_distribution'],
     conditions: [
       {
@@ -233,7 +220,6 @@ export const structures: Structure[] = [
         why:
           'A fixed amount, or a return measured against capital, is a return that does not depend on the venture. That is a loan with a price on it.',
         evidence: 'figure',
-        authority: 'SS 13',
       },
       {
         id: 'loss-on-capital-provider',
@@ -242,7 +228,6 @@ export const structures: Structure[] = [
         why:
           'The mudarib contributes work and loses that. Making them bear capital loss as well turns the arrangement into a guaranteed loan to the capital provider.',
         evidence: 'document',
-        authority: 'SS 13',
       },
       {
         id: 'no-guarantee',
@@ -251,7 +236,6 @@ export const structures: Structure[] = [
         why:
           'A guaranteed return is the definition of what this contract exists instead of. A guarantee routed through an affiliate is the same guarantee.',
         evidence: 'document',
-        authority: 'SS 13',
       },
       {
         id: 'profit-on-realisation',
@@ -260,7 +244,6 @@ export const structures: Structure[] = [
         why:
           'Distributing unrealised profit pays one party out of another’s capital, and the shortfall appears later as a loss somebody did not agree to bear.',
         evidence: 'figure',
-        authority: 'SS 13',
       },
       {
         id: 'expenses-agreed',
@@ -269,7 +252,6 @@ export const structures: Structure[] = [
         why:
           'Unbounded expenses charged to the venture reduce the profit the capital provider shares in, which recovers by the back door what the ratio gave away.',
         evidence: 'document',
-        authority: 'SS 13',
       },
       {
         id: 'reserves-approved',
@@ -278,7 +260,6 @@ export const structures: Structure[] = [
         why:
           'The reserves smooth what depositors are paid, which is what they are for and also how a poor period is hidden. Undisclosed, they make the return look like a rate rather than a share.',
         evidence: 'figure',
-        authority: 'SS 13; and the board’s own approved basis',
       },
     ],
   },
@@ -289,7 +270,6 @@ export const structures: Structure[] = [
     id: 'musawama',
     name: 'Musawama — sale at a negotiated price',
     family: 'sale',
-    authority: 'AAOIFI Shariah Standard No. 8 by contrast; the general rules of sale',
     calculations: ['late_payment'],
     conditions: [
       {
@@ -299,7 +279,6 @@ export const structures: Structure[] = [
         why:
           'This is the line between musawama and murabaha. A buyer who was told a cost has been sold a contract of trust, and the seller is then bound by the accuracy of that figure whether or not anyone called it murabaha.',
         evidence: 'document',
-        authority: 'General rules of sale; SS 8 by contrast',
       },
       {
         id: 'price-certain',
@@ -307,7 +286,6 @@ export const structures: Structure[] = [
         why:
           'A price left to be settled later is a term the parties have not agreed. Each of them is bound to something different, and the disagreement surfaces after performance has begun.',
         evidence: 'document',
-        authority: 'General rules of sale',
       },
       {
         id: 'subject-identified',
@@ -315,7 +293,6 @@ export const structures: Structure[] = [
         why:
           'Selling what one does not own or cannot point to is selling an expectation. Neither the buyer nor anyone reviewing it afterwards can say what changed hands.',
         evidence: 'document',
-        authority: 'General rules of sale',
       },
       {
         id: 'no-increase-for-time',
@@ -324,7 +301,6 @@ export const structures: Structure[] = [
         why:
           'An increase for the passage of time on a settled debt is the exact thing the sale form was chosen to avoid. Anything collected under that heading is not the institution\u2019s to keep.',
         evidence: 'document',
-        authority: 'SS 3 on default in payment',
       },
     ],
   },
@@ -333,7 +309,6 @@ export const structures: Structure[] = [
     id: 'salam',
     name: 'Salam — payment now for delivery later',
     family: 'sale',
-    authority: 'AAOIFI Shariah Standard No. 10',
     calculations: [],
     conditions: [
       {
@@ -343,7 +318,6 @@ export const structures: Structure[] = [
         why:
           'Salam is the one sale where the subject may not yet exist, and it is allowed because the capital reaches the seller immediately. Defer the price and both sides of the exchange are delayed, which is a debt for a debt.',
         evidence: 'sequence',
-        authority: 'SS 10',
       },
       {
         id: 'goods-described-by-specification',
@@ -352,7 +326,6 @@ export const structures: Structure[] = [
         why:
           'The seller must be able to deliver from anywhere. Tying delivery to one identified source means the contract fails if that source fails, which turns a sale into a wager on that source.',
         evidence: 'document',
-        authority: 'SS 10',
       },
       {
         id: 'delivery-date-fixed',
@@ -360,7 +333,6 @@ export const structures: Structure[] = [
         why:
           'Without a fixed date the buyer has paid for something with no moment at which the seller is in default. There is nothing to enforce and nothing to review.',
         evidence: 'document',
-        authority: 'SS 10',
       },
       {
         id: 'no-sale-before-receipt',
@@ -369,7 +341,6 @@ export const structures: Structure[] = [
         why:
           'Selling goods not yet received passes on a risk the seller has not yet borne, and if the first delivery fails the second sale has nothing under it.',
         evidence: 'sequence',
-        authority: 'SS 10',
       },
       {
         id: 'parallel-salam-independent',
@@ -378,7 +349,6 @@ export const structures: Structure[] = [
         why:
           'Two contracts made conditional on each other are one contract with two prices. The institution would then be passing through a position it never held, which is the arrangement the form is meant to prevent.',
         evidence: 'document',
-        authority: 'SS 10 on parallel salam',
       },
     ],
   },
@@ -387,7 +357,6 @@ export const structures: Structure[] = [
     id: 'istisna',
     name: "Istisna' and parallel istisna' — manufacture to order",
     family: 'sale',
-    authority: 'AAOIFI Shariah Standard No. 11',
     calculations: ['late_payment'],
     conditions: [
       {
@@ -397,7 +366,6 @@ export const structures: Structure[] = [
         why:
           "Istisna' is a contract over work as well as goods. If nothing is to be made, the parties are in an ordinary sale and the freedoms this contract allows do not apply to them.",
         evidence: 'document',
-        authority: 'SS 11',
       },
       {
         id: 'price-fixed-payment-flexible',
@@ -406,7 +374,6 @@ export const structures: Structure[] = [
         why:
           'The flexibility here is in the timing of payment, not in the amount. A price that moves with the schedule is a charge for time under another name.',
         evidence: 'document',
-        authority: 'SS 11',
       },
       {
         id: 'manufacturer-bears-work',
@@ -415,7 +382,6 @@ export const structures: Structure[] = [
         why:
           'The return in this contract is earned by taking the risk of production. A manufacturer who bears neither the work nor the risk of loss is financing, and the sale is a wrapper.',
         evidence: 'document',
-        authority: 'SS 11',
       },
       {
         id: 'parallel-istisna-separate',
@@ -424,7 +390,6 @@ export const structures: Structure[] = [
         why:
           'If the institution can point at the subcontractor and step out, it never bore the obligation it was paid to bear. The two contracts must be able to fail independently.',
         evidence: 'document',
-        authority: "SS 11 on parallel istisna'",
       },
       {
         id: 'delivery-terms-and-remedies',
@@ -433,7 +398,6 @@ export const structures: Structure[] = [
         why:
           'A reduction tied to the length of a delay is a rate. A reduction tied to what the delay actually cost is a remedy, and the two look identical on a statement.',
         evidence: 'document',
-        authority: 'SS 11; SS 3 on default',
       },
     ],
   },
@@ -444,7 +408,6 @@ export const structures: Structure[] = [
     id: 'musharaka',
     name: 'Musharaka — partnership in capital and profit',
     family: 'partnership',
-    authority: 'AAOIFI Shariah Standard No. 12',
     calculations: ['profit_distribution'],
     conditions: [
       {
@@ -454,7 +417,6 @@ export const structures: Structure[] = [
         why:
           'Profit may reward effort as well as money, so its ratio is open to agreement. Loss is the destruction of capital, and a partner who is protected from it has lent rather than invested.',
         evidence: 'document',
-        authority: 'SS 12',
       },
       {
         id: 'no-guaranteed-return',
@@ -463,7 +425,6 @@ export const structures: Structure[] = [
         why:
           'A guaranteed return converts the share into a debt with a rate. Routing the guarantee through an affiliate changes who signs it and changes nothing about what it is.',
         evidence: 'undertaking',
-        authority: 'SS 12',
       },
       {
         id: 'profit-from-actual-results',
@@ -472,7 +433,6 @@ export const structures: Structure[] = [
         why:
           'A distribution that is never adjusted is a payment fixed in advance. The partnership then reports a share and pays a coupon.',
         evidence: 'figure',
-        authority: 'SS 12',
       },
       {
         id: 'capital-contributions-valued',
@@ -481,7 +441,6 @@ export const structures: Structure[] = [
         why:
           'Unvalued contributions mean the profit ratios rest on a number nobody wrote down, and the argument arrives at the first distribution rather than at the start.',
         evidence: 'figure',
-        authority: 'SS 12',
       },
       {
         id: 'management-terms-stated',
@@ -490,7 +449,6 @@ export const structures: Structure[] = [
         why:
           'A management fee folded into the profit share hides a fixed payment inside a variable one, and the partner receiving it stops depending on the result.',
         evidence: 'document',
-        authority: 'SS 12',
       },
     ],
   },
@@ -499,7 +457,6 @@ export const structures: Structure[] = [
     id: 'diminishing-musharaka',
     name: 'Diminishing musharaka — partnership with a buy-out',
     family: 'partnership',
-    authority: 'AAOIFI Shariah Standard No. 12, section on diminishing partnership',
     calculations: ['profit_distribution'],
     conditions: [
       {
@@ -509,7 +466,6 @@ export const structures: Structure[] = [
         why:
           'A price fixed in advance at face value means the institution recovers its capital whatever happened to the asset. It has then taken rent without taking ownership risk.',
         evidence: 'sequence',
-        authority: 'SS 12',
       },
       {
         id: 'buy-out-not-a-condition-of-the-partnership',
@@ -518,7 +474,6 @@ export const structures: Structure[] = [
         why:
           'Two contracts written as one leave the parties unable to say which obligation they are performing, and a partnership that must end in a sale was never a partnership.',
         evidence: 'undertaking',
-        authority: 'SS 12; SS 25 on combining contracts',
       },
       {
         id: 'rent-tracks-remaining-share',
@@ -527,7 +482,6 @@ export const structures: Structure[] = [
         why:
           'Rent that does not fall as ownership falls is a payment for the outstanding balance rather than for the use of what is owned.',
         evidence: 'figure',
-        authority: 'SS 12; SS 9 on ijara',
       },
       {
         id: 'loss-shared-while-jointly-owned',
@@ -536,7 +490,6 @@ export const structures: Structure[] = [
         why:
           'If the client bears all of it, the institution owns a share on paper and none of the exposure that makes ownership real.',
         evidence: 'document',
-        authority: 'SS 12',
       },
     ],
   },
@@ -547,7 +500,6 @@ export const structures: Structure[] = [
     id: 'wakala-investment',
     name: 'Investment wakala — agency to invest',
     family: 'agency',
-    authority: 'AAOIFI Shariah Standard No. 23 on agency; No. 46 on investment agency',
     calculations: ['profit_distribution'],
     conditions: [
       {
@@ -557,7 +509,6 @@ export const structures: Structure[] = [
         why:
           'An agent is paid for work. Paying them a share of profit makes them a partner in the result, and the contract is then a mudaraba wearing an agency label \u2014 with a different rule for losses.',
         evidence: 'document',
-        authority: 'SS 46',
       },
       {
         id: 'incentive-clearly-separated',
@@ -566,7 +517,6 @@ export const structures: Structure[] = [
         why:
           'An enforceable incentive over a target return is a share of profit by another name, and it also gives the agent a reason to take risk the principal did not agree to.',
         evidence: 'document',
-        authority: 'SS 46',
       },
       {
         id: 'no-capital-guarantee',
@@ -575,7 +525,6 @@ export const structures: Structure[] = [
         why:
           'An agent who guarantees the capital has borrowed it. The whole difference between agency and a deposit is who carries the loss when nothing went wrong.',
         evidence: 'undertaking',
-        authority: 'SS 46',
       },
       {
         id: 'mandate-states-what-may-be-invested-in',
@@ -584,7 +533,6 @@ export const structures: Structure[] = [
         why:
           'Without a stated mandate there is no line to have crossed, and a breach cannot be found because nothing was agreed to be breached.',
         evidence: 'document',
-        authority: 'SS 23; SS 46',
       },
       {
         id: 'results-reported-to-principal',
@@ -593,7 +541,6 @@ export const structures: Structure[] = [
         why:
           'Paying the expected return regardless of the result turns the report into a formality and the expectation into an entitlement.',
         evidence: 'figure',
-        authority: 'SS 46',
       },
     ],
   },
@@ -604,7 +551,6 @@ export const structures: Structure[] = [
     id: 'sukuk',
     name: 'Sukuk — asset-backed and asset-based',
     family: 'security',
-    authority: 'AAOIFI Shariah Standard No. 17; the 2008 resolution on sukuk',
     calculations: ['tangibility', 'profit_distribution', 'purification'],
     conditions: [
       {
@@ -614,7 +560,6 @@ export const structures: Structure[] = [
         why:
           'This is the whole distinction between asset-backed and asset-based. Holders who own nothing hold a debt against the originator, and the assets are decoration on a bond.',
         evidence: 'document',
-        authority: 'SS 17; the 2008 resolution',
       },
       {
         id: 'no-purchase-undertaking-at-face-value',
@@ -623,7 +568,6 @@ export const structures: Structure[] = [
         why:
           'A buy-back at face value returns the holders\u2019 capital whatever happened to the assets. They then carry no ownership risk, and the return they were paid was a rate on money.',
         evidence: 'undertaking',
-        authority: 'SS 17; the 2008 resolution',
       },
       {
         id: 'tangible-ratio-for-trading',
@@ -632,7 +576,6 @@ export const structures: Structure[] = [
         why:
           'A pool that is mostly receivables is mostly debt, and trading debt at other than par is the sale of money for more money. Where the threshold sits is a question boards answer differently, which is why it is set rather than assumed.',
         evidence: 'figure',
-        authority: 'SS 17; SS 21; SS 59 on sale of debt',
       },
       {
         id: 'returns-from-the-assets',
@@ -641,7 +584,6 @@ export const structures: Structure[] = [
         why:
           'A topped-up distribution that holders can rely on is a fixed coupon, and the topping up is where the fixed rate re-enters a structure built to avoid one.',
         evidence: 'figure',
-        authority: 'SS 17',
       },
       {
         id: 'proceeds-used-as-stated',
@@ -650,7 +592,6 @@ export const structures: Structure[] = [
         why:
           'Unapplied or unidentified proceeds mean the certificates rest on nothing in particular, and no later review can test what holders were told against what happened.',
         evidence: 'document',
-        authority: 'SS 17',
       },
       {
         id: 'income-screened-where-mixed',
@@ -659,7 +600,6 @@ export const structures: Structure[] = [
         why:
           'A mixed pool does not become clean because it is securitised. What was owed on the underlying activity is still owed once it has been divided into certificates.',
         evidence: 'figure',
-        authority: 'SS 21; SS 17',
       },
     ],
   },
@@ -670,7 +610,6 @@ export const structures: Structure[] = [
     id: 'sarf',
     name: 'Sarf — exchange of currency and monetary value',
     family: 'exchange',
-    authority: 'AAOIFI Shariah Standard No. 1',
     calculations: [],
     conditions: [
       {
@@ -680,7 +619,6 @@ export const structures: Structure[] = [
         why:
           'Deferring one leg means one party holds the other\u2019s money for a period. That interval is the thing the rule exists to close, and it is worth money to whoever holds it.',
         evidence: 'sequence',
-        authority: 'SS 1',
       },
       {
         id: 'equal-for-equal-where-same-kind',
@@ -689,7 +627,6 @@ export const structures: Structure[] = [
         why:
           'An unequal exchange of the same thing is an increase for nothing but the exchange itself, which is the plainest form of the increase the rule prohibits.',
         evidence: 'figure',
-        authority: 'SS 1',
       },
       {
         id: 'rate-fixed-at-contract',
@@ -698,7 +635,6 @@ export const structures: Structure[] = [
         why:
           'A rate settled afterwards means neither party knew what they were exchanging, and the party choosing the reference decides the price after the fact.',
         evidence: 'document',
-        authority: 'SS 1',
       },
       {
         id: 'no-forward-promise-binding-both',
@@ -707,7 +643,6 @@ export const structures: Structure[] = [
         why:
           'A promise binding both sides is a forward contract, which is a deferred exchange written as an intention. Charging for it sells the interval outright.',
         evidence: 'undertaking',
-        authority: 'SS 1; SS 49 on unilateral promise',
       },
     ],
   },
@@ -718,7 +653,6 @@ export const structures: Structure[] = [
     id: 'kafala',
     name: 'Kafala — guarantee',
     family: 'support',
-    authority: 'AAOIFI Shariah Standard No. 5',
     calculations: [],
     conditions: [
       {
@@ -728,7 +662,6 @@ export const structures: Structure[] = [
         why:
           'A guarantee is a voluntary undertaking. Charging for it prices the risk of a debt, which is selling the use of money without lending it, and the fee rises with the exposure exactly as a rate would.',
         evidence: 'figure',
-        authority: 'SS 5',
       },
       {
         id: 'guaranteed-obligation-is-valid',
@@ -737,7 +670,6 @@ export const structures: Structure[] = [
         why:
           'Guaranteeing an obligation the board would not have approved makes the institution the party that makes it work, and it carries the consequences of the arrangement it enabled.',
         evidence: 'document',
-        authority: 'SS 5',
       },
       {
         id: 'recourse-limited-to-what-was-paid',
@@ -746,7 +678,6 @@ export const structures: Structure[] = [
         why:
           'Recovering more than was paid turns a rescue into a trade, and the surplus is a return on an amount advanced for a period.',
         evidence: 'figure',
-        authority: 'SS 5',
       },
     ],
   },
@@ -755,7 +686,6 @@ export const structures: Structure[] = [
     id: 'rahn',
     name: 'Rahn — pledge of an asset as security',
     family: 'support',
-    authority: 'AAOIFI Shariah Standard No. 39',
     calculations: [],
     conditions: [
       {
@@ -765,7 +695,6 @@ export const structures: Structure[] = [
         why:
           'Benefit taken from a pledge because a debt exists is a return on the debt. The security was given to secure, not to yield.',
         evidence: 'document',
-        authority: 'SS 39',
       },
       {
         id: 'asset-identified-and-owned',
@@ -773,7 +702,6 @@ export const structures: Structure[] = [
         why:
           'A pledge over something unidentified secures nothing, and one over something the pledgor does not own transfers a right they never had.',
         evidence: 'document',
-        authority: 'SS 39',
       },
       {
         id: 'surplus-returned-on-sale',
@@ -782,7 +710,6 @@ export const structures: Structure[] = [
         why:
           'Keeping the surplus makes the default profitable to the creditor, and gives them a reason to prefer the outcome the security exists to guard against.',
         evidence: 'figure',
-        authority: 'SS 39',
       },
       {
         id: 'costs-of-custody-on-owner',
@@ -791,7 +718,6 @@ export const structures: Structure[] = [
         why:
           'A custody charge set above cost is a fee that grows with the debt, and it does the work of a rate while carrying another name.',
         evidence: 'figure',
-        authority: 'SS 39',
       },
     ],
   },
@@ -800,7 +726,6 @@ export const structures: Structure[] = [
     id: 'hawala',
     name: 'Hawala — transfer of a debt to another party',
     family: 'support',
-    authority: 'AAOIFI Shariah Standard No. 7',
     calculations: [],
     conditions: [
       {
@@ -810,7 +735,6 @@ export const structures: Structure[] = [
         why:
           'If the first debtor remains liable, nothing was transferred and the creditor has gained a second obligor for free. That is a guarantee, and it is judged by the rules of one.',
         evidence: 'document',
-        authority: 'SS 7',
       },
       {
         id: 'no-fee-on-the-amount',
@@ -819,7 +743,6 @@ export const structures: Structure[] = [
         why:
           'A charge that scales with the amount is a price for the money rather than for the work, and the work does not become harder because the sum is larger.',
         evidence: 'figure',
-        authority: 'SS 7',
       },
       {
         id: 'consent-of-the-parties',
@@ -827,7 +750,6 @@ export const structures: Structure[] = [
         why:
           'A debt moved without the consent it needs leaves at least one party bound to somebody they did not agree to deal with.',
         evidence: 'document',
-        authority: 'SS 7',
       },
     ],
   },
@@ -836,7 +758,6 @@ export const structures: Structure[] = [
     id: 'wad',
     name: "Wa'd — promise, and the bilateral promise",
     family: 'support',
-    authority: 'AAOIFI Shariah Standard No. 49',
     calculations: [],
     conditions: [
       {
@@ -846,7 +767,6 @@ export const structures: Structure[] = [
         why:
           'Two promises binding both sides are a contract concluded in advance. The parties then hold the effect of a forward while calling it an intention, and the form was chosen to avoid exactly that.',
         evidence: 'undertaking',
-        authority: 'SS 49',
       },
       {
         id: 'no-price-for-the-promise',
@@ -854,7 +774,6 @@ export const structures: Structure[] = [
         why:
           'Charging for a promise sells an option. What is being sold is the right to decide later, which is not property that existed before the promise was written.',
         evidence: 'figure',
-        authority: 'SS 49',
       },
       {
         id: 'damages-are-actual-loss',
@@ -863,7 +782,6 @@ export const structures: Structure[] = [
         why:
           'A pre-set sum for breaking a promise is a price for the choice, and it makes the promise enforceable in substance while leaving it unilateral on paper.',
         evidence: 'figure',
-        authority: 'SS 49',
       },
     ],
   },
@@ -872,7 +790,6 @@ export const structures: Structure[] = [
     id: 'qard-hasan',
     name: 'Qard hasan — a loan repaid in the same amount',
     family: 'gratuitous',
-    authority: 'AAOIFI Shariah Standard No. 19',
     calculations: [],
     conditions: [
       {
@@ -882,7 +799,6 @@ export const structures: Structure[] = [
         why:
           'Any increase over what was lent is a return on money for time, and the description it is given on the statement does not change what produced it.',
         evidence: 'figure',
-        authority: 'SS 19',
       },
       {
         id: 'no-benefit-conditioned-on-the-loan',
@@ -891,7 +807,6 @@ export const structures: Structure[] = [
         why:
           'A benefit required as a condition is part of the price of the loan even when no money moves. Bundling it into another agreement moves where it is written, not what it is.',
         evidence: 'document',
-        authority: 'SS 19',
       },
       {
         id: 'fees-limited-to-actual-cost',
@@ -900,7 +815,6 @@ export const structures: Structure[] = [
         why:
           'A charge that moves with the amount or the term is a rate. The cost of opening a file does not depend on how large the file is.',
         evidence: 'figure',
-        authority: 'SS 19',
       },
     ],
   },
@@ -911,7 +825,6 @@ export const structures: Structure[] = [
     id: 'takaful',
     name: 'Takaful — mutual protection',
     family: 'protection',
-    authority: 'AAOIFI Shariah Standard No. 26',
     calculations: ['profit_distribution', 'zakat'],
     conditions: [
       {
@@ -921,7 +834,6 @@ export const structures: Structure[] = [
         why:
           'If contributions are a price paid to the operator, each participant has bought an uncertain payout with a certain payment, and one side gains exactly what the other loses. The donation is what makes the uncertainty shared rather than traded.',
         evidence: 'document',
-        authority: 'SS 26',
       },
       {
         id: 'funds-segregated',
@@ -930,7 +842,6 @@ export const structures: Structure[] = [
         why:
           'Once the two are mixed, a surplus belonging to participants can be reported as the operator\u2019s earnings, and nobody can afterwards say whose money paid a claim.',
         evidence: 'figure',
-        authority: 'SS 26',
       },
       {
         id: 'operator-paid-a-stated-fee',
@@ -939,7 +850,6 @@ export const structures: Structure[] = [
         why:
           'An operator taking the underwriting surplus is carrying the risk itself, and the arrangement becomes the sale of protection it was structured not to be.',
         evidence: 'document',
-        authority: 'SS 26',
       },
       {
         id: 'surplus-belongs-to-participants',
@@ -948,7 +858,6 @@ export const structures: Structure[] = [
         why:
           'Where the surplus goes is the test of whose fund it is. If it reaches the shareholders, the participants donated into somebody else\u2019s business.',
         evidence: 'figure',
-        authority: 'SS 26',
       },
       {
         id: 'deficit-met-by-interest-free-loan',
@@ -957,7 +866,6 @@ export const structures: Structure[] = [
         why:
           'Meeting a deficit for a return would make the operator a lender to the fund it manages, and the fund would be paying for time out of contributions given as donations.',
         evidence: 'document',
-        authority: 'SS 26',
       },
       {
         id: 'fund-invested-within-the-mandate',
@@ -966,7 +874,6 @@ export const structures: Structure[] = [
         why:
           'Participants gave into a pool on stated terms. Investing outside them spends other people\u2019s donations on something they did not agree to.',
         evidence: 'document',
-        authority: 'SS 26',
       },
     ],
   },
@@ -977,7 +884,6 @@ export const structures: Structure[] = [
     id: 'combining-contracts',
     name: 'Combining contracts in one arrangement',
     family: 'combination',
-    authority: 'AAOIFI Shariah Standard No. 25',
     calculations: [],
     conditions: [
       {
@@ -987,7 +893,6 @@ export const structures: Structure[] = [
         why:
           'Some pairings are named because together they do something neither does alone: a loan made attractive by a sale is a loan with a return attached to it.',
         evidence: 'document',
-        authority: 'SS 25',
       },
       {
         id: 'no-contract-conditional-on-another',
@@ -996,7 +901,6 @@ export const structures: Structure[] = [
         why:
           'Contracts made conditional on each other are one contract with several signatures. The parties cannot say which obligation they are performing, and a defect in one silently becomes a defect in all.',
         evidence: 'document',
-        authority: 'SS 25',
       },
       {
         id: 'not-a-route-to-what-is-otherwise-refused',
@@ -1005,7 +909,6 @@ export const structures: Structure[] = [
         why:
           'This is the condition most arrangements fail. Each contract passes on its own, and the sequence produces a fixed return on money — which is why the arrangement is judged as a whole and not as a list of parts.',
         evidence: 'sequence',
-        authority: 'SS 25',
       },
       {
         id: 'no-circularity',
@@ -1014,7 +917,6 @@ export const structures: Structure[] = [
         why:
           'A subject that comes back to where it started has not moved in substance. What moved was money, out and back with a difference, and the intervening steps are the form.',
         evidence: 'sequence',
-        authority: 'SS 25; SS 30 on monetisation',
       },
       {
         id: 'each-contract-valid-on-its-own',
@@ -1022,7 +924,6 @@ export const structures: Structure[] = [
         why:
           'A combination cannot repair a defective part. Judging the whole is in addition to judging the pieces, not instead of it.',
         evidence: 'document',
-        authority: 'SS 25',
       },
     ],
   },

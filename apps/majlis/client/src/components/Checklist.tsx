@@ -101,7 +101,6 @@ function Condition({
         reasoning rather than only with the citation.
       */}
       <p className="mt-2.5 max-w-[62ch] text-[12.5px] leading-[1.6] text-muted">{c.why}</p>
-      <p className="mt-1.5 text-[11.5px] text-muted">{c.authority}</p>
 
       {state.history.length > 0 && (
         <details className="mt-2.5">
@@ -337,7 +336,14 @@ export default function Checklist({ matterId, canRule }: { matterId: string; can
           {t(data.declined ? 'adopt.declined' : `adopt.${data.source}`)}
         </Tag>
       </div>
-      <p className="mb-2 text-[12px] text-muted">{data.structure.authority}</p>
+      {/*
+        The basis, where the board stated one on its own adoption. Never a
+        standard of ours: the shipped library names none, so a board that has
+        not said reads as not having said.
+      */}
+      <p className="mb-2 text-[12px] text-muted">
+        {data.basis ?? t('adopt.noBasis')}
+      </p>
 
       {/* The server's own sentence about what that means. Not restated here. */}
       <p

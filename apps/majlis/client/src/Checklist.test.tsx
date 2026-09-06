@@ -13,7 +13,6 @@ const condition = (over: Record<string, unknown> = {}) => ({
   requirement: 'The institution owns the asset and has taken possession of it before selling it on.',
   why: 'Selling what one does not own turns the sale into a financing of money by money.',
   evidence: 'sequence',
-  authority: 'SS 8; SS 18 on possession',
   ...over,
 });
 
@@ -22,7 +21,6 @@ const checklist = (over: Record<string, unknown> = {}) => ({
     id: 'murabaha',
     name: 'Murabaha, including commodity murabaha and tawarruq',
     family: 'sale',
-    authority: 'AAOIFI Shariah Standard No. 8',
     calculations: ['late_payment'],
     conditions: [condition()],
   },
@@ -33,6 +31,8 @@ const checklist = (over: Record<string, unknown> = {}) => ({
   // out would let a test pass against a shape nobody had taken.
   source: 'draft',
   declined: false,
+  // The board said nothing here, and nothing is said on its behalf.
+  basis: null,
   sourceNote:
     'This is the shipped draft. This board has not adopted this shape, so its conditions are a starting point offered for the board to rule beside. They are binding on nobody.',
   unanswered: ['ownership-before-sale'],
@@ -88,14 +88,37 @@ describe('it shows the shape, not a score', () => {
     expect(document.querySelector('[role="progressbar"]')).toBeNull();
   });
 
-  it('gives every condition its reason as well as its citation', async () => {
+  it('gives every condition its reason, which is what it argues from now', async () => {
     stub(checklist());
     show();
 
     await waitFor(() =>
       expect(screen.getByText(/turns the sale into a financing of money by money/)).toBeInTheDocument(),
     );
-    expect(screen.getByText(/SS 8; SS 18 on possession/)).toBeInTheDocument();
+  });
+
+  /*
+   * The product follows no standard and names none. Which standard governs is
+   * each board's decision, so the only citation that can appear here is one a
+   * board wrote itself.
+   */
+  it('names no standard where the board named none', async () => {
+    stub(checklist());
+    show();
+
+    await waitFor(() =>
+      expect(screen.getByText(/has not said what these rest on/)).toBeInTheDocument(),
+    );
+    expect(document.body.textContent).not.toMatch(/AAOIFI|SS d/);
+  });
+
+  it('prints the board’s own words where it gave them', async () => {
+    stub(checklist({ basis: 'Our own resolution of 4 February' }));
+    show();
+
+    await waitFor(() =>
+      expect(screen.getByText(/Our own resolution of 4 February/)).toBeInTheDocument(),
+    );
   });
 
   it('carries the sentence saying it is not a conclusion', async () => {

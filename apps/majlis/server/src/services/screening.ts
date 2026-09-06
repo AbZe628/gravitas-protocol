@@ -1,5 +1,5 @@
 /**
- * The three screening ratios of AAOIFI Shariah Standard No. 21.
+ * The three screening ratios, measured against limits the board sets.
  *
  * **This file computes. It never concludes.**
  *
@@ -21,12 +21,23 @@
  * flipped because of binary rounding at the fifteenth decimal place would be a
  * ruling decided by IEEE 754.
  *
- * ── a correction this file exists partly to make ──────────────────────────
- * A **30% tangible-asset ratio** appears in older screening material and in the
- * demonstration data this repository shipped with. AAOIFI Shariah Standard
- * No. 59 on the Sale of Debt revised it. It is not among the three below, and
- * teaching it as current would be the same fault as a document describing code
- * that does not exist.
+ * ── the limits belong to the board, and this file no longer holds any ─────
+ *
+ * This file used to ship three thresholds — 30%, 30%, 5% — each with a standard
+ * named beside it. Both are gone, and the removal is the correction rather than
+ * a tidy-up. What is measured is arithmetic and stays here. **Where the limit
+ * sits is a ruling, so it now has to be given.**
+ *
+ * That is not fastidiousness. Boards differ on all three figures, on whether
+ * each limit is inclusive, and on which denominator belongs underneath — and a
+ * file that answered on their behalf, with a citation attached, was doing the
+ * one thing this product exists to prevent. Worse, it was doing it invisibly:
+ * a board that never set a threshold still saw *within the threshold*, and had
+ * no way to tell that the limit it was being measured against was ours.
+ *
+ * A ratio computed with no limit given comes back with `withinThreshold: null`
+ * and `unknownBecause: 'no_limit_set'`. The number is shown in full, and
+ * nothing claims to have tested it.
  */
 
 import { formatAmount, parseAmount } from './money.js';
@@ -42,24 +53,38 @@ const BPS = 10_000n;
 
 export type RatioKey = 'debt' | 'liquidity' | 'income';
 
-/** Whether the standard's limit is inclusive. The difference is in the text. */
+/** Whether the board's limit is inclusive. The difference is in the text. */
 export type Bound = 'at_or_below' | 'strictly_below';
 
+/**
+ * One limit, as this board set it.
+ *
+ * `basis` is the board's own words for what the limit rests on — a standard it
+ * follows, a resolution of its own, a supervisor's circular. Optional, and
+ * never written from here: nothing in this repository knows which standard
+ * governs any board, and a citation no member wrote is worse than none at all.
+ */
+export interface Threshold {
+  key: RatioKey;
+  thresholdBps: number;
+  bound: Bound;
+  basis?: string;
+}
+
+/** What is measured. That is arithmetic, so it ships. The limit does not. */
 export interface RatioDefinition {
   key: RatioKey;
   label: string;
   numeratorLabel: string;
   denominatorLabel: string;
-  thresholdBps: number;
-  bound: Bound;
-  /** Where the rule comes from, in the words a scholar would look for. */
-  authority: string;
 }
 
 /**
- * Two of the three are inclusive limits and one is not. That is how the
- * standard is written, and collapsing them into one comparison would be a
- * quiet amendment to it.
+ * What the three ratios divide by what. No limits: see the file header.
+ *
+ * Whether a limit is inclusive is part of the limit and travels with it, in
+ * `Threshold.bound`. Boards do differ on that, and collapsing it into one
+ * comparison would be a quiet amendment to whichever board was right.
  */
 export const RATIOS: readonly RatioDefinition[] = [
   {
@@ -67,27 +92,18 @@ export const RATIOS: readonly RatioDefinition[] = [
     label: 'Interest-bearing debt to market capitalisation',
     numeratorLabel: 'interest-bearing debt',
     denominatorLabel: 'market capitalisation',
-    thresholdBps: 3000,
-    bound: 'at_or_below',
-    authority: 'AAOIFI Shariah Standard No. 21',
   },
   {
     key: 'liquidity',
     label: 'Cash and interest-bearing securities to market capitalisation',
     numeratorLabel: 'cash and interest-bearing securities',
     denominatorLabel: 'market capitalisation',
-    thresholdBps: 3000,
-    bound: 'strictly_below',
-    authority: 'AAOIFI Shariah Standard No. 21',
   },
   {
     key: 'income',
     label: 'Non-permissible income to total revenue',
     numeratorLabel: 'non-permissible income',
     denominatorLabel: 'total revenue',
-    thresholdBps: 500,
-    bound: 'at_or_below',
-    authority: 'AAOIFI Shariah Standard No. 21',
   },
 ];
 
@@ -102,11 +118,34 @@ export interface Figures {
   cashAndInterestBearingSecurities: string;
   totalRevenue: string;
   nonPermissibleIncome: string;
+  /**
+   * The limits this board set, by ratio. Absent or partial is a real state.
+   *
+   * A board that has ruled on one ratio and not the others gets one comparison
+   * and two bare figures, which is exactly what it has decided. Nothing is
+   * filled in for the two it has not reached.
+   */
+  thresholds?: Threshold[];
 }
 
 export interface RatioResult extends RatioDefinition {
   numerator: string;
   denominator: string;
+  /** The board's limit, or null where the board has not set one. */
+  thresholdBps: number | null;
+  bound: Bound | null;
+  /** What the board said its limit rests on. Never written from here. */
+  basis: string | null;
+  /**
+   * Why there is no answer, where there is none.
+   *
+   * Two very different silences used to look identical. A ratio with a zero
+   * denominator could not be computed; a ratio with no limit given was computed
+   * perfectly and simply has nothing to be measured against. Reporting both as
+   * `null` let an interface render "—" over each and let a reader assume the
+   * figures were bad, when what was actually missing was the board's ruling.
+   */
+  unknownBecause: 'denominator_is_zero' | 'no_limit_set' | null;
   /**
    * The ratio in basis points, rounded for display only.
    *
@@ -122,49 +161,86 @@ export interface RatioResult extends RatioDefinition {
   workings: string;
 }
 
-function ratio(def: RatioDefinition, numerator: bigint, denominator: bigint, currency: string): RatioResult {
+function ratio(
+  def: RatioDefinition,
+  numerator: bigint,
+  denominator: bigint,
+  currency: string,
+  limit: Threshold | undefined,
+): RatioResult {
   const shown = {
     numerator: formatAmount(numerator),
     denominator: formatAmount(denominator),
+  };
+
+  const set = {
+    thresholdBps: limit?.thresholdBps ?? null,
+    bound: limit?.bound ?? null,
+    basis: limit?.basis ?? null,
   };
 
   if (denominator <= 0n) {
     return {
       ...def,
       ...shown,
+      ...set,
       valueBps: null,
       percent: null,
       withinThreshold: null,
+      unknownBecause: 'denominator_is_zero',
       workings:
         `${def.denominatorLabel} is ${shown.denominator} ${currency}. ` +
         `The ratio cannot be computed, and no threshold has been tested.`,
     };
   }
 
-  // Exact comparison first. numerator/denominator vs threshold/10000 becomes
-  // numerator * 10000 vs denominator * threshold, entirely in integers.
-  const left = numerator * BPS;
-  const right = denominator * BigInt(def.thresholdBps);
-  const within = def.bound === 'at_or_below' ? left <= right : left < right;
-
-  // Display value, rounded half-up, and never consulted above.
+  // Display value, rounded half-up, and never consulted for the comparison.
   const scaled = (numerator * BPS * 100n) / denominator;
   const bps = Number((scaled + 50n) / 100n);
   const percent = (bps / 100).toFixed(2);
 
-  const sign = def.bound === 'at_or_below' ? '≤' : '<';
-  const limit = (def.thresholdBps / 100).toFixed(0);
+  /*
+   * The ratio is arithmetic and is always reported. The comparison is not, and
+   * is reported only where the board has said what to compare against — this
+   * is the branch that used to silently apply our own 30%.
+   */
+  if (!limit) {
+    return {
+      ...def,
+      ...shown,
+      ...set,
+      valueBps: bps,
+      percent,
+      withinThreshold: null,
+      unknownBecause: 'no_limit_set',
+      workings:
+        `${shown.numerator} ÷ ${shown.denominator} = ${percent}%. ` +
+        `This board has not set a limit for this ratio, so nothing has been ` +
+        `tested against one.`,
+    };
+  }
+
+  // Exact comparison. numerator/denominator vs threshold/10000 becomes
+  // numerator * 10000 vs denominator * threshold, entirely in integers.
+  const left = numerator * BPS;
+  const right = denominator * BigInt(limit.thresholdBps);
+  const within = limit.bound === 'at_or_below' ? left <= right : left < right;
+
+  const sign = limit.bound === 'at_or_below' ? '≤' : '<';
+  const shownLimit = (limit.thresholdBps / 100).toFixed(2).replace(/\.00$/, '');
 
   return {
     ...def,
     ...shown,
+    ...set,
     valueBps: bps,
     percent,
     withinThreshold: within,
+    unknownBecause: null,
     workings:
       `${shown.numerator} ÷ ${shown.denominator} = ${percent}%, ` +
-      `against a limit of ${sign} ${limit}%. ` +
-      `${within ? 'Within' : 'Outside'} the threshold.`,
+      `against this board’s limit of ${sign} ${shownLimit}%. ` +
+      `${within ? 'Within' : 'Outside'} it.`,
   };
 }
 
@@ -182,6 +258,14 @@ export interface Assessment {
    * activity, which is a question no ratio answers.
    */
   allWithinThresholds: boolean | null;
+  /**
+   * How many of the three the board has actually set a limit for.
+   *
+   * Zero is the state a board starts in, and an interface that cannot tell it
+   * apart from three will show a screen of dashes and let a reader conclude
+   * the figures were rejected.
+   */
+  limitsSet: number;
   /** Said in the output, not only in this file, because output travels. */
   note: string;
 }
@@ -195,25 +279,41 @@ export function assess(figures: Figures): Assessment {
   const cap = parseAmount(figures.marketCapitalisation, 'marketCapitalisation');
   const revenue = parseAmount(figures.totalRevenue, 'totalRevenue');
 
+  const limitFor = (key: RatioKey) => (figures.thresholds ?? []).find((t) => t.key === key);
+
   const results = [
-    ratio(RATIOS[0], parseAmount(figures.interestBearingDebt, 'interestBearingDebt'), cap, figures.currency),
+    ratio(
+      RATIOS[0],
+      parseAmount(figures.interestBearingDebt, 'interestBearingDebt'),
+      cap,
+      figures.currency,
+      limitFor('debt'),
+    ),
     ratio(
       RATIOS[1],
       parseAmount(figures.cashAndInterestBearingSecurities, 'cashAndInterestBearingSecurities'),
       cap,
       figures.currency,
+      limitFor('liquidity'),
     ),
-    ratio(RATIOS[2], parseAmount(figures.nonPermissibleIncome, 'nonPermissibleIncome'), revenue, figures.currency),
+    ratio(
+      RATIOS[2],
+      parseAmount(figures.nonPermissibleIncome, 'nonPermissibleIncome'),
+      revenue,
+      figures.currency,
+      limitFor('income'),
+    ),
   ];
 
-  const uncomputable = results.some((r) => r.withinThreshold === null);
+  const untested = results.some((r) => r.withinThreshold === null);
 
   return {
     asOf: figures.asOf,
     source: figures.source,
     currency: figures.currency,
     ratios: results,
-    allWithinThresholds: uncomputable ? null : results.every((r) => r.withinThreshold === true),
+    allWithinThresholds: untested ? null : results.every((r) => r.withinThreshold === true),
+    limitsSet: results.filter((r) => r.thresholdBps !== null).length,
     note: NOT_A_RULING,
   };
 }
@@ -260,11 +360,19 @@ export function crossings(previous: Assessment, current: Assessment): Crossing[]
       direction: intoBreach ? 'into_breach' : 'back_within',
       was: was.percent,
       now: now.percent,
+      /*
+       * The limit is named as the board's own, and its basis only where the
+       * board gave one. Naming a standard here would put a citation into the
+       * question a scholar is being asked — which is where it would do the
+       * most damage, because a question is answered on the terms it is put in.
+       */
       questionForBoard: intoBreach
         ? `${now.label} was ${was.percent}% when the board last ruled and is now ${now.percent}%, ` +
-          `outside the threshold in ${now.authority}. Does the standing ruling still hold?`
-        : `${now.label} was ${was.percent}% and is now ${now.percent}%, back within the threshold in ` +
-          `${now.authority}. Does that change anything the board decided on that basis?`,
+          `outside the limit this board set${now.basis ? ` on ${now.basis}` : ''}. ` +
+          `Does the standing ruling still hold?`
+        : `${now.label} was ${was.percent}% and is now ${now.percent}%, back within the limit this ` +
+          `board set${now.basis ? ` on ${now.basis}` : ''}. ` +
+          `Does that change anything the board decided on that basis?`,
     });
   }
 

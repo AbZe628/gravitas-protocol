@@ -35,7 +35,15 @@ import { structureById } from '../data/structures.js';
 import { hashParameters, verifyParameters } from './hash.js';
 import { quorumFor, ratificationDeadline } from './lifecycle.js';
 import { Refused } from './lifecycle.js';
-import type { Board, Matter, Reasoning, RuleParameter, Scholar, SourceRef } from '../types.js';
+import type {
+  AdoptedStructure,
+  Board,
+  Matter,
+  Reasoning,
+  RuleParameter,
+  Scholar,
+  SourceRef,
+} from '../types.js';
 
 /** What kind of decision this document records. */
 export type FatwaKind =
@@ -70,7 +78,6 @@ export interface FatwaSignature {
 export interface FatwaFinding {
   requirement: string;
   why: string;
-  authority: string;
   holds: 'met' | 'not_met' | 'not_applicable';
   reason: string;
   scholarId: string;
@@ -122,7 +129,15 @@ export interface Fatwa {
    */
   structure: {
     name: string;
-    authority: string;
+    /**
+     * What this board said its conditions rest on, in its own words.
+     *
+     * Null where the board did not say, which is printed as not stated rather
+     * than filled in. The library names no standard, so there is nothing to
+     * fall back to — and inventing one here would put a citation in a signed
+     * document that no member ever wrote.
+     */
+    basis: string | null;
     findings: FatwaFinding[];
     /** Conditions nobody answered. Named rather than omitted. */
     unanswered: string[];
@@ -192,7 +207,11 @@ function signature(board: Board, r: Reasoning, hashInForce: string): FatwaSignat
  * Conditions nobody answered are named rather than dropped, because a checklist
  * that quietly omitted them would read as complete.
  */
-function structureOf(board: Board, matter: Matter): Fatwa['structure'] {
+function structureOf(
+  board: Board,
+  matter: Matter,
+  adoption: AdoptedStructure | null,
+): Fatwa['structure'] {
   const structure = matter.structureId ? structureById(matter.structureId) : undefined;
   if (!structure) return null;
 
@@ -210,7 +229,6 @@ function structureOf(board: Board, matter: Matter): Fatwa['structure'] {
       findings.push({
         requirement: condition.requirement,
         why: condition.why,
-        authority: condition.authority,
         holds: f.holds,
         reason: f.reason,
         scholarId: f.scholarId,
@@ -219,7 +237,7 @@ function structureOf(board: Board, matter: Matter): Fatwa['structure'] {
     }
   }
 
-  return { name: structure.name, authority: structure.authority, findings, unanswered };
+  return { name: structure.name, basis: adoption?.basis ?? null, findings, unanswered };
 }
 
 /**
@@ -228,7 +246,12 @@ function structureOf(board: Board, matter: Matter): Fatwa['structure'] {
  * @throws Refused when the matter has not been decided. A document for an open
  *         question is the one output this file must never produce.
  */
-export function assemble(board: Board, matter: Matter, generatedAt: string): Fatwa {
+export function assemble(
+  board: Board,
+  matter: Matter,
+  generatedAt: string,
+  adoption: AdoptedStructure | null = null,
+): Fatwa {
   const kind = SETTLED[matter.status];
   if (!kind) {
     throw new Refused(
@@ -265,7 +288,7 @@ export function assemble(board: Board, matter: Matter, generatedAt: string): Fat
     boardName: board.name,
     institutionId: board.institutionId,
 
-    structure: structureOf(board, matter),
+    structure: structureOf(board, matter, adoption),
 
     question: matter.proposal,
     mechanism: matter.mechanism,
@@ -530,7 +553,11 @@ ${notDecided}
 
 ${fatwa.structure ? `    <section>
       <h2>Conditions of ${esc(fatwa.structure.name)}</h2>
-      <p class="authority">${esc(fatwa.structure.authority)}</p>
+      <p class="authority">${
+        fatwa.structure.basis
+          ? esc(fatwa.structure.basis)
+          : 'This board has not stated what these conditions rest on. Which standard governs is the board’s to decide, and none is named on its behalf.'
+      }</p>
 ${fatwa.structure.findings.map((f) => `      <div class="finding ${f.holds}">
         <p class="req">${esc(f.requirement)}</p>
         <p class="held"><strong>${f.holds === 'met' ? 'Met' : f.holds === 'not_met' ? 'Not met' : 'Does not apply'}</strong> — ${esc(f.name)}</p>

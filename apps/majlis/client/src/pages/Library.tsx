@@ -118,7 +118,7 @@ function Shape({
             </span>
           </div>
           <p className="mt-2 text-[12.5px] text-muted">
-            {held.structure.authority}
+            {held.adoption?.basis ?? t('adopt.noBasis')}
             <span className="mx-2 opacity-40">·</span>
             <span className="tabular-nums">{held.structure.conditions.length}</span>{' '}
             {t('adopt.conditions')}

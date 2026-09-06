@@ -758,8 +758,6 @@ export interface Structure {
   conditions: StructureCondition[];
   /** Which calculations this shape normally attracts. */
   calculations: CalculationKind[];
-  /** Where the conditions are drawn from, for the board to confirm. */
-  authority: string;
 }
 
 export interface StructureCondition {
@@ -776,7 +774,6 @@ export interface StructureCondition {
   why: string;
   /** How it is shown: a document, an order of events, a figure, an undertaking. */
   evidence: 'document' | 'sequence' | 'figure' | 'undertaking';
-  authority: string;
 }
 
 /**
@@ -960,6 +957,22 @@ export interface AdoptedStructure {
 
   /** What the board changed and why, in their words. Empty on a plain adoption. */
   amendments: string[];
+
+  /**
+   * What this board says its conditions rest on. Its own words, and optional.
+   *
+   * The shipped library names no standard, deliberately: which standard governs
+   * is a board's decision and no two boards need decide alike, so a citation
+   * printed by the product would be the product ruling. This is the only place
+   * a standard is ever named, and a board puts it here — "AAOIFI Shariah
+   * Standard No. 17", "Bank Negara policy document on sukuk", "our own view,
+   * minuted 12 March" are all equally valid entries, because the board is the
+   * one being asked.
+   *
+   * Absent where the board did not say. That reads as *not stated*, never as
+   * *none* — and nothing in the application fills it in on their behalf.
+   */
+  basis?: string;
 
   /** The settled matter this was decided in. Required, and checked. */
   matterId: string;

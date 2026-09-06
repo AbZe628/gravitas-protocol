@@ -8,7 +8,19 @@ import {
   formatAmount,
   parseAmount,
   type Figures,
+  type Threshold,
 } from '../src/services/screening.js';
+
+/*
+ * Limits a board set. There are no shipped ones any more, so a test that wants
+ * a comparison has to say what to compare against — which is the same thing the
+ * product now asks of a board.
+ */
+const LIMITS: Threshold[] = [
+  { key: 'debt', thresholdBps: 3000, bound: 'at_or_below', basis: 'This board’s resolution of 4 February' },
+  { key: 'liquidity', thresholdBps: 3000, bound: 'strictly_below' },
+  { key: 'income', thresholdBps: 500, bound: 'at_or_below' },
+];
 
 const figures = (over: Partial<Figures> = {}): Figures => ({
   asOf: '2026-06-30',
@@ -19,6 +31,7 @@ const figures = (over: Partial<Figures> = {}): Figures => ({
   cashAndInterestBearingSecurities: '100',
   totalRevenue: '500',
   nonPermissibleIncome: '10',
+  thresholds: LIMITS,
   ...over,
 });
 
@@ -64,11 +77,13 @@ describe('the three ratios', () => {
     expect(of(a, 'debt').percent).toBe('20.00');
     expect(of(a, 'liquidity').percent).toBe('10.00');
     expect(of(a, 'income').percent).toBe('2.00');
-    expect(of(a, 'debt').workings).toBe('200 ÷ 1000 = 20.00%, against a limit of ≤ 30%. Within the threshold.');
+    expect(of(a, 'debt').workings).toBe(
+      '200 ÷ 1000 = 20.00%, against this board’s limit of ≤ 30%. Within it.',
+    );
     expect(a.allWithinThresholds).toBe(true);
   });
 
-  it('keeps the standard’s own strictness: one limit is exclusive and two are not', () => {
+  it('keeps each limit’s own strictness: the board says whether it is inclusive', () => {
     const atExactly30 = assess(
       figures({ interestBearingDebt: '300', cashAndInterestBearingSecurities: '300' }),
     );
@@ -121,10 +136,80 @@ describe('what it must not say', () => {
     }
   });
 
-  it('does not teach the tangible-asset ratio that Standard 59 revised', () => {
+  it('does not teach a tangible-asset ratio among these three', () => {
     const keys = RATIOS.map((r) => r.key);
     expect(keys).toEqual(['debt', 'liquidity', 'income']);
     expect(JSON.stringify(RATIOS).toLowerCase()).not.toContain('tangible');
+  });
+
+  /*
+   * The product is not a standard and does not follow one. Every board decides
+   * which standard governs it, and a threshold or a citation shipped in this
+   * file would be that decision taken for them — quietly, since a board reading
+   * "within the threshold" has no way to ask whose threshold it was.
+   */
+  it('ships no limit and no standard of its own', () => {
+    const json = JSON.stringify(RATIOS).toLowerCase();
+    for (const word of ['aaoifi', 'standard', 'authority', 'threshold', 'bps']) {
+      expect(json).not.toContain(word);
+    }
+  });
+});
+
+describe('the limit is the board’s, and there is none until they set one', () => {
+  const noLimits = (over: Partial<Figures> = {}) => figures({ thresholds: undefined, ...over });
+
+  it('still computes and shows the ratio', () => {
+    const a = assess(noLimits());
+    expect(of(a, 'debt').percent).toBe('20.00');
+    expect(of(a, 'debt').valueBps).toBe(2000);
+  });
+
+  it('tests nothing, rather than testing against a figure we chose', () => {
+    const a = assess(noLimits());
+    for (const key of ['debt', 'liquidity', 'income']) {
+      expect(of(a, key).withinThreshold).toBeNull();
+      expect(of(a, key).thresholdBps).toBeNull();
+      expect(of(a, key).bound).toBeNull();
+    }
+    expect(a.allWithinThresholds).toBeNull();
+    expect(a.limitsSet).toBe(0);
+  });
+
+  it('says which silence this is, so a reader does not read it as bad figures', () => {
+    expect(of(assess(noLimits()), 'debt').unknownBecause).toBe('no_limit_set');
+    expect(of(assess(noLimits()), 'debt').workings).toContain('has not set a limit');
+
+    const cannotDivide = assess(figures({ marketCapitalisation: '0' }));
+    expect(of(cannotDivide, 'debt').unknownBecause).toBe('denominator_is_zero');
+  });
+
+  it('takes one limit without inventing the other two', () => {
+    const a = assess(
+      noLimits({ thresholds: [{ key: 'debt', thresholdBps: 3300, bound: 'at_or_below' }] }),
+    );
+    expect(of(a, 'debt').withinThreshold).toBe(true);
+    expect(of(a, 'debt').thresholdBps).toBe(3300);
+    expect(of(a, 'liquidity').withinThreshold).toBeNull();
+    expect(of(a, 'income').withinThreshold).toBeNull();
+    expect(a.limitsSet).toBe(1);
+  });
+
+  it('carries the board’s own words for what the limit rests on, and only those', () => {
+    const a = assess(figures());
+    expect(of(a, 'debt').basis).toBe('This board’s resolution of 4 February');
+    // The board gave no basis for this one, and none is supplied for it.
+    expect(of(a, 'liquidity').basis).toBeNull();
+  });
+
+  it('names the limit as the board’s when it asks the drift question', () => {
+    const before = assess(figures());
+    const after = assess(figures({ interestBearingDebt: '340' }));
+    const question = crossings(before, after)[0].questionForBoard;
+
+    expect(question).toContain('the limit this board set');
+    expect(question).toContain('This board’s resolution of 4 February');
+    expect(question.toLowerCase()).not.toContain('aaoifi');
   });
 });
 
@@ -164,7 +249,7 @@ describe('drift, which is where the value is', () => {
 
     expect(found).toHaveLength(1);
     expect(found[0].direction).toBe('back_within');
-    expect(found[0].questionForBoard).toContain('back within the threshold');
+    expect(found[0].questionForBoard).toContain('back within the limit this board set');
   });
 
   it('reports every ratio that moved, not just the first', () => {

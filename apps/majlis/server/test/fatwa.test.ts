@@ -276,10 +276,42 @@ describe('the document carries what the board found on each condition', () => {
       ...over,
     });
 
-  it('names the shape and its source', () => {
+  it('names the shape, and states no basis the board did not give', () => {
     const f = assemble(board, judged(), NOW);
     expect(f.structure?.name).toContain('Murabaha');
-    expect(f.structure?.authority).toContain('Standard No. 8');
+    // No adoption was passed, so the board has said nothing this can print.
+    expect(f.structure?.basis).toBeNull();
+    /*
+     * Narrowed to the structure section on purpose. The board's own evidence
+     * may cite AAOIFI and often will — a board is entitled to argue from any
+     * standard it likes. What must carry no citation is the part the product
+     * wrote, which is the shape and its conditions.
+     */
+    expect(JSON.stringify(f.structure).toLowerCase()).not.toContain('aaoifi');
+    expect(JSON.stringify(f.structure).toLowerCase()).not.toContain('standard');
+  });
+
+  it('prints the board’s own basis where the board adopted the shape', () => {
+    const adoption = {
+      id: 'adopt-1',
+      boardId: board.id,
+      structureId: 'murabaha',
+      standing: 'adopted' as const,
+      conditions: [],
+      amendments: [],
+      basis: 'Bank Negara policy document, as this board reads it',
+      matterId: 'matter-x',
+      decidedBy: 'scholar-1',
+      decidedAt: NOW,
+      supersedes: null,
+    };
+    const f = assemble(board, judged(), NOW, adoption);
+    expect(f.structure?.basis).toBe('Bank Negara policy document, as this board reads it');
+    expect(render(f)).toContain('Bank Negara policy document');
+  });
+
+  it('says so in the document when the board never stated a basis', () => {
+    expect(render(assemble(board, judged(), NOW))).toContain('has not stated what these conditions rest on');
   });
 
   it('carries each finding in the member’s own words, under their name', () => {

@@ -609,6 +609,7 @@ describe('reviews and screening, over HTTP', () => {
           marketCapitalisation: '1000', interestBearingDebt: debt,
           cashAndInterestBearingSecurities: '100',
           totalRevenue: '500', nonPermissibleIncome: '10',
+          thresholds: [{ key: 'debt', thresholdBps: 3000, bound: 'at_or_below' }],
         },
       });
 
@@ -623,6 +624,7 @@ describe('reviews and screening, over HTTP', () => {
           marketCapitalisation: '1000', interestBearingDebt: '340',
           cashAndInterestBearingSecurities: '100',
           totalRevenue: '500', nonPermissibleIncome: '10',
+          thresholds: [{ key: 'debt', thresholdBps: 3000, bound: 'at_or_below' }],
         },
       })
       .expect(200);
@@ -1055,17 +1057,21 @@ describe('the structures, over HTTP', () => {
     expect(res.body.note).toContain('nothing here is binding');
   });
 
-  it('sends every condition with its reason and its source, not only the headings', async () => {
+  it('sends every condition with its reason, and no standard of ours', async () => {
     const res = await request(app).get('/api/structures').set('Authorization', as('watcher')).expect(200);
 
     for (const s of res.body.structures) {
       expect(s.conditions.length).toBeGreaterThan(0);
       for (const c of s.conditions) {
         expect(c.requirement.length).toBeGreaterThan(10);
+        // The reason is what survives the citation, and it has to carry the
+        // weight now that nothing is being argued from authority.
         expect(c.why.length).toBeGreaterThan(40);
-        expect(c.authority.length).toBeGreaterThan(3);
+        expect(c).not.toHaveProperty('authority');
       }
     }
+
+    expect(JSON.stringify(res.body).toLowerCase()).not.toContain('aaoifi');
   });
 
   it('walks a product approval through its conditions', async () => {
