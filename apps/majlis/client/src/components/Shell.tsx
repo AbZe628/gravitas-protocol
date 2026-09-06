@@ -141,6 +141,17 @@ function Mark() {
   );
 }
 
+/**
+ * The screens built to fill the work area rather than a column of prose.
+ *
+ * Every other page is a reading width, and widening one that holds prose
+ * only lengthens its lines. A page joins this list in the same commit that
+ * rebuilds it — never before.
+ *
+ * Exact matches: a detail page under one of these is prose again.
+ */
+const WORK_AREA = ['/register', '/library', '/calculations'];
+
 export default function Shell({ children }: { children: React.ReactNode }) {
   const { t, lang, setLang } = useI18n();
   const { identity } = useIdentity();
@@ -300,7 +311,10 @@ export default function Shell({ children }: { children: React.ReactNode }) {
 
         <main
           key={path}
-          className="mx-auto w-full max-w-reading px-5 py-8 pb-24 sm:px-8"
+          className={
+            'mx-auto w-full px-5 py-8 pb-24 sm:px-8 ' +
+            (WORK_AREA.includes(path) ? 'max-w-work' : 'max-w-reading')
+          }
           style={{ animation: 'shellFade 220ms ease-out' }}
         >
           {children}

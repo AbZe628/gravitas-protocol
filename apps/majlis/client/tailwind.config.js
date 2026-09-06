@@ -76,7 +76,15 @@ export default {
         sans: ['Manrope', 'system-ui', 'Segoe UI', 'Noto Sans Arabic', 'Noto Nastaliq Urdu', 'sans-serif'],
         serif: ['Newsreader', 'Iowan Old Style', 'Palatino Linotype', 'Georgia', 'Amiri', 'serif'],
       },
-      maxWidth: { reading: '58rem' },
+      /*
+       * Two widths, and a page belongs to one of them.
+       *
+       * `reading` is a column of prose. `work` is the width the artboards
+       * are drawn at — a narrow list beside an open thing — and a page only
+       * earns it once it is built to fill it. Widening a page of prose does
+       * nothing but lengthen its lines.
+       */
+      maxWidth: { reading: '58rem', work: '76rem' },
       borderRadius: { card: '14px', sheet: '20px' },
       /*
        * Elevation instead of outline. The half-pixel ring is the first layer

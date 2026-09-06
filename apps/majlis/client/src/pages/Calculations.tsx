@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useI18n } from '../lib/i18n.js';
+import { Display, Note } from '../components/type.js';
 import Distribution from '../components/Distribution.js';
 import LatePayment from '../components/LatePayment.js';
 import Purification from '../components/Purification.js';
@@ -38,6 +39,15 @@ import Zakat from '../components/Zakat.js';
  * And noting is not approving. Whether the method was the right one is a
  * ruling, made in the ordinary way with a vote at the end of it. The sentence
  * saying so comes from the server and is shown before the panel offers to act.
+ *
+ * ── one narrow list, one open thing ────────────────────────────
+ *
+ * The seven were a strip of tabs across the top of a column, which is a menu
+ * bar over a document. They are a column of their own now, on the work area,
+ * with the open calculation beside them — the shape a scholar already knows
+ * from mail, so there is nothing to learn before using it. They keep their
+ * tab semantics, because a list of things one of which is showing is what a
+ * tablist is, whichever way it is laid out.
  */
 
 type Tab = 'screening' | 'purification' | 'zakat' | 'distribution' | 'tradability' | 'late' | 'recorded';
@@ -50,8 +60,12 @@ export default function Calculations() {
 
   return (
     <div>
-      <h1 className="mb-1 text-[19px] font-semibold tracking-tight">{t('calc.title')}</h1>
-      <p className="mb-4 max-w-prose text-[13px] leading-relaxed text-muted">{t('calc.intro')}</p>
+      <div className="mb-8">
+        <Display>{t('calc.title')}</Display>
+        <Note className="mt-3">{t('calc.intro')}</Note>
+      </div>
+
+      <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
 
       {/*
         One at a time. Four money forms stacked down a page is furniture, and a
@@ -60,7 +74,8 @@ export default function Calculations() {
       <div
         role="tablist"
         aria-label={t('calc.title')}
-        className="mb-5 flex flex-wrap gap-1 border-b border-line"
+        aria-orientation="vertical"
+        className="flex w-full shrink-0 flex-row flex-wrap gap-1 lg:w-[244px] lg:flex-col lg:flex-nowrap"
       >
         {TABS.map((k) => (
           <button
@@ -70,10 +85,10 @@ export default function Calculations() {
             aria-selected={tab === k}
             onClick={() => setTab(k)}
             className={
-              'px-3 py-2 text-[13px] transition-colors ' +
+              'rounded-xl px-4 py-3 text-start text-[13.5px] transition-all ' +
               (tab === k
-                ? 'border-b-2 border-lapis font-semibold text-lapis'
-                : 'border-b-2 border-transparent text-muted hover:text-paper')
+                ? 'bg-raised font-semibold text-paper shadow-card'
+                : 'text-sand hover:bg-raised/60 hover:text-paper')
             }
           >
             {t(`calc.tab.${k}`)}
@@ -81,29 +96,34 @@ export default function Calculations() {
         ))}
       </div>
 
-      <div className="g-panel-raised p-6">
-        <h2 className="mb-1 text-[15px] font-semibold">{t(`calc.tab.${tab}`)}</h2>
-        <p className="mb-4 max-w-prose text-[12.5px] leading-relaxed text-muted">
-          {t(`calc.${tab}.about`)}
-        </p>
+      <div className="min-w-0 flex-1">
+        <div className="g-panel-raised px-7 py-6">
+          <h2 className="font-display text-[24px] leading-snug tracking-[-0.018em]">
+            {t(`calc.tab.${tab}`)}
+          </h2>
+          <p className="mb-6 mt-2.5 max-w-[62ch] text-[13px] leading-[1.65] text-muted">
+            {t(`calc.${tab}.about`)}
+          </p>
 
-        {tab === 'screening' && <Screening />}
-        {tab === 'purification' && <Purification />}
-        {tab === 'zakat' && <Zakat />}
-        {tab === 'distribution' && <Distribution />}
-        {tab === 'tradability' && <Tradability />}
-        {tab === 'late' && <LatePayment />}
-        {tab === 'recorded' && <Recorded />}
-      </div>
+          {tab === 'screening' && <Screening />}
+          {tab === 'purification' && <Purification />}
+          {tab === 'zakat' && <Zakat />}
+          {tab === 'distribution' && <Distribution />}
+          {tab === 'tradability' && <Tradability />}
+          {tab === 'late' && <LatePayment />}
+          {tab === 'recorded' && <Recorded />}
+        </div>
 
       {/*
         Said on the page rather than discovered afterwards. A scholar who works
         something out and assumes it was filed has been misled by the interface
         rather than by the record.
       */}
-      <p className="mt-4 rounded-card bg-surface/60 px-4 py-3 text-[12.5px] leading-relaxed text-muted shadow-ring">
-        {t('calc.recordingIsSeparate')}
-      </p>
+          <p className="mt-4 rounded-card bg-raised/60 px-5 py-4 text-[12.5px] leading-[1.6] text-muted shadow-ring">
+            {t('calc.recordingIsSeparate')}
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
