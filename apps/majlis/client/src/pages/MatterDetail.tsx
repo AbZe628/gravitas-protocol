@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { api, type Matter } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { Card, DateText, ErrorText, Loading, Section, Sources, Tag } from '../components/ui.js';
+import { State, toneForStatus } from '../components/kit.js';
 import Deliberation from '../components/Deliberation.js';
 import { oversight } from '../lib/api.js';
 import Evidence from '../components/Evidence.js';
@@ -43,23 +44,28 @@ export default function MatterDetail() {
         ← {t('common.back')}
       </Link>
 
-      <div className="mb-3 flex flex-wrap items-center gap-2">
-        <Tag tone={matter.direction === 'restrict' ? 'warn' : 'gold'}>
+      <div className="mb-4 flex flex-wrap items-center gap-2.5">
+        <State tone={matter.direction === 'restrict' ? 'breach' : 'settled'}>
           {t(`matter.direction.${matter.direction}`)}
-        </Tag>
-        <Tag>{t(`matter.status.${matter.status}`)}</Tag>
+        </State>
+        <State tone={toneForStatus(matter.status)}>{t(`matter.status.${matter.status}`)}</State>
+        <span className="text-[12px] text-muted">
+          {t(`matter.origin.${matter.origin}`)}
+          <span className="mx-1.5 opacity-40">·</span>
+          <DateText iso={matter.openedAt} />
+        </span>
       </div>
 
-      <h1 className="mb-2 text-[21px] font-semibold leading-tight">{matter.title}</h1>
-      <div className="mb-6 text-[12px] text-muted">
-        {t(`matter.origin.${matter.origin}`)}
-        <span className="mx-1.5 opacity-40">·</span>
-        <DateText iso={matter.openedAt} />
-      </div>
+      <h1
+        className="mb-4 max-w-[21ch] font-display text-[32px] font-normal leading-[1.12] tracking-[-0.024em] sm:text-[38px]"
+        style={{ textWrap: 'balance' }}
+      >
+        {matter.title}
+      </h1>
 
-      <div className="mb-5 rounded-lg border border-line bg-surface/60 px-4 py-3 text-[13px] leading-relaxed text-muted">
+      <p className="mb-7 max-w-[62ch] text-[13px] leading-[1.65] text-muted">
         {t(`matter.direction.${matter.direction}Note`)}
-      </div>
+      </p>
 
       {/*
         Where this stands and what is next, above everything else on the page.
@@ -68,6 +74,18 @@ export default function MatterDetail() {
         was nearly decided or barely begun.
       */}
       <Passage matterId={matter.id} />
+
+      {/*
+        Two columns: the question, and the act.
+
+        Everything on this page used to be one stack, so a member reading a
+        long matter had scrolled the thing they came to do off the screen by
+        the time they had read enough to do it. The tally and the vote now sit
+        in a column of their own and stay in view — which is the arrangement
+        the artboard draws, and the reason it draws it.
+      */}
+      <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
+        <div className="min-w-0 flex-1">
 
       {/*
         What the board already decided about a question of this shape, above
@@ -94,7 +112,7 @@ export default function MatterDetail() {
             note={t(matter.status === 'timelock' ? 'doc.fatwaPending' : 'doc.fatwaNote')}
           />
         ) : (
-          <p className="rounded-lg border border-line/60 px-4 py-3 text-[12.5px] leading-relaxed text-muted">
+          <p className="rounded-card bg-raised/60 px-5 py-4 text-[12.5px] leading-[1.6] text-muted shadow-ring">
             {t('doc.fatwaNotYet')}
           </p>
         )}
@@ -128,8 +146,12 @@ export default function MatterDetail() {
 
       <Section title={t('matter.parameters')}>
         <Card>
-          <div className="mb-3 text-[14px] font-medium">{rule.title}</div>
-          <p className="mb-4 text-[14px] text-paper/80">{rule.statement}</p>
+          <div className="mb-3 font-display text-[20px] leading-snug tracking-[-0.014em]">
+            {rule.title}
+          </div>
+          <p className="mb-5 border-s-2 border-gold/50 ps-4 font-display text-[16px] leading-[1.55] text-paper">
+            {rule.statement}
+          </p>
 
           {/*
             The terms, the hash and whether they can still be changed. A board
@@ -156,7 +178,7 @@ export default function MatterDetail() {
         <Section title={t('matter.simulation')}>
           <Card>
             <div className="mb-3 text-[14px]">
-              <span className="text-[22px] font-semibold text-goldsoft tabular-nums">
+              <span className="font-display text-[30px] leading-none tracking-[-0.026em] text-lapis tabular-nums">
                 {matter.simulation.transactionsAffected}
               </span>{' '}
               <span className="text-muted">
@@ -243,15 +265,6 @@ export default function MatterDetail() {
         <Precedent matterId={matter.id} />
       </Section>
 
-      <Section title={t('vote.tally')}>
-        <VotePanel
-          matter={matter}
-          role={identity?.role}
-          scholarId={identity?.scholarId}
-          onChanged={setMatter}
-        />
-      </Section>
-
       {matter.reasoning.length > 0 && (
         <Section title={t('matter.reasoning')}>
           <ul className="space-y-4">
@@ -259,12 +272,12 @@ export default function MatterDetail() {
               <li
                 key={i}
                 className={
-                  'rounded-lg border p-3.5 ' +
-                  (r.releasedAt ? 'border-line/50 bg-surface/20' : 'border-line')
+                  'rounded-card px-5 py-4 ' +
+                  (r.releasedAt ? 'bg-raised/50 shadow-ring' : 'bg-raised shadow-card')
                 }
               >
                 <div className="mb-1.5 flex flex-wrap items-center gap-2 text-[12px]">
-                  <span className={r.releasedAt ? 'text-muted' : 'text-goldsoft'}>{r.scholarId}</span>
+                  <span className={r.releasedAt ? 'text-muted' : 'font-semibold text-lapis'}>{r.scholarId}</span>
                   <Tag tone={r.releasedAt ? 'neutral' : r.position === 'against' ? 'warn' : 'neutral'}>
                     {r.position}
                   </Tag>
@@ -272,7 +285,7 @@ export default function MatterDetail() {
                     <DateText iso={r.at} />
                   </span>
                   {r.releasedAt && (
-                    <span className="rounded border border-line px-1.5 py-0.5 text-[10.5px] uppercase tracking-wide text-muted">
+                    <span className="rounded-full bg-black/[0.045] px-2.5 py-0.5 text-[10.5px] font-bold uppercase tracking-[0.1em] text-muted">
                       {t('vote.released')}
                     </span>
                   )}
@@ -291,7 +304,25 @@ export default function MatterDetail() {
         </Section>
       )}
 
-      <Sources sources={[...matter.sources, ...rule.sources]} />
+          <Sources sources={[...matter.sources, ...rule.sources]} />
+        </div>
+
+        {/*
+          The act. Sticky, because a member who has read four screens of
+          argument should not have to find their way back to the thing they
+          read it for.
+        */}
+        <aside className="w-full shrink-0 lg:sticky lg:top-24 lg:w-[364px]">
+          <Section title={t('vote.tally')}>
+            <VotePanel
+              matter={matter}
+              role={identity?.role}
+              scholarId={identity?.scholarId}
+              onChanged={setMatter}
+            />
+          </Section>
+        </aside>
+      </div>
     </article>
   );
 }

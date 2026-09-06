@@ -52,8 +52,8 @@ type Step = 'what' | 'act' | 'done';
 function Detail({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="mb-4">
-      <div className="mb-1 text-[11px] uppercase tracking-wider text-muted">{label}</div>
-      <div className="text-[13.5px] leading-relaxed">{children}</div>
+      <div className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">{label}</div>
+      <div className="text-[14px] leading-[1.62] text-sand">{children}</div>
     </div>
   );
 }
@@ -100,7 +100,12 @@ export default function MatterAction() {
         <Tag>{t(`matter.status.${matter.status}`)}</Tag>
       </div>
 
-      <h1 className="mb-4 text-[20px] font-semibold leading-snug tracking-tight">{matter.title}</h1>
+      <h1
+        className="mb-5 max-w-[24ch] font-display text-[28px] font-normal leading-[1.14] tracking-[-0.022em] sm:text-[32px]"
+        style={{ textWrap: 'balance' }}
+      >
+        {matter.title}
+      </h1>
 
       {/* ── what it is ─────────────────────────────────────────────────── */}
 
@@ -134,8 +139,8 @@ export default function MatterAction() {
             act is the thing competing with it.
           */}
           {next && (
-            <div className="mb-5 rounded-lg border border-line bg-surface/60 px-4 py-3">
-              <div className="text-[11px] uppercase tracking-wider text-muted">
+            <div className="mb-5 rounded-card bg-raised px-5 py-4 shadow-card">
+              <div className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
                 {t('passage.next')}
               </div>
               <div className="mt-0.5 text-[14px] leading-snug">
@@ -229,8 +234,8 @@ export default function MatterAction() {
             the matter is decided — it usually is not.
           */}
           {passage?.next && (
-            <div className="mb-5 rounded-lg border border-line px-4 py-3">
-              <div className="text-[11px] uppercase tracking-wider text-muted">
+            <div className="mb-5 rounded-card bg-raised/70 px-5 py-4 shadow-ring">
+              <div className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
                 {t('passage.next')}
               </div>
               <div className="mt-0.5 text-[14px] leading-snug">{passage.next.act}</div>

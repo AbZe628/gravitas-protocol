@@ -148,9 +148,17 @@ function Mark() {
  * only lengthens its lines. A page joins this list in the same commit that
  * rebuilds it — never before.
  *
- * Exact matches: a detail page under one of these is prose again.
+ * Exact paths, plus one prefix. The prefix is the **classic** matter page,
+ * which holds the act in a column beside the question — not `/matters/:id`,
+ * which is one guided act at a time and is a column of prose. Widening that
+ * one ran a paragraph across 1,100 pixels, which is the rule in
+ * `tailwind.config.js` demonstrating itself.
  */
 const WORK_AREA = ['/register', '/library', '/calculations'];
+
+function atWorkArea(path: string): boolean {
+  return WORK_AREA.includes(path) || path.startsWith('/classic/matters/');
+}
 
 export default function Shell({ children }: { children: React.ReactNode }) {
   const { t, lang, setLang } = useI18n();
@@ -313,7 +321,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
           key={path}
           className={
             'mx-auto w-full px-5 py-8 pb-24 sm:px-8 ' +
-            (WORK_AREA.includes(path) ? 'max-w-work' : 'max-w-reading')
+            (atWorkArea(path) ? 'max-w-work' : 'max-w-reading')
           }
           style={{ animation: 'shellFade 220ms ease-out' }}
         >
