@@ -41,13 +41,13 @@ export default function Assistant() {
       <ul className="mb-6 space-y-5">
         {thread.map((x) => (
           <li key={x.id}>
-            <div className="mb-2 rounded-card shadow-ring px-3.5 py-2.5 text-[14px]">
+            <div className="mb-2.5 rounded-card bg-black/[0.035] px-5 py-3 text-[14px] text-sand">
               {x.question}
             </div>
-            <div className="rounded-card shadow-ring bg-raised px-3.5 py-3">
+            <div className="rounded-card bg-raised px-5 py-4 shadow-card">
               {(x.declinedAsRuling || x.escalated) && (
                 <div className="mb-2 flex flex-wrap gap-1.5">
-                  {x.declinedAsRuling && <Tag tone="warn">{t('asst.declined')}</Tag>}
+                  {x.declinedAsRuling && <Tag tone="breach">{t('asst.declined')}</Tag>}
                   {x.escalated && <Tag tone="gold">{t('asst.escalated')}</Tag>}
                 </div>
               )}
@@ -61,7 +61,7 @@ export default function Assistant() {
       {error && <div className="mb-4 text-[13px] text-breach">{t('asst.error')}</div>}
 
       <div className="sticky bottom-16 md:bottom-4">
-        <div className="flex gap-2 rounded-card shadow-ring bg-raised p-2">
+        <div className="flex gap-2 rounded-sheet bg-raised p-2.5 shadow-card">
           <textarea
             value={question}
             onChange={(e) => setQuestion(e.target.value)}

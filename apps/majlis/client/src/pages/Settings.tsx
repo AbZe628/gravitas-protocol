@@ -85,16 +85,18 @@ export default function Settings() {
       </h2>
       <ul className="mb-8 space-y-2">
         {data.members.map((m) => (
-          <li key={m.scholarId}>
-            <Card>
-              <div className="flex flex-wrap items-baseline justify-between gap-2">
-                <span className="text-[14px] font-medium">{m.name}</span>
-                <span className="font-mono text-[11px] text-muted">{m.scholarId}</span>
+          <li key={m.scholarId} className="rounded-sheet bg-raised/75 px-6 py-5 shadow-ring">
+            <div>
+              <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                <span className="font-display text-[19px] leading-snug tracking-[-0.014em]">
+                  {m.name}
+                </span>
+                <span className="font-mono text-[11.5px] text-muted">{m.scholarId}</span>
               </div>
-              {m.title && <div className="mt-0.5 text-[12px] text-muted">{m.title}</div>}
+              {m.title && <div className="mt-1.5 text-[12.5px] text-muted">{m.title}</div>}
 
-              <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                <Tag tone={m.signatory ? 'gold' : undefined}>
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <Tag tone={m.signatory ? 'ok' : undefined}>
                   {t(m.signatory ? 'set.signs' : 'set.advisory')}
                 </Tag>
                 {m.office && <Tag>{t(`set.office.${m.office}`)}</Tag>}
@@ -111,7 +113,7 @@ export default function Settings() {
                   <Tag tone="warn">{t('set.noCredential')}</Tag>
                 ) : null}
               </div>
-            </Card>
+            </div>
           </li>
         ))}
       </ul>

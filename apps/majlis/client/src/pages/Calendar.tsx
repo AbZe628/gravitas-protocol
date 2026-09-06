@@ -59,16 +59,18 @@ function Entry({ entry }: { entry: CalendarEntry }) {
           : 'bg-raised shadow-ring')
       }
     >
-      <div className="mb-1.5 flex flex-wrap items-center gap-2">
-        <Tag tone={entry.overdue ? 'warn' : undefined}>{t(`cal.kind.${entry.kind}`)}</Tag>
+      <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-2">
+        <Tag tone={entry.overdue ? 'breach' : undefined}>{t(`cal.kind.${entry.kind}`)}</Tag>
         <span className={entry.overdue ? 'text-[12px] font-semibold text-breach' : 'text-[12px] text-muted'}>
           <DateText iso={entry.at} />
         </span>
       </div>
-      <div className="text-[14px] font-medium leading-snug">{entry.title}</div>
-      <p className="mt-1 text-[12px] leading-relaxed text-muted">{entry.note}</p>
+      <div className="max-w-[46ch] font-display text-[18px] leading-snug tracking-[-0.012em]">
+        {entry.title}
+      </div>
+      <p className="mt-2 max-w-[62ch] text-[12.5px] leading-[1.6] text-muted">{entry.note}</p>
       {entry.waitingOn.length > 0 && (
-        <p className="mt-1.5 text-[11.5px] text-muted">
+        <p className="mt-3 border-t border-line pt-2.5 text-[11.5px] text-muted">
           {t('cal.notYetFrom')} {entry.waitingOn.join(', ')}
         </p>
       )}

@@ -393,14 +393,14 @@ export default function Meetings() {
         <button
           type="button"
           onClick={() => setConvening(true)}
-          className="mb-5 rounded-xl shadow-ring px-3 py-1.5 text-[13px] text-muted hover:text-paper"
+          className="mb-5 rounded-xl bg-lapis px-5 py-2.5 text-[13px] font-semibold text-white shadow-act transition-all hover:bg-lapissoft"
         >
           {t('meet.convene')}
         </button>
       )}
 
       {canConvene && convening && (
-        <form onSubmit={convene} className="mb-5 rounded-card shadow-ring px-4 py-3.5">
+        <form onSubmit={convene} className="mb-5 rounded-sheet bg-raised px-6 py-5 shadow-card">
           {/*
             Wrapping labels rather than sitting beside the field. A label a
             screen reader cannot associate with its input is a label only some

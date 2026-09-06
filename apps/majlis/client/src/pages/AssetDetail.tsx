@@ -100,7 +100,7 @@ export default function AssetDetail() {
       </div>
 
       <h1 className="mb-2 font-display font-normal leading-[1.12] tracking-[-0.024em] text-[30px] sm:text-[34px]">{a.name}</h1>
-      <p className="mb-5 text-[13px] leading-relaxed text-muted">{data.note}</p>
+      <p className="mb-7 max-w-[62ch] text-[13.5px] leading-[1.65] text-muted">{data.note}</p>
 
       {refusal && (
         <div className="mb-5 rounded-card shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)] bg-[#FCF0EE] px-4 py-3 text-[13px] leading-relaxed text-breach">

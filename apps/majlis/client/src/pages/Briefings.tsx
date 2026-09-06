@@ -27,7 +27,9 @@ export default function Briefings() {
                 <span className="mx-1.5 opacity-40">·</span>
                 {t('brief.raisedBy')} {t(`brief.raisedBy.${b.raisedBy}`)}
               </div>
-              <h2 className="text-[15px] font-medium leading-snug">{b.title}</h2>
+              <h2 className="max-w-[46ch] font-display text-[21px] leading-snug tracking-[-0.014em]">
+                {b.title}
+              </h2>
 
               <div className="mt-4 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
                 {t('brief.whatChanged')}
@@ -47,11 +49,14 @@ export default function Briefings() {
                 </div>
               )}
 
-              <div className="mt-4 rounded-xl shadow-[0_0_0_0.5px_rgba(176,132,48,0.24)] bg-[#FBF4E4] p-3">
+              <div className="mt-5 rounded-card bg-[#FBF4E4] px-5 py-4 shadow-[0_0_0_0.5px_rgba(176,132,48,0.24)]">
                 <div className="text-[10px] font-bold uppercase tracking-[0.15em] text-gold">
                   {t('brief.question')}
                 </div>
-                <p className="mt-1.5 text-[14px] leading-relaxed">{b.questionForBoard}</p>
+                {/* The one part addressed to the board, in the board's face. */}
+                <p className="mt-2 max-w-[62ch] font-display text-[16px] leading-[1.55]">
+                  {b.questionForBoard}
+                </p>
               </div>
 
               <Sources sources={b.sources} />

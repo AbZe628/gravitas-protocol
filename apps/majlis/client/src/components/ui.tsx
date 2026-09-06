@@ -44,7 +44,7 @@ export function Tag({
   tone = 'neutral',
 }: {
   children: ReactNode;
-  tone?: 'neutral' | 'gold' | 'warn' | 'ok';
+  tone?: 'neutral' | 'gold' | 'warn' | 'ok' | 'breach';
 }) {
   /*
    * A pill is a tinted ground with a half-pixel ring of its own colour, not an
@@ -55,6 +55,10 @@ export function Tag({
     gold: 'bg-[#FBF4E4] text-gold shadow-[0_0_0_0.5px_rgba(176,132,48,0.22)]',
     warn: 'bg-[#FBF4E4] text-gold shadow-[0_0_0_0.5px_rgba(176,132,48,0.22)]',
     ok: 'bg-[#EBF3EF] text-settled shadow-[0_0_0_0.5px_rgba(44,107,87,0.18)]',
+    // The fourth state the palette has and this had no name for: overdue,
+    // refused, a threshold crossed. Callers were reaching for 'warn', which
+    // is gold, which is a clock that is still running.
+    breach: 'bg-[#FCF0EE] text-breach shadow-[0_0_0_0.5px_rgba(154,56,48,0.18)]',
   } as const;
   return (
     <span

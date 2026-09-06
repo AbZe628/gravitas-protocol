@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api, oversight, type EnforcementSnapshot, type MatterSummary, type Wait } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
-import { Card, DateText, ErrorText, Loading, Tag } from '../components/ui.js';
+import { DateText, ErrorText, Loading, Tag } from '../components/ui.js';
 import Attention from '../components/Attention.js';
 import DriftPanel from '../components/Drift.js';
 import Pace, { WaitingFor } from '../components/Pace.js';
@@ -97,19 +97,23 @@ export default function Dashboard() {
       {open.length === 0 ? (
         <p className="text-muted text-sm">{t('dash.none')}</p>
       ) : (
-        <ul className="space-y-3">
+        <ul className="space-y-2">
           {open.map((m) => (
             <li key={m.id}>
-              <Link to={`/matters/${m.id}`} className="block">
-                <Card accent={m.direction === 'restrict'}>
-                  <div className="mb-2 flex flex-wrap items-center gap-2">
-                    <Tag tone={m.direction === 'restrict' ? 'warn' : 'gold'}>
+              <Link
+                to={`/matters/${m.id}`}
+                className="block rounded-sheet bg-raised/75 px-6 py-5 shadow-ring transition-all hover:-translate-y-px hover:shadow-card"
+              >
+                <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-2">
+                    <Tag tone={m.direction === 'restrict' ? 'breach' : 'ok'}>
                       {t(`matter.direction.${m.direction}`)}
                     </Tag>
                     <Tag>{t(`matter.status.${m.status}`)}</Tag>
+                </div>
+                  <div className="max-w-[46ch] font-display text-[19px] leading-snug tracking-[-0.014em]">
+                    {m.title}
                   </div>
-                  <div className="text-[15px] font-medium leading-snug">{m.title}</div>
-                  <div className="mt-2 text-[12px] text-muted">
+                  <div className="mt-2.5 text-[12px] text-muted">
                     {t(`matter.origin.${m.origin}`)}
                     <span className="mx-1.5 opacity-40">·</span>
                     {t('common.opened')} <DateText iso={m.openedAt} />
@@ -128,7 +132,6 @@ export default function Dashboard() {
                       </>
                     )}
                   </div>
-                </Card>
               </Link>
             </li>
           ))}
