@@ -113,25 +113,29 @@ export default function Passage({ matterId }: { matterId: string }) {
   if (!passage) return null;
 
   return (
-    <div className="mb-6 rounded-card shadow-ring bg-raised px-4 py-3.5">
+    <div className="mb-6 rounded-sheet bg-raised px-6 py-5 shadow-card">
       {/*
         The one sentence. A scholar opening this on a phone between two other
         things wants to know what now, and whether it is theirs.
       */}
       {passage.next ? (
-        <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+        <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
           <div className="min-w-0">
-            <div className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+            <div className="mb-2.5 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
               {t('passage.next')}
             </div>
-            <div className="mt-0.5 text-[15px] leading-snug">
-              {passage.next.act}
-              <span className="ms-2 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+              <span className="font-display text-[22px] leading-snug tracking-[-0.016em]">
+                {passage.next.act}
+              </span>
+              {/* Whose act it is, as a state rather than as a caption stuck
+                  to the end of the sentence. */}
+              <span className="rounded-full bg-black/[0.045] px-2.5 py-0.5 text-[10.5px] font-bold uppercase tracking-[0.1em] text-sand">
                 {t(`passage.whose.${passage.next.whose}`)}
               </span>
             </div>
             {passage.next.standing && (
-              <p className="mt-1 max-w-prose text-[12.5px] leading-relaxed text-muted">
+              <p className="mt-2.5 max-w-[62ch] text-[13px] leading-[1.6] text-muted">
                 {passage.next.standing}
               </p>
             )}
@@ -144,34 +148,32 @@ export default function Passage({ matterId }: { matterId: string }) {
             clock and nobody is holding it up.
           */}
           {passage.waiting && (
-            <div className="text-end">
-              <div className="font-mono text-[19px] tabular-nums text-goldsoft">
+            <div className="shrink-0 text-end">
+              <div className="font-display text-[40px] leading-[0.92] tabular-nums tracking-[-0.028em] text-gold">
                 {passage.waiting.days}
               </div>
-              <div className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
-                {t('passage.days')}
-              </div>
+              <div className="mt-1.5 text-[11.5px] text-muted">{t('passage.days')}</div>
             </div>
           )}
         </div>
       ) : (
-        <p className="text-[13px] leading-relaxed">{passage.settled}</p>
+        <p className="max-w-[62ch] font-display text-[18px] leading-[1.55]">{passage.settled}</p>
       )}
 
       {passage.waiting && (
-        <p className="mt-2 text-[11.5px] leading-relaxed text-muted">{passage.waiting.note}</p>
+        <p className="mt-3 max-w-[62ch] text-[12px] leading-[1.55] text-muted">{passage.waiting.note}</p>
       )}
 
       <button
         type="button"
         onClick={() => setOpen((was) => !was)}
-        className="mt-3 rounded-xl shadow-ring px-2.5 py-1 text-[12px] text-muted transition-colors hover:text-paper"
+        className="mt-4 rounded-xl bg-ink px-3.5 py-2 text-[12.5px] text-sand shadow-ring transition-colors hover:text-paper"
       >
         {open ? t('passage.hide') : t('passage.show')}
       </button>
 
       {open && (
-        <div className="mt-4 grid gap-5 sm:grid-cols-2">
+        <div className="mt-5 grid gap-7 border-t border-line pt-5 sm:grid-cols-2">
           <div>
             <div className="mb-1 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
               {t('passage.shaping')}

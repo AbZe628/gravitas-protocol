@@ -54,8 +54,8 @@ function Item({
   const { t } = useI18n();
 
   return (
-    <li className="rounded-xl shadow-ring px-3 py-2.5">
-      <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+    <li className="rounded-card bg-ink px-5 py-4">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
         <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
           {t(`inherit.kind.${proposal.kind}`)}
         </span>
@@ -73,19 +73,19 @@ function Item({
       </div>
 
       {/* The board's own words from its own past ruling. Never rewritten. */}
-      <p className="mt-1 text-[12.5px] leading-relaxed">
+      <p className="mt-2.5 max-w-[62ch] font-display text-[15.5px] leading-[1.55]">
         {proposal.value}
-        {proposal.unit && <span className="ms-1 text-[11.5px] text-muted">{proposal.unit}</span>}
+        {proposal.unit && <span className="ms-1.5 font-body text-[11.5px] text-muted">{proposal.unit}</span>}
       </p>
 
       {taken ? (
-        <p className="mt-2 text-[12px] text-muted">{t('inherit.taken')}</p>
+        <p className="mt-3 text-[12px] text-settled">{t('inherit.taken')}</p>
       ) : (
         <button
           type="button"
           onClick={onTake}
           disabled={busy}
-          className="mt-2 rounded-xl shadow-ring px-3 py-1 text-[12px] text-muted transition-colors hover:text-paper disabled:opacity-40"
+          className="mt-3 rounded-xl bg-raised px-3.5 py-2 text-[12.5px] text-sand shadow-ring transition-colors hover:text-paper disabled:opacity-40"
         >
           {t('inherit.take')}
         </button>
@@ -154,8 +154,8 @@ export default function Inherited({
   const rest = inheritance.proposals.filter((p) => p.kind !== 'condition');
 
   return (
-    <div className="mb-6 rounded-card shadow-ring bg-raised px-4 py-3.5">
-      <div className="mb-1 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+    <div className="mb-6 rounded-sheet bg-raised/75 px-6 py-5 shadow-ring">
+      <div className="mb-3 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
         {t('inherit.title')}
       </div>
 
@@ -171,13 +171,13 @@ export default function Inherited({
             'the 2th question' was wrong in English and an ordinal does not
             survive translation into Arabic or Urdu at all.
           */}
-          <p className="text-[14px] leading-snug">
+          <p className="max-w-[62ch] font-display text-[19px] leading-[1.45] tracking-[-0.008em]">
             {inheritance.timesRuled > 2
               ? t('inherit.timesMany').replace('{n}', String(inheritance.timesRuled - 1))
               : t('inherit.timesOnce')}
           </p>
-          <p className="mt-1 text-[12.5px] leading-relaxed text-muted">
-            <Link to={`/matters/${inheritance.from.id}`} className="underline underline-offset-4">
+          <p className="mt-2.5 max-w-[62ch] text-[12.5px] leading-[1.6] text-muted">
+            <Link to={`/matters/${inheritance.from.id}`} className="text-lapis underline decoration-lapis/30 underline-offset-4">
               {inheritance.from.title}
             </Link>
             {inheritance.from.decidedAt && (
@@ -187,23 +187,23 @@ export default function Inherited({
           </p>
         </>
       ) : (
-        <p className="text-[12.5px] leading-relaxed text-muted">{inheritance.note}</p>
+        <p className="max-w-[62ch] text-[13px] leading-[1.6] text-muted">{inheritance.note}</p>
       )}
 
       {inheritance.proposals.length > 0 && (
         <>
-          <p className="mt-3 max-w-prose text-[12px] leading-relaxed text-muted">
+          <p className="mt-4 max-w-[62ch] text-[12.5px] leading-[1.6] text-muted">
             {inheritance.note}
           </p>
 
           {refusal && (
-            <p className="mt-2 rounded border border-warn/50 px-3 py-2 text-[12.5px] leading-relaxed text-warn">
+            <p className="mt-3 rounded-xl bg-[#FCF0EE] px-4 py-2.5 text-[12.5px] leading-[1.55] text-breach shadow-[0_0_0_0.5px_rgba(154,56,48,0.18)]">
               {refusal}
             </p>
           )}
 
           {conditions.length > 0 && (
-            <ul className="mt-3 space-y-2">
+            <ul className="mt-4 space-y-2.5">
               {conditions.map((p, i) => {
                 const id = idOf(p, i);
                 return (
@@ -226,20 +226,20 @@ export default function Inherited({
             would record an edit as though it were a ruling.
           */}
           {rest.length > 0 && (
-            <div className="mt-3 border-t border-line pt-3">
+            <div className="mt-5 border-t border-line pt-4">
               <div className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
                 {t('inherit.alsoSaid')}
               </div>
-              <ul className="space-y-2">
+              <ul className="space-y-2.5">
                 {rest.map((p, i) => (
-                  <li key={idOf(p, i)} className="rounded-xl shadow-ring px-3 py-2">
+                  <li key={idOf(p, i)} className="rounded-card bg-ink px-5 py-4">
                     <div className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
                       {t(`inherit.kind.${p.kind}`)}
-                      {p.key && <span className="ms-2 font-mono normal-case">{p.key}</span>}
+                      {p.key && <span className="ms-2 font-mono normal-case tracking-normal">{p.key}</span>}
                     </div>
-                    <p className="mt-1 text-[12.5px] leading-relaxed">
+                    <p className="mt-2.5 max-w-[62ch] font-display text-[15.5px] leading-[1.55]">
                       {p.value}
-                      {p.unit && <span className="ms-1 text-[11.5px] text-muted">{p.unit}</span>}
+                      {p.unit && <span className="ms-1.5 font-body text-[11.5px] text-muted">{p.unit}</span>}
                     </p>
                   </li>
                 ))}
