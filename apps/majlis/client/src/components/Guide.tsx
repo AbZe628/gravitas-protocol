@@ -78,9 +78,11 @@ export default function Guide() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="fixed bottom-5 end-5 z-40 flex items-center gap-2 rounded-full shadow-ring bg-raised px-4 py-2.5 text-[13px] text-sand shadow-lift transition-all hover:-translate-y-px hover:text-paper"
+        className="fixed bottom-5 end-5 z-40 flex items-center gap-2 rounded-full bg-raised px-4 py-2.5 text-[13px] font-medium text-sand shadow-[0_0_0_0.5px_rgba(25,23,19,0.08),0_2px_6px_rgba(25,23,19,0.09),0_14px_30px_-10px_rgba(25,23,19,0.3)] transition-all hover:-translate-y-px hover:text-paper"
       >
-        <span aria-hidden className="text-gold">?</span>
+        <svg aria-hidden width="14" height="14" viewBox="0 0 16 16" fill="none">
+          <path d="M8 1 L9.6 6.4 L15 8 L9.6 9.6 L8 15 L6.4 9.6 L1 8 L6.4 6.4 Z" fill="#B08430" />
+        </svg>
         {t('guide.open')}
       </button>
     );
@@ -88,18 +90,21 @@ export default function Guide() {
 
   return (
     <div className="fixed bottom-5 end-5 z-40 w-[min(26rem,calc(100vw-2.5rem))]">
-      <div className="rounded-card shadow-ring bg-raised shadow-lift">
-        <div className="flex items-center justify-between border-b border-line px-4 py-3">
-          <div>
+      <div className="rounded-sheet bg-raised shadow-[0_0_0_0.5px_rgba(25,23,19,0.08),0_2px_6px_rgba(25,23,19,0.09),0_24px_48px_-16px_rgba(25,23,19,0.35)]">
+        {/* `items-start` and a `shrink-0` close: on a phone the scope line
+            wraps to two, and centred with a flexible close the × sat on top
+            of the second line. */}
+        <div className="flex items-start justify-between gap-3 border-b border-line px-4 py-3">
+          <div className="min-w-0">
             <div className="text-[13px] font-medium text-paper">{t('guide.title')}</div>
             {/* What it is for, and what it is not, in one line. */}
-            <div className="mt-0.5 text-[11.5px] text-muted">{t('guide.scope')}</div>
+            <div className="mt-0.5 text-[11.5px] leading-snug text-muted">{t('guide.scope')}</div>
           </div>
           <button
             type="button"
             onClick={() => setOpen(false)}
             aria-label={t('guide.close')}
-            className="text-[18px] leading-none text-muted transition-colors hover:text-paper"
+            className="-me-1 shrink-0 rounded-lg px-1.5 text-[18px] leading-none text-muted transition-colors hover:text-paper"
           >
             ×
           </button>

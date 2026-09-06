@@ -320,7 +320,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
         <main
           key={path}
           className={
-            'mx-auto w-full px-5 py-8 pb-24 sm:px-8 ' +
+            'mx-auto w-full px-5 py-8 pb-28 sm:px-8 sm:pb-24 ' +
             (atWorkArea(path) ? 'max-w-work' : 'max-w-reading')
           }
           style={{ animation: 'shellFade 220ms ease-out' }}
