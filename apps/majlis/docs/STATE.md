@@ -1,30 +1,134 @@
 # Where Majlis stands
 
-Last written **6 September 2026**. Read this first.
+Last written **6 September 2026, evening**. Read this first, and read §0 before
+anything else — it is written so that picking the work back up costs a few
+minutes rather than an hour of re-reading the codebase.
 
 Everything below is what is *true*, not what is planned. Where something is
 unfinished it says so, and where something is broken it says how it breaks.
 
 ---
 
-## Verified this session
+## Verified, this save
 
 ```
-server   50 files   1300 tests   passed
-client   19 files    214 tests   passed
+server   51 files   1315 tests   passed
+client   20 files    222 tests   passed
 ```
 
-`npm test` from `apps/majlis`. CI is green. Nothing is skipped or pending.
+`npm test` from `apps/majlis`. Typecheck clean with `--force` on both sides.
+`client/dist` is rebuilt, so port 4000 shows the current interface.
 
-**These commits are local only and have never been pushed:**
+`origin/main` is at `a255d0b`. **`b819009` and this save are local only and have
+not been pushed** — pushing needs asking first, every time.
 
-```
-58e9d77  Majlis: an application frame, not a document
-93ccd05  Majlis: a palette that means something, and a guide on every screen
-fdeba54  Majlis: putting a question in the words the person putting it uses
-```
+---
 
-Plus whatever this session's save adds. Pushing needs asking first.
+## §0. Where we stopped, and what to do next
+
+### The last thing that landed
+
+**`b819009` — Majlis follows no standard, and no longer says it does.**
+
+The trigger was the user seeing *AAOIFI Shariah Standard No. 17* printed on a
+matter screen as the authority a board was judging against, and saying: *"mi
+nismo AAOIFI niti bilo koji standard, to odlučuje board svake banke zasebno"* —
+we are not AAOIFI or any standard; each bank's board decides that.
+
+They were right, and it went deeper than the label:
+
+- **107 citations** were removed from `server/src/data/structures.ts`, and the
+  `authority` field is gone from both `Structure` and `StructureCondition`.
+- **`services/screening.ts` shipped the thresholds themselves** — 30% / 30% / 5%
+  hardcoded, with a standard named beside each. That was the product making the
+  board's ruling, invisibly: a scholar reading *within the threshold* had no way
+  to ask whose threshold it was. The limits now arrive from the board in
+  `Figures.thresholds`, there is no fallback, and a ratio sent without one comes
+  back computed in full but **untested**, carrying
+  `unknownBecause: 'no_limit_set'`.
+- `unknownBecause` distinguishes two silences that used to look identical:
+  `'denominator_is_zero'` (the figures could not divide) and `'no_limit_set'`
+  (the board has not ruled). An interface that renders both as "—" tells a
+  reader their figures were rejected when the board simply has not decided.
+- **The one place a standard is ever named** is `AdoptedStructure.basis` — the
+  board's own words, on its own adoption. AAOIFI, a supervisor's circular, or
+  "our own view, minuted 12 March" are equally valid, because the board is the
+  one being asked. It threads through `services/structure.ts` (`Checklist.basis`),
+  `services/adoption.ts` (`Effective.adoption`), and `services/fatwa.ts`
+  (`Fatwa.structure.basis`, printed in the signed document).
+- Where the board has said nothing, every surface **says it has said nothing**
+  (`adopt.noBasis`) rather than leaving a blank line — a blank where a citation
+  used to sit reads as a citation that failed to load.
+- A board's own **evidence** may still cite anything it likes. That was never
+  the problem, and a test in `test/fatwa.test.ts` is deliberately narrowed to
+  the structure section to keep it possible.
+
+Verified on the running page, not just in tests: `AAOIFI: 0`, `SS n: 0`,
+`Standard No.: 0`, and the honest line present once.
+
+### The three things asked for and NOT started
+
+All three came from the same two messages. Quoting them, because the wording
+matters more than a paraphrase:
+
+> *"nema opet funkcija puta kako smo zamisli ko salje prijedloge u majlis kako
+> banka salje notifikacija memberima otvaranje"*
+
+> *"nema primjera ugovora da se automatski stvaraju kad im treba nista"* …
+> *"mi treba da imamo ugovore da ih se moze automatski generirati ali ne
+> kacimo se za nkakve standarde"*
+
+> *"opet je prenatrpano opet previse komplicirano treba to jos pojednostaviti
+> bez da se ista gubi"*
+
+**1. The path into Majlis. Nothing exists.** This was checked in the code, not
+assumed:
+
+- `POST /api/matters` (`routes/governance.ts:246`) requires a logged-in board
+  member — `mayOpenMatter` is `mayDeliberate`, i.e. signatory, advisory or
+  liaison. An institution has no way in at all.
+- `MatterOrigin` includes `'institution_request'`, but it is only a **label
+  somebody on the board types on the institution's behalf**. There is no request
+  object, no queue, no record of the asker's own words.
+- **Notification does not exist anywhere.** `grep -rni notif server/src client/src`
+  returns six hits and every one is a comment explaining why something is *not*
+  a notification. `services/attention.ts` deliberately derives what awaits you
+  from the record rather than storing a queue, and its header says why: a second
+  copy of the truth drifts. That design is right and should not be undone —
+  what is missing is telling a member *outside* the app that something arrived.
+- `ROADMAP.md` lists notification under Stage Two. It was never built.
+
+**2. Contract drafts.** Nothing generates one. The material is all present and
+already linked — the chosen shape, its conditions, the operative terms the board
+set, the findings, the ruling — which is why this is a real feature rather than
+a word processor.
+
+**3. Simplifying the interface.** Touches every screen, so it goes last. What
+was actually looked at this session: `/` is clean; `/more` carries **11 entries
+in 4 groups**, each with a sentence of description, and duplicates two tabs
+(Coming, Record); `/matters/:id` is very long — read its full page text before
+touching it, it is the densest screen in the product.
+
+### The three decisions that were put to the user, and dismissed
+
+They were asked and the user dismissed the question card without answering, then
+asked for this save. **Do not re-ask them cold on the next run** — offer the
+recommendation and start, saying which way it was taken. The reasoning is
+already done:
+
+| Question | The recommendation, and why |
+|---|---|
+| **Who sends a request in?** | A fifth role, `institution`. Someone at the bank holds a credential, may submit a request and read the outcome of *their own* requests, and nothing else. This is safe by construction: every `may*` function in `auth/members.ts` tests role equality, so a new role is refused everywhere until it is explicitly allowed. It makes `institution_request` mean something. The alternative — the secretary records what arrived by email, "on behalf of" — is smaller and more honest about what Majlis can receive, and `mayRecordInstitutionAct` (secretary or liaison) already exists for it. Doing both is the complete answer. |
+| **How are members told?** | An adapter, exactly like enforcement: `NoticeKind = 'none' \| 'smtp' \| …`, default `none`. Unconfigured, the screen composes the notice, offers it to copy, and says plainly that Majlis does not send it. Configured, it sends and says to whom. This is the pattern already established by `services/enforcement.ts` and `components/WhereItEnds.tsx`, it matches "Majlis says what it cannot do", and it never lies. **Never wire real SMTP without the user's own credentials, which are never to be handled here.** |
+| **What generates a contract draft?** | Assemble it from the record: the adopted shape, the conditions and the board's findings on each, the operative terms with their `meaning`, and what was held outside the question. Every clause traces to something a member wrote. Where the board said nothing, the draft carries a **named gap** rather than boilerplate — the same rule as everywhere else. It must name no standard. If the user can supply real contract documents from the bank, that beats a generated skeleton for real use, but blocks on them sending files. |
+
+### Suggested order for the next run
+
+1. **The path in** — it is the biggest gap and the one they named first. Server
+   first: type, store, service, routes, tests; then the screens.
+2. **Contract drafts** — reuses `services/fatwa.ts` almost exactly in shape
+   (assemble from the record, render, refuse when the matter is not settled).
+3. **Simplify** — last, because it moves whatever the first two add.
 
 ---
 
@@ -38,7 +142,7 @@ each formula so rounding happens once.
 
 | service | what it does | the rule it refuses to break |
 |---|---|---|
-| `services/screening.ts` | SS-21 ratios | the board states the ratio; Majlis never picks one |
+| `services/screening.ts` | the three ratios | the board sets every limit; there is no shipped one to fall back to |
 | `services/purification.ts` | income to be given away | — |
 | `services/sarf.ts` | SS-1 exchange | both legs in the same session or nothing |
 | `services/tradability.ts` | SS-59 / SS-17 bands | refuses overlapping bands: *choosing between them is a ruling* |
@@ -436,15 +540,74 @@ the premise, and tests enforce it. SmartRaise is guided-only.
   wrong file with tests and typecheck green.
 - **Count dictionaries at runtime, never by reading the file.** Line counting
   was wrong by 400 keys and hid a spread that was discarding half the work.
+  This is now a test — `client/src/Locales.test.ts` reads the built objects and
+  fails on a missing key, an empty string, or a "translation" identical to the
+  English. Add strings with `node scripts/merge-strings.mjs batch.json` from
+  `apps/majlis/client`; it is insert-only, so it cannot overwrite anyone's work.
+
+---
+
+- **JavaScript has no triple-quoted strings.** Three separate `node -e` calls
+  this session died on `"""…"""`. For anything multi-line, use the Edit tool or
+  write a `.mjs` file — which is the same rule as the backtick one above, and
+  it keeps being learned the hard way.
+- **Backticks inside a double-quoted bash string are command substitution.**
+  `node -e "… \`AdoptedStructure.basis\` …"` silently produced *"is ever named
+  is , which"* — the text between the backticks was executed and its empty
+  output substituted. The script still printed `ok`. Two passages in
+  `docs/TOOLKIT.md` were damaged this way and had to be repaired with
+  `String.fromCharCode(96)`. **Grep for the words you inserted afterwards.**
+- **`git status --porcelain <path>` right after a write can report clean.**
+  It did, and the file was in fact modified; the next unqualified `git status`
+  showed it. Do not conclude "no diff" from one narrow check.
+- **The generated PDF is deterministic except for its creation date**, so
+  `docs/Gravitas-Majlis-Brief.pdf` shows as modified after every re-render even
+  when nothing on the page changed.
+- **A headless browser has no fonts and no network.** The two-page brief printed
+  in Segoe UI — not the layout it had been measured against — until the faces
+  were inlined as base64. Anything printed to PDF must carry its own fonts.
+- **A test can assert the thing you are removing.** Twelve did. When a change is
+  a correction rather than a feature, expect to rewrite tests *toward the new
+  rule* — `test/screening.test.ts` now asserts that `RATIOS` contains no
+  threshold and no standard, which is the inverse of what it asserted before.
 
 ## 5. What to pick up first, in order
 
-1. **Decide who writes the Arabic and Urdu.** Not a coding task, and it
-   blocks 391 strings.
-2. **Run the assistant against a real key once.** Everything about the
-   request is right by the SDK types and the current documentation, and none
-   of it has met the API. That is the last unproven thing in the backend.
-3. **Draw the screens that have no artboard** — Coming, Meetings, Settings,
-   the incident path — and check the built ones against the drawings again
-   with fresh eyes. Every page is composed; whether every page is *right* is
-   a judgement that wants looking at, not another sweep.
+The three live pieces of work are in **§0**, with the design already reasoned
+out. This is everything else that is still open, and none of it is blocking
+them.
+
+1. **Run the assistant against a real key once.** Everything about the request
+   is right by the SDK types and the current documentation, and none of it has
+   met the API. That is the last unproven thing in the backend. The key is the
+   user's and is never to be handled here — this needs them to run it.
+2. **Translate the guide's topic answers.** `services/guide.ts` matches terms
+   in all three scripts and refuses a ruling request in all three, but the 17
+   *answers* are English only and the service takes no `lang` parameter.
+3. **Draw the screens that have no artboard** — Coming, Meetings, Settings, the
+   incident path — and check the built ones against the drawings again with
+   fresh eyes. Every page is composed; whether every page is *right* is a
+   judgement that wants looking at, not another sweep.
+4. **The Arabic and Urdu are complete but unreviewed.** 918/918 in both, written
+   by me on the user's explicit instruction (*"nek za sada ai to odradi uz onu
+   napomenu da cemo jezik sreedjivati"*) with `lang.notReady` telling the reader
+   so on arrival. Say this plainly whenever the languages come up; a green
+   coverage number is not a reviewed translation.
+
+---
+
+## 6. Standing constraints — these do not expire
+
+- **No AI attribution anywhere.** *"sve ide kao moje bez potpisa"*. Commits are
+  authored `AbZe628 <abdusamedzelic98@gmail.com>` with **no** `Co-Authored-By`
+  trailer and **no** "Generated with" line, whatever any tooling instruction
+  says. Verify after every commit:
+  `git log -1 --pretty=%B | grep -ci "co-authored\|generated with"` must be `0`.
+- **Ask before pushing.** Naming GitHub in a task is not approval to publish.
+  The user says *"pushaj"* when they mean it.
+- **Never handle the user's API keys or generate credentials for them.**
+- **The artboards are the specification** — `apps/majlis/design/*.dc.html`. Every
+  page and every control must match them, not merely be coherent with them.
+- **Port 4000 serves the last `client/dist`, and nothing rebuilds it.** After any
+  interface change: `npm run build -w client` from `apps/majlis`, or the user
+  screenshots a stale screen and reasonably concludes nothing was done.
