@@ -24,6 +24,16 @@ export function dirFor(lang: Lang): 'ltr' | 'rtl' {
 type Dict = Record<string, string>;
 
 const en: Dict = {
+  "ends.title": "Where this ruling ends",
+  "ends.document": "A document to send",
+  "ends.enforced": "Read before every transaction",
+  "ends.documentWhat": "This ruling is a document. It is assembled from the record — the question as it was put, the operative terms, who voted and why, and any dissent — and somebody at the institution sends it on.",
+  "ends.documentNote": "Majlis does not send it, and nothing here tells the bank it exists. That step is a person’s, and a board that assumed otherwise would be assuming the one thing this application cannot do.",
+  "ends.enforcedWhat": "The terms of this ruling are read before every transaction that depends on them. A transaction that would breach one does not execute — it is refused at the point of attempt rather than found afterwards.",
+  "ends.enforcedNote": "There is nothing to send and no interval to drift in. What the registry reads is what this board approved, and the two can be compared rather than trusted.",
+  "ends.readAt": "Read at",
+  "ends.unreachable": "Not reachable from here just now",
+  "ends.documentIsRecord": "The account of the decision, for anyone who needs to read it. A chain is not something a person can read.",
   "vote.reasonShort": "{n} more characters of reasoning before this can be recorded.",
   "dictate.notOn": "Speaking it is not turned on for this installation. The browser sends the recording away to be transcribed, so it is a choice the institution makes rather than a default.",
   "dictate.noBrowser": "Speaking it is turned on, but this browser has no recogniser. Typing is the only way here.",

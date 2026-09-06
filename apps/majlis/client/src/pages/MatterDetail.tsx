@@ -5,11 +5,9 @@ import { useI18n } from '../lib/i18n.js';
 import { Card, DateText, ErrorText, Loading, Section, Sources, Tag } from '../components/ui.js';
 import { State, toneForStatus } from '../components/kit.js';
 import Deliberation from '../components/Deliberation.js';
-import { oversight } from '../lib/api.js';
 import Evidence from '../components/Evidence.js';
 import Precedent from '../components/Precedent.js';
 import Terms from '../components/Terms.js';
-import { DocumentLink } from '../components/Documents.js';
 import Checklist from '../components/Checklist.js';
 import Screening from '../components/Screening.js';
 import VotePanel from '../components/VotePanel.js';
@@ -17,6 +15,7 @@ import { mayDeliberate, useIdentity } from '../lib/identity.js';
 import Passage from '../components/Passage.js';
 import Carrying from '../components/Carrying.js';
 import Inherited from '../components/Inherited.js';
+import WhereItEnds from '../components/WhereItEnds.js';
 
 /** The statuses a document exists for. Mirrors SETTLED in services/fatwa.ts. */
 const DECIDED = ['in_force', 'timelock', 'rejected', 'lapsed', 'withdrawn'];
@@ -105,12 +104,7 @@ export default function MatterDetail() {
       */}
       <div className="mb-7">
         {DECIDED.includes(matter.status) ? (
-          <DocumentLink
-            emphasis
-            href={oversight.hrefs.fatwa(matter.id)}
-            label={t('doc.fatwa')}
-            note={t(matter.status === 'timelock' ? 'doc.fatwaPending' : 'doc.fatwaNote')}
-          />
+          <WhereItEnds matter={matter} />
         ) : (
           <p className="rounded-card bg-raised/60 px-5 py-4 text-[12.5px] leading-[1.6] text-muted shadow-ring">
             {t('doc.fatwaNotYet')}
