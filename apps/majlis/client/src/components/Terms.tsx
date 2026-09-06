@@ -105,7 +105,7 @@ export default function Terms({ matter, canEdit, onChanged }: Props) {
           )}
         </div>
 
-        {refusal && <p className="text-[12.5px] text-amber-200">{refusal}</p>}
+        {refusal && <p className="text-[12.5px] text-breach">{refusal}</p>}
 
         {mayEdit && (
           <button
@@ -180,7 +180,7 @@ export default function Terms({ matter, canEdit, onChanged }: Props) {
         {t('terms.addRow')}
       </button>
 
-      {refusal && <p className="text-[12.5px] text-amber-200">{refusal}</p>}
+      {refusal && <p className="text-[12.5px] text-breach">{refusal}</p>}
 
       <div className="flex gap-2 border-t border-line pt-3">
         <button

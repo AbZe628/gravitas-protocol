@@ -163,7 +163,7 @@ export default function IncidentDetail() {
           <ul className="space-y-1.5">
             {i.concurrences.map((c, k) => (
               <li key={k}>
-                <span className={c.actual ? 'text-warn' : 'text-emerald-400'}>
+                <span className={c.actual ? 'text-breach' : 'text-settled'}>
                   {c.actual ? t('snc.isBreach') : t('snc.notBreach')}
                 </span>
                 <span className="mx-1.5 opacity-40">·</span>
@@ -336,7 +336,7 @@ export default function IncidentDetail() {
           → {i.purification.destination}
           <br />
           {i.purification.paidAt ? (
-            <span className="text-emerald-400">
+            <span className="text-settled">
               {t('snc.paid')} <DateText iso={i.purification.paidAt} />
             </span>
           ) : (

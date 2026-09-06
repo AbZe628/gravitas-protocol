@@ -149,7 +149,7 @@ export default function RaiseMatter({ boardId }: { boardId: string }) {
       <p className="mb-1.5 text-[11.5px] leading-relaxed text-muted">{t('raise.notDecidedHelp')}</p>
       <textarea value={notDecided} onChange={(e) => setNotDecided(e.target.value)} rows={2} className={field + ' resize-y'} />
 
-      {refusal && <p className="mt-2 text-[12px] leading-relaxed text-amber-300">{refusal}</p>}
+      {refusal && <p className="mt-2 text-[12px] leading-relaxed text-breach">{refusal}</p>}
 
       <div className="mt-3 flex items-center gap-2">
         <button

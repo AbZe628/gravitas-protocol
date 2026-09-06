@@ -91,7 +91,7 @@ function Composer({
         </div>
       )}
 
-      {refusal && <p className="mt-2 text-[12px] leading-relaxed text-amber-300">{refusal}</p>}
+      {refusal && <p className="mt-2 text-[12px] leading-relaxed text-breach">{refusal}</p>}
       <div className="mt-2 flex items-center gap-2">
         <button
           type="button"
@@ -171,15 +171,20 @@ function Entry({
   const [replying, setReplying] = useState(false);
 
   return (
-    <li className={'rounded-lg border p-3.5 ' + (entry.liaisonAnswer ? 'border-line bg-surface/40' : 'border-line')}>
-      <div className="mb-1.5 flex items-center gap-2 text-[12px]">
-        <span className="text-lapis">{entry.scholarId}</span>
+    <li
+      className={
+        'rounded-card px-5 py-4 ' +
+        (entry.liaisonAnswer ? 'bg-raised/60 shadow-ring' : 'bg-raised shadow-card')
+      }
+    >
+      <div className="mb-2.5 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[12px]">
+        <span className="font-semibold text-lapis">{entry.scholarId}</span>
         {entry.liaisonAnswer && <Tag>{t('matter.liaison')}</Tag>}
         <span className="text-muted">
           <DateText iso={entry.at} />
         </span>
       </div>
-      <p className="text-[14px] leading-relaxed">
+      <p className="max-w-[62ch] font-display text-[15.5px] leading-[1.6]">
         <Body entry={entry} />
       </p>
 
@@ -187,7 +192,7 @@ function Entry({
         <button
           type="button"
           onClick={() => setReplying(true)}
-          className="mt-2 text-[12px] text-muted hover:text-paper"
+          className="mt-3 text-[12.5px] text-muted underline decoration-line underline-offset-4 transition-colors hover:text-paper"
         >
           {t('say.reply')}
         </button>
@@ -195,7 +200,7 @@ function Entry({
 
       {replying && (
         <div className="mt-3">
-          <p className="mb-1.5 text-[11px] text-muted">
+          <p className="mb-2 text-[11.5px] text-muted">
             {t('say.replyingTo')} {entry.scholarId}
           </p>
           <Composer
@@ -209,17 +214,17 @@ function Entry({
       )}
 
       {replies.length > 0 && (
-        <ul className="mt-3 space-y-3 border-s border-line ps-3.5">
+        <ul className="mt-4 space-y-4 border-s-2 border-line ps-5">
           {replies.map((reply) => (
             <li key={reply.id}>
-              <div className="mb-1 flex items-center gap-2 text-[12px]">
-                <span className="text-lapis">{reply.scholarId}</span>
+              <div className="mb-2 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[12px]">
+                <span className="font-semibold text-lapis">{reply.scholarId}</span>
                 {reply.liaisonAnswer && <Tag>{t('matter.liaison')}</Tag>}
                 <span className="text-muted">
                   <DateText iso={reply.at} />
                 </span>
               </div>
-              <p className="text-[13.5px] leading-relaxed">{reply.body}</p>
+              <p className="max-w-[62ch] font-display text-[15px] leading-[1.6]">{reply.body}</p>
             </li>
           ))}
         </ul>

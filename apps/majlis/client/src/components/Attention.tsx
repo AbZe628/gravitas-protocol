@@ -87,7 +87,7 @@ export default function Attention() {
                       <span
                         className={
                           item.overdue
-                            ? 'text-[12px] font-medium text-amber-300'
+                            ? 'text-[12px] font-semibold text-breach'
                             : 'text-[12px] text-muted'
                         }
                       >

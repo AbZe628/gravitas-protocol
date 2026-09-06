@@ -191,7 +191,7 @@ export default function Evidence({ matter, scholarId, canAttach, onChanged }: Pr
       )}
 
       {refusal && !adding && (
-        <p className="rounded border border-amber-500/40 bg-amber-500/5 p-2 text-[12.5px] text-amber-200">
+        <p className="rounded-xl bg-[#FCF0EE] px-4 py-2.5 text-[12.5px] leading-[1.55] text-breach shadow-[0_0_0_0.5px_rgba(154,56,48,0.18)]">
           {refusal}
         </p>
       )}
@@ -296,7 +296,7 @@ export default function Evidence({ matter, scholarId, canAttach, onChanged }: Pr
             className={field + ' resize-y leading-relaxed'}
           />
 
-          {refusal && <p className="text-[12.5px] text-amber-200">{refusal}</p>}
+          {refusal && <p className="text-[12.5px] text-breach">{refusal}</p>}
 
           <div className="flex gap-2 pt-1">
             <button

@@ -57,13 +57,13 @@ function Ratio({ ratio }: { ratio: RatioResult }) {
   // third into "outside" would report a failure the figures do not support.
   const tone =
     ratio.withinThreshold === null
-      ? 'border-line text-muted'
+      ? 'shadow-ring text-muted'
       : ratio.withinThreshold
-        ? 'border-emerald-700/50'
-        : 'border-warn/50';
+        ? 'shadow-[0_0_0_0.5px_rgba(44,107,87,0.22)]'
+        : 'shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)]';
 
   return (
-    <li className={'rounded border px-3 py-2.5 ' + tone}>
+    <li className={'rounded-xl bg-raised px-4 py-3 ' + tone}>
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <span className="text-[13px] font-medium">{ratio.label}</span>
         <span className="font-mono text-[13px] tabular-nums">

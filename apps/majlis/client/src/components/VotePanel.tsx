@@ -50,7 +50,7 @@ function useCountdown(iso: string | null): { text: string; elapsed: boolean } | 
 
 function Refusal({ message }: { message: string | null }) {
   if (!message) return null;
-  return <p className="mt-2 text-[12px] leading-relaxed text-amber-300">{message}</p>;
+  return <p className="mt-2 text-[12px] leading-relaxed text-breach">{message}</p>;
 }
 
 export default function VotePanel({ matter, role, scholarId, onChanged }: Props) {
@@ -102,10 +102,10 @@ export default function VotePanel({ matter, role, scholarId, onChanged }: Props)
       onClick={onClick}
       disabled={busy}
       className={
-        'rounded border px-3 py-1.5 text-[12px] disabled:opacity-40 ' +
+        'rounded-xl px-4 py-2 text-[12.5px] disabled:opacity-40 ' +
         (tone === 'warn'
-          ? 'border-amber-500/40 text-amber-200 hover:bg-amber-500/10'
-          : 'border-line hover:bg-surface/60')
+          ? 'bg-raised text-breach shadow-[0_0_0_0.5px_rgba(154,56,48,0.25)] hover:brightness-[0.99]'
+          : 'bg-raised text-sand shadow-ring hover:text-paper')
       }
     >
       {label}
@@ -253,7 +253,7 @@ export default function VotePanel({ matter, role, scholarId, onChanged }: Props)
               type="button"
               disabled={busy || reason.trim().length < MIN_REASON}
               onClick={() => run(() => governance.object(matter.id, reason.trim()))}
-              className="rounded border border-amber-500/40 px-3 py-1.5 text-[12px] text-amber-200 hover:bg-amber-500/10 disabled:opacity-40"
+              className="rounded-xl bg-raised px-4 py-2 text-[12.5px] font-medium text-breach shadow-[0_0_0_0.5px_rgba(154,56,48,0.25)] disabled:opacity-40"
             >
               {t('object.submit')}
             </button>

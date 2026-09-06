@@ -93,7 +93,7 @@ export default function RecordCalculation({ input, wantsHolding = false }: Recor
   // twice by somebody pressing the button again.
   if (done) {
     return (
-      <p className="mt-3 rounded border border-emerald-700/50 px-3 py-2.5 text-[12.5px] leading-relaxed">
+      <p className="mt-3 rounded-xl bg-[#EBF3EF] px-4 py-2.5 text-[12.5px] leading-[1.55] text-settled shadow-[0_0_0_0.5px_rgba(44,107,87,0.18)]">
         {t('noteCalc.done')}
       </p>
     );
