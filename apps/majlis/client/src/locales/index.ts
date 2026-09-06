@@ -24,6 +24,9 @@ export function dirFor(lang: Lang): 'ltr' | 'rtl' {
 type Dict = Record<string, string>;
 
 const en: Dict = {
+  "vote.reasonShort": "{n} more characters of reasoning before this can be recorded.",
+  "dictate.notOn": "Speaking it is not turned on for this installation. The browser sends the recording away to be transcribed, so it is a choice the institution makes rather than a default.",
+  "dictate.noBrowser": "Speaking it is turned on, but this browser has no recogniser. Typing is the only way here.",
   "lang.notReady": "Arabic and Urdu are not finished.",
   "lang.notReadyBody": "This application is complete and this language is not. About four fifths of it is translated; where a phrase has no translation yet you will see the English, laid out so it still reads correctly. Nothing about what the board can do is affected — only the words it is said in.",
   "read.open": "Read the figures from a document",

@@ -82,7 +82,24 @@ export default function Dictate({ onText }: { onText: (text: string) => void }) 
   useEffect(() => () => recognition.current?.stop(), []);
 
   const Recognition = recognitionClass();
-  if (health?.dictation !== 'browser' || !Recognition) return null;
+
+  if (health?.dictation !== 'browser') {
+    return (
+      <p className="mt-2.5 text-[11.5px] leading-[1.55] text-muted">
+        {t('dictate.notOn')}
+      </p>
+    );
+  }
+
+  // Turned on, but this browser has no recogniser. A different absence,
+  // and not one the institution can do anything about.
+  if (!Recognition) {
+    return (
+      <p className="mt-2.5 text-[11.5px] leading-[1.55] text-muted">
+        {t('dictate.noBrowser')}
+      </p>
+    );
+  }
 
   const agreed = () => {
     try {

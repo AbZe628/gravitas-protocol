@@ -219,6 +219,13 @@ export default function VotePanel({ matter, role, scholarId, onChanged }: Props)
 
           <Refusal message={refusal} />
 
+          {/* What is missing, while it is missing. */}
+          {reason.trim().length < MIN_REASON && (
+            <p className="mt-3 text-[12px] text-muted">
+              {t('vote.reasonShort').replace('{n}', String(MIN_REASON - reason.trim().length))}
+            </p>
+          )}
+
           <div className="mt-4">
             <button
               type="button"

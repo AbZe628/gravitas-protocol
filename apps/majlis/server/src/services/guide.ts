@@ -33,6 +33,8 @@
  * properly do instead.
  */
 
+import { classifyLexical, normaliseForMatch } from './assistant.js';
+
 export interface GuideAnswer {
   /** What the question was matched to. Null where nothing matched. */
   topic: string | null;
@@ -91,7 +93,7 @@ export const NOT_A_RULING =
 const TOPICS: readonly Topic[] = [
   {
     id: 'matter',
-    terms: ['matter', 'matters', 'question', 'case', 'proposal'],
+    terms: ['matter', 'matters', 'question', 'case', 'proposal', 'مسألة', 'مسائل', 'قضية', 'معاملہ', 'مسئلہ'],
     answer:
       'A matter is one question put to the board. It holds the question as it was asked, what ' +
       'actually happens, what is deliberately not being decided, what it rests on, the operative ' +
@@ -102,7 +104,7 @@ const TOPICS: readonly Topic[] = [
   },
   {
     id: 'direction',
-    terms: ['direction', 'permit', 'permitting', 'restrict', 'restricting'],
+    terms: ['direction', 'permit', 'permitting', 'restrict', 'restricting', 'اتجاه', 'إباحة', 'تقييد', 'سمت', 'اجازت', 'پابندی'],
     answer:
       'Whether a matter permits something or restricts it, and it is not a label — it decides how ' +
       'the matter is treated. Permitting carries the full quorum and a delay before it takes ' +
@@ -113,7 +115,7 @@ const TOPICS: readonly Topic[] = [
   },
   {
     id: 'passage',
-    terms: ['passage', 'next', 'step', 'steps', 'stage', 'order'],
+    terms: ['passage', 'next', 'step', 'steps', 'stage', 'order', 'مسار', 'خطوة', 'خطوات', 'مرحلة', 'مرحلہ', 'قدم'],
     answer:
       'Where a matter stands and what the next act is. Putting a question into shape happens in ' +
       'whatever order the work happens, so those steps are a set. Deciding waits on itself — ' +
@@ -123,7 +125,7 @@ const TOPICS: readonly Topic[] = [
   },
   {
     id: 'timelock',
-    terms: ['timelock', 'delay', 'objection', 'object'],
+    terms: ['timelock', 'delay', 'objection', 'object', 'مهلة', 'تأجيل', 'اعتراض', 'التوا', 'مہلت'],
     answer:
       'The delay between a permitting vote closing and the ruling taking effect. Any member may ' +
       'object during it. A restriction has no delay: it takes effect at once and is ratified ' +
@@ -132,7 +134,7 @@ const TOPICS: readonly Topic[] = [
   },
   {
     id: 'quorum',
-    terms: ['quorum', 'threshold', 'tally', 'majority'],
+    terms: ['quorum', 'threshold', 'tally', 'majority', 'نصاب', 'أغلبية', 'اکثریت'],
     answer:
       'How many signatures a matter needs, and it differs by direction: the full quorum to ' +
       'permit, a reduced one to restrict. Abstentions never count toward it. Reaching the ' +
@@ -142,7 +144,7 @@ const TOPICS: readonly Topic[] = [
   },
   {
     id: 'vote',
-    terms: ['vote', 'voting', 'position', 'reasoning', 'reason'],
+    terms: ['vote', 'voting', 'position', 'reasoning', 'reason', 'تصويت', 'صوت', 'موقف', 'تعليل', 'ووٹ', 'رائے'],
     answer:
       'A position with your reasoning in your own words, and the reasoning is required. A tally ' +
       'of names without reasons is a show of hands, and a board that cannot say why it decided ' +
@@ -153,7 +155,7 @@ const TOPICS: readonly Topic[] = [
   },
   {
     id: 'terms',
-    terms: ['terms', 'parameters', 'parameter', 'hash', 'operative'],
+    terms: ['terms', 'parameters', 'parameter', 'hash', 'operative', 'شروط', 'بنود', 'بصمة', 'شرائط', 'ضوابط'],
     answer:
       'The operative terms are a key, a value, a unit and what it does — the part a system can ' +
       'carry out and an auditor can test against. They stop moving when the vote opens, and every ' +
@@ -162,7 +164,7 @@ const TOPICS: readonly Topic[] = [
   },
   {
     id: 'carrying',
-    terms: ['carrying', 'enforced', 'enforcement', 'registry', 'checked'],
+    terms: ['carrying', 'enforced', 'enforcement', 'registry', 'checked', 'إنفاذ', 'تنفيذ', 'نفاذ'],
     answer:
       'When the terms get checked. Where nothing is attached they are carried out by whatever the ' +
       'institution already uses and tested when somebody looks — which means a breach can stand ' +
@@ -173,7 +175,7 @@ const TOPICS: readonly Topic[] = [
   },
   {
     id: 'drift',
-    terms: ['drift', 'drifted', 'crossed', 'composition'],
+    terms: ['drift', 'drifted', 'crossed', 'composition', 'انحراف', 'تجاوز', 'تركيبة', 'بہاؤ', 'ترکیب'],
     answer:
       'When the ground moves under a ruling. A pool that was 51% tangible in March is 47% in ' +
       'July because it rebalanced, and nobody did anything. Majlis compares the composition ' +
@@ -184,7 +186,7 @@ const TOPICS: readonly Topic[] = [
   },
   {
     id: 'register',
-    terms: ['register', 'asset', 'assets', 'holding', 'holdings', 'examined'],
+    terms: ['register', 'asset', 'assets', 'holding', 'holdings', 'examined', 'سجل', 'أصول', 'موجودات', 'رجسٹر', 'اثاثہ'],
     answer:
       'Everything this institution holds or offers, and where each of them stands with the board. ' +
       'Its most useful line is usually the count of holdings never put to the board at all.',
@@ -193,7 +195,7 @@ const TOPICS: readonly Topic[] = [
   },
   {
     id: 'inherit',
-    terms: ['inherit', 'inherited', 'precedent', 'before', 'previously', 'last time'],
+    terms: ['inherit', 'inherited', 'precedent', 'before', 'previously', 'last time', 'سابقة', 'سابقا', 'نظیر', 'پہلے'],
     answer:
       'Where this board has ruled on a question of the same contract shape before, its own ' +
       'previous answers are offered on the new one: each condition with the finding and the ' +
@@ -204,7 +206,7 @@ const TOPICS: readonly Topic[] = [
   },
   {
     id: 'checklist',
-    terms: ['checklist', 'condition', 'conditions', 'shape', 'structure', 'library'],
+    terms: ['checklist', 'condition', 'conditions', 'shape', 'structure', 'library', 'هيكل', 'مكتبة', 'قائمة', 'ڈھانچہ', 'کتب'],
     answer:
       'Choosing a contract shape attaches the conditions this board holds such a contract to, and ' +
       'the board answers each in its own words. A board may also rule against a condition it ' +
@@ -215,7 +217,7 @@ const TOPICS: readonly Topic[] = [
   },
   {
     id: 'fatwa',
-    terms: ['fatwa', 'ruling', 'document', 'written', 'export'],
+    terms: ['fatwa', 'ruling', 'document', 'written', 'export', 'فتوى', 'حكم', 'وثيقة', 'فتوی', 'دستاویز'],
     answer:
       'When the board closes the vote and the delay has run, the ruling is assembled: the question ' +
       'put, what occurs, what it does not decide, how it is implemented, the operative terms, and ' +
@@ -226,7 +228,7 @@ const TOPICS: readonly Topic[] = [
   },
   {
     id: 'record',
-    terms: ['record', 'audit', 'history', 'append', 'correction', 'superseded'],
+    terms: ['record', 'audit', 'history', 'append', 'correction', 'superseded', 'تدقيق', 'تصحيح', 'تاريخ', 'ریکارڈ', 'تاریخ'],
     answer:
       'The record is append-only. Nothing is edited and nothing is deleted: a correction is ' +
       'written as a new entry that supersedes the old one, and what stands is worked out by ' +
@@ -252,7 +254,7 @@ const TOPICS: readonly Topic[] = [
   },
   {
     id: 'incident',
-    terms: ['incident', 'breach', 'event', 'thirty', 'rectification', 'purification'],
+    terms: ['incident', 'breach', 'event', 'thirty', 'rectification', 'purification', 'مخالفة', 'حادثة', 'واقعة', 'تطهير', 'واقعہ', 'تطہیر'],
     answer:
       'Something that already happened. The board determines whether it was actual — now, not ' +
       'next quarter — and from that moment thirty days run for a rectification plan. Four of the ' +
@@ -263,7 +265,7 @@ const TOPICS: readonly Topic[] = [
   },
   {
     id: 'assistant',
-    terms: ['assistant', 'ai', 'model', 'chatbot', 'explain'],
+    terms: ['assistant', 'ai', 'model', 'chatbot', 'explain', 'مساعد', 'ذكاء', 'نموذج', 'معاون'],
     answer:
       'The assistant answers questions of mechanism — what a structure does, how a protocol ' +
       'works — and never whether something is permissible. Three gates enforce that in code ' +
@@ -275,7 +277,15 @@ const TOPICS: readonly Topic[] = [
   },
   {
     id: 'start',
-    terms: ['start', 'begin', 'how', 'new', 'raise', 'open', 'first'],
+    /*
+     * Not `how`, and not its Arabic and Urdu equivalents.
+     *
+     * They stand in front of most questions somebody asks an application —
+     * how does voting work, how is drift measured — so owning them made this
+     * topic win almost every time and answer *here is how to begin* to a
+     * question about something else entirely.
+     */
+    terms: ['start', 'begin', 'new', 'raise', 'open', 'first', 'بدء', 'ابدأ', 'جديد', 'شروع'],
     answer:
       'From the first screen, if you may deliberate, choose what kind of decision it is in your ' +
       'own words and write what is being asked. That opens a draft — nothing is decided by ' +
@@ -286,7 +296,23 @@ const TOPICS: readonly Topic[] = [
   },
 ];
 
-const WORDS = /[a-z']+/g;
+/*
+ * Latin words, and runs of Arabic script.
+ *
+ * This was `/[a-z']+/g`, so a question typed in Arabic or Urdu produced an
+ * empty set of words, matched no topic, and got the sentence that says the
+ * guide does not know about it. On a right-to-left screen the guide answered
+ * nothing at all — which is what *the guide does not answer questions* turned
+ * out to mean.
+ *
+ * Arabic and Urdu share the block and are matched the same way: a word is a
+ * run of letters in either, and `normaliseForMatch` has already made the
+ * letters the two scripts share identical.
+ */
+const WORDS = /[a-z']+|[؀-ۿݐ-ݿﭐ-﷿ﹰ-﻿]+/g;
+
+/** Whether a term is written in Arabic script, and so agglutinates. */
+const ARABIC = /[؀-ۿݐ-ݿﭐ-﷿ﹰ-﻿]/;
 
 /**
  * How well a topic answers a question, and where its evidence sits.
@@ -299,21 +325,46 @@ const WORDS = /[a-z']+/g;
  * predict or would want.
  */
 function score(question: string, topic: Topic): { hits: number; at: number } {
-  const lower = question.toLowerCase();
+  /*
+   * Normalised on both sides. Gate 1 of the assistant already matches across
+   * the three scripts this application is read in — tashkeel stripped, alef,
+   * ya, kaf and ha forms unified — and the guide simply never used it, so
+   * ordinary orthographic variation was enough to miss a topic.
+   */
+  const lower = normaliseForMatch(question.toLowerCase());
   const asked = new Set(lower.match(WORDS) ?? []);
 
   let hits = 0;
   let at = Number.MAX_SAFE_INTEGER;
 
   for (const term of topic.terms) {
-    // Whole words only: `vote` should not be found inside `devoted`, and the
-    // terms are short enough that substring matching would be noise.
-    const matched = term.includes(' ') ? lower.includes(term) : asked.has(term);
+    const wanted = normaliseForMatch(term);
+
+    /*
+     * English matches whole words; Arabic and Urdu match inside one.
+     *
+     * `vote` must not be found inside `devoted`, so a Latin term is looked up
+     * in the set of words. But Arabic attaches the definite article and its
+     * prepositions to the word itself — a reader asking about a matter types
+     * `المسألة`, and `مسألة` is not a word in that sentence, it is four fifths
+     * of one. Whole-word matching found nothing at all in either script, which
+     * is what made the guide silent on a right-to-left screen even after it
+     * had the words.
+     */
+    const script = ARABIC.test(wanted) ? 'inside' : 'whole';
+    const matched =
+      script === 'inside' || wanted.includes(' ') ? lower.includes(wanted) : asked.has(wanted);
     if (!matched) continue;
     hits += 1;
 
-    const where = new RegExp(`\\b${term}\\b`).exec(lower)?.index;
-    if (where !== undefined && where < at) at = where;
+    /*
+     * By index rather than by a word boundary. `\b` is defined on ASCII word
+     * characters, so it never fires between two Arabic letters — the tie-break
+     * would have gone on working in English and quietly stopped in the other
+     * two.
+     */
+    const where = lower.indexOf(wanted);
+    if (where >= 0 && where < at) at = where;
   }
 
   return { hits, at };
@@ -329,8 +380,34 @@ const NOTHING_MATCHED =
 export function askTheGuide(question: string): GuideAnswer {
   const asked = question.trim();
 
-  // First, and without exception.
-  if (SEEKS_A_RULING.some((pattern) => pattern.test(asked))) {
+  /*
+   * First, and without exception — and in every language the record is read
+   * in.
+   *
+   * `SEEKS_A_RULING` is English regular expressions, so `هل هذا جائز` and
+   * `کیا یہ جائز ہے` walked straight past it. They then matched no topic and
+   * got *the guide does not know about that*, which is a non-answer rather
+   * than a wrong one — but the refusal is the whole point of this gate, and a
+   * refusal that only fires in English is a guarantee that holds in one third
+   * of the application.
+   *
+   * The assistant's own lexical gate already covers Latin, Arabic and Urdu and
+   * is measured against a corpus. It runs first here for the same reason it
+   * runs first there.
+   */
+  /*
+   * `hard` only, not `soft`.
+   *
+   * The assistant sends a soft match to its semantic classifier rather than
+   * refusing it, because soft patterns are the ones that catch an innocent
+   * question along with a disguised one. Refusing on soft here made
+   * `ما هي المسألة` — *what is a matter* — a refused request for a ruling.
+   *
+   * The guide can afford to be the more permissive of the two: every answer it
+   * gives is fixed prose about this application, written in advance. There is
+   * nothing for a cleverly worded question to extract.
+   */
+  if (classifyLexical(asked) === 'hard' || SEEKS_A_RULING.some((p) => p.test(asked))) {
     return { topic: null, answer: NOT_A_RULING, goTo: null, seeAlso: [], refused: true };
   }
 
