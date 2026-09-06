@@ -349,15 +349,43 @@ Along the way, every one of those was also wearing `warn`, which is gold,
 which is **a clock still running**. Overdue clocks, refusals and breached
 thresholds were all painted the colour for *there is still time*.
 
-#### Pages that still only inherited
+#### Every page is composed
 
-Dashboard (classic), AssetDetail, Assistant, Briefings, Calendar,
-IncidentDetail, Incidents, Meetings, More, Record, Rules, Search, Settings —
-and the panels inside a matter: Passage, Carrying, Inherited, VotePanel,
-Deliberation, Terms, Evidence, Checklist.
+Guided, Register, Library, Calculations, both matter pages, What stands,
+Incidents, Search, Coming, Briefings, the Assistant, Meetings, Settings,
+AssetDetail, IncidentDetail and the classic Dashboard.
 
-Some of these are legitimately one column — Settings, Search, Assistant. That
-is a judgement to make against the artboard for each, not a reason to skip it.
+The same three faults ran through nearly all of them, and they are worth
+knowing because they will come back:
+
+1. **A title that is the board’s own words, set smaller than the pills
+   describing it.** Fifteen pixels of sans under two labels was the house
+   style. Anything the board wrote — a matter’s title, a member’s argument, a
+   condition’s requirement, a briefing’s question — is the serif at reading
+   size.
+2. **A figure kept in a line of small print** between the intro and the list,
+   which is where a number goes to be skipped. It belongs in a column beside
+   the list, at the size a figure is set.
+3. **A control that is the board’s own act, dressed as a quiet outline.** If
+   pressing it changes the record, it is filled and it is lapis.
+
+`Tag` had three tones for a palette with four states, so callers wanting
+*overdue, refused, crossed* reached for `warn` — which is gold, which is a
+clock **still running**. It has `breach` now.
+
+#### The trap that made all of this invisible
+
+`server/src/app.ts` serves `client/dist` and **nothing rebuilds it**. `npm run
+dev` runs Vite on 5173 and the server on 4000 from the last build, and on 6
+September those two were weeks apart: 5173 was light and 4000 was still
+serving the dark interface from before the palette turned over. Every
+screenshot taken through the server port, and every demo, shows the last
+build.
+
+Run `npm run build -w client` after any interface change somebody may look at
+through port 4000, and check the bundle really carries the palette:
+`grep FBF8F1 client/dist/assets/*.css`. `client/dist` is gitignored, so
+nothing in the repository records which build is live.
 
 ### What already exists on screen
 
@@ -406,12 +434,12 @@ the premise, and tests enforce it. SmartRaise is guided-only.
 
 ## 5. What to pick up first, in order
 
-1. **The rest of the pages, against their artboard**, in the order a scholar
-   meets them: Incidents, Search, Meetings, Settings, Calendar, Briefings,
-   AssetDetail, IncidentDetail, Assistant, Dashboard. They have the palette,
-   the sheet, the type scale and the label style; what several still lack is a
-   composition.
-2. **Fix the Anthropic integration**: SDK upgrade, then models, then the
-   thinking block.
-3. **Decide who writes the Arabic and Urdu.** Not a coding task, and it blocks
-   391 strings.
+1. **Fix the Anthropic integration**: SDK upgrade, then models, then the
+   thinking block. It is the only thing in the application that is broken
+   rather than unfinished.
+2. **Decide who writes the Arabic and Urdu.** Not a coding task, and it
+   blocks 391 strings.
+3. **Draw the screens that have no artboard** — Coming, Meetings, Settings,
+   the incident path — and check the built ones against the drawings again
+   with fresh eyes. Every page is composed; whether every page is *right* is
+   a judgement that wants looking at, not another sweep.
