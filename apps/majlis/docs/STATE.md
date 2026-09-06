@@ -1,6 +1,6 @@
 # Where Majlis stands
 
-Last written **6 September 2026, 01:20**. Read this first.
+Last written **6 September 2026**. Read this first.
 
 Everything below is what is *true*, not what is planned. Where something is
 unfinished it says so, and where something is broken it says how it breaks.
@@ -16,7 +16,7 @@ client   19 files    214 tests   passed
 
 `npm test` from `apps/majlis`. CI is green. Nothing is skipped or pending.
 
-**Three commits are local only and have never been pushed:**
+**These commits are local only and have never been pushed:**
 
 ```
 58e9d77  Majlis: an application frame, not a document
@@ -155,12 +155,15 @@ every contract the bank does.
 
 **https://claude.ai/code/artifact/05e2cfc1-89ff-4a56-9e23-6c143ce1d5e1**
 
-Three artboards, direction accepted by the user and then refined once more:
+Six artboards — two rows: the journey on top, the tools underneath.
 
 - `design/Main.dc.html` — 1440×900, arrival: *what needs you*
 - `design/Matter.dc.html` — 1440×980, one matter: the question and the act
 - `design/Phone.dc.html` — 390×844, arrival on a phone
-- `design/canvas.json` — layout and the three notes
+- `design/Calculations.dc.html` — 1440×980, a rule the board wrote, applied
+- `design/Library.dc.html` — 1440×980, what already stands about a shape
+- `design/Register.dc.html` — 1440×980, what stands, and the chain behind it
+- `design/canvas.json` — layout and the six notes
 
 The language is written down in full in **`docs/DESIGN.md`** — palette,
 elevation, the sweep, the type scale, and the list of things that were removed
@@ -173,11 +176,25 @@ The working copies live in two places — `apps/majlis/design/` (committed) and
 runs, and where the 2.5 MB seeded `majlis-interface.html` sits uncommitted).
 Keep them in step.
 
-### Not drawn yet
+### How the three tool screens answer *powerful, but not thrown together*
 
-**Calculations, contract library, register.** The user's phrase for what they
-have to be: *powerful with all the tools, but not thrown together.* They were
-deliberately left undrawn until the palette was confirmed, which it now is.
+One narrow, quiet list and one open thing carrying the shadow — the shape a
+scholar already knows from mail. Never a grid of equal cards, because nothing
+on these screens is equally important.
+
+Each of the three also states, on the screen, what it is **not**:
+
+- **Calculations** quotes the ruling being applied in the board’s own words,
+  shows the arithmetic exactly — numerator, denominator, one division — and
+  then says Majlis did not choose the threshold. Whether the holding is
+  permissible is a ruling, and no ruling has been made.
+- **Contract library** marks three of the eight shapes the bank uses as *never
+  put to this board*, and names the two questions the settled shape leaves
+  open, rather than leaving a silence where an answer looks like it should be.
+- **Register** draws the supersession chain descending — what stands, what it
+  replaced, what that replaced — and labels it *the chain, not the calendar*.
+  Dates are shown but sort nothing. Superseded entries stay readable at 62%
+  rather than hidden, because nothing here is deleted.
 
 ### Not applied yet — this is the big one
 
@@ -226,12 +243,9 @@ the premise, and tests enforce it. SmartRaise is guided-only.
 
 ## 5. What to pick up first, in order
 
-1. **Draw the three remaining screens** on the canvas — calculations, contract
-   library, register — in the language `DESIGN.md` records. The direction is
-   confirmed; this is no longer a risk.
-2. **Bring the application to the canvas**: tokens + tailwind config +
+1. **Bring the application to the canvas**: tokens + tailwind config +
    `kit.tsx`, together, then the content inside `Shell.tsx`.
-3. **Fix the Anthropic integration**: SDK upgrade, then models, then the
+2. **Fix the Anthropic integration**: SDK upgrade, then models, then the
    thinking block.
-4. **Decide who writes the Arabic and Urdu.** Not a coding task, and it blocks
+3. **Decide who writes the Arabic and Urdu.** Not a coding task, and it blocks
    390 strings.

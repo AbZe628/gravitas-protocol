@@ -2,12 +2,18 @@
   "artboards": [
     { "file": "Main.dc.html", "x": 0, "y": 0, "w": 1440, "h": 900, "title": "Arrival — what needs you" },
     { "file": "Matter.dc.html", "x": 1560, "y": 0, "w": 1440, "h": 980, "title": "One matter — the question and the act" },
-    { "file": "Phone.dc.html", "x": 3120, "y": 0, "w": 390, "h": 844, "title": "Arrival on a phone" }
+    { "file": "Phone.dc.html", "x": 3120, "y": 0, "w": 390, "h": 844, "title": "Arrival on a phone" },
+    { "file": "Calculations.dc.html", "x": 0, "y": 1220, "w": 1440, "h": 980, "title": "Calculations — a rule the board wrote, applied" },
+    { "file": "Library.dc.html", "x": 1560, "y": 1220, "w": 1440, "h": 980, "title": "Contract library — what already stands about a shape" },
+    { "file": "Register.dc.html", "x": 3120, "y": 1220, "w": 1440, "h": 980, "title": "Register — what stands, and the chain behind it" }
   ],
   "annotations": [
     { "id": "note-light", "x": 0, "y": -230, "w": 640, "text": "Light is the material.\n\nVellum ground, a white sheet lifted off it by shadow rather than fenced by a border: hairlines are half a pixel, elevation is a stack of three soft shadows, and surfaces beside the sheet are translucent and blurred. Colour still carries meaning and nothing else — lapis is the board's own acts, gold is the mark and what is running out, green is what holds, madder is overdue or refused." },
     { "id": "note-geometry", "x": 1560, "y": -230, "w": 640, "text": "Zaha, not ornament.\n\nOne continuous curve crosses each screen — the pointed arch opened out until it is a sweep — carrying light from one corner and never a line the eye has to read. The rule at the edge of a card tapers the way a nib lifts. The eight-point khatam appears once, as the board's mark. Everything else was removed: no pattern fills, no tinted panels, no borders that could be a shadow instead." },
-    { "id": "note-phone", "x": 3120, "y": -230, "w": 400, "text": "The phone is not a small desktop.\n\nOne card, thumb-reachable, a 52px primary control, four tabs on a blurred bar above the home indicator. A board member reads this between two other things." }
+    { "id": "note-phone", "x": 3120, "y": -230, "w": 400, "text": "The phone is not a small desktop.\n\nOne card, thumb-reachable, a 52px primary control, four tabs on a blurred bar above the home indicator. A board member reads this between two other things." },
+    { "id": "note-tools", "x": 0, "y": 990, "w": 640, "text": "The tools, without being thrown together.\n\nEach of these three is one list and one open thing — the pattern a scholar already knows from mail. Nothing is a grid of equal cards, because nothing here is equally important. The list is narrow and quiet; the open thing carries the shadow." },
+    { "id": "note-computes", "x": 1560, "y": 990, "w": 640, "text": "Every screen says what it is not.\n\nCalculations quote the ruling being applied and then say Majlis did not choose the threshold. The library names what has never been put to this board rather than leaving a silence. The register says what nobody can do here. A gap is stated in place — that is what makes the rest of it trustworthy." },
+    { "id": "note-chain", "x": 3120, "y": 990, "w": 640, "text": "The chain is drawn, not implied.\n\nThe register descends through supersession — what stands, then what it replaced, then what that replaced — and says in the label that this is the chain rather than the calendar. Dates are shown but never sort anything. Superseded entries stay readable at 62% rather than being hidden." }
   ],
   "launch": { "view": "canvas" }
 }
