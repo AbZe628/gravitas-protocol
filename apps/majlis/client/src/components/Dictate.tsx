@@ -155,7 +155,7 @@ export default function Dictate({ onText }: { onText: (text: string) => void }) 
       )}
 
       {refusal && (
-        <p className="mt-1.5 text-[11.5px] leading-relaxed text-warn">{refusal}</p>
+        <p className="mt-1.5 text-[11.5px] leading-relaxed text-breach">{refusal}</p>
       )}
 
       {/*

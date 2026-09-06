@@ -103,7 +103,7 @@ export default function AssetDetail() {
       <p className="mb-5 text-[13px] leading-relaxed text-muted">{data.note}</p>
 
       {refusal && (
-        <div className="mb-5 rounded-card shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)] bg-[#FCF0EE]] px-4 py-3 text-[13px] leading-relaxed text-breach">
+        <div className="mb-5 rounded-card shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)] bg-[#FCF0EE] px-4 py-3 text-[13px] leading-relaxed text-breach">
           {refusal}
         </div>
       )}
@@ -190,7 +190,7 @@ export default function AssetDetail() {
             <p
               className={
                 'text-[12px] leading-relaxed ' +
-                (data.composition.incomplete ? 'text-warn' : 'text-muted')
+                (data.composition.incomplete ? 'text-breach' : 'text-muted')
               }
             >
               {data.composition.note}

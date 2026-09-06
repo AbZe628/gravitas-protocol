@@ -111,7 +111,7 @@ function Candidate({
       </p>
 
       {!candidate.quoteVerified && (
-        <p className="mt-1.5 text-[11.5px] leading-relaxed text-warn">{t('read.unverified')}</p>
+        <p className="mt-1.5 text-[11.5px] leading-relaxed text-breach">{t('read.unverified')}</p>
       )}
 
       {taken ? (

@@ -266,7 +266,7 @@ export function Note({ children }: { children: string }) {
  */
 export function Refusal({ children }: { children: string }) {
   return (
-    <p className="mb-3 rounded-xl shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)] bg-[#FCF0EE]] px-3 py-2.5 text-[12.5px] leading-relaxed text-breach">
+    <p className="mb-3 rounded-xl shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)] bg-[#FCF0EE] px-3 py-2.5 text-[12.5px] leading-relaxed text-breach">
       {children}
     </p>
   );

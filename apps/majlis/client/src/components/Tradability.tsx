@@ -194,7 +194,7 @@ export default function Tradability() {
         <p
           className={
             'mt-2.5 font-mono text-[12px] tabular-nums ' +
-            (total === WHOLE ? 'text-muted' : 'text-warn')
+            (total === WHOLE ? 'text-muted' : 'text-breach')
           }
         >
           {pct(total)}%

@@ -369,7 +369,7 @@ export default function Meetings() {
                 <span className="text-muted">{t('meet.lastHeld')} </span>
                 <DateText iso={data.cadence.lastHeldAt} />
               </span>
-              <span className={data.cadence.overdue ? 'text-warn' : ''}>
+              <span className={data.cadence.overdue ? 'text-breach' : ''}>
                 <span className="text-muted">{t('meet.dueBy')} </span>
                 <DateText iso={data.cadence.dueBy} />
               </span>

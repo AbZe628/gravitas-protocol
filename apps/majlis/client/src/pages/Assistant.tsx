@@ -30,7 +30,7 @@ export default function Assistant() {
     <div>
       <h1 className="mb-2 font-display font-normal leading-[1.12] tracking-[-0.024em] text-[30px] sm:text-[34px]">{t('asst.title')}</h1>
 
-      <div className="mb-6 rounded-card shadow-[0_0_0_0.5px_rgba(176,132,48,0.24)] bg-[#FBF4E4]] px-4 py-3 text-[13px] leading-relaxed text-sand">
+      <div className="mb-6 rounded-card shadow-[0_0_0_0.5px_rgba(176,132,48,0.24)] bg-[#FBF4E4] px-4 py-3 text-[13px] leading-relaxed text-sand">
         {t('asst.limits')}
       </div>
 
@@ -58,7 +58,7 @@ export default function Assistant() {
         ))}
       </ul>
 
-      {error && <div className="mb-4 text-[13px] text-warn">{t('asst.error')}</div>}
+      {error && <div className="mb-4 text-[13px] text-breach">{t('asst.error')}</div>}
 
       <div className="sticky bottom-16 md:bottom-4">
         <div className="flex gap-2 rounded-card shadow-ring bg-raised p-2">

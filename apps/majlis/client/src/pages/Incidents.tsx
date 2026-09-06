@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { oversight, type Incident, type IncidentList } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
-import { Card, DateText, ErrorText, Loading, Tag } from '../components/ui.js';
+import { DateText, ErrorText, Loading, Tag } from '../components/ui.js';
 import { mayDeliberate, useIdentity } from '../lib/identity.js';
 
 /**
@@ -47,7 +47,7 @@ export function ClockLine({ incident }: { incident: Incident }) {
 
   const days = Math.round(Math.abs(clock.daysRemaining));
   return (
-    <span className={clock.overdue ? 'text-[12px] font-medium text-warn' : 'text-[12px] text-muted'}>
+    <span className={clock.overdue ? 'text-[12px] font-medium text-breach' : 'text-[12px] text-muted'}>
       {clock.overdue
         ? `${t('snc.overdueBy')} ${days} ${t('attention.days')}`
         : `${days} ${t('snc.daysLeftOf30')}`}
@@ -95,21 +95,7 @@ export default function Incidents() {
   return (
     <div>
       <h1 className="mb-1 font-display font-normal leading-[1.12] tracking-[-0.024em] text-[30px] sm:text-[34px]">{t('snc.title')}</h1>
-      <p className="mb-5 text-[13px] leading-relaxed text-muted">{t('snc.intro')}</p>
-
-      {incidents.length > 0 && (
-        <div className="mb-5 flex flex-wrap gap-x-5 gap-y-1 text-[13px]">
-          <span>
-            <span className="text-muted">{t('snc.awaiting')} </span>
-            <span className="font-medium tabular-nums">{data.awaitingDetermination}</span>
-          </span>
-          {data.overdue > 0 && (
-            <span className="text-warn">
-              {data.overdue} {t('snc.overdueCount')}
-            </span>
-          )}
-        </div>
-      )}
+      <p className="mb-8 max-w-[62ch] text-[13.5px] leading-[1.65] text-muted">{t('snc.intro')}</p>
 
       {/*
         Open to anyone on the board, not only to the institution's own people. A
@@ -119,7 +105,7 @@ export default function Incidents() {
       {mayDeliberate(identity?.role) && (
         <div className="mb-6">
           {open ? (
-            <form onSubmit={report} className="rounded-card shadow-ring bg-raised p-4">
+            <form onSubmit={report} className="rounded-sheet bg-raised px-6 py-5 shadow-card">
               <label className="mb-1 block text-[12px] text-muted">{t('snc.reference')}</label>
               <input
                 value={form.reference}
@@ -145,7 +131,7 @@ export default function Incidents() {
               />
               <p className="mb-3 text-[11px] leading-relaxed text-muted">{t('snc.accountHint')}</p>
 
-              {error && <p className="mb-3 text-[13px] text-warn">{error}</p>}
+              {error && <p className="mb-3 text-[13px] text-breach">{error}</p>}
 
               <div className="flex gap-2">
                 <button type="submit" className="rounded-xl bg-raised shadow-ring px-3 py-1.5 text-[13px] text-lapis font-medium">
@@ -163,7 +149,7 @@ export default function Incidents() {
           ) : (
             <button
               onClick={() => setOpen(true)}
-              className="rounded-xl shadow-ring px-3 py-2 text-[13px] text-muted hover:text-paper"
+              className="rounded-xl bg-lapis px-5 py-2.5 text-[13px] font-semibold text-white shadow-act transition-all hover:bg-lapissoft"
             >
               {t('snc.report')}
             </button>
@@ -171,20 +157,35 @@ export default function Incidents() {
         </div>
       )}
 
+      <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
+        <div className="min-w-0 flex-1">
       {incidents.length === 0 ? (
         <p className="text-[14px] text-muted">{t('snc.none')}</p>
       ) : (
-        <ul className="space-y-3">
+        <ul className="space-y-2">
           {incidents.map((i) => (
             <li key={i.id}>
-              <Link to={`/incidents/${i.id}`} className="block">
-                <Card accent={Boolean(i.clock?.overdue)}>
-                  <div className="mb-2 flex flex-wrap items-center gap-2">
+              <Link
+                to={`/incidents/${i.id}`}
+                className={
+                  'block rounded-sheet px-6 py-5 transition-all hover:-translate-y-px hover:shadow-card ' +
+                  (i.clock?.overdue
+                    ? 'bg-raised shadow-[0_0_0_0.5px_rgba(154,56,48,0.2),0_1px_2px_rgba(25,23,19,0.045),0_12px_24px_-14px_rgba(25,23,19,0.16)]'
+                    : 'bg-raised/75 shadow-ring')
+                }
+              >
+                <div className="flex flex-col gap-2.5 sm:flex-row sm:items-start sm:justify-between sm:gap-5">
+                  <div className="min-w-0 sm:order-first">
+                    <div className="font-display text-[19px] leading-snug tracking-[-0.014em]">
+                      {i.title}
+                    </div>
+                  </div>
+                  <div className="order-first flex shrink-0 flex-wrap items-center gap-2.5 sm:order-none">
                     <Tag tone={stageTone(i)}>{t(`snc.stage.${i.stage}`)}</Tag>
                     <ClockLine incident={i} />
                   </div>
-                  <div className="text-[15px] font-medium leading-snug">{i.title}</div>
-                  <div className="mt-2 text-[12px] text-muted">
+                </div>
+                  <div className="mt-2.5 text-[12px] text-muted">
                     <span className="font-mono">{i.reference}</span>
                     <span className="mx-1.5 opacity-40">·</span>
                     {t('snc.reported')} <DateText iso={i.reportedAt} />
@@ -197,12 +198,38 @@ export default function Incidents() {
                       </>
                     )}
                   </div>
-                </Card>
               </Link>
             </li>
           ))}
         </ul>
       )}
+        </div>
+
+        {/*
+          The two figures a board acts on. Waiting on it, and past the thirty
+          days that run from finding an event actual — which is the only
+          deadline in this application the board does not set for itself.
+        */}
+        {incidents.length > 0 && (
+          <aside className="w-full shrink-0 space-y-4 lg:w-[306px]">
+            <div className="rounded-sheet bg-raised/60 px-6 py-5 shadow-ring">
+              <div className="font-display text-[40px] leading-[0.92] tabular-nums tracking-[-0.028em] text-paper">
+                {data.awaitingDetermination}
+              </div>
+              <p className="mt-3.5 text-[13px] leading-[1.6] text-sand">{t('snc.awaiting')}</p>
+            </div>
+
+            {data.overdue > 0 && (
+              <div className="rounded-sheet bg-[#FCF0EE] px-6 py-5 shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)]">
+                <div className="font-display text-[40px] leading-[0.92] tabular-nums tracking-[-0.028em] text-breach">
+                  {data.overdue}
+                </div>
+                <p className="mt-3.5 text-[13px] leading-[1.6] text-breach">{t('snc.overdueCount')}</p>
+              </div>
+            )}
+          </aside>
+        )}
+      </div>
     </div>
   );
 }

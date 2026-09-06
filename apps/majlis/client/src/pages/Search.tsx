@@ -135,13 +135,16 @@ export default function Search() {
 
       {result && (
         <>
-          <p className="mb-3 text-[12.5px] text-muted tabular-nums">
-            {result.count} {t('search.count')}
-          </p>
+          <div className="mb-5 flex items-baseline gap-2.5">
+            <span className="font-display text-[28px] leading-none tabular-nums tracking-[-0.024em]">
+              {result.count}
+            </span>
+            <span className="text-[13px] text-muted">{t('search.count')}</span>
+          </div>
           {result.hits.length === 0 ? (
             <p className="text-[13px] text-muted">{t('search.none')}</p>
           ) : (
-            <ul className="space-y-3">
+            <ul className="space-y-2.5">
               {result.hits.map((h) => (
                 <Hit key={h.matterId} hit={h} />
               ))}
@@ -156,9 +159,9 @@ export default function Search() {
 function Hit({ hit }: { hit: SearchHit }) {
   const { t } = useI18n();
   return (
-    <li className="rounded-card shadow-ring p-3.5">
-      <div className="mb-1.5 flex flex-wrap items-center gap-2 text-[11.5px]">
-        <Tag tone={hit.direction === 'restrict' ? 'warn' : 'gold'}>
+    <li className="rounded-sheet bg-raised/75 px-6 py-5 shadow-ring transition-all hover:shadow-card">
+      <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-2 text-[11.5px]">
+        <Tag tone={hit.direction === 'restrict' ? 'warn' : 'ok'}>
           {t(`matter.direction.${hit.direction}`)}
         </Tag>
         <Tag>{t(`matter.status.${hit.status}`)}</Tag>
@@ -167,17 +170,25 @@ function Hit({ hit }: { hit: SearchHit }) {
         </span>
       </div>
 
-      <Link to={`/matters/${hit.matterId}`} className="text-[15px] font-medium leading-snug text-paper hover:text-lapis">
+      <Link
+        to={`/matters/${hit.matterId}`}
+        className="block max-w-[46ch] font-display text-[20px] leading-snug tracking-[-0.014em] text-paper transition-colors hover:text-lapis"
+      >
         {hit.title}
       </Link>
 
       {hit.matches.length > 0 && (
-        <ul className="mt-2.5 space-y-1.5 border-t border-line pt-2.5">
+        <ul className="mt-4 space-y-3.5 border-t border-line pt-4">
           {hit.matches.map((m, i) => (
-            <li key={i} className="text-[12.5px] leading-relaxed">
-              <span className="text-lapis">{t(`search.field.${m.field}`)}</span>
-              {m.by && <span className="text-muted"> · {m.by}</span>}
-              <div className="text-muted">{m.snippet}</div>
+            <li key={i}>
+              <div className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+                {t(`search.field.${m.field}`)}
+                {m.by && <span className="ms-2 normal-case tracking-normal">{m.by}</span>}
+              </div>
+              {/* What matched, in the face the board wrote it in. */}
+              <p className="max-w-[62ch] border-s-2 border-gold/50 ps-4 font-display text-[15px] leading-[1.55] text-sand">
+                {m.snippet}
+              </p>
             </li>
           ))}
         </ul>

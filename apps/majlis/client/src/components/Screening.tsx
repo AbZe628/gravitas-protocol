@@ -188,7 +188,7 @@ export default function Screening() {
           />
         </label>
 
-        {error && <p className="mb-3 text-[13px] leading-relaxed text-warn">{error}</p>}
+        {error && <p className="mb-3 text-[13px] leading-relaxed text-breach">{error}</p>}
 
         <div className="flex gap-2">
           <button

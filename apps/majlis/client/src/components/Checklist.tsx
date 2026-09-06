@@ -165,7 +165,7 @@ function Condition({
                 className="mb-2 h-20 w-full rounded-xl shadow-ring bg-raised px-3 py-2 text-[13.5px]"
               />
 
-              {refusal && <p className="mb-2 text-[12.5px] leading-relaxed text-warn">{refusal}</p>}
+              {refusal && <p className="mb-2 text-[12.5px] leading-relaxed text-breach">{refusal}</p>}
 
               <div className="flex gap-2">
                 <button

@@ -224,7 +224,7 @@ export default function MatterAction() {
 
       {step === 'done' && (
         <>
-          <p className="mb-4 rounded-card shadow-[0_0_0_0.5px_rgba(176,132,48,0.24)] bg-[#FBF4E4]] px-4 py-3.5 text-[13.5px] leading-relaxed">
+          <p className="mb-4 rounded-card shadow-[0_0_0_0.5px_rgba(176,132,48,0.24)] bg-[#FBF4E4] px-4 py-3.5 text-[13.5px] leading-relaxed">
             {t('action.recorded')}
           </p>
 

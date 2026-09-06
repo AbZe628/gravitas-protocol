@@ -37,7 +37,7 @@ function Row({ drift }: { drift: Drift }) {
   return (
     <li>
       <Link to={`/register/${drift.assetId}`} className="block">
-        <div className="rounded-card shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)] bg-[#FCF0EE]] px-4 py-3 transition-colors">
+        <div className="rounded-card shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)] bg-[#FCF0EE] px-4 py-3 transition-colors">
           <div className="mb-1.5 flex flex-wrap items-center gap-2">
             <Tag tone="warn">{t(`drift.${drift.term.bound}`)}</Tag>
             {/*
@@ -45,7 +45,7 @@ function Row({ drift }: { drift: Drift }) {
               one, because one would be an assertion.
             */}
             <span className="font-mono text-[12.5px] tabular-nums">
-              <span className="text-warn">{drift.observed.percent}%</span>
+              <span className="text-breach">{drift.observed.percent}%</span>
               <span className="mx-1.5 text-muted">·</span>
               <span className="text-muted">
                 {t('drift.against')} {(Number(drift.term.value) / 100).toFixed(2)}%
@@ -161,8 +161,8 @@ export function DriftForAsset({ assetId }: { assetId: string }) {
   if (!drifting || drifting.length === 0) return null;
 
   return (
-    <div className="mb-6 rounded-card shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)] bg-[#FCF0EE]] px-4 py-3.5">
-      <div className="mb-2 text-[13px] font-semibold text-warn">{t('drift.onThisHolding')}</div>
+    <div className="mb-6 rounded-card shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)] bg-[#FCF0EE] px-4 py-3.5">
+      <div className="mb-2 text-[13px] font-semibold text-breach">{t('drift.onThisHolding')}</div>
       <ul className="space-y-2.5">
         {drifting.map((d) => (
           <li key={d.term.key} className="text-[12.5px] leading-relaxed">

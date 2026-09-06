@@ -62,14 +62,14 @@ export default function Settings() {
         it untrue in a way the page cannot otherwise show.
       */}
       {mismatches.length > 0 && (
-        <div className="mb-7 rounded-card shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)] bg-[#FCF0EE]] px-4 py-3.5">
-          <div className="mb-2 text-[13px] font-semibold text-warn">
+        <div className="mb-7 rounded-card shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)] bg-[#FCF0EE] px-4 py-3.5">
+          <div className="mb-2 text-[13px] font-semibold text-breach">
             {mismatches.length === 1 ? t('set.oneMismatch') : `${mismatches.length} ${t('set.mismatches')}`}
           </div>
           <ul className="space-y-2.5">
             {mismatches.map((m, i) => (
               <li key={i} className="text-[12.5px] leading-relaxed">
-                <span className="font-mono text-[11.5px] text-warn">{m.scholarId}</span>
+                <span className="font-mono text-[11.5px] text-breach">{m.scholarId}</span>
                 <p className="mt-0.5 text-muted">{m.consequence}</p>
               </li>
             ))}

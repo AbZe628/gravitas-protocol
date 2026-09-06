@@ -238,7 +238,7 @@ export default function IncidentDetail() {
           ))}
         </ol>
       ) : i.plans.length > 0 ? (
-        <span className="text-warn">
+        <span className="text-breach">
           {t('snc.planReturned')} {i.plans[i.plans.length - 1].returnedReason}
         </span>
       ) : (
@@ -345,7 +345,7 @@ export default function IncidentDetail() {
               {t('snc.paid')} <DateText iso={i.purification.paidAt} />
             </span>
           ) : (
-            <span className="text-warn">{t('snc.outstanding')}</span>
+            <span className="text-breach">{t('snc.outstanding')}</span>
           )}
         </>
       ) : (
@@ -413,7 +413,7 @@ export default function IncidentDetail() {
       <p className="mb-6 text-[15px] leading-relaxed">{i.report}</p>
 
       {refusal && (
-        <div className="mb-5 rounded-card shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)] bg-[#FCF0EE]] px-4 py-3 text-[13px] leading-relaxed text-breach">
+        <div className="mb-5 rounded-card shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)] bg-[#FCF0EE] px-4 py-3 text-[13px] leading-relaxed text-breach">
           {refusal}
         </div>
       )}
