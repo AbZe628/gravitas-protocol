@@ -224,7 +224,15 @@ describe('where the vote stands', () => {
     });
     renderMatter();
 
-    expect(await screen.findByText('2 / 3')).toBeInTheDocument();
+    /*
+     * The count and the threshold are two elements now, not the string
+     * `2 / 3`. A fraction set in a row of small print is something a reader
+     * parses; the artboard makes the count the largest thing in the column
+     * and says what it is counting towards beside it. Same fact, and this
+     * still holds all three parts of it.
+     */
+    expect(await screen.findByText('2')).toBeInTheDocument();
+    expect(screen.getByText('of 3')).toBeInTheDocument();
     expect(screen.getByText('Threshold not met')).toBeInTheDocument();
     expect(screen.getByText(/member-c, member-d/)).toBeInTheDocument();
   });

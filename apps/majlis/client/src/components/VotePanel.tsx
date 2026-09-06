@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Refused, governance, type Matter, type Tally } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import Dictate from './Dictate.js';
-import { Card, Tag } from './ui.js';
+import { Card } from './ui.js';
 
 /**
  * Where the vote stands, and what this member can still do about it.
@@ -115,24 +115,51 @@ export default function VotePanel({ matter, role, scholarId, onChanged }: Props)
   return (
     <div className="space-y-4">
       {showsTally && tally && (
-        <Card>
-          <div className="flex flex-wrap items-baseline gap-3 text-[14px]">
-            <span className="text-[19px] font-semibold tabular-nums">
-              {tally.for} / {tally.required}
+        <div className="rounded-sheet bg-raised px-6 py-5 shadow-card">
+          <div className="mb-4 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+            <span
+              className={
+                'font-display text-[44px] leading-[0.9] tabular-nums tracking-[-0.03em] ' +
+                (tally.met ? 'text-settled' : 'text-paper')
+              }
+            >
+              {tally.for}
             </span>
-            <Tag tone={tally.met ? 'gold' : undefined}>
+            <span className="font-display text-[25px] leading-none tracking-[-0.02em] text-muted">
+              {t('vote.ofRequired')} {tally.required}
+            </span>
+            <span className="text-[12.5px] text-muted">
               {t(tally.met ? 'vote.met' : 'vote.notMet')}
-            </Tag>
-            <span className="text-[12px] text-muted tabular-nums">
-              {t('vote.against')} {tally.against} · {t('vote.abstain')} {tally.abstain}
             </span>
           </div>
+
+          {/* The same fact as a shape: one segment per signature needed. */}
+          <div className="flex gap-1.5" aria-hidden="true">
+            {Array.from({ length: Math.max(tally.required, tally.for) }, (_, i) => (
+              <span
+                key={i}
+                className={
+                  'h-[5px] flex-1 rounded-full ' + (i < tally.for ? 'bg-settled' : 'bg-line')
+                }
+              />
+            ))}
+          </div>
+
+          <div className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-[12.5px] text-muted">
+            <span className="tabular-nums">
+              {t('vote.against')} {tally.against}
+            </span>
+            <span className="tabular-nums">
+              {t('vote.abstain')} {tally.abstain}
+            </span>
+          </div>
+
           {tally.outstanding.length > 0 && (
-            <p className="mt-2 text-[12px] text-muted">
+            <p className="mt-3 border-t border-line pt-3 text-[12.5px] leading-[1.55] text-muted">
               {t('vote.outstanding')}: {tally.outstanding.join(', ')}
             </p>
           )}
-        </Card>
+        </div>
       )}
 
       {matter.status === 'timelock' && countdown && (
@@ -152,15 +179,18 @@ export default function VotePanel({ matter, role, scholarId, onChanged }: Props)
       {/* Casting a position */}
       {matter.status === 'voting' && signatory && !alreadyVoted && (
         <Card>
-          <div className="mb-2 flex flex-wrap gap-2">
+          <div className="mb-4 grid grid-cols-3 gap-2">
             {(['for', 'against', 'abstain'] as const).map((p) => (
               <button
                 key={p}
                 type="button"
+                aria-pressed={position === p}
                 onClick={() => setPosition(p)}
                 className={
-                  'rounded border px-3 py-1.5 text-[12px] ' +
-                  (position === p ? 'border-lapis text-lapis' : 'border-line hover:bg-surface/60')
+                  'h-12 rounded-xl text-[13px] transition-all ' +
+                  (position === p
+                    ? 'bg-[#EBF3EF] font-bold text-[#235A49] shadow-[0_0_0_1.5px_#2C6B57]'
+                    : 'bg-raised text-sand shadow-ring hover:text-paper')
                 }
               >
                 {t(`vote.${p}`)}
@@ -168,14 +198,14 @@ export default function VotePanel({ matter, role, scholarId, onChanged }: Props)
             ))}
           </div>
 
-          <label className="mb-1 block text-[12px] text-muted">{t('vote.reason')}</label>
+          <label className="mb-2 block text-[12.5px] text-muted">{t('vote.reason')}</label>
           <textarea
             value={reason}
             onChange={(e) => setReason(e.target.value)}
-            rows={3}
-            className="w-full resize-y rounded-xl shadow-ring bg-raised p-2 text-[14px] leading-relaxed outline-none"
+            rows={4}
+            className="w-full resize-y rounded-card bg-raised px-4 py-3 font-display text-[15.5px] leading-[1.55] shadow-ring outline-none focus:shadow-[0_0_0_1.5px_rgba(22,68,112,0.35)]"
           />
-          <p className="mt-1.5 text-[11.5px] leading-relaxed text-muted">{t('vote.reasonHelp')}</p>
+          <p className="mt-2 text-[11.5px] leading-[1.55] text-muted">{t('vote.reasonHelp')}</p>
 
           {/*
             Speaking it rather than typing it. The words stay the member's own —
@@ -189,12 +219,12 @@ export default function VotePanel({ matter, role, scholarId, onChanged }: Props)
 
           <Refusal message={refusal} />
 
-          <div className="mt-2">
+          <div className="mt-4">
             <button
               type="button"
               disabled={busy || reason.trim().length < MIN_REASON}
               onClick={() => run(() => governance.vote(matter.id, position, reason.trim()))}
-              className="rounded-xl shadow-ring px-3 py-1.5 text-[12px] hover:bg-raised disabled:opacity-40"
+              className="h-12 w-full rounded-xl bg-gradient-to-br from-lapissoft to-[#143E67] text-[14px] font-bold text-white shadow-act transition-all hover:brightness-110 active:scale-[0.99] disabled:opacity-40"
             >
               {t('vote.submit')}
             </button>

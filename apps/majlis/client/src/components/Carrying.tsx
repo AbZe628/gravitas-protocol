@@ -65,8 +65,8 @@ export default function Carrying({ matterId }: { matterId: string }) {
   if (!carrying) return null;
 
   return (
-    <div className="mb-6 rounded-card shadow-ring bg-raised px-4 py-3.5">
-      <div className="mb-2 flex flex-wrap items-baseline gap-x-2">
+    <div className="mb-6 rounded-sheet bg-raised/75 px-6 py-5 shadow-ring">
+      <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-2">
         <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted">{t('carry.title')}</span>
         {/*
           The distinction, as a badge, because it is the one thing on this panel
@@ -85,34 +85,36 @@ export default function Carrying({ matterId }: { matterId: string }) {
       </div>
 
       {/* The sentence itself, at reading size rather than as a caption. */}
-      <p className="max-w-prose text-[13.5px] leading-relaxed">{carrying.whenChecked}</p>
+      <p className="max-w-[62ch] text-[13.5px] leading-[1.68] text-sand">{carrying.whenChecked}</p>
 
-      <p className="mt-2.5 max-w-prose border-s-2 border-line ps-3 text-[12.5px] leading-relaxed text-muted">
+      <p className="mt-3 max-w-[62ch] border-s-2 border-line ps-4 text-[12.5px] leading-[1.6] text-muted">
         {carrying.drift}
       </p>
 
       {carrying.terms.length > 0 && (
         <div className="mt-4">
-          <div className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+          <div className="mb-2.5 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
             {t('carry.terms')}
           </div>
-          <ul className="space-y-2">
+          <ul className="space-y-2.5">
             {carrying.terms.map((term) => (
-              <li key={term.key} className="rounded-xl shadow-ring px-3 py-2">
-                <div className="flex flex-wrap items-baseline justify-between gap-2">
-                  <span className="font-mono text-[12.5px]">{term.key}</span>
-                  <span className="font-mono text-[13px] tabular-nums text-lapis">
-                    {term.value}
-                    {term.unit && <span className="ms-1 text-[11.5px] text-muted">{term.unit}</span>}
-                  </span>
+              <li key={term.key} className="flex items-center justify-between gap-6 rounded-xl bg-ink px-5 py-3.5">
+                <div className="min-w-0">
+                  <div className="font-mono text-[12.5px]">{term.key}</div>
+                  {/* The board's own words. Never rewritten on the way through. */}
+                  <p className="mt-1.5 text-[12.5px] leading-[1.5] text-muted">{term.meaning}</p>
+                  {term.onBreach && (
+                    <p className="mt-1.5 text-[12px] leading-[1.5] text-gold">
+                      {t('carry.onBreach')} {term.onBreach}
+                    </p>
+                  )}
                 </div>
-                {/* The board's own words. Never rewritten on the way through. */}
-                <p className="mt-1 text-[12px] leading-relaxed text-muted">{term.meaning}</p>
-                {term.onBreach && (
-                  <p className="mt-1.5 text-[12px] leading-relaxed text-warn">
-                    {t('carry.onBreach')} {term.onBreach}
-                  </p>
-                )}
+                <div className="shrink-0 text-end">
+                  <div className="font-mono text-[18px] font-medium tabular-nums tracking-[-0.01em] text-lapis">
+                    {term.value}
+                  </div>
+                  {term.unit && <div className="mt-0.5 text-[11px] text-muted">{term.unit}</div>}
+                </div>
               </li>
             ))}
           </ul>
@@ -124,14 +126,14 @@ export default function Carrying({ matterId }: { matterId: string }) {
         mechanism and left out its own blind spots would be the more impressive
         and the less honest of the two.
       */}
-      <div className="mt-4 border-t border-line pt-3">
+      <div className="mt-5 border-t border-line pt-4">
         <div className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
           {t('carry.limits')}
         </div>
         <ul className="space-y-1.5">
           {carrying.limits.map((limit, i) => (
-            <li key={i} className="flex gap-2 text-[12px] leading-relaxed text-muted">
-              <span className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-muted" />
+            <li key={i} className="flex items-baseline gap-3 text-[12.5px] leading-[1.55] text-muted">
+              <span className="relative top-[-5px] h-px w-3.5 shrink-0 bg-line" />
               <span>{limit}</span>
             </li>
           ))}

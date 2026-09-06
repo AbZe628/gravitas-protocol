@@ -758,6 +758,7 @@ const en: Dict = {
   'vote.submit': 'Record my position',
   'vote.recorded': 'Your position is recorded.',
   'vote.tally': 'Where the vote stands',
+  'vote.ofRequired': 'of',
   'vote.met': 'Threshold met',
   'vote.notMet': 'Threshold not met',
   'vote.timelockRunning': 'In its timelock',
