@@ -54,7 +54,7 @@ function ReviewLine({ review }: { review: ReviewStatus | undefined }) {
   );
 }
 
-export default function Rules() {
+export default function Rules({ embedded = false }: { embedded?: boolean }) {
   const { t } = useI18n();
   const [rules, setRules] = useState<Rule[] | null>(null);
   const [reviews, setReviews] = useState<Map<string, ReviewStatus>>(new Map());
@@ -79,7 +79,7 @@ export default function Rules() {
 
   return (
     <div>
-      <h1 className="mb-1 font-display font-normal leading-[1.12] tracking-[-0.024em] text-[30px] sm:text-[34px]">{t('nav.rules')}</h1>
+      {!embedded && (<h1 className="mb-1 font-display font-normal leading-[1.12] tracking-[-0.024em] text-[30px] sm:text-[34px]">{t('nav.rules')}</h1>)}
 
       <div className="mb-5 flex flex-wrap items-baseline gap-x-4 gap-y-1 text-[13px] text-muted">
         <span className="tabular-nums">

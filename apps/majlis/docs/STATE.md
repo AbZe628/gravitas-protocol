@@ -298,14 +298,56 @@ Real coverage, measured through the dictionaries rather than by reading the
 file: **English 899, Arabic 709, Urdu 698**. The line-counted figures reported
 here before (430/240/229) were wrong.
 
-### Still not composed
+### The bar: the artboards are the specification
 
-Every page inherited the palette, the sheet and the type scale, so the
-application is coherent. What only some pages have is a *composition* — a
-narrow list beside an open thing, a figure given room, an aside that carries
-the count. Those are Guided, Register, Library, Calculations and the two
-matter pages. The rest are a single column of stacked sections, which for
-several of them (Settings, Search, Assistant) is the right shape anyway.
+Given on 6 September 2026, with the phone artboard sent back: *this is how you
+drew it, this is how all of it must be, from start to end — every page, every
+option.* Coherent is not the bar. The drawn screens are the only agreed
+definition of finished, and where the application has no counterpart for
+something drawn, that is a gap to build rather than a difference to explain.
+
+Compare composition, not palette. Every page below inherited the palette, the
+sheet, the type scale and the label style — and several of them still open as
+a single column of stacked sections, which is the shape that was thrown out.
+
+#### The largest gap: the phone has no chrome of its own
+
+`design/Phone.dc.html` draws a masthead — the mark, **Majlis**, the board’s
+name, and the member’s avatar — and a four-item bar across the bottom on a
+blurred surface above the home indicator: **Work · Record · Coming · Guide**.
+
+The application has none of it. On a phone it shows a hamburger, a language
+switcher and an avatar in the bar, and a drawer holding the desktop rail. That
+is a small desktop, which is the one thing the artboard note says the phone is
+not.
+
+Two things to settle while building it, because the drawing does not answer
+them and inventing an answer is how the earlier passes went wrong:
+
+- **Where the language switch goes.** It exists only in the shell today. The
+  drawn masthead has no room for it. `/more` is the phone’s "everything else"
+  and is the obvious home.
+- **What the second masthead line says.** The drawing says *Rakbank Shariah
+  Board*. The application has no board name — the rail shows `app.stage`,
+  which is a sentence and will not fit. Either a name comes from the server or
+  the line is dropped; it should not be a truncated sentence.
+
+#### Pages composed on purpose
+
+Guided, Register, Library, Calculations, the two matter pages, and **What we
+decided, and what stands** — which now names itself once and carries its two
+views as a segmented control beside the name, rather than opening with a strip
+of underlined tabs above a page that then titled itself second.
+
+#### Pages that still only inherited
+
+Dashboard (classic), AssetDetail, Assistant, Briefings, Calendar,
+IncidentDetail, Incidents, Meetings, More, Record, Rules, Search, Settings —
+and the panels inside a matter: Passage, Carrying, Inherited, VotePanel,
+Deliberation, Terms, Evidence, Checklist.
+
+Some of these are legitimately one column — Settings, Search, Assistant. That
+is a judgement to make against the artboard for each, not a reason to skip it.
 
 ### What already exists on screen
 
@@ -354,12 +396,18 @@ the premise, and tests enforce it. SmartRaise is guided-only.
 
 ## 5. What to pick up first, in order
 
-1. **Rebuild the pages on `kit`, widening the work area in the same pass.**
-   Nineteen pages still hold prose in a centred 58rem column. Widen
-   `Shell`’s main to the canvas’ work-area width only together with the page
-   that fills it — widening alone just makes the lines longer. Start with the
-   three the canvas draws: calculations, library, register.
-2. **Fix the Anthropic integration**: SDK upgrade, then models, then the
+1. **The phone’s own chrome.** The masthead and the four-tab bar the artboard
+   draws. This is the difference between the phone being designed and the
+   phone being the desktop at 375px. Settle the two open questions above
+   first — where the language switch lives, and what the second masthead line
+   says — rather than inventing an answer.
+2. **The rest of the pages, against their artboard**, in the order a scholar
+   meets them: Incidents, More, Search, Meetings, Settings, Calendar,
+   Briefings, AssetDetail, IncidentDetail, Assistant, Dashboard.
+3. **The panels inside a matter**: Passage, Carrying, Inherited, VotePanel,
+   Deliberation, Terms, Evidence, Checklist. These are what a member actually
+   reads, and they are still the flattest thing in the application.
+4. **Fix the Anthropic integration**: SDK upgrade, then models, then the
    thinking block.
-3. **Decide who writes the Arabic and Urdu.** Not a coding task, and it blocks
-   390 strings.
+5. **Decide who writes the Arabic and Urdu.** Not a coding task, and it blocks
+   391 strings.

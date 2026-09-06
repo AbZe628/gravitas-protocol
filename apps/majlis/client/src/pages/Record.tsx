@@ -4,7 +4,7 @@ import { useI18n } from '../lib/i18n.js';
 import { Card, DateText, Tag } from '../components/ui.js';
 import { DocumentLink, YearPicker } from '../components/Documents.js';
 
-export default function Record() {
+export default function Record({ embedded = false }: { embedded?: boolean }) {
   const { t } = useI18n();
   const [log, setLog] = useState<AssistantExchange[]>([]);
   const [health, setHealth] = useState<Health | null>(null);
@@ -36,7 +36,7 @@ export default function Record() {
 
   return (
     <div>
-      <h1 className="mb-5 font-display font-normal leading-[1.12] tracking-[-0.024em] text-[30px] sm:text-[34px]">{t('record.title')}</h1>
+      {!embedded && (<h1 className="mb-5 font-display font-normal leading-[1.12] tracking-[-0.024em] text-[30px] sm:text-[34px]">{t('record.title')}</h1>)}
 
       {health?.recordSince && (
         <div className="mb-5 rounded-card shadow-ring bg-raised px-4 py-3">

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useI18n } from '../lib/i18n.js';
 import Record from './Record.js';
 import Rules from './Rules.js';
+import { Display } from '../components/type.js';
 
 /**
  * What we decided, and what stands.
@@ -30,6 +31,15 @@ import Rules from './Rules.js';
  * looking for last year's ruling would find a screen that is not what they
  * asked for and would have to work out why. A stable starting point is worth
  * more here than a remembered one.
+ *
+ * ── one heading, and a switch that looks like one ─────────────────────────
+ *
+ * This used to be a strip of underlined tabs *above* whichever page it showed,
+ * and that page then set its own title underneath — so a screen opened with a
+ * row of small links and named itself second. The page is named first now, and
+ * the two views sit beside the name as a segmented control: a recess with the
+ * chosen one raised out of it, which is the same device the language switch
+ * uses, so there is nothing new to learn.
  */
 
 type Tab = 'decided' | 'inForce';
@@ -42,32 +52,40 @@ export default function WhatStands() {
 
   return (
     <div>
-      <div
-        role="tablist"
-        aria-label={t('stands.title')}
-        className="mb-5 flex flex-wrap gap-1 border-b border-line"
-      >
-        {TABS.map((k) => (
-          <button
-            key={k}
-            role="tab"
-            type="button"
-            aria-selected={tab === k}
-            onClick={() => setTab(k)}
-            className={
-              'px-3 py-2 text-[13px] transition-colors ' +
-              (tab === k
-                ? 'border-b-2 border-lapis text-lapis'
-                : 'border-b-2 border-transparent text-muted hover:text-paper')
-            }
-          >
-            {t(`stands.tab.${k}`)}
-          </button>
-        ))}
+      <div className="mb-8 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+        <Display>{t('stands.title')}</Display>
+
+        <div
+          role="tablist"
+          aria-label={t('stands.title')}
+          className="flex shrink-0 gap-0.5 self-start rounded-xl bg-paper/[0.045] p-[3px] sm:self-auto"
+        >
+          {TABS.map((k) => (
+            <button
+              key={k}
+              role="tab"
+              type="button"
+              aria-selected={tab === k}
+              onClick={() => setTab(k)}
+              className={
+                'rounded-lg px-3.5 py-1.5 text-[12.5px] transition-all ' +
+                (tab === k
+                  ? 'bg-raised font-semibold text-paper shadow-[0_1px_2px_rgba(25,23,19,0.08)]'
+                  : 'text-muted hover:text-sand')
+              }
+            >
+              {t(`stands.tab.${k}`)}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {/* The pages themselves, unchanged. Nothing here reimplements either. */}
-      {tab === 'decided' ? <Record /> : <Rules />}
+      {/*
+        The pages themselves, unchanged. Nothing here reimplements either —
+        `embedded` only stops each of them setting a second title under the
+        first.
+      */}
+      {tab === 'decided' ? <Record embedded /> : <Rules embedded />}
     </div>
   );
 }
