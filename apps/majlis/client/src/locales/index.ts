@@ -1691,7 +1691,6 @@ const ar: Dict = {
   'pace.onTheClock': 'في مدة التأجيل',
   'pace.partial': '* تُحتسب من وصول المسألة إلى هذا النظام، وقد يكون ذلك بعد طلب المؤسسة الأول.',
 
-  ...en,
   'nav.matters': 'المسائل',
   'nav.rules': 'القواعد النافذة',
   'nav.briefings': 'الإحاطات',
@@ -2406,7 +2405,6 @@ const ur: Dict = {
   'pace.onTheClock': 'ٹائم لاک میں',
   'pace.partial': '* پیمائش اُس وقت سے جب معاملہ اس نظام تک پہنچا، جو ادارے کی پہلی درخواست کے بعد ہو سکتا ہے۔',
 
-  ...en,
   'nav.matters': 'مسائل',
   'nav.rules': 'نافذ قواعد',
   'nav.briefings': 'بریفنگ',
@@ -2427,6 +2425,49 @@ const ur: Dict = {
 
 const DICTS: Record<Lang, Dict> = { en, ar, ur };
 
+/**
+ * First Strong Isolate and Pop Directional Isolate.
+ *
+ * `FSI` opens a run whose direction the browser takes from its first strong
+ * character, and `PDI` closes it. Both are invisible and both are ordinary
+ * characters, so a wrapped value is still a `string` and still works where a
+ * translation goes into an `aria-label` or a `title`.
+ */
+/*
+ * Built from their code points rather than written out.
+ *
+ * These two are invisible bidi controls, and invisible bidi controls in source
+ * are what the Trojan Source attack is made of \u2014 so toolchains along the way
+ * are entitled to strip them, and something in this one does. Written as a
+ * literal they silently became the empty string, the wrap compiled to
+ * `'' + text + ''`, and every test passed while nothing happened. Constructed
+ * at runtime there is nothing in the file for anything to sanitise.
+ */
+const FSI = String.fromCharCode(0x2068);
+const PDI = String.fromCharCode(0x2069);
+
+/**
+ * A translation, and English where there is not one yet.
+ *
+ * ── why the fallback is isolated ──────────────────────────────────────────
+ *
+ * Arabic is 190 keys short and Urdu 201, so a right-to-left screen is mostly
+ * English sentences today. Dropped into an RTL paragraph raw, the bidi
+ * algorithm attaches their trailing punctuation to the surrounding direction
+ * and a full stop appears at the *start* of the line: `.have never been put to
+ * this board`. Nothing is wrong with the layout or the string — but the screen
+ * reads as broken, and a board looking at the Arabic build would reasonably
+ * conclude the software is.
+ *
+ * Wrapping the fallback in an isolate makes the browser lay that run out on
+ * its own terms, so an untranslated sentence reads as an untranslated
+ * sentence rather than as a defect. It does not translate anything and it is
+ * not meant to: see docs/STATE.md on who writes the Arabic and Urdu.
+ */
 export function translate(lang: Lang, key: string): string {
-  return DICTS[lang][key] ?? DICTS.en[key] ?? key;
+  const own = DICTS[lang][key];
+  if (own !== undefined) return own;
+
+  const fallback = DICTS.en[key] ?? key;
+  return dirFor(lang) === 'rtl' ? FSI + fallback + PDI : fallback;
 }

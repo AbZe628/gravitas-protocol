@@ -104,7 +104,35 @@ describe('localisation', () => {
   });
 
   it('falls back to English for a key missing in a translation', () => {
-    expect(translate('ur', 'rule.hashExplain')).toBe(translate('en', 'rule.hashExplain'));
+    // Isolated, not bare: see below. The words are the English ones.
+    expect(translate('ur', 'rule.hashExplain')).toContain(translate('en', 'rule.hashExplain'));
+  });
+
+  /*
+   * Arabic is 190 keys short and Urdu 201, so a right-to-left screen is mostly
+   * English today. Dropped into an RTL paragraph raw, the bidi algorithm puts
+   * an English sentence's full stop at the start of the line, and a board
+   * looking at the Arabic build would reasonably conclude the software is
+   * broken rather than untranslated.
+   */
+  it('isolates an English fallback on a right-to-left screen, and only there', () => {
+    const FSI = String.fromCharCode(0x2068);
+    const PDI = String.fromCharCode(0x2069);
+    const missing = 'rule.hashExplain';
+
+    expect(translate('ur', missing).startsWith(FSI)).toBe(true);
+    expect(translate('ur', missing).endsWith(PDI)).toBe(true);
+
+    // English is already laid out left to right; wrapping it would be noise.
+    expect(translate('en', missing).includes(FSI)).toBe(false);
+  });
+
+  it('leaves a real translation alone', () => {
+    // A string the language actually has is never wrapped: the isolate exists
+    // for the gap, and marking a finished translation would outlive the gap.
+    for (const l of LANGS) {
+      expect(translate(l.code, 'asst.limits').includes(String.fromCharCode(0x2068))).toBe(false);
+    }
   });
 
   it('returns the key itself when it does not exist anywhere', () => {
