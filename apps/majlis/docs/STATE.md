@@ -226,20 +226,44 @@ found that way: the top bar overflowed the right edge of a phone, because the
 language control and the identity block would not both fit. The identity text
 now stands down below `sm` and the avatar carries it alone.
 
-### Still not applied — what the next pass is
+### The three drawn screens, and the rest
 
-- **Nineteen pages still carry the old flat markup.** They are light and
-  coherent now, because they inherited the tokens, but only `Guided` was
-  rebuilt on `kit`. The rest are prose in a column, not the canvas layouts.
-- **The work area is still `max-w-reading` (58rem), centred.** The canvas work
-  area is ~1,168px and holds a narrow list beside an open thing. A centred
-  928px column is the shape that made this read as a document in the first
-  place, and widening it needs the pages to be rebuilt in the same pass —
-  otherwise prose simply gets longer lines.
-- **The signed-in view has never been seen.** The lead card with the tapering
-  edge and the gold *Open it* only renders for a member, and member
-  credentials are the user’s to create (`npm run members -w server`). What was
-  verified in a browser is the observer view.
+Register, contract library and calculations are built at the width they were
+drawn for. A page belongs to one of two widths — `reading` for prose, `work`
+for the artboard layouts — and it earns `work` only in the commit that
+rebuilds it to fill it. That rule broke on its own terms once and the break
+is the proof: `/matters/:id` was given the work area and ran a paragraph
+across 1,100 pixels.
+
+The classic matter page holds the tally and the vote in a sticky column
+beside the question. The guided matter page keeps its shape — one act at a
+time is its premise, not a limitation — and only what it paints changed.
+
+Then the last of the outlined boxes: 149 class strings and 60 labels across
+43 files. Every box is a sheet with a half-pixel ring; every label is the one
+label style. That was what kept the screens flat after the palette turned
+over — the colour changed underneath the shapes and the shapes did not.
+
+### Two traps this cost time on
+
+- **`/matters/:id` renders `MatterAction`, not `MatterDetail`.** `MatterDetail`
+  is reachable only from `/classic/matters/:id`. A whole pass was made to the
+  wrong file, the tests passed, the typecheck passed, and only opening the
+  page showed it. Nothing in the code says which of the two a route uses.
+- **`npm run typecheck` uses `tsc -b`, which is incremental** and reported a
+  file clean that it had not re-read — while vite was failing to compile the
+  same file. Run `npx tsc -b --noEmit --force` when a result looks too good.
+
+### Still not applied
+
+- The remaining pages inherited the palette and the sheet, so they are
+  coherent, but only Guided, Register, Library, Calculations and the two
+  matter pages were composed on purpose. The rest are still a single column
+  of stacked sections.
+- **The Arabic and Urdu screens have never been looked at** in the new
+  palette. RTL flips the tapering edge and the sticky column, and Amiri does
+  not take the negative tracking the display scale uses — `tokens.css` zeroes
+  it under `[dir=rtl]`, but nobody has checked what that looks like.
 
 ### What already exists on screen
 
