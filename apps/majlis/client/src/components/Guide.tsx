@@ -78,7 +78,7 @@ export default function Guide() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="fixed bottom-5 end-5 z-40 flex items-center gap-2 rounded-full border border-line bg-raised px-4 py-2.5 text-[13px] text-sand shadow-lift transition-all hover:-translate-y-px hover:text-paper"
+        className="fixed bottom-5 end-5 z-40 flex items-center gap-2 rounded-full shadow-ring bg-raised px-4 py-2.5 text-[13px] text-sand shadow-lift transition-all hover:-translate-y-px hover:text-paper"
       >
         <span aria-hidden className="text-gold">?</span>
         {t('guide.open')}
@@ -88,7 +88,7 @@ export default function Guide() {
 
   return (
     <div className="fixed bottom-5 end-5 z-40 w-[min(26rem,calc(100vw-2.5rem))]">
-      <div className="rounded-card border border-line bg-raised shadow-lift">
+      <div className="rounded-card shadow-ring bg-raised shadow-lift">
         <div className="flex items-center justify-between border-b border-line px-4 py-3">
           <div>
             <div className="text-[13px] font-medium text-paper">{t('guide.title')}</div>
@@ -137,7 +137,7 @@ export default function Guide() {
                         setQuestion(t(`guide.ask.${next}`));
                         void ask(t(`guide.ask.${next}`));
                       }}
-                      className="rounded-full border border-line px-2.5 py-1 text-[12px] text-muted transition-colors hover:border-muted hover:text-paper"
+                      className="rounded-full shadow-ring px-2.5 py-1 text-[12px] text-muted transition-colors hover:text-paper"
                     >
                       {t(`guide.ask.${next}`)}
                     </button>
@@ -157,7 +157,7 @@ export default function Guide() {
                       setQuestion(t(`guide.ask.${s}`));
                       void ask(t(`guide.ask.${s}`));
                     }}
-                    className="rounded-full border border-line px-2.5 py-1 text-[12px] text-muted transition-colors hover:border-muted hover:text-paper"
+                    className="rounded-full shadow-ring px-2.5 py-1 text-[12px] text-muted transition-colors hover:text-paper"
                   >
                     {t(`guide.ask.${s}`)}
                   </button>
@@ -179,7 +179,7 @@ export default function Guide() {
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
             placeholder={t('guide.placeholder')}
-            className="w-full rounded-lg border border-line bg-transparent px-3 py-2 text-[13.5px] outline-none transition-colors focus:border-muted"
+            className="w-full rounded-card shadow-ring bg-raised px-3 py-2 text-[13.5px] outline-none transition-colors focus:shadow-[0_0_0_1.5px_rgba(22,68,112,0.35)]"
           />
           <button
             type="submit"

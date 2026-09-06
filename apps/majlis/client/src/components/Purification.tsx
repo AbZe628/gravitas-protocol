@@ -194,7 +194,7 @@ export default function Purification() {
             onChange={set('basis')}
           />
 
-          <label className="mb-3 flex cursor-pointer items-start gap-2.5 rounded border border-line px-3 py-2.5">
+          <label className="mb-3 flex cursor-pointer items-start gap-2.5 rounded-xl shadow-ring px-3 py-2.5">
             <input
               type="checkbox"
               checked={apportion}

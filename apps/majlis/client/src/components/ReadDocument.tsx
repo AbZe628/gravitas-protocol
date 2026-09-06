@@ -69,7 +69,7 @@ function Candidate({
 
   if (candidate.notFound) {
     return (
-      <li className="rounded border border-line px-3 py-2.5">
+      <li className="rounded-xl shadow-ring px-3 py-2.5">
         <div className="text-[12.5px] font-medium">{label}</div>
         {/* A gap a scholar looks at, rather than a plausible zero. */}
         <p className="mt-0.5 text-[12px] leading-relaxed text-muted">{t('read.notFound')}</p>
@@ -90,7 +90,7 @@ function Candidate({
   };
 
   return (
-    <li className="rounded border border-line px-3 py-2.5">
+    <li className="rounded-xl shadow-ring px-3 py-2.5">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <span className="text-[12.5px] font-medium">{label}</span>
         <span className="font-mono text-[14px] tabular-nums text-goldsoft">{candidate.value}</span>
@@ -120,7 +120,7 @@ function Candidate({
         <button
           type="button"
           onClick={confirm}
-          className="mt-2 rounded border border-line px-3 py-1 text-[12px] text-muted transition-colors hover:border-muted hover:text-paper"
+          className="mt-2 rounded-xl shadow-ring px-3 py-1 text-[12px] text-muted transition-colors hover:text-paper"
         >
           {t('read.confirm')}
         </button>
@@ -180,7 +180,7 @@ export default function ReadDocument({ fields, onConfirm }: ReadDocumentProps) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="mb-3 rounded border border-line px-3 py-1.5 text-[12.5px] text-muted transition-colors hover:border-muted hover:text-paper"
+        className="mb-3 rounded-xl shadow-ring px-3 py-1.5 text-[12.5px] text-muted transition-colors hover:text-paper"
       >
         {t('read.open')}
       </button>
@@ -190,8 +190,8 @@ export default function ReadDocument({ fields, onConfirm }: ReadDocumentProps) {
   const labelOf = (key: string) => fields.find((f) => f.key === key)?.label ?? key;
 
   return (
-    <div className="mb-4 rounded-lg border border-line px-4 py-3.5">
-      <div className="mb-2 text-[11px] uppercase tracking-wider text-muted">{t('read.title')}</div>
+    <div className="mb-4 rounded-card shadow-ring px-4 py-3.5">
+      <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">{t('read.title')}</div>
       <p className="mb-3 text-[12.5px] leading-relaxed text-muted">{t('read.intro')}</p>
 
       {documents.length === 0 ? (
@@ -199,13 +199,13 @@ export default function ReadDocument({ fields, onConfirm }: ReadDocumentProps) {
       ) : (
         <div className="flex flex-wrap items-end gap-2">
           <label className="min-w-[220px] flex-1">
-            <span className="mb-1 block text-[11px] uppercase tracking-wider text-muted">
+            <span className="mb-1 block text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
               {t('read.document')}
             </span>
             <select
               value={chosen}
               onChange={(e) => setChosen(e.target.value)}
-              className="w-full rounded border border-line bg-transparent px-3 py-2 text-[13px]"
+              className="w-full rounded-xl shadow-ring bg-raised px-3 py-2 text-[13px]"
             >
               <option value="">{t('read.pickDocument')}</option>
               {documents.map((d) => (

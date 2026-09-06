@@ -173,7 +173,7 @@ export default function VotePanel({ matter, role, scholarId, onChanged }: Props)
             value={reason}
             onChange={(e) => setReason(e.target.value)}
             rows={3}
-            className="w-full resize-y rounded border border-line bg-transparent p-2 text-[14px] leading-relaxed outline-none"
+            className="w-full resize-y rounded-xl shadow-ring bg-raised p-2 text-[14px] leading-relaxed outline-none"
           />
           <p className="mt-1.5 text-[11.5px] leading-relaxed text-muted">{t('vote.reasonHelp')}</p>
 
@@ -194,7 +194,7 @@ export default function VotePanel({ matter, role, scholarId, onChanged }: Props)
               type="button"
               disabled={busy || reason.trim().length < MIN_REASON}
               onClick={() => run(() => governance.vote(matter.id, position, reason.trim()))}
-              className="rounded border border-line px-3 py-1.5 text-[12px] hover:bg-surface/60 disabled:opacity-40"
+              className="rounded-xl shadow-ring px-3 py-1.5 text-[12px] hover:bg-raised disabled:opacity-40"
             >
               {t('vote.submit')}
             </button>
@@ -215,7 +215,7 @@ export default function VotePanel({ matter, role, scholarId, onChanged }: Props)
             value={reason}
             onChange={(e) => setReason(e.target.value)}
             rows={3}
-            className="w-full resize-y rounded border border-line bg-transparent p-2 text-[14px] leading-relaxed outline-none"
+            className="w-full resize-y rounded-xl shadow-ring bg-raised p-2 text-[14px] leading-relaxed outline-none"
           />
           <Refusal message={refusal} />
           <div className="mt-2 flex gap-2">
@@ -243,7 +243,7 @@ export default function VotePanel({ matter, role, scholarId, onChanged }: Props)
             value={reason}
             onChange={(e) => setReason(e.target.value)}
             rows={3}
-            className="w-full resize-y rounded border border-line bg-transparent p-2 text-[14px] leading-relaxed outline-none"
+            className="w-full resize-y rounded-xl shadow-ring bg-raised p-2 text-[14px] leading-relaxed outline-none"
           />
           <Refusal message={refusal} />
           <div className="mt-2 flex gap-2">
@@ -251,7 +251,7 @@ export default function VotePanel({ matter, role, scholarId, onChanged }: Props)
               type="button"
               disabled={busy || reason.trim().length < MIN_REASON}
               onClick={() => run(() => governance.reopen(matter.id, reason.trim()))}
-              className="rounded border border-line px-3 py-1.5 text-[12px] hover:bg-surface/60 disabled:opacity-40"
+              className="rounded-xl shadow-ring px-3 py-1.5 text-[12px] hover:bg-raised disabled:opacity-40"
             >
               {t('reopen.submit')}
             </button>

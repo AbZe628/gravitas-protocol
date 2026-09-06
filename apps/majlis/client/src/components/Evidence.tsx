@@ -102,7 +102,7 @@ export default function Evidence({ matter, scholarId, canAttach, onChanged }: Pr
       },
     );
 
-  const field = 'w-full rounded border border-line bg-transparent p-2 text-[14px] outline-none';
+  const field = 'w-full rounded-xl bg-raised shadow-ring p-2 text-[14px] outline-none';
 
   return (
     <div className="space-y-3">
@@ -124,7 +124,7 @@ export default function Evidence({ matter, scholarId, canAttach, onChanged }: Pr
                 }
               >
                 <div className="mb-1 flex flex-wrap items-center gap-2 text-[11.5px]">
-                  <span className="rounded border border-line px-1.5 py-0.5 uppercase tracking-wide text-muted">
+                  <span className="rounded-xl shadow-ring px-1.5 py-0.5 uppercase tracking-wide text-muted">
                     {t(`evidence.kind.${s.kind}`)}
                   </span>
                   {s.addedBy && (
@@ -136,7 +136,7 @@ export default function Evidence({ matter, scholarId, canAttach, onChanged }: Pr
                     </span>
                   )}
                   {withdrawn && (
-                    <span className="rounded border border-line px-1.5 py-0.5 uppercase tracking-wide text-muted">
+                    <span className="rounded-xl shadow-ring px-1.5 py-0.5 uppercase tracking-wide text-muted">
                       {t('evidence.withdrawn')}
                     </span>
                   )}
@@ -204,7 +204,7 @@ export default function Evidence({ matter, scholarId, canAttach, onChanged }: Pr
               setRefusal(null);
               setAdding(true);
             }}
-            className="rounded border border-line px-3 py-1.5 text-[12px] hover:bg-surface/60"
+            className="rounded-xl shadow-ring px-3 py-1.5 text-[12px] hover:bg-raised"
           >
             {t('evidence.add')}
           </button>
@@ -218,7 +218,7 @@ export default function Evidence({ matter, scholarId, canAttach, onChanged }: Pr
                   setRefusal(null);
                   chooser.current?.click();
                 }}
-                className="rounded border border-line px-3 py-1.5 text-[12px] hover:bg-surface/60 disabled:opacity-40"
+                className="rounded-xl shadow-ring px-3 py-1.5 text-[12px] hover:bg-raised disabled:opacity-40"
               >
                 {t('evidence.attachDocument')}
               </button>
@@ -241,7 +241,7 @@ export default function Evidence({ matter, scholarId, canAttach, onChanged }: Pr
       )}
 
       {mayAdd && adding && (
-        <div className="space-y-2 rounded-lg border border-line p-3">
+        <div className="space-y-2 rounded-card shadow-ring p-3">
           <p className="text-[12px] leading-relaxed text-muted">{t('evidence.help')}</p>
 
           <div className="flex flex-wrap gap-1.5">
@@ -303,7 +303,7 @@ export default function Evidence({ matter, scholarId, canAttach, onChanged }: Pr
               type="button"
               disabled={busy || label.trim().length < 3 || ref.trim().length < 1}
               onClick={submit}
-              className="rounded border border-line px-3 py-1.5 text-[12px] hover:bg-surface/60 disabled:opacity-40"
+              className="rounded-xl shadow-ring px-3 py-1.5 text-[12px] hover:bg-raised disabled:opacity-40"
             >
               {t('evidence.attach')}
             </button>

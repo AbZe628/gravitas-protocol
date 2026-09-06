@@ -54,7 +54,7 @@ export default function Attention() {
   if (failed || !data || !items) return null;
   if (items.length === 0) {
     return (
-      <div className="mb-5 rounded-lg border border-line bg-surface/60 px-4 py-3 text-[13px] text-muted">
+      <div className="mb-5 rounded-card shadow-ring bg-raised px-4 py-3 text-[13px] text-muted">
         {t('attention.none')}
       </div>
     );

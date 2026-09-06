@@ -61,7 +61,7 @@ function Composer({
   }
 
   return (
-    <div className="rounded-lg border border-line p-3">
+    <div className="rounded-card shadow-ring p-3">
       <textarea
         value={body}
         onChange={(e) => setBody(e.target.value)}
@@ -76,14 +76,14 @@ function Composer({
       */}
       {mentionable.length > 0 && (
         <div className="mt-1 flex flex-wrap items-center gap-1.5">
-          <span className="text-[11px] uppercase tracking-wider text-muted">{t('say.ask')}</span>
+          <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted">{t('say.ask')}</span>
           {mentionable.map((m) => (
             <button
               key={m.id}
               type="button"
               title={m.title}
               onClick={() => setBody((was) => (was.endsWith(' ') || was === '' ? was : was + ' ') + '@' + m.id + ' ')}
-              className="rounded border border-line px-2 py-0.5 text-[11.5px] text-muted hover:border-muted hover:text-paper"
+              className="rounded-xl shadow-ring px-2 py-0.5 text-[11.5px] text-muted hover:text-paper"
             >
               {m.name}
             </button>
@@ -97,7 +97,7 @@ function Composer({
           type="button"
           onClick={submit}
           disabled={!body.trim() || busy}
-          className="rounded border border-line px-3 py-1.5 text-[12px] hover:bg-surface/60 disabled:opacity-40"
+          className="rounded-xl shadow-ring px-3 py-1.5 text-[12px] hover:bg-raised disabled:opacity-40"
         >
           {t('say.submit')}
         </button>

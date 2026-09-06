@@ -44,7 +44,7 @@ export default function Precedent({ matterId }: { matterId: string }) {
 
       <ul className="space-y-2">
         {related.map((r) => (
-          <li key={r.matterId} className="rounded-lg border border-line p-3">
+          <li key={r.matterId} className="rounded-card shadow-ring p-3">
             <div className="mb-1.5 flex flex-wrap items-center gap-2 text-[11.5px]">
               <Tag tone={r.direction === 'restrict' ? 'warn' : 'gold'}>
                 {t(`matter.direction.${r.direction}`)}

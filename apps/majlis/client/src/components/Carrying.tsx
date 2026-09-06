@@ -65,9 +65,9 @@ export default function Carrying({ matterId }: { matterId: string }) {
   if (!carrying) return null;
 
   return (
-    <div className="mb-6 rounded-lg border border-line bg-surface/60 px-4 py-3.5">
+    <div className="mb-6 rounded-card shadow-ring bg-raised px-4 py-3.5">
       <div className="mb-2 flex flex-wrap items-baseline gap-x-2">
-        <span className="text-[11px] uppercase tracking-wider text-muted">{t('carry.title')}</span>
+        <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted">{t('carry.title')}</span>
         {/*
           The distinction, as a badge, because it is the one thing on this panel
           a scholar should carry away even if they read nothing else.
@@ -93,12 +93,12 @@ export default function Carrying({ matterId }: { matterId: string }) {
 
       {carrying.terms.length > 0 && (
         <div className="mt-4">
-          <div className="mb-1.5 text-[11px] uppercase tracking-wider text-muted">
+          <div className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
             {t('carry.terms')}
           </div>
           <ul className="space-y-2">
             {carrying.terms.map((term) => (
-              <li key={term.key} className="rounded border border-line px-3 py-2">
+              <li key={term.key} className="rounded-xl shadow-ring px-3 py-2">
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
                   <span className="font-mono text-[12.5px]">{term.key}</span>
                   <span className="font-mono text-[13px] tabular-nums text-goldsoft">
@@ -125,7 +125,7 @@ export default function Carrying({ matterId }: { matterId: string }) {
         and the less honest of the two.
       */}
       <div className="mt-4 border-t border-line pt-3">
-        <div className="mb-1.5 text-[11px] uppercase tracking-wider text-muted">
+        <div className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
           {t('carry.limits')}
         </div>
         <ul className="space-y-1.5">

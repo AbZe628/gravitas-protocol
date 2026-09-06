@@ -86,7 +86,7 @@ export default function Dashboard() {
       */}
       <DriftPanel />
 
-      <div className="mb-5 rounded-lg border border-line bg-surface/60 px-4 py-3 text-[13px] text-muted">
+      <div className="mb-5 rounded-card shadow-ring bg-raised px-4 py-3 text-[13px] text-muted">
         {t('dash.stageNotice')}
       </div>
 
@@ -145,7 +145,7 @@ export default function Dashboard() {
               <li key={m.id}>
                 <Link
                   to={`/matters/${m.id}`}
-                  className="block rounded-lg border border-line px-4 py-3 hover:border-muted"
+                  className="block rounded-card shadow-ring px-4 py-3 hover:text-paper"
                 >
                   <div className="text-[14px] leading-snug">{m.title}</div>
                   <div className="mt-1 text-[12px] text-muted">
@@ -164,8 +164,8 @@ export default function Dashboard() {
         fault in something that was never configured.
       */}
       {enforcement && !enforcement.configured && (
-        <div className="mt-9 rounded-lg border border-line px-4 py-3">
-          <div className="text-[11px] uppercase tracking-wider text-muted">
+        <div className="mt-9 rounded-card shadow-ring px-4 py-3">
+          <div className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
             {t('dash.enforcement')}
           </div>
           <p className="mt-1.5 text-[13px] leading-relaxed text-muted">{t('dash.enforcementNone')}</p>
@@ -173,8 +173,8 @@ export default function Dashboard() {
       )}
 
       {enforcement?.configured && (
-        <div className="mt-9 rounded-lg border border-line px-4 py-3">
-          <div className="text-[11px] uppercase tracking-wider text-muted">
+        <div className="mt-9 rounded-card shadow-ring px-4 py-3">
+          <div className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
             {enforcement.label ?? t('dash.registry')}
           </div>
           {enforcement.address && (

@@ -77,13 +77,13 @@ export default function More() {
       <div className="space-y-6">
         {groups.map((group) => (
           <section key={group.title}>
-            <div className="mb-2 text-[11px] uppercase tracking-wider text-muted">{group.title}</div>
+            <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">{group.title}</div>
             <ul className="space-y-1.5">
               {group.entries.map((entry) => (
                 <li key={entry.to}>
                   <Link
                     to={entry.to}
-                    className="block rounded border border-line px-3.5 py-2.5 transition-colors hover:border-muted"
+                    className="block rounded-xl shadow-ring px-3.5 py-2.5 transition-colors hover:text-paper"
                   >
                     <div className="text-[13.5px]">{entry.label}</div>
                     {/* What it is for, because the name alone taught nobody. */}

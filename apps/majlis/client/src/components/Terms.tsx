@@ -60,7 +60,7 @@ export default function Terms({ matter, canEdit, onChanged }: Props) {
     }
   }
 
-  const field = 'w-full rounded border border-line bg-transparent p-1.5 text-[13px] outline-none';
+  const field = 'w-full rounded-xl bg-raised shadow-ring p-1.5 text-[13px] outline-none';
 
   // ── reading ─────────────────────────────────────────────────────────────
   if (!editing) {
@@ -71,7 +71,7 @@ export default function Terms({ matter, canEdit, onChanged }: Props) {
         ) : (
           <ul className="space-y-2">
             {rule.parameters.map((p) => (
-              <li key={p.key} className="rounded-lg border border-line p-3">
+              <li key={p.key} className="rounded-card shadow-ring p-3">
                 <div className="flex flex-wrap items-baseline gap-2">
                   <span className="font-mono text-[12.5px] text-muted">{p.key}</span>
                   <span className="text-[15px] font-medium text-paper tabular-nums">
@@ -89,7 +89,7 @@ export default function Terms({ matter, canEdit, onChanged }: Props) {
           The hash state is the honest signal here: empty means the terms can
           still move, and a value means the board is committed to exactly these.
         */}
-        <div className="rounded-lg border border-line bg-surface/30 p-3">
+        <div className="rounded-card shadow-ring bg-raised p-3">
           {rule.parameterHash ? (
             <>
               <div className="mb-1 text-[11.5px] uppercase tracking-wide text-muted">
@@ -111,7 +111,7 @@ export default function Terms({ matter, canEdit, onChanged }: Props) {
           <button
             type="button"
             onClick={start}
-            className="rounded border border-line px-3 py-1.5 text-[12px] hover:bg-surface/60"
+            className="rounded-xl shadow-ring px-3 py-1.5 text-[12px] hover:bg-raised"
           >
             {rule.parameters.length ? t('terms.edit') : t('terms.set')}
           </button>
@@ -122,7 +122,7 @@ export default function Terms({ matter, canEdit, onChanged }: Props) {
 
   // ── drafting ────────────────────────────────────────────────────────────
   return (
-    <div className="space-y-3 rounded-lg border border-line p-3">
+    <div className="space-y-3 rounded-card shadow-ring p-3">
       <p className="text-[12px] leading-relaxed text-muted">{t('terms.help')}</p>
 
       <ul className="space-y-3">
@@ -187,7 +187,7 @@ export default function Terms({ matter, canEdit, onChanged }: Props) {
           type="button"
           disabled={busy}
           onClick={save}
-          className="rounded border border-line px-3 py-1.5 text-[12px] hover:bg-surface/60 disabled:opacity-40"
+          className="rounded-xl shadow-ring px-3 py-1.5 text-[12px] hover:bg-raised disabled:opacity-40"
         >
           {t('terms.save')}
         </button>

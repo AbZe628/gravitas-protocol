@@ -40,7 +40,7 @@ export function DocumentLink({
     >
       <div className="flex items-baseline justify-between gap-3">
         <span className={'text-[14px] font-medium ' + (emphasis ? 'text-goldsoft' : '')}>{label}</span>
-        <span className="shrink-0 text-[11px] uppercase tracking-wider text-muted">
+        <span className="shrink-0 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
           {t('doc.opens')}
         </span>
       </div>
@@ -70,7 +70,7 @@ export function YearPicker({
     <select
       value={year}
       onChange={(e) => onChange(Number(e.target.value))}
-      className="rounded border border-line bg-surface px-2 py-1 text-[13px] tabular-nums"
+      className="rounded-xl shadow-ring bg-raised px-2 py-1 text-[13px] tabular-nums"
     >
       {years.map((y) => (
         <option key={y} value={y}>

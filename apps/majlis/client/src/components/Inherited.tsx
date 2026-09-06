@@ -54,9 +54,9 @@ function Item({
   const { t } = useI18n();
 
   return (
-    <li className="rounded border border-line px-3 py-2.5">
+    <li className="rounded-xl shadow-ring px-3 py-2.5">
       <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-        <span className="text-[11px] uppercase tracking-wider text-muted">
+        <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
           {t(`inherit.kind.${proposal.kind}`)}
         </span>
         {proposal.key && <span className="font-mono text-[12px]">{proposal.key}</span>}
@@ -85,7 +85,7 @@ function Item({
           type="button"
           onClick={onTake}
           disabled={busy}
-          className="mt-2 rounded border border-line px-3 py-1 text-[12px] text-muted transition-colors hover:border-muted hover:text-paper disabled:opacity-40"
+          className="mt-2 rounded-xl shadow-ring px-3 py-1 text-[12px] text-muted transition-colors hover:text-paper disabled:opacity-40"
         >
           {t('inherit.take')}
         </button>
@@ -154,8 +154,8 @@ export default function Inherited({
   const rest = inheritance.proposals.filter((p) => p.kind !== 'condition');
 
   return (
-    <div className="mb-6 rounded-lg border border-line bg-surface/60 px-4 py-3.5">
-      <div className="mb-1 text-[11px] uppercase tracking-wider text-muted">
+    <div className="mb-6 rounded-card shadow-ring bg-raised px-4 py-3.5">
+      <div className="mb-1 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
         {t('inherit.title')}
       </div>
 
@@ -227,13 +227,13 @@ export default function Inherited({
           */}
           {rest.length > 0 && (
             <div className="mt-3 border-t border-line pt-3">
-              <div className="mb-1.5 text-[11px] uppercase tracking-wider text-muted">
+              <div className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
                 {t('inherit.alsoSaid')}
               </div>
               <ul className="space-y-2">
                 {rest.map((p, i) => (
-                  <li key={idOf(p, i)} className="rounded border border-line px-3 py-2">
-                    <div className="text-[11px] uppercase tracking-wider text-muted">
+                  <li key={idOf(p, i)} className="rounded-xl shadow-ring px-3 py-2">
+                    <div className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
                       {t(`inherit.kind.${p.kind}`)}
                       {p.key && <span className="ms-2 font-mono normal-case">{p.key}</span>}
                     </div>

@@ -131,7 +131,7 @@ export default function Recorded({ kind, assetId }: { kind?: string; assetId?: s
           <Entry key={e.computation.id} entry={e} />
         ))}
       </ul>
-      <p className="mt-3 rounded border border-line bg-surface/60 px-3 py-2.5 text-[12.5px] leading-relaxed text-muted">
+      <p className="mt-3 rounded-xl shadow-ring bg-raised px-3 py-2.5 text-[12.5px] leading-relaxed text-muted">
         {data.whatRecordingMeans}
       </p>
     </div>

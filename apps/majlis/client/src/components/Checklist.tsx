@@ -85,7 +85,7 @@ function Condition({
           <Tag>{t('chk.unanswered')}</Tag>
         )}
         {contested && <Tag tone="gold">{t('chk.contested')}</Tag>}
-        <span className="text-[11px] uppercase tracking-wider text-muted">
+        <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
           {t(`chk.evidence.${c.evidence}`)}
         </span>
       </div>
@@ -152,7 +152,7 @@ function Condition({
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
                 placeholder={t('chk.reasonHint')}
-                className="mb-2 h-20 w-full rounded border border-line bg-transparent px-3 py-2 text-[13.5px]"
+                className="mb-2 h-20 w-full rounded-xl shadow-ring bg-raised px-3 py-2 text-[13.5px]"
               />
 
               {refusal && <p className="mb-2 text-[12.5px] leading-relaxed text-warn">{refusal}</p>}
@@ -169,7 +169,7 @@ function Condition({
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
-                  className="rounded border border-line px-3 py-1.5 text-[12.5px] text-muted"
+                  className="rounded-xl shadow-ring px-3 py-1.5 text-[12.5px] text-muted"
                 >
                   {t('common.cancel')}
                 </button>
@@ -179,7 +179,7 @@ function Condition({
             <button
               type="button"
               onClick={() => setOpen(true)}
-              className="rounded border border-line px-3 py-1.5 text-[12.5px] text-muted hover:border-muted"
+              className="rounded-xl shadow-ring px-3 py-1.5 text-[12.5px] text-muted hover:text-paper"
             >
               {mine ? t('chk.changeFinding') : t('chk.recordFinding')}
             </button>
@@ -238,7 +238,7 @@ function Picker({
 
         return (
           <div key={family}>
-            <div className="mb-1.5 text-[11px] uppercase tracking-wider text-muted">
+            <div className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
               {t(`family.${family}`)}
             </div>
             <div className="flex flex-wrap gap-2">
@@ -247,7 +247,7 @@ function Picker({
                   key={s.id}
                   type="button"
                   onClick={() => onChoose(s.id)}
-                  className="rounded border border-line px-3 py-1.5 text-left text-[12.5px] text-muted transition-colors hover:border-muted hover:text-paper"
+                  className="rounded-xl shadow-ring px-3 py-1.5 text-left text-[12.5px] text-muted transition-colors hover:text-paper"
                 >
                   {s.name}
                 </button>
@@ -373,7 +373,7 @@ export default function Checklist({ matterId, canRule }: { matterId: string; can
         ))}
       </ul>
 
-      <p className="mt-4 rounded border border-line bg-surface/60 px-3 py-2.5 text-[12.5px] leading-relaxed text-muted">
+      <p className="mt-4 rounded-xl shadow-ring bg-raised px-3 py-2.5 text-[12.5px] leading-relaxed text-muted">
         {data.note}
       </p>
     </div>

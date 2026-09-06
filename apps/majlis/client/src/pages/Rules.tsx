@@ -119,7 +119,7 @@ export default function Rules() {
                 {t('rule.inForceFrom')} <DateText iso={r.inForceFrom} />
               </div>
 
-              <div className="mt-3 text-[11px] uppercase tracking-wider text-muted">
+              <div className="mt-3 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
                 {t('rule.statement')}
               </div>
               <p className="mt-1 text-[14px] text-paper/85">{r.statement}</p>

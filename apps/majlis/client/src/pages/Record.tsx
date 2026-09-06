@@ -39,7 +39,7 @@ export default function Record() {
       <h1 className="mb-5 text-[19px] font-semibold">{t('record.title')}</h1>
 
       {health?.recordSince && (
-        <div className="mb-5 rounded-lg border border-line bg-surface/40 px-4 py-3">
+        <div className="mb-5 rounded-card shadow-ring bg-raised px-4 py-3">
           <div className="text-[13px] text-paper">
             {t('record.since')} <DateText iso={health.recordSince} />
           </div>
@@ -88,7 +88,7 @@ export default function Record() {
       ) : (
         <ul className="space-y-3">
           {log.map((x) => (
-            <li key={x.id} className="rounded-lg border border-line p-3.5">
+            <li key={x.id} className="rounded-card shadow-ring p-3.5">
               <div className="mb-1.5 flex flex-wrap items-center gap-2 text-[12px] text-muted">
                 <DateText iso={x.at} />
                 {x.declinedAsRuling && <Tag tone="warn">{t('asst.declined')}</Tag>}

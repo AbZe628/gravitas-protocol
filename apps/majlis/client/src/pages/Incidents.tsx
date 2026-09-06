@@ -119,12 +119,12 @@ export default function Incidents() {
       {mayDeliberate(identity?.role) && (
         <div className="mb-6">
           {open ? (
-            <form onSubmit={report} className="rounded-lg border border-line bg-surface p-4">
+            <form onSubmit={report} className="rounded-card shadow-ring bg-raised p-4">
               <label className="mb-1 block text-[12px] text-muted">{t('snc.reference')}</label>
               <input
                 value={form.reference}
                 onChange={(e) => setForm({ ...form, reference: e.target.value })}
-                className="mb-3 w-full rounded border border-line bg-transparent px-3 py-2 text-[14px]"
+                className="mb-3 w-full rounded-xl shadow-ring bg-raised px-3 py-2 text-[14px]"
                 placeholder="SNC-2026-001"
                 required
               />
@@ -132,7 +132,7 @@ export default function Incidents() {
               <input
                 value={form.title}
                 onChange={(e) => setForm({ ...form, title: e.target.value })}
-                className="mb-3 w-full rounded border border-line bg-transparent px-3 py-2 text-[14px]"
+                className="mb-3 w-full rounded-xl shadow-ring bg-raised px-3 py-2 text-[14px]"
                 required
                 minLength={3}
               />
@@ -140,7 +140,7 @@ export default function Incidents() {
               <textarea
                 value={form.report}
                 onChange={(e) => setForm({ ...form, report: e.target.value })}
-                className="mb-1 h-24 w-full rounded border border-line bg-transparent px-3 py-2 text-[14px]"
+                className="mb-1 h-24 w-full rounded-xl shadow-ring bg-raised px-3 py-2 text-[14px]"
                 required
               />
               <p className="mb-3 text-[11px] leading-relaxed text-muted">{t('snc.accountHint')}</p>
@@ -154,7 +154,7 @@ export default function Incidents() {
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
-                  className="rounded border border-line px-3 py-1.5 text-[13px] text-muted"
+                  className="rounded-xl shadow-ring px-3 py-1.5 text-[13px] text-muted"
                 >
                   {t('common.cancel')}
                 </button>
@@ -163,7 +163,7 @@ export default function Incidents() {
           ) : (
             <button
               onClick={() => setOpen(true)}
-              className="rounded border border-line px-3 py-2 text-[13px] text-muted hover:border-muted"
+              className="rounded-xl shadow-ring px-3 py-2 text-[13px] text-muted hover:text-paper"
             >
               {t('snc.report')}
             </button>

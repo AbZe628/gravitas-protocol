@@ -80,14 +80,14 @@ export default function RaiseMatter({ boardId }: { boardId: string }) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="mb-5 rounded border border-line px-3 py-1.5 text-[12px] hover:bg-surface/60"
+        className="mb-5 rounded-xl shadow-ring px-3 py-1.5 text-[12px] hover:bg-raised"
       >
         {t('raise.open')}
       </button>
     );
   }
 
-  const field = 'w-full rounded border border-line bg-transparent p-2 text-[14px] leading-relaxed outline-none';
+  const field = 'w-full rounded-xl bg-raised shadow-ring p-2 text-[14px] leading-relaxed outline-none';
 
   return (
     <Card>
@@ -156,7 +156,7 @@ export default function RaiseMatter({ boardId }: { boardId: string }) {
           type="button"
           onClick={submit}
           disabled={!ready || busy}
-          className="rounded border border-line px-3 py-1.5 text-[12px] hover:bg-surface/60 disabled:opacity-40"
+          className="rounded-xl shadow-ring px-3 py-1.5 text-[12px] hover:bg-raised disabled:opacity-40"
         >
           {t('raise.submit')}
         </button>

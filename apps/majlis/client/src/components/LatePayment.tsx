@@ -186,8 +186,8 @@ export default function LatePayment() {
           />
 
           {retention === 'evidenced_costs' && (
-            <fieldset className="mb-3 rounded border border-line px-3 py-3">
-              <legend className="px-1 text-[11px] uppercase tracking-wider text-muted">
+            <fieldset className="mb-3 rounded-xl shadow-ring px-3 py-3">
+              <legend className="px-1 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
                 {t('late.costs')}
               </legend>
               <p className="mb-2.5 text-[11.5px] leading-relaxed text-muted">{t('late.costs.hint')}</p>
@@ -197,33 +197,33 @@ export default function LatePayment() {
                   <div key={i} className="flex flex-wrap items-end gap-2">
                     <div className="min-w-[180px] flex-[2]">
                       <label className="block">
-                        <span className="mb-1 block text-[11px] uppercase tracking-wider text-muted">
+                        <span className="mb-1 block text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
                           {t('late.costWhat')}
                         </span>
                         <input
                           value={cost.description}
                           onChange={(e) => setCost(i, { description: e.target.value })}
-                          className="w-full rounded border border-line bg-transparent px-2.5 py-1.5 text-[13px] focus:border-muted focus:outline-none"
+                          className="w-full rounded-xl shadow-ring bg-raised px-2.5 py-1.5 text-[13px] focus:shadow-[0_0_0_1.5px_rgba(22,68,112,0.35)] focus:outline-none"
                         />
                       </label>
                     </div>
                     <div className="w-36">
                       <label className="block">
-                        <span className="mb-1 block text-[11px] uppercase tracking-wider text-muted">
+                        <span className="mb-1 block text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
                           {t('late.costAmount')}
                         </span>
                         <input
                           inputMode="decimal"
                           value={cost.amount}
                           onChange={(e) => setCost(i, { amount: e.target.value })}
-                          className="w-full rounded border border-line bg-transparent px-2.5 py-1.5 font-mono text-[13px] tabular-nums focus:border-muted focus:outline-none"
+                          className="w-full rounded-xl shadow-ring bg-raised px-2.5 py-1.5 font-mono text-[13px] tabular-nums focus:shadow-[0_0_0_1.5px_rgba(22,68,112,0.35)] focus:outline-none"
                         />
                       </label>
                     </div>
                     <button
                       type="button"
                       onClick={() => setCosts((was) => was.filter((_, j) => j !== i))}
-                      className="rounded border border-line px-2.5 py-1.5 text-[12px] text-muted hover:border-muted hover:text-paper"
+                      className="rounded-xl shadow-ring px-2.5 py-1.5 text-[12px] text-muted hover:text-paper"
                     >
                       {t('late.removeCost')}
                     </button>
@@ -234,7 +234,7 @@ export default function LatePayment() {
               <button
                 type="button"
                 onClick={() => setCosts((was) => [...was, { description: '', amount: '' }])}
-                className="mt-2.5 rounded border border-line px-2.5 py-1 text-[12px] text-muted hover:border-muted hover:text-paper"
+                className="mt-2.5 rounded-xl shadow-ring px-2.5 py-1 text-[12px] text-muted hover:text-paper"
               >
                 {t('late.addCost')}
               </button>
@@ -278,7 +278,7 @@ export default function LatePayment() {
               obligation it is. This sentence is what stops a retained amount
               being read as ordinary revenue.
             */}
-            <p className="mb-3 rounded border border-line px-3 py-2 text-[12.5px] leading-relaxed">
+            <p className="mb-3 rounded-xl shadow-ring px-3 py-2 text-[12.5px] leading-relaxed">
               {result.retentionStated}
             </p>
             <div className="mb-3 space-y-1 text-[12.5px]">

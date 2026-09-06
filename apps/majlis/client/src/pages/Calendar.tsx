@@ -111,11 +111,11 @@ export default function Calendar() {
 
       <a
         href={oversight.hrefs.calendarFeed()}
-        className="mb-7 block rounded-lg border border-line bg-surface px-4 py-3 transition-colors hover:border-muted"
+        className="mb-7 block rounded-card shadow-ring bg-raised px-4 py-3 transition-colors hover:text-paper"
       >
         <div className="flex items-baseline justify-between gap-3">
           <span className="text-[14px] font-medium">{t('cal.feed')}</span>
-          <span className="shrink-0 text-[11px] uppercase tracking-wider text-muted">
+          <span className="shrink-0 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
             {t('cal.download')}
           </span>
         </div>
@@ -146,8 +146,8 @@ export default function Calendar() {
         and missing the six-month cadence would be worse than none at all.
       */}
       {Array.isArray(data.gaps) && data.gaps.length > 0 && (
-        <div className="mt-8 rounded-lg border border-line px-4 py-3">
-          <div className="mb-2 text-[11px] uppercase tracking-wider text-muted">
+        <div className="mt-8 rounded-card shadow-ring px-4 py-3">
+          <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
             {t('cal.notHere')}
           </div>
           <ul className="space-y-2">

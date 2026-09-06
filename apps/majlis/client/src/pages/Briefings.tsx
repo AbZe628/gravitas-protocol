@@ -29,12 +29,12 @@ export default function Briefings() {
               </div>
               <h2 className="text-[15px] font-medium leading-snug">{b.title}</h2>
 
-              <div className="mt-4 text-[11px] uppercase tracking-wider text-muted">
+              <div className="mt-4 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
                 {t('brief.whatChanged')}
               </div>
               <p className="mt-1 text-[14px] text-paper/85">{b.whatChanged}</p>
 
-              <div className="mt-3.5 text-[11px] uppercase tracking-wider text-muted">
+              <div className="mt-3.5 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
                 {t('brief.whyChanged')}
               </div>
               <p className="mt-1 text-[14px] text-paper/85">{b.whyChanged}</p>

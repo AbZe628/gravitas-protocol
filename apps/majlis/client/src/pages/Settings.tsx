@@ -52,7 +52,7 @@ export default function Settings() {
         sentence rather than a warning on every row.
       */}
       {!data.credentialsConfigured && (
-        <div className="mb-7 rounded-lg border border-line bg-surface/60 px-4 py-3 text-[13px] leading-relaxed text-muted">
+        <div className="mb-7 rounded-card shadow-ring bg-raised px-4 py-3 text-[13px] leading-relaxed text-muted">
           {t('set.noCredentialsAtAll')}
         </div>
       )}

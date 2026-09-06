@@ -166,7 +166,7 @@ export default function Dictate({ onText }: { onText: (text: string) => void }) 
         because typing was always the path and this is the thing that leaves.
       */}
       {asking && (
-        <div className="mt-2 rounded border border-line px-3 py-2.5">
+        <div className="mt-2 rounded-xl shadow-ring px-3 py-2.5">
           <p className="text-[12px] leading-relaxed text-muted">{health.dictationNote}</p>
           <div className="mt-2 flex flex-wrap gap-2">
             <button
@@ -187,7 +187,7 @@ export default function Dictate({ onText }: { onText: (text: string) => void }) 
             <button
               type="button"
               onClick={() => setAsking(false)}
-              className="rounded border border-line px-3 py-1 text-[12px] text-muted"
+              className="rounded-xl shadow-ring px-3 py-1 text-[12px] text-muted"
             >
               {t('dictate.typeInstead')}
             </button>

@@ -107,8 +107,8 @@ export default function DriftPanel() {
         defeat the panel above it.
       */}
       {(data.unwatched.length > 0 || data.unmeasured.length > 0) && (
-        <div className="rounded-lg border border-line px-4 py-3">
-          <div className="mb-2 text-[11px] uppercase tracking-wider text-muted">
+        <div className="rounded-card shadow-ring px-4 py-3">
+          <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
             {t('drift.notChecked')}
           </div>
           <ul className="space-y-2">

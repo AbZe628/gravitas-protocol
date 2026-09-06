@@ -156,7 +156,7 @@ export default function MatterAction() {
           )}
 
           {passage?.settled && (
-            <p className="mb-5 rounded-lg border border-line px-4 py-3 text-[13px] leading-relaxed">
+            <p className="mb-5 rounded-card shadow-ring px-4 py-3 text-[13px] leading-relaxed">
               {passage.settled}
             </p>
           )}
@@ -178,7 +178,7 @@ export default function MatterAction() {
             */}
             <Link
               to={`/classic/matters/${matter.id}`}
-              className="rounded border border-line px-3.5 py-1.5 text-[13px] text-muted transition-colors hover:border-muted hover:text-paper"
+              className="rounded-xl shadow-ring px-3.5 py-1.5 text-[13px] text-muted transition-colors hover:text-paper"
             >
               {t('action.everything')}
             </Link>
@@ -249,7 +249,7 @@ export default function MatterAction() {
 
           <Link
             to="/"
-            className="inline-block rounded border border-line px-3.5 py-1.5 text-[13px] text-muted transition-colors hover:border-muted hover:text-paper"
+            className="inline-block rounded-xl shadow-ring px-3.5 py-1.5 text-[13px] text-muted transition-colors hover:text-paper"
           >
             {t('action.home')}
           </Link>

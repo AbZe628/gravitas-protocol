@@ -64,7 +64,7 @@ export default function Search() {
     setFailed(false);
   }
 
-  const select = 'rounded border border-line bg-transparent px-2 py-1.5 text-[13px] outline-none';
+  const select = 'rounded-xl bg-raised shadow-ring px-2 py-1.5 text-[13px] outline-none';
 
   return (
     <div>
@@ -84,12 +84,12 @@ export default function Search() {
             onChange={(e) => setQ(e.target.value)}
             placeholder={t('search.placeholder')}
             aria-label={t('search.title')}
-            className="min-w-[14rem] flex-1 rounded border border-line bg-transparent p-2 text-[14px] outline-none"
+            className="min-w-[14rem] flex-1 rounded-xl shadow-ring bg-raised p-2 text-[14px] outline-none"
           />
           <button
             type="submit"
             disabled={busy || empty}
-            className="rounded border border-line px-4 py-2 text-[13px] hover:bg-surface/60 disabled:opacity-40"
+            className="rounded-xl shadow-ring px-4 py-2 text-[13px] hover:bg-raised disabled:opacity-40"
           >
             {t('search.go')}
           </button>
@@ -156,7 +156,7 @@ export default function Search() {
 function Hit({ hit }: { hit: SearchHit }) {
   const { t } = useI18n();
   return (
-    <li className="rounded-lg border border-line p-3.5">
+    <li className="rounded-card shadow-ring p-3.5">
       <div className="mb-1.5 flex flex-wrap items-center gap-2 text-[11.5px]">
         <Tag tone={hit.direction === 'restrict' ? 'warn' : 'gold'}>
           {t(`matter.direction.${hit.direction}`)}

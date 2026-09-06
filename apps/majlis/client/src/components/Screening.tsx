@@ -91,7 +91,7 @@ export default function Screening() {
     return (
       <button
         onClick={() => setOpen(true)}
-        className="rounded border border-line px-3 py-2 text-[13px] text-muted hover:border-muted"
+        className="rounded-xl shadow-ring px-3 py-2 text-[13px] text-muted hover:text-paper"
       >
         {t('screen.open')}
       </button>
@@ -130,7 +130,7 @@ export default function Screening() {
   };
 
   return (
-    <div className="rounded-lg border border-line bg-surface p-4">
+    <div className="rounded-card shadow-ring bg-raised p-4">
       <ReadDocument
         fields={FIELDS.map((f) => ({ key: f.key as string, label: t(f.label) }))}
         onConfirm={takeCandidate}
@@ -139,52 +139,52 @@ export default function Screening() {
       <form onSubmit={compute}>
         <div className="mb-3 flex gap-2">
           <label className="flex-1">
-            <span className="mb-1 block text-[11px] uppercase tracking-wider text-muted">
+            <span className="mb-1 block text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
               {t('screen.asOf')}
             </span>
             <input
               type="date"
               value={figures.asOf}
               onChange={(e) => setFigures({ ...figures, asOf: e.target.value })}
-              className="w-full rounded border border-line bg-transparent px-2 py-1.5 text-[13px]"
+              className="w-full rounded-xl shadow-ring bg-raised px-2 py-1.5 text-[13px]"
             />
           </label>
           <label className="w-24">
-            <span className="mb-1 block text-[11px] uppercase tracking-wider text-muted">
+            <span className="mb-1 block text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
               {t('screen.currency')}
             </span>
             <input
               value={figures.currency}
               onChange={(e) => setFigures({ ...figures, currency: e.target.value })}
-              className="w-full rounded border border-line bg-transparent px-2 py-1.5 text-[13px]"
+              className="w-full rounded-xl shadow-ring bg-raised px-2 py-1.5 text-[13px]"
             />
           </label>
         </div>
 
         {FIELDS.map((f) => (
           <label key={f.key} className="mb-2.5 block">
-            <span className="mb-1 block text-[11px] uppercase tracking-wider text-muted">
+            <span className="mb-1 block text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
               {t(f.label)}
             </span>
             <input
               inputMode="decimal"
               value={figures[f.key] as string}
               onChange={(e) => setFigures({ ...figures, [f.key]: e.target.value })}
-              className="w-full rounded border border-line bg-transparent px-3 py-2 text-[14px] font-mono tabular-nums"
+              className="w-full rounded-xl shadow-ring bg-raised px-3 py-2 text-[14px] font-mono tabular-nums"
               placeholder="0"
             />
           </label>
         ))}
 
         <label className="mb-3 block">
-          <span className="mb-1 block text-[11px] uppercase tracking-wider text-muted">
+          <span className="mb-1 block text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
             {t('screen.source')}
           </span>
           <input
             value={figures.source}
             onChange={(e) => setFigures({ ...figures, source: e.target.value })}
             placeholder={t('screen.sourceHint')}
-            className="w-full rounded border border-line bg-transparent px-3 py-2 text-[13px]"
+            className="w-full rounded-xl shadow-ring bg-raised px-3 py-2 text-[13px]"
           />
         </label>
 
@@ -205,7 +205,7 @@ export default function Screening() {
               setResult(null);
               setError(null);
             }}
-            className="rounded border border-line px-3 py-1.5 text-[13px] text-muted"
+            className="rounded-xl shadow-ring px-3 py-1.5 text-[13px] text-muted"
           >
             {t('common.cancel')}
           </button>
@@ -225,7 +225,7 @@ export default function Screening() {
             cannot soften it and the same sentence travels with the figures
             wherever they go.
           */}
-          <p className="mt-3 rounded border border-line bg-surface/60 px-3 py-2.5 text-[12.5px] leading-relaxed text-muted">
+          <p className="mt-3 rounded-xl shadow-ring bg-raised px-3 py-2.5 text-[12.5px] leading-relaxed text-muted">
             {result.note}
           </p>
         </div>

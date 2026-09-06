@@ -64,7 +64,7 @@ function Step({ step, ordinal }: { step: PassageStep; ordinal?: number }) {
           <span className={'text-[13px] ' + (dim ? 'text-muted' : 'text-paper')}>{step.act}</span>
           {/* Whose it is, on every step. The commonest way a matter stalls is
               that everyone believes it is with somebody else. */}
-          <span className="text-[11px] uppercase tracking-wider text-muted">
+          <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
             {t(`passage.whose.${step.whose}`)}
           </span>
           {step.state === 'done' && (
@@ -113,7 +113,7 @@ export default function Passage({ matterId }: { matterId: string }) {
   if (!passage) return null;
 
   return (
-    <div className="mb-6 rounded-lg border border-line bg-surface/60 px-4 py-3.5">
+    <div className="mb-6 rounded-card shadow-ring bg-raised px-4 py-3.5">
       {/*
         The one sentence. A scholar opening this on a phone between two other
         things wants to know what now, and whether it is theirs.
@@ -121,7 +121,7 @@ export default function Passage({ matterId }: { matterId: string }) {
       {passage.next ? (
         <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
           <div className="min-w-0">
-            <div className="text-[11px] uppercase tracking-wider text-muted">
+            <div className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
               {t('passage.next')}
             </div>
             <div className="mt-0.5 text-[15px] leading-snug">
@@ -148,7 +148,7 @@ export default function Passage({ matterId }: { matterId: string }) {
               <div className="font-mono text-[19px] tabular-nums text-goldsoft">
                 {passage.waiting.days}
               </div>
-              <div className="text-[11px] uppercase tracking-wider text-muted">
+              <div className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
                 {t('passage.days')}
               </div>
             </div>
@@ -165,7 +165,7 @@ export default function Passage({ matterId }: { matterId: string }) {
       <button
         type="button"
         onClick={() => setOpen((was) => !was)}
-        className="mt-3 rounded border border-line px-2.5 py-1 text-[12px] text-muted transition-colors hover:border-muted hover:text-paper"
+        className="mt-3 rounded-xl shadow-ring px-2.5 py-1 text-[12px] text-muted transition-colors hover:text-paper"
       >
         {open ? t('passage.hide') : t('passage.show')}
       </button>
@@ -173,7 +173,7 @@ export default function Passage({ matterId }: { matterId: string }) {
       {open && (
         <div className="mt-4 grid gap-5 sm:grid-cols-2">
           <div>
-            <div className="mb-1 text-[11px] uppercase tracking-wider text-muted">
+            <div className="mb-1 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
               {t('passage.shaping')}
             </div>
             {/* Unnumbered on purpose: the order is the work's, not ours. */}
@@ -188,7 +188,7 @@ export default function Passage({ matterId }: { matterId: string }) {
           </div>
 
           <div>
-            <div className="mb-1 text-[11px] uppercase tracking-wider text-muted">
+            <div className="mb-1 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
               {t('passage.deciding')}
             </div>
             <p className="mb-2.5 text-[11.5px] leading-relaxed text-muted">

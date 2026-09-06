@@ -71,7 +71,7 @@ function Reason({
         value={text}
         onChange={(e) => setText(e.target.value)}
         placeholder={placeholder}
-        className="mb-2 h-20 w-full rounded border border-line bg-transparent px-3 py-2 text-[14px]"
+        className="mb-2 h-20 w-full rounded-xl shadow-ring bg-raised px-3 py-2 text-[14px]"
       />
       <div className="flex gap-2">
         <button
@@ -90,7 +90,7 @@ function Reason({
         >
           {label}
         </button>
-        <button onClick={() => setOpen(false)} className="rounded border border-line px-3 py-1.5 text-[13px] text-muted">
+        <button onClick={() => setOpen(false)} className="rounded-xl shadow-ring px-3 py-1.5 text-[13px] text-muted">
           {t('common.cancel')}
         </button>
       </div>
@@ -295,7 +295,7 @@ export default function IncidentDetail() {
         i.stage === 'endorsed' && clerk ? (
           <button
             onClick={() => act(() => oversight.directors(id))}
-            className="rounded border border-line px-3 py-1.5 text-[13px] text-muted"
+            className="rounded-xl shadow-ring px-3 py-1.5 text-[13px] text-muted"
           >
             {t('snc.recordDirectors')}
           </button>
@@ -316,7 +316,7 @@ export default function IncidentDetail() {
         i.stage === 'approved' && clerk ? (
           <button
             onClick={() => act(() => oversight.submission(id))}
-            className="rounded border border-line px-3 py-1.5 text-[13px] text-muted"
+            className="rounded-xl shadow-ring px-3 py-1.5 text-[13px] text-muted"
           >
             {t('snc.recordSubmission')}
           </button>
@@ -372,7 +372,7 @@ export default function IncidentDetail() {
         (i.stage === 'submitted' || i.stage === 'not_actual') && board ? (
           <button
             onClick={() => act(() => oversight.closeIncident(id))}
-            className="rounded border border-line px-3 py-1.5 text-[13px] text-muted"
+            className="rounded-xl shadow-ring px-3 py-1.5 text-[13px] text-muted"
           >
             {t('snc.close')}
           </button>
@@ -430,7 +430,7 @@ export default function IncidentDetail() {
             <div>
               <div className="mb-1 flex flex-wrap items-baseline gap-2">
                 <span className="text-[14px] font-medium">{s.label}</span>
-                <span className="text-[11px] uppercase tracking-wider text-muted">{mine(s.owner)}</span>
+                <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted">{mine(s.owner)}</span>
               </div>
               <div className="text-[13px] leading-relaxed">{s.detail}</div>
               {s.action && <div className="mt-2.5">{s.action}</div>}
@@ -466,19 +466,19 @@ function PrescribeForm({
           value={p.amount}
           onChange={(e) => setP({ ...p, amount: e.target.value })}
           placeholder="12480.55"
-          className="w-32 rounded border border-line bg-transparent px-3 py-2 text-[14px] tabular-nums"
+          className="w-32 rounded-xl shadow-ring bg-raised px-3 py-2 text-[14px] tabular-nums"
         />
         <input
           value={p.currency}
           onChange={(e) => setP({ ...p, currency: e.target.value })}
-          className="w-20 rounded border border-line bg-transparent px-3 py-2 text-[14px]"
+          className="w-20 rounded-xl shadow-ring bg-raised px-3 py-2 text-[14px]"
         />
       </div>
       <input
         value={p.destination}
         onChange={(e) => setP({ ...p, destination: e.target.value })}
         placeholder={t('snc.destinationHint')}
-        className="w-full rounded border border-line bg-transparent px-3 py-2 text-[14px]"
+        className="w-full rounded-xl shadow-ring bg-raised px-3 py-2 text-[14px]"
       />
       <p className="text-[11px] leading-relaxed text-muted">{t('snc.destinationNote')}</p>
       <div className="flex gap-2">
@@ -491,7 +491,7 @@ function PrescribeForm({
         >
           {t('snc.prescribe')}
         </button>
-        <button onClick={() => setOpen(false)} className="rounded border border-line px-3 py-1.5 text-[13px] text-muted">
+        <button onClick={() => setOpen(false)} className="rounded-xl shadow-ring px-3 py-1.5 text-[13px] text-muted">
           {t('common.cancel')}
         </button>
       </div>

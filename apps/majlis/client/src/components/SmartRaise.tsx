@@ -106,15 +106,15 @@ export default function SmartRaise({ boardId }: { boardId: string }) {
   }
 
   const field =
-    'w-full rounded border border-line bg-transparent p-2 text-[14px] leading-relaxed outline-none focus:border-muted';
+    'w-full rounded-xl bg-raised shadow-ring p-2 text-[14px] leading-relaxed outline-none focus:shadow-[0_0_0_1.5px_rgba(22,68,112,0.35)]';
 
   return (
-    <div className="rounded-lg border border-line bg-surface/60 px-4 py-4">
+    <div className="rounded-card shadow-ring bg-raised px-4 py-4">
       <div className="mb-3 text-[15px] font-semibold">{t('smart.title')}</div>
 
       {/* ── one: what kind of decision ─────────────────────────────────── */}
 
-      <div className="mb-1 text-[11px] uppercase tracking-wider text-muted">{t('smart.whatKind')}</div>
+      <div className="mb-1 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">{t('smart.whatKind')}</div>
       <div className="mb-4 grid gap-2 sm:grid-cols-2">
         {KINDS.map((k) => (
           <button
@@ -143,7 +143,7 @@ export default function SmartRaise({ boardId }: { boardId: string }) {
             the delay and whether it is ratified afterwards, and somebody
             choosing in a hurry should see that rather than discover it.
           */}
-          <p className="mb-4 rounded border border-line px-3 py-2 text-[12px] leading-relaxed text-muted">
+          <p className="mb-4 rounded-xl shadow-ring px-3 py-2 text-[12px] leading-relaxed text-muted">
             {t(`matter.direction.${RECORDS[kind].direction}Note`)}
           </p>
 

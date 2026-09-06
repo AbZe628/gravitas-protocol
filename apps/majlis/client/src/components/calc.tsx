@@ -36,7 +36,7 @@ export function Field({
 }) {
   return (
     <label className="mb-2.5 block">
-      <span className="mb-1 block text-[11px] uppercase tracking-wider text-muted">{label}</span>
+      <span className="mb-1 block text-[10px] font-bold uppercase tracking-[0.15em] text-muted">{label}</span>
       {children}
       {hint && <span className="mt-1 block text-[11px] leading-relaxed text-muted opacity-80">{hint}</span>}
     </label>
@@ -44,7 +44,7 @@ export function Field({
 }
 
 const INPUT =
-  'w-full rounded border border-line bg-transparent px-3 py-2 text-[14px] focus:border-muted focus:outline-none';
+  'w-full rounded-xl bg-raised shadow-ring px-3 py-2 text-[14px] focus:shadow-[0_0_0_1.5px_rgba(22,68,112,0.35)] focus:outline-none';
 
 /** A money field. Monospaced and tabular so digits line up down a column. */
 export function Money({
@@ -165,7 +165,7 @@ export function Choice<T extends string>({
 }) {
   return (
     <fieldset className="mb-3">
-      <legend className="mb-1.5 text-[11px] uppercase tracking-wider text-muted">{label}</legend>
+      <legend className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">{label}</legend>
       {hint && <p className="mb-2 text-[11.5px] leading-relaxed text-muted">{hint}</p>}
       <div className="space-y-1.5">
         {options.map((o) => (
@@ -198,7 +198,7 @@ export function Steps({ steps }: { steps: CalcStep[] }) {
   return (
     <ol className="space-y-1.5">
       {steps.map((s, i) => (
-        <li key={i} className="rounded border border-line px-3 py-2">
+        <li key={i} className="rounded-xl shadow-ring px-3 py-2">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
             <span className="text-[13px]">{s.label}</span>
             <span className="font-mono text-[13px] tabular-nums">{s.value}</span>
@@ -251,7 +251,7 @@ export function Result({
  */
 export function Note({ children }: { children: string }) {
   return (
-    <p className="mt-3 rounded border border-line bg-surface/60 px-3 py-2.5 text-[12.5px] leading-relaxed text-muted">
+    <p className="mt-3 rounded-xl shadow-ring bg-raised px-3 py-2.5 text-[12.5px] leading-relaxed text-muted">
       {children}
     </p>
   );

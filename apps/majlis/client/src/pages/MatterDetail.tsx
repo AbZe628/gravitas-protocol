@@ -190,7 +190,7 @@ export default function MatterDetail() {
               {t('sim.window')} <DateText iso={matter.simulation.windowFrom} /> —{' '}
               <DateText iso={matter.simulation.windowTo} />
             </div>
-            <div className="mb-2 text-[11px] uppercase tracking-wider text-muted">
+            <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
               {t('sim.sample')}
             </div>
             <ul className="space-y-2.5">

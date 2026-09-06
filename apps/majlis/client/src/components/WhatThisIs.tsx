@@ -72,7 +72,7 @@ export default function WhatThisIs({
   }
 
   return (
-    <section className="mb-6 rounded-lg border border-line bg-surface/60 px-4 py-4 sm:px-5">
+    <section className="mb-6 rounded-card shadow-ring bg-raised px-4 py-4 sm:px-5">
       <h2 className="text-[17px] font-semibold tracking-tight">{t('intro.title')}</h2>
       <p className="mt-1.5 max-w-prose text-[13.5px] leading-relaxed">{t('intro.lede')}</p>
 
@@ -81,7 +81,7 @@ export default function WhatThisIs({
           <Link
             key={kind}
             to={WHERE[kind]}
-            className="group rounded border border-line px-3.5 py-3 transition-colors hover:border-muted"
+            className="group rounded-xl shadow-ring px-3.5 py-3 transition-colors hover:text-paper"
           >
             <div className="text-[13px] font-medium">{t(`intro.${kind}`)}</div>
             <p className="mt-1 text-[12px] leading-relaxed text-muted">{t(`intro.${kind}.body`)}</p>
@@ -99,7 +99,7 @@ export default function WhatThisIs({
         spend one.
       */}
       <div className="mt-4 border-t border-line pt-3.5">
-        <div className="mb-1.5 text-[11px] uppercase tracking-wider text-muted">
+        <div className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
           {t('intro.never')}
         </div>
         <ul className="space-y-1.5">
@@ -115,7 +115,7 @@ export default function WhatThisIs({
       <button
         type="button"
         onClick={onToggle}
-        className="mt-3.5 rounded border border-line px-3 py-1 text-[12px] text-muted transition-colors hover:border-muted hover:text-paper"
+        className="mt-3.5 rounded-xl shadow-ring px-3 py-1 text-[12px] text-muted transition-colors hover:text-paper"
       >
         {t('intro.hide')}
       </button>

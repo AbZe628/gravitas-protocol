@@ -38,7 +38,7 @@ import ReadDocument from './ReadDocument.js';
 function ReserveRow({ r, currency }: { r: Reserve; currency: string }) {
   const { t } = useI18n();
   return (
-    <li className="rounded border border-line px-3 py-2.5">
+    <li className="rounded-xl shadow-ring px-3 py-2.5">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <span className="text-[13px] font-medium">{r.name}</span>
         <span className="font-mono text-[13px] tabular-nums">
@@ -149,8 +149,8 @@ export default function Distribution() {
       />
 
       {/* Before the split. Both parties bear it. */}
-      <div className="mb-3 rounded border border-line px-3 py-3">
-        <div className="mb-2 text-[11px] uppercase tracking-wider text-muted">{t('dist.perTitle')}</div>
+      <div className="mb-3 rounded-xl shadow-ring px-3 py-3">
+        <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">{t('dist.perTitle')}</div>
         <p className="mb-2.5 text-[11.5px] leading-relaxed text-muted">{t('dist.per.meaning')}</p>
         <Rate label={t('dist.deduction')} bps={per} onChange={setPer} />
         <div className="flex gap-2">
@@ -164,8 +164,8 @@ export default function Distribution() {
       </div>
 
       {/* After the split. The depositors alone bear it. */}
-      <div className="mb-3 rounded border border-line px-3 py-3">
-        <div className="mb-2 text-[11px] uppercase tracking-wider text-muted">{t('dist.irrTitle')}</div>
+      <div className="mb-3 rounded-xl shadow-ring px-3 py-3">
+        <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">{t('dist.irrTitle')}</div>
         <p className="mb-2.5 text-[11.5px] leading-relaxed text-muted">{t('dist.irr.meaning')}</p>
         <Rate label={t('dist.deduction')} bps={irr} onChange={setIrr} />
         <div className="flex gap-2">
@@ -203,8 +203,8 @@ export default function Distribution() {
             report showing only what was paid hides the entire question the
             reserves exist to raise.
           */}
-          <div className="mb-3 rounded border border-line px-3 py-2.5">
-            <div className="mb-1.5 text-[11px] uppercase tracking-wider text-muted">
+          <div className="mb-3 rounded-xl shadow-ring px-3 py-2.5">
+            <div className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
               {t('dist.smoothing')}
             </div>
             <div className="flex flex-wrap items-baseline justify-between gap-2 font-mono text-[12.5px] tabular-nums">

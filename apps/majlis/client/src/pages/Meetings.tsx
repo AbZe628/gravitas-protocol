@@ -146,7 +146,7 @@ function MeetingCard({
         <div className="mt-3 space-y-3">
           {/* ── who was there ───────────────────────────────────────────── */}
           <div>
-            <div className="mb-1.5 text-[11px] uppercase tracking-wider text-muted">
+            <div className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
               {t('meet.attendance')}
             </div>
 
@@ -175,7 +175,7 @@ function MeetingCard({
                         value={notes[member.id] ?? ''}
                         onChange={(e) => setNotes({ ...notes, [member.id]: e.target.value })}
                         placeholder={t('meet.absenceNote')}
-                        className="flex-1 rounded border border-line bg-transparent px-2 py-1 text-[12.5px]"
+                        className="flex-1 rounded-xl shadow-ring bg-raised px-2 py-1 text-[12.5px]"
                       />
                     )}
                   </div>
@@ -184,7 +184,7 @@ function MeetingCard({
                   type="button"
                   disabled={busy}
                   onClick={saveAttendance}
-                  className="rounded border border-line px-3 py-1.5 text-[12.5px] text-muted hover:border-muted hover:text-paper disabled:opacity-40"
+                  className="rounded-xl shadow-ring px-3 py-1.5 text-[12.5px] text-muted hover:text-paper disabled:opacity-40"
                 >
                   {t('meet.saveAttendance')}
                 </button>
@@ -218,7 +218,7 @@ function MeetingCard({
 
           {/* ── the minute ──────────────────────────────────────────────── */}
           <div>
-            <div className="mb-1.5 text-[11px] uppercase tracking-wider text-muted">
+            <div className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
               {t('meet.minute')}
             </div>
 
@@ -229,13 +229,13 @@ function MeetingCard({
                   onChange={(e) => setMinute(e.target.value)}
                   rows={4}
                   placeholder={t('meet.minuteHint')}
-                  className="w-full rounded border border-line bg-transparent px-3 py-2 text-[13px] leading-relaxed"
+                  className="w-full rounded-xl shadow-ring bg-raised px-3 py-2 text-[13px] leading-relaxed"
                 />
                 <button
                   type="button"
                   disabled={busy}
                   onClick={() => run(() => oversight.writeMinute(m.id, minute))}
-                  className="mt-1.5 rounded border border-line px-3 py-1.5 text-[12.5px] text-muted hover:border-muted hover:text-paper disabled:opacity-40"
+                  className="mt-1.5 rounded-xl shadow-ring px-3 py-1.5 text-[12.5px] text-muted hover:text-paper disabled:opacity-40"
                 >
                   {t('meet.saveMinute')}
                 </button>
@@ -391,33 +391,33 @@ export default function Meetings() {
         <button
           type="button"
           onClick={() => setConvening(true)}
-          className="mb-5 rounded border border-line px-3 py-1.5 text-[13px] text-muted hover:border-muted hover:text-paper"
+          className="mb-5 rounded-xl shadow-ring px-3 py-1.5 text-[13px] text-muted hover:text-paper"
         >
           {t('meet.convene')}
         </button>
       )}
 
       {canConvene && convening && (
-        <form onSubmit={convene} className="mb-5 rounded-lg border border-line px-4 py-3.5">
+        <form onSubmit={convene} className="mb-5 rounded-card shadow-ring px-4 py-3.5">
           {/*
             Wrapping labels rather than sitting beside the field. A label a
             screen reader cannot associate with its input is a label only some
             people have.
           */}
           <label className="mb-2.5 block">
-            <span className="mb-1 block text-[11px] uppercase tracking-wider text-muted">
+            <span className="mb-1 block text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
               {t('meet.when')}
             </span>
             <input
               type="datetime-local"
               value={at}
               onChange={(e) => setAt(e.target.value)}
-              className="w-full rounded border border-line bg-transparent px-3 py-2 text-[13px]"
+              className="w-full rounded-xl shadow-ring bg-raised px-3 py-2 text-[13px]"
             />
           </label>
 
           <label className="mb-2.5 block">
-            <span className="mb-1 block text-[11px] uppercase tracking-wider text-muted">
+            <span className="mb-1 block text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
               {t('meet.agenda')}
             </span>
             <textarea
@@ -425,19 +425,19 @@ export default function Meetings() {
               onChange={(e) => setAgenda(e.target.value)}
               rows={3}
               placeholder={t('meet.agendaHint')}
-              className="w-full rounded border border-line bg-transparent px-3 py-2 text-[13px]"
+              className="w-full rounded-xl shadow-ring bg-raised px-3 py-2 text-[13px]"
             />
           </label>
 
           <label className="mb-3 block">
-            <span className="mb-1 block text-[11px] uppercase tracking-wider text-muted">
+            <span className="mb-1 block text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
               {t('meet.joinUrl')}
             </span>
             <input
               value={joinUrl}
               onChange={(e) => setJoinUrl(e.target.value)}
               placeholder={t('meet.joinUrlHint')}
-              className="w-full rounded border border-line bg-transparent px-3 py-2 text-[13px]"
+              className="w-full rounded-xl shadow-ring bg-raised px-3 py-2 text-[13px]"
             />
           </label>
 
@@ -461,7 +461,7 @@ export default function Meetings() {
                 setConvening(false);
                 setError(null);
               }}
-              className="rounded border border-line px-3 py-1.5 text-[13px] text-muted"
+              className="rounded-xl shadow-ring px-3 py-1.5 text-[13px] text-muted"
             >
               {t('common.cancel')}
             </button>

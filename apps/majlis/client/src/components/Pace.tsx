@@ -68,7 +68,7 @@ export default function Pace() {
   if (nothingYet) return null;
 
   return (
-    <section className="mb-5 rounded-lg border border-line bg-surface/40 px-4 py-3">
+    <section className="mb-5 rounded-card shadow-ring bg-raised px-4 py-3">
       <div className="flex flex-wrap items-baseline gap-x-5 gap-y-1.5">
         {board.medianDays !== null && (
           <span className="text-[13px]">

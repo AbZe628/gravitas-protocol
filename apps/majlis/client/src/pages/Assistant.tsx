@@ -41,10 +41,10 @@ export default function Assistant() {
       <ul className="mb-6 space-y-5">
         {thread.map((x) => (
           <li key={x.id}>
-            <div className="mb-2 rounded-lg border border-line px-3.5 py-2.5 text-[14px]">
+            <div className="mb-2 rounded-card shadow-ring px-3.5 py-2.5 text-[14px]">
               {x.question}
             </div>
-            <div className="rounded-lg border border-line bg-surface px-3.5 py-3">
+            <div className="rounded-card shadow-ring bg-raised px-3.5 py-3">
               {(x.declinedAsRuling || x.escalated) && (
                 <div className="mb-2 flex flex-wrap gap-1.5">
                   {x.declinedAsRuling && <Tag tone="warn">{t('asst.declined')}</Tag>}
@@ -61,7 +61,7 @@ export default function Assistant() {
       {error && <div className="mb-4 text-[13px] text-warn">{t('asst.error')}</div>}
 
       <div className="sticky bottom-16 md:bottom-4">
-        <div className="flex gap-2 rounded-lg border border-line bg-surface p-2">
+        <div className="flex gap-2 rounded-card shadow-ring bg-raised p-2">
           <textarea
             value={question}
             onChange={(e) => setQuestion(e.target.value)}

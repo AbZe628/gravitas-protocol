@@ -104,7 +104,7 @@ export default function RecordCalculation({ input, wantsHolding = false }: Recor
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="mt-3 rounded border border-line px-3 py-1.5 text-[13px] text-muted transition-colors hover:border-muted hover:text-paper"
+        className="mt-3 rounded-xl shadow-ring px-3 py-1.5 text-[13px] text-muted transition-colors hover:text-paper"
       >
         {t('noteCalc.open')}
       </button>
@@ -112,8 +112,8 @@ export default function RecordCalculation({ input, wantsHolding = false }: Recor
   }
 
   return (
-    <div className="mt-3 rounded-lg border border-line px-4 py-3.5">
-      <div className="mb-2 text-[11px] uppercase tracking-wider text-muted">{t('noteCalc.title')}</div>
+    <div className="mt-3 rounded-card shadow-ring px-4 py-3.5">
+      <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">{t('noteCalc.title')}</div>
 
       {/* The server's own words. Shown before the panel offers to act. */}
       {meaning && <p className="mb-3 text-[12.5px] leading-relaxed text-muted">{meaning}</p>}
@@ -129,13 +129,13 @@ export default function RecordCalculation({ input, wantsHolding = false }: Recor
 
       {wantsHolding && (
         <label className="mb-2.5 block">
-          <span className="mb-1 block text-[11px] uppercase tracking-wider text-muted">
+          <span className="mb-1 block text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
             {t('noteCalc.holding')}
           </span>
           <select
             value={assetId}
             onChange={(e) => setAssetId(e.target.value)}
-            className="w-full rounded border border-line bg-transparent px-3 py-2 text-[13px]"
+            className="w-full rounded-xl shadow-ring bg-raised px-3 py-2 text-[13px]"
           >
             <option value="">{t('noteCalc.noHolding')}</option>
             {assets.map((a) => (
@@ -165,7 +165,7 @@ export default function RecordCalculation({ input, wantsHolding = false }: Recor
             setOpen(false);
             setError(null);
           }}
-          className="rounded border border-line px-3 py-1.5 text-[13px] text-muted"
+          className="rounded-xl shadow-ring px-3 py-1.5 text-[13px] text-muted"
         >
           {t('common.cancel')}
         </button>

@@ -94,7 +94,7 @@ export default function AssetDetail() {
         >
           {t(`reg.status.${data.status}`)}
         </Tag>
-        <span className="text-[11px] uppercase tracking-wider text-muted">
+        <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
           {t(`reg.kind.${a.kind}`)}
         </span>
       </div>
@@ -143,7 +143,7 @@ export default function AssetDetail() {
         <ul className="space-y-1.5">
           {a.identifiers.map((i, n) => (
             <li key={n} className="text-[13px]">
-              <span className="text-[11px] uppercase tracking-wider text-muted">{i.scheme}</span>
+              <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted">{i.scheme}</span>
               <span className="mx-2 font-mono break-all">{i.value}</span>
               {i.network && <span className="text-[12px] text-muted">{i.network}</span>}
             </li>
@@ -221,7 +221,7 @@ export default function AssetDetail() {
               <li key={m}>
                 <Link
                   to={`/matters/${m}`}
-                  className="flex items-baseline gap-2 rounded-lg border border-line px-3 py-2 text-[13px] hover:border-muted"
+                  className="flex items-baseline gap-2 rounded-card shadow-ring px-3 py-2 text-[13px] hover:text-paper"
                 >
                   {m === data.governedBy && <Tag>{t('reg.governs')}</Tag>}
                   <span className="font-mono text-[12px] break-all">{m}</span>
@@ -243,8 +243,8 @@ export default function AssetDetail() {
       </Section>
 
       {a.retiredAt && (
-        <div className="mt-6 rounded-lg border border-line px-4 py-3">
-          <div className="text-[11px] uppercase tracking-wider text-muted">{t('reg.retired')}</div>
+        <div className="mt-6 rounded-card shadow-ring px-4 py-3">
+          <div className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted">{t('reg.retired')}</div>
           <p className="mt-1.5 text-[13px] leading-relaxed text-muted">
             <DateText iso={a.retiredAt} />
             {a.retiredReason ? <> — {a.retiredReason}</> : null}

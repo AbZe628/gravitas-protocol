@@ -62,7 +62,7 @@ function BpsField({
   const [text, setText] = useState(String(bps / 100));
   return (
     <label className="block">
-      <span className="mb-1 block text-[11px] uppercase tracking-wider text-muted">{label}</span>
+      <span className="mb-1 block text-[10px] font-bold uppercase tracking-[0.15em] text-muted">{label}</span>
       <div className="flex items-center gap-1.5">
         <input
           inputMode="decimal"
@@ -72,7 +72,7 @@ function BpsField({
             const n = Number(e.target.value);
             onChange(Number.isNaN(n) ? 0 : Math.round(n * 100));
           }}
-          className="w-full rounded border border-line bg-transparent px-2.5 py-1.5 font-mono text-[13px] tabular-nums focus:border-muted focus:outline-none"
+          className="w-full rounded-xl shadow-ring bg-raised px-2.5 py-1.5 font-mono text-[13px] tabular-nums focus:shadow-[0_0_0_1.5px_rgba(22,68,112,0.35)] focus:outline-none"
         />
         <span className="text-[13px] text-muted">%</span>
       </div>
@@ -123,8 +123,8 @@ export default function Tradability() {
 
       {/* ── the composition ───────────────────────────────────────────────── */}
 
-      <fieldset className="mb-3 rounded border border-line px-3 py-3">
-        <legend className="px-1 text-[11px] uppercase tracking-wider text-muted">
+      <fieldset className="mb-3 rounded-xl shadow-ring px-3 py-3">
+        <legend className="px-1 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
           {t('trade.composition')}
         </legend>
         <p className="mb-2.5 text-[11.5px] leading-relaxed text-muted">{t('trade.composition.hint')}</p>
@@ -134,13 +134,13 @@ export default function Tradability() {
             <div key={i} className="flex flex-wrap items-end gap-2">
               <div className="min-w-[160px] flex-[2]">
                 <label className="block">
-                  <span className="mb-1 block text-[11px] uppercase tracking-wider text-muted">
+                  <span className="mb-1 block text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
                     {t('trade.partLabel')}
                   </span>
                   <input
                     value={part.label}
                     onChange={(e) => setPart(i, { label: e.target.value })}
-                    className="w-full rounded border border-line bg-transparent px-2.5 py-1.5 text-[13px] focus:border-muted focus:outline-none"
+                    className="w-full rounded-xl shadow-ring bg-raised px-2.5 py-1.5 text-[13px] focus:shadow-[0_0_0_1.5px_rgba(22,68,112,0.35)] focus:outline-none"
                   />
                 </label>
               </div>
@@ -149,13 +149,13 @@ export default function Tradability() {
               </div>
               <div className="w-36">
                 <label className="block">
-                  <span className="mb-1 block text-[11px] uppercase tracking-wider text-muted">
+                  <span className="mb-1 block text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
                     {t('trade.kind')}
                   </span>
                   <select
                     value={part.kind}
                     onChange={(e) => setPart(i, { kind: e.target.value as PartKind })}
-                    className="w-full rounded border border-line bg-transparent px-2.5 py-1.5 text-[13px] focus:border-muted focus:outline-none"
+                    className="w-full rounded-xl shadow-ring bg-raised px-2.5 py-1.5 text-[13px] focus:shadow-[0_0_0_1.5px_rgba(22,68,112,0.35)] focus:outline-none"
                   >
                     {PART_KINDS.map((k) => (
                       <option key={k} value={k}>
@@ -169,7 +169,7 @@ export default function Tradability() {
                 <button
                   type="button"
                   onClick={() => setParts((was) => was.filter((_, j) => j !== i))}
-                  className="rounded border border-line px-2.5 py-1.5 text-[12px] text-muted hover:border-muted hover:text-paper"
+                  className="rounded-xl shadow-ring px-2.5 py-1.5 text-[12px] text-muted hover:text-paper"
                 >
                   {t('trade.removePart')}
                 </button>
@@ -181,7 +181,7 @@ export default function Tradability() {
         <button
           type="button"
           onClick={() => setParts((was) => [...was, { ...EMPTY_PART }])}
-          className="mt-2.5 rounded border border-line px-2.5 py-1 text-[12px] text-muted hover:border-muted hover:text-paper"
+          className="mt-2.5 rounded-xl shadow-ring px-2.5 py-1 text-[12px] text-muted hover:text-paper"
         >
           {t('trade.addPart')}
         </button>
@@ -210,8 +210,8 @@ export default function Tradability() {
 
       {/* ── what the board counts ─────────────────────────────────────────── */}
 
-      <fieldset className="mb-3 rounded border border-line px-3 py-3">
-        <legend className="px-1 text-[11px] uppercase tracking-wider text-muted">
+      <fieldset className="mb-3 rounded-xl shadow-ring px-3 py-3">
+        <legend className="px-1 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
           {t('trade.counts')}
         </legend>
         {/*
@@ -238,15 +238,15 @@ export default function Tradability() {
 
       {/* ── the board's rule ──────────────────────────────────────────────── */}
 
-      <fieldset className="mb-3 rounded border border-line px-3 py-3">
-        <legend className="px-1 text-[11px] uppercase tracking-wider text-muted">
+      <fieldset className="mb-3 rounded-xl shadow-ring px-3 py-3">
+        <legend className="px-1 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
           {t('trade.bands')}
         </legend>
         <p className="mb-2.5 text-[11.5px] leading-relaxed text-muted">{t('trade.bands.hint')}</p>
 
         <div className="space-y-2.5">
           {bands.map((band, i) => (
-            <div key={i} className="rounded border border-line px-2.5 py-2.5">
+            <div key={i} className="rounded-xl shadow-ring px-2.5 py-2.5">
               <div className="mb-2 flex flex-wrap items-end gap-2">
                 <div className="w-28">
                   <BpsField
@@ -266,14 +266,14 @@ export default function Tradability() {
                   <button
                     type="button"
                     onClick={() => setBands((was) => was.filter((_, j) => j !== i))}
-                    className="rounded border border-line px-2.5 py-1.5 text-[12px] text-muted hover:border-muted hover:text-paper"
+                    className="rounded-xl shadow-ring px-2.5 py-1.5 text-[12px] text-muted hover:text-paper"
                   >
                     {t('trade.removeBand')}
                   </button>
                 )}
               </div>
               <label className="block">
-                <span className="mb-1 block text-[11px] uppercase tracking-wider text-muted">
+                <span className="mb-1 block text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
                   {t('trade.consequence')}
                 </span>
                 <textarea
@@ -281,7 +281,7 @@ export default function Tradability() {
                   rows={2}
                   placeholder={t('trade.consequence.placeholder')}
                   onChange={(e) => setBand(i, { consequence: e.target.value })}
-                  className="w-full rounded border border-line bg-transparent px-2.5 py-1.5 text-[13px] leading-relaxed focus:border-muted focus:outline-none"
+                  className="w-full rounded-xl shadow-ring bg-raised px-2.5 py-1.5 text-[13px] leading-relaxed focus:shadow-[0_0_0_1.5px_rgba(22,68,112,0.35)] focus:outline-none"
                 />
                 <span className="mt-1 block text-[11px] leading-relaxed text-muted opacity-80">
                   {t('trade.consequence.hint')}
@@ -294,7 +294,7 @@ export default function Tradability() {
         <button
           type="button"
           onClick={() => setBands((was) => [...was, { ...EMPTY_BAND }])}
-          className="mt-2.5 rounded border border-line px-2.5 py-1 text-[12px] text-muted hover:border-muted hover:text-paper"
+          className="mt-2.5 rounded-xl shadow-ring px-2.5 py-1 text-[12px] text-muted hover:text-paper"
         >
           {t('trade.addBand')}
         </button>
@@ -363,7 +363,7 @@ export default function Tradability() {
             actually governs rather than left to infer it from a zero.
           */}
           {result.alsoGovernedBy.map((line, i) => (
-            <p key={i} className="mb-2 rounded border border-line px-3 py-2 text-[12.5px] leading-relaxed">
+            <p key={i} className="mb-2 rounded-xl shadow-ring px-3 py-2 text-[12.5px] leading-relaxed">
               {line}
             </p>
           ))}
