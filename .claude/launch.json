@@ -1,0 +1,19 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "majlis-server",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "-w", "server"],
+      "cwd": "apps/majlis",
+      "port": 4000
+    },
+    {
+      "name": "majlis",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "-w", "client"],
+      "cwd": "apps/majlis",
+      "port": 5173
+    }
+  ]
+}

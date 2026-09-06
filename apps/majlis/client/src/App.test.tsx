@@ -103,22 +103,26 @@ describe('localisation', () => {
     expect(dirFor('en')).toBe('ltr');
   });
 
-  it('falls back to English for a key missing in a translation', () => {
-    // Isolated, not bare: see below. The words are the English ones.
-    expect(translate('ur', 'rule.hashExplain')).toContain(translate('en', 'rule.hashExplain'));
+  it('falls back rather than showing nothing when a key is missing', () => {
+    // Arabic and Urdu now carry every key, so the only gap left is a key that
+    // exists in no dictionary — a string reached before it is written. It
+    // returns the key, isolated, rather than an empty label.
+    const unwritten = 'not.yet.written';
+    expect(translate('en', unwritten)).toBe(unwritten);
+    expect(translate('ur', unwritten)).toContain(unwritten);
   });
 
   /*
-   * Arabic is 190 keys short and Urdu 201, so a right-to-left screen is mostly
-   * English today. Dropped into an RTL paragraph raw, the bidi algorithm puts
-   * an English sentence's full stop at the start of the line, and a board
-   * looking at the Arabic build would reasonably conclude the software is
-   * broken rather than untranslated.
+   * A key added to English first is untranslated for as long as it takes the
+   * next pass to reach it. Dropped into a right-to-left paragraph raw, the
+   * bidi algorithm puts a Latin sentence's full stop at the start of the line,
+   * and a board looking at the Arabic build would reasonably conclude the
+   * software is broken rather than untranslated.
    */
-  it('isolates an English fallback on a right-to-left screen, and only there', () => {
+  it('isolates a fallback on a right-to-left screen, and only there', () => {
     const FSI = String.fromCharCode(0x2068);
     const PDI = String.fromCharCode(0x2069);
-    const missing = 'rule.hashExplain';
+    const missing = 'not.yet.written';
 
     expect(translate('ur', missing).startsWith(FSI)).toBe(true);
     expect(translate('ur', missing).endsWith(PDI)).toBe(true);
