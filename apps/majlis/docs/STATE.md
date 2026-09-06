@@ -115,22 +115,27 @@ Written up in `docs/PATHS.md`. All six work today.
 
 ### What is short
 
-**Translation.** Counted this session, from `client/src/locales/index.ts`:
+**Translation.** Measured through the dictionaries at runtime, not by reading
+the file:
 
 ```
-en   430 keys
-ar   240 keys   190 missing
-ur   229 keys   201 missing
+en   899 keys
+ar   709 keys   190 missing   79%
+ur   698 keys   201 missing   78%
 ```
 
-The missing keys start at the very top (`app.name`, `app.stage`,
-`dash.registryReachable`, `dash.registryUnreachable`, `dash.stageNotice`), so
-the gap is not confined to new screens — it is everywhere.
+Until 6 September 2026 roughly half of what exists was never reaching a
+screen: both `ar` and `ur` spread `...en` into themselves *in the middle of*
+the literal, so every key authored above that line was overwritten by its
+English value. Counting lines instead of keys hid it and reported
+430/240/229. Never count a dictionary by reading the file.
 
-This is blocked on a decision that is not a coding decision: **who writes the
-Arabic and Urdu, and who reviews it.** A Shariah board reading a machine
-translation of its own terminology is worse than reading English. Nothing
-should be filled in until that is answered.
+What remains is blocked on a decision that is not a coding decision: **who
+writes the Arabic and Urdu, and who reviews it.** A Shariah board reading a
+machine translation of its own terminology is worse than reading English.
+Nothing should be filled in until that is answered — and an English fallback
+now reads correctly on a right-to-left screen rather than looking like a
+defect, so the gap is honest rather than ugly.
 
 Watch for **key collisions** when adding: a duplicate key overrides silently,
 and can strike in one language only.
@@ -254,16 +259,53 @@ over — the colour changed underneath the shapes and the shapes did not.
   file clean that it had not re-read — while vite was failing to compile the
   same file. Run `npx tsc -b --noEmit --force` when a result looks too good.
 
-### Still not applied
+### The application speaks one language now
 
-- The remaining pages inherited the palette and the sheet, so they are
-  coherent, but only Guided, Register, Library, Calculations and the two
-  matter pages were composed on purpose. The rest are still a single column
-  of stacked sections.
-- **The Arabic and Urdu screens have never been looked at** in the new
-  palette. RTL flips the tapering edge and the sticky column, and Amiri does
-  not take the negative tracking the display scale uses — `tokens.css` zeroes
-  it under `[dir=rtl]`, but nobody has checked what that looks like.
+Every screen names itself in the display serif. Nothing draws a one-pixel
+border — 149 class strings became sheets with a half-pixel ring. Sixty-eight
+labels and small-caps runs joined one scale. The accent finished moving: the
+twenty-eight things still wearing `goldsoft` were an option a member chose, a
+reference to a person or a term, and a figure — all the board’s own, all
+lapis. Two stayed gold because they are clocks.
+
+Two of those were interface saying something untrue rather than something
+plain: a condition recorded as `met` and a carrying cadence that is `attached`
+were painted in the colour for *time is running out*.
+
+### Right to left, which had never worked
+
+Three faults, each hiding the next.
+
+1. **`ar` and `ur` each spread `...en` into themselves, in the middle of the
+   literal.** Every key authored above that line was overwritten by English.
+   About half of each language existed in the file, was counted, and never
+   reached a screen. Removed — `translate` already falls back.
+2. **No Arabic or Urdu face was ever fetched**, and the variables `tokens.css`
+   set them in are read by nothing: the application sets faces with Tailwind
+   utilities. Arabic rendered in whatever the machine had; Urdu, which is
+   written in nastaliq, rendered in a naskh sans.
+3. **English text in an RTL paragraph** had its full stop moved to the front of
+   the line. Two fixes, because there are two sources: an untranslated *label*
+   is wrapped in a first-strong isolate inside `translate`, and *content the
+   board or the institution gave us* — which never goes through `translate` —
+   is handled by `unicode-bidi: plaintext` in the stylesheet.
+
+The Latin face is named first in every script stack. Fallback runs per glyph,
+and a record is full of English; with the script face first, Nastaliq draws
+the Latin too, and its Latin is a condensed afterthought.
+
+Real coverage, measured through the dictionaries rather than by reading the
+file: **English 899, Arabic 709, Urdu 698**. The line-counted figures reported
+here before (430/240/229) were wrong.
+
+### Still not composed
+
+Every page inherited the palette, the sheet and the type scale, so the
+application is coherent. What only some pages have is a *composition* — a
+narrow list beside an open thing, a figure given room, an aside that carries
+the count. Those are Guided, Register, Library, Calculations and the two
+matter pages. The rest are a single column of stacked sections, which for
+several of them (Settings, Search, Assistant) is the right shape anyway.
 
 ### What already exists on screen
 
@@ -293,6 +335,22 @@ the premise, and tests enforce it. SmartRaise is guided-only.
   must do the same.
 
 ---
+
+- **A hidden Browser pane paints nothing.** Every screenshot comes back blank
+  and it looks exactly like a crash on click. The DOM is intact — read
+  geometry with `javascript_tool`, or `read_page`, when the pane is not up.
+- **Invisible characters do not survive the toolchain.** A bidi isolate
+  written as a literal silently became the empty string (Trojan Source
+  mitigation), so the wrap compiled to `'' + text + ''` and every test passed
+  while nothing happened. Build them with `String.fromCharCode`.
+- **`tsc -b` is incremental.** It reported a file clean that it had not
+  re-read while vite was failing to compile the same file. Use
+  `npx tsc -b --noEmit --force` when a result looks too good.
+- **A route does not name its page.** `/matters/:id` renders `MatterAction`;
+  `MatterDetail` is only at `/classic/matters/:id`. A whole pass went to the
+  wrong file with tests and typecheck green.
+- **Count dictionaries at runtime, never by reading the file.** Line counting
+  was wrong by 400 keys and hid a spread that was discarding half the work.
 
 ## 5. What to pick up first, in order
 
