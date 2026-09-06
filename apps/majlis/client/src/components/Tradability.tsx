@@ -349,7 +349,7 @@ export default function Tradability() {
                 <span className={result.countsAsTangible.includes(k.kind) ? 'text-paper' : 'text-muted'}>
                   {t(`trade.kind.${k.kind}`)}
                   {result.countsAsTangible.includes(k.kind) && (
-                    <span className="ms-1.5 text-[11px] text-goldsoft">{t('trade.countedMark')}</span>
+                    <span className="ms-1.5 text-[11px] text-lapis">{t('trade.countedMark')}</span>
                   )}
                 </span>
                 <span className="font-mono tabular-nums text-muted">{k.percent}%</span>

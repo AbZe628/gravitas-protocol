@@ -86,7 +86,7 @@ export default function WhatThisIs({
             <div className="text-[13px] font-medium">{t(`intro.${kind}`)}</div>
             <p className="mt-1 text-[12px] leading-relaxed text-muted">{t(`intro.${kind}.body`)}</p>
             {/* What is running out. It is the thing that differs between them. */}
-            <p className="mt-1.5 text-[11.5px] leading-relaxed text-goldsoft">
+            <p className="mt-1.5 text-[11.5px] leading-relaxed text-lapis">
               {t(`intro.${kind}.clock`)}
             </p>
           </Link>

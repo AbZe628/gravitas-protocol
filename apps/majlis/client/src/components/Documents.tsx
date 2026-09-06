@@ -39,7 +39,7 @@ export function DocumentLink({
       }
     >
       <div className="flex items-baseline justify-between gap-3">
-        <span className={'text-[14px] font-medium ' + (emphasis ? 'text-goldsoft' : '')}>{label}</span>
+        <span className={'text-[14px] font-medium ' + (emphasis ? 'text-lapis' : '')}>{label}</span>
         <span className="shrink-0 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
           {t('doc.opens')}
         </span>

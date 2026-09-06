@@ -57,7 +57,7 @@ export default function WhatStands() {
             className={
               'px-3 py-2 text-[13px] transition-colors ' +
               (tab === k
-                ? 'border-b-2 border-gold text-goldsoft'
+                ? 'border-b-2 border-lapis text-lapis'
                 : 'border-b-2 border-transparent text-muted hover:text-paper')
             }
           >

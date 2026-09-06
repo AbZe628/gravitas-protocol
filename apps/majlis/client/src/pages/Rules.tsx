@@ -122,16 +122,16 @@ export default function Rules() {
               <div className="mt-3 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
                 {t('rule.statement')}
               </div>
-              <p className="mt-1 text-[14px] text-paper/85">{r.statement}</p>
+              <p className="mt-1 text-[14px] text-sand">{r.statement}</p>
 
               <dl className="mt-4 space-y-2.5 border-t border-line pt-3">
                 {r.parameters.map((p) => (
                   <div key={p.key}>
-                    <dt className="font-mono text-[12px] text-goldsoft break-all">
+                    <dt className="font-mono text-[12px] text-lapis break-all">
                       {p.key} = {p.value}
                       {p.unit ? <span className="text-muted"> {p.unit}</span> : null}
                     </dt>
-                    <dd className="mt-0.5 text-[13px] text-paper/70">{p.meaning}</dd>
+                    <dd className="mt-0.5 text-[13px] text-sand">{p.meaning}</dd>
                   </div>
                 ))}
               </dl>

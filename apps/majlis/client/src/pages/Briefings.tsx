@@ -32,12 +32,12 @@ export default function Briefings() {
               <div className="mt-4 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
                 {t('brief.whatChanged')}
               </div>
-              <p className="mt-1 text-[14px] text-paper/85">{b.whatChanged}</p>
+              <p className="mt-1 text-[14px] text-sand">{b.whatChanged}</p>
 
               <div className="mt-3.5 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
                 {t('brief.whyChanged')}
               </div>
-              <p className="mt-1 text-[14px] text-paper/85">{b.whyChanged}</p>
+              <p className="mt-1 text-[14px] text-sand">{b.whyChanged}</p>
 
               {b.touchesRules.length > 0 && (
                 <div className="mt-3.5 flex flex-wrap gap-1.5">

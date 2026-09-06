@@ -93,7 +93,7 @@ function Candidate({
     <li className="rounded-xl shadow-ring px-3 py-2.5">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <span className="text-[12.5px] font-medium">{label}</span>
-        <span className="font-mono text-[14px] tabular-nums text-goldsoft">{candidate.value}</span>
+        <span className="font-mono text-[14px] tabular-nums text-lapis">{candidate.value}</span>
       </div>
 
       {/*

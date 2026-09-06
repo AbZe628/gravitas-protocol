@@ -95,7 +95,7 @@ export default function Record() {
                 {x.escalated && <Tag tone="gold">{t('asst.escalated')}</Tag>}
               </div>
               <div className="text-[14px]">{x.question}</div>
-              <div className="mt-1.5 text-[13px] text-paper/70 line-clamp-3">{x.answer}</div>
+              <div className="mt-1.5 text-[13px] text-sand line-clamp-3">{x.answer}</div>
             </li>
           ))}
         </ul>

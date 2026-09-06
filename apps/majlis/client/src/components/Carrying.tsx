@@ -101,7 +101,7 @@ export default function Carrying({ matterId }: { matterId: string }) {
               <li key={term.key} className="rounded-xl shadow-ring px-3 py-2">
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
                   <span className="font-mono text-[12.5px]">{term.key}</span>
-                  <span className="font-mono text-[13px] tabular-nums text-goldsoft">
+                  <span className="font-mono text-[13px] tabular-nums text-lapis">
                     {term.value}
                     {term.unit && <span className="ms-1 text-[11.5px] text-muted">{term.unit}</span>}
                   </span>

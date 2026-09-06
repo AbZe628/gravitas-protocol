@@ -191,7 +191,7 @@ export default function Incidents() {
                     {i.purification && !i.purification.paidAt && (
                       <>
                         <span className="mx-1.5 opacity-40">·</span>
-                        <span className="text-goldsoft">
+                        <span className="text-lapis">
                           {i.purification.amount} {i.purification.currency} {t('snc.owed')}
                         </span>
                       </>

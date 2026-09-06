@@ -140,7 +140,7 @@ function Condition({
                     onClick={() => setHolds(h)}
                     className={
                       'rounded border px-3 py-1.5 text-[12px] ' +
-                      (holds === h ? 'border-goldsoft text-goldsoft' : 'border-line text-muted hover:border-muted')
+                      (holds === h ? 'border-lapis text-lapis' : 'border-line text-muted hover:border-muted')
                     }
                   >
                     {t(`chk.${h}`)}
@@ -351,7 +351,7 @@ export default function Checklist({ matterId, canRule }: { matterId: string; can
         {data.contested.length > 0 && (
           <>
             <span className="mx-1.5 opacity-40">·</span>
-            <span className="text-goldsoft">
+            <span className="text-lapis">
               {data.contested.length} {t('chk.contestedCount')}
             </span>
           </>

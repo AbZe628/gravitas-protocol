@@ -57,7 +57,7 @@ export default function Precedent({ matterId }: { matterId: string }) {
 
             <Link
               to={`/matters/${r.matterId}`}
-              className="text-[14px] font-medium leading-snug text-paper hover:text-goldsoft"
+              className="text-[14px] font-medium leading-snug text-paper hover:text-lapis"
             >
               {r.title}
             </Link>
@@ -66,7 +66,7 @@ export default function Precedent({ matterId }: { matterId: string }) {
             <ul className="mt-2 space-y-1">
               {r.relations.map((rel, i) => (
                 <li key={i} className="text-[12px] leading-relaxed text-muted">
-                  <span className="text-goldsoft">{t(`related.${rel.kind}`)}</span>
+                  <span className="text-lapis">{t(`related.${rel.kind}`)}</span>
                   <span className="mx-1.5 opacity-40">·</span>
                   <span className="font-mono text-[11.5px]">{rel.shared}</span>
                 </li>

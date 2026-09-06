@@ -110,8 +110,13 @@ describe('the names in a body are shown as names', () => {
 
     // The useful question when reading a long thread is whether any of it was
     // addressed to you.
+    //
+    // The mark is a tinted ground, and the hue moved with the palette: a
+    // name is a reference to a person, which is lapis, and gold is now the
+    // clock. What the test holds is that your own name carries a ground and
+    // somebody else's does not.
     await waitFor(() => expect(screen.getByText('@s2')).toBeInTheDocument());
-    expect(screen.getByText('@s2').className).toContain('bg-gold');
+    expect(screen.getByText('@s2').className).toContain('bg-lapis');
   });
 
   it('marks somebody else’s name without the emphasis', async () => {
@@ -120,7 +125,7 @@ describe('the names in a body are shown as names', () => {
     show();
 
     await waitFor(() => expect(screen.getByText('@s2')).toBeInTheDocument());
-    expect(screen.getByText('@s2').className).not.toContain('bg-gold');
+    expect(screen.getByText('@s2').className).not.toContain('bg-lapis');
   });
 
   it('shows the body as it is where the server sent no segments', async () => {

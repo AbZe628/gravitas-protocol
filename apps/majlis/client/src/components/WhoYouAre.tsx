@@ -23,9 +23,11 @@ export default function WhoYouAre() {
   if (identity.role !== 'observer') return null;
 
   return (
-    <div className="mb-5 rounded-lg border border-goldsoft/40 bg-goldsoft/[0.07] px-4 py-3">
+    // The one outlined box the sweep could not see: it was edged in gold
+    // rather than in `line`, so the rule that found the other 149 walked past.
+    <div className="mb-5 rounded-card bg-raised px-5 py-4 shadow-[0_0_0_1px_rgba(176,132,48,0.3),0_1px_2px_rgba(25,23,19,0.045),0_12px_24px_-14px_rgba(25,23,19,0.16)]">
       <div className="mb-1 text-[13px] font-medium text-paper">{t('whoami.observerTitle')}</div>
-      <p className="text-[12.5px] leading-relaxed text-paper/70">{t('whoami.observerBody')}</p>
+      <p className="text-[12.5px] leading-relaxed text-sand">{t('whoami.observerBody')}</p>
     </div>
   );
 }

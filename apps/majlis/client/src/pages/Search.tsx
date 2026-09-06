@@ -167,7 +167,7 @@ function Hit({ hit }: { hit: SearchHit }) {
         </span>
       </div>
 
-      <Link to={`/matters/${hit.matterId}`} className="text-[15px] font-medium leading-snug text-paper hover:text-goldsoft">
+      <Link to={`/matters/${hit.matterId}`} className="text-[15px] font-medium leading-snug text-paper hover:text-lapis">
         {hit.title}
       </Link>
 
@@ -175,7 +175,7 @@ function Hit({ hit }: { hit: SearchHit }) {
         <ul className="mt-2.5 space-y-1.5 border-t border-line pt-2.5">
           {hit.matches.map((m, i) => (
             <li key={i} className="text-[12.5px] leading-relaxed">
-              <span className="text-goldsoft">{t(`search.field.${m.field}`)}</span>
+              <span className="text-lapis">{t(`search.field.${m.field}`)}</span>
               {m.by && <span className="text-muted"> · {m.by}</span>}
               <div className="text-muted">{m.snippet}</div>
             </li>

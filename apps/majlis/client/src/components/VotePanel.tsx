@@ -160,7 +160,7 @@ export default function VotePanel({ matter, role, scholarId, onChanged }: Props)
                 onClick={() => setPosition(p)}
                 className={
                   'rounded border px-3 py-1.5 text-[12px] ' +
-                  (position === p ? 'border-goldsoft text-goldsoft' : 'border-line hover:bg-surface/60')
+                  (position === p ? 'border-lapis text-lapis' : 'border-line hover:bg-surface/60')
                 }
               >
                 {t(`vote.${p}`)}

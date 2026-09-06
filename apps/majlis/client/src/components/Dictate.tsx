@@ -145,7 +145,7 @@ export default function Dictate({ onText }: { onText: (text: string) => void }) 
         className={
           'rounded border px-3 py-1 text-[12px] transition-colors ' +
           (listening
-            ? 'border-gold/60 text-goldsoft'
+            ? 'border-lapis/40 text-lapis'
             : 'border-line text-muted hover:border-muted hover:text-paper')
         }
       >

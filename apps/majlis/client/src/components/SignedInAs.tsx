@@ -29,7 +29,7 @@ export default function SignedInAs() {
     <div className="text-right leading-tight">
       <div
         className={
-          'text-[11px] font-medium ' + (observer ? 'text-muted' : 'text-goldsoft')
+          'text-[11px] font-medium ' + (observer ? 'text-muted' : 'text-lapis')
         }
       >
         {t(`who.role.${identity.role}`)}

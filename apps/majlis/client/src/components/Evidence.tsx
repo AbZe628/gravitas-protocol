@@ -128,7 +128,7 @@ export default function Evidence({ matter, scholarId, canAttach, onChanged }: Pr
                     {t(`evidence.kind.${s.kind}`)}
                   </span>
                   {s.addedBy && (
-                    <span className={withdrawn ? 'text-muted' : 'text-goldsoft'}>{s.addedBy}</span>
+                    <span className={withdrawn ? 'text-muted' : 'text-lapis'}>{s.addedBy}</span>
                   )}
                   {s.at && (
                     <span className="text-muted">
@@ -253,7 +253,7 @@ export default function Evidence({ matter, scholarId, canAttach, onChanged }: Pr
                 className={
                   'rounded border px-2 py-1 text-[11.5px] uppercase tracking-wide ' +
                   (kind === k
-                    ? 'border-gold text-goldsoft'
+                    ? 'border-lapis text-lapis'
                     : 'border-line text-muted hover:text-paper')
                 }
               >

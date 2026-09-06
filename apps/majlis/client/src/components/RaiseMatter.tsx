@@ -109,7 +109,7 @@ export default function RaiseMatter({ boardId }: { boardId: string }) {
             onClick={() => setDirection(d)}
             className={
               'rounded border px-3 py-1.5 text-[12px] ' +
-              (direction === d ? 'border-goldsoft text-goldsoft' : 'border-line hover:bg-surface/60')
+              (direction === d ? 'border-lapis text-lapis' : 'border-line hover:bg-surface/60')
             }
           >
             {t(`raise.direction.${d}`)}

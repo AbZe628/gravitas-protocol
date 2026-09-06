@@ -198,11 +198,11 @@ export default function MatterDetail() {
                 <li key={s.hash} className="border-t border-line pt-2.5 first:border-0 first:pt-0">
                   <div className="font-mono text-[11px] text-muted">{s.hash}</div>
                   <div className="text-[13px]">{s.asset}</div>
-                  <div className="text-[12px] text-paper/70">{s.reason}</div>
+                  <div className="text-[12px] text-sand">{s.reason}</div>
                 </li>
               ))}
             </ul>
-            <p className="mt-4 border-t border-line pt-3 text-[13px] text-paper/75">
+            <p className="mt-4 border-t border-line pt-3 text-[13px] text-sand">
               {matter.simulation.note}
             </p>
           </Card>

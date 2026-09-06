@@ -30,7 +30,7 @@ export default function Assistant() {
     <div>
       <h1 className="mb-2 font-display font-normal leading-[1.12] tracking-[-0.024em] text-[30px] sm:text-[34px]">{t('asst.title')}</h1>
 
-      <div className="mb-6 rounded-lg border border-gold/40 bg-gold/[0.05] px-4 py-3 text-[13px] leading-relaxed text-paper/85">
+      <div className="mb-6 rounded-lg border border-gold/40 bg-gold/[0.05] px-4 py-3 text-[13px] leading-relaxed text-sand">
         {t('asst.limits')}
       </div>
 

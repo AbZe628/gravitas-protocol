@@ -55,7 +55,7 @@ function Reason({
   const [busy, setBusy] = useState(false);
   const { t } = useI18n();
 
-  const border = tone === 'warn' ? 'border-warn/60 text-warn' : tone === 'gold' ? 'border-gold/60 text-goldsoft' : 'border-line text-muted';
+  const border = tone === 'warn' ? 'border-warn/60 text-warn' : tone === 'gold' ? 'border-lapis/40 text-lapis' : 'border-line text-muted';
 
   if (!open) {
     return (

@@ -122,7 +122,7 @@ export default function Dashboard() {
                     {m.affected !== null && (
                       <>
                         <span className="mx-1.5 opacity-40">·</span>
-                        <span className="text-goldsoft">
+                        <span className="text-lapis">
                           {m.affected} {t('sim.affected')}
                         </span>
                       </>

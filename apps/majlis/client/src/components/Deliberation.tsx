@@ -138,8 +138,8 @@ function Body({ entry }: { entry: Entry }) {
               // question when reading a long thread is whether any of it was
               // addressed to you.
               part.scholarId === identity?.scholarId
-                ? 'rounded bg-gold/20 px-1 text-goldsoft'
-                : 'text-goldsoft'
+                ? 'rounded bg-lapis/10 px-1 text-lapis'
+                : 'text-lapis'
             }
           >
             {part.text}
@@ -173,7 +173,7 @@ function Entry({
   return (
     <li className={'rounded-lg border p-3.5 ' + (entry.liaisonAnswer ? 'border-line bg-surface/40' : 'border-line')}>
       <div className="mb-1.5 flex items-center gap-2 text-[12px]">
-        <span className="text-goldsoft">{entry.scholarId}</span>
+        <span className="text-lapis">{entry.scholarId}</span>
         {entry.liaisonAnswer && <Tag>{t('matter.liaison')}</Tag>}
         <span className="text-muted">
           <DateText iso={entry.at} />
@@ -213,7 +213,7 @@ function Entry({
           {replies.map((reply) => (
             <li key={reply.id}>
               <div className="mb-1 flex items-center gap-2 text-[12px]">
-                <span className="text-goldsoft">{reply.scholarId}</span>
+                <span className="text-lapis">{reply.scholarId}</span>
                 {reply.liaisonAnswer && <Tag>{t('matter.liaison')}</Tag>}
                 <span className="text-muted">
                   <DateText iso={reply.at} />

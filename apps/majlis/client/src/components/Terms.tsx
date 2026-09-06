@@ -95,7 +95,7 @@ export default function Terms({ matter, canEdit, onChanged }: Props) {
               <div className="mb-1 text-[11.5px] uppercase tracking-wide text-muted">
                 {t('terms.fixed')}
               </div>
-              <div className="break-all font-mono text-[11.5px] text-goldsoft">
+              <div className="break-all font-mono text-[11.5px] text-lapis">
                 {rule.parameterHash}
               </div>
               <p className="mt-1.5 text-[12px] leading-relaxed text-muted">{t('terms.fixedNote')}</p>
