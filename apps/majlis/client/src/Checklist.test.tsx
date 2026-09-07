@@ -88,6 +88,25 @@ describe('it shows the shape, not a score', () => {
     expect(document.querySelector('[role="progressbar"]')).toBeNull();
   });
 
+  /*
+   * Collapsed, not removed. The reasoning is the sentence a scholar disagrees
+   * with, and the rule is that nothing is folded away unless it opens where it
+   * sits — a summary that leads somewhere else is a deletion with a link on it.
+   */
+  it('keeps the reasoning one tap away, in place', async () => {
+    stub(checklist());
+    show();
+
+    await waitFor(() => expect(screen.getByText(/Why this condition exists/i)).toBeInTheDocument());
+
+    const summary = screen.getByText(/Why this condition exists/i);
+    const details = summary.closest('details');
+    expect(details).not.toBeNull();
+    expect(details?.open).toBe(false);
+    // Still in the record, under that summary, rather than gone.
+    expect(details?.textContent).toContain('financing of money by money');
+  });
+
   it('gives every condition its reason, which is what it argues from now', async () => {
     stub(checklist());
     show();

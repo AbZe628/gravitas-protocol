@@ -127,14 +127,13 @@ export default function MatterAction() {
           )}
 
           {/*
-            What this board already said about a question of this shape. Here
-            rather than deeper in, because it is the thing that turns reading
-            the question into most of the work already done.
-          */}
-          <Inherited matterId={matter.id} canRule={identity?.role !== 'observer'} onChanged={load} />
+            Above the two long lists, not below them.
 
-          {/*
-            One sentence about where this stands, in place of the whole
+            Measured on the demonstration record: this block is twenty words and
+            sat at 96% of the scroll depth, under eight hundred words of
+            conditions. A scholar arriving to do one thing had to read
+            everything first to find out what the thing was. One sentence about
+            where this stands, in place of the whole
             passage. On a screen whose point is the next act, the map of every
             act is the thing competing with it.
           */}
@@ -154,6 +153,19 @@ export default function MatterAction() {
               )}
             </div>
           )}
+
+          {/*
+            What this board already said about a question of this shape. Here
+            rather than deeper in, because it is the thing that turns reading
+            the question into most of the work already done.
+          */}
+          <Inherited
+            matterId={matter.id}
+            canRule={identity?.role !== 'observer'}
+            onChanged={load}
+            conditionsBelow
+          />
+
 
           {passage?.settled && (
             <p className="mb-5 rounded-card shadow-ring px-4 py-3 text-[13px] leading-relaxed">

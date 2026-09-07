@@ -98,10 +98,25 @@ export default function Inherited({
   matterId,
   canRule,
   onChanged,
+  conditionsBelow,
 }: {
   matterId: string;
   canRule: boolean;
   onChanged?: () => void;
+  /**
+   * Whether the checklist below is drawing the condition-level proposals.
+   *
+   * It is, on the matter screen, and this panel then draws only its header and
+   * the terms and exclusions. The two used to render the same six conditions
+   * one after the other — 826 of the page's 997 words — and a scholar read
+   * each requirement twice before reaching the act.
+   *
+   * A flag rather than a split component: the header, the count of previous
+   * rulings and the sentence about nothing being decided belong to this panel
+   * wherever the conditions are drawn, and duplicating them into the checklist
+   * would trade one repetition for another.
+   */
+  conditionsBelow?: boolean;
 }) {
   const { t } = useI18n();
   const [inheritance, setInheritance] = useState<Inheritance | null>(null);
@@ -202,7 +217,13 @@ export default function Inherited({
             </p>
           )}
 
-          {conditions.length > 0 && (
+          {conditions.length > 0 && conditionsBelow && (
+            <p className="mt-3 max-w-[62ch] text-[12.5px] leading-[1.6] text-muted">
+              {t('inherit.underEach')}
+            </p>
+          )}
+
+          {conditions.length > 0 && !conditionsBelow && (
             <ul className="mt-4 space-y-2.5">
               {conditions.map((p, i) => {
                 const id = idOf(p, i);

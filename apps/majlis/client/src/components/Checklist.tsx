@@ -1,5 +1,12 @@
 import { useEffect, useState } from 'react';
-import { oversight, Refused, type Checklist as ChecklistData, type ConditionState, type Structure } from '../lib/api.js';
+import {
+  oversight,
+  Refused,
+  type Checklist as ChecklistData,
+  type ConditionState,
+  type Proposal,
+  type Structure,
+} from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { Tag } from './ui.js';
 
@@ -34,15 +41,86 @@ function toneFor(holds: string | undefined): 'ok' | 'warn' | undefined {
   return undefined;
 }
 
+/**
+ * What this board said about this condition the last time it ruled on a
+ * question of this shape.
+ *
+ * It used to live in its own panel above, which meant the same six conditions
+ * were rendered twice on one screen — the requirement, then two hundred words
+ * later the requirement again with the previous finding under it. Here it sits
+ * under the condition it belongs to, which is where a scholar is already
+ * looking when they decide whether to carry it across.
+ *
+ * Recording it is one act with the member's name on it. The button says so:
+ * an unreviewed proposal is not an answer, and nothing counts as one until the
+ * member says it does.
+ */
+function Carried({
+  proposal,
+  taken,
+  busy,
+  onTake,
+}: {
+  proposal: Proposal;
+  taken: boolean;
+  busy: boolean;
+  onTake: () => void;
+}) {
+  const { t } = useI18n();
+
+  return (
+    <div className="mt-3 rounded-card bg-ink px-4 py-3">
+      <div className="mb-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-1.5">
+        <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+          {t('inherit.lastTime')}
+        </span>
+        {proposal.holds && (
+          <span
+            className={
+              'rounded-full px-2.5 py-0.5 text-[10.5px] font-bold uppercase tracking-[0.1em] ' +
+              (proposal.holds === 'met'
+                ? 'bg-[#EBF3EF] text-settled shadow-[0_0_0_0.5px_rgba(44,107,87,0.18)]'
+                : 'bg-black/[0.045] text-sand')
+            }
+          >
+            {t(`inherit.holds.${proposal.holds}`)}
+          </span>
+        )}
+      </div>
+
+      {/* The board's own words from its own past ruling. Never rewritten. */}
+      <p className="max-w-[62ch] text-[13px] leading-[1.6]">{proposal.value}</p>
+
+      {taken ? (
+        <p className="mt-2 text-[12px] text-settled">{t('inherit.taken')}</p>
+      ) : (
+        <button
+          type="button"
+          onClick={onTake}
+          disabled={busy}
+          className="mt-2.5 rounded-xl bg-gradient-to-br from-lapissoft to-[#143E67] px-3.5 py-1.5 text-[12px] font-semibold text-white shadow-act transition-all hover:brightness-110 disabled:opacity-40"
+        >
+          {t('inherit.take')}
+        </button>
+      )}
+    </div>
+  );
+}
+
 function Condition({
   state,
   contested,
   canRule,
+  carried,
+  onCarry,
   onRecord,
 }: {
   state: ConditionState;
   contested: boolean;
   canRule: boolean;
+  /** What the board said last time, where it ruled on this shape before. */
+  carried?: { proposal: Proposal; taken: boolean; busy: boolean } | null;
+  onCarry?: () => void;
   onRecord: (holds: (typeof HOLDS)[number], reason: string) => Promise<void>;
 }) {
   const { t } = useI18n();
@@ -98,9 +176,21 @@ function Condition({
 
       {/*
         The reason the condition exists, so a scholar can disagree with the
-        reasoning rather than only with the citation.
+        reasoning rather than only with the citation. It is the most important
+        sentence on the condition and the one least often needed *now*.
+
+        Six of these open on a screen whose job is to record findings is two
+        hundred words of background a scholar reads past on every visit after
+        the first. Behind a disclosure it is one tap, in place, and the summary
+        says what is under it — which is a different thing from removing it.
+        Nothing here is ever collapsed unless it can be opened where it sits.
       */}
-      <p className="mt-2.5 max-w-[62ch] text-[12.5px] leading-[1.6] text-muted">{c.why}</p>
+      <details className="group mt-2">
+        <summary className="cursor-pointer list-none text-[12px] text-muted underline decoration-line underline-offset-4 hover:text-paper">
+          {t('chk.why')}
+        </summary>
+        <p className="mt-2 max-w-[62ch] text-[12.5px] leading-[1.6] text-muted">{c.why}</p>
+      </details>
 
       {state.history.length > 0 && (
         <details className="mt-2.5">
@@ -133,6 +223,21 @@ function Condition({
             ))}
           </ul>
         </details>
+      )}
+
+      {/*
+        What the board said last time, under the condition it is about — and
+        only where this member has not already answered it themselves. A
+        proposal shown beside a finding the member has made is offering them
+        their own past as a suggestion.
+      */}
+      {carried && !mine && (
+        <Carried
+          proposal={carried.proposal}
+          taken={carried.taken}
+          busy={carried.busy || !canRule}
+          onTake={() => onCarry?.()}
+        />
       )}
 
       {canRule && (
@@ -275,6 +380,39 @@ export default function Checklist({ matterId, canRule }: { matterId: string; can
   const [structures, setStructures] = useState<Structure[] | null>(null);
   const [none, setNone] = useState(false);
 
+  /*
+   * What the board said last time, keyed by condition.
+   *
+   * Fetched here rather than passed in, because the checklist is what draws
+   * the conditions and one owner is what stops the two lists drifting apart
+   * again. A failure is silent by design: the checklist is the record and the
+   * inheritance is a convenience, so losing the second must not cost the first.
+   */
+  const [carried, setCarried] = useState<Map<string, Proposal>>(new Map());
+  const [taken, setTaken] = useState<Set<string>>(new Set());
+  const [carrying, setCarrying] = useState(false);
+  const [carryRefusal, setCarryRefusal] = useState<string | null>(null);
+
+  useEffect(() => {
+    let live = true;
+    oversight
+      .inheritance(matterId)
+      .then((i) => {
+        if (!live || !Array.isArray(i?.proposals)) return;
+        const map = new Map<string, Proposal>();
+        for (const proposal of i.proposals) {
+          if (proposal.kind === 'condition' && proposal.key && proposal.holds) {
+            map.set(proposal.key, proposal);
+          }
+        }
+        setCarried(map);
+      })
+      .catch(() => undefined);
+    return () => {
+      live = false;
+    };
+  }, [matterId]);
+
   const load = () =>
     oversight
       .checklist(matterId)
@@ -320,6 +458,35 @@ export default function Checklist({ matterId, canRule }: { matterId: string; can
   }
 
   if (!data) return null;
+
+  /**
+   * Carry one across. One act, with this member's name on it.
+   *
+   * The reason recorded is the board's own sentence from the earlier ruling,
+   * unedited — which is what makes this a citation of the board's reasoning
+   * rather than a tick. A member who disagrees answers the condition normally
+   * instead, and both stay in the record.
+   */
+  async function carry(conditionId: string) {
+    const proposal = carried.get(conditionId);
+    if (!proposal?.holds) return;
+
+    setCarrying(true);
+    setCarryRefusal(null);
+    try {
+      await oversight.recordFinding(matterId, {
+        conditionId,
+        holds: proposal.holds,
+        reason: proposal.value,
+      });
+      setTaken((was) => new Set(was).add(conditionId));
+      await load();
+    } catch (e) {
+      setCarryRefusal(e instanceof Refused ? e.message : String(e));
+    } finally {
+      setCarrying(false);
+    }
+  }
 
   return (
     <div>
@@ -376,6 +543,12 @@ export default function Checklist({ matterId, canRule }: { matterId: string; can
         )}
       </p>
 
+      {carryRefusal && (
+        <p className="mb-3 rounded-xl bg-[#FCF0EE] px-4 py-2.5 text-[12.5px] leading-[1.55] text-breach shadow-[0_0_0_0.5px_rgba(154,56,48,0.18)]">
+          {carryRefusal}
+        </p>
+      )}
+
       <ul className="space-y-2.5">
         {data.conditions.map((c) => (
           <Condition
@@ -383,6 +556,16 @@ export default function Checklist({ matterId, canRule }: { matterId: string; can
             state={c}
             contested={data.contested.includes(c.condition.id)}
             canRule={canRule}
+            carried={
+              carried.has(c.condition.id)
+                ? {
+                    proposal: carried.get(c.condition.id)!,
+                    taken: taken.has(c.condition.id),
+                    busy: carrying,
+                  }
+                : null
+            }
+            onCarry={() => void carry(c.condition.id)}
             onRecord={async (holds, reason) => {
               await oversight.recordFinding(matterId, { conditionId: c.condition.id, holds, reason });
               await load();

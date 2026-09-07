@@ -24,6 +24,9 @@ export function dirFor(lang: Lang): 'ltr' | 'rtl' {
 type Dict = Record<string, string>;
 
 const en: Dict = {
+  "chk.why": "Why this condition exists",
+  "inherit.lastTime": "What the board said last time",
+  "inherit.underEach": "What the board said about each condition is under that condition below, where you answer it.",
   "doc.contract": "Draft clauses for the agreement",
   "doc.contractNote": "Assembled from this ruling: the conditions the board found, the terms it approved, and what it held outside the question. Only that — a financing agreement contains a great deal more, and none of the rest was put to the board.",
   "queue.opened": "Taken up",
@@ -1088,6 +1091,9 @@ const en: Dict = {
 };
 
 const ar: Dict = {
+  "chk.why": "لماذا وُجد هذا الشرط",
+  "inherit.lastTime": "ما قاله المجلس في المرة السابقة",
+  "inherit.underEach": "ما قاله المجلس في كل شرط موضوع تحت ذلك الشرط أدناه، حيث تجيب عنه.",
   "doc.contract": "مسودة بنود للعقد",
   "doc.contractNote": "مجمَّعة من هذا الحكم: الشروط التي وجدها المجلس، والبنود التي أقرّها، وما أبقاه خارج السؤال. هذا فقط — فعقد التمويل يحوي ما هو أكثر بكثير، ولم يُعرض شيء من سائره على المجلس.",
   "queue.opened": "فُتحت كمسألة",
@@ -2073,6 +2079,9 @@ const ar: Dict = {
 };
 
 const ur: Dict = {
+  "chk.why": "یہ شرط کیوں ہے",
+  "inherit.lastTime": "بورڈ نے پچھلی بار کیا کہا",
+  "inherit.underEach": "بورڈ نے ہر شرط کے بارے میں جو کہا وہ نیچے اُسی شرط کے تحت ہے، جہاں آپ اس کا جواب دیتے ہیں۔",
   "doc.contract": "معاہدے کے لیے مسودۂ شقات",
   "doc.contractNote": "اسی فیصلے سے مرتب: وہ شرائط جو بورڈ نے پائیں، وہ ضوابط جو اُس نے منظور کیے، اور جو اُس نے سوال سے باہر رکھا۔ صرف اتنا — مالیاتی معاہدے میں اس سے کہیں زیادہ ہوتا ہے، اور باقی کچھ بورڈ کے سامنے رکھا ہی نہیں گیا۔",
   "queue.opened": "لیا گیا",
