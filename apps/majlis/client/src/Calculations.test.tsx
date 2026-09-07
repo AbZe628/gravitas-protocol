@@ -242,7 +242,7 @@ describe('what the page says about itself', () => {
     show();
     expect(screen.getByText(/Working something out does not record it/)).toBeInTheDocument();
     // And that noting one is not approving the method.
-    expect(screen.getByText(/not approval of the method/)).toBeInTheDocument();
+    expect(screen.getByText(/records the figure, not the method/)).toBeInTheDocument();
   });
 
   it('offers all four calculations, screening included', () => {
