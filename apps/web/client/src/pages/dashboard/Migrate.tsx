@@ -23,6 +23,7 @@ import { arbitrumSepolia } from "wagmi/chains";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { CONTRACTS } from "@/lib/wagmi";
+import { buildV3Params, deadlineFrom, signedMessage } from '@/lib/migration';
 import { decodeContractError } from "@/lib/errorDecoder";
 
 // ─── ABIs ─────────────────────────────────────────────────────────────────────
@@ -354,32 +355,21 @@ export default function Migrate() {
   const handleV3Sign = async () => {
     if (!isConnected || !address) { toast.error("Please connect your wallet"); return; }
     if (!v3Form.tokenId) { toast.error("Please enter a Token ID"); return; }
-    const deadline = BigInt(Math.floor(Date.now() / 1000) + 1800);
+    const deadline = deadlineFrom(Date.now());
     setV3Deadline(deadline);
     try {
+      // Built once, in lib/migration.ts, and used again by handleV3Execute.
+      // These fields used to be written out by hand in both places, fifty
+      // lines apart, with a comment saying they must match and nothing
+      // checking that they did.
       const sig = await signTypedDataAsync({
         domain: EIP712_DOMAIN,
         types: EIP712_TYPES,
         primaryType: "MigrationIntent",
-        // These values MUST be identical to the params submitted in handleV3Execute,
-        // otherwise on-chain signature verification will reject the migration.
-        message: {
-          tokenId: BigInt(v3Form.tokenId),
-          newFee: parseInt(v3Form.newFee) as 500 | 3000 | 10000,
-          newTickLower: parseInt(v3Form.tickLower),
-          newTickUpper: parseInt(v3Form.tickUpper),
-          amount0MinMint: BigInt(v3Form.amount0MinMint || "1"),
-          amount1MinMint: BigInt(v3Form.amount1MinMint || "1"),
-          amount0MinDecrease: BigInt(v3Form.amount0MinDecrease || "0"),
-          amount1MinDecrease: BigInt(v3Form.amount1MinDecrease || "0"),
-          deadline,
-          executeSwap: false,
-          zeroForOne: false,
-          swapAmountIn: BigInt(0),
-          swapAmountOutMin: BigInt(0),
-          swapFeeTier: 3000,
-          nonce: userNonce ?? BigInt(0),
-        },
+        message: signedMessage(
+          buildV3Params(v3Form, deadline),
+          userNonce ?? BigInt(0),
+        ),
       });
       setV3Signature(sig);
       setStep("execute");
@@ -398,25 +388,10 @@ export default function Migrate() {
         address: CONTRACTS.TELEPORT_V3 as `0x${string}`,
         abi: TELEPORT_V3_ABI,
         functionName: "executeAtomicMigration",
-        args: [
-          {
-            tokenId: BigInt(v3Form.tokenId),
-            newFee: parseInt(v3Form.newFee) as 500 | 3000 | 10000,
-            newTickLower: parseInt(v3Form.tickLower),
-            newTickUpper: parseInt(v3Form.tickUpper),
-            amount0MinMint: BigInt(v3Form.amount0MinMint || "1"),
-            amount1MinMint: BigInt(v3Form.amount1MinMint || "1"),
-            amount0MinDecrease: BigInt(v3Form.amount0MinDecrease || "0"),
-            amount1MinDecrease: BigInt(v3Form.amount1MinDecrease || "0"),
-            deadline: v3Deadline,
-            executeSwap: false,
-            zeroForOne: false,
-            swapAmountIn: BigInt(0),
-            swapAmountOutMin: BigInt(0),
-            swapFeeTier: 3000,
-          },
-          v3Signature,
-        ],
+        // The same builder the signature used, with the deadline that was
+        // signed rather than a fresh one — two clicks apart, a recomputed
+        // deadline would be a value the signature does not cover.
+        args: [buildV3Params(v3Form, v3Deadline), v3Signature],
         chainId: arbitrumSepolia.id,
       });
       setV3TxHash(hash);
