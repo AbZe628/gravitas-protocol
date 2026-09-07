@@ -12,7 +12,7 @@ unfinished it says so, and where something is broken it says how it breaks.
 ## Verified, this save
 
 ```
-server   54 files   1374 tests   passed
+server   54 files   1379 tests   passed
 client   21 files    232 tests   passed
 ```
 
@@ -54,9 +54,19 @@ reads rather than how much. And a label extracting as
 `OPERATIVE TERMminTangibleRatioBps` has an 8px margin and renders correctly —
 it is a text-extraction artefact. Measure before changing.
 
-**Still open, and none of it blocking:** the assistant has never met a real key;
-the guide's 17 topic answers are English only and the service takes no `lang`;
-the Arabic and Urdu are complete but unreviewed; four screens have no artboard.
+**Still open, and both need a person rather than another pass:** the assistant
+has never met a real key, and the Arabic and Urdu are complete but unreviewed.
+
+**The guide now answers in the language it was asked in** (`21314e7`). The
+terms and the refusal already worked in three scripts; the eighteen answers
+were the half left behind, and the English was rewritten rather than merely
+translated from, because it carried the register the interface strings had just
+been cleaned of.
+
+**Closed rather than done: no further artboards.** Thirteen screens have none.
+Asked on 7 September whether to draw them, the user ruled that an artboard is
+not shown in Majlis and so does not earn the work. The check for an undrawn
+screen is the running application, read directly. Do not offer to draw more.
 
 ---
 
