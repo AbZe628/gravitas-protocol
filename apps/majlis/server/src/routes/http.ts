@@ -105,6 +105,11 @@ const ROLE_MEANS: Record<string, string> = {
     'A signatory votes, objects and determines. The steps that belong to the institution — the ' +
     'plan, the Directors, the regulator, the payment — are recorded by its secretary or liaison, ' +
     'and the board must not be able to record them by deciding to.',
+  institution:
+    'This credential belongs to the institution rather than to the board. It puts questions to ' +
+    'the board and reads what became of its own, which is the whole of it: what the board says ' +
+    'to itself while it decides is the board’s, and a question is answered by the board rather ' +
+    'than negotiated with whoever asked it.',
 };
 
 export function requireRole(

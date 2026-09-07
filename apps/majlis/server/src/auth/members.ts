@@ -33,9 +33,35 @@ import { randomBytes, scryptSync, timingSafeEqual } from 'node:crypto';
  * making the request. A board member reading over someone's shoulder is an
  * observer, and the record should not pretend otherwise.
  */
-export type Role = 'signatory' | 'advisory' | 'liaison' | 'observer';
+export type Role = 'signatory' | 'advisory' | 'liaison' | 'observer' | 'institution';
 
-export const ROLES: readonly Role[] = ['signatory', 'advisory', 'liaison', 'observer'];
+export const ROLES: readonly Role[] = [
+  'signatory',
+  'advisory',
+  'liaison',
+  'observer',
+  'institution',
+];
+
+/**
+ * `institution` is the only role that is not on the board at all.
+ *
+ * It is the desk at the bank that has a question — the product team, the
+ * compliance officer, whoever actually needs an answer before a transaction can
+ * go ahead. Before it existed there was no way in: opening a matter required a
+ * board credential, so the institution's own question reached the record only
+ * as something a member retyped, with the wording paraphrased and the date it
+ * was asked a guess.
+ *
+ * **It may put a question and read what became of its own questions. Nothing
+ * else.** It does not deliberate, does not vote, does not see another desk's
+ * submissions, and cannot see the board's deliberation on its own.
+ *
+ * Adding it was safe because every function below tests role equality rather
+ * than excluding a list. A new role is therefore refused everywhere until it is
+ * named somewhere, which is the right default for an authority check — the
+ * opposite arrangement would have quietly handed a bank a vote.
+ */
 
 /**
  * An office is held *by* a member. It is not a level above them.
@@ -319,6 +345,31 @@ export function mayAnswerAsLiaison(role: Role): boolean {
 
 /** Opening a matter is not a vote; anyone who deliberates may raise one. */
 export function mayOpenMatter(role: Role): boolean {
+  return mayDeliberate(role);
+}
+
+/**
+ * Who may put a question to the board.
+ *
+ * The institution, obviously — that is what the role is for. And anyone who
+ * deliberates, because a great many questions arrive by email from a desk that
+ * will never hold a credential, and the secretary typing one in on their behalf
+ * is the ordinary case rather than a workaround. The submission records which
+ * of the two happened, so the difference is in the record instead of in who was
+ * allowed to act.
+ */
+export function maySubmit(role: Role): boolean {
+  return role === 'institution' || mayDeliberate(role);
+}
+
+/**
+ * Who decides what becomes of a submitted question.
+ *
+ * Opening it as a matter, or declining it with a reason, are both the board
+ * answering — so both belong to the board and neither is a vote. The
+ * institution may withdraw its own question, which is not this.
+ */
+export function mayDisposeOfSubmission(role: Role): boolean {
   return mayDeliberate(role);
 }
 

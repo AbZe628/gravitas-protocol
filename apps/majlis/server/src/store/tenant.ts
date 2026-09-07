@@ -10,6 +10,7 @@ import type {
   Matter,
   Meeting,
   Rule,
+  Submission,
 } from '../types.js';
 import { NotFound, type Store } from './store.js';
 
@@ -281,6 +282,50 @@ export class TenantStore implements Store {
       const next = change(current);
       if (next.boardId !== current.boardId) {
         throw new OutsideInstitution('move a meeting to', next.boardId);
+      }
+      return next;
+    });
+  }
+
+  // ── the way in ──────────────────────────────────────────────────────────
+  //
+  // Scoped through the board like everything else, and it matters more here
+  // than anywhere: a submission is one bank's own commercial question, often
+  // naming a counterparty and a deal that has not happened yet. Another
+  // institution seeing the queue would be the worst leak this record can have.
+
+  async submissions(boardId?: string): Promise<Submission[]> {
+    if (boardId && !(await this.owns(boardId))) return [];
+    const mine = await this.ownBoardIds();
+    const all = await this.inner.submissions(boardId);
+    return all.filter((s) => mine.has(s.boardId));
+  }
+
+  async submission(id: string): Promise<Submission | null> {
+    const found = await this.inner.submission(id);
+    if (!found) return null;
+    return (await this.owns(found.boardId)) ? found : null;
+  }
+
+  async createSubmission(submission: Submission): Promise<Submission> {
+    if (!(await this.owns(submission.boardId))) {
+      throw new OutsideInstitution('put a question to', submission.boardId);
+    }
+    return this.inner.createSubmission(submission);
+  }
+
+  async updateSubmission(
+    id: string,
+    change: (current: Submission) => Submission,
+  ): Promise<Submission> {
+    const found = await this.inner.submission(id);
+    // Indistinguishable from one that does not exist, deliberately.
+    if (!found || !(await this.owns(found.boardId))) throw new NotFound('submission', id);
+
+    return this.inner.updateSubmission(id, (current) => {
+      const next = change(current);
+      if (next.boardId !== current.boardId) {
+        throw new OutsideInstitution('move a question to', next.boardId);
       }
       return next;
     });

@@ -43,6 +43,7 @@ import type {
   Matter,
   Meeting,
   Rule,
+  Submission,
 } from '../types.js';
 import {
   boards as seedBoards,
@@ -90,6 +91,7 @@ interface Document {
   computations?: Computation[];
   adoptions?: AdoptedStructure[];
   meetings?: Meeting[];
+  submissions?: Submission[];
   briefings: Briefing[];
 }
 
@@ -175,6 +177,7 @@ export class FileStore implements Store {
       loaded.computations ??= [];
       loaded.adoptions ??= [];
       loaded.meetings ??= [];
+      loaded.submissions ??= [];
       this.doc = loaded;
       return;
     }
@@ -194,6 +197,7 @@ export class FileStore implements Store {
             computations: [],
             adoptions: [],
             meetings: [],
+            submissions: [],
           }
         : {
             version: 1,
@@ -209,6 +213,9 @@ export class FileStore implements Store {
             computations: [],
             adoptions: [],
             meetings: [],
+            // Nothing seeded: a queue of questions nobody at the bank actually
+            // asked would be words put in an institution's mouth.
+            submissions: [],
             briefings: copy(seedBriefings),
           };
     this.persist();
@@ -470,6 +477,44 @@ export class FileStore implements Store {
       // Runs against a copy and before persist(), so a refusal writes nothing.
       const next = change(copy(this.doc.meetings[index]));
       this.doc.meetings[index] = copy(next);
+      this.persist();
+      return copy(next);
+    });
+  }
+
+  async submissions(boardId?: string): Promise<Submission[]> {
+    const all = this.doc.submissions ?? [];
+    return copy(boardId === undefined ? all : all.filter((s) => s.boardId === boardId));
+  }
+
+  async submission(id: string): Promise<Submission | null> {
+    return copy((this.doc.submissions ?? []).find((s) => s.id === id) ?? null);
+  }
+
+  async createSubmission(submission: Submission): Promise<Submission> {
+    return this.serialise(() => {
+      this.doc.submissions ??= [];
+      if (this.doc.submissions.some((s) => s.id === submission.id)) {
+        throw new Error(`A submission with id ${submission.id} already exists.`);
+      }
+      this.doc.submissions.push(copy(submission));
+      this.persist();
+      return copy(submission);
+    });
+  }
+
+  async updateSubmission(
+    id: string,
+    change: (current: Submission) => Submission,
+  ): Promise<Submission> {
+    return this.serialise(() => {
+      this.doc.submissions ??= [];
+      const index = this.doc.submissions.findIndex((s) => s.id === id);
+      if (index === -1) throw new NotFound('Submission', id);
+
+      // Runs against a copy and before persist(), so a refusal writes nothing.
+      const next = change(copy(this.doc.submissions[index]));
+      this.doc.submissions[index] = copy(next);
       this.persist();
       return copy(next);
     });

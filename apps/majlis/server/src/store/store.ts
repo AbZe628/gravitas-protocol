@@ -33,6 +33,7 @@ import type {
   Matter,
   Meeting,
   Rule,
+  Submission,
 } from '../types.js';
 
 export class NotFound extends Error {
@@ -163,6 +164,25 @@ export interface Store {
    * @throws NotFound if there is no such meeting.
    */
   updateMeeting(id: string, change: (current: Meeting) => Meeting): Promise<Meeting>;
+
+  // ── the way in ─────────────────────────────────────────────────────────
+
+  submissions(boardId?: string): Promise<Submission[]>;
+  submission(id: string): Promise<Submission | null>;
+
+  /** @throws if a submission with this id already exists. */
+  createSubmission(submission: Submission): Promise<Submission>;
+
+  /**
+   * Read, change and write one submission atomically.
+   *
+   * The only change a caller may make is appending a disposition — the
+   * question itself is never edited, which is enforced in
+   * services/submission.ts rather than here, so the store stays a store.
+   *
+   * @throws NotFound if there is no such submission.
+   */
+  updateSubmission(id: string, change: (current: Submission) => Submission): Promise<Submission>;
 
   // ── the library as each board holds it ─────────────────────────────────
   //

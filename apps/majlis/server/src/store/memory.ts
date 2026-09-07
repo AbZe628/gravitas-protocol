@@ -23,6 +23,7 @@ import type {
   Matter,
   Meeting,
   Rule,
+  Submission,
 } from '../types.js';
 import {
   boards as seedBoards,
@@ -47,6 +48,7 @@ export interface MemorySeed {
   computations?: Computation[];
   adoptions?: AdoptedStructure[];
   meetings?: Meeting[];
+  submissions?: Submission[];
 }
 
 export class MemoryStore implements Store {
@@ -63,6 +65,7 @@ export class MemoryStore implements Store {
   private readonly _computations: Map<string, Computation>;
   private readonly _adoptions: Map<string, AdoptedStructure>;
   private readonly _meetings: Map<string, Meeting>;
+  private readonly _submissions: Map<string, Submission>;
   private readonly _log: AssistantExchange[] = [];
 
   constructor(seed: MemorySeed = {}) {
@@ -82,6 +85,9 @@ export class MemoryStore implements Store {
     // adopted would be showing a decision no board in it ever took.
     this._adoptions = new Map((seed.adoptions ?? []).map((a) => [a.id, copy(a)]));
     this._meetings = new Map((seed.meetings ?? []).map((m) => [m.id, copy(m)]));
+    // Nothing seeded by default: a queue of questions nobody at the bank
+    // actually asked would be words in an institution's mouth.
+    this._submissions = new Map((seed.submissions ?? []).map((x) => [x.id, copy(x)]));
   }
 
   async institutions(): Promise<Institution[]> {
@@ -273,6 +279,36 @@ export class MemoryStore implements Store {
 
     const next = change(copy(current));
     this._meetings.set(id, copy(next));
+    return copy(next);
+  }
+
+  async submissions(boardId?: string): Promise<Submission[]> {
+    const all = [...this._submissions.values()];
+    return copy(boardId === undefined ? all : all.filter((s) => s.boardId === boardId));
+  }
+
+  async submission(id: string): Promise<Submission | null> {
+    const found = this._submissions.get(id);
+    return found ? copy(found) : null;
+  }
+
+  async createSubmission(submission: Submission): Promise<Submission> {
+    if (this._submissions.has(submission.id)) {
+      throw new Error(`A submission with id ${submission.id} already exists.`);
+    }
+    this._submissions.set(submission.id, copy(submission));
+    return copy(submission);
+  }
+
+  async updateSubmission(
+    id: string,
+    change: (current: Submission) => Submission,
+  ): Promise<Submission> {
+    const current = this._submissions.get(id);
+    if (!current) throw new NotFound('Submission', id);
+
+    const next = change(copy(current));
+    this._submissions.set(id, copy(next));
     return copy(next);
   }
 

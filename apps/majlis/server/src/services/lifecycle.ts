@@ -59,7 +59,15 @@ export type RefusalCode =
   | 'not_yours'
   // ── parameters ──
   | 'parameters_frozen'
-  | 'duplicate_parameter';
+  | 'duplicate_parameter'
+  // ── the way in: a question the institution put ──
+  | 'question_too_short'
+  | 'no_subject'
+  | 'no_asker'
+  | 'asked_in_the_future'
+  | 'wrong_standing'
+  | 'reason_too_short'
+  | 'no_reason';
 
 export class Refused extends Error {
   constructor(

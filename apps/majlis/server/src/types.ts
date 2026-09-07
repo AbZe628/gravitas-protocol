@@ -983,3 +983,100 @@ export interface AdoptedStructure {
   /** The adoption this replaces. The replaced one stays. */
   supersedes: string | null;
 }
+
+// ── the way in ────────────────────────────────────────────────────────────
+
+/**
+ * What the institution did with a question once it was put.
+ *
+ * Appended, never edited, and each carries who and why. A decline that left no
+ * reason would be the board refusing to answer and refusing to say why, which
+ * is the thing an institution would most reasonably complain about.
+ */
+export interface Disposition {
+  kind: 'opened' | 'declined' | 'withdrawn';
+  at: string;
+  /** The credential that did it. A member for the first two, the asker for the last. */
+  by: string;
+  /** Required on `declined` and `withdrawn`, and checked. Absent on `opened`. */
+  reason?: string;
+  /** The matter this became. Set on `opened`, and only there. */
+  matterId?: string;
+}
+
+/**
+ * A question the institution put to the board.
+ *
+ * This is the way in, and until it existed there was none: opening a matter
+ * needed a board credential, so the bank's own question reached the record only
+ * as something a member retyped on its behalf. The date it was asked was
+ * guesswork, the wording was a paraphrase, and if the board declined there was
+ * nowhere for that to be said back.
+ *
+ * **The question is the institution's own words and is never edited.** A board
+ * that answers a rephrased question has answered a different one, and the
+ * rephrasing is exactly where a compliance desk's meaning gets lost. What the
+ * board thinks the question is becomes the matter's `title` and `proposal`,
+ * which is a separate act by a named member — and the two sit side by side, so
+ * a reader can see whether the board answered what was asked.
+ *
+ * Append-only like everything else here. `dispositions` grows; nothing in it is
+ * rewritten, and which one stands is the last of them.
+ */
+export interface Submission {
+  id: string;
+  boardId: string;
+  /** Whose question it is. Isolation is enforced at the store boundary. */
+  institutionId: string;
+
+  /**
+   * When the institution actually asked, as against when Majlis heard about it.
+   *
+   * Both are kept because they answer different questions. `arrivedAt` is what
+   * the business has been waiting on and is the figure this product is sold on;
+   * `recordedAt` is when it reached the record. A submission entered by the
+   * secretary a week after the email arrived has a real gap between them, and
+   * collapsing the two would quietly understate the wait.
+   */
+  arrivedAt: string;
+  recordedAt: string;
+
+  /**
+   * Who asked, at the institution. A name and a desk, in plain text.
+   *
+   * Not a credential and not a user: the person who signs off a product at a
+   * bank is usually not the person who logs in, and inventing an account for
+   * them would put a login in the record where a name belongs.
+   */
+  askedBy: string;
+  /** The credential that put it in — the asker themselves, or who did it for them. */
+  recordedBy: string;
+  /**
+   * True where a member entered it for somebody who has no access.
+   *
+   * A question typed by the secretary from an email and a question the desk
+   * submitted itself are different evidence, and the record says which.
+   */
+  onBehalf: boolean;
+
+  /** One line, for a list. Theirs, not the board's. */
+  subject: string;
+  /** The question as put. Never edited, never paraphrased into the record. */
+  question: string;
+  /** What the desk thinks the board needs to know. May be empty. */
+  background: string;
+  /**
+   * What the institution says it is waiting to do.
+   *
+   * Not a deadline the board is bound by — a board is not bound by a bank's
+   * launch date — but a board deciding what to take first is entitled to know
+   * which question is holding up a transaction and which is housekeeping.
+   */
+  awaiting: string;
+
+  /** Documents attached by the asker. Ids into the vault, as elsewhere. */
+  attachments: string[];
+
+  /** Appended in order. The one that stands is the last. */
+  dispositions: Disposition[];
+}

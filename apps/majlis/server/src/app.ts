@@ -29,6 +29,8 @@ import { vaultFromEnv, type Vault } from './store/vault.js';
 import { readingFromEnv, type Reading } from './services/reading.js';
 import { computationRoutes } from './routes/computations.js';
 import { meetingRoutes } from './routes/meetings.js';
+import { submissionRoutes } from './routes/submissions.js';
+import { notifierFromEnv, type Notifier } from './services/notice.js';
 import { incidentRoutes } from './routes/incidents.js';
 
 
@@ -76,6 +78,15 @@ export function createApp(
    * separately from the assistant — see services/reading.ts.
    */
   reading: Reading = readingFromEnv(),
+  /**
+   * How a member is told, outside the application, that something arrived.
+   *
+   * Chosen at construction like everything else an institution might or might
+   * not have, and its default sends nothing. What it does instead is compose
+   * the words and hand them back for a person to carry — see
+   * `services/notice.ts` for why that is honest rather than a placeholder.
+   */
+  notifier: Notifier = notifierFromEnv(),
 ): Express {
   const app = express();
 
@@ -152,6 +163,17 @@ export function createApp(
       recordSince: store.startedAt ?? null,
       // What this installation is, rather than what the default one is.
       enforcement: enforcement.kind,
+      /*
+       * Whether a member can be told, outside the application, that something
+       * arrived.
+       *
+       * `none` is the default and is the ordinary installation rather than a
+       * broken one: the notice is composed and shown for a person to send. The
+       * interface reads this so it can say that in words — a screen that
+       * offered the words with no explanation would let a secretary assume the
+       * board had already been emailed.
+       */
+      notice: notifier.kind,
       /*
        * Whether a document can be kept at all.
        *
@@ -431,6 +453,7 @@ export function createApp(
   app.use('/api', incidentRoutes(store));
   app.use('/api', computationRoutes(store));
   app.use('/api', adoptionRoutes(store));
+  app.use('/api', submissionRoutes(store, notifier));
   app.use('/api', meetingRoutes(store));
 
   // ---- audit export ----------------------------------------------------
