@@ -1,0 +1,615 @@
+<div class="sheet cover">
+  <div class="mark">
+    <svg width="34" height="34" viewBox="0 0 40 40" aria-hidden="true">
+      <circle cx="20" cy="20" r="18.5" fill="none" stroke="#164470" stroke-width="1" />
+      <path d="M11 20 h18" stroke="#B08430" stroke-width="1.4" />
+      <path d="M11 14.5 h18" stroke="#164470" stroke-width="0.7" opacity="0.55" />
+      <path d="M11 25.5 h18" stroke="#164470" stroke-width="0.7" opacity="0.55" />
+      <circle cx="20" cy="20" r="3.2" fill="none" stroke="#164470" stroke-width="1" />
+    </svg>
+    <div>
+      <div class="wordmark">Gravitas <span>Majlis</span></div>
+      <div class="kicker">A guide for Shariah boards and the banks they serve</div>
+    </div>
+  </div>
+
+  <hr class="edge" />
+
+  <h1 class="cover-title">What Majlis is, what it does,<br />and how to use it</h1>
+
+  <p class="cover-lead">
+    Majlis is where a Shariah board does its work. A question arrives from the
+    bank. The board reads it, argues about it, votes on it, and writes down why.
+    Majlis keeps all of that in one place, so anyone can find the decision a year
+    later and check what it was based on.
+  </p>
+
+  <p class="cover-lead">
+    This guide explains every part of it. It is written for two readers: a
+    scholar who will use it, and a bank officer who needs to know what it does
+    before agreeing to use it.
+  </p>
+
+  <div class="cover-box">
+    <p><strong>Majlis does not decide anything.</strong></p>
+    <p>
+      It does not say whether a product is permissible. It does not choose a
+      threshold, a method, or a standard. Every one of those is the board's, and
+      the software is built to refuse them. What Majlis does is hold the work, do
+      the arithmetic, and show its own gaps.
+    </p>
+  </div>
+
+  <div class="cover-figures">
+    <div><span class="n">3</span><span class="l">Languages, with full right to left support</span></div>
+    <div><span class="n">19</span><span class="l">Contract shapes with their conditions</span></div>
+    <div><span class="n">1,632</span><span class="l">Automated tests, all passing</span></div>
+  </div>
+
+  <div class="foot">
+    <hr class="edge gold" />
+    <div class="line"><span>September 2026</span><span class="page">Guide</span></div>
+  </div>
+</div>
+
+<!-- ────────────────────────────────────────────────────────────── -->
+
+<div class="sheet">
+  <h2>1. Who uses Majlis</h2>
+
+  <p class="lead">
+    Five kinds of people sign in. Each one sees a different set of buttons.
+    Majlis hides what a person may not do, and the server refuses it as well, so
+    a hidden button is not the only thing stopping them.
+  </p>
+
+  <table class="roles">
+    <thead><tr><th>Role</th><th>What they can do</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>Signatory</strong><i>A scholar who signs</i></td>
+        <td>Reads everything. Takes part in discussion. Votes. Objects during a
+        waiting period. Closes a vote once enough signatures are in.</td>
+      </tr>
+      <tr>
+        <td><strong>Advisory member</strong><i>A scholar without a signature</i></td>
+        <td>Reads everything and takes part in discussion. Their written view is
+        kept in the record. It does not count towards the number of signatures
+        needed.</td>
+      </tr>
+      <tr>
+        <td><strong>Technical liaison</strong><i>The engineer or product person</i></td>
+        <td>Explains how something works when the board asks. Records the steps
+        that belong to the bank. No vote.</td>
+      </tr>
+      <tr>
+        <td><strong>Institution</strong><i>The desk with a question</i></td>
+        <td>Puts a question to the board. Reads what happened to its own
+        questions. Sees nothing else. This is the account you give to a product
+        team or a compliance officer.</td>
+      </tr>
+      <tr>
+        <td><strong>Observer</strong><i>An auditor or a regulator</i></td>
+        <td>Reads. Writes nothing.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p class="note">
+    One person can also hold an office as well as a role. The <strong>chair</strong>
+    calls meetings. The <strong>secretary</strong> writes down what the bank did,
+    such as filing a plan to fix a problem. An office does not give anyone more
+    authority to decide. It only says who does the paperwork.
+  </p>
+
+  <h2>2. How to find your way around</h2>
+
+  <p class="lead">
+    On a phone there are five buttons across the bottom. On a wide screen there
+    is a list down the left. Both lead to the same places.
+  </p>
+
+  <table class="nav">
+    <thead><tr><th>Where</th><th>What is there</th></tr></thead>
+    <tbody>
+      <tr><td><code>Work</code></td><td>The first screen. It answers one question: is there anything here for me today.</td></tr>
+      <tr><td><code>Record</code></td><td>What the board decided, and what is still in force.</td></tr>
+      <tr><td><code>Coming</code></td><td>Every date the board is held to. Worked out from the record, not typed in.</td></tr>
+      <tr><td><code>More</code></td><td>Everything the first screen does not show. Eleven places, in four groups.</td></tr>
+      <tr><td><code>Guide</code></td><td>Ask a question about the application in plain words. It answers in your language.</td></tr>
+    </tbody>
+  </table>
+
+  <p class="note">
+    The language picker sits at the top of every screen: <strong>English</strong>,
+    <strong>العربية</strong>, <strong>اردو</strong>. The whole interface changes,
+    including the direction of the text.
+  </p>
+
+  <div class="foot">
+    <hr class="edge gold" />
+    <div class="line"><span>Gravitas Majlis · Guide</span><span class="page">2</span></div>
+  </div>
+</div>
+
+<!-- ────────────────────────────────────────────────────────────── -->
+
+<div class="sheet">
+  <h2>3. The path a question takes</h2>
+
+  <p class="lead">
+    This is the main thing to understand. A question goes through eight steps
+    from the desk that asks it to the document the bank files. Each step happens
+    on one screen, and each one leaves a record.
+  </p>
+
+  <ol class="steps">
+    <li>
+      <h3>The bank asks</h3>
+      <p>
+        Someone at the bank signs in with an <em>institution</em> account and
+        writes the question in their own words. They say what they are waiting to
+        do, so the board can see which questions are holding up work.
+      </p>
+      <p class="rule">
+        The question is never edited. What the board thinks the question is
+        becomes a separate text, written by a named member. The two sit side by
+        side, so you can see whether the board answered what was asked.
+      </p>
+      <p class="where">Screen: the first screen for an institution account. Or <code>Questions</code> for the board.</p>
+    </li>
+
+    <li>
+      <h3>The board picks it up</h3>
+      <p>
+        The board sees a queue, oldest first. A member either opens the question
+        as a matter, or declines it and says why. The reason is required. Without
+        one the bank cannot tell whether to come back with more information or
+        not to come back at all.
+      </p>
+      <p class="rule">A declined question can be reconsidered later. Both decisions stay in the record.</p>
+      <p class="where">Screen: <code>Questions</code></p>
+    </li>
+
+    <li>
+      <h3>The board sets out the question</h3>
+      <p>
+        A matter holds the question, what actually happens in the transaction,
+        and <em>what is not being decided</em>. That last part matters. It stops a
+        narrow approval being read a year later as a broad one.
+      </p>
+      <p class="where">Screen: the matter itself</p>
+    </li>
+
+    <li>
+      <h3>The board judges it against a contract shape</h3>
+      <p>
+        Majlis ships nineteen contract shapes with the conditions each one is
+        normally held to. Murabaha, ijara, mudaraba, sukuk, and so on. The board
+        answers each condition in its own words: met, not met, or does not apply.
+      </p>
+      <p class="rule">
+        These conditions are a draft. They bind nobody until this board adopts
+        them. Where the board has ruled on the same shape before, its earlier
+        answers are offered under each condition, and accepting one records it as
+        your finding today.
+      </p>
+      <p class="where">Screen: the matter, lower down. Or <code>More &rsaquo; Library</code> to read the shapes.</p>
+    </li>
+
+  </ol>
+
+  <div class="foot">
+    <hr class="edge gold" />
+    <div class="line"><span>Gravitas Majlis · Guide</span><span class="page">3</span></div>
+  </div>
+</div>
+
+<div class="sheet">
+  <h2>The path a question takes <span class="cont">continued</span></h2>
+
+  <ol class="steps" start="5" style="counter-reset: step 4">
+    <li>
+      <h3>The board sets the operative terms</h3>
+      <p>
+        A term is a name, a number, a unit, and a sentence saying what it does.
+        For example: <code>minTangibleRatioBps</code>, 5100, basis points,
+        <em>tangible assets must be at least 51% of pool value</em>.
+      </p>
+      <p class="rule">
+        The plain sentence is required. It is what the scholar actually reads. It
+        is left out of the fingerprint on purpose, so improving the wording never
+        cancels an approval.
+      </p>
+      <p class="where">Screen: the matter</p>
+    </li>
+
+    <li>
+      <h3>The board votes</h3>
+      <p>
+        Each signatory records a position and a reason. The reason is required. A
+        list of names with no reasons cannot be followed the next time a similar
+        question comes up.
+      </p>
+      <p class="rule">
+        Permitting something needs the full number of signatures and then waits
+        48 hours before it takes effect. Any one member can object during that
+        time. Restricting something takes effect at once on fewer signatures, and
+        then has to be confirmed by the full board or it falls away.
+      </p>
+      <p class="where">Screen: the matter, under <em>What is next</em></p>
+    </li>
+
+    <li>
+      <h3>Majlis writes the ruling</h3>
+      <p>
+        When the vote closes and the waiting period ends, Majlis assembles the
+        document: the question, what happens, what was not decided, the terms,
+        and every member's reasoning next to their position. It opens in a browser
+        tab and saves as a PDF.
+      </p>
+      <p class="where">Screen: the matter, under <em>Where this ruling ends</em></p>
+    </li>
+
+    <li>
+      <h3>Majlis drafts the clauses</h3>
+      <p>
+        From the same ruling, Majlis writes out the clauses an agreement has to
+        contain. Every clause comes from something a member wrote: a condition
+        they found, a term they approved, something they held outside the
+        question.
+      </p>
+      <p class="rule">
+        This is not a contract and it is not legal advice. It covers only what the
+        board ruled on. A financing agreement contains much more, and the rest was
+        never put to the board. The draft says so at the top, above the clauses.
+      </p>
+      <p class="where">Screen: the matter, next to the ruling</p>
+    </li>
+  </ol>
+
+  <div class="foot">
+    <hr class="edge gold" />
+    <div class="line"><span>Gravitas Majlis · Guide</span><span class="page">3</span></div>
+  </div>
+</div>
+
+<!-- ────────────────────────────────────────────────────────────── -->
+
+<div class="sheet">
+  <h2>4. What happens after a ruling</h2>
+
+  <p class="lead">
+    Most compliance is not lost when a board rules badly. It is lost afterwards,
+    when the transactions drift away from what was approved and nobody compares
+    the two. Majlis has four ways of catching that.
+  </p>
+
+  <div class="after">
+    <div class="card">
+      <h3>Drift</h3>
+      <p>
+        A pool that was 51% tangible in March is 47% in July because it
+        rebalanced. Nobody did anything wrong. Majlis compares the composition
+        against the terms the board set and raises the question.
+      </p>
+      <p class="rule">It never re-rules. The status stays what the board made it.</p>
+      <p class="where"><code>More &rsaquo; Register</code></p>
+    </div>
+
+    <div class="card">
+      <h3>Examinations</h3>
+      <p>
+        The bank's own review function checks a sample of executed transactions
+        against the ruling, and records what it found: how many were looked at,
+        which conditions held, and how many exceptions there were.
+      </p>
+      <p class="rule">
+        Majlis does not choose the sample. The examiner does, and says how.
+      </p>
+      <p class="where"><code>Examinations</code></p>
+    </div>
+
+    <div class="card">
+      <h3>Events</h3>
+      <p>
+        The bank reports a breach. The board decides whether it was real, now
+        rather than next quarter. From that moment thirty days run for a plan to
+        fix it. Nine steps follow, and four of them belong to the bank.
+      </p>
+      <p class="where"><code>More &rsaquo; Events</code></p>
+    </div>
+
+    <div class="card">
+      <h3>Review dates</h3>
+      <p>
+        A ruling comes back to the board on an interval the board sets. The dates
+        are worked out from the rules themselves. You can subscribe to them from
+        your own calendar.
+      </p>
+      <p class="where"><code>Coming</code></p>
+    </div>
+  </div>
+
+  <div class="foot">
+    <hr class="edge gold" />
+    <div class="line"><span>Gravitas Majlis · Guide</span><span class="page">4</span></div>
+  </div>
+</div>
+
+<div class="sheet">
+  <h2>5. The arithmetic Majlis will do</h2>
+
+  <p class="lead">
+    Six calculations, under <code>More &rsaquo; Calculations</code>. Every one of
+    them shows the full sum. None of them reaches a verdict.
+  </p>
+
+  <table class="calcs">
+    <tbody>
+      <tr><td><strong>Screening</strong></td><td>Three ratios on a company's figures. <em>The board sets every limit. Majlis ships none.</em> Send no limit and the ratio is worked out and reported untested.</td></tr>
+      <tr><td><strong>Purification</strong></td><td>How much income must be given away, and to where.</td></tr>
+      <tr><td><strong>Zakat</strong></td><td>On the base and by the method the board chooses.</td></tr>
+      <tr><td><strong>Profit distribution</strong></td><td>What depositors are paid, and what the reserves did to it.</td></tr>
+      <tr><td><strong>Tradability</strong></td><td>Where a pool falls against the bands this board set, quoted in the board's own words.</td></tr>
+      <tr><td><strong>Late payment</strong></td><td>An increase charged on a late payment, and where it goes. You say first whether the debtor could have paid.</td></tr>
+    </tbody>
+  </table>
+
+  <p class="note">
+    Money is never handled as a decimal number in the usual programming sense.
+    Every amount stays exact, and every comparison is done by multiplying rather
+    than dividing, so a figure that displays as 30.00% can never be inside the
+    limit on one screen and outside it on another.
+  </p>
+
+  <div class="foot">
+    <hr class="edge gold" />
+    <div class="line"><span>Gravitas Majlis · Guide</span><span class="page">4</span></div>
+  </div>
+</div>
+
+<!-- ────────────────────────────────────────────────────────────── -->
+
+<div class="sheet">
+  <h2>6. The documents it produces</h2>
+
+  <p class="lead">
+    Each one opens in a browser tab and saves as a PDF. Nothing is generated in
+    advance. They are built from the record each time they are asked for, so they
+    cannot fall out of step with it.
+  </p>
+
+  <table class="docs">
+    <thead><tr><th>Document</th><th>What is in it</th></tr></thead>
+    <tbody>
+      <tr><td><strong>The ruling</strong></td><td>The question, what happens, what was not decided, the terms, and each member's reasoning beside their position.</td></tr>
+      <tr><td><strong>Draft clauses</strong></td><td>What an agreement must provide for the ruling to reach it. Nothing invented.</td></tr>
+      <tr><td><strong>The manual</strong></td><td>Every rule in force, its conditions, how it is carried out, and its limits.</td></tr>
+      <tr><td><strong>The annual report</strong></td><td>The year: decisions, reviews, meetings, examinations, breaches, purification. It also lists what the record cannot say.</td></tr>
+      <tr><td><strong>One holding</strong></td><td>Everything the board ever decided about a single asset, on one page.</td></tr>
+      <tr><td><strong>Audit export</strong></td><td>The whole record with a fingerprint, in one action.</td></tr>
+      <tr><td><strong>Calendar feed</strong></td><td>Every date the board is held to, for your own calendar.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>7. With a chain, and without one</h2>
+
+  <p class="lead">
+    Majlis works the same either way. The difference is only what happens to the
+    ruling at the end.
+  </p>
+
+  <div class="two">
+    <div class="card">
+      <div class="tag quiet">Without a chain</div>
+      <h3>The ruling is a document</h3>
+      <p>
+        Everything runs inside the application: the question, the evidence, the
+        vote, the file. Majlis produces the PDF, and somebody at the bank sends
+        it on.
+      </p>
+      <p class="rule">
+        Majlis does not send it, and says so on the screen. That step is a
+        person's.
+      </p>
+    </div>
+
+    <div class="card">
+      <div class="tag settled">With a policy registry</div>
+      <h3>The terms are read before every transaction</h3>
+      <p>
+        The same board, the same record, the same vote. Instead of a document to
+        send, the terms are written where they are consulted. A transaction that
+        would break one does not go through.
+      </p>
+      <p class="rule">
+        The document still exists, as the account of the decision rather than the
+        instrument of it.
+      </p>
+    </div>
+  </div>
+
+  <p class="note">
+    A bank with no chain anywhere near it is running the ordinary installation,
+    not a reduced one. The day it connects a registry, nothing about how the
+    board works changes.
+  </p>
+
+  <div class="foot">
+    <hr class="edge gold" />
+    <div class="line"><span>Gravitas Majlis · Guide</span><span class="page">5</span></div>
+  </div>
+</div>
+
+<!-- ────────────────────────────────────────────────────────────── -->
+
+<div class="sheet">
+  <h2>8. What Majlis will not do</h2>
+
+  <p class="lead">
+    This section matters as much as the rest. A bank should know the limits
+    before it relies on the product, not after.
+  </p>
+
+  <ul class="limits">
+    <li>
+      <strong>It does not rule.</strong> No screen and no document says whether
+      something is permissible. The assistant refuses the question in three
+      languages, and so does the guide.
+    </li>
+    <li>
+      <strong>It follows no standard and ships none.</strong> There is no
+      threshold, no ratio and no citation built in. Which standard governs is
+      your board's decision. The only place a standard is ever named is where
+      your board writes it, in its own words.
+    </li>
+    <li>
+      <strong>It does not sign.</strong> A decision recorded in Majlis does not
+      change the policy registry by itself. Signing authority moving into Majlis
+      is the next stage of the work and is not built.
+    </li>
+    <li>
+      <strong>It does not send anything.</strong> No email leaves the building
+      unless your institution wires up its own mail relay. Where none is
+      configured, Majlis writes the words for a person to send and says on the
+      screen that nobody has been told.
+    </li>
+    <li>
+      <strong>It does not choose an audit sample.</strong> Your review function
+      chooses, and says how it chose.
+    </li>
+    <li>
+      <strong>It does not fill in gaps.</strong> Where your board has not decided
+      something, every screen and every document says so rather than leaving a
+      blank space that reads as a clean result.
+    </li>
+  </ul>
+
+  <h2>9. What is not finished</h2>
+
+  <table class="open">
+    <tbody>
+      <tr>
+        <td><strong>Arabic and Urdu</strong></td>
+        <td>Every string is translated, and the translations have not yet been
+        checked by a native speaker. The application says so to the reader on
+        arrival, in their own language.</td>
+      </tr>
+      <tr>
+        <td><strong>The assistant</strong></td>
+        <td>Off unless your institution turns it on with its own key. It explains
+        how a mechanism works and refuses to rule.</td>
+      </tr>
+      <tr>
+        <td><strong>Uploading documents</strong></td>
+        <td>Needs a storage volume. Without one the upload control does not
+        appear at all, rather than appearing and then refusing.</td>
+      </tr>
+      <tr>
+        <td><strong>Signing</strong></td>
+        <td>Stage Three. The vote becoming the cryptographic signature is
+        designed and not built.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="foot">
+    <hr class="edge gold" />
+    <div class="line"><span>Gravitas Majlis · Guide</span><span class="page">7</span></div>
+  </div>
+</div>
+
+<div class="sheet">
+  <h2>10. Trying it</h2>
+
+  <p class="lead">
+    You will be sent a link and one account for each role. Sign in and work
+    through the path in section 3. It takes about fifteen minutes.
+  </p>
+
+  <ol class="try">
+    <li>Sign in as the <strong>institution</strong> account. Put a question to the board. Say what you are waiting to do.</li>
+    <li>Sign out. Sign in as a <strong>signatory</strong>. Open <code>Questions</code>. Your question is at the top of the queue.</li>
+    <li>Take it up as a matter. Write the board's own version of the question.</li>
+    <li>Choose a contract shape. Answer two or three of its conditions.</li>
+    <li>Set one operative term. Give it a plain sentence.</li>
+    <li>Open the vote. Record a position and a reason. Do the same with a second signatory account.</li>
+    <li>Close the vote. Open the ruling, then the draft clauses.</li>
+    <li>Sign back in as the <strong>institution</strong> account and look at your own question. It now names the matter it became.</li>
+  </ol>
+
+  <div class="creds">
+    <div class="tag gold">Accounts</div>
+    <p>
+      Accounts are generated for each pilot and sent separately from this
+      document. They are never written in a file that travels by email.
+    </p>
+    <p>
+      Each one is a name and a password. There is no self service sign up, and no
+      account can be created from inside the application, because an account is a
+      person the board has agreed to.
+    </p>
+  </div>
+
+  <div class="foot">
+    <hr class="edge gold" />
+    <div class="line"><span>Gravitas Majlis · Guide</span><span class="page">6</span></div>
+  </div>
+</div>
+
+<!-- ────────────────────────────────────────────────────────────── -->
+
+<div class="sheet">
+  <h2>11. Questions a bank usually asks</h2>
+
+  <dl class="faq">
+    <dt>Does it replace our Shariah board?</dt>
+    <dd>No. It holds their work. Every judgement stays theirs, and the software
+    refuses to make one.</dd>
+
+    <dt>Does it tell us what is halal?</dt>
+    <dd>No, and it is built so that it cannot. Ask it and it will explain where
+    the question goes instead.</dd>
+
+    <dt>Which standard does it follow?</dt>
+    <dd>None. Your board decides that and writes it down in its own words. There
+    is no threshold or citation built into the product.</dd>
+
+    <dt>Can we change our mind about something we decided?</dt>
+    <dd>Yes. Nothing is edited or deleted. A correction is written as a new entry
+    that supersedes the old one, and both stay visible.</dd>
+
+    <dt>Who can see our questions?</dt>
+    <dd>Each institution's record is separated at the storage layer, not by a
+    check in each screen. Within one bank, a desk sees only the questions it
+    asked itself.</dd>
+
+    <dt>Do we need a blockchain?</dt>
+    <dd>No. Most banks will run it with nothing attached, and that is the
+    ordinary installation.</dd>
+
+    <dt>What happens if we stop using it?</dt>
+    <dd>One action exports the whole record with a fingerprint. It is your record,
+    and it leaves in a form you can read without us.</dd>
+
+    <dt>Is our data used to train anything?</dt>
+    <dd>No. The assistant is off unless you turn it on, and the in application
+    guide answers only from what the software knows about itself, so nothing you
+    type there leaves the building.</dd>
+  </dl>
+
+  <div class="close">
+    <p class="closing">
+      Everything in this guide describes what the software does today. Where
+      something is designed and not built, this document says so, in the same
+      words the application uses on the screen.
+    </p>
+    <p class="contact">gravitasprotocol.xyz</p>
+  </div>
+
+  <div class="foot">
+    <hr class="edge gold" />
+    <div class="line"><span>Gravitas Majlis · Guide</span><span class="page">7</span></div>
+  </div>
+</div>
