@@ -112,7 +112,7 @@ describe('the queue', () => {
     for (const input of inputs) {
       expect(input.value).not.toBe('Wrapped sukuk for the treasury desk');
     }
-    expect(screen.getByText(/Your own wording, not theirs/i)).toBeInTheDocument();
+    expect(screen.getByText(/Your wording, not theirs/i)).toBeInTheDocument();
   });
 
   it('says a decline is being reconsidered before it is reopened', async () => {

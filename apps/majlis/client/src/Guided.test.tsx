@@ -222,7 +222,7 @@ describe('nothing was removed', () => {
     show('/more');
 
     await waitFor(() =>
-      expect(screen.getByText(/it was moved off it/)).toBeInTheDocument(),
+      expect(screen.getByText(/Nothing was taken away from it/)).toBeInTheDocument(),
     );
   });
 });
@@ -322,7 +322,7 @@ describe('putting something to the board', () => {
     // It opens as a draft. The shape, the terms and what is not being decided
     // are the board's, and a form that filled them would put words in the mouth
     // of a board that has not met.
-    expect(screen.getByText(/Nothing is decided by sending this/)).toBeInTheDocument();
+    expect(screen.getByText(/Sending this decides nothing/)).toBeInTheDocument();
   });
 
   it('is absent for somebody who could not open a matter', async () => {
