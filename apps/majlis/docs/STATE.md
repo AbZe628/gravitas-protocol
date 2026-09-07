@@ -12,21 +12,55 @@ unfinished it says so, and where something is broken it says how it breaks.
 ## Verified, this save
 
 ```
-server   51 files   1315 tests   passed
-client   20 files    222 tests   passed
+server   54 files   1374 tests   passed
+client   21 files    232 tests   passed
 ```
 
 `npm test` from `apps/majlis`. Typecheck clean with `--force` on both sides.
 `client/dist` is rebuilt, so port 4000 shows the current interface.
 
-`origin/main` is at `a255d0b`. **`b819009` and this save are local only and have
-not been pushed** — pushing needs asking first, every time.
+Pushed to `origin/main` on 7 September 2026, on the user's explicit say-so.
+**Pushing needs asking first, every time** — naming GitHub in a task is not
+approval to publish.
 
 ---
 
 ## §0. Where we stopped, and what to do next
 
-### The last thing that landed
+### All four things the user asked for are built
+
+Written 7 September 2026. The three gaps this section used to describe as *not
+started* are closed, and the fourth — simplification — has had its first pass.
+
+| | |
+|---|---|
+| `b819009` | **Majlis follows no standard.** 107 citations out of the library, `authority` gone from both types, and screening's hardcoded 30/30/5 thresholds replaced by limits the board sets. See below. |
+| `a8040c5` | **A way in, on the server.** `Submission`, the fifth role `institution`, and a notice adapter whose default sends nothing. |
+| `00c93c1` | **A way in, on screen.** Two screens chosen by credential: the board works a queue, the institution puts a question and reads its own. |
+| `d5930e1` | **Contract drafts.** Assembled from the ruling — findings, terms, exclusions — and nothing composed. `/api/matters/:id/contract`. |
+| `d2efbbe` | **The matter screen.** The act moved from 96% of scroll depth to 17%; previous findings moved under the condition each answers; the reasoning collapsed in place. |
+
+**What is left of the simplification.** One pass is done on the densest screen.
+Whether the rest is right is a judgement that wants fresh eyes rather than
+another sweep — `/more` was measured (11 destinations, 4 groups, 195 words) and
+deliberately left alone, because its subtitles are what tell a scholar what
+*Register* or *Events* mean and the instruction was to simplify without losing
+anything.
+
+**Two things measured that turned out not to be faults.** The two condition
+lists on the matter screen looked like 83% duplication; they were the same six
+conditions saying different things, so folding them improved *where* a scholar
+reads rather than how much. And a label extracting as
+`OPERATIVE TERMminTangibleRatioBps` has an 8px margin and renders correctly —
+it is a text-extraction artefact. Measure before changing.
+
+**Still open, and none of it blocking:** the assistant has never met a real key;
+the guide's 17 topic answers are English only and the service takes no `lang`;
+the Arabic and Urdu are complete but unreviewed; four screens have no artboard.
+
+---
+
+### The standards detachment, in detail
 
 **`b819009` — Majlis follows no standard, and no longer says it does.**
 
@@ -66,10 +100,12 @@ They were right, and it went deeper than the label:
 Verified on the running page, not just in tests: `AAOIFI: 0`, `SS n: 0`,
 `Standard No.: 0`, and the honest line present once.
 
-### The three things asked for and NOT started
+### What was asked for, in the user's own words
 
-All three came from the same two messages. Quoting them, because the wording
-matters more than a paraphrase:
+**All three are built** — see the table above. The wording is kept verbatim
+because it is what the work was held to, and what follows describes what was
+found in the code at the time, which is still the best account of why each
+mattered.
 
 > *"nema opet funkcija puta kako smo zamisli ko salje prijedloge u majlis kako
 > banka salje notifikacija memberima otvaranje"*
@@ -109,12 +145,14 @@ in 4 groups**, each with a sentence of description, and duplicates two tabs
 (Coming, Record); `/matters/:id` is very long — read its full page text before
 touching it, it is the densest screen in the product.
 
-### The three decisions that were put to the user, and dismissed
+### The three decisions, and which way each was taken
 
-They were asked and the user dismissed the question card without answering, then
-asked for this save. **Do not re-ask them cold on the next run** — offer the
-recommendation and start, saying which way it was taken. The reasoning is
-already done:
+Put to the user as a question card; they dismissed it without answering and
+asked for a save instead. On the next run the recommendation was taken in each
+case and the choice was stated plainly rather than re-asked — which is the right
+handling when someone has already declined to arbitrate. **All three are now
+built as described below**, so this table is the record of why, not a pending
+decision.
 
 | Question | The recommendation, and why |
 |---|---|
@@ -122,13 +160,30 @@ already done:
 | **How are members told?** | An adapter, exactly like enforcement: `NoticeKind = 'none' \| 'smtp' \| …`, default `none`. Unconfigured, the screen composes the notice, offers it to copy, and says plainly that Majlis does not send it. Configured, it sends and says to whom. This is the pattern already established by `services/enforcement.ts` and `components/WhereItEnds.tsx`, it matches "Majlis says what it cannot do", and it never lies. **Never wire real SMTP without the user's own credentials, which are never to be handled here.** |
 | **What generates a contract draft?** | Assemble it from the record: the adopted shape, the conditions and the board's findings on each, the operative terms with their `meaning`, and what was held outside the question. Every clause traces to something a member wrote. Where the board said nothing, the draft carries a **named gap** rather than boilerplate — the same rule as everywhere else. It must name no standard. If the user can supply real contract documents from the bank, that beats a generated skeleton for real use, but blocks on them sending files. |
 
-### Suggested order for the next run
+### The order it was done in, and why it held
 
-1. **The path in** — it is the biggest gap and the one they named first. Server
-   first: type, store, service, routes, tests; then the screens.
-2. **Contract drafts** — reuses `services/fatwa.ts` almost exactly in shape
+1. **The path in** — the biggest gap and the one named first. Server first:
+   type, store, service, routes, tests; then the screens.
+2. **Contract drafts** — reused `services/fatwa.ts` almost exactly in shape
    (assemble from the record, render, refuse when the matter is not settled).
-3. **Simplify** — last, because it moves whatever the first two add.
+3. **Simplify** — last, because it moves whatever the first two add. It did:
+   the matter screen had to be re-ordered around the queue-fed matters and the
+   inherited findings that arrived with them.
+
+### Where the new pieces live
+
+```
+server/src/types.ts                    Submission, Disposition
+server/src/services/submission.ts      the lifecycle: submit, open, decline, withdraw
+server/src/services/notice.ts          the adapter; default sends nothing
+server/src/services/contract.ts        assemble + render draft clauses
+server/src/routes/submissions.ts       POST /api/submissions and its four acts
+server/src/auth/members.ts             the fifth role, maySubmit, mayDisposeOfSubmission
+client/src/pages/Ask.tsx               the institution's own screen
+client/src/pages/Questions.tsx         the board's queue
+client/src/components/TheNotice.tsx    says MAJLIS HAS NOT SENT THIS, then the words
+client/scripts/merge-strings.mjs       insert-only string merge, all three languages
+```
 
 ---
 
