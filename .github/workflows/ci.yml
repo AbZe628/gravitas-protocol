@@ -164,3 +164,43 @@ jobs:
                   npm run typecheck
                   npm test
                   npm run build
+
+    web:
+        name: 🌐 Web
+        needs: security-scan
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v7
+
+            # Node 22, not 20. @wallet-standard/base requires 22 or newer, and
+            # the deploy workflow's EBADENGINE warning on every build is that
+            # requirement going unmet.
+            - name: Setup Node.js 22
+              uses: actions/setup-node@v7
+              with:
+                  node-version: 22
+
+            # `npm install`, deliberately, and it must not be "corrected" to
+            # `npm ci`.
+            #
+            # apps/web/package-lock.json was last written on Windows. On Linux,
+            # resolution reaches three packages the lockfile does not contain,
+            # so `npm ci` refuses to start. deploy-frontend.yml runs
+            # `npm install` for the same reason, and a gate that installed
+            # differently from the deploy would pass while production broke.
+            #
+            # The real fix is regenerating the lockfile on Linux and committing
+            # it from there. Both this and the deploy switch to `npm ci` on the
+            # same day. See docs/KNOWN-ISSUES.md.
+            - name: Install
+              working-directory: ./apps/web
+              run: npm install
+
+            - name: Typecheck
+              working-directory: ./apps/web
+              run: npm run check
+
+            - name: Build
+              working-directory: ./apps/web
+              run: npm run build

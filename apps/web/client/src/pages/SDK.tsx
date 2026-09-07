@@ -1,4 +1,5 @@
 import { usePageMeta } from "@/lib/pageMeta";
+import { ARBISCAN, CONTRACTS } from '@/lib/wagmi';
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -155,8 +156,8 @@ npm install /path/to/gravitas-protocol/gravitas-sdk`}
 const client = new GravitasClient({
   rpcUrl: 'https://sepolia-rollup.arbitrum.io/rpc',
   chainId: 421614,
-  registryAddress: '0x6f3bfb896DD9964C9c05dA88692bDf1b1b2C3F23',
-  teleportV3Address: '0x6702C2CE6eD58ca3934eBBd785CaC1De8DCd85B4',
+  registryAddress: '${CONTRACTS.POLICY_REGISTRY}',
+  teleportV3Address: '${CONTRACTS.TELEPORT_V3}',
 });
 
 client.compliance;      // ComplianceService — a property, not a call
@@ -335,8 +336,8 @@ const calldata = migration.encodeCalldata(signature);`}
 import { arbitrumSepolia } from 'viem/chains';
 import { GravitasClient, buildMigrationTypedData } from '@gravitas/sdk';
 
-const TELEPORT_V3 = '0x6702C2CE6eD58ca3934eBBd785CaC1De8DCd85B4' as const;
-const REGISTRY = '0x6f3bfb896DD9964C9c05dA88692bDf1b1b2C3F23' as const;
+const TELEPORT_V3 = '${CONTRACTS.TELEPORT_V3}' as const;
+const REGISTRY = '${CONTRACTS.POLICY_REGISTRY}' as const;
 
 const client = new GravitasClient({
   rpcUrl: 'https://sepolia-rollup.arbitrum.io/rpc',

@@ -1,4 +1,5 @@
 import { ReactNode, useState, useEffect } from "react";
+import { ARBISCAN, CONTRACTS } from '@/lib/wagmi';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -253,7 +254,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               )}
             </div>
             <a
-              href="https://sepolia.arbiscan.io/address/0x6702C2CE6eD58ca3934eBBd785CaC1De8DCd85B4"
+              href={ARBISCAN + CONTRACTS.TELEPORT_V3}
               target="_blank"
               rel="noopener noreferrer"
               className="shrink-0"

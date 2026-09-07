@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
-import { ARBISCAN, DEPLOYMENT } from "@/lib/wagmi";
+import { ARBISCAN, CONTRACTS, DEPLOYMENT } from "@/lib/wagmi";
 import { motion } from "framer-motion";
 import {
   BookOpen, Code2, Shield, Zap, Copy, CheckCheck,
@@ -258,8 +258,8 @@ npm run build`} language="bash" />
 const client = new GravitasClient({
   rpcUrl: 'https://sepolia-rollup.arbitrum.io/rpc',
   chainId: 421614,
-  registryAddress: '0x6f3bfb896DD9964C9c05dA88692bDf1b1b2C3F23',
-  teleportV3Address: '0x6702C2CE6eD58ca3934eBBd785CaC1De8DCd85B4',
+  registryAddress: '${CONTRACTS.POLICY_REGISTRY}',
+  teleportV3Address: '${CONTRACTS.TELEPORT_V3}',
 });`} language="typescript" />
                   </div>
                   <div>

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { TrendingUp, TrendingDown, DollarSign, Users, Activity, ArrowUpRight, ExternalLink, Shield, Zap, CheckCircle, Copy, CheckCheck } from "lucide-react";
 import { useReadContract } from "wagmi";
-import { CONTRACTS } from "@/lib/wagmi";
+import { ARBISCAN, CONTRACTS } from "@/lib/wagmi";
 import { AreaChart, Area, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { motion } from "framer-motion";
 import { Link } from "wouter";
@@ -207,15 +207,15 @@ export default function Overview() {
             <CardContent className="space-y-3">
               <ContractAddress
                 label="GravitasPolicyRegistry"
-                address="0x6f3bfb896DD9964C9c05dA88692bDf1b1b2C3F23"
+                address={CONTRACTS.POLICY_REGISTRY}
                 short="0x6f3b…3F23"
-                href="https://sepolia.arbiscan.io/address/0x6f3bfb896DD9964C9c05dA88692bDf1b1b2C3F23"
+                href={ARBISCAN + CONTRACTS.POLICY_REGISTRY}
               />
               <ContractAddress
                 label="TeleportV3"
-                address="0x6702C2CE6eD58ca3934eBBd785CaC1De8DCd85B4"
+                address={CONTRACTS.TELEPORT_V3}
                 short="0x6702…85B4"
-                href="https://sepolia.arbiscan.io/address/0x6702C2CE6eD58ca3934eBBd785CaC1De8DCd85B4"
+                href={ARBISCAN + CONTRACTS.TELEPORT_V3}
               />
 
               <div className="pt-2 space-y-2">
