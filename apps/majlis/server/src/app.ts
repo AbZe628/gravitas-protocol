@@ -21,6 +21,7 @@ import { Limiter, REFUSAL_MESSAGES } from './services/limits.js';
 import { basicAuth, authFromEnv } from './middleware/basicAuth.js';
 import { buildSettings } from './services/settings.js';
 import { TIMELOCK_HOURS } from './types.js';
+import type { Language } from './types.js';
 import { LoginLimiter, loginThrottle } from './middleware/loginLimit.js';
 import { governanceRoutes } from './routes/governance.js';
 import { adoptionRoutes } from './routes/adoption.js';
@@ -351,17 +352,28 @@ export function createApp(
    * allowlist somebody added on purpose, and a route that only answers a
    * question does not belong on it.
    */
+  /**
+   * Which language the question was asked in.
+   *
+   * Taken from the query rather than from Accept-Language: the reader chooses
+   * the language in the application, and a browser configured for one while a
+   * scholar reads another would answer in the wrong one and look like a fault.
+   * Anything unrecognised is English, which is the language that always exists.
+   */
+  const askedIn = (req: Request): Language =>
+    req.query.lang === 'ar' || req.query.lang === 'ur' ? req.query.lang : 'en';
+
   app.get('/api/guide', (req: Request, res: Response) => {
     const question = typeof req.query.q === 'string' ? req.query.q : '';
     if (question.trim().length < 2) {
       res.status(400).json({ error: 'no_question', message: 'Ask something.' });
       return;
     }
-    res.json(askTheGuide(question));
+    res.json(askTheGuide(question, askedIn(req)));
   });
 
-  app.get('/api/guide/topics', (_req: Request, res: Response) => {
-    res.json({ topics: guideTopics() });
+  app.get('/api/guide/topics', (req: Request, res: Response) => {
+    res.json({ topics: guideTopics(askedIn(req)) });
   });
 
   app.get('/api/enforcement', enforcementRoute);

@@ -43,7 +43,7 @@ describe('it explains the application', () => {
   it('says plainly when it does not know', () => {
     const a = askTheGuide('what is the weather in Dubai');
     expect(a.topic).toBeNull();
-    expect(a.answer).toContain('not something this guide knows about');
+    expect(a.answer).toContain('does not know about that');
     // And says where the other two kinds of question go.
     expect(a.answer).toContain('goes to the board');
   });
@@ -69,7 +69,7 @@ describe('it never answers whether something is permissible', () => {
     for (const question of seeking) {
       const a = askTheGuide(question);
       expect(a.refused, `not refused: ${question}`).toBe(true);
-      expect(a.answer).toBe(NOT_A_RULING);
+      expect(a.answer).toBe(NOT_A_RULING.en);
     }
   });
 
@@ -86,7 +86,7 @@ describe('it never answers whether something is permissible', () => {
 
   it('offers what it can properly do instead of stopping', () => {
     // A refusal that is a dead end teaches nobody where the question goes.
-    expect(NOT_A_RULING).toContain('record your position with your reasoning');
+    expect(NOT_A_RULING.en).toContain('record your position with your reasoning');
   });
 
   it('still answers a mechanical question containing the same words', () => {
@@ -101,5 +101,63 @@ describe('every topic is offerable', () => {
     const topics = guideTopics();
     expect(topics.length).toBeGreaterThan(10);
     expect(topics.every((t) => t.id && t.answer.length > 40)).toBe(true);
+  });
+});
+
+/**
+ * The guide answers in the language it was asked in.
+ *
+ * Until it did, a scholar reading the Arabic interface asked in Arabic and got
+ * an answer in English. The terms already matched in three scripts and the
+ * refusal already fired in three scripts; the answers were the half that had
+ * been left behind, which is the half a reader actually reads.
+ */
+describe('the language it answers in', () => {
+  it('answers in the language it was asked in', () => {
+    const en = askTheGuide('timelock', 'en').answer;
+    const ar = askTheGuide('timelock', 'ar').answer;
+    const ur = askTheGuide('timelock', 'ur').answer;
+
+    expect(en).not.toBe(ar);
+    expect(ar).not.toBe(ur);
+    expect(ar).toMatch(/[\u0600-\u06FF]/);
+    expect(ur).toMatch(/[\u0600-\u06FF]/);
+  });
+
+  it('refuses a ruling request in the language it was asked in', () => {
+    const refused = askTheGuide('هل هذا جائز', 'ar');
+    expect(refused.refused).toBe(true);
+    expect(refused.answer).toMatch(/[\u0600-\u06FF]/);
+    expect(refused.answer).not.toMatch(/[A-Za-z]{6,}/);
+  });
+
+  /*
+   * A guide that answered in Arabic and then labelled the way onward in
+   * English would send a reader looking for a screen whose name they had not
+   * been given.
+   */
+  it('names the way onward in the same language', () => {
+    const ar = askTheGuide('matter', 'ar');
+    expect(ar.goTo).not.toBeNull();
+    expect(ar.goTo?.label).toMatch(/[\u0600-\u06FF]/);
+    expect(ar.goTo?.path).toBe('/');
+  });
+
+  it('falls back to English rather than to an empty panel', () => {
+    // Every topic must answer in every language, so this is a guard on the
+    // data rather than on the fallback: a missing translation is a bug here.
+    for (const lang of ['en', 'ar', 'ur'] as const) {
+      for (const topic of guideTopics(lang)) {
+        expect(topic.answer.trim().length).toBeGreaterThan(20);
+      }
+    }
+  });
+
+  it('says every answer in all three languages, none of them the English twice', () => {
+    const en = new Map(guideTopics('en').map((t) => [t.id, t.answer]));
+    for (const lang of ['ar', 'ur'] as const) {
+      const same = guideTopics(lang).filter((t) => t.answer === en.get(t.id));
+      expect({ lang, same: same.map((t) => t.id) }).toEqual({ lang, same: [] });
+    }
   });
 });

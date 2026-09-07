@@ -43,7 +43,7 @@ interface Answer {
 const STARTERS = ['start', 'matter', 'vote', 'drift'] as const;
 
 export default function Guide() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const [open, setOpen] = useState(false);
   const [question, setQuestion] = useState('');
   const [answer, setAnswer] = useState<Answer | null>(null);
@@ -75,8 +75,16 @@ export default function Guide() {
     if (asked.trim().length < 2 || busy) return;
     setBusy(true);
     try {
-      // A read, so a GET. Nothing here changes anything.
-      const res = await fetch('/api/guide?q=' + encodeURIComponent(asked));
+      /*
+        A read, so a GET. Nothing here changes anything.
+
+        The language goes with the question. Until it did, a scholar reading the
+        Arabic interface asked in Arabic and got the answer in English, which is
+        the one place the application had a language and did not use it.
+      */
+      const res = await fetch(
+        '/api/guide?q=' + encodeURIComponent(asked) + '&lang=' + encodeURIComponent(lang),
+      );
       if (res.ok) setAnswer((await res.json()) as Answer);
     } catch {
       // Nothing is lost: the reader can ask again, and the page they were on
