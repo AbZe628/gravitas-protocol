@@ -4,6 +4,7 @@ import Guided from './pages/Guided.js';
 import MatterAction from './pages/MatterAction.js';
 import More from './pages/More.js';
 import Questions from './pages/Questions.js';
+import Examinations from './pages/Examinations.js';
 import Ask from './pages/Ask.js';
 import WhatStands from './pages/WhatStands.js';
 import MatterDetail from './pages/MatterDetail.js';
@@ -64,6 +65,7 @@ export default function App() {
             Neither is a cut-down version of the other.
           */}
           <Route path="/questions" element={<Questions boardId="demo-board" />} />
+          <Route path="/examinations" element={<Examinations boardId="demo-board" />} />
           <Route path="/ask" element={<Ask boardId="demo-board" />} />
 
           {/*

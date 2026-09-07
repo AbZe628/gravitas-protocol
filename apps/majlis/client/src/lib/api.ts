@@ -1872,3 +1872,86 @@ export const theWayIn = {
   withdraw: (id: string, reason: string) =>
     send<{ submission: Submission }>(`/api/submissions/${id}/withdraw`, { reason }),
 };
+
+// ── examining what was executed against what was approved ─────────────────
+
+export interface ExaminationFinding {
+  /** A condition id of the shape, or `term:<key>` for an operative term. */
+  against: string;
+  held: 'held' | 'exceptions' | 'not_examined';
+  exceptions: number;
+  note: string;
+}
+
+export interface Coverage {
+  examined: number;
+  /** Null where the institution did not say how many transactions there were. */
+  population: number | null;
+  /** Null for the same reason. Never inferred from the sample. */
+  percent: string | null;
+}
+
+export interface Examination {
+  id: string;
+  boardId: string;
+  matterId: string;
+  ruleId: string;
+  parameterHash: string;
+  from: string;
+  to: string;
+  /** How the sample was chosen, in the examiner's words. Never generated. */
+  howChosen: string;
+  population: number | null;
+  examined: number;
+  examinedBy: string;
+  recordedAt: string;
+  findings: ExaminationFinding[];
+
+  /** Derived on the server, so two screens cannot derive them differently. */
+  coverage: Coverage;
+  exceptions: number;
+  /** Conditions and terms this examination did not reach. Named, not omitted. */
+  notExamined: string[];
+  matterTitle: string | null;
+  /**
+   * False where the board has amended the terms since. The examination is then
+   * evidence about the older ones, and the screen has to say so.
+   */
+  againstCurrentTerms: boolean | null;
+}
+
+/** What a ruling can be examined against. */
+export interface Examinable {
+  matterId: string;
+  title: string;
+  settled: boolean;
+  conditions: { against: string; requirement: string }[];
+  terms: { against: string; requirement: string; key: string }[];
+}
+
+export const examinations = {
+  list: (boardId?: string, matterId?: string) => {
+    const p = new URLSearchParams();
+    if (boardId) p.set('board', boardId);
+    if (matterId) p.set('matter', matterId);
+    const q = p.toString();
+    return get<{ examinations: Examination[]; count: number }>(
+      '/api/examinations' + (q ? '?' + q : ''),
+    );
+  },
+
+  one: (id: string) => get<{ examination: Examination }>(`/api/examinations/${id}`),
+
+  /** The conditions and terms of one ruling, so a form does not assemble them. */
+  examinable: (matterId: string) => get<Examinable>(`/api/matters/${matterId}/examinable`),
+
+  record: (input: {
+    matterId: string;
+    from: string;
+    to: string;
+    howChosen: string;
+    population: number | null;
+    examined: number;
+    findings: ExaminationFinding[];
+  }) => send<{ examination: Examination }>('/api/examinations', input),
+};
