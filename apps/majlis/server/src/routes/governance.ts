@@ -44,6 +44,10 @@ import { attentionList } from '../services/attention.js';
 import { paceOf, waitingNow } from '../services/clocks.js';
 import { assemble, render } from '../services/fatwa.js';
 import { standingAdoptions } from '../services/adoption.js';
+import {
+  assemble as assembleContract,
+  render as renderContract,
+} from '../services/contract.js';
 import { assembleAnnualReport, renderAnnualReport } from '../services/annual.js';
 import { buildCalendar, toICalendar } from '../services/calendar.js';
 import { buildRegister, readComposition, standingOf } from '../services/register.js';
@@ -1788,6 +1792,44 @@ export function governanceRoutes(
       }
 
       res.type('html').send(render(fatwa));
+    }),
+  );
+
+  /**
+   * Draft clauses, assembled from the ruling.
+   *
+   * The other half of what an institution actually needs. The fatwa says what
+   * the board decided; this says what an agreement has to provide for the
+   * decision to reach it — and then stops, loudly, because the parts a Shariah
+   * board rules on are a small fraction of a financing agreement.
+   *
+   * Refuses for an undecided matter, for one the board did not approve, and for
+   * a shape the board ruled against using. See `services/contract.ts`.
+   *
+   * Open to observers, like the fatwa: the people who most need to read it are
+   * often the ones holding the narrowest credential.
+   */
+  router.get(
+    '/matters/:id/contract',
+    handle(async (req, res) => {
+      const board = await boardFor(store, res, req.params.id);
+      if (!board) return;
+
+      const matter = await store.matter(req.params.id);
+      if (!matter) return;
+
+      const adoptions = matter.structureId ? await store.adoptions(matter.boardId) : [];
+      const adoption =
+        standingAdoptions(adoptions).find((a) => a.structureId === matter.structureId) ?? null;
+
+      const draft = assembleContract(board, matter, now(), adoption);
+
+      if (req.query.format === 'json') {
+        res.json(draft);
+        return;
+      }
+
+      res.type('html').send(renderContract(draft));
     }),
   );
 

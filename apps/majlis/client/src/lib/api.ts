@@ -122,6 +122,14 @@ export interface Matter extends MatterSummary {
   mentionable?: { id: string; name: string; title: string }[];
   proposal: string;
   notDecided: string[];
+  /**
+   * The contract shape this matter is judged against, where the board chose one.
+   *
+   * Absent on matters that are not about a structure at all. The draft-clauses
+   * link is offered only where it is present, because the route refuses
+   * otherwise and a link that leads to a refusal is a link that lied.
+   */
+  structureId?: string;
   mechanism: string;
   interactsWith: string[];
   proposedRule: Rule;
@@ -1334,6 +1342,14 @@ export const oversight = {
   /** Addresses of the printable documents. Opened, never fetched. */
   hrefs: {
     fatwa: (id: string) => `/api/matters/${id}/fatwa`,
+    /**
+     * Draft clauses, assembled from the ruling.
+     *
+     * Only offered where the board has decided and judged the matter against a
+     * shape: the route refuses otherwise, and a link that leads to a refusal is
+     * a link that lied.
+     */
+    contract: (id: string) => `/api/matters/${id}/contract`,
     manual: () => '/api/manual',
     annual: (year: number) => `/api/annual?year=${year}`,
     /** Everything the board ever decided about one holding, as a page. */

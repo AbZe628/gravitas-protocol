@@ -24,6 +24,8 @@ export function dirFor(lang: Lang): 'ltr' | 'rtl' {
 type Dict = Record<string, string>;
 
 const en: Dict = {
+  "doc.contract": "Draft clauses for the agreement",
+  "doc.contractNote": "Assembled from this ruling: the conditions the board found, the terms it approved, and what it held outside the question. Only that — a financing agreement contains a great deal more, and none of the rest was put to the board.",
   "queue.opened": "Taken up",
   "queue.seeMatter": "The matter it became",
   "queue.answeredIn": "answered in",
@@ -1086,6 +1088,8 @@ const en: Dict = {
 };
 
 const ar: Dict = {
+  "doc.contract": "مسودة بنود للعقد",
+  "doc.contractNote": "مجمَّعة من هذا الحكم: الشروط التي وجدها المجلس، والبنود التي أقرّها، وما أبقاه خارج السؤال. هذا فقط — فعقد التمويل يحوي ما هو أكثر بكثير، ولم يُعرض شيء من سائره على المجلس.",
   "queue.opened": "فُتحت كمسألة",
   "queue.seeMatter": "المسألة التي صارت إليها",
   "queue.answeredIn": "أُجيب خلال",
@@ -2069,6 +2073,8 @@ const ar: Dict = {
 };
 
 const ur: Dict = {
+  "doc.contract": "معاہدے کے لیے مسودۂ شقات",
+  "doc.contractNote": "اسی فیصلے سے مرتب: وہ شرائط جو بورڈ نے پائیں، وہ ضوابط جو اُس نے منظور کیے، اور جو اُس نے سوال سے باہر رکھا۔ صرف اتنا — مالیاتی معاہدے میں اس سے کہیں زیادہ ہوتا ہے، اور باقی کچھ بورڈ کے سامنے رکھا ہی نہیں گیا۔",
   "queue.opened": "لیا گیا",
   "queue.seeMatter": "وہ معاملہ جو یہ بنا",
   "queue.answeredIn": "جواب اتنے میں",

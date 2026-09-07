@@ -67,7 +67,11 @@ export type RefusalCode =
   | 'asked_in_the_future'
   | 'wrong_standing'
   | 'reason_too_short'
-  | 'no_reason';
+  | 'no_reason'
+  // ── a draft assembled from a ruling ──
+  | 'no_structure'
+  | 'shape_declined'
+  | 'not_in_library';
 
 export class Refused extends Error {
   constructor(

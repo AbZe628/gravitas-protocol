@@ -101,13 +101,27 @@ export default function WhereItEnds({ matter }: { matter: Matter }) {
         </div>
       )}
 
-      <div className="mt-5">
+      <div className="mt-5 space-y-2.5">
         <DocumentLink
           emphasis={!onChain}
           href={oversight.hrefs.fatwa(matter.id)}
           label={t('doc.fatwa')}
           note={t(onChain ? 'ends.documentIsRecord' : 'doc.fatwaNote')}
         />
+
+        {/*
+          The draft is offered only where the matter was judged against a
+          contract shape. The route refuses otherwise, and a link that leads to
+          a refusal is a link that lied — the rule the whole application follows
+          for a control the installation cannot honour.
+        */}
+        {matter.structureId && (
+          <DocumentLink
+            href={oversight.hrefs.contract(matter.id)}
+            label={t('doc.contract')}
+            note={t('doc.contractNote')}
+          />
+        )}
       </div>
     </div>
   );
