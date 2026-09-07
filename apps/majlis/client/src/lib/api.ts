@@ -261,7 +261,7 @@ export const api = {
 
 // ── Stage Two ─────────────────────────────────────────────────────────────
 
-export type Role = 'signatory' | 'advisory' | 'liaison' | 'observer';
+export type Role = 'signatory' | 'advisory' | 'liaison' | 'observer' | 'institution';
 
 export interface Tally {
   for: number;
@@ -1739,3 +1739,120 @@ export interface DriftReport {
   unwatched: Unwatched[];
   unmeasured: { assetId: string; assetName: string; reason: string }[];
 }
+
+// ── the way in ────────────────────────────────────────────────────────────
+
+export type SubmissionStanding = 'waiting' | 'opened' | 'declined' | 'withdrawn';
+
+export interface Disposition {
+  kind: 'opened' | 'declined' | 'withdrawn';
+  at: string;
+  by: string;
+  reason?: string;
+  matterId?: string;
+}
+
+/**
+ * A question the institution put, as the server reports it.
+ *
+ * `standing`, `matterId` and `waitedHours` are derived on the server and sent
+ * with it, so no two screens can derive them differently — which is how a queue
+ * and a detail page start disagreeing about whether something is still waiting.
+ */
+export interface Submission {
+  id: string;
+  boardId: string;
+  institutionId: string;
+  arrivedAt: string;
+  recordedAt: string;
+  askedBy: string;
+  recordedBy: string;
+  onBehalf: boolean;
+  subject: string;
+  /** The institution's own words. Never edited, and never shown paraphrased. */
+  question: string;
+  background: string;
+  awaiting: string;
+  attachments: string[];
+  dispositions: Disposition[];
+
+  standing: SubmissionStanding;
+  matterId: string | null;
+  waitedHours: number;
+}
+
+/** The words to tell a member something arrived. */
+export interface Notice {
+  subject: string;
+  body: string;
+  concerns: string[];
+}
+
+/**
+ * Whether anything was actually sent.
+ *
+ * `sent` is false on every installation with no channel, which is most of them,
+ * and the interface has to say that in words rather than showing the notice
+ * silently — a secretary who assumed the board had been emailed would find out
+ * only when nobody turned up.
+ */
+export interface Delivery {
+  kind: 'none' | 'smtp';
+  configured: boolean;
+  sent: boolean;
+  at: string;
+  reached?: number;
+  error?: string;
+}
+
+export interface PutQuestion {
+  boardId: string;
+  subject: string;
+  question: string;
+  background?: string;
+  awaiting?: string;
+  /** Who asked, at the institution. Required when a member enters it for them. */
+  askedBy?: string;
+  /** When they actually asked, where that is not now. */
+  arrivedAt?: string;
+  attachments?: string[];
+}
+
+export const theWayIn = {
+  /** Put a question to the board. */
+  put: (input: PutQuestion) =>
+    send<{ submission: Submission; notice: Notice; delivery: Delivery }>('/api/submissions', input),
+
+  /**
+   * The board sees the whole queue; a desk sees only what it put itself.
+   * Which of the two happens is decided by the credential, on the server.
+   */
+  list: (boardId?: string) =>
+    get<{ submissions: Submission[]; waiting: string[] }>(
+      '/api/submissions' + (boardId ? `?board=${encodeURIComponent(boardId)}` : ''),
+    ),
+
+  one: (id: string) => get<{ submission: Submission }>(`/api/submissions/${id}`),
+
+  /** The board takes it up. The title and proposal are the board's own wording. */
+  open: (
+    id: string,
+    input: {
+      title: string;
+      proposal: string;
+      direction: 'permit' | 'restrict';
+      notDecided?: string[];
+    },
+  ) =>
+    send<{ submission: Submission; matter: Matter; notice: Notice; delivery: Delivery }>(
+      `/api/submissions/${id}/open`,
+      input,
+    ),
+
+  decline: (id: string, reason: string) =>
+    send<{ submission: Submission }>(`/api/submissions/${id}/decline`, { reason }),
+
+  /** Whoever asked takes it back. The board declines instead, and says why. */
+  withdraw: (id: string, reason: string) =>
+    send<{ submission: Submission }>(`/api/submissions/${id}/withdraw`, { reason }),
+};

@@ -283,6 +283,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
       title: t('shell.theWork'),
       items: [
         { to: '/', label: t('guided.greeting'), end: true },
+        { to: '/questions', label: t('nav.questions') },
         { to: '/incidents', label: t('nav.incidents') },
         { to: '/calendar', label: t('nav.calendar') },
       ],

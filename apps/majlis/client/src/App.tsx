@@ -3,6 +3,8 @@ import Dashboard from './pages/Dashboard.js';
 import Guided from './pages/Guided.js';
 import MatterAction from './pages/MatterAction.js';
 import More from './pages/More.js';
+import Questions from './pages/Questions.js';
+import Ask from './pages/Ask.js';
 import WhatStands from './pages/WhatStands.js';
 import MatterDetail from './pages/MatterDetail.js';
 import Rules from './pages/Rules.js';
@@ -21,6 +23,26 @@ import Record from './pages/Record.js';
 import Search from './pages/Search.js';
 import Shell from './components/Shell.js';
 import Guide from './components/Guide.js';
+import { useIdentity, isInstitution } from './lib/identity.js';
+
+/**
+ * What the arrival screen is depends on whose credential it is.
+ *
+ * A board member arrives at the question every scholar arrives with — is there
+ * anything here for me. The institution arrives at a different one entirely:
+ * where do I put my question, and what happened to the last one. Showing the
+ * bank the board's screen with most of it inert would have it hunting for what
+ * it is not allowed to touch, and reasonably concluding the product was not
+ * built for it.
+ *
+ * Nothing waits on a blank screen. Until the identity answers this renders the
+ * board's arrival, which is the common case and is harmless to a desk for the
+ * half second before it is replaced.
+ */
+function Arrival() {
+  const { identity } = useIdentity();
+  return isInstitution(identity?.role) ? <Ask boardId="demo-board" /> : <Guided />;
+}
 
 export default function App() {
   return (
@@ -32,8 +54,17 @@ export default function App() {
             unchanged, one link away: nothing was removed, and what changed is
             what a person sees first.
           */}
-          <Route path="/" element={<Guided />} />
+          <Route path="/" element={<Arrival />} />
           <Route path="/more" element={<More />} />
+
+          {/*
+            The way in. Two screens for one path, and which one a person gets
+            is decided by whose credential it is: the board works a queue,
+            the institution puts a question and reads what became of its own.
+            Neither is a cut-down version of the other.
+          */}
+          <Route path="/questions" element={<Questions boardId="demo-board" />} />
+          <Route path="/ask" element={<Ask boardId="demo-board" />} />
 
           {/*
             One matter, one act. `MatterDetail` puts twelve sections on a page

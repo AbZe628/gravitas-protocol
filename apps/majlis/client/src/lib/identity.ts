@@ -72,3 +72,21 @@ export const mayVote = (role: Role | undefined): boolean => role === 'signatory'
  */
 export const mayRecordInstitutionAct = (role: Role | undefined, office: Office | undefined): boolean =>
   office === 'secretary' || role === 'liaison';
+
+/**
+ * Whether this credential belongs to the bank rather than to the board.
+ *
+ * The one role that is not on the board at all — the desk with a question. It
+ * sees a form to put one and what became of its own, and nothing that belongs
+ * to the board's own working: not the queue, not the deliberation, not a
+ * matter it is not connected to.
+ *
+ * Used to *replace* the interface rather than to hide parts of it. A desk shown
+ * the board's screens with most of it greyed out would spend its time looking
+ * for what it is not allowed to touch.
+ */
+export const isInstitution = (role: Role | undefined): boolean => role === 'institution';
+
+/** Whether to offer putting a question at all. The route refuses regardless. */
+export const maySubmit = (role: Role | undefined): boolean =>
+  role === 'institution' || mayDeliberate(role);
