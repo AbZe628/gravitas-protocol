@@ -34,6 +34,7 @@ import type {
   Meeting,
   Rule,
   Submission,
+  Examination,
 } from '../types.js';
 
 export class NotFound extends Error {
@@ -164,6 +165,20 @@ export interface Store {
    * @throws NotFound if there is no such meeting.
    */
   updateMeeting(id: string, change: (current: Meeting) => Meeting): Promise<Meeting>;
+
+  // ── examining what was executed against what was approved ──────────────
+
+  examinations(boardId?: string): Promise<Examination[]>;
+  examination(id: string): Promise<Examination | null>;
+
+  /**
+   * Record one. There is no update: an examination is what somebody found on a
+   * date, and a later look is a new examination naming the same ruling rather
+   * than a rewrite of the first.
+   *
+   * @throws if an examination with this id already exists.
+   */
+  recordExamination(examination: Examination): Promise<Examination>;
 
   // ── the way in ─────────────────────────────────────────────────────────
 

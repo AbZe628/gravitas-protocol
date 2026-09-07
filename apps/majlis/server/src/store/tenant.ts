@@ -11,6 +11,7 @@ import type {
   Meeting,
   Rule,
   Submission,
+  Examination,
 } from '../types.js';
 import { NotFound, type Store } from './store.js';
 
@@ -285,6 +286,32 @@ export class TenantStore implements Store {
       }
       return next;
     });
+  }
+
+  // ── examinations ────────────────────────────────────────────────────────
+  //
+  // Scoped through the board like everything else. An examination names the
+  // institution's own transactions and their exceptions, which is among the
+  // most sensitive things the record holds.
+
+  async examinations(boardId?: string): Promise<Examination[]> {
+    if (boardId && !(await this.owns(boardId))) return [];
+    const mine = await this.ownBoardIds();
+    const all = await this.inner.examinations(boardId);
+    return all.filter((e) => mine.has(e.boardId));
+  }
+
+  async examination(id: string): Promise<Examination | null> {
+    const found = await this.inner.examination(id);
+    if (!found) return null;
+    return (await this.owns(found.boardId)) ? found : null;
+  }
+
+  async recordExamination(examination: Examination): Promise<Examination> {
+    if (!(await this.owns(examination.boardId))) {
+      throw new OutsideInstitution('record an examination for', examination.boardId);
+    }
+    return this.inner.recordExamination(examination);
   }
 
   // ── the way in ──────────────────────────────────────────────────────────

@@ -24,6 +24,7 @@ import type {
   Meeting,
   Rule,
   Submission,
+  Examination,
 } from '../types.js';
 import {
   boards as seedBoards,
@@ -49,6 +50,7 @@ export interface MemorySeed {
   adoptions?: AdoptedStructure[];
   meetings?: Meeting[];
   submissions?: Submission[];
+  examinations?: Examination[];
 }
 
 export class MemoryStore implements Store {
@@ -66,6 +68,7 @@ export class MemoryStore implements Store {
   private readonly _adoptions: Map<string, AdoptedStructure>;
   private readonly _meetings: Map<string, Meeting>;
   private readonly _submissions: Map<string, Submission>;
+  private readonly _examinations: Map<string, Examination>;
   private readonly _log: AssistantExchange[] = [];
 
   constructor(seed: MemorySeed = {}) {
@@ -88,6 +91,9 @@ export class MemoryStore implements Store {
     // Nothing seeded by default: a queue of questions nobody at the bank
     // actually asked would be words in an institution's mouth.
     this._submissions = new Map((seed.submissions ?? []).map((x) => [x.id, copy(x)]));
+    // Nothing seeded: an examination nobody carried out would be the strongest
+    // claim in the record and the one least earned.
+    this._examinations = new Map((seed.examinations ?? []).map((x) => [x.id, copy(x)]));
   }
 
   async institutions(): Promise<Institution[]> {
@@ -280,6 +286,24 @@ export class MemoryStore implements Store {
     const next = change(copy(current));
     this._meetings.set(id, copy(next));
     return copy(next);
+  }
+
+  async examinations(boardId?: string): Promise<Examination[]> {
+    const all = [...this._examinations.values()];
+    return copy(boardId === undefined ? all : all.filter((e) => e.boardId === boardId));
+  }
+
+  async examination(id: string): Promise<Examination | null> {
+    const found = this._examinations.get(id);
+    return found ? copy(found) : null;
+  }
+
+  async recordExamination(examination: Examination): Promise<Examination> {
+    if (this._examinations.has(examination.id)) {
+      throw new Error(`An examination with id ${examination.id} already exists.`);
+    }
+    this._examinations.set(examination.id, copy(examination));
+    return copy(examination);
   }
 
   async submissions(boardId?: string): Promise<Submission[]> {

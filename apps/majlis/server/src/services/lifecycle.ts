@@ -71,7 +71,18 @@ export type RefusalCode =
   // ── a draft assembled from a ruling ──
   | 'no_structure'
   | 'shape_declined'
-  | 'not_in_library';
+  | 'not_in_library'
+  // ── examining what was executed against what was approved ──
+  | 'no_basis_for_sample'
+  | 'nothing_examined'
+  | 'more_examined_than_exist'
+  | 'bad_exception_count'
+  | 'more_exceptions_than_examined'
+  | 'no_finding_note'
+  | 'exceptions_without_a_count'
+  | 'held_with_exceptions'
+  | 'backwards_period'
+  | 'not_in_this_ruling';
 
 export class Refused extends Error {
   constructor(

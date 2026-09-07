@@ -1080,3 +1080,93 @@ export interface Submission {
   /** Appended in order. The one that stands is the last. */
   dispositions: Disposition[];
 }
+
+// ── examining what was actually executed ──────────────────────────────────
+
+/**
+ * What an examination found against one condition or one operative term.
+ *
+ * `exceptions` is a count of the transactions examined that did not hold to it,
+ * and it is a number rather than a verdict. Whether four exceptions in fifty
+ * make an arrangement impermissible is a ruling, and it is raised as a matter
+ * like any other.
+ */
+export interface ExaminationFinding {
+  /** A condition id of the shape, or `term:<key>` for an operative term. */
+  against: string;
+  /**
+   * `not_examined` is a real answer and the commonest honest one. A programme
+   * that covered four of nine conditions and reported the other five as held
+   * would be the examination lying about its own scope.
+   */
+  held: 'held' | 'exceptions' | 'not_examined';
+  /** How many of the examined transactions did not hold to it. */
+  exceptions: number;
+  /** What was found, in the examiner's words. Required where there are any. */
+  note: string;
+}
+
+/**
+ * An examination of what was actually executed under a ruling.
+ *
+ * The gap this closes is the one the whole discipline names as its commonest
+ * failure: a board approves a structure, the institution executes something
+ * adjacent to it, and nobody compares the two until an audit years later. Until
+ * now Majlis held the ruling and said, in the annual report, that the findings
+ * of the institution's review and audit functions were *not held here*. That
+ * was honest and it left the most valuable comparison in the product outside
+ * it.
+ *
+ * ── three rules, and they are the same three as everywhere ────────────────
+ *
+ * **Majlis does not choose the sample.** Which transactions were examined, and
+ * why those, is the examiner's and is recorded in their words. A system that
+ * picked them would be conducting the audit rather than holding it, and the
+ * choice of sample is most of what an audit is.
+ *
+ * **It records what was found. It never concludes.** No field says compliant,
+ * passed or failed. Exceptions are counted and described; what they mean is a
+ * ruling and is raised as a matter.
+ *
+ * **What was not examined says so.** Coverage is only knowable where the
+ * institution said how many transactions there were, so `population` is
+ * nullable and an absent one is reported as unknown rather than assumed.
+ */
+export interface Examination {
+  id: string;
+  boardId: string;
+  /** The matter whose ruling this was examined against. */
+  matterId: string;
+  /** The rule as it stood, so a later version cannot change what was tested. */
+  ruleId: string;
+  /**
+   * The hash of the operative terms at the time of the examination.
+   *
+   * Recorded so that an examination against terms that have since been amended
+   * is visibly an examination against the older ones, rather than silently
+   * reported against today's.
+   */
+  parameterHash: string;
+
+  /** The period examined, as the examiner defined it. */
+  from: string;
+  to: string;
+
+  /** How the transactions were chosen. The examiner's words, never generated. */
+  howChosen: string;
+  /**
+   * How many transactions there were in the period.
+   *
+   * Null where the institution did not say, which is common and is not a
+   * failure of this record. Coverage is then unknown, and unknown is printed
+   * rather than a percentage nobody can stand behind.
+   */
+  population: number | null;
+  /** How many were actually examined. */
+  examined: number;
+
+  examinedBy: string;
+  recordedAt: string;
+
+  findings: ExaminationFinding[];
+}

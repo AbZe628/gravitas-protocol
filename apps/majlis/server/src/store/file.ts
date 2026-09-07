@@ -44,6 +44,7 @@ import type {
   Meeting,
   Rule,
   Submission,
+  Examination,
 } from '../types.js';
 import {
   boards as seedBoards,
@@ -92,6 +93,7 @@ interface Document {
   adoptions?: AdoptedStructure[];
   meetings?: Meeting[];
   submissions?: Submission[];
+  examinations?: Examination[];
   briefings: Briefing[];
 }
 
@@ -178,6 +180,7 @@ export class FileStore implements Store {
       loaded.adoptions ??= [];
       loaded.meetings ??= [];
       loaded.submissions ??= [];
+      loaded.examinations ??= [];
       this.doc = loaded;
       return;
     }
@@ -198,6 +201,7 @@ export class FileStore implements Store {
             adoptions: [],
             meetings: [],
             submissions: [],
+            examinations: [],
           }
         : {
             version: 1,
@@ -216,6 +220,7 @@ export class FileStore implements Store {
             // Nothing seeded: a queue of questions nobody at the bank actually
             // asked would be words put in an institution's mouth.
             submissions: [],
+            examinations: [],
             briefings: copy(seedBriefings),
           };
     this.persist();
@@ -479,6 +484,27 @@ export class FileStore implements Store {
       this.doc.meetings[index] = copy(next);
       this.persist();
       return copy(next);
+    });
+  }
+
+  async examinations(boardId?: string): Promise<Examination[]> {
+    const all = this.doc.examinations ?? [];
+    return copy(boardId === undefined ? all : all.filter((e) => e.boardId === boardId));
+  }
+
+  async examination(id: string): Promise<Examination | null> {
+    return copy((this.doc.examinations ?? []).find((e) => e.id === id) ?? null);
+  }
+
+  async recordExamination(examination: Examination): Promise<Examination> {
+    return this.serialise(() => {
+      this.doc.examinations ??= [];
+      if (this.doc.examinations.some((e) => e.id === examination.id)) {
+        throw new Error(`An examination with id ${examination.id} already exists.`);
+      }
+      this.doc.examinations.push(copy(examination));
+      this.persist();
+      return copy(examination);
     });
   }
 

@@ -31,6 +31,7 @@ import { readingFromEnv, type Reading } from './services/reading.js';
 import { computationRoutes } from './routes/computations.js';
 import { meetingRoutes } from './routes/meetings.js';
 import { submissionRoutes } from './routes/submissions.js';
+import { examinationRoutes } from './routes/examinations.js';
 import { notifierFromEnv, type Notifier } from './services/notice.js';
 import { incidentRoutes } from './routes/incidents.js';
 
@@ -466,6 +467,7 @@ export function createApp(
   app.use('/api', computationRoutes(store));
   app.use('/api', adoptionRoutes(store));
   app.use('/api', submissionRoutes(store, notifier));
+  app.use('/api', examinationRoutes(store));
   app.use('/api', meetingRoutes(store));
 
   // ---- audit export ----------------------------------------------------

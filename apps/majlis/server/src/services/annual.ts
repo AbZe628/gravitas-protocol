@@ -30,6 +30,7 @@
  */
 
 import { disclosureFor, type Disclosure } from './incident.js';
+import { coveringYear, exceptionsIn } from './examination.js';
 import { forYear } from './computation.js';
 import { attendanceAcross, type AttendanceSummary } from './meeting.js';
 import { paceOf } from './clocks.js';
@@ -44,6 +45,7 @@ import type {
   Meeting,
   Rule,
   Scholar,
+  Examination,
 } from '../types.js';
 
 export interface ReportedCalculation {
@@ -125,6 +127,20 @@ export interface AnnualReport {
    * absence to be explicable — so where a board gave a reason for an absence,
    * the reason travels here with it rather than being reduced to a count.
    */
+  /**
+   * What the institution's own review examined against this board's rulings.
+   *
+   * Counted rather than summarised. Whether the exceptions found matter is a
+   * ruling, and the report does not reach one — it says how many transactions
+   * were looked at and how many did not hold.
+   */
+  examinations: {
+    recorded: number;
+    transactionsExamined: number;
+    exceptions: number;
+    /** Rulings that had at least one examination against them this year. */
+    rulingsExamined: number;
+  };
   meetings: {
     held: number;
     attendance: AttendanceSummary[];
@@ -240,6 +256,11 @@ export function assembleAnnualReport(params: {
    * rather than becoming a crash.
    */
   meetings?: Meeting[];
+  /**
+   * Optional for the same reason as meetings: an installation with none still
+   * produces a report, and the gap it names about itself stays true.
+   */
+  examinations?: Examination[];
   generatedAt: string;
 }): AnnualReport {
   const { year, board, generatedAt } = params;
@@ -273,6 +294,15 @@ export function assembleAnnualReport(params: {
   const pace = paceOf(board, settledThisYear, periodTo);
 
   const statuses = rules.map((r) => reviewStatus(r, periodTo));
+
+  /*
+   * By the period examined, not by the day it was typed up. An examination of
+   * the first half of the year written up in January belongs to the year it
+   * examined.
+   */
+  const examinationsThisYear = coveringYear(params.examinations ?? [], params.year).filter(
+    (e) => e.boardId === params.board.id,
+  );
 
   // Only meetings this board actually held, and only in this year. One
   // convened for next month is not a meeting held, and a report that counted
@@ -317,6 +347,12 @@ export function assembleAnnualReport(params: {
 
     nonCompliance: disclosureFor(year, incidents),
 
+    examinations: {
+      recorded: examinationsThisYear.length,
+      transactionsExamined: examinationsThisYear.reduce((n, e) => n + e.examined, 0),
+      exceptions: examinationsThisYear.reduce((n, e) => n + exceptionsIn(e), 0),
+      rulingsExamined: new Set(examinationsThisYear.map((e) => e.matterId)).size,
+    },
     meetings: {
       held: meetingsThisYear.length,
       attendance: attendanceAcross(meetingsThisYear, board),
@@ -354,10 +390,22 @@ export function assembleAnnualReport(params: {
  * worst moment.
  */
 function gapsIn(report: AnnualReport): string[] {
-  const gaps: string[] = [
-    'The findings of the institution’s own Shariah review and Shariah audit functions are not ' +
-      'held here. The board’s opinion normally rests on them.',
-  ];
+  const gaps: string[] = [];
+
+  /*
+   * Named only while nothing has been recorded.
+   *
+   * This was unconditional from the day the report was written, and it stopped
+   * being true the moment an examination could be held here. A gap that
+   * outlives its cause teaches a board to stop reading the gaps — the same
+   * correction meetings needed, for the same reason.
+   */
+  if (report.examinations.recorded === 0) {
+    gaps.push(
+      'No examination of executed transactions against this board’s rulings is recorded for the ' +
+        'year. The board’s opinion normally rests on one.',
+    );
+  }
 
   /**
    * Meetings are a gap only while none has been recorded.
@@ -667,6 +715,27 @@ ${report.pace.approximate ? '    <p class="none">Some figures cover only the par
   <section>
     <h2>Meetings and attendance</h2>
     ${meetings}
+  </section>
+
+  <section>
+    <h2>Examination of executed transactions</h2>
+    ${
+      /*
+       * The comparison the board's opinion normally rests on: what was executed
+       * against what was approved. Counted, never characterised — whether the
+       * exceptions matter is a ruling, and this report does not reach one.
+       */
+      report.examinations.recorded === 0
+        ? '<p>No examination against this board’s rulings is recorded for the period.</p>'
+        : `<div class="figures">
+      <div><span>Examinations recorded</span><span>${report.examinations.recorded}</span></div>
+      <div><span>Rulings examined against</span><span>${report.examinations.rulingsExamined}</span></div>
+      <div><span>Transactions examined</span><span>${report.examinations.transactionsExamined}</span></div>
+      <div><span>Exceptions found</span><span>${report.examinations.exceptions}</span></div>
+    </div>
+    <p>What the exceptions mean is a matter for the board. This states what was
+    examined and what was found.</p>`
+    }
   </section>
 
   <section>

@@ -196,8 +196,63 @@ describe('non-compliance in the year', () => {
 });
 
 describe('what the draft cannot state', () => {
-  it('always names the review functions, which nothing here holds', () => {
-    expect(build().gaps.join(' ')).toContain('Shariah review and Shariah audit');
+  /*
+   * This used to assert the gap was named *always*, which was right while
+   * nothing could hold an examination. Something can now, so the rule the
+   * report follows everywhere else applies: a gap is named while it is true and
+   * disappears when it stops being, or it teaches a board to stop reading them.
+   */
+  it('names the examination gap while none has been recorded', () => {
+    expect(build().gaps.join(' ')).toContain('No examination of executed transactions');
+    expect(build().examinations.recorded).toBe(0);
+  });
+
+  it('stops naming it once the institution has examined something', () => {
+    const examined = build({
+      examinations: [
+        {
+          id: 'exam-1',
+          boardId: board.id,
+          matterId: 'matter-1',
+          ruleId: 'rule-1',
+          parameterHash: '0xabc',
+          from: '2026-01-01T00:00:00.000Z',
+          to: '2026-06-30T00:00:00.000Z',
+          howChosen: 'Every murabaha over one million, plus ten at random from the rest.',
+          population: 240,
+          examined: 30,
+          examinedBy: 'secretary',
+          recordedAt: '2026-07-10T00:00:00.000Z',
+          findings: [
+            {
+              against: 'ownership-before-sale',
+              held: 'exceptions',
+              exceptions: 2,
+              note: 'The bank was not on title before the onward sale in two files.',
+            },
+          ],
+        },
+      ],
+    });
+
+    expect(examined.gaps.join(' ')).not.toContain('No examination of executed transactions');
+    expect(examined.examinations).toMatchObject({
+      recorded: 1,
+      transactionsExamined: 30,
+      exceptions: 2,
+      rulingsExamined: 1,
+    });
+  });
+
+  /*
+   * The report counts what was found. Whether two exceptions in thirty make an
+   * arrangement impermissible is a ruling, and no report reaches one.
+   */
+  it('counts the exceptions and reaches no verdict about them', () => {
+    const json = JSON.stringify(build()).toLowerCase();
+    for (const word of ['compliant', 'passed', 'failed', 'satisfactory']) {
+      expect(json).not.toContain(word);
+    }
   });
 
   it('names meetings while none has been recorded for the year', () => {

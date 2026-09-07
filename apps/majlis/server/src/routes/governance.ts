@@ -1721,12 +1721,13 @@ export function governanceRoutes(
         return;
       }
 
-      const [matters, rules, incidents, computations, meetings] = await Promise.all([
+      const [matters, rules, incidents, computations, meetings, examinations] = await Promise.all([
         store.matters(board.id),
         store.rules(board.id),
         store.incidents(board.id),
         store.computations({ boardId: board.id }),
         store.meetings(board.id),
+        store.examinations(board.id),
       ]);
 
       const report = assembleAnnualReport({
@@ -1737,6 +1738,7 @@ export function governanceRoutes(
         incidents,
         computations,
         meetings,
+        examinations,
         generatedAt: at,
       });
 
