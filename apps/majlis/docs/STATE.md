@@ -12,16 +12,16 @@ unfinished it says so, and where something is broken it says how it breaks.
 ## Verified, this save
 
 ```
-server   54 files   1379 tests   passed
+server   55 files   1400 tests   passed
 client   21 files    232 tests   passed
 ```
 
 `npm test` from `apps/majlis`. Typecheck clean with `--force` on both sides.
 `client/dist` is rebuilt, so port 4000 shows the current interface.
 
-Pushed to `origin/main` on 7 September 2026, on the user's explicit say-so.
-**Pushing needs asking first, every time** — naming GitHub in a task is not
-approval to publish.
+Pushed to `origin/main` through `4f8c4b1`, on the user's explicit say-so each
+time. **Pushing needs asking first, every time** — naming GitHub in a task is
+not approval to publish.
 
 ---
 
@@ -56,6 +56,37 @@ it is a text-extraction artefact. Measure before changing.
 
 **Still open, and both need a person rather than another pass:** the assistant
 has never met a real key, and the Arabic and Urdu are complete but unreviewed.
+
+### Examinations, and the guide for banks
+
+**`d45523a` / `2923887` — what was executed, against what was approved.** Added
+after researching how Shariah boards actually work, which named the gap in its
+own words: the distance between the approved structure in the fatwa and the
+executed transactions is the commonest source of compliance failure, and it is
+found only through ongoing audit. Majlis held the ruling and not the comparison,
+and the annual report said so.
+
+An examination records the period, **how the sample was chosen**, how many
+transactions there were and how many were looked at, and one finding per
+condition and per operative term. Three refusals define it: it does not choose
+the sample, it reaches no verdict, and it reports coverage as unknown where the
+institution never said how many transactions there were. A signatory cannot
+record one — it is the institution's own review function reporting to the board,
+so the secretary or the liaison does, like every other institutional step.
+
+The annual report's gap about the audit function is now **conditional** and
+disappears once a year has one.
+
+**`4f8c4b1` — `docs/MAJLIS-GUIDE.html` and its PDF.** Ten A4 pages for a bank:
+roles, navigation, the eight steps a question takes, what happens after a
+ruling, the calculations, the documents, chain and no chain, what Majlis will
+not do, what is not finished, and a fifteen-minute path to try it. Average
+sentence 11.7 words, no em dashes — measured, not judged by ear. Rebuild it the
+same way as the two-page brief, with the fonts inlined from
+`scratchpad/fonts-min.css` or re-fetched.
+
+**Accounts are described in the guide and never included in it.** Generate them
+with `npm run members -w server`, which prints once and writes nothing to disk.
 
 **The guide now answers in the language it was asked in** (`21314e7`). The
 terms and the refusal already worked in three scripts; the eighteen answers
