@@ -19,13 +19,34 @@ client   21 files    232 tests   passed
 `npm test` from `apps/majlis`. Typecheck clean with `--force` on both sides.
 `client/dist` is rebuilt, so port 4000 shows the current interface.
 
-Pushed to `origin/main` through `4f8c4b1`, on the user's explicit say-so each
+Pushed to `origin/main` through `521bd26`, on the user's explicit say-so each
 time. **Pushing needs asking first, every time** — naming GitHub in a task is
-not approval to publish.
+not approval to publish. Nothing is unpushed at this save.
+
+**The repository beyond Majlis has its own audit now:** `docs/AUDIT.md` at the
+repo root. Read it before touching the protocol, the site or `apps/web`; this
+file stays the deeper handoff for Majlis itself.
 
 ---
 
 ## §0. Where we stopped, and what to do next
+
+### Picking it up: the shortest true summary
+
+Everything the user asked for through 7 September is built and pushed. What
+remains needs **them**, not another pass:
+
+1. **Schedule the external audit.** Every on-chain item queues behind it — the
+   timelock handover, mainnet, publishing the SDK.
+2. **Answer four questions about key management** before any Stage Three code:
+   succession, prolonged absence, device loss, quorum change.
+3. **Have a native speaker read the Arabic and Urdu.** Complete, unreviewed, and
+   mine.
+4. **Run the assistant against a real key once.** Never done; the key is theirs.
+
+Two smaller decisions are theirs too: whether to keep the `/classic/*` routes,
+and regenerating `apps/web/package-lock.json` on Linux so production stops
+building unpinned.
 
 ### All four things the user asked for are built
 
@@ -93,6 +114,41 @@ terms and the refusal already worked in three scripts; the eighteen answers
 were the half left behind, and the English was rewritten rather than merely
 translated from, because it carried the register the interface strings had just
 been cleaned of.
+
+### The language pass, and what it taught
+
+**`ca46bdd` / `2956979` / `21314e7`.** The user's complaint was that the
+interface reads as machine-written. The author is the worst possible judge of
+that, so the tells were looked up and counted instead of weighed by ear.
+
+983 strings. **157 carried at least one tell and 73 ran over 25 words**, in a
+user interface. The shape was the same every time: a fact, an em dash, a
+correction of something the reader was not thinking, and a closing aphorism.
+`whoami.observerBody` took 79 words to say *you are on a shared login and can
+only read*.
+
+58 strings rewritten in all three languages, plus the guide's 18 answers, which
+were English-only until then and are the most-read explanatory text in the
+product. Em dashes 42 to 16; long strings 73 to 55.
+
+**The rules, worth keeping:** say what it does and stop; help text under twenty
+words; no em dashes; no not-X-but-Y; the design rationale stays in the code
+comments, where the reader is a maintainer rather than a scholar trying to
+record a finding.
+
+**Where it stopped, and why.** 55 strings still run over 25 words and most have
+earned it. The permitting-versus-restricting rule is two branches a member must
+understand before choosing. The complaint was that it read like a machine wrote
+it, not that it was long, and past that point it would be trimming meaning to
+move a number.
+
+`client/scripts/replace-strings.mjs` is the other half of `merge-strings.mjs`:
+it changes only keys that exist, refuses one it cannot find rather than adding
+it quietly, and takes one language at a time, so an English rewrite whose Arabic
+came from the older wording is visibly out of step rather than silently so.
+
+Five tests failed on the old prose across those commits. That is them working:
+each guarded a promise to the reader, and the promise had been reworded.
 
 **Closed rather than done: no further artboards.** Thirteen screens have none.
 Asked on 7 September whether to draw them, the user ruled that an artboard is
