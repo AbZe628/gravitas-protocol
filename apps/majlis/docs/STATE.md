@@ -645,8 +645,14 @@ the premise, and tests enforce it. SmartRaise is guided-only.
 
 - **JavaScript has no triple-quoted strings.** Three separate `node -e` calls
   this session died on `"""…"""`. For anything multi-line, use the Edit tool or
-  write a `.mjs` file — which is the same rule as the backtick one above, and
+  write a `.mjs` file — which is the same rule as the backtick one below, and
   it keeps being learned the hard way.
+- **The rule, stated once so it stops being relearned: prose never goes through
+  `node -e`.** Backticks, regex escapes and triple quotes have each eaten text
+  silently, three times in one session even with the trap written down. Markdown
+  and interface copy are full of backticks by nature, so this is not an edge
+  case. Use the Edit tool for a passage, or a `.mjs` file for anything
+  repetitive. The shell is for running things, not for carrying sentences.
 - **Backticks inside a double-quoted bash string are command substitution.**
   `node -e "… \`AdoptedStructure.basis\` …"` silently produced *"is ever named
   is , which"* — the text between the backticks was executed and its empty

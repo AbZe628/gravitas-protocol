@@ -549,10 +549,13 @@ Meetings, @mentions and the per-asset document from
    not settle cadence: a screening ratio recomputed once a year is a ratio that
    was wrong for eleven months. Whether a bank sends statements quarterly, or a
    scholar loads them when a question arises, changes what drift can catch.
-2. **Does the structure library ship with citations?** Naming a standard the
-   board has not checked is the software asserting fiqh. Naming none makes the
-   library harder to adopt. The current answer is to ship the citation and
-   require the board to confirm it on adoption.
+2. **~~Does the structure library ship with citations?~~ Settled 6 September
+   2026: it ships none.** The question was real and the answer went the other
+   way from what this list expected. Shipping a citation the board had not
+   checked was the software asserting fiqh, and 107 of them were removed along
+   with the `authority` field itself. The only place a standard is named is
+   `AdoptedStructure.basis`, which the board writes in its own words. Yes, this
+   makes the library harder to adopt, and that cost was accepted.
 3. **Profit distribution needs a practitioner.** The variants in reserve
    treatment are wide and I would not encode them from reading alone.
 
