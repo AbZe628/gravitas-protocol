@@ -1,6 +1,10 @@
 import { useState } from 'react';
 import { api, type AssistantExchange } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
+import { useHealth } from '../lib/health.js';
+import { mayDeliberate, useIdentity } from '../lib/identity.js';
+import RaiseAMatter from '../components/RaiseAMatter.js';
+import { Nothing } from '../components/page.js';
 import { PageHead } from '../components/page.js';
 import { Sources, Tag } from '../components/ui.js';
 
@@ -10,6 +14,14 @@ export default function Assistant() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(false);
   const [thread, setThread] = useState<AssistantExchange[]>([]);
+  const health = useHealth();
+  const { identity } = useIdentity();
+
+  /*
+   * Off unless a key is configured, which is most installations. Until the
+   * health answers, nothing is claimed either way.
+   */
+  const off = health?.assistantKind === 'off';
 
   async function submit() {
     const q = question.trim();
@@ -38,7 +50,12 @@ export default function Assistant() {
         {t('asst.limits')}
       </div>
 
-      {thread.length === 0 && !busy && (
+      {/*
+        "Nothing asked yet" belongs only where something could have been. On an
+        installation with no assistant it read as a second, weaker version of
+        the sentence at the bottom of the page saying there is nothing to ask.
+      */}
+      {thread.length === 0 && !busy && !off && (
         <p className="mb-6 text-[13px] text-muted">{t('asst.empty')}</p>
       )}
 
@@ -57,6 +74,22 @@ export default function Assistant() {
               )}
               <p className="whitespace-pre-wrap text-[14px] leading-relaxed">{x.answer}</p>
               <Sources sources={x.sources} />
+
+              {/*
+                What follows an answer. It is not a ruling and never becomes
+                one by being read — the escalation tag was already saying to
+                put it to the board, without giving anybody a way to.
+              */}
+              <RaiseAMatter
+                boardId="demo-board"
+                title={x.question.slice(0, 120)}
+                proposal={x.question}
+                direction="permit"
+                origin="institution_request"
+                label={t('asst.putToBoard')}
+                note={t('asst.notARuling')}
+                canOpen={mayDeliberate(identity?.role)}
+              />
             </div>
           </li>
         ))}
@@ -64,6 +97,14 @@ export default function Assistant() {
 
       {error && <div className="mb-4 text-[13px] text-breach">{t('asst.error')}</div>}
 
+      {/*
+        Absent, not disabled. A question box on an installation with no
+        assistant is a control that lies, and the lie is only discovered
+        after somebody has written out their question.
+      */}
+      {off ? (
+        <Nothing>{t('asst.isOff')}</Nothing>
+      ) : (
       <div className="sticky bottom-16 md:bottom-4">
         <div className="flex gap-2 rounded-sheet bg-raised p-2.5 shadow-card">
           <textarea
@@ -74,6 +115,7 @@ export default function Assistant() {
             }}
             rows={2}
             placeholder={t('asst.placeholder')}
+            aria-label={t('asst.placeholder')}
             className="flex-1 resize-none bg-transparent px-2 py-1.5 text-[15px] outline-none placeholder:text-muted"
           />
           <button
@@ -86,6 +128,7 @@ export default function Assistant() {
           </button>
         </div>
       </div>
+      )}
     </div>
   );
 }

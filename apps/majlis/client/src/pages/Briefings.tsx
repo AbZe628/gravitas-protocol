@@ -1,16 +1,22 @@
 import { useEffect, useState } from 'react';
 import { api, type Briefing } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
+import { mayDeliberate, useIdentity } from '../lib/identity.js';
+import RaiseAMatter from '../components/RaiseAMatter.js';
 import { PageHead } from '../components/page.js';
 import { Card, DateText, ErrorText, Loading, Sources, Tag } from '../components/ui.js';
 
 export default function Briefings() {
   const { t } = useI18n();
+  const { identity } = useIdentity();
   const [items, setItems] = useState<Briefing[] | null>(null);
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
-    api.briefings().then(setItems).catch(() => setFailed(true));
+    api
+      .briefings()
+      .then((r) => (Array.isArray(r) ? setItems(r) : setFailed(true)))
+      .catch(() => setFailed(true));
   }, []);
 
   if (failed) return <ErrorText />;
@@ -63,6 +69,22 @@ export default function Briefings() {
                   {b.questionForBoard}
                 </p>
               </div>
+
+              {/*
+                A briefing carries a question addressed to the board and had
+                nothing to do about it: the screen was a dead end with the
+                one thing on it that most obviously asks for an answer.
+              */}
+              <RaiseAMatter
+                boardId="demo-board"
+                title={b.title}
+                proposal={b.questionForBoard}
+                direction="permit"
+                origin="protocol_change"
+                label={t('brief.putToBoard')}
+                note={t('brief.raisedBy')}
+                canOpen={mayDeliberate(identity?.role)}
+              />
 
               <Sources sources={b.sources} />
             </Card>
