@@ -1,6 +1,6 @@
 # Where Majlis stands
 
-Last written **6 September 2026, evening**. Read this first, and read §0 before
+Last written **8 September 2026**. Read this first, and read §0 before
 anything else — it is written so that picking the work back up costs a few
 minutes rather than an hour of re-reading the codebase.
 
@@ -136,7 +136,7 @@ on the four key-custody answers below. The document says so in those words.
 `npm test` from `apps/majlis`. Typecheck clean with `--force` on both sides.
 `client/dist` is rebuilt, so port 4000 shows the current interface.
 
-Pushed to `origin/main` through `521bd26`, on the user's explicit say-so each
+Pushed to `origin/main` through `0191bef`, on the user's explicit say-so each
 time. **Pushing needs asking first, every time** — naming GitHub in a task is
 not approval to publish. Nothing is unpushed at this save.
 
@@ -148,52 +148,83 @@ file stays the deeper handoff for Majlis itself.
 
 ## §0. Where we stopped, and what to do next
 
-### Picking it up: the shortest true summary
+Written **8 September 2026**. Read this section and the *Verified* block above
+it, and you have the whole state. Everything below §0 is history: accurate, and
+not needed to start.
 
-Everything the user asked for through 7 September is built and pushed. What
-remains needs **them**, not another pass:
+### The one sentence
+
+Everything asked for is built and pushed through `0191bef`. Nothing is
+unpushed, the working tree is clean, and the next piece of work is a choice
+between four named things rather than a search for what to do.
+
+### What to do next, in the order it is worth doing
+
+1. **Annotations on a document.** The last thing every board portal has that
+   this does not: a member marks a passage and says something about it, and
+   the next reader sees it. `SourceRef.file` already carries the key, and
+   `reading-a-contract.ts` already returns a character offset for a passage —
+   which is the hard half, and it is done.
+2. **Committees.** Stage Four. `boardId` is already threaded through
+   everything, so this is a routing and settings problem rather than a model
+   change.
+3. **Calendar subscription.** `/api/calendar.ics` is a download. A member's own
+   calendar wants a private URL it can poll, which is a token per member and
+   nothing else. The account work below is what made this possible.
+4. **Notifications.** `notice.ts` composes the words and its default sends
+   nothing. Now that a member has an account, an address can live on one.
+
+### What needs the user, not another pass
+
+These four have not moved and will not move without them:
 
 1. **Schedule the external audit.** Every on-chain item queues behind it — the
    timelock handover, mainnet, publishing the SDK.
 2. **Answer four questions about key management** before any Stage Three code:
    succession, prolonged absence, device loss, quorum change.
-3. **Have a native speaker read the Arabic and Urdu.** Complete, unreviewed, and
-   mine.
-4. **Run the assistant against a real key once.** Never done; the key is theirs.
+3. **Have a native speaker read the Arabic and Urdu.** Complete, unreviewed,
+   and mine. Roughly 1,100 keys in each.
+4. **Run the assistant against a real key once.** Never done; the key is theirs
+   and must never be handled here.
 
-Two smaller decisions are theirs too: whether to keep the `/classic/*` routes,
+Two smaller decisions are also theirs: whether to keep the `/classic/*` routes,
 and regenerating `apps/web/package-lock.json` on Linux so production stops
-building unpinned.
+building from an unpinned graph.
 
-### All four things the user asked for are built
+### How to look at it, without burning an hour
 
-Written 7 September 2026. The three gaps this section used to describe as *not
-started* are closed, and the fourth — simplification — has had its first pass.
+There is no way to open the running interface without a credential, and the
+user's own instance on port 4000 uses theirs. What worked, repeatedly:
 
-| | |
-|---|---|
-| `b819009` | **Majlis follows no standard.** 107 citations out of the library, `authority` gone from both types, and screening's hardcoded 30/30/5 thresholds replaced by limits the board sets. See below. |
-| `a8040c5` | **A way in, on the server.** `Submission`, the fifth role `institution`, and a notice adapter whose default sends nothing. |
-| `00c93c1` | **A way in, on screen.** Two screens chosen by credential: the board works a queue, the institution puts a question and reads its own. |
-| `d5930e1` | **Contract drafts.** Assembled from the ruling — findings, terms, exclusions — and nothing composed. `/api/matters/:id/contract`. |
-| `d2efbbe` | **The matter screen.** The act moved from 96% of scroll depth to 17%; previous findings moved under the condition each answers; the reasoning collapsed in place. |
+```
+cd apps/majlis/server
+PORT=4100 BASIC_AUTH_USER= BASIC_AUTH_PASSWORD= npx tsx src/index.ts
+```
 
-**What is left of the simplification.** One pass is done on the densest screen.
-Whether the rest is right is a judgement that wants fresh eyes rather than
-another sweep — `/more` was measured (11 destinations, 4 groups, 195 words) and
-deliberately left alone, because its subtitles are what tell a scholar what
-*Register* or *Events* mean and the instruction was to simplify without losing
-anything.
+Empty strings switch authentication off — `configFromEnv` treats them as
+absent — so everybody is an observer and every screen renders. Rebuild
+`client/dist` first (`npm run build -w client`) or the server serves the last
+build. For anything that needs a real identity, `npm run member -w server`
+prints a line for `MAJLIS_MEMBERS`; put it in the environment of that same
+throwaway process and never in `.claude/launch.json`, which is tracked.
 
-**Two things measured that turned out not to be faults.** The two condition
-lists on the matter screen looked like 83% duplication; they were the same six
-conditions saying different things, so folding them improved *where* a scholar
-reads rather than how much. And a label extracting as
-`OPERATIVE TERMminTangibleRatioBps` has an 8px margin and renders correctly —
-it is a text-extraction artefact. Measure before changing.
+### Three habits that saved time, and one that cost it
 
-**Still open, and both need a person rather than another pass:** the assistant
-has never met a real key, and the Arabic and Urdu are complete but unreviewed.
+**Run it, do not only test it.** The account work passed 32 tests and had three
+faults that only appeared against a real store: the `institution` role could
+never have changed its own password, the refusal came back as a 500, and the
+read was blocked while the write succeeded. Every one was found by a `curl`
+against a running process.
+
+**Measure before claiming.** Twice a claim about what was missing turned out to
+be wrong on inspection — the language pass found the AI register already gone,
+and a survey of which services had no route produced a false positive for
+`signature.ts`, which reaches HTTP through `fatwa.ts`.
+
+**Prose never goes through a shell string.** Backticks inside a double-quoted
+`node -e` are command substitution and they ate text silently **three times in
+this session**, including once in the very paragraph describing the trap. Use
+the Edit tool for a passage, or a `.mjs` file for anything repetitive.
 
 ### Examinations, and the guide for banks
 
