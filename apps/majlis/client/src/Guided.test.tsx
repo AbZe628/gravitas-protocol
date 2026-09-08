@@ -184,7 +184,7 @@ describe('one thing asks to be done', () => {
      * that it was an answer rather than a blank has gone: it was explaining
      * what the typography now says.
      */
-    await waitFor(() => expect(screen.getByText('Nothing needs you.')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('Nothing is waiting for you today.')).toBeInTheDocument());
   });
 
   it('shows what the board is doing even when nothing needs anybody', async () => {
@@ -197,7 +197,7 @@ describe('one thing asks to be done', () => {
      * everybody, the first time. A front page that says nothing is waiting and
      * stops has told a first-time reader there is nothing here.
      */
-    await waitFor(() => expect(screen.getByText('Everything the board holds')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('How it works')).toBeInTheDocument());
 
     /*
      * Four rows, always, whoever is reading.
@@ -219,7 +219,7 @@ describe('one thing asks to be done', () => {
     stub({ items: [], outstanding: 0, overdue: 0 });
     show();
 
-    await waitFor(() => expect(screen.getByText('Everything the board holds')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('How it works')).toBeInTheDocument());
 
     /*
      * The screen used to print "1 holdings".
@@ -274,7 +274,7 @@ describe('nothing was removed', () => {
      * written in an email to a colleague, and a dead link is a worse outcome
      * than a redirect to the screen that now holds all of it.
      */
-    await waitFor(() => expect(screen.getByText('Everything the board holds')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('How it works')).toBeInTheDocument());
   });
 });
 

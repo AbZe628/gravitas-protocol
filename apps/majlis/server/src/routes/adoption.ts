@@ -35,6 +35,16 @@ import {
   type AdoptInput,
 } from '../services/adoption.js';
 import { structures } from '../data/structures.js';
+
+/**
+ * The statuses a contract draft exists for.
+ *
+ * Mirrors SETTLED in services/contract.ts, which is the thing that actually
+ * refuses. Kept in step so the library offers a draft only where the route
+ * will honour it — a list that offered one for every matter would be nineteen
+ * links to a refusal.
+ */
+const DECIDED = ['in_force', 'timelock', 'rejected', 'lapsed', 'withdrawn'];
 import type { Store } from '../store/index.js';
 import { handle, badRequest, identityOf, requireRole } from './http.js';
 
@@ -83,10 +93,28 @@ export function adoptionRoutes(
       }
 
       const all = await store.adoptions(boardId);
+      const matters = await store.matters(boardId);
 
       res.json({
         boardId,
-        library: libraryFor(boardId, all, structures),
+        /*
+         * Each shape, with the matters that name it.
+         *
+         * Assembled here rather than on the screen: the screen would have to
+         * fetch every matter and filter, and two screens filtering the same
+         * way is how two screens come to disagree about what a shape is for.
+         */
+        library: libraryFor(boardId, all, structures).map((entry) => ({
+          ...entry,
+          usedBy: matters
+            .filter((m) => m.structureId === entry.structure.id)
+            .map((m) => ({
+              matterId: m.id,
+              title: m.title,
+              status: m.status,
+              hasDraft: DECIDED.includes(m.status),
+            })),
+        })),
         adopted: standingAdoptions(all).filter((a) => a.standing !== 'declined').length,
         declined: standingAdoptions(all).filter((a) => a.standing === 'declined').length,
         total: structures.length,

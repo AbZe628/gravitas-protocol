@@ -285,6 +285,18 @@ export default function Guided() {
         first time.
       */}
       <Block label={t('spine.everything')}>
+        {/*
+          What the thing does, in one sentence, above the four steps.
+
+          The four rows carried the process and never said it. A person opening
+          this saw four abstract nouns with numbers beside them and had to work
+          out that they were a sequence — and a board member who cannot tell
+          what the application is for in one look does not open it twice.
+        */}
+        <p className="mb-5 max-w-[62ch] text-[13.5px] leading-[1.7] text-sand">
+          {t('spine.howItWorks')}
+        </p>
+
         <FourDoors
           counts={{
             asked: waiting,

@@ -152,9 +152,16 @@ describe('localisation', () => {
 
 describe('shell', () => {
   it('says the board decides here and that nothing here signs', async () => {
-    // The distinction this has to keep making. Stage Two records a decision;
-    // it does not execute one. If the interface ever stops saying so, it is
-    // claiming an authority the application does not have.
+    /*
+     * The distinction this has to keep making: a decision is recorded here,
+     * not executed. If the interface ever stops saying so it is claiming an
+     * authority the application does not have.
+     *
+     * It used to be the product's own subtitle, worded from our roadmap, so
+     * the first line anybody read was about a stage rather than about what
+     * the application does. It sits with the rest of what this copy can and
+     * cannot do now. The claim is what matters; where it sits is not.
+     */
     renderApp();
     expect(await screen.findAllByText(/nothing here signs/i)).not.toHaveLength(0);
   });

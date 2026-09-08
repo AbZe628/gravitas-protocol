@@ -1636,6 +1636,27 @@ export const oversight = {
    * document in — so the reading existed and nobody could reach it. Nothing
    * about the text is kept.
    */
+  /**
+   * The words for telling the bank something happened.
+   *
+   * Composed on the server so that one event has one wording wherever it is
+   * shown. Never sent: the delivery comes back saying so.
+   */
+  /** What was undertaken at a sitting, and what became of it. */
+  undertakings: (boardId?: string) =>
+    get<{
+      boardId: string;
+      undertakings: { undertaking: Undertaking; whoName: string; overdue: boolean }[];
+      summary: { open: number; overdue: number; openWithNoDate: number; done: number; dropped: number };
+    }>('/api/undertakings' + (boardId ? `?board=${encodeURIComponent(boardId)}` : '')),
+
+  /** Close one by saying what happened. A tick would record nothing useful. */
+  closeUndertaking: (id: string, state: string, said: string) =>
+    send<{ undertaking: Undertaking }>(`/api/undertakings/${id}/close`, { state, said }),
+
+  telling: (kind: string, id: string) =>
+    get<{ notice: Notice; delivery: Delivery }>(`/api/telling/${kind}/${id}`),
+
   readContract: (matterId: string, text: string) =>
     send<ContractReading>(`/api/matters/${matterId}/reading`, { text }),
 
@@ -1885,6 +1906,16 @@ export interface HeldStructure {
   adoption: AdoptedStructure | null;
   declined: boolean;
   note: string;
+  /**
+   * The matters that name this shape, and whether a draft exists for each.
+   *
+   * A draft is assembled from a ruling, which is right — a contract drafted
+   * from nothing is an agreement the board never made. But it left this
+   * screen with no way forward: nineteen descriptions and nothing to do. The
+   * shape becomes a starting point once it can say what the board ruled with
+   * it, or that nobody has.
+   */
+  usedBy?: { matterId: string; title: string; status: string; hasDraft: boolean }[];
 }
 
 export interface Library {

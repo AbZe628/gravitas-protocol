@@ -3,6 +3,7 @@ import Dashboard from './pages/Dashboard.js';
 import Guided from './pages/Guided.js';
 import MatterPack from './pages/MatterPack.js';
 import BoardBook from './pages/BoardBook.js';
+import Undertakings from './pages/Undertakings.js';
 import Questions from './pages/Questions.js';
 import Examinations from './pages/Examinations.js';
 import Ask from './pages/Ask.js';
@@ -98,6 +99,11 @@ export default function App() {
             has that this application did not.
           */}
           <Route path="/meetings/:id/book" element={<BoardBook />} />
+          {/*
+            What was undertaken. Built with its routes and reachable from no
+            screen at all until now.
+          */}
+          <Route path="/undertakings" element={<Undertakings />} />
           <Route path="/incidents" element={<Incidents />} />
           <Route path="/incidents/:id" element={<IncidentDetail />} />
           <Route path="/briefings" element={<Briefings />} />

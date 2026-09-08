@@ -74,6 +74,18 @@ export const mayRecordInstitutionAct = (role: Role | undefined, office: Office |
   office === 'secretary' || role === 'liaison';
 
 /**
+ * Who keeps the minutes, and therefore who may close somebody else's
+ * undertaking.
+ *
+ * Mirrors `mayKeepMinutes` in the server's `auth/members.ts`, which is the
+ * thing that actually refuses. An undertaking is closed by the person who
+ * gave it or by whoever keeps the record — anybody else writing an account of
+ * work they did not do would be putting words in a colleague's mouth.
+ */
+export const mayKeepMinutes = (_role: Role | undefined, office: Office | undefined): boolean =>
+  office === 'secretary' || office === 'chair';
+
+/**
  * Whether this credential belongs to the bank rather than to the board.
  *
  * The one role that is not on the board at all — the desk with a question. It

@@ -93,6 +93,7 @@ export const DOORS: readonly Door[] = [
     destinations: [
       { to: '/classic', label: 'door.deciding.open', note: 'door.deciding.open.note', main: true },
       { to: '/meetings', label: 'door.deciding.sittings', note: 'door.deciding.sittings.note' },
+      { to: '/undertakings', label: 'door.deciding.undertaken', note: 'door.deciding.undertaken.note' },
       { to: '/calendar', label: 'door.deciding.dates', note: 'door.deciding.dates.note' },
     ],
   },

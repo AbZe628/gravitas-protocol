@@ -31,6 +31,7 @@ import { LoginLimiter, loginThrottle } from './middleware/loginLimit.js';
 import { governanceRoutes } from './routes/governance.js';
 import { accountRoutes } from './routes/account.js';
 import { undertakingRoutes } from './routes/undertakings.js';
+import { tell } from './services/telling.js';
 import { adoptionRoutes } from './routes/adoption.js';
 import { segmentsOf } from './services/mentions.js';
 import { vaultFromEnv, type Vault } from './store/vault.js';
@@ -590,6 +591,69 @@ export function createApp(
    */
   app.use('/api', accountRoutes(store, auth.members));
   app.use('/api', undertakingRoutes(store));
+
+  /**
+   * The words for telling the bank something.
+   *
+   * Composed, never sent — like every notice here. Most installations have no
+   * channel and what they get is the text, correct and complete, for a person
+   * to send. A control that said Send and quietly did nothing would leave a
+   * board believing the desk had been told.
+   *
+   * One route for every kind of thing, because the alternative is each screen
+   * writing its own wording and the record and the mailbox disagreeing.
+   */
+  app.get('/api/telling/:kind/:id', async (req: Request, res: Response) => {
+    const kind = req.params.kind;
+    const boards = await store.boards();
+    const board = boards[0];
+    if (!board) {
+      res.status(404).json({ error: 'not_found', message: 'No such board.' });
+      return;
+    }
+
+    const off = { kind: 'none' as const, configured: false, sent: false, at: new Date().toISOString() };
+
+    if (kind === 'ruling' || kind === 'refusal' || kind === 'draft_ready') {
+      const matter = await store.matter(req.params.id);
+      if (!matter) {
+        res.status(404).json({ error: 'not_found', message: 'No such matter.' });
+        return;
+      }
+      res.json({ notice: tell(board, { kind, matter }), delivery: off });
+      return;
+    }
+
+    if (kind === 'figure') {
+      const computation = await store.computation(req.params.id);
+      if (!computation) {
+        res.status(404).json({ error: 'not_found', message: 'No such figure.' });
+        return;
+      }
+      res.json({ notice: tell(board, { kind: 'figure', computation }), delivery: off });
+      return;
+    }
+
+    if (kind === 'examination') {
+      const examination = await store.examination(req.params.id);
+      if (!examination) {
+        res.status(404).json({ error: 'not_found', message: 'No such review.' });
+        return;
+      }
+      const rule = await store.rule(examination.ruleId);
+      res.json({
+        notice: tell(board, {
+          kind: 'examination',
+          examination,
+          ruleTitle: rule?.title ?? examination.ruleId,
+        }),
+        delivery: off,
+      });
+      return;
+    }
+
+    res.status(404).json({ error: 'not_found', message: 'Nothing of that kind is told.' });
+  });
 
   // ---- audit export ----------------------------------------------------
   app.get('/api/export/:boardId', async (req, res) => {

@@ -9,6 +9,7 @@ import VotePanel from '../components/VotePanel.js';
 import Deliberation from '../components/Deliberation.js';
 import SignTheDocument from '../components/SignTheDocument.js';
 import ReadTheContract from '../components/ReadTheContract.js';
+import TellTheBank from '../components/TellTheBank.js';
 import Checklist from '../components/Checklist.js';
 
 /**
@@ -69,6 +70,9 @@ function Part({
     </section>
   );
 }
+
+/** The statuses a decision exists for. Mirrors SETTLED in services/fatwa.ts. */
+const DECIDED_STATUSES = ['in_force', 'timelock', 'rejected', 'lapsed', 'withdrawn'];
 
 function day(iso: string): string {
   const d = new Date(iso);
@@ -356,6 +360,15 @@ export default function MatterPack() {
         <div className="mt-5">
           <SignTheDocument matter={matter} />
         </div>
+
+        {/*
+          And then you tell the bank. The half of every task that existed
+          nowhere: the board decided, and the desk that asked found out by
+          somebody remembering to write an email.
+        */}
+        {DECIDED_STATUSES.includes(matter.status) && (
+          <TellTheBank kind={matter.status === 'rejected' ? 'refusal' : 'ruling'} id={matter.id} />
+        )}
 
         <div className="mt-5 px-1">
           <a

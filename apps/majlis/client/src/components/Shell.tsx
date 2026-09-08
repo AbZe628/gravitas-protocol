@@ -94,6 +94,18 @@ function Installation() {
       </div>
 
       <div className="space-y-2 text-[12px]">
+        {/*
+          What used to sit under the product's name as "Stage Two — the board
+          decides here. Nothing here signs." It is a true and important thing
+          to say and it was the first sentence anybody read, in a vocabulary
+          from our own roadmap: a bank does not know what Stage Two is, and a
+          reader learned nothing about what the application does. The claim
+          belongs here, with everything else this copy does and does not do.
+        */}
+        <div className="flex items-start gap-2.5">
+          <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-line" />
+          <span className="leading-snug text-muted">{t('shell.nothingSigns')}</span>
+        </div>
         <div className="flex items-start gap-2.5">
           <span
             className={
@@ -399,7 +411,33 @@ export default function Shell({ children }: { children: React.ReactNode }) {
               )}
             </div>
           </Link>
-          <Avatar id={identity?.scholarId} />
+          {/*
+            Search and the settings, on a phone.
+
+            They were in the rail and the rail is desktop-only, so below 1024
+            pixels this application had no settings, no search and no
+            assistant at all — a member could not change their own password
+            from the device they actually carry.
+
+            Not a hamburger. A drawer holding the desktop rail is what makes a
+            phone a small desktop, which is the thing the artboard says it is
+            not. Two marks in the masthead, where a phone puts them.
+          */}
+          <div className="flex shrink-0 items-center gap-1">
+            <Link
+              to="/search"
+              aria-label={t('besides.search')}
+              className="grid h-9 w-9 place-items-center rounded-full text-muted transition-colors hover:bg-raised/60 hover:text-paper"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+                <circle cx="11" cy="11" r="7" />
+                <path d="M20 20l-3.5-3.5" />
+              </svg>
+            </Link>
+            <Link to="/settings" aria-label={t('besides.board')}>
+              <Avatar id={identity?.scholarId} />
+            </Link>
+          </div>
         </header>
 
         {/* The language, before anything else, because a reader who cannot

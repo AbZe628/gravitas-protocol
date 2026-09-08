@@ -8,8 +8,10 @@ import {
   type MatterSummary,
 } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
+import TellTheBank from '../components/TellTheBank.js';
+import ReportWhatWasFound from '../components/ReportWhatWasFound.js';
 import { Division, Nothing, PageHead } from '../components/page.js';
-import { useIdentity, mayRecordInstitutionAct } from '../lib/identity.js';
+import { useIdentity, mayRecordInstitutionAct, mayDeliberate } from '../lib/identity.js';
 import { Act, Card, Quiet, State } from '../components/kit.js';
 
 /**
@@ -30,7 +32,7 @@ const field = 'w-full rounded-xl bg-raised shadow-ring p-2.5 text-[14px] leading
 const label = 'mb-1 block text-[12px] text-muted';
 const help = 'mb-2 max-w-[62ch] text-[11.5px] leading-[1.6] text-muted';
 
-function One({ e }: { e: Examination }) {
+function One({ e, canReport }: { e: Examination; canReport: boolean }) {
   const { t } = useI18n();
 
   return (
@@ -117,6 +119,19 @@ function One({ e }: { e: Examination }) {
           {t('exam.termsMoved')}
         </p>
       )}
+
+      {/*
+        And then you tell the bank what the review found. It says what was
+        looked at and what fell outside the terms, and stops there — whether
+        anything follows is the board's determination and has its own path.
+      */}
+      {/*
+        The one thing that follows from a finding with exceptions, and the
+        step that had no path: putting it to the board as a reported event.
+      */}
+      <ReportWhatWasFound e={e} ruleTitle={e.ruleId} canReport={canReport} />
+
+      <TellTheBank kind="examination" id={e.id} />
     </Card>
   );
 }
@@ -371,7 +386,7 @@ export default function Examinations({ boardId }: { boardId: string }) {
         ) : (
           <div className="space-y-3">
             {all.map((e) => (
-              <One key={e.id} e={e} />
+              <One key={e.id} e={e} canReport={mayDeliberate(identity?.role)} />
             ))}
           </div>
         )}

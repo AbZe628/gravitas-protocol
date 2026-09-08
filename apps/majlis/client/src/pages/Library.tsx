@@ -132,6 +132,47 @@ function Shape({
       </div>
 
       {/*
+        Where this shape has actually been used, and what came of it.
+
+        The screen listed nineteen descriptions and offered nothing to do
+        with any of them. A draft is assembled from a ruling — which is
+        right, a contract drafted from nothing is an agreement the board
+        never made — so the way forward is not a draft button but the
+        matters that used the shape, and a way to raise one where none has.
+      */}
+      <div className="mt-4 border-t border-line pt-3.5">
+        <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.14em] text-muted">
+          {t('adopt.usedIn')}
+        </div>
+        {(held.usedBy ?? []).length === 0 ? (
+          <p className="max-w-[58ch] text-[12.5px] leading-[1.6] text-muted">
+            {t('adopt.neverUsed')}
+          </p>
+        ) : (
+          <ul className="space-y-1.5">
+            {(held.usedBy ?? []).map((u) => (
+              <li key={u.matterId} className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                <Link to={`/matters/${u.matterId}`} className="text-[13px] text-lapis hover:underline">
+                  {u.title}
+                </Link>
+                <span className="text-[11.5px] text-muted">{t(`matter.status.${u.status}`)}</span>
+                {/* Offered only where the route will honour it. */}
+                {u.hasDraft && (
+                  <a
+                    href={oversight.hrefs.contract(u.matterId)}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-[12.5px] font-semibold text-lapis underline decoration-line underline-offset-4"
+                  >
+                    {t('adopt.theDraft')}
+                  </a>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+      {/*
         What the board said, where it said something. The amendments are the
         part a later reader is looking for: the difference between the board's
         version and the shipped one — so they are set in the serif behind a

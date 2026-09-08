@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { oversight, type ComputationList, type HistoryEntry } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
+import TellTheBank from './TellTheBank.js';
 import { Steps } from './calc.js';
 import { Tag } from './ui.js';
 
@@ -92,6 +93,13 @@ function Entry({ entry }: { entry: HistoryEntry }) {
           <Steps steps={c.steps} />
           {/* Carried from the server, so nothing here can soften it. */}
           <p className="mt-2 text-[12px] leading-relaxed text-muted">{c.note}</p>
+
+          {/*
+            And then you tell the bank. A figure recorded and never sent is a
+            figure the desk that has to act on it never saw — which is where
+            every one of these stopped before.
+          */}
+          <TellTheBank kind="figure" id={c.id} />
         </div>
       )}
     </li>

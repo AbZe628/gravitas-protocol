@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { api, oversight, type ReviewStatus, type Rule } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
+import ReconsiderThis from '../components/ReconsiderThis.js';
+import { mayDeliberate, useIdentity } from '../lib/identity.js';
 import { Card, DateText, ErrorText, Loading, Sources, Tag } from '../components/ui.js';
 import { DocumentLink } from '../components/Documents.js';
 
@@ -18,7 +20,15 @@ import { DocumentLink } from '../components/Documents.js';
  * has noticed yet.
  */
 
-function ReviewLine({ review }: { review: ReviewStatus | undefined }) {
+function ReviewLine({
+  review,
+  rule,
+  canOpen,
+}: {
+  review: ReviewStatus | undefined;
+  rule: Rule;
+  canOpen: boolean;
+}) {
   const { t } = useI18n();
   if (!review) return null;
 
@@ -27,6 +37,7 @@ function ReviewLine({ review }: { review: ReviewStatus | undefined }) {
       <div className="mt-3 border-t border-line pt-2.5 text-[12px] leading-relaxed">
         <Tag tone="warn">{t('review.unscheduled')}</Tag>
         <p className="mt-1.5 text-muted">{t('review.unscheduledNote')}</p>
+        <ReconsiderThis rule={rule} canOpen={canOpen} />
       </div>
     );
   }
@@ -50,12 +61,23 @@ function ReviewLine({ review }: { review: ReviewStatus | undefined }) {
           {t('review.next')} <DateText iso={review.dueAt} />
         </span>
       )}
+      {/*
+        The one act, where the date has actually passed. A rule not yet due
+        does not need looking at, and offering it would invite a board to
+        reopen everything it has ever decided.
+      */}
+      {(review.overdue || review.state === 'due') && (
+        <div className="w-full">
+          <ReconsiderThis rule={rule} canOpen={canOpen} />
+        </div>
+      )}
     </div>
   );
 }
 
 export default function Rules({ embedded = false }: { embedded?: boolean }) {
   const { t } = useI18n();
+  const { identity } = useIdentity();
   const [rules, setRules] = useState<Rule[] | null>(null);
   const [reviews, setReviews] = useState<Map<string, ReviewStatus>>(new Map());
   const [dueCount, setDueCount] = useState(0);
@@ -136,7 +158,7 @@ export default function Rules({ embedded = false }: { embedded?: boolean }) {
                 ))}
               </dl>
 
-              <ReviewLine review={reviews.get(r.id)} />
+              <ReviewLine review={reviews.get(r.id)} rule={r} canOpen={mayDeliberate(identity?.role)} />
 
               <div className="mt-3 font-mono text-[10px] break-all text-muted">
                 {r.parameterHash}
