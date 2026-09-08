@@ -53,6 +53,7 @@ export interface MemorySeed {
   meetings?: Meeting[];
   submissions?: Submission[];
   examinations?: Examination[];
+  undertakings?: Undertaking[];
 }
 
 export class MemoryStore implements Store {
@@ -79,7 +80,7 @@ export class MemoryStore implements Store {
   private readonly _signings: StoredSigning[] = [];
   /** Keyed by scholar: a member holds one credential or none. */
   private readonly _credentials = new Map<string, Credential>();
-  private readonly _undertakings = new Map<string, Undertaking>();
+  private readonly _undertakings: Map<string, Undertaking>;
   private readonly _log: AssistantExchange[] = [];
 
   constructor(seed: MemorySeed = {}) {
@@ -105,6 +106,7 @@ export class MemoryStore implements Store {
     // Nothing seeded: an examination nobody carried out would be the strongest
     // claim in the record and the one least earned.
     this._examinations = new Map((seed.examinations ?? []).map((x) => [x.id, copy(x)]));
+    this._undertakings = new Map((seed.undertakings ?? []).map((u) => [u.id, copy(u)]));
   }
 
   async institutions(): Promise<Institution[]> {

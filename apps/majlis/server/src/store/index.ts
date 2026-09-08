@@ -14,6 +14,14 @@
 import { FileStore } from './file.js';
 import { MemoryStore } from './memory.js';
 import { incidents as seedIncidents, meetings as seedMeetings } from '../data/seed.js';
+import {
+  submissions as seedSubmissions,
+  computations as seedComputations,
+  examinations as seedExaminations,
+  undertakings as seedUndertakings,
+} from '../data/seed-work.js';
+import { matters as seedMatters } from '../data/seed.js';
+import { lifecycleMatters } from '../data/seed-lifecycle.js';
 import { TenantStore } from './tenant.js';
 import type { Store } from './store.js';
 
@@ -79,12 +87,32 @@ export function storeFromEnv(): Store {
    * A bare `new MemoryStore()` is deliberately empty — a board with nothing
    * reported and no meeting held is a real state, and eight tests are about
    * it. But a scholar opening this application is not testing an empty
-   * state; they are trying to see what it does, and three of the screens
-   * they would open had nothing on them at all.
+   * state; they are trying to see what it does, and six of the sixteen
+   * screens they would open had nothing on them at all. Incidents and
+   * meetings were filled here when that was first noticed; the queue of
+   * questions, the figures, the examinations and what members undertook were
+   * left, each behind its own comment about not putting words in a board's
+   * mouth — while this same record fabricates the board, its rulings and its
+   * matters. That inconsistency is what made the newest parts of the
+   * application look unbuilt.
    *
    * Nobody is being quoted. This board is called 'Demonstration Board
    * (illustrative data only)' and every member in it is an unnamed
    * placeholder; see the header of data/seed.ts.
    */
-  return new MemoryStore({ incidents: seedIncidents, meetings: seedMeetings });
+  return new MemoryStore({
+    /*
+     * The three seeded matters were in deliberation, lapsed and in force, so
+     * nothing was ever in voting or in a waiting period — and the two screens
+     * this product is about could not be reached at all. Somebody showing it
+     * had to open a vote in front of the room to prove voting existed.
+     */
+    matters: [...seedMatters, ...lifecycleMatters],
+    incidents: seedIncidents,
+    meetings: seedMeetings,
+    submissions: seedSubmissions,
+    computations: seedComputations,
+    examinations: seedExaminations,
+    undertakings: seedUndertakings,
+  });
 }
