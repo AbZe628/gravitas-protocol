@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { api, oversight, type Matter, type Pack } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
-import { useIdentity } from '../lib/identity.js';
+import { mayDeliberate, useIdentity } from '../lib/identity.js';
 import { Loading, ErrorText } from '../components/ui.js';
 import InTheMargin from '../components/InTheMargin.js';
 import WhatTheCommitteeFound from '../components/WhatTheCommitteeFound.js';
@@ -11,6 +11,7 @@ import VotePanel from '../components/VotePanel.js';
 import Deliberation from '../components/Deliberation.js';
 import SignTheDocument from '../components/SignTheDocument.js';
 import ReadTheContract from '../components/ReadTheContract.js';
+import Evidence from '../components/Evidence.js';
 import TellTheBank from '../components/TellTheBank.js';
 import Checklist from '../components/Checklist.js';
 
@@ -278,7 +279,23 @@ export default function MatterPack() {
             you say what you think about it.
           */}
           <Part n="05" heading={t('pack.reading')}>
+            {/*
+              The documents themselves, and then reading one against the
+              conditions. Attaching was reachable only from the classic
+              address, which nothing in the navigation opens — so a member
+              walking the ordinary path had no way to put a document in
+              front of the board.
+            */}
+            <Evidence
+              matter={matter}
+              scholarId={identity?.scholarId}
+              canAttach={mayDeliberate(identity?.role)}
+              onChanged={setMatter}
+            />
+
+            <div className="mt-6">
             <ReadTheContract matterId={matter.id} canRead={identity?.role !== 'observer'} />
+            </div>
             <div className="mt-6 border-t border-line pt-5">
               <Checklist matterId={matter.id} canRule={identity?.role !== 'observer'} />
             </div>

@@ -168,6 +168,12 @@ const readingSchema = z.object({
   structureId: z.string().max(120).optional(),
 });
 
+/** The same reading, with the shape named rather than taken from a matter. */
+const standaloneReadingSchema = z.object({
+  text: z.string().min(1).max(200_000),
+  structureId: z.string().min(1).max(120),
+});
+
 /*
  * Signing.
  *
@@ -670,6 +676,54 @@ export function governanceRoutes(
    * would ask about is not yet a document of the record, and keeping it would
    * make it one without anybody deciding to.
    */
+  /**
+   * Read a contract against a shape's conditions, with no matter involved.
+   *
+   * What a scholar does before anything is opened: here is the draft, here are
+   * the conditions we judge this kind of arrangement against, show me where it
+   * answers each of them. It returns `found`, `unclear` or `absent` per
+   * condition with the sentence and where it starts, and **never a verdict** —
+   * whether the arrangement is permissible is a ruling and rulings carry a
+   * scholar's name.
+   */
+  router.post(
+    '/reading',
+    handle(async (req, res) => {
+      const who = identityOf(req);
+      if (!requireRole(res, mayDeliberate(who.role), 'read a contract', who.role)) return;
+
+      const parsed = standaloneReadingSchema.safeParse(req.body);
+      if (!parsed.success) return badRequest(res, parsed.error.issues);
+
+      const structure = structureById(parsed.data.structureId);
+      if (!structure) {
+        res.status(404).json({
+          error: 'not_found',
+          message: 'There is no contract shape by that name in the library.',
+        });
+        return;
+      }
+
+      const boards = await store.boards();
+      if (!boards[0]) {
+        res.status(404).json({ error: 'not_found', message: 'No such board.' });
+        return;
+      }
+
+      /*
+       * Whether this board took the shape up matters to the answer: a reading
+       * against conditions nobody adopted is a reading against a draft, and it
+       * says so rather than implying the board stands behind them.
+       */
+      const adoptions = standingAdoptions(await store.adoptions(boards[0].id));
+      const adopted = adoptions.some(
+        (x) => x.structureId === structure.id && x.standing === 'adopted',
+      );
+
+      res.json(readContract({ structure, adopted, text: parsed.data.text, readAt: now() }));
+    }),
+  );
+
   router.post(
     '/matters/:id/reading',
     handle(async (req, res) => {

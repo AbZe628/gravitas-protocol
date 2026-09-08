@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
   api,
   governance,
@@ -102,6 +103,66 @@ function TheOneThing({ item }: { item: AttentionItem }) {
         </Act>
       </div>
     </Card>
+  );
+}
+
+/**
+ * The board's most pressing fact, for a reader nothing is waiting on.
+ *
+ * One statement, chosen in the order a board would rank them: a question
+ * somebody is waiting on beats a matter being argued, which beats a holding
+ * that has left the limits, which beats one nobody has examined. Each links to
+ * the screen that answers it, so the sentence is a way in rather than a
+ * headline to read past.
+ *
+ * Where the board genuinely has nothing outstanding it says that, and that is
+ * a different sentence from "nothing needs you" — the first is about the
+ * board, the second about the reader, and running them together is what made
+ * a full record read as an empty one.
+ */
+function Pressing({
+  waiting,
+  longestWait,
+  open,
+  moved,
+  unexamined,
+}: {
+  waiting: number | null;
+  longestWait: number | null;
+  open: number | null;
+  moved: number | null;
+  unexamined: number | null;
+}) {
+  const { t } = useI18n();
+
+  const said =
+    waiting !== null && waiting > 0
+      ? {
+          to: '/questions',
+          text:
+            longestWait !== null
+              ? `${t('pressing.waitedFor')} ${longestWait} ${t('guided.days')}.`
+              : `${waiting} ${t('spine.asked.count')}.`,
+        }
+      : open !== null && open > 0
+        ? { to: '/classic', text: `${open} ${t('pressing.open')}` }
+        : moved !== null && moved > 0
+          ? { to: '/examinations', text: `${moved} ${t('pressing.moved')}` }
+          : unexamined !== null && unexamined > 0
+            ? { to: '/register', text: `${unexamined} ${t('pressing.unexamined')}` }
+            : null;
+
+  return (
+    <>
+      {said ? (
+        <Link to={said.to} className="block">
+          <Display className="max-w-[20ch] text-paper">{said.text}</Display>
+        </Link>
+      ) : (
+        <Display className="max-w-[20ch] text-sand">{t('pressing.nothingOutstanding')}</Display>
+      )}
+      <p className="mt-3 text-[13px] leading-[1.6] text-muted">{t('guided.clearShort')}</p>
+    </>
   );
 }
 
@@ -264,9 +325,19 @@ export default function Guided() {
             )}
           </>
         ) : (
-          // An answer, not a blank — and set large, because for most people
-          // opening this it is the whole of the first question's answer.
-          <Display className="max-w-[20ch] text-sand">{t('guided.clearShort')}</Display>
+          /*
+           * Nothing needs this reader. That is said, quietly, under the thing
+           * that *is* true of the board — because a reader with no seat is
+           * still asking what this board is doing, and answering only the
+           * first question at forty pixels made a working record look empty.
+           */
+          <Pressing
+            waiting={waiting}
+            longestWait={longestWait}
+            open={matters === null ? null : open}
+            moved={drifting}
+            unexamined={unexamined}
+          />
         )}
       </Block>
 

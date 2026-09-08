@@ -18,6 +18,12 @@ import { Nothing } from './page.js';
  * said, because that is where it belongs in the order somebody reads: here is
  * the text, here is where each condition is answered, now say what you think.
  *
+ * And it sits on a screen of its own, against a shape from the library, for
+ * the case that comes first: a scholar with a draft in their hand and nothing
+ * opened yet. Requiring a matter for that meant the one thing the AI advisers
+ * are bought for could only be reached by somebody who had already decided to
+ * deliberate.
+ *
  * ── what it is not, and the difference is the product ─────────────────────
  *
  * The competing products return a verdict — compliant, partially compliant,
@@ -46,9 +52,13 @@ const STANDING: Record<string, { tone: string; key: string }> = {
 
 export default function ReadTheContract({
   matterId,
+  structureId,
   canRead,
 }: {
-  matterId: string;
+  /** Read against this matter's shape. */
+  matterId?: string;
+  /** Or against a shape named directly, with no matter involved. */
+  structureId?: string;
   canRead: boolean;
 }) {
   const { t } = useI18n();
@@ -63,7 +73,11 @@ export default function ReadTheContract({
     setBusy(true);
     setFailed(null);
     try {
-      setReading(await oversight.readContract(matterId, text));
+      setReading(
+        matterId
+          ? await oversight.readContract(matterId, text)
+          : await oversight.readAgainstShape(structureId as string, text),
+      );
     } catch (e) {
       setFailed(e instanceof Error ? e.message : t('read.failed'));
     } finally {

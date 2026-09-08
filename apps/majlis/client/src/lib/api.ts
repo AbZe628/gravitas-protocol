@@ -1802,6 +1802,16 @@ export const oversight = {
   readContract: (matterId: string, text: string) =>
     send<ContractReading>(`/api/matters/${matterId}/reading`, { text }),
 
+  /**
+   * The same reading with the shape named, and no matter involved.
+   *
+   * What a scholar does before anything is opened: here is the draft, here are
+   * the conditions this kind of arrangement is judged against, show me where
+   * it answers each of them.
+   */
+  readAgainstShape: (structureId: string, text: string) =>
+    send<ContractReading>('/api/reading', { structureId, text }),
+
   /** Addresses of the printable documents. Opened, never fetched. */
   hrefs: {
     fatwa: (id: string) => `/api/matters/${id}/fatwa`,

@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useI18n } from '../lib/i18n.js';
 import { DOORS, mainOf, type Phase } from '../lib/spine.js';
+import { useHealth } from '../lib/health.js';
 
 /**
  * The whole application, in four rows.
@@ -67,6 +68,14 @@ const EDGE: Record<string, string> = {
 
 export default function FourDoors({ counts }: { counts: DoorCounts }) {
   const { t } = useI18n();
+  const health = useHealth();
+
+  /*
+   * A control that cannot be honoured is absent, not disabled. The
+   * assistant is the only destination that depends on the installation.
+   */
+  const offer = (d: { needs?: 'assistant' }) =>
+    d.needs !== 'assistant' || health?.assistantKind !== 'off';
 
   return (
     <ul className="space-y-2.5">
@@ -157,6 +166,35 @@ export default function FourDoors({ counts }: { counts: DoorCounts }) {
                 <path d="M9 5l7 7-7 7" />
               </svg>
             </Link>
+
+            {/*
+              The rest of the phase, under the row that opens its main screen.
+              Eleven of the fifteen destinations were reachable only from the
+              rail — which is hidden on a phone — so anybody who opened this on
+              anything narrow saw four screens and concluded that was all of it.
+
+              The sentence under each is the one the spine already held. A
+              second wording here would be a second place for them to disagree.
+            */}
+            {door.destinations.filter((d) => d.to !== mainOf(door) && offer(d)).length > 0 && (
+              <ul className="mb-2.5 ms-7 mt-1.5 grid gap-1.5 sm:grid-cols-2">
+                {door.destinations
+                  .filter((d) => d.to !== mainOf(door) && offer(d))
+                  .map((d) => (
+                    <li key={d.to}>
+                      <Link
+                        to={d.to}
+                        className="block rounded-card bg-ink px-4 py-2.5 shadow-ring transition-shadow hover:shadow-card"
+                      >
+                        <span className="text-[13px] font-semibold text-paper">{t(d.label)}</span>
+                        <span className="mt-0.5 block text-[11.5px] leading-[1.5] text-muted">
+                          {t(d.note)}
+                        </span>
+                      </Link>
+                    </li>
+                  ))}
+              </ul>
+            )}
           </li>
         );
       })}

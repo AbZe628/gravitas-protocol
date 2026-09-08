@@ -107,6 +107,7 @@ export const DOORS: readonly Door[] = [
       { to: '/rules', label: 'door.inforce.stands', note: 'door.inforce.stands.note', main: true },
       { to: '/register', label: 'door.inforce.register', note: 'door.inforce.register.note' },
       { to: '/library', label: 'door.inforce.contracts', note: 'door.inforce.contracts.note' },
+      { to: '/check', label: 'door.inforce.check', note: 'door.inforce.check.note' },
       { to: '/calculations', label: 'door.inforce.figures', note: 'door.inforce.figures.note' },
       { to: '/briefings', label: 'door.inforce.papers', note: 'door.inforce.papers.note' },
     ],

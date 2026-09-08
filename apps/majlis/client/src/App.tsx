@@ -13,6 +13,7 @@ import Rules from './pages/Rules.js';
 import AssetDetail from './pages/AssetDetail.js';
 import Calculations from './pages/Calculations.js';
 import Library from './pages/Library.js';
+import CheckAContract from './pages/CheckAContract.js';
 import Calendar from './pages/Calendar.js';
 import Meetings from './pages/Meetings.js';
 import Register from './pages/Register.js';
@@ -90,6 +91,13 @@ export default function App() {
           <Route path="/rules" element={<WhatStands />} />
           <Route path="/classic/rules" element={<Rules />} />
           <Route path="/library" element={<Library />} />
+          {/*
+            Reading a draft against the conditions, with no matter opened.
+            It lived inside a matter only, so a scholar had to decide to
+            deliberate before they could look at the contract that would
+            tell them whether there was anything to deliberate.
+          */}
+          <Route path="/check" element={<CheckAContract />} />
           <Route path="/calculations" element={<Calculations />} />
           <Route path="/calendar" element={<Calendar />} />
           <Route path="/meetings" element={<Meetings />} />

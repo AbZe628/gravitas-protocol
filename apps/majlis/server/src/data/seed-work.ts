@@ -119,6 +119,32 @@ export const submissions: Submission[] = [
       },
     ],
   },
+  {
+    /*
+     * Put in by the desk itself, which is what makes it different from the
+     * three above. `onBehalf` is false and `recordedBy` is the desk's own
+     * credential, so this is the one that appears on the institution's screen.
+     */
+    id: 'submission-2026-08-25',
+    boardId: BOARD,
+    institutionId: INSTITUTION,
+    arrivedAt: '2026-08-25T11:05:00Z',
+    recordedAt: '2026-08-25T11:05:00Z',
+    askedBy: 'Treasury desk (illustrative)',
+    recordedBy: 'desk-treasury',
+    onBehalf: false,
+    subject: 'A profit rate benchmarked to an interest rate',
+    question:
+      'Our funding cost is quoted against a conventional benchmark and the counterparty ' +
+      'prices from it. May the profit rate on a murabaha reference that benchmark as a ' +
+      'number, where the contract itself contains no interest?',
+    background:
+      'Every quote we receive is expressed this way. We can restate it as a fixed figure at ' +
+      'signing, but the figure would still have been arrived at from the benchmark.',
+    awaiting: 'Know whether to renegotiate the pricing basis before the facility renews.',
+    attachments: [],
+    dispositions: [],
+  },
 ];
 
 /**
