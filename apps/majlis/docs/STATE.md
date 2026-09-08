@@ -1,8 +1,8 @@
 # Where Majlis stands
 
-Last written **8 September 2026**. Read this first, and read §0 before
-anything else — it is written so that picking the work back up costs a few
-minutes rather than an hour of re-reading the codebase.
+Last written **8 September 2026**, second save of the day. Read this first,
+and read §0 before anything else — it is written so that picking the work
+back up costs a few minutes rather than an hour of re-reading the codebase.
 
 Everything below is what is *true*, not what is planned. Where something is
 unfinished it says so, and where something is broken it says how it breaks.
@@ -12,9 +12,71 @@ unfinished it says so, and where something is broken it says how it breaks.
 ## Verified, this save
 
 ```
-server   63 files   1527 tests   passed
-client   21 files    234 tests   passed
+server   68 files   1599 tests   passed
+client   25 files    321 tests   passed
 ```
+
+**New since the last save: nothing has anything left to be missing.**
+
+Both remaining competitor features are built, and three faults were found by
+opening the running interface rather than by reading it.
+
+**Notes in the margin.** `services/annotation.ts`, `routes/annotations.ts`,
+`components/InTheMargin.tsx`. A member selects words in the proposal or the
+briefing and writes what they think about that passage; the next reader sees
+the mark where the words are. It anchors to the **quote**, never to an offset:
+a document that gains a paragraph would otherwise move every note below it onto
+the wrong sentence while still looking correct. Where the words are gone the
+note says it has come loose and keeps what it marked. The server finds the
+text and the client never sends it, so a note cannot be attached to words the
+board never read. Withdrawn, never deleted, and only by whoever wrote it.
+
+**Committees.** `services/committee.ts`, `routes/committees.ts`,
+`components/WhatTheCommitteeFound.tsx`, `components/TheCommittees.tsx`. Some of
+the board, given a question to look at first. **A committee never rules** —
+there is no committee vote and no state a matter reaches through one that it
+could not reach without it, because a board's threshold is the number of
+signatures that bind the institution. Two tests compare the matter
+byte-for-byte before and after a referral and a report. Forming one needs a
+settled matter rather than a settings page. Dissent carries words or it is not
+recorded, and it is shown at the same size as the account it disagrees with.
+The report has no outcome field: a committee returning *permit* would be the
+board reading a verdict rather than an account.
+
+**Three faults, all found by running it.**
+
+- **The matter pack announced a failure it had not had.** The matter and the
+  pack are two requests and the pack is slower, so for the moment in between,
+  every member opening a matter read *the pack could not be put together just
+  now* and then watched it replace itself with six parts of content.
+- **Eleven screens went white on a 200 of the wrong shape.** `VotePanel` read
+  `tally.outstanding.length` on a body carrying no `outstanding`, threw inside
+  render, and React unmounted the entire tree — the vote, the pack and the
+  proposal gone over one absent field. Every fetch now checks the body before
+  it walks it.
+- **Five screens showed *unreachable* as *empty*.** They started at `[]` and
+  swallowed the failure, so a board whose server was down read *nothing has
+  been asked* and *nothing has been examined*.
+
+`src/NoScreenLies.test.tsx` holds all three shut: every route is opened twice,
+against a server that never answers and against one answering `{}`, and in
+neither may a screen claim a failure, claim the board has nothing, or
+disappear. `src/SevenScreens.test.tsx` covers the seven screens that had no
+test at all, against fixtures captured from the running server.
+
+**And the words.** Seventy-six keys were defined and shown on no screen — the
+old nav and the old drawer — and are gone from all three languages;
+`scripts/remove-strings.mjs` is the counterpart to `merge-strings.mjs` and
+refuses the whole run if any listed key is still asked for anywhere in `src`.
+The rail said *Sittings* and the page it opened said *Meetings*: it is a
+meeting everywhere now, in English and in Urdu. Twenty-one fields carried a
+placeholder and nothing else and now say what they are for. Five physical
+left/right classes became logical ones, so Arabic no longer lays out backwards
+in five places. And the notice about the translation was out of date in a way
+that undersold it: every sentence is translated, and what is missing is a
+reading by somebody who works in these languages and in this field.
+
+**Still missing from the competition:** nothing.
 
 **New since the last save: a member is a person now.**
 
@@ -57,9 +119,6 @@ fixed; `Credential` carries its institution now, the way an asset does.
   `met`: that is a scholar's finding and it carries their name. A condition
   about the order of events says a person has to read it, however many of the
   words are present.
-
-**Still missing from the competition:** annotations on a document, and
-committees.
 
 **New since the last save: one shape for every page.**
 
@@ -136,9 +195,10 @@ on the four key-custody answers below. The document says so in those words.
 `npm test` from `apps/majlis`. Typecheck clean with `--force` on both sides.
 `client/dist` is rebuilt, so port 4000 shows the current interface.
 
-Pushed to `origin/main` through `0191bef`, on the user's explicit say-so each
+Pushed to `origin/main` through `bd49ac8`, on the user's explicit say-so each
 time. **Pushing needs asking first, every time** — naming GitHub in a task is
-not approval to publish. Nothing is unpushed at this save.
+not approval to publish. **Five commits are unpushed at this save**, from
+`0db0e81` to `22e4c77`, waiting on the user.
 
 **The repository beyond Majlis has its own audit now:** `docs/AUDIT.md` at the
 repo root. Read it before touching the protocol, the site or `apps/web`; this
@@ -154,25 +214,26 @@ not needed to start.
 
 ### The one sentence
 
-Everything asked for is built and pushed through `0191bef`. Nothing is
-unpushed, the working tree is clean, and the next piece of work is a choice
-between four named things rather than a search for what to do.
+Everything asked for is built through `22e4c77` and **five commits are
+unpushed**; the working tree is clean, both competitor gaps are closed, and
+what remains is either small or is the user's to decide.
 
 ### What to do next, in the order it is worth doing
 
-1. **Annotations on a document.** The last thing every board portal has that
-   this does not: a member marks a passage and says something about it, and
-   the next reader sees it. `SourceRef.file` already carries the key, and
-   `reading-a-contract.ts` already returns a character offset for a passage —
-   which is the hard half, and it is done.
-2. **Committees.** Stage Four. `boardId` is already threaded through
-   everything, so this is a routing and settings problem rather than a model
-   change.
-3. **Calendar subscription.** `/api/calendar.ics` is a download. A member's own
+1. **Push the five commits**, once the user says so.
+2. **Calendar subscription.** `/api/calendar.ics` is a download. A member's own
    calendar wants a private URL it can poll, which is a token per member and
    nothing else. The account work below is what made this possible.
-4. **Notifications.** `notice.ts` composes the words and its default sends
+3. **Notifications.** `notice.ts` composes the words and its default sends
    nothing. Now that a member has an account, an address can live on one.
+4. **Twenty-nine fields have a visible label with no `htmlFor`.** A person
+   reads them correctly and a screen reader does not. Mechanical, and the
+   count is exact: run `unnamed-fields` against `src`.
+5. **Eighty-seven pairs of keys share one English sentence.** Most are
+   different contexts that happen to read alike — *of*, *from*, *withdrawn* —
+   and collapsing those would be churn. The handful worth collapsing are the
+   ones where two keys name one object; `sitting`/`meeting` was the last of
+   those found.
 
 ### What needs the user, not another pass
 
