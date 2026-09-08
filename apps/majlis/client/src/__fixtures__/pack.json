@@ -1,0 +1,182 @@
+{
+  "matterId": "matter-2026-08-11",
+  "boardId": "demo-board",
+  "title": "Suspension of leveraged index instruments",
+  "status": "voting",
+  "direction": "restrict",
+  "question": {
+    "text": "That the desk take no new position in an index instrument whose exposure is obtained through borrowing inside the index, where that borrowing exceeds the limit below.",
+    "notDecided": [
+      "Whether existing positions must be sold. They are held pending a decision of the board.",
+      "Whether the same treatment applies to a fund that borrows at the fund level rather than inside the index. That is a separate question."
+    ],
+    "mechanism": "At each rebalancing the borrowing inside the index is measured against the index’s market value. Above the limit, no new position is taken.",
+    "openedAt": "2026-08-11T09:00:00Z",
+    "arrivedAt": "2026-08-04T15:30:00Z",
+    "waitedDays": 35,
+    "waitPartlyUnknown": false
+  },
+  "alreadySaid": {
+    "related": [
+      {
+        "matterId": "matter-2026-04-02",
+        "title": "Secondary trading of a mixed pool at market price",
+        "status": "in_force",
+        "direction": "permit",
+        "openedAt": "2026-03-18T09:00:00Z",
+        "inForceAt": "2026-04-02T00:00:00Z",
+        "relations": [
+          {
+            "kind": "declared",
+            "shared": "rule-pool-trading"
+          },
+          {
+            "kind": "same_parameter",
+            "shared": "onbreach"
+          }
+        ]
+      },
+      {
+        "matterId": "matter-2026-07-28",
+        "title": "A restoration window before a pool is reclassified",
+        "status": "timelock",
+        "direction": "permit",
+        "openedAt": "2026-07-28T09:00:00Z",
+        "inForceAt": null,
+        "relations": [
+          {
+            "kind": "declared",
+            "shared": "rule-pool-trading"
+          }
+        ]
+      }
+    ],
+    "nothingYet": false
+  },
+  "figures": {
+    "computations": [],
+    "terms": [
+      {
+        "key": "maxProviderBorrowingBps",
+        "value": "3000",
+        "unit": "basis points",
+        "meaning": "Borrowing inside an index may not exceed 30.00% of the index’s market value, measured at each rebalancing.",
+        "watches": {
+          "kind": "debt",
+          "bound": "maximum"
+        }
+      },
+      {
+        "key": "onBreach",
+        "value": "suspend_new_positions",
+        "meaning": "While the proportion is above the limit, no new position is taken. Existing positions are held pending a decision of the board rather than sold automatically."
+      }
+    ]
+  },
+  "said": [
+    {
+      "id": "del-2026-08-11-a",
+      "scholarId": "member-a",
+      "body": "The borrowing is the provider’s and not ours, but the exposure it buys is ours. I do not think the distinction survives.",
+      "at": "2026-08-11T10:15:00Z",
+      "replyTo": null,
+      "liaisonAnswer": false
+    },
+    {
+      "id": "del-2026-08-11-b",
+      "scholarId": "member-b",
+      "body": "Agreed on the principle. My concern is the measurement: at each rebalancing means we are reading a figure the provider publishes, and we should say what happens when they do not publish it.",
+      "at": "2026-08-11T11:40:00Z",
+      "replyTo": "del-2026-08-11-a",
+      "liaisonAnswer": false
+    },
+    {
+      "id": "del-2026-08-11-c",
+      "scholarId": "liaison-1",
+      "body": "On the mechanism: the provider publishes at each rebalancing and not between. Where the figure is missing the desk has nothing to read, so the rule would need to say whether that counts as above the limit or as unknown.",
+      "at": "2026-08-11T14:05:00Z",
+      "replyTo": "del-2026-08-11-b",
+      "liaisonAnswer": true
+    }
+  ],
+  "follows": {
+    "carrying": {
+      "matterId": "matter-2026-08-11",
+      "attached": true,
+      "carrier": "Gravitas Policy Registry",
+      "cadence": "before_every_transaction",
+      "whenChecked": "These terms are read by Gravitas Policy Registry before every transaction that depends on them. A transaction that would breach one does not execute — it is refused at the point of attempt rather than found afterwards.",
+      "drift": "There is no interval to drift in. A condition applied before every transaction cannot be crossed quietly between meetings and discovered at the audit: the moment the figure moves past the line, the transactions that depend on it stop. What the board still decides is what should happen next — whether a breach is permanent, and whether a pool that comes back within the line resumes on its own or waits for the board.",
+      "terms": [
+        {
+          "key": "maxProviderBorrowingBps",
+          "value": "3000",
+          "unit": "basis points",
+          "meaning": "Borrowing inside an index may not exceed 30.00% of the index’s market value, measured at each rebalancing.",
+          "onBreach": "While the proportion is above the limit, no new position is taken. Existing positions are held pending a decision of the board rather than sold automatically."
+        },
+        {
+          "key": "onBreach",
+          "value": "suspend_new_positions",
+          "meaning": "While the proportion is above the limit, no new position is taken. Existing positions are held pending a decision of the board rather than sold automatically.",
+          "onBreach": null
+        }
+      ],
+      "limits": [
+        "Majlis reads what the registry currently says. It does not write to it, and a decision taken here does not itself change what is enforced — that is a separate act by whoever holds the key.",
+        "A term the registry does not implement is not enforced by being written here. What is carried out is what the registry was configured to read."
+      ]
+    },
+    "assetIds": [
+      "asset-leveraged-index"
+    ],
+    "structureId": "murabaha"
+  },
+  "evidence": [
+    {
+      "kind": "external",
+      "label": "Index methodology (illustrative), section 4: internal leverage",
+      "ref": "p. 17",
+      "addedBy": "liaison-1",
+      "at": "2026-08-11T14:10:00Z"
+    }
+  ],
+  "gaps": [
+    "No figures have been recorded for the holdings this names. Whether they are inside the limits is unknown rather than satisfied.",
+    "Nobody has run this against real transactions, so what it would have done is not shown."
+  ],
+  "standing": {
+    "required": 2,
+    "recorded": [
+      {
+        "scholarId": "member-a",
+        "position": "for",
+        "reason": "The exposure obtained is the exposure held. Where it is obtained by borrowing, the holder has taken on what the borrowing bought.",
+        "at": "2026-08-12T09:00:00Z",
+        "onParameterHash": "0x486a443c2ab3e6e17d52de729929aae4487c3665b9d414dd00c1be8c74df9b84"
+      },
+      {
+        "scholarId": "member-b",
+        "position": "for",
+        "reason": "For, on the understanding that a missing figure is treated as above the limit rather than as unknown. I would want that written into the terms before it is closed.",
+        "at": "2026-08-12T10:30:00Z",
+        "onParameterHash": "0x486a443c2ab3e6e17d52de729929aae4487c3665b9d414dd00c1be8c74df9b84"
+      }
+    ],
+    "yetToSpeak": [
+      {
+        "scholarId": "member-c",
+        "name": "Board Member C"
+      },
+      {
+        "scholarId": "member-d",
+        "name": "Board Member D"
+      },
+      {
+        "scholarId": "member-e",
+        "name": "Board Member E"
+      }
+    ]
+  },
+  "assembledAt": "2026-09-08T19:29:14.805Z"
+}

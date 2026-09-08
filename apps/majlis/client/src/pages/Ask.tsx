@@ -4,6 +4,7 @@ import { useI18n } from '../lib/i18n.js';
 import { useIdentity, isInstitution } from '../lib/identity.js';
 import { Act, Card, Edge, Quiet, State } from '../components/kit.js';
 import TheNotice from '../components/TheNotice.js';
+import { ErrorText } from '../components/ui.js';
 
 /**
  * The bank's own screen: put a question, and see what became of it.
@@ -101,7 +102,8 @@ export default function Ask({ boardId }: { boardId: string }) {
   const [askedBy, setAskedBy] = useState('');
   const [arrivedAt, setArrivedAt] = useState('');
 
-  const [mine, setMine] = useState<Submission[]>([]);
+  const [mine, setMine] = useState<Submission[] | null>(null);
+  const [mineFailed, setMineFailed] = useState(false);
   const [notice, setNotice] = useState<{ notice: Notice; delivery: Delivery } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -110,7 +112,7 @@ export default function Ask({ boardId }: { boardId: string }) {
     theWayIn
       .list(boardId)
       .then((r) => setMine(Array.isArray(r.submissions) ? r.submissions : []))
-      .catch(() => undefined);
+      .catch(() => setMineFailed(true));
   };
 
   useEffect(load, [boardId]);
@@ -247,7 +249,11 @@ export default function Ask({ boardId }: { boardId: string }) {
         <h2 className="mb-3 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
           {t('ask.mine')}
         </h2>
-        {mine.length === 0 ? (
+        {mineFailed ? (
+          <ErrorText />
+        ) : !mine ? (
+          <p className="text-[13px] text-muted">{t('common.loading')}</p>
+        ) : mine.length === 0 ? (
           <p className="text-[13px] text-muted">{t('ask.mineNone')}</p>
         ) : (
           <div className="space-y-3">

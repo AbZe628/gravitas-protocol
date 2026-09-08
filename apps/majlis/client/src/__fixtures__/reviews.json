@@ -1,0 +1,43 @@
+{
+  "asOf": "2026-09-08T19:29:16.081Z",
+  "due": 0,
+  "unscheduled": 3,
+  "items": [
+    {
+      "ruleId": "rule-wakil-mandate",
+      "boardId": "demo-board",
+      "title": "Deployment boundary for an investment agent",
+      "countingFrom": "2026-05-11T00:00:00Z",
+      "everyMonths": null,
+      "dueAt": null,
+      "daysUntilDue": null,
+      "overdue": false,
+      "state": "unscheduled",
+      "note": "In force with no review interval. Nothing will bring this back to the board, which is how a ruling comes to describe something that has changed."
+    },
+    {
+      "ruleId": "rule-stablecoin-par",
+      "boardId": "demo-board",
+      "title": "Exchange of cash-backed tokens at par",
+      "countingFrom": "2026-02-18T00:00:00Z",
+      "everyMonths": null,
+      "dueAt": null,
+      "daysUntilDue": null,
+      "overdue": false,
+      "state": "unscheduled",
+      "note": "In force with no review interval. Nothing will bring this back to the board, which is how a ruling comes to describe something that has changed."
+    },
+    {
+      "ruleId": "rule-tangible-ratio",
+      "boardId": "demo-board",
+      "title": "Tangible asset ratio for secondary trading of mixed pools",
+      "countingFrom": "2026-04-02T00:00:00Z",
+      "everyMonths": null,
+      "dueAt": null,
+      "daysUntilDue": null,
+      "overdue": false,
+      "state": "unscheduled",
+      "note": "In force with no review interval. Nothing will bring this back to the board, which is how a ruling comes to describe something that has changed."
+    }
+  ]
+}

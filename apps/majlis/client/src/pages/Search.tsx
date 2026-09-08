@@ -134,7 +134,8 @@ export default function Search() {
         <p className="text-[13px] leading-relaxed text-muted">{t('search.emptyQuery')}</p>
       )}
 
-      {failed && <p className="text-[13px] text-breach">{t('common.loading')}</p>}
+      {/* It said "Loading…" in the colour of a failure. */}
+      {failed && <p className="text-[13px] text-breach">{t('common.error')}</p>}
 
       {result && (
         <>

@@ -40,7 +40,10 @@ export default function Dashboard() {
     });
 
   useEffect(() => {
-    api.matters().then(setMatters).catch(() => setFailed(true));
+    api
+      .matters()
+      .then((r) => (Array.isArray(r) ? setMatters(r) : setFailed(true)))
+      .catch(() => setFailed(true));
     api.enforcement().then(setEnforcement).catch(() => setEnforcement(null));
     oversight
       .pace()

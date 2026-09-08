@@ -73,6 +73,7 @@ function Reason({
   return (
     <div className="mt-1">
       <textarea
+        aria-label={placeholder}
         value={text}
         onChange={(e) => setText(e.target.value)}
         placeholder={placeholder}
@@ -114,7 +115,16 @@ export default function IncidentDetail() {
   const load = () =>
     oversight
       .incident(id)
-      .then(setIncident)
+      /*
+       * Every list this screen walks, checked before it is set. A 200 with the
+       * wrong shape threw inside render and React unmounted the whole tree, so
+       * one absent field turned the nine steps into a blank page.
+       */
+      .then((r) =>
+        r && Array.isArray(r.concurrences) && Array.isArray(r.stopped) && Array.isArray(r.plans)
+          ? setIncident(r)
+          : setFailed(true),
+      )
       .catch(() => setFailed(true));
 
   useEffect(() => {
@@ -205,7 +215,7 @@ export default function IncidentDetail() {
       current: determined && i.stopped.length === 0,
       detail:
         i.stopped.length > 0 ? (
-          <ul className="list-disc pl-4">
+          <ul className="list-disc ps-4">
             {i.stopped.map((a, k) => (
               <li key={k}>{a}</li>
             ))}
@@ -232,7 +242,7 @@ export default function IncidentDetail() {
       done: plan !== null,
       current: i.stage === 'determined',
       detail: plan ? (
-        <ol className="list-decimal space-y-1 pl-4">
+        <ol className="list-decimal space-y-1 ps-4">
           {plan.steps.map((s, k) => (
             <li key={k}>{s}</li>
           ))}
@@ -472,23 +482,39 @@ function PrescribeForm({
 
   return (
     <div className="space-y-2">
+      {/*
+        Named on the screen, not only to a reader of the markup. The
+        currency box had nothing at all on it — a three-letter field beside
+        a number, which a person can only guess at.
+      */}
       <div className="flex gap-2">
-        <input
-          value={p.amount}
-          onChange={(e) => setP({ ...p, amount: e.target.value })}
-          placeholder="12480.55"
-          className="w-32 rounded-xl shadow-ring bg-raised px-3 py-2 text-[14px] tabular-nums"
-        />
-        <input
-          value={p.currency}
-          onChange={(e) => setP({ ...p, currency: e.target.value })}
-          className="w-20 rounded-xl shadow-ring bg-raised px-3 py-2 text-[14px]"
-        />
+        <label className="block">
+          <span className="mb-1 block text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+            {t('common.amount')}
+          </span>
+          <input
+            value={p.amount}
+            onChange={(e) => setP({ ...p, amount: e.target.value })}
+            placeholder="12480.55"
+            className="w-32 rounded-xl shadow-ring bg-raised px-3 py-2 text-[14px] tabular-nums"
+          />
+        </label>
+        <label className="block">
+          <span className="mb-1 block text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+            {t('common.currency')}
+          </span>
+          <input
+            value={p.currency}
+            onChange={(e) => setP({ ...p, currency: e.target.value })}
+            className="w-20 rounded-xl shadow-ring bg-raised px-3 py-2 text-[14px]"
+          />
+        </label>
       </div>
       <input
         value={p.destination}
         onChange={(e) => setP({ ...p, destination: e.target.value })}
         placeholder={t('snc.destinationHint')}
+            aria-label={t('snc.destinationHint')}
         className="w-full rounded-xl shadow-ring bg-raised px-3 py-2 text-[14px]"
       />
       <p className="text-[11px] leading-relaxed text-muted">{t('snc.destinationNote')}</p>

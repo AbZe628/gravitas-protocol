@@ -11,6 +11,7 @@ import { useI18n } from '../lib/i18n.js';
 import TellTheBank from '../components/TellTheBank.js';
 import ReportWhatWasFound from '../components/ReportWhatWasFound.js';
 import { Division, Nothing, PageHead } from '../components/page.js';
+import { ErrorText, Loading } from '../components/ui.js';
 import { useIdentity, mayRecordInstitutionAct, mayDeliberate } from '../lib/identity.js';
 import { Act, Card, Quiet, State } from '../components/kit.js';
 
@@ -139,7 +140,8 @@ function One({ e, canReport }: { e: Examination; canReport: boolean }) {
 export default function Examinations({ boardId }: { boardId: string }) {
   const { t } = useI18n();
   const { identity } = useIdentity();
-  const [all, setAll] = useState<Examination[]>([]);
+  const [all, setAll] = useState<Examination[] | null>(null);
+  const [failed, setFailed] = useState(false);
   const [settled, setSettled] = useState<MatterSummary[]>([]);
   const [open, setOpen] = useState(false);
   const [subject, setSubject] = useState<Examinable | null>(null);
@@ -157,7 +159,7 @@ export default function Examinations({ boardId }: { boardId: string }) {
     examinations
       .list(boardId)
       .then((r) => setAll(Array.isArray(r.examinations) ? r.examinations : []))
-      .catch(() => undefined);
+      .catch(() => setFailed(true));
     api
       .matters()
       .then((m) => {
@@ -168,6 +170,11 @@ export default function Examinations({ boardId }: { boardId: string }) {
   };
 
   useEffect(load, [boardId]);
+
+  // Unreachable is not "nothing has been examined", which on this screen of
+  // all screens is the more alarming of the two claims.
+  if (failed) return <ErrorText />;
+  if (!all) return <Loading />;
 
   // Whoever records this is the institution's own review function, never a
   // signatory. The route refuses regardless of what is shown.
@@ -334,6 +341,7 @@ export default function Examinations({ boardId }: { boardId: string }) {
                               <input
                                 inputMode="numeric"
                                 placeholder={t('exam.howManyFailed')}
+            aria-label={t('exam.howManyFailed')}
                                 value={v.exceptions}
                                 onChange={(e) =>
                                   setHeld({ ...held, [r.against]: { ...v, exceptions: e.target.value } })
@@ -342,6 +350,7 @@ export default function Examinations({ boardId }: { boardId: string }) {
                               />
                               <textarea
                                 placeholder={t('exam.findingNote')}
+            aria-label={t('exam.findingNote')}
                                 value={v.note}
                                 onChange={(e) => setHeld({ ...held, [r.against]: { ...v, note: e.target.value } })}
                                 rows={2}

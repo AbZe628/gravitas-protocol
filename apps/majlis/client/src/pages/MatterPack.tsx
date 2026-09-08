@@ -84,6 +84,8 @@ export default function MatterPack() {
   const { t } = useI18n();
   const { identity } = useIdentity();
   const [pack, setPack] = useState<Pack | null>(null);
+  // Null while it is still coming; true only once it actually failed.
+  const [packFailed, setPackFailed] = useState(false);
   const [matter, setMatter] = useState<Matter | null>(null);
   const [failed, setFailed] = useState(false);
 
@@ -97,11 +99,22 @@ export default function MatterPack() {
      * services it draws on is down. The parts then say they are unavailable
      * and the act still works, rather than the whole screen going white.
      */
-    api.matter(id).then(setMatter).catch(() => setFailed(true));
+    api
+      .matter(id)
+      .then((m) =>
+        m && Array.isArray(m.notDecided) && Array.isArray(m.reasoning)
+          ? setMatter(m)
+          : setFailed(true),
+      )
+      .catch(() => setFailed(true));
+    setPackFailed(false);
     api
       .pack(id)
-      .then((p) => setPack(p && p.question ? p : null))
-      .catch(() => setPack(null));
+      .then((p) => {
+        if (p && p.question) setPack(p);
+        else setPackFailed(true);
+      })
+      .catch(() => setPackFailed(true));
   }
 
   useEffect(load, [id]);
@@ -295,11 +308,15 @@ export default function MatterPack() {
           </>
         ) : (
           /*
-           * The pack could not be assembled. Said plainly and in place: a
-           * blank column here would read as a matter with nothing in it.
+           * Said plainly and in place: a blank column here would read as a
+           * matter with nothing in it. Which sentence depends on whether
+           * the pack has failed or has simply not arrived — the matter
+           * loads first, so there is always a moment where neither is
+           * true yet, and claiming a failure in it was a lie the screen
+           * told every member on the way in.
            */
           <p className="rounded-card bg-raised/60 px-5 py-4 text-[12.5px] leading-[1.6] text-muted shadow-ring">
-            {t('pack.unavailable')}
+            {t(packFailed ? 'pack.unavailable' : 'common.loading')}
           </p>
         )}
       </div>

@@ -77,7 +77,14 @@ export default function VotePanel({ matter, role, scholarId, onChanged }: Props)
     if (!showsTally) return;
     governance
       .tally(matter.id)
-      .then(setTally)
+      /*
+       * Checked before it is set. A 200 carrying the wrong shape threw
+       * inside render and took the entire matter screen with it — the
+       * vote, the pack and the proposal — over one absent field.
+       */
+      .then((r) =>
+        setTally(r && typeof r.for === 'number' && Array.isArray(r.outstanding) ? r : null),
+      )
       .catch(() => setTally(null));
   }, [matter.id, matter.status, matter.reasoning?.length, showsTally]);
 
@@ -249,6 +256,7 @@ export default function VotePanel({ matter, role, scholarId, onChanged }: Props)
           <div className="mb-1 text-[13px] font-medium">{t('object.title')}</div>
           <p className="mb-2 text-[12px] leading-relaxed text-muted">{t('object.help')}</p>
           <textarea
+            aria-label={t('object.title')}
             value={reason}
             onChange={(e) => setReason(e.target.value)}
             rows={3}
@@ -277,6 +285,7 @@ export default function VotePanel({ matter, role, scholarId, onChanged }: Props)
           <div className="mb-1 text-[13px] font-medium">{t('reopen.title')}</div>
           <p className="mb-2 text-[12px] leading-relaxed text-muted">{t('reopen.help')}</p>
           <textarea
+            aria-label={t('reopen.title')}
             value={reason}
             onChange={(e) => setReason(e.target.value)}
             rows={3}

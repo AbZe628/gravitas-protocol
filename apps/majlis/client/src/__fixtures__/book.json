@@ -1,0 +1,363 @@
+{
+  "meetingId": "meeting-2026-08-20",
+  "boardId": "demo-board",
+  "at": "2026-08-20T13:00:00Z",
+  "state": "closed",
+  "joinUrl": null,
+  "items": [
+    {
+      "number": 1,
+      "item": "Tangible ratio breached by drift rather than by act",
+      "matterId": "matter-2026-07-03",
+      "pack": {
+        "matterId": "matter-2026-07-03",
+        "boardId": "demo-board",
+        "title": "Treatment of a tangible asset ratio breached by drift rather than by act",
+        "status": "deliberation",
+        "direction": "permit",
+        "question": {
+          "text": "The rule presently in force suspends secondary market trading the moment the tangible asset ratio falls below the threshold, and provides nothing further. In practice a pool may cross the threshold through ordinary market movement, with no act or omission by the manager, and be restored within days. The proposal is to keep the suspension immediate but to give the manager a defined period to restore the ratio before the pool is reclassified.",
+          "notDecided": [
+            "Whether the 51% threshold itself is correct. That is not reopened here.",
+            "Whether redemption at net asset value may continue during suspension. It may; that is already settled.",
+            "Whether a breach caused by an act of the manager attracts the same treatment. It does not, and is dealt with separately."
+          ],
+          "mechanism": "The ratio is read at each transaction that depends on it. When it falls below the threshold, transactions requiring the tradability condition cease to execute immediately. Under the proposal a timer begins at that moment. If the ratio is restored before the timer expires, trading resumes with no further act by the board. If it is not, the pool is reclassified and cannot be traded at market price until the board rules again.",
+          "openedAt": "2026-07-21T09:00:00Z",
+          "arrivedAt": null,
+          "waitedDays": 49,
+          "waitPartlyUnknown": true
+        },
+        "alreadySaid": {
+          "related": [
+            {
+              "matterId": "matter-2026-04-02",
+              "title": "Secondary trading of a mixed pool at market price",
+              "status": "in_force",
+              "direction": "permit",
+              "openedAt": "2026-03-18T09:00:00Z",
+              "inForceAt": "2026-04-02T00:00:00Z",
+              "relations": [
+                {
+                  "kind": "declared",
+                  "shared": "rule-tangible-ratio"
+                },
+                {
+                  "kind": "same_parameter",
+                  "shared": "mintangibleratiobps"
+                }
+              ]
+            }
+          ],
+          "nothingYet": false
+        },
+        "figures": {
+          "computations": [
+            {
+              "id": "computation-2026-06-30-screening",
+              "kind": "screening",
+              "boardId": "demo-board",
+              "assetId": "asset-mixed-pool",
+              "periodFrom": "2026-04-01",
+              "periodTo": "2026-06-30",
+              "method": "Ratios against market value, as this board set them.",
+              "methodStated": "Debt and interest-bearing holdings measured against market value, with the limits set by this board in matter-2026-04-02. Majlis applied the method; it did not choose it.",
+              "currency": "AED",
+              "source": "Pool net asset value breakdown (illustrative) as at 30 June 2026",
+              "figures": {
+                "marketValue": 412000000,
+                "debt": 96400000,
+                "interestBearing": 11200000,
+                "tangibleRatioBps": 5000
+              },
+              "headline": "Tangible 50.00%, against the 51.00% this board requires",
+              "amount": "50.00%",
+              "steps": [
+                {
+                  "label": "Debt against market value",
+                  "working": "96,400,000 ÷ 412,000,000",
+                  "value": "23.40%"
+                },
+                {
+                  "label": "Interest-bearing against market value",
+                  "working": "11,200,000 ÷ 412,000,000",
+                  "value": "2.72%"
+                },
+                {
+                  "label": "Tangible and usufruct against pool value",
+                  "working": "206,000,000 ÷ 412,000,000",
+                  "value": "50.00%"
+                }
+              ],
+              "note": "The tangible proportion is below the minimum this board set. That is a finding for the board, not a conclusion drawn here.",
+              "recordedBy": "member-b",
+              "recordedAt": "2026-07-04T10:20:00Z",
+              "supersedes": null,
+              "withdrawnAt": null,
+              "withdrawnBy": null,
+              "withdrawalReason": null
+            }
+          ],
+          "terms": [
+            {
+              "key": "minTangibleRatioBps",
+              "value": "5100",
+              "unit": "basis points",
+              "meaning": "Unchanged from the rule currently in force."
+            },
+            {
+              "key": "graceHours",
+              "value": "720",
+              "unit": "hours",
+              "meaning": "Thirty days during which the manager may restore the ratio. Trading remains suspended throughout; the grace period governs reclassification, not permission to trade."
+            },
+            {
+              "key": "onGraceExpiry",
+              "value": "reclassify_pool",
+              "meaning": "If the ratio is not restored within the period, the pool is reclassified and the tokens cease to be treated as tradable at market price until the board rules again."
+            }
+          ]
+        },
+        "said": [
+          {
+            "id": "d1",
+            "scholarId": "member-a",
+            "body": "The immediate suspension is correct and should not be softened. My question is narrower: does a grace period of thirty days risk becoming an ordinary state, in which a manager operates at the boundary and relies on the period rather than treating it as an exception?",
+            "at": "2026-07-21T14:12:00Z",
+            "replyTo": null,
+            "liaisonAnswer": false
+          },
+          {
+            "id": "d2",
+            "scholarId": "member-b",
+            "body": "A related point. If the ratio is restored on day twenty-nine and breached again on day thirty-two, does a fresh period begin? If it does, the constraint is not a constraint. I would want a limit on the number of periods within a rolling year before reclassification follows automatically.",
+            "at": "2026-07-22T07:40:00Z",
+            "replyTo": "d1",
+            "liaisonAnswer": false
+          },
+          {
+            "id": "d3",
+            "scholarId": "liaison",
+            "body": "On the mechanism: a rolling limit is expressible as a parameter and would be enforced identically to the period itself. It would read as a count of grace periods entered within a trailing window. It is not currently in the proposed parameters. If the board wishes it, the proposal returns to draft and comes back with it included rather than being amended after approval.",
+            "at": "2026-07-22T09:15:00Z",
+            "replyTo": "d2",
+            "liaisonAnswer": true
+          }
+        ],
+        "follows": {
+          "carrying": {
+            "matterId": "matter-2026-07-03",
+            "attached": true,
+            "carrier": "Gravitas Policy Registry",
+            "cadence": "before_every_transaction",
+            "whenChecked": "These terms are read by Gravitas Policy Registry before every transaction that depends on them. A transaction that would breach one does not execute — it is refused at the point of attempt rather than found afterwards.",
+            "drift": "There is no interval to drift in. A condition applied before every transaction cannot be crossed quietly between meetings and discovered at the audit: the moment the figure moves past the line, the transactions that depend on it stop. What the board still decides is what should happen next — whether a breach is permanent, and whether a pool that comes back within the line resumes on its own or waits for the board.",
+            "terms": [
+              {
+                "key": "minTangibleRatioBps",
+                "value": "5100",
+                "unit": "basis points",
+                "meaning": "Unchanged from the rule currently in force.",
+                "onBreach": "If the ratio is not restored within the period, the pool is reclassified and the tokens cease to be treated as tradable at market price until the board rules again."
+              },
+              {
+                "key": "graceHours",
+                "value": "720",
+                "unit": "hours",
+                "meaning": "Thirty days during which the manager may restore the ratio. Trading remains suspended throughout; the grace period governs reclassification, not permission to trade.",
+                "onBreach": "If the ratio is not restored within the period, the pool is reclassified and the tokens cease to be treated as tradable at market price until the board rules again."
+              },
+              {
+                "key": "onGraceExpiry",
+                "value": "reclassify_pool",
+                "meaning": "If the ratio is not restored within the period, the pool is reclassified and the tokens cease to be treated as tradable at market price until the board rules again.",
+                "onBreach": null
+              }
+            ],
+            "limits": [
+              "Majlis reads what the registry currently says. It does not write to it, and a decision taken here does not itself change what is enforced — that is a separate act by whoever holds the key.",
+              "A term the registry does not implement is not enforced by being written here. What is carried out is what the registry was configured to read."
+            ]
+          },
+          "assetIds": [
+            "asset-mixed-pool"
+          ],
+          "structureId": "sukuk"
+        },
+        "evidence": [
+          {
+            "kind": "code",
+            "label": "GravitasPolicyRegistry",
+            "ref": "contracts/GravitasPolicyRegistry.sol"
+          },
+          {
+            "kind": "chain",
+            "label": "Registry on Arbitrum Sepolia",
+            "ref": "0x6f3bfb896DD9964C9c05dA88692bDf1b1b2C3F23"
+          }
+        ],
+        "gaps": [],
+        "standing": {
+          "required": 3,
+          "recorded": [],
+          "yetToSpeak": [
+            {
+              "scholarId": "member-a",
+              "name": "Board Member A"
+            },
+            {
+              "scholarId": "member-b",
+              "name": "Board Member B"
+            },
+            {
+              "scholarId": "member-c",
+              "name": "Board Member C"
+            },
+            {
+              "scholarId": "member-d",
+              "name": "Board Member D"
+            },
+            {
+              "scholarId": "member-e",
+              "name": "Board Member E"
+            }
+          ]
+        },
+        "assembledAt": "2026-09-08T19:29:14.934Z"
+      },
+      "missing": false
+    },
+    {
+      "number": 2,
+      "item": "Reported non-compliance SNC-2026-004 — determination",
+      "matterId": null,
+      "pack": null,
+      "missing": false
+    },
+    {
+      "number": 3,
+      "item": "The contract library: which shapes this board will take up first",
+      "matterId": null,
+      "pack": null,
+      "missing": false
+    }
+  ],
+  "expected": [
+    {
+      "scholarId": "member-a",
+      "name": "Board Member A",
+      "present": true
+    },
+    {
+      "scholarId": "member-b",
+      "name": "Board Member B",
+      "present": true
+    },
+    {
+      "scholarId": "member-c",
+      "name": "Board Member C",
+      "present": true
+    },
+    {
+      "scholarId": "member-d",
+      "name": "Board Member D",
+      "present": false,
+      "note": "Travelling; sent written comments on the first item."
+    },
+    {
+      "scholarId": "member-e",
+      "name": "Board Member E",
+      "present": true
+    },
+    {
+      "scholarId": "advisor-1",
+      "name": "Advisory Member",
+      "present": true
+    },
+    {
+      "scholarId": "liaison-1",
+      "name": "Technical Liaison",
+      "present": true
+    }
+  ],
+  "unaccountedFor": [],
+  "sinceWeMet": [
+    {
+      "kind": "moved",
+      "what": "Mixed pool — leased equipment and trade finance",
+      "ref": "matter-2026-04-02",
+      "note": "Mixed pool — leased equipment and trade finance: tangible is 50.00%, against the 51.00% minimum this board set in matter-2026-04-02. The composition was supplied by Pool net asset value breakdown (illustrative) as at 2026-06-30. Does the standing ruling still hold?"
+    },
+    {
+      "kind": "never_examined",
+      "what": "Cash-backed settlement token",
+      "ref": "asset-cash-backed",
+      "note": "In the register and never put to the board."
+    },
+    {
+      "kind": "never_examined",
+      "what": "Commodity murabaha for retail deposits",
+      "ref": "asset-commodity-murabaha",
+      "note": "In the register and never put to the board."
+    },
+    {
+      "kind": "never_examined",
+      "what": "Sukuk al-ijara, five year",
+      "ref": "asset-sukuk-ijara",
+      "note": "In the register and never put to the board."
+    },
+    {
+      "kind": "never_examined",
+      "what": "Wrapped staking position",
+      "ref": "asset-staking-wrapper",
+      "note": "In the register and never put to the board."
+    }
+  ],
+  "undertakings": {
+    "fromThisSitting": [
+      {
+        "id": "undertaking-2026-08-20-a",
+        "boardId": "demo-board",
+        "meetingId": "meeting-2026-08-20",
+        "matterId": "matter-2026-07-03",
+        "what": "Ask the desk for the pricing feed’s update schedule, and whether a stale feed can hold a trade rather than let it through.",
+        "who": "member-b",
+        "dueAt": "2026-09-03T00:00:00Z",
+        "minutedBy": "member-b",
+        "minutedAt": "2026-08-20T14:40:00Z",
+        "state": "open"
+      },
+      {
+        "id": "undertaking-2026-08-20-b",
+        "boardId": "demo-board",
+        "meetingId": "meeting-2026-08-20",
+        "what": "Put the three June transfers to the board as a reported non-compliance, or say why they are not one.",
+        "who": "member-a",
+        "minutedBy": "member-b",
+        "minutedAt": "2026-08-20T14:45:00Z",
+        "state": "open"
+      },
+      {
+        "id": "undertaking-2026-08-20-c",
+        "boardId": "demo-board",
+        "meetingId": "meeting-2026-08-20",
+        "what": "Circulate the contract library so members can say which shapes to take up first.",
+        "who": "member-c",
+        "dueAt": "2026-08-27T00:00:00Z",
+        "minutedBy": "member-b",
+        "minutedAt": "2026-08-20T14:50:00Z",
+        "state": "done",
+        "outcome": {
+          "said": "Circulated on 25 August. Three members replied; murabaha and ijara were named by all three.",
+          "by": "member-c",
+          "at": "2026-08-26T09:10:00Z"
+        }
+      }
+    ],
+    "stillOpenFromBefore": []
+  },
+  "gaps": [
+    "2 of the agenda items are not matters before the board, so there are no papers for them. Whoever put them on the agenda holds what is needed."
+  ],
+  "assembledAt": "2026-09-08T19:29:14.934Z"
+}

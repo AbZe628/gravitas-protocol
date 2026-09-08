@@ -36,7 +36,15 @@ export default function AssetDetail() {
   useEffect(() => {
     oversight
       .asset(id)
-      .then(setData)
+      .then((r) =>
+        r &&
+        r.asset &&
+        Array.isArray(r.asset.identifiers) &&
+        Array.isArray(r.history) &&
+        Array.isArray(r.openMatters)
+          ? setData(r)
+          : setFailed(true),
+      )
       .catch(() => setFailed(true));
   }, [id]);
 

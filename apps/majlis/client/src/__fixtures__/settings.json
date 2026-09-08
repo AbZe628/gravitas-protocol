@@ -1,0 +1,74 @@
+{
+  "boardId": "demo-board",
+  "boardName": "Demonstration Board (illustrative data only)",
+  "institutionId": "demo-institution",
+  "credentialsConfigured": false,
+  "members": [
+    {
+      "scholarId": "member-a",
+      "name": "Board Member A",
+      "title": "Shariah Board Member (placeholder)",
+      "signatory": true,
+      "role": null,
+      "office": null
+    },
+    {
+      "scholarId": "member-b",
+      "name": "Board Member B",
+      "title": "Shariah Auditor (placeholder)",
+      "signatory": true,
+      "role": null,
+      "office": null
+    },
+    {
+      "scholarId": "member-c",
+      "name": "Board Member C",
+      "title": "Shariah Board Member (placeholder)",
+      "signatory": true,
+      "role": null,
+      "office": null
+    },
+    {
+      "scholarId": "member-d",
+      "name": "Board Member D",
+      "title": "Shariah Board Member (placeholder)",
+      "signatory": true,
+      "role": null,
+      "office": null
+    },
+    {
+      "scholarId": "member-e",
+      "name": "Board Member E",
+      "title": "Shariah Board Member (placeholder)",
+      "signatory": true,
+      "role": null,
+      "office": null
+    },
+    {
+      "scholarId": "advisor-1",
+      "name": "Advisory Member",
+      "title": "Advisory, without signing authority (placeholder)",
+      "signatory": false,
+      "role": null,
+      "office": null
+    },
+    {
+      "scholarId": "liaison-1",
+      "name": "Technical Liaison",
+      "title": "Answers questions of mechanism, does not vote (placeholder)",
+      "signatory": false,
+      "role": null,
+      "office": null
+    }
+  ],
+  "decides": {
+    "quorumPermit": 3,
+    "quorumRestrict": 2,
+    "totalSignatories": 5,
+    "signatoriesSeated": 5,
+    "ratificationWindowHours": 168,
+    "timelockHours": 48
+  },
+  "mismatches": [],
+  "fixIn": "MAJLIS_MEMBERS on the server, one line per member. See apps/majlis/.env.example."
+}

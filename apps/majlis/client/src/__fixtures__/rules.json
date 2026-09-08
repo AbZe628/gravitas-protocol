@@ -1,0 +1,127 @@
+[
+  {
+    "id": "rule-tangible-ratio",
+    "boardId": "demo-board",
+    "title": "Tangible asset ratio for secondary trading of mixed pools",
+    "statement": "Where a tokenised pool combines asset categories, tokens may be traded in the secondary market at market price only while tangible assets and usufructs constitute the majority of the value of the pool.",
+    "parameters": [
+      {
+        "key": "minTangibleRatioBps",
+        "value": "5100",
+        "unit": "basis points",
+        "meaning": "Tangible assets and usufructs must be at least 51.00% of pool value."
+      },
+      {
+        "key": "measurementSource",
+        "value": "pool.navBreakdown",
+        "meaning": "The ratio is read from the pool net asset value breakdown at the time of the transaction."
+      },
+      {
+        "key": "onBreach",
+        "value": "block_secondary_market_trades",
+        "meaning": "While the ratio is below the threshold, secondary market transfers at market price do not execute. Redemption at net asset value is unaffected."
+      }
+    ],
+    "parameterHash": "0x6056c6190cccd91602c1eab7f4c3d33079ca7891ef8789df0e5f1245fb5ad155",
+    "version": 3,
+    "inForceFrom": "2026-04-02T00:00:00Z",
+    "supersededBy": null,
+    "supersedes": null,
+    "sources": [
+      {
+        "kind": "code",
+        "label": "PolicyRegistry.checkRatio",
+        "ref": "contracts/GravitasPolicyRegistry.sol"
+      },
+      {
+        "kind": "test",
+        "label": "ratio boundary at exactly 5100 bps",
+        "ref": "test/PolicyRegistry.ratio.t.sol"
+      },
+      {
+        "kind": "document",
+        "label": "Illustrative tradability principles (fabricated demonstration source)",
+        "ref": "docs/references/mixed-portfolio.md"
+      }
+    ],
+    "parameterHashVerified": true
+  },
+  {
+    "id": "rule-stablecoin-par",
+    "boardId": "demo-board",
+    "title": "Exchange of cash-backed tokens at par",
+    "statement": "A token representing nothing beyond monetary value may be exchanged against the currency it represents only at par. It may not be dealt in as an instrument of trading gain in its own right.",
+    "parameters": [
+      {
+        "key": "toleranceBps",
+        "value": "0",
+        "unit": "basis points",
+        "meaning": "No deviation from par is permitted on either side."
+      },
+      {
+        "key": "appliesTo",
+        "value": "assetClass:cash_backed_token",
+        "meaning": "Applies to tokens classified by the board as backed solely by monetary assets."
+      },
+      {
+        "key": "onBreach",
+        "value": "revert",
+        "meaning": "A transaction attempting exchange at any rate other than par does not execute."
+      }
+    ],
+    "parameterHash": "0xee2c9e77dc2095568b177dbc4eff407bd9c832e6e30cb62e191616b1fbf07a46",
+    "version": 1,
+    "inForceFrom": "2026-02-18T00:00:00Z",
+    "supersededBy": null,
+    "supersedes": null,
+    "sources": [
+      {
+        "kind": "code",
+        "label": "PolicyRegistry.parCheck",
+        "ref": "contracts/GravitasPolicyRegistry.sol"
+      },
+      {
+        "kind": "test",
+        "label": "par exchange rejects premium and discount",
+        "ref": "test/PolicyRegistry.par.t.sol"
+      }
+    ],
+    "parameterHashVerified": true
+  },
+  {
+    "id": "rule-wakil-mandate",
+    "boardId": "demo-board",
+    "title": "Deployment boundary for an investment agent",
+    "statement": "An agent appointed under Wakalah bil Istithmar may deploy pooled funds only into the asset categories the board has approved for that mandate.",
+    "parameters": [
+      {
+        "key": "permittedCategories",
+        "value": "leased_property,leased_equipment,diminishing_musharakah,trade_finance,compliant_reits",
+        "meaning": "The complete set of categories into which the agent may deploy."
+      },
+      {
+        "key": "onOutOfMandate",
+        "value": "revert",
+        "meaning": "A deployment into any category outside the set does not execute."
+      }
+    ],
+    "parameterHash": "0x21d407a39ff2d54ec5093c3ed5703735212658ab732bd36b97608fcee34b7983",
+    "version": 2,
+    "inForceFrom": "2026-05-11T00:00:00Z",
+    "supersededBy": null,
+    "supersedes": null,
+    "sources": [
+      {
+        "kind": "code",
+        "label": "PolicyRegistry.mandateCheck",
+        "ref": "contracts/GravitasPolicyRegistry.sol"
+      },
+      {
+        "kind": "test",
+        "label": "out-of-mandate deployment reverts",
+        "ref": "test/PolicyRegistry.mandate.t.sol"
+      }
+    ],
+    "parameterHashVerified": true
+  }
+]

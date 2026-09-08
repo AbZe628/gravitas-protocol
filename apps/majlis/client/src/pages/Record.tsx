@@ -1,18 +1,22 @@
 import { useEffect, useState } from 'react';
 import { api, oversight, type AssistantExchange, type Health } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
-import { Card, DateText, Tag } from '../components/ui.js';
+import { Card, DateText, ErrorText, Loading, Tag } from '../components/ui.js';
 import { DocumentLink, YearPicker } from '../components/Documents.js';
 
 export default function Record({ embedded = false }: { embedded?: boolean }) {
   const { t } = useI18n();
-  const [log, setLog] = useState<AssistantExchange[]>([]);
+  const [log, setLog] = useState<AssistantExchange[] | null>(null);
+  const [failed, setFailed] = useState(false);
   const [health, setHealth] = useState<Health | null>(null);
   const [exporting, setExporting] = useState(false);
   const [year, setYear] = useState(new Date().getUTCFullYear());
 
   useEffect(() => {
-    api.assistantLog().then(setLog).catch(() => setLog([]));
+    api
+      .assistantLog()
+      .then((r) => (Array.isArray(r) ? setLog(r) : setFailed(true)))
+      .catch(() => setFailed(true));
     api.health().then(setHealth).catch(() => setHealth(null));
   }, []);
 
@@ -83,7 +87,11 @@ export default function Record({ embedded = false }: { embedded?: boolean }) {
       </h2>
       <p className="mb-4 text-[13px] leading-relaxed text-muted">{t('record.assistantLogNote')}</p>
 
-      {log.length === 0 ? (
+      {failed ? (
+        <ErrorText />
+      ) : !log ? (
+        <Loading />
+      ) : log.length === 0 ? (
         <p className="text-[13px] text-muted">{t('common.none')}</p>
       ) : (
         <ul className="space-y-3">

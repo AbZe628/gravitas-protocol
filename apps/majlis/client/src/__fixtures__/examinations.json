@@ -1,0 +1,91 @@
+{
+  "examinations": [
+    {
+      "id": "examination-2026-07-31",
+      "boardId": "demo-board",
+      "matterId": "matter-2026-04-02",
+      "ruleId": "rule-pool-trading",
+      "parameterHash": "",
+      "from": "2026-04-01",
+      "to": "2026-06-30",
+      "howChosen": "Every secondary transfer in the quarter above AED 1,000,000, and twenty below it chosen at random.",
+      "population": 412,
+      "examined": 78,
+      "examinedBy": "member-b",
+      "recordedAt": "2026-07-31T16:30:00Z",
+      "findings": [
+        {
+          "against": "minTangibleRatioBps",
+          "held": "exceptions",
+          "exceptions": 3,
+          "note": "Three transfers executed on 12 and 13 June while the ratio stood at 50.4%. The desk reports the pricing feed was two days stale. The transfers were not reversed."
+        },
+        {
+          "against": "onBreach",
+          "held": "held",
+          "exceptions": 0,
+          "note": "Once the ratio was corrected in the feed, secondary transfers stopped executing without anybody intervening."
+        }
+      ],
+      "coverage": {
+        "examined": 78,
+        "population": 412,
+        "percent": "18.9"
+      },
+      "exceptions": 3,
+      "notExamined": [
+        "Certificate holders own an undivided share in the underlying assets, with the rights and the exposures that ownership carries, rather than a claim against the originator.",
+        "Any undertaking by the originator to buy the assets back is at market value or a value agreed at the time, not at face value or at the outstanding principal.",
+        "Where certificates are traded, the proportion of tangible assets in the pool meets the threshold the board sets, and the proportion is measured and reported.",
+        "Distributions come from what the assets earn, and any shortfall met by the originator is a separate liquidity facility that is disclosed and is not a term of the certificates.",
+        "The proceeds are applied to the purpose stated in the prospectus, and the assets are identified.",
+        "Where the underlying activity produces income from unlawful sources, the proportion is measured and the amount attributable to holders is worked out.",
+        "minTangibleRatioBps",
+        "onBreach"
+      ],
+      "matterTitle": "Secondary trading of a mixed pool at market price",
+      "againstCurrentTerms": true
+    },
+    {
+      "id": "examination-2026-04-30",
+      "boardId": "demo-board",
+      "matterId": "matter-2026-04-02",
+      "ruleId": "rule-pool-trading",
+      "parameterHash": "",
+      "from": "2026-01-01",
+      "to": "2026-03-31",
+      "howChosen": "Every secondary transfer in the quarter.",
+      "population": 366,
+      "examined": 366,
+      "examinedBy": "member-b",
+      "recordedAt": "2026-04-30T11:00:00Z",
+      "findings": [
+        {
+          "against": "minTangibleRatioBps",
+          "held": "held",
+          "exceptions": 0,
+          "note": "The ratio stayed above the minimum throughout the quarter."
+        }
+      ],
+      "coverage": {
+        "examined": 366,
+        "population": 366,
+        "percent": "100.0"
+      },
+      "exceptions": 0,
+      "notExamined": [
+        "Certificate holders own an undivided share in the underlying assets, with the rights and the exposures that ownership carries, rather than a claim against the originator.",
+        "Any undertaking by the originator to buy the assets back is at market value or a value agreed at the time, not at face value or at the outstanding principal.",
+        "Where certificates are traded, the proportion of tangible assets in the pool meets the threshold the board sets, and the proportion is measured and reported.",
+        "Distributions come from what the assets earn, and any shortfall met by the originator is a separate liquidity facility that is disclosed and is not a term of the certificates.",
+        "The proceeds are applied to the purpose stated in the prospectus, and the assets are identified.",
+        "Where the underlying activity produces income from unlawful sources, the proportion is measured and the amount attributable to holders is worked out.",
+        "minTangibleRatioBps",
+        "onBreach"
+      ],
+      "matterTitle": "Secondary trading of a mixed pool at market price",
+      "againstCurrentTerms": true
+    }
+  ],
+  "count": 2
+}

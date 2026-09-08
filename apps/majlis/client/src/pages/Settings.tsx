@@ -33,7 +33,7 @@ export default function Settings() {
   useEffect(() => {
     oversight
       .settings()
-      .then(setData)
+      .then((r) => (r && Array.isArray(r.members) ? setData(r) : setFailed(true)))
       .catch(() => setFailed(true));
     api.health().then(setHealth).catch(() => setHealth(null));
   }, []);

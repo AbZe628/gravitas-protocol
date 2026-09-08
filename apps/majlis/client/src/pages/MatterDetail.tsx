@@ -30,7 +30,14 @@ export default function MatterDetail() {
 
   useEffect(() => {
     if (!id) return;
-    api.matter(id).then(setMatter).catch(() => setFailed(true));
+    api
+      .matter(id)
+      .then((m) =>
+        m && Array.isArray(m.notDecided) && Array.isArray(m.reasoning)
+          ? setMatter(m)
+          : setFailed(true),
+      )
+      .catch(() => setFailed(true));
   }, [id]);
 
   if (failed) return <ErrorText />;

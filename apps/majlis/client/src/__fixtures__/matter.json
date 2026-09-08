@@ -1,0 +1,161 @@
+{
+  "id": "matter-2026-08-11",
+  "boardId": "demo-board",
+  "title": "Suspension of leveraged index instruments",
+  "origin": "institution_request",
+  "direction": "restrict",
+  "status": "voting",
+  "openedAt": "2026-08-11T09:00:00Z",
+  "arrivedAt": "2026-08-04T15:30:00Z",
+  "proposal": "That the desk take no new position in an index instrument whose exposure is obtained through borrowing inside the index, where that borrowing exceeds the limit below.",
+  "notDecided": [
+    "Whether existing positions must be sold. They are held pending a decision of the board.",
+    "Whether the same treatment applies to a fund that borrows at the fund level rather than inside the index. That is a separate question."
+  ],
+  "mechanism": "At each rebalancing the borrowing inside the index is measured against the index’s market value. Above the limit, no new position is taken.",
+  "interactsWith": [
+    "rule-pool-trading"
+  ],
+  "assetIds": [
+    "asset-leveraged-index"
+  ],
+  "structureId": "murabaha",
+  "proposedRule": {
+    "id": "rule-leveraged-index",
+    "boardId": "demo-board",
+    "title": "Leveraged index instruments",
+    "statement": "No new position is taken in an index instrument whose internal borrowing exceeds the proportion this board has set.",
+    "parameters": [
+      {
+        "key": "maxProviderBorrowingBps",
+        "value": "3000",
+        "unit": "basis points",
+        "meaning": "Borrowing inside an index may not exceed 30.00% of the index’s market value, measured at each rebalancing.",
+        "watches": {
+          "kind": "debt",
+          "bound": "maximum"
+        }
+      },
+      {
+        "key": "onBreach",
+        "value": "suspend_new_positions",
+        "meaning": "While the proportion is above the limit, no new position is taken. Existing positions are held pending a decision of the board rather than sold automatically."
+      }
+    ],
+    "parameterHash": "0x486a443c2ab3e6e17d52de729929aae4487c3665b9d414dd00c1be8c74df9b84",
+    "version": 1,
+    "inForceFrom": null,
+    "supersededBy": null,
+    "supersedes": null,
+    "sources": [],
+    "parameterHashVerified": true
+  },
+  "simulation": null,
+  "deliberation": [
+    {
+      "id": "del-2026-08-11-a",
+      "scholarId": "member-a",
+      "body": "The borrowing is the provider’s and not ours, but the exposure it buys is ours. I do not think the distinction survives.",
+      "at": "2026-08-11T10:15:00Z",
+      "replyTo": null,
+      "liaisonAnswer": false,
+      "segments": [
+        {
+          "text": "The borrowing is the provider’s and not ours, but the exposure it buys is ours. I do not think the distinction survives."
+        }
+      ]
+    },
+    {
+      "id": "del-2026-08-11-b",
+      "scholarId": "member-b",
+      "body": "Agreed on the principle. My concern is the measurement: at each rebalancing means we are reading a figure the provider publishes, and we should say what happens when they do not publish it.",
+      "at": "2026-08-11T11:40:00Z",
+      "replyTo": "del-2026-08-11-a",
+      "liaisonAnswer": false,
+      "segments": [
+        {
+          "text": "Agreed on the principle. My concern is the measurement: at each rebalancing means we are reading a figure the provider publishes, and we should say what happens when they do not publish it."
+        }
+      ]
+    },
+    {
+      "id": "del-2026-08-11-c",
+      "scholarId": "liaison-1",
+      "body": "On the mechanism: the provider publishes at each rebalancing and not between. Where the figure is missing the desk has nothing to read, so the rule would need to say whether that counts as above the limit or as unknown.",
+      "at": "2026-08-11T14:05:00Z",
+      "replyTo": "del-2026-08-11-b",
+      "liaisonAnswer": true,
+      "segments": [
+        {
+          "text": "On the mechanism: the provider publishes at each rebalancing and not between. Where the figure is missing the desk has nothing to read, so the rule would need to say whether that counts as above the limit or as unknown."
+        }
+      ]
+    }
+  ],
+  "reasoning": [
+    {
+      "scholarId": "member-a",
+      "position": "for",
+      "reason": "The exposure obtained is the exposure held. Where it is obtained by borrowing, the holder has taken on what the borrowing bought.",
+      "at": "2026-08-12T09:00:00Z",
+      "onParameterHash": "0x486a443c2ab3e6e17d52de729929aae4487c3665b9d414dd00c1be8c74df9b84"
+    },
+    {
+      "scholarId": "member-b",
+      "position": "for",
+      "reason": "For, on the understanding that a missing figure is treated as above the limit rather than as unknown. I would want that written into the terms before it is closed.",
+      "at": "2026-08-12T10:30:00Z",
+      "onParameterHash": "0x486a443c2ab3e6e17d52de729929aae4487c3665b9d414dd00c1be8c74df9b84"
+    }
+  ],
+  "timelockStartedAt": null,
+  "timelockEndsAt": null,
+  "objections": [],
+  "inForceAt": null,
+  "sources": [
+    {
+      "kind": "external",
+      "label": "Index methodology (illustrative), section 4: internal leverage",
+      "ref": "p. 17",
+      "addedBy": "liaison-1",
+      "at": "2026-08-11T14:10:00Z"
+    }
+  ],
+  "mentionable": [
+    {
+      "id": "member-a",
+      "name": "Board Member A",
+      "title": "Shariah Board Member (placeholder)"
+    },
+    {
+      "id": "member-b",
+      "name": "Board Member B",
+      "title": "Shariah Auditor (placeholder)"
+    },
+    {
+      "id": "member-c",
+      "name": "Board Member C",
+      "title": "Shariah Board Member (placeholder)"
+    },
+    {
+      "id": "member-d",
+      "name": "Board Member D",
+      "title": "Shariah Board Member (placeholder)"
+    },
+    {
+      "id": "member-e",
+      "name": "Board Member E",
+      "title": "Shariah Board Member (placeholder)"
+    },
+    {
+      "id": "advisor-1",
+      "name": "Advisory Member",
+      "title": "Advisory, without signing authority (placeholder)"
+    },
+    {
+      "id": "liaison-1",
+      "name": "Technical Liaison",
+      "title": "Answers questions of mechanism, does not vote (placeholder)"
+    }
+  ]
+}

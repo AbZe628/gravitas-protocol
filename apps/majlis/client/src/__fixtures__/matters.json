@@ -1,0 +1,62 @@
+[
+  {
+    "id": "matter-2026-08-11",
+    "boardId": "demo-board",
+    "title": "Suspension of leveraged index instruments",
+    "origin": "institution_request",
+    "direction": "restrict",
+    "status": "voting",
+    "openedAt": "2026-08-11T09:00:00Z",
+    "timelockEndsAt": null,
+    "affected": null,
+    "deliberationCount": 3
+  },
+  {
+    "id": "matter-2026-07-28",
+    "boardId": "demo-board",
+    "title": "A restoration window before a pool is reclassified",
+    "origin": "periodic_review",
+    "direction": "permit",
+    "status": "timelock",
+    "openedAt": "2026-07-28T09:00:00Z",
+    "timelockEndsAt": "2026-08-07T16:00:00Z",
+    "affected": null,
+    "deliberationCount": 1
+  },
+  {
+    "id": "matter-2026-07-03",
+    "boardId": "demo-board",
+    "title": "Treatment of a tangible asset ratio breached by drift rather than by act",
+    "origin": "compliance_concern",
+    "direction": "permit",
+    "status": "deliberation",
+    "openedAt": "2026-07-21T09:00:00Z",
+    "timelockEndsAt": null,
+    "affected": 47,
+    "deliberationCount": 3
+  },
+  {
+    "id": "matter-2026-06-19",
+    "boardId": "demo-board",
+    "title": "Suspension of an asset following a change in its underlying structure",
+    "origin": "protocol_change",
+    "direction": "restrict",
+    "status": "lapsed",
+    "openedAt": "2026-06-19T06:30:00Z",
+    "timelockEndsAt": null,
+    "affected": null,
+    "deliberationCount": 0
+  },
+  {
+    "id": "matter-2026-04-02",
+    "boardId": "demo-board",
+    "title": "Secondary trading of a mixed pool at market price",
+    "origin": "institution_request",
+    "direction": "permit",
+    "status": "in_force",
+    "openedAt": "2026-03-18T09:00:00Z",
+    "timelockEndsAt": "2026-04-01T14:20:00Z",
+    "affected": null,
+    "deliberationCount": 0
+  }
+]

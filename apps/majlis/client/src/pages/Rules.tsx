@@ -84,7 +84,10 @@ export default function Rules({ embedded = false }: { embedded?: boolean }) {
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
-    api.rules().then(setRules).catch(() => setFailed(true));
+    api
+      .rules()
+      .then((r) => (Array.isArray(r) ? setRules(r) : setFailed(true)))
+      .catch(() => setFailed(true));
     // A failure here takes nothing off the page: the rules render without
     // their review state rather than the page refusing to load.
     oversight

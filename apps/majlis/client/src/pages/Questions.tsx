@@ -6,6 +6,7 @@ import { useIdentity, mayDeliberate, maySubmit } from '../lib/identity.js';
 import { Act, Card, Quiet, State } from '../components/kit.js';
 import TheNotice from '../components/TheNotice.js';
 import { Division, Gaps, Nothing, PageHead } from '../components/page.js';
+import { ErrorText, Loading } from '../components/ui.js';
 
 /**
  * What the institution has asked, and what the board did about it.
@@ -271,7 +272,8 @@ function One({
 export default function Questions({ boardId }: { boardId: string }) {
   const { t } = useI18n();
   const { identity } = useIdentity();
-  const [all, setAll] = useState<Submission[]>([]);
+  const [all, setAll] = useState<Submission[] | null>(null);
+  const [failed, setFailed] = useState(false);
   const [notice, setNotice] = useState<{ notice: Notice; delivery: Delivery } | null>(null);
 
   const load = () => {
@@ -280,10 +282,20 @@ export default function Questions({ boardId }: { boardId: string }) {
       // A 200 with the wrong shape crashes a whole page; every fetch here
       // checks before it sets.
       .then((r) => setAll(Array.isArray(r.submissions) ? r.submissions : []))
-      .catch(() => undefined);
+      .catch(() => setFailed(true));
   };
 
   useEffect(load, [boardId]);
+
+  /*
+   * Unreachable is not empty.
+   *
+   * This screen used to start at an empty array and swallow the failure, so
+   * a board whose server was down read "nothing has been asked" — a claim
+   * about the bank rather than about the connection.
+   */
+  if (failed) return <ErrorText />;
+  if (!all) return <Loading />;
 
   const canAct = mayDeliberate(identity?.role);
   const open = all.filter((s) => s.standing === 'waiting');

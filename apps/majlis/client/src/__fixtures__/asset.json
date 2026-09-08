@@ -1,0 +1,31 @@
+{
+  "asset": {
+    "id": "asset-cash-backed",
+    "institutionId": "demo-institution",
+    "kind": "token",
+    "name": "Cash-backed settlement token",
+    "identifiers": [
+      {
+        "scheme": "chain",
+        "value": "0xaf88…5831",
+        "network": "arbitrum-sepolia"
+      },
+      {
+        "scheme": "ticker",
+        "value": "USDC"
+      }
+    ],
+    "source": "registry",
+    "addedAt": "2026-01-14T00:00:00Z",
+    "addedBy": null,
+    "composition": null,
+    "retiredAt": null,
+    "retiredReason": null
+  },
+  "governedBy": null,
+  "openMatters": [],
+  "history": [],
+  "status": "never_examined",
+  "note": "In the register and never put to the board.",
+  "composition": null
+}
