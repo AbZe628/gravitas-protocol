@@ -16,6 +16,7 @@ import type {
 import { NotFound, type Store, type StoredSigning } from './store.js';
 import type { Credential } from '../services/account.js';
 import type { Undertaking } from '../services/undertaking.js';
+import type { Annotation } from '../services/annotation.js';
 
 /**
  * A store that can only see one institution.
@@ -407,6 +408,47 @@ export class TenantStore implements Store {
       const next = change(current);
       if (next.boardId !== current.boardId) {
         throw new OutsideInstitution('move an undertaking to', next.boardId);
+      }
+      return next;
+    });
+  }
+
+  /*
+   * Notes are scoped through the board, like undertakings. What a member
+   * wrote in the margin of their own papers is the most private thing in
+   * this record: it is a reading, before the board has agreed anything.
+   */
+  async annotations(subjectId?: string): Promise<Annotation[]> {
+    const mine = await this.ownBoardIds();
+    const all = await this.inner.annotations(subjectId);
+    return all.filter((a) => mine.has(a.boardId));
+  }
+
+  async annotation(id: string): Promise<Annotation | null> {
+    const found = await this.inner.annotation(id);
+    if (!found) return null;
+    return (await this.owns(found.boardId)) ? found : null;
+  }
+
+  async markAnnotation(annotation: Annotation): Promise<Annotation> {
+    if (!(await this.owns(annotation.boardId))) {
+      throw new OutsideInstitution('write a note on', annotation.boardId);
+    }
+    return this.inner.markAnnotation(annotation);
+  }
+
+  async updateAnnotation(
+    id: string,
+    change: (current: Annotation) => Annotation,
+  ): Promise<Annotation> {
+    const found = await this.inner.annotation(id);
+    // Indistinguishable from one that does not exist, deliberately.
+    if (!found || !(await this.owns(found.boardId))) throw new NotFound('note', id);
+
+    return this.inner.updateAnnotation(id, (current) => {
+      const next = change(current);
+      if (next.boardId !== current.boardId) {
+        throw new OutsideInstitution('move a note to', next.boardId);
       }
       return next;
     });

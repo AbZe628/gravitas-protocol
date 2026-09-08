@@ -19,6 +19,7 @@ import {
   computations as seedComputations,
   examinations as seedExaminations,
   undertakings as seedUndertakings,
+  annotations as seedAnnotations,
 } from '../data/seed-work.js';
 import { matters as seedMatters } from '../data/seed.js';
 import { lifecycleMatters } from '../data/seed-lifecycle.js';
@@ -114,5 +115,6 @@ export function storeFromEnv(): Store {
     computations: seedComputations,
     examinations: seedExaminations,
     undertakings: seedUndertakings,
+    annotations: seedAnnotations,
   });
 }

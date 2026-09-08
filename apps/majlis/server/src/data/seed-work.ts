@@ -1,5 +1,6 @@
 import type { Computation, Examination, Submission } from '../types.js';
 import type { Undertaking } from '../services/undertaking.js';
+import type { Annotation } from '../services/annotation.js';
 
 /**
  * The rest of the demonstration record.
@@ -335,5 +336,46 @@ export const undertakings: Undertaking[] = [
       by: 'member-c',
       at: '2026-08-26T09:10:00Z',
     },
+  },
+];
+
+/**
+ * Notes two members left in the margin of the papers.
+ *
+ * FABRICATED, like everything else in this file. They are here because a
+ * margin with nothing in it demonstrates nothing: a board portal's annotations
+ * are only legible once you can see one member marking a line, another
+ * answering, and the mark sitting exactly where the words are.
+ *
+ * Both are on the proposal of `matter-2026-08-11`, which is the matter in
+ * voting — the one somebody showing this will already have open.
+ */
+export const annotations: Annotation[] = [
+  {
+    id: 'note-2026-08-12-a',
+    boardId: BOARD,
+    on: 'proposal',
+    subjectId: 'matter-2026-08-11',
+    quote: 'borrowing inside the index',
+    at: 0,
+    said:
+      'Inside the index, or inside the fund holding it? A fund that borrows at its own level ' +
+      'reaches the same exposure and this wording does not touch it.',
+    by: 'member-b',
+    atTime: '2026-08-12T09:20:00Z',
+  },
+  {
+    id: 'note-2026-08-12-b',
+    boardId: BOARD,
+    on: 'proposal',
+    subjectId: 'matter-2026-08-11',
+    quote: 'borrowing inside the index',
+    at: 0,
+    said:
+      'Inside the index only. Borrowing at fund level is named in what is not being decided, ' +
+      'and it is a separate question.',
+    by: 'member-a',
+    atTime: '2026-08-12T11:05:00Z',
+    replyTo: 'note-2026-08-12-a',
   },
 ];

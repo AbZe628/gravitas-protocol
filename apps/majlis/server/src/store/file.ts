@@ -57,6 +57,7 @@ import {
 import { ASSISTANT_LOG_MAX, NotFound, type Store, type StoredSigning } from './store.js';
 import type { Credential } from '../services/account.js';
 import type { Undertaking } from '../services/undertaking.js';
+import type { Annotation } from '../services/annotation.js';
 
 interface Document {
   version: 1;
@@ -106,6 +107,7 @@ interface Document {
   credentials?: Credential[];
   /** What somebody undertook to do at a sitting, and what became of it. */
   undertakings?: Undertaking[];
+  annotations?: Annotation[];
   briefings: Briefing[];
 }
 
@@ -196,6 +198,7 @@ export class FileStore implements Store {
       loaded.signings ??= [];
       loaded.credentials ??= [];
       loaded.undertakings ??= [];
+      loaded.annotations ??= [];
       this.doc = loaded;
       return;
     }
@@ -562,6 +565,42 @@ export class FileStore implements Store {
       if (at === -1) throw new NotFound('Undertaking', id);
       const next = change(copy(this.doc.undertakings[at]));
       this.doc.undertakings[at] = copy(next);
+      this.persist();
+      return copy(next);
+    });
+  }
+
+  async annotations(subjectId?: string): Promise<Annotation[]> {
+    const all = this.doc.annotations ?? [];
+    return copy(subjectId === undefined ? all : all.filter((a) => a.subjectId === subjectId));
+  }
+
+  async annotation(id: string): Promise<Annotation | null> {
+    return copy((this.doc.annotations ?? []).find((a) => a.id === id) ?? null);
+  }
+
+  async markAnnotation(annotation: Annotation): Promise<Annotation> {
+    return this.serialise(() => {
+      this.doc.annotations ??= [];
+      if (this.doc.annotations.some((a) => a.id === annotation.id)) {
+        throw new Error('A note with id ' + annotation.id + ' already exists.');
+      }
+      this.doc.annotations.push(copy(annotation));
+      this.persist();
+      return copy(annotation);
+    });
+  }
+
+  async updateAnnotation(
+    id: string,
+    change: (current: Annotation) => Annotation,
+  ): Promise<Annotation> {
+    return this.serialise(() => {
+      this.doc.annotations ??= [];
+      const at = this.doc.annotations.findIndex((a) => a.id === id);
+      if (at === -1) throw new NotFound('Note', id);
+      const next = change(copy(this.doc.annotations[at]));
+      this.doc.annotations[at] = copy(next);
       this.persist();
       return copy(next);
     });

@@ -4,6 +4,7 @@ import { useI18n } from '../lib/i18n.js';
 import { mayDeliberate, useIdentity } from '../lib/identity.js';
 import RaiseAMatter from '../components/RaiseAMatter.js';
 import { PageHead } from '../components/page.js';
+import InTheMargin from '../components/InTheMargin.js';
 import { Card, DateText, ErrorText, Loading, Sources, Tag } from '../components/ui.js';
 
 export default function Briefings() {
@@ -42,15 +43,17 @@ export default function Briefings() {
                 {b.title}
               </h2>
 
+              {/*
+                What changed and why, as one passage a member can mark. The
+                two used to be separate paragraphs under separate headings,
+                which read as two documents when it is one account.
+              */}
               <div className="mt-4 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
-                {t('brief.whatChanged')}
+                {t('brief.account')}
               </div>
-              <p className="mt-1 text-[14px] text-sand">{b.whatChanged}</p>
-
-              <div className="mt-3.5 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
-                {t('brief.whyChanged')}
+              <div className="mt-2">
+                <InTheMargin on="briefing" subjectId={b.id} />
               </div>
-              <p className="mt-1 text-[14px] text-sand">{b.whyChanged}</p>
 
               {b.touchesRules.length > 0 && (
                 <div className="mt-3.5 flex flex-wrap gap-1.5">

@@ -419,6 +419,55 @@ export class Refused extends Error {
   }
 }
 
+/**
+ * A note one member left on a passage of something the board is reading.
+ *
+ * `at` is where the passage sits in the text *as the server just found it*,
+ * never where it sat when the note was written — an offset kept from then
+ * would point at whatever moved into its place.
+ */
+export interface Annotation {
+  id: string;
+  boardId: string;
+  on: 'proposal' | 'briefing' | 'document';
+  subjectId: string;
+  quote: string;
+  at: number;
+  said: string;
+  by: string;
+  atTime: string;
+  replyTo?: string;
+  withdrawn?: { by: string; at: string };
+  /** The member's name, added by the route. */
+  whoName?: string;
+}
+
+export interface AnnotationThread {
+  note: {
+    annotation: Annotation;
+    /** Null where the passage is no longer in the text. */
+    at: number | null;
+    adrift: boolean;
+  };
+  replies: Annotation[];
+  whoName: string;
+}
+
+export interface Margin {
+  on: 'proposal' | 'briefing' | 'document';
+  subjectId: string;
+  threads: AnnotationThread[];
+  summary: { standing: number; withdrawn: number; adrift: number; by: string[] };
+  /**
+   * The words the passages were checked against.
+   *
+   * Rendered from this rather than from the copy the screen already holds:
+   * two copies of a document disagreeing about where a sentence is, is how a
+   * note ends up beside the wrong one.
+   */
+  text: string;
+}
+
 async function send<T>(
   path: string,
   body?: unknown,
@@ -1653,6 +1702,18 @@ export const oversight = {
   /** Close one by saying what happened. A tick would record nothing useful. */
   closeUndertaking: (id: string, state: string, said: string) =>
     send<{ undertaking: Undertaking }>(`/api/undertakings/${id}/close`, { state, said }),
+
+  /** Every note on one thing being read, with each passage found in the text as it stands. */
+  margin: (on: string, subjectId: string) =>
+    get<Margin>(`/api/annotations/${on}/${encodeURIComponent(subjectId)}`),
+
+  /** Write one. `quote` is omitted on a reply, which inherits the passage. */
+  annotate: (input: { on: string; subjectId: string; quote?: string; said: string; replyTo?: string }) =>
+    send<{ annotation: Annotation }>('/api/annotations', input),
+
+  /** Withdraw one. It stays, marked, with what it said. */
+  withdrawNote: (id: string) =>
+    send<{ annotation: Annotation }>(`/api/annotations/${id}/withdraw`),
 
   telling: (kind: string, id: string) =>
     get<{ notice: Notice; delivery: Delivery }>(`/api/telling/${kind}/${id}`),

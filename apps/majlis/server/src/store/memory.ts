@@ -37,6 +37,7 @@ import {
 import { ASSISTANT_LOG_MAX, NotFound, type Store, type StoredSigning } from './store.js';
 import type { Credential } from '../services/account.js';
 import type { Undertaking } from '../services/undertaking.js';
+import type { Annotation } from '../services/annotation.js';
 
 const copy = <T>(value: T): T => structuredClone(value);
 
@@ -54,6 +55,7 @@ export interface MemorySeed {
   submissions?: Submission[];
   examinations?: Examination[];
   undertakings?: Undertaking[];
+  annotations?: Annotation[];
 }
 
 export class MemoryStore implements Store {
@@ -81,6 +83,7 @@ export class MemoryStore implements Store {
   /** Keyed by scholar: a member holds one credential or none. */
   private readonly _credentials = new Map<string, Credential>();
   private readonly _undertakings: Map<string, Undertaking>;
+  private readonly _annotations: Map<string, Annotation>;
   private readonly _log: AssistantExchange[] = [];
 
   constructor(seed: MemorySeed = {}) {
@@ -107,6 +110,7 @@ export class MemoryStore implements Store {
     // claim in the record and the one least earned.
     this._examinations = new Map((seed.examinations ?? []).map((x) => [x.id, copy(x)]));
     this._undertakings = new Map((seed.undertakings ?? []).map((u) => [u.id, copy(u)]));
+    this._annotations = new Map((seed.annotations ?? []).map((a) => [a.id, copy(a)]));
   }
 
   async institutions(): Promise<Institution[]> {
@@ -354,6 +358,35 @@ export class MemoryStore implements Store {
     if (!current) throw new NotFound('Undertaking', id);
     const next = change(copy(current));
     this._undertakings.set(id, copy(next));
+    return copy(next);
+  }
+
+  async annotations(subjectId?: string): Promise<Annotation[]> {
+    const all = [...this._annotations.values()];
+    return copy(subjectId === undefined ? all : all.filter((a) => a.subjectId === subjectId));
+  }
+
+  async annotation(id: string): Promise<Annotation | null> {
+    const found = this._annotations.get(id);
+    return found ? copy(found) : null;
+  }
+
+  async markAnnotation(annotation: Annotation): Promise<Annotation> {
+    if (this._annotations.has(annotation.id)) {
+      throw new Error(`A note with id ${annotation.id} already exists.`);
+    }
+    this._annotations.set(annotation.id, copy(annotation));
+    return copy(annotation);
+  }
+
+  async updateAnnotation(
+    id: string,
+    change: (current: Annotation) => Annotation,
+  ): Promise<Annotation> {
+    const current = this._annotations.get(id);
+    if (!current) throw new NotFound('Note', id);
+    const next = change(copy(current));
+    this._annotations.set(id, copy(next));
     return copy(next);
   }
 

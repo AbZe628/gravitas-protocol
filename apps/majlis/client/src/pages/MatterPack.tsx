@@ -4,6 +4,7 @@ import { api, oversight, type Matter, type Pack } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { useIdentity } from '../lib/identity.js';
 import { Loading, ErrorText } from '../components/ui.js';
+import InTheMargin from '../components/InTheMargin.js';
 import { State, toneForStatus } from '../components/kit.js';
 import VotePanel from '../components/VotePanel.js';
 import Deliberation from '../components/Deliberation.js';
@@ -173,7 +174,12 @@ export default function MatterPack() {
           the availability of five other services would be exactly wrong.
         */}
         <Part n="01" heading={t('pack.question')}>
-          <p className="max-w-[58ch] font-display text-[17px] leading-[1.6]">{matter.proposal}</p>
+          {/*
+            The proposal, and what members marked in it. The words and the
+            notes are one thing: a board portal that keeps its comments on a
+            separate tab makes a reader hold two documents in their head.
+          */}
+          <InTheMargin on="proposal" subjectId={matter.id} />
           <p className="mt-3 text-[12.5px] text-muted">
             {q?.arrivedAt ? `${t('pack.asked')} ${day(q.arrivedAt)} · ` : ''}
             {t('pack.opened')} {day(matter.openedAt)}

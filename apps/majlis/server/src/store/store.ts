@@ -39,6 +39,7 @@ import type {
 import type { Signing } from '../services/signature.js';
 import type { Credential } from '../services/account.js';
 import type { Undertaking } from '../services/undertaking.js';
+import type { Annotation } from '../services/annotation.js';
 
 /**
  * A signature, with what it is a signature on.
@@ -247,6 +248,27 @@ export interface Store {
    * @throws NotFound if there is no such undertaking.
    */
   updateUndertaking(id: string, change: (current: Undertaking) => Undertaking): Promise<Undertaking>;
+
+  // ── notes in the margin of the papers ──────────────────────────────────
+
+  /**
+   * Every note on one thing being read, withdrawn ones included.
+   *
+   * Withdrawn notes come back because the record is append-only: a thread
+   * that closed up around a withdrawal would leave replies answering
+   * nothing. The service decides how they are shown.
+   */
+  annotations(subjectId?: string): Promise<Annotation[]>;
+  annotation(id: string): Promise<Annotation | null>;
+
+  /** @throws if one with this id already exists. */
+  markAnnotation(annotation: Annotation): Promise<Annotation>;
+
+  /**
+   * Read, change and write one atomically.
+   * @throws NotFound if there is no such note.
+   */
+  updateAnnotation(id: string, change: (current: Annotation) => Annotation): Promise<Annotation>;
 
   // ── the way in ─────────────────────────────────────────────────────────
 
