@@ -24,6 +24,8 @@ export function dirFor(lang: Lang): 'ltr' | 'rtl' {
 type Dict = Record<string, string>;
 
 const en: Dict = {
+  "decided.heading": "What this board has decided",
+  "decided.none": "Nothing has been settled yet. A matter appears here once the board has closed it, whichever way it went.",
   "pressing.waitedFor": "A question has waited",
   "pressing.open": "matters are open, and being argued.",
   "pressing.moved": "holdings have left the board's limits.",
@@ -1297,6 +1299,8 @@ const en: Dict = {
 };
 
 const ar: Dict = {
+  "decided.heading": "ما بتّت فيه هذه الهيئة",
+  "decided.none": "لم يُبتّ في شيء بعد. تظهر المسألة هنا متى أغلقتها الهيئة، أياً كان وجه البتّ.",
   "pressing.waitedFor": "سؤال ينتظر منذ",
   "pressing.open": "مسائل مفتوحة، وقيد النقاش.",
   "pressing.moved": "أصول خرجت عن حدود الهيئة.",
@@ -2513,6 +2517,8 @@ const ar: Dict = {
 };
 
 const ur: Dict = {
+  "decided.heading": "اس بورڈ نے کیا طے کیا",
+  "decided.none": "ابھی کچھ طے نہیں ہوا۔ معاملہ یہاں تب آتا ہے جب بورڈ اسے بند کر دے، نتیجہ جو بھی ہو۔",
   "pressing.waitedFor": "ایک سوال انتظار میں ہے",
   "pressing.open": "معاملات کھلے ہیں، اور زیرِ بحث ہیں۔",
   "pressing.moved": "ملکیتیں بورڈ کی حدوں سے باہر نکل چکی ہیں۔",
