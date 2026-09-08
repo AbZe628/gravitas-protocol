@@ -17,6 +17,7 @@ import { NotFound, type Store, type StoredSigning } from './store.js';
 import type { Credential } from '../services/account.js';
 import type { Undertaking } from '../services/undertaking.js';
 import type { Annotation } from '../services/annotation.js';
+import type { Committee, Referral } from '../services/committee.js';
 
 /**
  * A store that can only see one institution.
@@ -418,6 +419,81 @@ export class TenantStore implements Store {
    * wrote in the margin of their own papers is the most private thing in
    * this record: it is a reading, before the board has agreed anything.
    */
+  /*
+   * Committees are scoped through the board, like everything under it. Who
+   * a bank puts on its contracts committee is its own business.
+   */
+  async committees(boardId?: string): Promise<Committee[]> {
+    if (boardId && !(await this.owns(boardId))) return [];
+    const mine = await this.ownBoardIds();
+    const all = await this.inner.committees(boardId);
+    return all.filter((c) => mine.has(c.boardId));
+  }
+
+  async committee(id: string): Promise<Committee | null> {
+    const found = await this.inner.committee(id);
+    if (!found) return null;
+    return (await this.owns(found.boardId)) ? found : null;
+  }
+
+  async formCommittee(committee: Committee): Promise<Committee> {
+    if (!(await this.owns(committee.boardId))) {
+      throw new OutsideInstitution('form a committee on', committee.boardId);
+    }
+    return this.inner.formCommittee(committee);
+  }
+
+  async updateCommittee(
+    id: string,
+    change: (current: Committee) => Committee,
+  ): Promise<Committee> {
+    const found = await this.inner.committee(id);
+    if (!found || !(await this.owns(found.boardId))) throw new NotFound('committee', id);
+
+    return this.inner.updateCommittee(id, (current) => {
+      const next = change(current);
+      if (next.boardId !== current.boardId) {
+        throw new OutsideInstitution('move a committee to', next.boardId);
+      }
+      return next;
+    });
+  }
+
+  async referrals(where?: { matterId?: string; committeeId?: string }): Promise<Referral[]> {
+    const mine = await this.ownBoardIds();
+    const all = await this.inner.referrals(where);
+    return all.filter((r) => mine.has(r.boardId));
+  }
+
+  async referral(id: string): Promise<Referral | null> {
+    const found = await this.inner.referral(id);
+    if (!found) return null;
+    return (await this.owns(found.boardId)) ? found : null;
+  }
+
+  async referMatter(referral: Referral): Promise<Referral> {
+    if (!(await this.owns(referral.boardId))) {
+      throw new OutsideInstitution('refer a matter on', referral.boardId);
+    }
+    return this.inner.referMatter(referral);
+  }
+
+  async updateReferral(
+    id: string,
+    change: (current: Referral) => Referral,
+  ): Promise<Referral> {
+    const found = await this.inner.referral(id);
+    if (!found || !(await this.owns(found.boardId))) throw new NotFound('referral', id);
+
+    return this.inner.updateReferral(id, (current) => {
+      const next = change(current);
+      if (next.boardId !== current.boardId) {
+        throw new OutsideInstitution('move a referral to', next.boardId);
+      }
+      return next;
+    });
+  }
+
   async annotations(subjectId?: string): Promise<Annotation[]> {
     const mine = await this.ownBoardIds();
     const all = await this.inner.annotations(subjectId);

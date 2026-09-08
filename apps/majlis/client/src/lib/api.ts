@@ -468,6 +468,57 @@ export interface Margin {
   text: string;
 }
 
+/** Some of the board, given a question to look at first. It never rules. */
+export interface Committee {
+  id: string;
+  boardId: string;
+  name: string;
+  remit: string;
+  members: string[];
+  convenor?: string;
+  formedIn: string;
+  formedAt: string;
+  dissolvedAt?: string;
+}
+
+export interface Referral {
+  id: string;
+  boardId: string;
+  committeeId: string;
+  matterId: string;
+  asking: string;
+  referredBy: string;
+  referredAt: string;
+  report?: {
+    found: string;
+    by: string;
+    at: string;
+    standing: { scholarId: string; agrees: boolean; said?: string; at: string }[];
+  };
+  withdrawn?: { by: string; at: string; why: string };
+}
+
+/**
+ * How a committee stood behind its own account.
+ *
+ * Named, never counted: "four agreed" tells a board nothing it can act on, and
+ * "Board Member C did not, because …" is the sentence it has to read.
+ */
+export interface HowItStood {
+  unanimous: boolean;
+  agreedNames: string[];
+  dissentedNames: { scholarId: string; said: string; name: string }[];
+  silentNames: string[];
+}
+
+export interface ReferralOnMatter {
+  referral: Referral;
+  committee: Committee | null;
+  state: 'waiting' | 'reported' | 'withdrawn';
+  referredByName: string;
+  stood: HowItStood | null;
+}
+
 async function send<T>(
   path: string,
   body?: unknown,
@@ -1714,6 +1765,36 @@ export const oversight = {
   /** Withdraw one. It stays, marked, with what it said. */
   withdrawNote: (id: string) =>
     send<{ annotation: Annotation }>(`/api/annotations/${id}/withdraw`),
+
+  /** What was referred on one matter, and what came back. */
+  referrals: (matterId: string) =>
+    get<{ matterId: string; referrals: ReferralOnMatter[]; note: string }>(
+      `/api/matters/${encodeURIComponent(matterId)}/referrals`,
+    ),
+
+  /** Every committee this board keeps, with what each is carrying. */
+  committees: (boardId?: string) =>
+    get<{
+      boardId: string;
+      committees: {
+        committee: Committee;
+        memberNames: string[];
+        convenorName: string | null;
+        summary: { waiting: number; reported: number; withdrawn: number; notUnanimous: number };
+      }[];
+      keepsNone: boolean;
+    }>('/api/committees' + (boardId ? `?board=${encodeURIComponent(boardId)}` : '')),
+
+  /** Ask a committee to look at a matter first. It decides nothing. */
+  referMatter: (input: { committeeId: string; matterId: string; asking: string }) =>
+    send<{ referral: Referral }>('/api/referrals', input),
+
+  /** The committee's account of what it found. Dissent carries words. */
+  reportOnReferral: (
+    id: string,
+    found: string,
+    standing: { scholarId: string; agrees: boolean; said?: string }[],
+  ) => send<{ referral: Referral; stood: HowItStood | null }>(`/api/referrals/${id}/report`, { found, standing }),
 
   telling: (kind: string, id: string) =>
     get<{ notice: Notice; delivery: Delivery }>(`/api/telling/${kind}/${id}`),

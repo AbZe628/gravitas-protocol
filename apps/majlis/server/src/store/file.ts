@@ -58,6 +58,7 @@ import { ASSISTANT_LOG_MAX, NotFound, type Store, type StoredSigning } from './s
 import type { Credential } from '../services/account.js';
 import type { Undertaking } from '../services/undertaking.js';
 import type { Annotation } from '../services/annotation.js';
+import type { Committee, Referral } from '../services/committee.js';
 
 interface Document {
   version: 1;
@@ -108,6 +109,8 @@ interface Document {
   /** What somebody undertook to do at a sitting, and what became of it. */
   undertakings?: Undertaking[];
   annotations?: Annotation[];
+  committees?: Committee[];
+  referrals?: Referral[];
   briefings: Briefing[];
 }
 
@@ -199,6 +202,8 @@ export class FileStore implements Store {
       loaded.credentials ??= [];
       loaded.undertakings ??= [];
       loaded.annotations ??= [];
+      loaded.committees ??= [];
+      loaded.referrals ??= [];
       this.doc = loaded;
       return;
     }
@@ -565,6 +570,80 @@ export class FileStore implements Store {
       if (at === -1) throw new NotFound('Undertaking', id);
       const next = change(copy(this.doc.undertakings[at]));
       this.doc.undertakings[at] = copy(next);
+      this.persist();
+      return copy(next);
+    });
+  }
+
+  async committees(boardId?: string): Promise<Committee[]> {
+    const all = this.doc.committees ?? [];
+    return copy(boardId === undefined ? all : all.filter((c) => c.boardId === boardId));
+  }
+
+  async committee(id: string): Promise<Committee | null> {
+    return copy((this.doc.committees ?? []).find((c) => c.id === id) ?? null);
+  }
+
+  async formCommittee(committee: Committee): Promise<Committee> {
+    return this.serialise(() => {
+      this.doc.committees ??= [];
+      if (this.doc.committees.some((c) => c.id === committee.id)) {
+        throw new Error('A committee with id ' + committee.id + ' already exists.');
+      }
+      this.doc.committees.push(copy(committee));
+      this.persist();
+      return copy(committee);
+    });
+  }
+
+  async updateCommittee(
+    id: string,
+    change: (current: Committee) => Committee,
+  ): Promise<Committee> {
+    return this.serialise(() => {
+      this.doc.committees ??= [];
+      const at = this.doc.committees.findIndex((c) => c.id === id);
+      if (at === -1) throw new NotFound('Committee', id);
+      const next = change(copy(this.doc.committees[at]));
+      this.doc.committees[at] = copy(next);
+      this.persist();
+      return copy(next);
+    });
+  }
+
+  async referrals(where?: { matterId?: string; committeeId?: string }): Promise<Referral[]> {
+    let all = this.doc.referrals ?? [];
+    if (where?.matterId) all = all.filter((r) => r.matterId === where.matterId);
+    if (where?.committeeId) all = all.filter((r) => r.committeeId === where.committeeId);
+    return copy(all);
+  }
+
+  async referral(id: string): Promise<Referral | null> {
+    return copy((this.doc.referrals ?? []).find((r) => r.id === id) ?? null);
+  }
+
+  async referMatter(referral: Referral): Promise<Referral> {
+    return this.serialise(() => {
+      this.doc.referrals ??= [];
+      if (this.doc.referrals.some((r) => r.id === referral.id)) {
+        throw new Error('A referral with id ' + referral.id + ' already exists.');
+      }
+      this.doc.referrals.push(copy(referral));
+      this.persist();
+      return copy(referral);
+    });
+  }
+
+  async updateReferral(
+    id: string,
+    change: (current: Referral) => Referral,
+  ): Promise<Referral> {
+    return this.serialise(() => {
+      this.doc.referrals ??= [];
+      const at = this.doc.referrals.findIndex((r) => r.id === id);
+      if (at === -1) throw new NotFound('Referral', id);
+      const next = change(copy(this.doc.referrals[at]));
+      this.doc.referrals[at] = copy(next);
       this.persist();
       return copy(next);
     });

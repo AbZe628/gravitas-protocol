@@ -32,6 +32,7 @@ import { governanceRoutes } from './routes/governance.js';
 import { accountRoutes } from './routes/account.js';
 import { undertakingRoutes } from './routes/undertakings.js';
 import { annotationRoutes } from './routes/annotations.js';
+import { committeeRoutes } from './routes/committees.js';
 import { tell } from './services/telling.js';
 import { adoptionRoutes } from './routes/adoption.js';
 import { segmentsOf } from './services/mentions.js';
@@ -593,6 +594,7 @@ export function createApp(
   app.use('/api', accountRoutes(store, auth.members));
   app.use('/api', undertakingRoutes(store));
   app.use('/api', annotationRoutes(store));
+  app.use('/api', committeeRoutes(store));
 
   /**
    * The words for telling the bank something.

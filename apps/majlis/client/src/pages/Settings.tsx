@@ -4,6 +4,7 @@ import { useI18n } from '../lib/i18n.js';
 import { PageHead } from '../components/page.js';
 import YourAccount from '../components/YourAccount.js';
 import { Card, DateText, ErrorText, Loading, Tag } from '../components/ui.js';
+import TheCommittees from '../components/TheCommittees.js';
 
 /**
  * Who is on this board, and how it decides.
@@ -119,6 +120,11 @@ export default function Settings() {
           </li>
         ))}
       </ul>
+
+      <h2 className="mb-3 mt-8 border-t border-line pt-6 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+        {t('set.committees')}
+      </h2>
+      <TheCommittees />
 
       <h2 className="mb-3 mt-8 border-t border-line pt-6 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
         {t('set.howItDecides')}

@@ -1,6 +1,7 @@
 import type { Computation, Examination, Submission } from '../types.js';
 import type { Undertaking } from '../services/undertaking.js';
 import type { Annotation } from '../services/annotation.js';
+import type { Committee, Referral } from '../services/committee.js';
 
 /**
  * The rest of the demonstration record.
@@ -377,5 +378,64 @@ export const annotations: Annotation[] = [
     by: 'member-a',
     atTime: '2026-08-12T11:05:00Z',
     replyTo: 'note-2026-08-12-a',
+  },
+];
+
+/**
+ * One committee, and one matter it was asked to look at.
+ *
+ * FABRICATED. It exists so the referral panel demonstrates the thing that
+ * matters about it: the committee reported, it was *not* of one mind, and the
+ * matter is exactly where it was. A seeded committee that agreed unanimously
+ * would show the feature and hide the point.
+ *
+ * Majlis ships no committee names and no standing committees. This one is
+ * named the way a board would name its own, in the demonstration record only.
+ */
+export const committees: Committee[] = [
+  {
+    id: 'committee-contracts',
+    boardId: BOARD,
+    name: 'The contracts committee',
+    remit:
+      'Read a contract shape before it comes to the board, and say what is unclear in it. ' +
+      'The committee does not rule; the board does.',
+    members: ['member-a', 'member-b', 'member-c'],
+    convenor: 'member-a',
+    formedIn: 'matter-2026-04-02',
+    formedAt: '2026-04-09T00:00:00Z',
+  },
+];
+
+export const referrals: Referral[] = [
+  {
+    id: 'referral-2026-08-12',
+    boardId: BOARD,
+    committeeId: 'committee-contracts',
+    matterId: 'matter-2026-08-11',
+    asking:
+      'Whether the wording reaches a fund that borrows at its own level rather than inside the index.',
+    referredBy: 'member-d',
+    referredAt: '2026-08-12T10:00:00Z',
+    report: {
+      found:
+        'The wording reaches borrowing inside the index only. A fund that borrows at its own ' +
+        'level is outside it. The committee reads that as deliberate, since the matter already ' +
+        'names fund-level borrowing among what is not being decided.',
+      by: 'member-a',
+      at: '2026-08-18T15:30:00Z',
+      standing: [
+        { scholarId: 'member-a', agrees: true, at: '2026-08-18T15:30:00Z' },
+        { scholarId: 'member-b', agrees: true, at: '2026-08-18T15:35:00Z' },
+        {
+          scholarId: 'member-c',
+          agrees: false,
+          said:
+            'A fund borrowing at its own level reaches the same exposure by another route. ' +
+            'Leaving it outside means the restriction can be stepped around the week it takes effect.',
+          at: '2026-08-18T16:10:00Z',
+        },
+      ],
+    },
   },
 ];

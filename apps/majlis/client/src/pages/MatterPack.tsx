@@ -5,6 +5,7 @@ import { useI18n } from '../lib/i18n.js';
 import { useIdentity } from '../lib/identity.js';
 import { Loading, ErrorText } from '../components/ui.js';
 import InTheMargin from '../components/InTheMargin.js';
+import WhatTheCommitteeFound from '../components/WhatTheCommitteeFound.js';
 import { State, toneForStatus } from '../components/kit.js';
 import VotePanel from '../components/VotePanel.js';
 import Deliberation from '../components/Deliberation.js';
@@ -200,9 +201,18 @@ export default function MatterPack() {
           )}
         </Part>
 
+        {/*
+          Outside the guard, and second, for one reason: a member votes from
+          this screen, and a committee that was not of one mind is the thing
+          they most need in front of them before they do.
+        */}
+        <Part n="02" heading={t('cttee.heading')}>
+          <WhatTheCommitteeFound matterId={matter.id} />
+        </Part>
+
         {pack && q ? (
           <>
-          <Part n="02" heading={t('pack.alreadySaid')}>
+          <Part n="03" heading={t('pack.alreadySaid')}>
             {pack.alreadySaid.nothingYet ? (
               <p className="max-w-[58ch] text-[13.5px] leading-[1.65] text-sand">
                 {t('pack.noPrecedent')}
@@ -227,7 +237,7 @@ export default function MatterPack() {
             )}
           </Part>
 
-          <Part n="03" heading={t('pack.figures')}>
+          <Part n="04" heading={t('pack.figures')}>
             {pack.figures.terms.length === 0 ? (
               <p className="max-w-[58ch] text-[13.5px] leading-[1.65] text-sand">
                 {t('pack.noTerms')}
@@ -267,14 +277,14 @@ export default function MatterPack() {
             It sits above the deliberation on purpose. You read the text, then
             you say what you think about it.
           */}
-          <Part n="04" heading={t('pack.reading')}>
+          <Part n="05" heading={t('pack.reading')}>
             <ReadTheContract matterId={matter.id} canRead={identity?.role !== 'observer'} />
             <div className="mt-6 border-t border-line pt-5">
               <Checklist matterId={matter.id} canRule={identity?.role !== 'observer'} />
             </div>
           </Part>
 
-          <Part n="05" heading={t('pack.said')}>
+          <Part n="06" heading={t('pack.said')}>
             <Deliberation
               matter={matter}
               canSpeak={identity?.role !== 'observer'}
@@ -282,7 +292,7 @@ export default function MatterPack() {
             />
           </Part>
 
-          <Part n="06" heading={t('pack.follows')}>
+          <Part n="07" heading={t('pack.follows')}>
             <p className="max-w-[58ch] text-[13.5px] leading-[1.65] text-sand">
               {pack.follows.carrying.whenChecked}
             </p>
@@ -297,7 +307,7 @@ export default function MatterPack() {
             The gaps. Same size and same weight as everything above, because a
             section that whispered would be read as a footnote.
           */}
-          <Part n="07" heading={t('pack.gaps')}>
+          <Part n="08" heading={t('pack.gaps')}>
             {pack.gaps.length === 0 ? (
               <p className="text-[13.5px] text-settled">{t('pack.noGaps')}</p>
             ) : (

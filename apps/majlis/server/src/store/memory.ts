@@ -38,6 +38,7 @@ import { ASSISTANT_LOG_MAX, NotFound, type Store, type StoredSigning } from './s
 import type { Credential } from '../services/account.js';
 import type { Undertaking } from '../services/undertaking.js';
 import type { Annotation } from '../services/annotation.js';
+import type { Committee, Referral } from '../services/committee.js';
 
 const copy = <T>(value: T): T => structuredClone(value);
 
@@ -56,6 +57,8 @@ export interface MemorySeed {
   examinations?: Examination[];
   undertakings?: Undertaking[];
   annotations?: Annotation[];
+  committees?: Committee[];
+  referrals?: Referral[];
 }
 
 export class MemoryStore implements Store {
@@ -84,6 +87,8 @@ export class MemoryStore implements Store {
   private readonly _credentials = new Map<string, Credential>();
   private readonly _undertakings: Map<string, Undertaking>;
   private readonly _annotations: Map<string, Annotation>;
+  private readonly _committees: Map<string, Committee>;
+  private readonly _referrals: Map<string, Referral>;
   private readonly _log: AssistantExchange[] = [];
 
   constructor(seed: MemorySeed = {}) {
@@ -111,6 +116,8 @@ export class MemoryStore implements Store {
     this._examinations = new Map((seed.examinations ?? []).map((x) => [x.id, copy(x)]));
     this._undertakings = new Map((seed.undertakings ?? []).map((u) => [u.id, copy(u)]));
     this._annotations = new Map((seed.annotations ?? []).map((a) => [a.id, copy(a)]));
+    this._committees = new Map((seed.committees ?? []).map((c) => [c.id, copy(c)]));
+    this._referrals = new Map((seed.referrals ?? []).map((r) => [r.id, copy(r)]));
   }
 
   async institutions(): Promise<Institution[]> {
@@ -358,6 +365,66 @@ export class MemoryStore implements Store {
     if (!current) throw new NotFound('Undertaking', id);
     const next = change(copy(current));
     this._undertakings.set(id, copy(next));
+    return copy(next);
+  }
+
+  async committees(boardId?: string): Promise<Committee[]> {
+    const all = [...this._committees.values()];
+    return copy(boardId === undefined ? all : all.filter((c) => c.boardId === boardId));
+  }
+
+  async committee(id: string): Promise<Committee | null> {
+    const found = this._committees.get(id);
+    return found ? copy(found) : null;
+  }
+
+  async formCommittee(committee: Committee): Promise<Committee> {
+    if (this._committees.has(committee.id)) {
+      throw new Error(`A committee with id ${committee.id} already exists.`);
+    }
+    this._committees.set(committee.id, copy(committee));
+    return copy(committee);
+  }
+
+  async updateCommittee(
+    id: string,
+    change: (current: Committee) => Committee,
+  ): Promise<Committee> {
+    const current = this._committees.get(id);
+    if (!current) throw new NotFound('Committee', id);
+    const next = change(copy(current));
+    this._committees.set(id, copy(next));
+    return copy(next);
+  }
+
+  async referrals(where?: { matterId?: string; committeeId?: string }): Promise<Referral[]> {
+    let all = [...this._referrals.values()];
+    if (where?.matterId) all = all.filter((r) => r.matterId === where.matterId);
+    if (where?.committeeId) all = all.filter((r) => r.committeeId === where.committeeId);
+    return copy(all);
+  }
+
+  async referral(id: string): Promise<Referral | null> {
+    const found = this._referrals.get(id);
+    return found ? copy(found) : null;
+  }
+
+  async referMatter(referral: Referral): Promise<Referral> {
+    if (this._referrals.has(referral.id)) {
+      throw new Error(`A referral with id ${referral.id} already exists.`);
+    }
+    this._referrals.set(referral.id, copy(referral));
+    return copy(referral);
+  }
+
+  async updateReferral(
+    id: string,
+    change: (current: Referral) => Referral,
+  ): Promise<Referral> {
+    const current = this._referrals.get(id);
+    if (!current) throw new NotFound('Referral', id);
+    const next = change(copy(current));
+    this._referrals.set(id, copy(next));
     return copy(next);
   }
 

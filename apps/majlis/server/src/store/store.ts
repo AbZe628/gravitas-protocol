@@ -40,6 +40,7 @@ import type { Signing } from '../services/signature.js';
 import type { Credential } from '../services/account.js';
 import type { Undertaking } from '../services/undertaking.js';
 import type { Annotation } from '../services/annotation.js';
+import type { Committee, Referral } from '../services/committee.js';
 
 /**
  * A signature, with what it is a signature on.
@@ -248,6 +249,28 @@ export interface Store {
    * @throws NotFound if there is no such undertaking.
    */
   updateUndertaking(id: string, change: (current: Undertaking) => Undertaking): Promise<Undertaking>;
+
+  // ── some of the board, looking at something first ─────────────────────
+
+  /** Every committee this board has formed, wound-up ones included. */
+  committees(boardId?: string): Promise<Committee[]>;
+  committee(id: string): Promise<Committee | null>;
+
+  /** @throws if one with this id already exists. */
+  formCommittee(committee: Committee): Promise<Committee>;
+
+  /** @throws NotFound if there is no such committee. */
+  updateCommittee(id: string, change: (current: Committee) => Committee): Promise<Committee>;
+
+  /** Referrals, by matter or by committee or all of them. */
+  referrals(where?: { matterId?: string; committeeId?: string }): Promise<Referral[]>;
+  referral(id: string): Promise<Referral | null>;
+
+  /** @throws if one with this id already exists. */
+  referMatter(referral: Referral): Promise<Referral>;
+
+  /** @throws NotFound if there is no such referral. */
+  updateReferral(id: string, change: (current: Referral) => Referral): Promise<Referral>;
 
   // ── notes in the margin of the papers ──────────────────────────────────
 
