@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import {
   api,
   governance,
   oversight,
+  theWayIn,
   type Attention as Attention_,
   type AttentionItem,
   type MatterSummary,
@@ -11,8 +11,9 @@ import {
 import { useI18n } from '../lib/i18n.js';
 import { mayDeliberate, useIdentity } from '../lib/identity.js';
 import SmartRaise from '../components/SmartRaise.js';
+import FourDoors from '../components/FourDoors.js';
 import { Block, Display, Label, Note, Why } from '../components/type.js';
-import { Act, Card, Edge, Figure, State, type Tone } from '../components/kit.js';
+import { Act, Card, Edge, State, type Tone } from '../components/kit.js';
 
 /**
  * Arrival.
@@ -104,15 +105,6 @@ function TheOneThing({ item }: { item: AttentionItem }) {
   );
 }
 
-/** One number, what it counts, and where it goes. */
-function Count({ n, of, to, tone = 'plain' }: { n: number; of: string; to: string; tone?: Tone }) {
-  return (
-    <Card to={to} tone="quiet">
-      <Figure n={n} of={of} tone={tone} />
-    </Card>
-  );
-}
-
 export default function Guided() {
   const { t } = useI18n();
   const { identity } = useIdentity();
@@ -120,6 +112,9 @@ export default function Guided() {
   const [matters, setMatters] = useState<MatterSummary[] | null>(null);
   const [drifting, setDrifting] = useState<number | null>(null);
   const [unexamined, setUnexamined] = useState<number | null>(null);
+  const [waiting, setWaiting] = useState<number | null>(null);
+  const [longestWait, setLongestWait] = useState<number | null>(null);
+  const [standing, setStanding] = useState<number | null>(null);
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
@@ -150,6 +145,31 @@ export default function Guided() {
       // The register already counts this and says what it means; deriving it
       // again here would be a second definition of the same word.
       .then((r) => live && setUnexamined(r.neverExamined))
+      .catch(() => undefined);
+
+    /*
+     * What is waiting at the door, and how long the worst of it has waited.
+     *
+     * The wait is the number that shames a board into acting, and it was
+     * nowhere on this screen. `waitedHours` is derived on the server so that
+     * two screens cannot disagree about it; the days are floored, because a
+     * question that has waited nine and a half days has waited nine whole
+     * days and rounding it up would be flattering nobody.
+     */
+    theWayIn
+      .list('demo-board')
+      .then((r) => {
+        if (!live) return;
+        const queue = (r.submissions ?? []).filter((s) => s.standing === 'waiting');
+        setWaiting(queue.length);
+        const worst = queue.reduce((most, s) => Math.max(most, s.waitedHours ?? 0), 0);
+        setLongestWait(queue.length ? Math.floor(worst / 24) : null);
+      })
+      .catch(() => undefined);
+
+    api
+      .rules()
+      .then((rules) => live && Array.isArray(rules) && setStanding(rules.length))
       .catch(() => undefined);
 
     return () => {
@@ -251,27 +271,30 @@ export default function Guided() {
       </Block>
 
       {/*
-        What the board is doing, always. The screen that asked only what needs
-        *you* was empty for an observer, an auditor, and anybody looking before
-        they have credentials — which is everybody, the first time.
+        The whole application, in four rows.
+
+        This was three loose counters under a heading that said *what is
+        happening* — the three that happened to be easy to fetch. One of them
+        linked to a page that never mentioned what it counted, and one read
+        "1 holdings". These four are the four phases, so the row a reader
+        wants always exists and each opens the screen that answers it.
+
+        Always present, for the same reason the counters were: the screen that
+        asked only what needs *you* was empty for an observer, an auditor, and
+        anybody looking before they have credentials — which is everybody, the
+        first time.
       */}
-      <Block label={t('guided.whatIsHappening')}>
-        <div className="grid gap-4 sm:grid-cols-3">
-          {matters !== null && (
-            <Count n={open} of={t('guided.countOpen')} to="/classic" tone="lapis" />
-          )}
-          {drifting !== null && (
-            <Count
-              n={drifting}
-              of={t('guided.countDrift')}
-              to="/register"
-              tone={drifting > 0 ? 'attention' : 'plain'}
-            />
-          )}
-          {unexamined !== null && (
-            <Count n={unexamined} of={t('guided.countUnexamined')} to="/register" />
-          )}
-        </div>
+      <Block label={t('spine.everything')}>
+        <FourDoors
+          counts={{
+            asked: waiting,
+            deciding: matters === null ? null : open,
+            inforce: standing,
+            checked: unexamined,
+            moved: drifting,
+            longestWaitDays: longestWait,
+          }}
+        />
       </Block>
 
       {mayDeliberate(identity?.role) && (
@@ -279,15 +302,6 @@ export default function Guided() {
           <SmartRaise boardId="demo-board" />
         </Block>
       )}
-
-      <Block className="border-t border-line pt-5 lg:block max-lg:hidden">
-        <Link
-          to="/more"
-          className="text-[13px] text-muted underline decoration-line underline-offset-4 transition-colors hover:text-paper"
-        >
-          {t('guided.everything')} →
-        </Link>
-      </Block>
     </div>
   );
 }

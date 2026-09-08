@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { oversight, type Calendar as CalendarData, type CalendarEntry } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
+import { PageHead } from '../components/page.js';
 import { DateText, ErrorText, Loading, Tag } from '../components/ui.js';
 
 /**
@@ -110,8 +111,11 @@ export default function Calendar() {
 
   return (
     <div>
-      <h1 className="mb-1 font-display font-normal leading-[1.12] tracking-[-0.024em] text-[30px] sm:text-[34px]">{t('cal.title')}</h1>
-      <p className="mb-5 text-[13px] leading-relaxed text-muted">{t('cal.intro')}</p>
+      <PageHead
+        phase="deciding"
+        title={t('cal.title')}
+        says={t('cal.intro')}
+      />
 
       <a
         href={oversight.hrefs.calendarFeed()}

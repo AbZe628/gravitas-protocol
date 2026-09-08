@@ -106,6 +106,25 @@ first three; voting and objecting belong to signatories. Without
 12 governance routes, each applying its change inside `store.updateMatter` so the
 rules run against the stored matter in a transaction and a refusal writes nothing.
 
+### Signing the written decision
+
+`services/signature.ts`. Two settings, both optional:
+
+| | |
+|---|---|
+| `MAJLIS_SEAL_KEY` | 32 characters or more. Without it nothing is sealed, `seal()` returns `null`, and the document prints that it is unsealed. There is no default key and no placeholder. |
+| `MAJLIS_SEAL_ISSUER` | What the document says sealed it. Defaults to "this Majlis installation". |
+
+Signing is not voting and the two are stored apart: a position is taken on a
+proposal, a signature is put on the finished document. `POST /matters/:id/sign`
+computes the hash from the record — a client cannot send one, or it would be
+choosing what the board's name goes under.
+
+What the seal proves is deliberately narrow, and the page says so in those
+words: this text is what was sealed, and these people signed it having proved
+who they were in the stated way. It is not a member's own key. That is Stage
+Three and it waits on the four key-custody answers in `ROADMAP.md`.
+
 **353 server tests, 26 client.**
 
 ### Deployment

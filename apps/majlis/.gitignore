@@ -8,3 +8,7 @@ build/
 coverage/
 .vite/
 tsconfig.tsbuildinfo
+
+# The seeded design canvas: a 2.5 MB payload built from the .dc.html
+# artboards beside it. The artboards are the source; this is the output.
+design/**/majlis-*.html

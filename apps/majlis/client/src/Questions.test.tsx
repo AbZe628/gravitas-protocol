@@ -77,9 +77,34 @@ describe('the queue', () => {
   it('says how long it has been waiting, from when they asked', async () => {
     stub({ submissions: [submission()], waiting: ['sub-1'] });
     show();
+    /*
+     * Twice, and both are wanted: once on the question itself, and once at the
+     * head of the page as the longest wait in the queue.
+     *
+     * The second is the number the board is judged on and it used to be
+     * nowhere — a reader had to scan every card and compare the figures
+     * themselves.
+     */
+    await waitFor(() => expect(screen.getAllByText(/6 days/i).length).toBeGreaterThan(1));
+    expect(screen.getByText(/longest wait/i)).toBeInTheDocument();
+
     // 145 hours reads as days, not as a count of hours nobody can picture.
-    await waitFor(() => expect(screen.getByText(/6 days/i)).toBeInTheDocument());
     expect(document.body.textContent).not.toContain('145');
+  });
+
+  it('says what it cannot see, rather than presenting the queue as the whole truth', async () => {
+    stub({ submissions: [submission()], waiting: ['sub-1'] });
+    show();
+
+    /*
+     * A board reading a queue of three has no way of knowing the desk sent
+     * five. Every screen in this application names its own edges, and this
+     * one's edge is that a question asked by email and never entered here
+     * cannot be counted.
+     */
+    await waitFor(() =>
+      expect(screen.getByText(/is not on this list, and Majlis cannot know about it/i)).toBeInTheDocument(),
+    );
   });
 
   it('says when a member entered it for somebody else', async () => {

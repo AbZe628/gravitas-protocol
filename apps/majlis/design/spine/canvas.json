@@ -1,0 +1,53 @@
+{
+  "artboards": [
+    { "file": "Doors.dc.html", "x": 0, "y": 0, "w": 1440, "h": 980, "title": "The map — twenty-three screens, four doors" },
+    { "file": "Main.dc.html", "x": 1560, "y": 0, "w": 1440, "h": 900, "title": "Arrival — the four rows" },
+    { "file": "Phone.dc.html", "x": 3120, "y": 0, "w": 390, "h": 844, "title": "The same four, on a phone" },
+    { "file": "Pack.dc.html", "x": 0, "y": 1260, "w": 1440, "h": 1020, "title": "The pack — one matter, everything for it, one act" }
+  ],
+  "annotations": [
+    {
+      "id": "note-spine",
+      "x": 0,
+      "y": -300,
+      "w": 660,
+      "text": "Four words, and the product is understood.\n\nAsked. Deciding. In force. Checked.\n\nThat is what a Shariah board does, in the order it does it, and it is the only structure anyone has to learn. Every one of the twenty-three screens already built sits under exactly one of the four. Nothing was deleted. What goes is the drawer called Everything else, which held twelve links and told a person nothing about which one they wanted."
+    },
+    {
+      "id": "note-arrival",
+      "x": 1560,
+      "y": -300,
+      "w": 660,
+      "text": "The arrival screen is the whole product.\n\nFour rows, and each says how many are there and what the worst one is. A member sees the state of the entire board in about six seconds, then the one row that needs them is lifted off the page by shadow and carries the only coloured button.\n\nThe old screen said Nothing needs you above three counters that each said something did. That contradiction is what made people distrust it. Here the headline counts, so it cannot disagree with what is under it."
+    },
+    {
+      "id": "note-phone",
+      "x": 3120,
+      "y": -300,
+      "w": 420,
+      "text": "The four words are the tab bar.\n\nSame vocabulary on the phone as on the desk, so nothing is relearned. One card carries the act, 52px, thumb height. A board member reads this between two other things."
+    },
+    {
+      "id": "note-pack",
+      "x": 0,
+      "y": 1010,
+      "w": 660,
+      "text": "The pack is where Majlis gets bigger, not just tidier.\n\nEvery board portal sold to corporate directors — Diligent, Nasdaq Boardvantage, Convene, BoardEffect — is built on one idea: before a vote, a director gets a pack, and everything needed to decide is inside it, in reading order. Majlis has all the pieces already and has never assembled them.\n\nSeven parts: the question as it was put, what this board has already said, the figures by the board's own method, what members have said, what follows if it passes, and what Majlis could not tell you. Then the act, which never moves off the screen. Downloadable as one PDF, because scholars read on aeroplanes."
+    },
+    {
+      "id": "note-competition",
+      "x": 1560,
+      "y": 1010,
+      "w": 700,
+      "text": "What the competition actually is, after looking properly.\n\nFOUR CATEGORIES EXIST, AND NOT ONE OF THEM IS THIS.\n\n1. AI advisers — Yani Pro, ShariaTech AI, ShariahLab, ShariaBot, Ansari. They answer a scholar's question, draft a contract, screen a stock. They assist the scholar. None of them is the board's record, and every one of them says so: the AI does not decide, the scholar does.\n\n2. Screening data — IdealRatings, Musaffa, Zoya, Islamicly. A verdict on a security with the ratios that produced it. Majlis already does this better in one respect: it applies the ratio this board wrote, and says so.\n\n3. Core banking — Azentio iMAL, which runs roughly 150 of the world's 250 Islamic banks, plus Oracle FLEXCUBE, Finacle, FIS, Newgen. Newgen comes closest: it routes a proposal through the Shariah board with approvals and an audit trail. But it is the bank's system, configured by the bank, and the board is a step inside somebody else's workflow.\n\n4. Board portals — Diligent, Boardvantage, Convene, BoardEffect. They know exactly how to make a board's work legible: agenda, pack, voting, minutes, resolutions, retention, audit trail. They know nothing about Shariah.\n\nWHERE MAJLIS SITS. It is a board portal that understands what the board decides, and it has a fourth phase none of the four categories has: after the ruling, somebody checks the bank obeyed it. A search for software that keeps a Shariah board's minutes and resolutions returns nothing, because none is sold. AAOIFI's own governance standards demand internal Shariah review, and banks do it in spreadsheets."
+    },
+    {
+      "id": "note-why-now",
+      "x": 2340,
+      "y": 1010,
+      "w": 480,
+      "text": "Two facts that make the timing an argument, not a hope.\n\nAAOIFI Standard 62 obliges every institution to re-audit its existing contract templates. That is a very large amount of board work arriving at once, at banks with no system for it.\n\nAnd there are roughly 1,600 qualified scholars in the world for 250-odd institutions. The senior ones are retiring, and what they decided is written in minutes nobody can search. Majlis is the record that survives them."
+    }
+  ],
+  "launch": { "view": "canvas" }
+}

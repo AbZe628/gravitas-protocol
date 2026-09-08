@@ -136,19 +136,42 @@ describe('one thing asks to be done', () => {
     await waitFor(() => expect(screen.getByText(/Open it/)).toBeInTheDocument());
 
     /*
-     * This reverses an earlier rule, and the reversal is the point.
+     * The rail is the four doors, and it is headed by them.
      *
      * Hiding the navigation on this screen was right when it was twelve equal
-     * links across the top — a list to read rather than a structure to learn,
-     * competing with the one thing that needed doing. It is now a grouped rail
-     * that is part of the application's frame, and a frame should be permanent:
-     * a reader learns where the navigation lives once and stops thinking about
-     * it. What must stay true is that the *work area* leads with one act, which
-     * the tests above hold.
+     * links across the top. It is now the four phases a question travels
+     * through, numbered, and a frame should be permanent: a reader learns
+     * where the navigation lives once and stops thinking about it.
+     *
+     * The headings are asserted by their number as well as their name, so a
+     * rail that lost the sequence — which is the information the numbers
+     * carry — fails here rather than quietly becoming four unordered piles.
      */
-    expect(screen.getByText('The work')).toBeInTheDocument();
-    expect(screen.getByText('What we hold')).toBeInTheDocument();
-    expect(screen.getAllByRole('link', { name: 'Register' }).length).toBeGreaterThan(0);
+    expect(screen.getByText(/01\s+Asked/)).toBeInTheDocument();
+    expect(screen.getByText(/02\s+Deciding/)).toBeInTheDocument();
+    expect(screen.getByText(/03\s+In force/)).toBeInTheDocument();
+    expect(screen.getByText(/04\s+Checked/)).toBeInTheDocument();
+
+    // Nothing was lost in the move: the register still has a way in.
+    expect(screen.getAllByRole('link', { name: 'Holdings' }).length).toBeGreaterThan(0);
+  });
+
+  it('has no drawer called everything else', async () => {
+    stub();
+    show();
+    await waitFor(() => expect(screen.getByText(/Open it/)).toBeInTheDocument());
+
+    /*
+     * The drawer is what this whole rearrangement was for.
+     *
+     * It held twelve links under four headings nobody had picked, it was four
+     * screens tall, and it told a reader nothing about which of the twelve
+     * they wanted. Every one of those destinations now sits under the phase
+     * it belongs to. If a *more* link comes back, something has been given a
+     * home nobody chose again.
+     */
+    expect(screen.queryByRole('link', { name: /everything else/i })).toBeNull();
+    expect(screen.queryByRole('link', { name: /^More$/i })).toBeNull();
   });
 
   it('says nothing waiting as an answer rather than a blank', async () => {
@@ -174,56 +197,84 @@ describe('one thing asks to be done', () => {
      * everybody, the first time. A front page that says nothing is waiting and
      * stops has told a first-time reader there is nothing here.
      */
-    await waitFor(() => expect(screen.getByText('What the board is doing')).toBeInTheDocument());
-  });
-});
+    await waitFor(() => expect(screen.getByText('Everything the board holds')).toBeInTheDocument());
 
-describe('nothing was removed', () => {
-  it('reaches every other screen from one link', async () => {
-    stub();
-    show('/more');
-
-    await waitFor(() => expect(screen.getByText('Everything else')).toBeInTheDocument());
-
-    // getAllBy rather than getBy: each entry carries a sentence saying what it
-    // is for, and some of those sentences name the thing too.
-    for (const label of ['Register', 'Library', 'what stands', 'Search', 'Meetings', 'Board']) {
+    /*
+     * Four rows, always, whoever is reading.
+     *
+     * These replaced three counters that were the three easiest to fetch
+     * rather than the three that answered anything — one of them linked to a
+     * page where the word it counted never appeared. Because these are the
+     * four phases, the row a reader wants always exists.
+     */
+    for (const phase of ['Asked', 'Deciding', 'In force', 'Checked']) {
       expect(
-        screen.getAllByRole('link', { name: new RegExp(label) }).length,
-        `${label} is not reachable from here`,
+        screen.getAllByText(phase).length,
+        `the ${phase} row is missing from the arrival screen`,
       ).toBeGreaterThan(0);
     }
   });
 
-  it('groups them, because the names alone taught nobody', async () => {
-    stub();
-    show('/more');
+  it('never writes a count and a noun that disagree', async () => {
+    stub({ items: [], outstanding: 0, overdue: 0 });
+    show();
 
-    // getAllBy: the rail carries the same group names, which is the point —
-    // the drawer and the frame agree about how the application is divided.
-    await waitFor(() => expect(screen.getAllByText('What we decided').length).toBeGreaterThan(0));
-    expect(screen.getAllByText('What we hold').length).toBeGreaterThan(0);
-    expect(screen.getByText('Working something out')).toBeInTheDocument();
-    expect(screen.getAllByText('The board itself').length).toBeGreaterThan(0);
+    await waitFor(() => expect(screen.getByText('Everything the board holds')).toBeInTheDocument());
+
+    /*
+     * The screen used to print "1 holdings".
+     *
+     * The fix is not a pluraliser. Arabic has a dual as well as a plural and
+     * Urdu agrees differently again, so the words under the numbers are
+     * written to read correctly at one and at forty — which is why no noun
+     * appears beside a count at all. This holds that line.
+     */
+    expect(screen.queryByText(/\b1 [a-z]+s\b/)).toBeNull();
+  });
+});
+
+describe('nothing was removed', () => {
+  it('reaches every screen from the rail, under the phase it belongs to', async () => {
+    stub();
+    show();
+
+    await waitFor(() => expect(screen.getByText(/01\s+Asked/)).toBeInTheDocument());
+
+    /*
+     * Every destination the retired drawer held, still one click away.
+     *
+     * This is the test that makes "simplify without losing anything" a fact
+     * rather than an intention: if a rearrangement drops a screen out of the
+     * navigation, it fails here.
+     */
+    for (const label of ['Holdings', 'Contracts', 'What stands', 'Search', 'Sittings', 'The board']) {
+      expect(
+        screen.getAllByRole('link', { name: new RegExp(label) }).length,
+        `${label} is not reachable from the rail`,
+      ).toBeGreaterThan(0);
+    }
   });
 
   it('leaves out a page this installation cannot honour', async () => {
     stub();
-    show('/more');
+    show();
 
     // The assistant is off here, so it is absent rather than listed and
     // refusing — the same rule as every other control.
-    await waitFor(() => expect(screen.getByText('Everything else')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText(/01\s+Asked/)).toBeInTheDocument());
     expect(screen.queryByRole('link', { name: /Assistant/ })).toBeNull();
   });
 
-  it('says plainly that nothing was taken off the first screen', async () => {
+  it('still answers the drawer address, rather than breaking a bookmark', async () => {
     stub();
     show('/more');
 
-    await waitFor(() =>
-      expect(screen.getByText(/Nothing was taken away from it/)).toBeInTheDocument(),
-    );
+    /*
+     * The page is gone; the address is not. Somebody has this bookmarked, or
+     * written in an email to a colleague, and a dead link is a worse outcome
+     * than a redirect to the screen that now holds all of it.
+     */
+    await waitFor(() => expect(screen.getByText('Everything the board holds')).toBeInTheDocument());
   });
 });
 

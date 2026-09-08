@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api, oversight, type HeldStructure, type Library as LibraryData, type MatterSummary } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
+import { Division, PageHead } from '../components/page.js';
 import { mayVote, useIdentity } from '../lib/identity.js';
 import { ErrorText, Loading } from '../components/ui.js';
 import { Card, State, type Tone } from '../components/kit.js';
-import { Display, Note } from '../components/type.js';
 
 /**
  * The library as this board holds it.
@@ -304,11 +304,13 @@ export default function Library() {
 
   return (
     <div>
-      <div className="mb-8">
-        <Display>{t('adopt.title')}</Display>
-        <Note className="mt-3">{t('adopt.intro')}</Note>
-      </div>
+      <PageHead
+        phase="inforce"
+        title={t('adopt.title')}
+        says={t('adopt.intro')}
+      />
 
+      <Division heading={t('adopt.shapes')}>
       <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
         <ul className="min-w-0 flex-1 space-y-2">
           {ORDER.flatMap((source) =>
@@ -357,6 +359,7 @@ export default function Library() {
           </p>
         </aside>
       </div>
+      </Division>
     </div>
   );
 }

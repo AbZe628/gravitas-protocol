@@ -54,7 +54,7 @@ import {
   rules as seedRules,
   assets as seedAssets,
 } from '../data/seed.js';
-import { ASSISTANT_LOG_MAX, NotFound, type Store } from './store.js';
+import { ASSISTANT_LOG_MAX, NotFound, type Store, type StoredSigning } from './store.js';
 
 interface Document {
   version: 1;
@@ -94,6 +94,12 @@ interface Document {
   meetings?: Meeting[];
   submissions?: Submission[];
   examinations?: Examination[];
+  /**
+   * Signatures on written decisions. Append-only and not keyed by member,
+   * because a member may sign more than once when a document is amended
+   * between signings, and both are part of the record.
+   */
+  signings?: StoredSigning[];
   briefings: Briefing[];
 }
 
@@ -181,6 +187,7 @@ export class FileStore implements Store {
       loaded.meetings ??= [];
       loaded.submissions ??= [];
       loaded.examinations ??= [];
+      loaded.signings ??= [];
       this.doc = loaded;
       return;
     }
@@ -505,6 +512,19 @@ export class FileStore implements Store {
       this.doc.examinations.push(copy(examination));
       this.persist();
       return copy(examination);
+    });
+  }
+
+  async signings(matterId: string): Promise<StoredSigning[]> {
+    return copy((this.doc.signings ?? []).filter((s) => s.matterId === matterId));
+  }
+
+  async recordSigning(signing: StoredSigning): Promise<StoredSigning> {
+    return this.serialise(() => {
+      this.doc.signings ??= [];
+      this.doc.signings.push(copy(signing));
+      this.persist();
+      return copy(signing);
     });
   }
 

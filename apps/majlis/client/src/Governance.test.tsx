@@ -242,7 +242,7 @@ describe('where the vote stands', () => {
     stub({ matter: matter({ status: 'timelock', timelockEndsAt: ends }) });
     renderMatter();
 
-    expect(await screen.findByText('In its timelock')).toBeInTheDocument();
+    expect(await screen.findByText('In its waiting period')).toBeInTheDocument();
     expect(screen.getByText(/Any one signatory can halt this/)).toBeInTheDocument();
     // Not yet ready, so it is not offered.
     expect(screen.queryByText('Bring into force')).toBeNull();
@@ -253,7 +253,7 @@ describe('where the vote stands', () => {
     stub({ matter: matter({ status: 'timelock', timelockEndsAt: ended }) });
     renderMatter();
 
-    expect(await screen.findByText('The timelock has run')).toBeInTheDocument();
+    expect(await screen.findByText('The waiting period has run')).toBeInTheDocument();
     await waitFor(() => expect(screen.getByText('Bring into force')).toBeInTheDocument());
   });
 });

@@ -1,10 +1,11 @@
 
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { useI18n } from '../lib/i18n.js';
-import { useIdentity } from '../lib/identity.js';
+import { useIdentity, maySubmit } from '../lib/identity.js';
 import { useHealth } from '../lib/health.js';
 import { useBoardName } from '../lib/board.js';
 import { LANGS, dirFor } from '../locales/index.js';
+import { BESIDES, DOORS, mainOf, phaseOf } from '../lib/spine.js';
 
 /**
  * The application's frame.
@@ -51,10 +52,12 @@ interface Item {
 
 function Group({ title, items }: { title: string; items: Item[] }) {
   return (
-    <div className="mb-7">
-      <div className="mb-2.5 px-3 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
-        {title}
-      </div>
+    <div className={title ? 'mb-7' : 'mb-6'}>
+      {title && (
+        <div className="mb-2.5 px-3 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+          {title}
+        </div>
+      )}
       <ul className="space-y-0.5">
         {items.map((item) => (
           <li key={item.to}>
@@ -185,45 +188,65 @@ function Avatar({ id }: { id?: string }) {
  */
 function TabBar() {
   const { t } = useI18n();
+  const here = phaseOf(useLocation().pathname);
 
-  const tabs = [
-    { to: '/', label: t('tab.work'), end: true, icon: 'work' },
-    { to: '/record', label: t('nav.record'), icon: 'record' },
-    { to: '/calendar', label: t('nav.calendar'), icon: 'coming' },
-    { to: '/more', label: t('tab.more'), icon: 'more' },
-  ] as const;
+  /*
+   * The same four words as the rail, so nothing is relearned on a phone.
+   *
+   * These used to be four different destinations from the rail's, plus a
+   * *more* tab opening a page of twelve links — which is a hamburger with
+   * extra steps. A member who learns `Asked, Deciding, In force, Checked` at
+   * their desk finds the identical four here, in the identical order.
+   */
+  const tabs = DOORS.map((door) => ({
+    to: mainOf(door),
+    label: t(door.label),
+    icon: door.phase,
+  }));
 
+  /*
+   * One drawing per phase, each of the thing itself rather than a symbol to
+   * decode: a question is a speech bubble, deciding is a balance, in force is
+   * a sealed page, checked is a magnifier.
+   */
   const icon = (kind: string, active: boolean) => {
     const stroke = active ? '#164470' : '#B3A896';
-    if (kind === 'work') {
+    const common = {
+      width: 21,
+      height: 21,
+      viewBox: '0 0 24 24',
+      fill: 'none',
+      stroke,
+      strokeWidth: 1.9,
+      strokeLinecap: 'round' as const,
+      strokeLinejoin: 'round' as const,
+    };
+    if (kind === 'asked') {
       return (
-        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke={stroke} strokeWidth="1.9" strokeLinecap="round">
-          <path d="M4 6h16M4 12h16M4 18h10" />
+        <svg {...common}>
+          <path d="M21 14a2 2 0 0 1-2 2H8l-4 4V5a2 2 0 0 1 2-2h13a2 2 0 0 1 2 2z" />
         </svg>
       );
     }
-    if (kind === 'record') {
+    if (kind === 'deciding') {
       return (
-        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke={stroke} strokeWidth="1.9" strokeLinecap="round">
-          <rect x="4" y="4" width="16" height="16" rx="2.5" />
-          <path d="M9 9h6M9 14h4" />
+        <svg {...common}>
+          <path d="M12 4v16M5 8h14M5 8l-2.5 6h5zM19 8l2.5 6h-5z" />
         </svg>
       );
     }
-    if (kind === 'coming') {
+    if (kind === 'inforce') {
       return (
-        <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke={stroke} strokeWidth="1.9" strokeLinecap="round">
-          <circle cx="12" cy="12" r="8.5" />
-          <path d="M12 7.5v5l3.2 2" />
+        <svg {...common}>
+          <path d="M6 3h9l4 4v14H6z" />
+          <path d="M9.5 12h6M9.5 16h4" />
         </svg>
       );
     }
-    // Everything the four do not hold.
     return (
-      <svg width="21" height="21" viewBox="0 0 24 24" fill={stroke}>
-        <circle cx="5" cy="12" r="1.9" />
-        <circle cx="12" cy="12" r="1.9" />
-        <circle cx="19" cy="12" r="1.9" />
+      <svg {...common}>
+        <circle cx="11" cy="11" r="7" />
+        <path d="M20 20l-3.6-3.6" />
       </svg>
     );
   };
@@ -234,28 +257,33 @@ function TabBar() {
       className="fixed inset-x-0 bottom-0 z-40 flex items-start bg-raised/85 px-1.5 pt-2.5 shadow-[0_-0.5px_0_rgba(25,23,19,0.09)] backdrop-blur-xl lg:hidden"
       style={{ paddingBottom: 'calc(0.5rem + env(safe-area-inset-bottom))' }}
     >
-      {tabs.map((tab) => (
-        <NavLink
-          key={tab.to}
-          to={tab.to}
-          end={'end' in tab ? tab.end : undefined}
-          className="flex flex-1 flex-col items-center gap-1.5 pb-1.5"
-        >
-          {({ isActive }) => (
-            <>
-              {icon(tab.icon, isActive)}
-              <span
-                className={
-                  'text-[10.5px] leading-none ' +
-                  (isActive ? 'font-bold text-lapis' : 'text-muted')
-                }
-              >
-                {tab.label}
-              </span>
-            </>
-          )}
-        </NavLink>
-      ))}
+      {tabs.map((tab) => {
+        /*
+         * Lit by phase, not by path.
+         *
+         * A member who taps `Deciding`, opens a matter and then opens one of
+         * its sources is still deciding, and a tab bar that went dark on them
+         * would be telling them they had left. `phaseOf` answers where they
+         * are, including for screens that are not themselves tabs.
+         */
+        const active = here === tab.icon;
+        return (
+          <NavLink
+            key={tab.to}
+            to={tab.to}
+            className="flex flex-1 flex-col items-center gap-1.5 pb-1.5"
+          >
+            {icon(tab.icon, active)}
+            <span
+              className={
+                'text-[10.5px] leading-none ' + (active ? 'font-bold text-lapis' : 'text-muted')
+              }
+            >
+              {tab.label}
+            </span>
+          </NavLink>
+        );
+      })}
 
       <button
         type="button"
@@ -278,43 +306,32 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   const boardName = useBoardName();
   const path = useLocation().pathname;
 
+  /*
+   * The rail is the four doors, and nothing is written out here.
+   *
+   * These groups used to be a hand-kept list that disagreed with the tab bar
+   * and with the page called *Everything else*: `Coming` and `Record` each
+   * appeared twice, under headings nobody had chosen. Everything now comes
+   * from `lib/spine.ts`, so the rail, the tabs and the arrival screen cannot
+   * drift apart — adding a screen in one place adds it in all three.
+   */
   const groups: { title: string; items: Item[] }[] = [
+    // Arrival on its own, above the four, because it is not one of them.
+    { title: '', items: [{ to: '/', label: t('guided.greeting'), end: true }] },
+
+    // One group per phase, numbered, because the order is the order a
+    // question actually travels and that is information rather than decoration.
+    ...DOORS.map((door) => ({
+      title: `${door.ordinal}  ${t(door.label)}`,
+      items: door.destinations.map((d) => ({ to: d.to, label: t(d.label) })),
+    })),
+
     {
-      title: t('shell.theWork'),
-      items: [
-        { to: '/', label: t('guided.greeting'), end: true },
-        { to: '/questions', label: t('nav.questions') },
-        { to: '/incidents', label: t('nav.incidents') },
-        { to: '/examinations', label: t('nav.examinations') },
-        { to: '/calendar', label: t('nav.calendar') },
-      ],
-    },
-    {
-      title: t('more.decided'),
-      items: [
-        { to: '/record', label: t('stands.title') },
-        { to: '/search', label: t('nav.search') },
-        { to: '/classic', label: t('more.allMatters') },
-      ],
-    },
-    {
-      title: t('more.hold'),
-      items: [
-        { to: '/register', label: t('nav.register') },
-        { to: '/library', label: t('nav.library') },
-        { to: '/calculations', label: t('nav.calculations') },
-      ],
-    },
-    {
-      title: t('more.theBoard'),
-      items: [
-        { to: '/meetings', label: t('nav.meetings') },
-        { to: '/briefings', label: t('nav.briefings') },
-        ...(health?.assistantKind === 'off'
-          ? []
-          : [{ to: '/assistant', label: t('nav.assistant') }]),
-        { to: '/settings', label: t('nav.settings') },
-      ],
+      title: t('spine.besides'),
+      items: BESIDES.filter(
+        // A control this installation cannot honour is absent, not disabled.
+        (d) => d.needs !== 'assistant' || health?.assistantKind !== 'off',
+      ).map((d) => ({ to: d.to, label: t(d.label) })),
     },
   ];
 
@@ -413,6 +430,52 @@ export default function Shell({ children }: { children: React.ReactNode }) {
           <span className="text-[13px] text-muted">{t('shell.where')}</span>
 
           <div className="flex items-center gap-4">
+            {/*
+              Search, in the frame rather than on a screen of its own.
+
+              It crosses all four phases by definition, so a reader looking for
+              a ruling should not first have to decide which phase it is in and
+              navigate there. It looks like a field and behaves like a link:
+              pressing it opens the search screen, where the typing happens.
+              A field here that searched as you typed would need its own
+              results surface floating over every page, which is a second
+              interface to maintain and to translate.
+            */}
+            <Link
+              to="/search"
+              className="flex w-[210px] items-center gap-2.5 rounded-xl bg-raised/80 px-3.5 py-2 shadow-ring transition-shadow hover:shadow-card"
+            >
+              <svg
+                width="13"
+                height="13"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#B3A896"
+                strokeWidth="2.1"
+                strokeLinecap="round"
+                aria-hidden="true"
+              >
+                <circle cx="11" cy="11" r="7" />
+                <path d="M20 20l-3.5-3.5" />
+              </svg>
+              <span className="truncate text-[12.5px] text-muted">{t('besides.search')}</span>
+            </Link>
+
+            {/*
+              The one act that belongs to no screen: putting something to the
+              board. It is what an institution comes here to do and what a
+              secretary does on their behalf, and it used to live only at the
+              bottom of the arrival screen.
+            */}
+            {maySubmit(identity?.role) && (
+              <Link
+                to="/ask"
+                className="rounded-xl bg-lapis px-4 py-2 text-[12.5px] font-semibold text-white shadow-act transition-shadow hover:shadow-lift"
+              >
+                {t('door.asked.put')}
+              </Link>
+            )}
+
             {/*
               A segmented control: the container is the recess, the chosen one
               is a raised sheet. Three outlined buttons said nothing about

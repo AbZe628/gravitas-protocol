@@ -36,6 +36,20 @@ import type {
   Submission,
   Examination,
 } from '../types.js';
+import type { Signing } from '../services/signature.js';
+
+/**
+ * A signature, with what it is a signature on.
+ *
+ * `Signing` itself is deliberately ignorant of storage — it is what the
+ * document renderer needs and nothing else. The two identifying fields live
+ * here so that a store can find them and a document cannot accidentally print
+ * them.
+ */
+export interface StoredSigning extends Signing {
+  matterId: string;
+  boardId: string;
+}
 
 export class NotFound extends Error {
   constructor(what: string, id: string) {
@@ -179,6 +193,24 @@ export interface Store {
    * @throws if an examination with this id already exists.
    */
   recordExamination(examination: Examination): Promise<Examination>;
+
+  // ── signing the written decision ───────────────────────────────────────
+
+  /** Every signature on this matter's document, oldest first. */
+  signings(matterId: string): Promise<StoredSigning[]>;
+
+  /**
+   * Record one signature.
+   *
+   * Append-only, like a position. A member who signs, sees the document
+   * amended, and signs again has done two things, and both stay visible: the
+   * first signature is over a hash the document no longer has, and the page
+   * says so beside their name. Overwriting it would erase the fact that they
+   * were shown something else.
+   *
+   * There is deliberately no way to remove one.
+   */
+  recordSigning(signing: StoredSigning): Promise<StoredSigning>;
 
   // ── the way in ─────────────────────────────────────────────────────────
 

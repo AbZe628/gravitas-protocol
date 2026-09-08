@@ -1,0 +1,149 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,300;6..72,400;6..72,500&family=Manrope:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Amiri:wght@400&display=swap">
+  <style>
+    body { margin: 0; -webkit-font-smoothing: antialiased; }
+    .dest { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 9px 0; border-bottom: 1px solid rgba(25,23,19,0.05); }
+    .dest:last-child { border-bottom: 0; }
+    .dn { font-size: 13.5px; color: #191713; letter-spacing: -0.004em; }
+    .dp { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #C0B6A3; white-space: nowrap; }
+    .dnote { font-size: 11.5px; line-height: 1.5; color: #9C9284; margin-top: 2px; }
+  </style>
+</helmet>
+
+<div style="position: relative; width: 1440px; height: 980px; background: #FBF8F1; font-family: Manrope, system-ui, sans-serif; color: #191713; overflow: hidden;">
+
+  <svg width="1440" height="980" viewBox="0 0 1440 980" style="position: absolute; inset: 0; pointer-events: none;">
+    <defs>
+      <linearGradient id="dsw" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stop-color="#164470" stop-opacity="0.05"/>
+        <stop offset="40%" stop-color="#B08430" stop-opacity="0.045"/>
+        <stop offset="72%" stop-color="#2C6B57" stop-opacity="0.04"/>
+        <stop offset="100%" stop-color="#B08430" stop-opacity="0.05"/>
+      </linearGradient>
+      <radialGradient id="dglow" cx="0.5" cy="0" r="0.75">
+        <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.95"/>
+        <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <rect width="1440" height="980" fill="url(#dglow)"/>
+    <path d="M-40 300 C 360 178, 1080 178, 1480 300 L1480 980 L-40 980 Z" fill="url(#dsw)"/>
+    <path d="M-40 300 C 360 178, 1080 178, 1480 300" fill="none" stroke="#164470" stroke-opacity="0.11" stroke-width="1"/>
+    <path d="M-40 318 C 360 196, 1080 196, 1480 318" fill="none" stroke="#B08430" stroke-opacity="0.13" stroke-width="1"/>
+  </svg>
+
+  <div style="position: relative; padding: 54px 60px 0;">
+
+    <div style="display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 34px;">
+      <div style="max-width: 62ch;">
+        <div style="font-size: 10px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: #B3A896; margin-bottom: 12px;">The whole application</div>
+        <h1 style="font-family: Newsreader, serif; font-size: 42px; font-weight: 400; line-height: 1.04; margin: 0; letter-spacing: -0.028em;">Twenty-three screens, four doors.</h1>
+        <div style="font-size: 14px; line-height: 1.65; color: #635C52; margin-top: 13px;">A question arrives, the board decides it, the decision governs the bank, and someone checks the bank obeyed. That is the whole of Shariah governance, and it is the whole of this product. Every screen already built sits under exactly one of these four. Nothing was removed and nothing new has to be learned.</div>
+      </div>
+      <div style="flex-shrink: 0; text-align: right;">
+        <div style="font-family: Newsreader, serif; font-size: 15px; color: #4E483F; letter-spacing: -0.01em;">Everything else</div>
+        <div style="font-family: Newsreader, serif; font-size: 46px; line-height: 1.1; color: #9A3830; letter-spacing: -0.03em;">retired</div>
+        <div style="font-size: 11.5px; color: #9C9284; margin-top: 4px; max-width: 22ch;">the drawer that held twelve links and told you nothing</div>
+      </div>
+    </div>
+
+    <!-- four doors -->
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px;">
+
+      <!-- 01 -->
+      <div style="background: #FFFFFF; border-radius: 20px; padding: 26px 24px 22px; box-shadow: 0 0 0 0.5px rgba(25,23,19,0.055), 0 1px 2px rgba(25,23,19,0.045), 0 14px 28px -18px rgba(25,23,19,0.18); position: relative; overflow: hidden;">
+        <svg width="100%" height="4" viewBox="0 0 320 4" preserveAspectRatio="none" style="position: absolute; left: 0; top: 0;"><path d="M0 0 H320 C 250 3.4, 90 3.4, 0 4 Z" fill="#164470"/></svg>
+        <div style="display: flex; align-items: baseline; gap: 10px; margin-top: 4px;">
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #B3A896;">01</span>
+          <span style="font-family: Newsreader, serif; font-size: 26px; letter-spacing: -0.022em;">Asked</span>
+        </div>
+        <div style="font-size: 12.5px; line-height: 1.55; color: #635C52; margin-top: 8px; min-height: 56px;">Somebody has put a question to the board and it has not been taken up yet. The clock starts here.</div>
+        <div style="height: 1px; background: rgba(25,23,19,0.07); margin: 6px 0 4px;"></div>
+        <div class="dest"><div><div class="dn">The queue</div><div class="dnote">what is waiting, longest first</div></div><span class="dp">/questions</span></div>
+        <div class="dest"><div><div class="dn">Put a question</div><div class="dnote">the bank writes, the board is told</div></div><span class="dp">/ask</span></div>
+        <div class="dest"><div><div class="dn">Declined, and why</div><div class="dnote">a refusal is a record too</div></div><span class="dp">/questions</span></div>
+      </div>
+
+      <!-- 02 -->
+      <div style="background: #FFFFFF; border-radius: 20px; padding: 26px 24px 22px; box-shadow: 0 0 0 0.5px rgba(25,23,19,0.055), 0 1px 2px rgba(25,23,19,0.045), 0 14px 28px -18px rgba(25,23,19,0.18); position: relative; overflow: hidden;">
+        <svg width="100%" height="4" viewBox="0 0 320 4" preserveAspectRatio="none" style="position: absolute; left: 0; top: 0;"><path d="M0 0 H320 C 250 3.4, 90 3.4, 0 4 Z" fill="#B08430"/></svg>
+        <div style="display: flex; align-items: baseline; gap: 10px; margin-top: 4px;">
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #C29438;">02</span>
+          <span style="font-family: Newsreader, serif; font-size: 26px; letter-spacing: -0.022em;">Deciding</span>
+        </div>
+        <div style="font-size: 12.5px; line-height: 1.55; color: #635C52; margin-top: 8px; min-height: 56px;">The board has it. Members read, argue, and record a position. This is where a scholar spends their attention.</div>
+        <div style="height: 1px; background: rgba(25,23,19,0.07); margin: 6px 0 4px;"></div>
+        <div class="dest"><div><div class="dn">The pack</div><div class="dnote">one matter, everything for it, one act</div></div><span class="dp">/matters/:id</span></div>
+        <div class="dest"><div><div class="dn">All open matters</div><div class="dnote">the full board, not just yours</div></div><span class="dp">/classic</span></div>
+        <div class="dest"><div><div class="dn">Sittings</div><div class="dnote">who attended, what was minuted</div></div><span class="dp">/meetings</span></div>
+        <div class="dest"><div><div class="dn">Dates that bind</div><div class="dnote">reviews, windows, deadlines</div></div><span class="dp">/calendar</span></div>
+      </div>
+
+      <!-- 03 -->
+      <div style="background: #FFFFFF; border-radius: 20px; padding: 26px 24px 22px; box-shadow: 0 0 0 0.5px rgba(25,23,19,0.055), 0 1px 2px rgba(25,23,19,0.045), 0 14px 28px -18px rgba(25,23,19,0.18); position: relative; overflow: hidden;">
+        <svg width="100%" height="4" viewBox="0 0 320 4" preserveAspectRatio="none" style="position: absolute; left: 0; top: 0;"><path d="M0 0 H320 C 250 3.4, 90 3.4, 0 4 Z" fill="#2C6B57"/></svg>
+        <div style="display: flex; align-items: baseline; gap: 10px; margin-top: 4px;">
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #B3A896;">03</span>
+          <span style="font-family: Newsreader, serif; font-size: 26px; letter-spacing: -0.022em;">In force</span>
+        </div>
+        <div style="font-size: 12.5px; line-height: 1.55; color: #635C52; margin-top: 8px; min-height: 56px;">The decision is now a rule the bank works under. This is what the bank reads, and what an auditor asks for.</div>
+        <div style="height: 1px; background: rgba(25,23,19,0.07); margin: 6px 0 4px;"></div>
+        <div class="dest"><div><div class="dn">What stands</div><div class="dnote">rulings in force, and what each replaced</div></div><span class="dp">/rules</span></div>
+        <div class="dest"><div><div class="dn">What is permitted</div><div class="dnote">holdings, and the ruling behind each</div></div><span class="dp">/register</span></div>
+        <div class="dest"><div><div class="dn">Contracts</div><div class="dnote">nineteen shapes, drafts written to order</div></div><span class="dp">/library</span></div>
+        <div class="dest"><div><div class="dn">Figures</div><div class="dnote">the board's own method, applied</div></div><span class="dp">/calculations</span></div>
+        <div class="dest"><div><div class="dn">Papers</div><div class="dnote">briefings, the annual report, exports</div></div><span class="dp">/briefings</span></div>
+      </div>
+
+      <!-- 04 -->
+      <div style="background: #FFFFFF; border-radius: 20px; padding: 26px 24px 22px; box-shadow: 0 0 0 0.5px rgba(25,23,19,0.055), 0 1px 2px rgba(25,23,19,0.045), 0 14px 28px -18px rgba(25,23,19,0.18); position: relative; overflow: hidden;">
+        <svg width="100%" height="4" viewBox="0 0 320 4" preserveAspectRatio="none" style="position: absolute; left: 0; top: 0;"><path d="M0 0 H320 C 250 3.4, 90 3.4, 0 4 Z" fill="#9A3830"/></svg>
+        <div style="display: flex; align-items: baseline; gap: 10px; margin-top: 4px;">
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #B3A896;">04</span>
+          <span style="font-family: Newsreader, serif; font-size: 26px; letter-spacing: -0.022em;">Checked</span>
+        </div>
+        <div style="font-size: 12.5px; line-height: 1.55; color: #635C52; margin-top: 8px; min-height: 56px;">A ruling nobody verifies is a wish. This is the door no other product on the market has at all.</div>
+        <div style="height: 1px; background: rgba(25,23,19,0.07); margin: 6px 0 4px;"></div>
+        <div class="dest"><div><div class="dn">What moved</div><div class="dnote">a holding that left the ruling's limits</div></div><span class="dp">/examinations</span></div>
+        <div class="dest"><div><div class="dn">Reviews</div><div class="dnote">how many sampled, how many failed</div></div><span class="dp">/examinations</span></div>
+        <div class="dest"><div><div class="dn">Breaches</div><div class="dnote">nine steps from found to closed</div></div><span class="dp">/incidents</span></div>
+        <div class="dest"><div><div class="dn">Never examined</div><div class="dnote">stated out loud, not left silent</div></div><span class="dp">/examinations</span></div>
+      </div>
+
+    </div>
+
+    <!-- the two that belong to no phase -->
+    <div style="display: flex; gap: 18px; margin-top: 20px;">
+      <div style="flex: 1; background: rgba(255,255,255,0.58); border-radius: 18px; padding: 20px 24px; box-shadow: 0 0 0 0.5px rgba(25,23,19,0.05); display: flex; align-items: center; gap: 22px;">
+        <div style="width: 150px; flex-shrink: 0;"><div style="font-family: Newsreader, serif; font-size: 19px; letter-spacing: -0.018em;">The board</div><div style="font-size: 11.5px; color: #9C9284; margin-top: 3px;">not a phase — who we are</div></div>
+        <div style="flex: 1; display: flex; gap: 26px; font-size: 12.5px; color: #4E483F;">
+          <span>Members and what each may do</span>
+          <span>Quorum</span>
+          <span>Notices</span>
+          <span>Language</span>
+        </div>
+        <span class="dp">/settings</span>
+      </div>
+      <div style="width: 420px; background: rgba(255,255,255,0.58); border-radius: 18px; padding: 20px 24px; box-shadow: 0 0 0 0.5px rgba(25,23,19,0.05); display: flex; align-items: center; gap: 22px;">
+        <div style="width: 150px; flex-shrink: 0;"><div style="font-family: Newsreader, serif; font-size: 19px; letter-spacing: -0.018em;">Search</div><div style="font-size: 11.5px; color: #9C9284; margin-top: 3px;">across all four at once</div></div>
+        <div style="flex: 1; font-size: 12.5px; color: #4E483F;">One field. Rulings, matters, holdings, contracts, incidents.</div>
+        <span class="dp">/search</span>
+      </div>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 40px; margin-top: 26px; padding-left: 4px;">
+      <div style="font-size: 12.5px; line-height: 1.6; color: #9C9284; max-width: 74ch;">The board portals corporate directors already use — Diligent, Boardvantage, Convene — organise a board around the meeting: agenda, pack, minutes, resolutions. That is three of these four. A Shariah board has a fourth, because its resolutions do not end at the minute book: they bind the bank's trading afterwards, and somebody has to look. No product sold today covers all four.</div>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

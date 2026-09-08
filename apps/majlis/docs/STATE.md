@@ -12,9 +12,81 @@ unfinished it says so, and where something is broken it says how it breaks.
 ## Verified, this save
 
 ```
-server   55 files   1400 tests   passed
-client   21 files    232 tests   passed
+server   57 files   1445 tests   passed
+client   21 files    233 tests   passed
 ```
+
+**New since the last save: one shape for every page.**
+
+`components/page.tsx` holds it — `PageHead`, `Part`, `Division`, `Gaps`,
+`Nothing`, `TwoColumns` — and all twenty-two screens use it. A reader learns
+one layout instead of twenty-two: where you are, what this is, what it is for,
+what is true right now, then the content, then what the page could not tell you.
+
+The matter pack is the reference. `services/pack.ts` assembles one matter from
+five services that already existed and never spoke to each other, in six
+numbered parts, and its sixth part is filled from the material rather than
+written by hand — so a gap cannot exist in the data and be missing from the
+list. The three-step wizard it replaced is gone.
+
+Search and *put something to the board* now live in the frame, as the artboard
+draws them, rather than one screen each.
+
+All twenty-two pages now carry their divisions as well as the head.
+
+**The language pass is done, and it found something different from what was
+expected.** The AI register was already gone — 1,098 English strings, average
+5.5 words a sentence, two sentences over 28 words, no corporate padding at all.
+What was left was *our* vocabulary standing in for the board's: timelock,
+operative parameter, installation, cadence. Twenty-three strings in each of the
+three languages now say waiting period, the terms, this copy, the clock. Nothing
+remains.
+
+Quorum, ratify, supersede and drift were left alone on purpose. Those are the
+board's own words and replacing them would be talking down to a scholar.
+
+**New since the last save: the four doors.**
+
+`lib/spine.ts` is now the one definition of the navigation, and the rail, the
+phone's tabs and the arrival screen all read it. A question travels **Asked →
+Deciding → In force → Checked**, and every screen sits under exactly one of the
+four. Nothing was removed; a test asserts every destination is still reachable.
+
+What went: the page called *Everything else*, which held twelve links under
+four headings nobody had picked and was four screens tall. Its address still
+answers, so a bookmark does not break — it lands on arrival.
+
+Two faults fixed with it. The arrival screen used to print "1 holdings"; the
+words under the counts are now written to read correctly at one and at forty,
+which is also the only way that works in Arabic and Urdu at once. And the
+counter for holdings that had drifted linked to `/register`, where the word
+*moved* never appears — it now goes to the examinations, which is the screen
+that says what moved.
+
+**Still to do on language:** the new strings are written plainly, but a pass
+over the older ones has not been made. That is the standing instruction and it
+is not finished.
+
+**And: signing the written decision, for Web2.**
+`services/signature.ts`, `POST /matters/:id/sign`, a signature page on the
+printed ruling, and `components/SignTheDocument.tsx`. Two settings, both
+optional and both documented in `ARCHITECTURE.md`: `MAJLIS_SEAL_KEY` and
+`MAJLIS_SEAL_ISSUER`. Without a key nothing is sealed and every copy says so
+in the same place and the same size — an unsealed installation must never be
+indistinguishable from a sealed one.
+
+Three things it holds to, each with tests:
+
+- **Signing is not voting.** A position is on a proposal, a signature is on the
+  finished write-up. A decided document with no signatures says exactly that,
+  rather than printing the votes as though they were signatures.
+- **The hash comes from the record.** A client cannot send one. If it could, it
+  would be choosing the text the board's name goes under.
+- **A signature over an older draft is named on the page.** It is not silently
+  counted and it is not hidden.
+
+What it is *not* is a member's own key. That is Stage Three, and it still waits
+on the four key-custody answers below. The document says so in those words.
 
 `npm test` from `apps/majlis`. Typecheck clean with `--force` on both sides.
 `client/dist` is rebuilt, so port 4000 shows the current interface.

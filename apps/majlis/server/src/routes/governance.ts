@@ -154,6 +154,28 @@ const voteSchema = z.object({
 const objectSchema = z.object({ reason: reasonSchema });
 
 /*
+ * Signing.
+ *
+ * The hash is deliberately not a field. It is computed from the record at the
+ * moment of signing; a client that could send one would be signing text of
+ * its own choosing and having the board's name put under it.
+ *
+ * `provedBy` is how the signer proved who they were, and it is printed on the
+ * document in those words. The weakest of the three reads as weak on the
+ * page, which is the honest outcome and the reason it is a stated value
+ * rather than a boolean.
+ */
+const signSchema = z.object({
+  provedBy: z.enum([
+    'their own sign-in',
+    'their own sign-in and a one-time code',
+    'in person at a sitting, entered by the secretary',
+  ]),
+  /** Anything the member wants recorded beside their name. Rare. */
+  note: z.string().trim().min(1).max(600).optional(),
+});
+
+/*
  * A citation, not an essay. The label is what a reader scans for and the ref is
  * where they go to check it; the note is the sentence explaining why this is
  * here, which the citation itself never carries.
@@ -1786,7 +1808,8 @@ export function governanceRoutes(
           (a) => a.structureId === matter.structureId && a.standing !== 'declined',
         ) ?? null;
 
-      const fatwa = assemble(board, matter, now(), adoption);
+      const signings = await store.signings(matter.id);
+      const fatwa = assemble(board, matter, now(), adoption, signings);
 
       if (req.query.format === 'json') {
         res.json(fatwa);
@@ -1794,6 +1817,70 @@ export function governanceRoutes(
       }
 
       res.type('html').send(render(fatwa));
+    }),
+  );
+
+  /**
+   * Sign the written decision.
+   *
+   * A separate act from voting, and it has to be. A member votes on what is
+   * proposed; they sign what was written up afterwards, having read it. The
+   * two are recorded apart so that a document can honestly show four votes
+   * and one signature, which is the ordinary state of affairs for a few days
+   * after every vote closes.
+   *
+   * The hash the member is signing is computed here, from the record, not
+   * accepted from the request. A client that sent its own would be signing
+   * whatever it liked.
+   *
+   * Only members who could vote may sign. An observer reading the document is
+   * not a party to it, and the secretary entering an in-person signature does
+   * so under their own credential with `provedBy` saying exactly that.
+   */
+  router.post(
+    '/matters/:id/sign',
+    handle(async (req, res) => {
+      const who = identityOf(req);
+      if (!requireRole(res, mayVote(who.role), 'sign a document', who.role)) return;
+
+      const parsed = signSchema.safeParse(req.body);
+      if (!parsed.success) return badRequest(res, parsed.error.issues);
+
+      const board = await boardFor(store, res, req.params.id);
+      if (!board) return;
+
+      const matter = await store.matter(req.params.id);
+      if (!matter) return;
+
+      /*
+       * The document must exist before it can be signed.
+       *
+       * `assemble` refuses an undecided matter, and that refusal is the check:
+       * there is no separate status test here that could drift away from it.
+       */
+      const adoptions = matter.structureId ? await store.adoptions(matter.boardId) : [];
+      const adoption =
+        standingAdoptions(adoptions).find(
+          (a) => a.structureId === matter.structureId && a.standing !== 'declined',
+        ) ?? null;
+
+      const at = now();
+      const fatwa = assemble(board, matter, at, adoption, await store.signings(matter.id));
+
+      const member = board.members.find((m) => m.id === who.scholarId);
+      const stored = await store.recordSigning({
+        matterId: matter.id,
+        boardId: matter.boardId,
+        scholarId: who.scholarId,
+        name: member?.name ?? who.scholarId,
+        title: member?.title ?? '',
+        at,
+        provedBy: parsed.data.provedBy,
+        documentHash: fatwa.documentHash,
+        ...(parsed.data.note ? { note: parsed.data.note } : {}),
+      });
+
+      res.status(201).json(stored);
     }),
   );
 

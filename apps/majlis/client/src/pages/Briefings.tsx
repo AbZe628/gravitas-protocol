@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { api, type Briefing } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
+import { PageHead } from '../components/page.js';
 import { Card, DateText, ErrorText, Loading, Sources, Tag } from '../components/ui.js';
 
 export default function Briefings() {
@@ -17,7 +18,11 @@ export default function Briefings() {
 
   return (
     <div>
-      <h1 className="mb-5 font-display font-normal leading-[1.12] tracking-[-0.024em] text-[30px] sm:text-[34px]">{t('nav.briefings')}</h1>
+      <PageHead
+        phase="inforce"
+        title={t('nav.briefings')}
+        says={t('brief.lead')}
+      />
       <ul className="space-y-5">
         {items.map((b) => (
           <li key={b.id}>

@@ -16,6 +16,7 @@ import Passage from '../components/Passage.js';
 import Carrying from '../components/Carrying.js';
 import Inherited from '../components/Inherited.js';
 import WhereItEnds from '../components/WhereItEnds.js';
+import SignTheDocument from '../components/SignTheDocument.js';
 
 /** The statuses a document exists for. Mirrors SETTLED in services/fatwa.ts. */
 const DECIDED = ['in_force', 'timelock', 'rejected', 'lapsed', 'withdrawn'];
@@ -104,7 +105,18 @@ export default function MatterDetail() {
       */}
       <div className="mb-7">
         {DECIDED.includes(matter.status) ? (
-          <WhereItEnds matter={matter} />
+          <>
+            <WhereItEnds matter={matter} />
+            {/*
+              Signing sits directly under where the document is offered, because
+              a member reads the document and then signs it. Putting the act on
+              a screen of its own would mean signing something you had to
+              remember rather than something in front of you.
+            */}
+            <div className="mt-6">
+              <SignTheDocument matter={matter} />
+            </div>
+          </>
         ) : (
           <p className="rounded-card bg-raised/60 px-5 py-4 text-[12.5px] leading-[1.6] text-muted shadow-ring">
             {t('doc.fatwaNotYet')}

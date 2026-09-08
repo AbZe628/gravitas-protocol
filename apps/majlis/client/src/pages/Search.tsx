@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { governance, type SearchHit, type SearchResult } from '../lib/api.js';
 import { useIdentity } from '../lib/identity.js';
 import { useI18n } from '../lib/i18n.js';
+import { Nothing, PageHead } from '../components/page.js';
 import { DateText, Tag } from '../components/ui.js';
 
 /**
@@ -68,8 +69,10 @@ export default function Search() {
 
   return (
     <div>
-      <h1 className="mb-2 font-display font-normal leading-[1.12] tracking-[-0.024em] text-[30px] sm:text-[34px]">{t('search.title')}</h1>
-      <p className="mb-5 max-w-[62ch] text-[13.5px] leading-[1.65] text-muted">{t('search.lead')}</p>
+      <PageHead
+        title={t('search.title')}
+        says={t('search.lead')}
+      />
 
       <form
         onSubmit={(e) => {
@@ -142,7 +145,7 @@ export default function Search() {
             <span className="text-[13px] text-muted">{t('search.count')}</span>
           </div>
           {result.hits.length === 0 ? (
-            <p className="text-[13px] text-muted">{t('search.none')}</p>
+            <Nothing>{t('search.none')}</Nothing>
           ) : (
             <ul className="space-y-2.5">
               {result.hits.map((h) => (

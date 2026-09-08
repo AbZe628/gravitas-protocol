@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useI18n } from '../lib/i18n.js';
-import { Display, Note } from '../components/type.js';
+import { PageHead } from '../components/page.js';
 import Distribution from '../components/Distribution.js';
 import LatePayment from '../components/LatePayment.js';
 import Purification from '../components/Purification.js';
@@ -60,10 +60,11 @@ export default function Calculations() {
 
   return (
     <div>
-      <div className="mb-8">
-        <Display>{t('calc.title')}</Display>
-        <Note className="mt-3">{t('calc.intro')}</Note>
-      </div>
+      <PageHead
+        phase="inforce"
+        title={t('calc.title')}
+        says={t('calc.intro')}
+      />
 
       <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
 

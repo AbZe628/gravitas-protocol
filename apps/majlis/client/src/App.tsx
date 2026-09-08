@@ -1,8 +1,7 @@
-import { Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import Dashboard from './pages/Dashboard.js';
 import Guided from './pages/Guided.js';
-import MatterAction from './pages/MatterAction.js';
-import More from './pages/More.js';
+import MatterPack from './pages/MatterPack.js';
 import Questions from './pages/Questions.js';
 import Examinations from './pages/Examinations.js';
 import Ask from './pages/Ask.js';
@@ -56,7 +55,14 @@ export default function App() {
             what a person sees first.
           */}
           <Route path="/" element={<Arrival />} />
-          <Route path="/more" element={<More />} />
+          {/*
+            The drawer is gone. It held twelve links under four headings
+            nobody had chosen, it was four screens tall, and every one of its
+            destinations now sits under the phase it belongs to. The address
+            still answers, because a bookmark should not break — it lands on
+            arrival, where the four doors are.
+          */}
+          <Route path="/more" element={<Navigate to="/" replace />} />
 
           {/*
             The way in. Two screens for one path, and which one a person gets
@@ -74,7 +80,7 @@ export default function App() {
             to do. Every section still exists, unchanged, at the classic path —
             what changed is that they no longer compete with the act.
           */}
-          <Route path="/matters/:id" element={<MatterAction />} />
+          <Route path="/matters/:id" element={<MatterPack />} />
           <Route path="/classic/matters/:id" element={<MatterDetail />} />
           <Route path="/classic" element={<Dashboard />} />
           <Route path="/register" element={<Register />} />

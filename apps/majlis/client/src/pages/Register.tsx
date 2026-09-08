@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { oversight, type AssetStanding, type AssetStatus, type Register as RegisterData } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { ErrorText, Loading } from '../components/ui.js';
 import { Card, State, type Tone } from '../components/kit.js';
-import { Display, Label, Note } from '../components/type.js';
+import { Division, Gaps, Nothing, PageHead } from '../components/page.js';
 
 /**
  * The universe the board rules on.
@@ -123,62 +124,77 @@ export default function Register() {
     items: assets.filter((a) => a.status === band),
   })).filter((g) => g.items.length > 0);
 
+  /*
+   * What this page cannot tell you.
+   *
+   * The count of unexamined holdings used to sit in a box on the right where a
+   * reader could take it as a statistic. It is a gap, it belongs with the
+   * other gaps, and it links to the screen that closes it — which the box
+   * never did.
+   */
+  const permitted = assets.filter((a) => a.status === 'permitted').length;
+
+  const gaps: string[] = [];
+  if (data.neverExamined > 0) {
+    gaps.push(
+      `${data.neverExamined} ${t('reg.of')} ${data.total} — ${t('reg.neverExaminedNote')}`,
+    );
+  }
+  if (assets.length > 0) gaps.push(t('reg.gap.asAtLast'));
+
   return (
     <div>
-      <div className="mb-8">
-        <Display>{t('reg.title')}</Display>
-        <Note className="mt-3">{t('reg.intro')}</Note>
-      </div>
+      <PageHead
+        phase="inforce"
+        title={t('reg.title')}
+        says={t('reg.intro')}
+        live={
+          assets.length > 0 ? (
+            <>
+              {/*
+                Every holding, not the permitted ones. The pill said
+                "permitted" over a count of everything, which is the kind of
+                small lie a bank finds in a demo.
+              */}
+              <State tone="plain">
+                {assets.length} {t('reg.live.holdings')}
+              </State>
+              {permitted > 0 && (
+                <State tone="settled">
+                  {permitted} {t('reg.live.permitted')}
+                </State>
+              )}
+              {data.neverExamined > 0 && (
+                <Link
+                  to="/examinations"
+                  className="text-[12.5px] text-gold underline decoration-gold/30 underline-offset-4 transition-colors hover:text-paper"
+                >
+                  {data.neverExamined} {t('spine.checked.count')}
+                </Link>
+              )}
+            </>
+          ) : undefined
+        }
+      />
 
       {assets.length === 0 ? (
-        <p className="text-[14px] text-muted">{t('reg.none')}</p>
+        <Nothing>{t('reg.none')}</Nothing>
       ) : (
-        <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
-          <div className="min-w-0 flex-1">
-            {grouped.map((g) => (
-              <section key={g.band} className="mb-8 last:mb-0">
-                <div className="mb-3.5 flex items-baseline gap-2.5">
-                  <Label>{t(`reg.status.${g.band}`)}</Label>
-                  <span className="text-[12px] tabular-nums text-muted">{g.items.length}</span>
-                </div>
-                <ul className="space-y-2">
-                  {g.items.map((s) => (
-                    <li key={s.asset.id}>
-                      <Row standing={s} />
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            ))}
-          </div>
+        <>
+          {grouped.map((g) => (
+            <Division key={g.band} heading={`${t(`reg.status.${g.band}`)} · ${g.items.length}`}>
+              <ul className="space-y-2">
+                {g.items.map((s) => (
+                  <li key={s.asset.id}>
+                    <Row standing={s} />
+                  </li>
+                ))}
+              </ul>
+            </Division>
+          ))}
 
-          {/*
-            The figure a chair asks for and no board can currently produce. It
-            is stated as a sentence rather than a badge, because it is not a
-            deadline and manufacturing urgency about it would be dishonest.
-          */}
-          <aside className="w-full shrink-0 lg:w-[306px]">
-            <div className="rounded-sheet bg-raised/60 px-6 py-5 shadow-ring">
-              {data.neverExamined > 0 ? (
-                <>
-                  <div className="flex items-baseline gap-2.5">
-                    <span className="font-display text-[40px] leading-[0.92] tabular-nums tracking-[-0.028em] text-paper">
-                      {data.neverExamined}
-                    </span>
-                    <span className="font-display text-[22px] leading-none tracking-[-0.02em] text-muted">
-                      {t('reg.of')} {data.total}
-                    </span>
-                  </div>
-                  <p className="mt-3.5 text-[13px] leading-[1.6] text-sand">
-                    {t('reg.neverExaminedNote')}
-                  </p>
-                </>
-              ) : (
-                <p className="text-[13px] leading-[1.6] text-sand">{t('reg.allExamined')}</p>
-              )}
-            </div>
-          </aside>
-        </div>
+          <Gaps items={gaps} />
+        </>
       )}
     </div>
   );

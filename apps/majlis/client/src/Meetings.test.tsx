@@ -137,7 +137,7 @@ describe('the page leads with the clock', () => {
     stub(data({ meetings: [], attendance: [] }));
     show();
     await waitFor(() =>
-      expect(screen.getByText(/gives the cadence something to count from/)).toBeInTheDocument(),
+      expect(screen.getByText(/gives the clock something to count from/)).toBeInTheDocument(),
     );
   });
 });

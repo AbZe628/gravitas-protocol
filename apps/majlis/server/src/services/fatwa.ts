@@ -33,6 +33,15 @@
 
 import { structureById } from '../data/structures.js';
 import { hashParameters, verifyParameters } from './hash.js';
+import {
+  documentHash,
+  readable,
+  seal,
+  signedSomethingElse,
+  type DocumentContent,
+  type Seal,
+  type Signing,
+} from './signature.js';
 import { quorumFor, ratificationDeadline } from './lifecycle.js';
 import { Refused } from './lifecycle.js';
 import type {
@@ -149,6 +158,28 @@ export interface Fatwa {
   /** False when the stored parameters do not produce the stored hash. */
   parametersVerified: boolean;
 
+  /**
+   * The hash of this document, as against the hash of its operative terms.
+   *
+   * What a reader compares against a filed copy years later. Printed in
+   * groups of four so a person can actually do the comparison.
+   */
+  documentHash: string;
+  /**
+   * The seal, or null where this installation holds no sealing key.
+   *
+   * Null is printed as "unsealed" rather than hidden. A document that quietly
+   * omitted the seal would be indistinguishable from one whose seal failed.
+   */
+  seal: Seal | null;
+  /**
+   * Who signed the finished document, as against who voted on the proposal.
+   *
+   * Ordinarily empty between the vote closing and the members reading the
+   * draft, which is a normal state and not an omission.
+   */
+  signings: Signing[];
+
   signatures: FatwaSignature[];
   /** Those against, separately, because dissent must be visible without counting. */
   dissent: FatwaSignature[];
@@ -251,6 +282,7 @@ export function assemble(
   matter: Matter,
   generatedAt: string,
   adoption: AdoptedStructure | null = null,
+  signings: readonly Signing[] = [],
 ): Fatwa {
   const kind = SETTLED[matter.status];
   if (!kind) {
@@ -275,6 +307,36 @@ export function assemble(
   const standing = matter.reasoning.filter((r) => !r.releasedAt);
   const all = matter.reasoning.map((r) => signature(board, r, actual));
 
+  /*
+   * The document's own hash, and the seal over it.
+   *
+   * Separate from `parameterHash`, and it must stay separate: that one covers
+   * the operative terms a rule engine would enforce, this one covers the
+   * document a regulator files. A bank asking "is this the paper the board
+   * signed" is asking about the second, and answering with the first would
+   * miss a changed title, a removed carve-out, or a vote that was added.
+   *
+   * Both are derived rather than stored, so a record edited behind this
+   * function's back produces a hash that no longer matches its seal — which
+   * is the entire point.
+   */
+  const content: DocumentContent = {
+    matterId: matter.id,
+    boardId: matter.boardId,
+    kind,
+    title: matter.title,
+    proposal: matter.proposal,
+    mechanism: matter.mechanism,
+    notDecided: matter.notDecided,
+    parameters: parameters.map((p) => ({ key: p.key, value: p.value })),
+    parameterHash: stored,
+    quorumRequired: quorumFor(board, matter.direction),
+    positions: standing.map((r) => ({ scholarId: r.scholarId, position: r.position })),
+    inForceAt: matter.inForceAt,
+  };
+  const docHash = documentHash(content);
+  const documentSeal = seal(content, signings, generatedAt);
+
   const takesEffectAt = matter.status === 'timelock' ? matter.timelockEndsAt : null;
   const ratificationDueAt =
     matter.status === 'in_force' && matter.direction === 'restrict'
@@ -298,6 +360,10 @@ export function assemble(
     parameters,
     parameterHash: stored,
     parametersVerified: verified,
+
+    documentHash: docHash,
+    seal: documentSeal,
+    signings: signings.map((s) => ({ ...s })),
 
     signatures: all.filter((s) => s.position === 'for'),
     dissent: all.filter((s) => s.position === 'against'),
@@ -443,6 +509,51 @@ ${fatwa.evidence
       The stored value is <span class="mono">${esc(fatwa.parameterHash)}</span>, and the terms
       printed above do not hash to it. Something changed after the board approved them. This
       document is not evidence of what was approved until that is explained.</p>`;
+
+  /*
+   * The signature page.
+   *
+   * Written to be read by somebody who is not a cryptographer. It states what
+   * the seal proves in one sentence, states what it does not prove in the
+   * next, and then prints the hash in groups of four so that comparing two
+   * copies is a thing a person can do rather than a thing they give up on.
+   *
+   * An unsealed document says it is unsealed, in the same place and the same
+   * size. Hiding the section would make an unsealed copy look identical to a
+   * sealed one, which is the failure this whole file exists to prevent.
+   */
+  const signed = fatwa.signings.length
+    ? fatwa.signings
+        .map((s) => {
+          const elsewhere = signedSomethingElse(s, fatwa.documentHash);
+          return `      <div class="sig${elsewhere ? ' released' : ''}">
+        <div class="who"><strong>${esc(s.name)}</strong>${s.title ? `<span>${esc(s.title)}</span>` : ''}</div>
+        ${s.note ? `<p class="reason">${esc(s.note)}</p>` : ''}
+        <p class="stamp">Signed ${date(s.at)} · identity proved by ${esc(s.provedBy)}${
+          elsewhere
+            ? ' · <strong>signed a different draft from this one; their signature does not cover the text above</strong>'
+            : ''
+        }</p>
+      </div>`;
+        })
+        .join('\n')
+    : '      <p class="none">Nobody has signed this document yet. The vote is recorded above; signing is a separate act, and members sign the written decision after reading it.</p>';
+
+  const sealBlock = fatwa.seal
+    ? `      <p>This document was sealed by ${esc(fatwa.seal.issuer)} on ${date(fatwa.seal.at)}.</p>
+      <p>The seal proves two things. The text above is exactly what was sealed — one changed
+      figure and it no longer matches. And the people under &ldquo;Signed&rdquo; put their names
+      to it, at the times shown, having proved who they were in the way each line states.</p>
+      <p>It does not prove that a member's own cryptographic key touched this page. No member
+      holds one. What signs is the installation named above, attesting to a sign-in it carried
+      out. Anyone relying on this document should read the seal as that and nothing more.</p>
+      <p>Document reference<br><span class="mono">${esc(readable(fatwa.documentHash))}</span></p>
+      <p>To check a copy against this one, compare those eight groups. If they match, the two
+      copies are the same decision.</p>`
+    : `      <p class="warn"><strong>This document is not sealed.</strong> This installation has no
+      sealing key configured, so there is nothing to compare a later copy against. The decision
+      and the votes above are still the board's record; what is missing is the means to prove
+      that a copy handed to somebody else was not altered on the way.</p>`;
 
   return `<!doctype html>
 <html lang="en">
@@ -600,8 +711,18 @@ ${evidence}
       </table>
     </section>
 
+    <section class="signatures">
+      <h2>Signed</h2>
+${signed}
+    </section>
+
     <section class="integrity">
-      <h2>Integrity</h2>
+      <h2>The seal</h2>
+${sealBlock}
+    </section>
+
+    <section class="integrity">
+      <h2>Integrity of the terms</h2>
 ${integrity}
     </section>
   </main>

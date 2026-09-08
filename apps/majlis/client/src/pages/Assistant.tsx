@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { api, type AssistantExchange } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
+import { PageHead } from '../components/page.js';
 import { Sources, Tag } from '../components/ui.js';
 
 export default function Assistant() {
@@ -28,7 +29,10 @@ export default function Assistant() {
 
   return (
     <div>
-      <h1 className="mb-2 font-display font-normal leading-[1.12] tracking-[-0.024em] text-[30px] sm:text-[34px]">{t('asst.title')}</h1>
+      <PageHead
+        title={t('asst.title')}
+        says={t('asst.lead')}
+      />
 
       <div className="mb-6 rounded-card shadow-[0_0_0_0.5px_rgba(176,132,48,0.24)] bg-[#FBF4E4] px-4 py-3 text-[13px] leading-relaxed text-sand">
         {t('asst.limits')}

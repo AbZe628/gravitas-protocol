@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { oversight, type Incident, type IncidentList } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
+import { Division, Nothing, PageHead } from '../components/page.js';
 import { DateText, ErrorText, Loading, Tag } from '../components/ui.js';
 import { mayDeliberate, useIdentity } from '../lib/identity.js';
 
@@ -94,8 +95,11 @@ export default function Incidents() {
 
   return (
     <div>
-      <h1 className="mb-1 font-display font-normal leading-[1.12] tracking-[-0.024em] text-[30px] sm:text-[34px]">{t('snc.title')}</h1>
-      <p className="mb-8 max-w-[62ch] text-[13.5px] leading-[1.65] text-muted">{t('snc.intro')}</p>
+      <PageHead
+        phase="checked"
+        title={t('snc.title')}
+        says={t('snc.intro')}
+      />
 
       {/*
         Open to anyone on the board, not only to the institution's own people. A
@@ -159,8 +163,9 @@ export default function Incidents() {
 
       <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
         <div className="min-w-0 flex-1">
+      <Division heading={t('snc.openHere')}>
       {incidents.length === 0 ? (
-        <p className="text-[14px] text-muted">{t('snc.none')}</p>
+        <Nothing>{t('snc.none')}</Nothing>
       ) : (
         <ul className="space-y-2">
           {incidents.map((i) => (
@@ -203,6 +208,7 @@ export default function Incidents() {
           ))}
         </ul>
       )}
+      </Division>
         </div>
 
         {/*

@@ -162,7 +162,7 @@ describe('it will not adopt without a decision', () => {
     fireEvent.click(screen.getAllByRole('button', { name: /Take this shape/ })[0]);
 
     await waitFor(() =>
-      expect(screen.getByText(/no ruling of this board in force/)).toBeInTheDocument(),
+      expect(screen.getByText(/No ruling of this board is in force/)).toBeInTheDocument(),
     );
     expect(screen.queryByRole('button', { name: /Take it as ours/ })).toBeNull();
     expect(posted).toHaveLength(0);

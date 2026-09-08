@@ -9,6 +9,7 @@ import {
   type Meetings as MeetingsData,
 } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
+import { Division, Nothing, PageHead } from '../components/page.js';
 import { useIdentity } from '../lib/identity.js';
 import { Card, DateText, ErrorText, Loading, Tag } from '../components/ui.js';
 
@@ -347,8 +348,11 @@ export default function Meetings() {
 
   return (
     <div>
-      <h1 className="mb-1 font-display font-normal leading-[1.12] tracking-[-0.024em] text-[30px] sm:text-[34px]">{t('meet.title')}</h1>
-      <p className="mb-4 max-w-[62ch] text-[13.5px] leading-[1.65] text-muted">{t('meet.intro')}</p>
+      <PageHead
+        phase="deciding"
+        title={t('meet.title')}
+        says={t('meet.intro')}
+      />
 
       {/*
         The clock first. Cadence is the one deadline with a regulatory floor
@@ -471,8 +475,9 @@ export default function Meetings() {
         </form>
       )}
 
+      <Division heading={t('meet.held')}>
       {data.meetings.length === 0 ? (
-        <p className="text-[12.5px] leading-relaxed text-muted">{t('meet.none')}</p>
+        <Nothing>{t('meet.none')}</Nothing>
       ) : (
         <div className="space-y-3">
           {data.meetings.map((row) => (
@@ -487,6 +492,7 @@ export default function Meetings() {
           ))}
         </div>
       )}
+      </Division>
 
       {/*
         Attendance across the year, which is what GS-1 asks the annual report
@@ -495,8 +501,7 @@ export default function Meetings() {
         three times, and a percentage hides exactly that.
       */}
       {data.attendance.some((a) => a.of > 0) && (
-        <div className="mt-6">
-          <h2 className="mb-2 text-[15px] font-semibold">{t('meet.attendanceAcross')}</h2>
+        <Division heading={t('meet.attendanceAcross')}>
           <ul className="space-y-1.5">
             {data.attendance.map((a) => (
               <li key={a.scholarId} className="flex flex-wrap items-baseline justify-between gap-2">
@@ -508,7 +513,7 @@ export default function Meetings() {
               </li>
             ))}
           </ul>
-        </div>
+        </Division>
       )}
     </div>
   );

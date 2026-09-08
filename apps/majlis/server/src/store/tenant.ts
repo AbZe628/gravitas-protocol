@@ -13,7 +13,7 @@ import type {
   Submission,
   Examination,
 } from '../types.js';
-import { NotFound, type Store } from './store.js';
+import { NotFound, type Store, type StoredSigning } from './store.js';
 
 /**
  * A store that can only see one institution.
@@ -312,6 +312,29 @@ export class TenantStore implements Store {
       throw new OutsideInstitution('record an examination for', examination.boardId);
     }
     return this.inner.recordExamination(examination);
+  }
+
+  /*
+   * Signatures are scoped through the matter, not the board id on the row.
+   *
+   * A caller asking for the signatures on a matter has not named a board, so
+   * trusting the board id stored beside each signature would let one
+   * institution read another's by asking for a matter id it guessed. The
+   * matter is fetched first — and this store only returns matters it owns —
+   * and a matter it cannot see yields nothing rather than an error, which is
+   * the same answer as a matter that has no signatures.
+   */
+  async signings(matterId: string): Promise<StoredSigning[]> {
+    const matter = await this.matter(matterId);
+    if (!matter) return [];
+    return this.inner.signings(matterId);
+  }
+
+  async recordSigning(signing: StoredSigning): Promise<StoredSigning> {
+    if (!(await this.owns(signing.boardId))) {
+      throw new OutsideInstitution('sign a document for', signing.boardId);
+    }
+    return this.inner.recordSigning(signing);
   }
 
   // ── the way in ──────────────────────────────────────────────────────────

@@ -8,6 +8,7 @@ import { storeFromEnv, type Store } from './store/index.js';
 
 import { enforcementFromEnv, type Enforcement } from './services/enforcement.js';
 import { buildCarrying } from './services/carrying.js';
+import { assemblePack } from './services/pack.js';
 import { dictationFromEnv, WHERE_THE_AUDIO_GOES } from './services/dictation.js';
 import { askTheGuide, guideTopics } from './services/guide.js';
 import {
@@ -392,6 +393,43 @@ export function createApp(
       return;
     }
     res.json(buildCarrying(matter, await enforcement.snapshot()));
+  });
+
+  /**
+   * The pack: one matter, everything needed to decide it, in reading order.
+   *
+   * It lives here rather than with the other matter routes because it needs
+   * the enforcement snapshot, which this file holds — the same reason
+   * `carrying` is here.
+   *
+   * Open to anybody who may read the matter. The pack composes nothing and
+   * recommends nothing, so there is no part of it an observer must be kept
+   * from; and an auditor reading how a decision was reached is one of the
+   * people it is for.
+   */
+  app.get('/api/matters/:id/pack', async (req: Request, res: Response) => {
+    const matter = await store.matter(req.params.id);
+    if (!matter) {
+      res.status(404).json({ error: 'not_found', message: 'No such matter.' });
+      return;
+    }
+    const board = await store.board(matter.boardId);
+    if (!board) {
+      res.status(404).json({ error: 'not_found', message: 'No such board.' });
+      return;
+    }
+
+    res.json(
+      assemblePack({
+        board,
+        matter,
+        // Precedent is found among this board's own matters and no others.
+        allMatters: await store.matters(matter.boardId),
+        computations: await store.computations({ boardId: matter.boardId }),
+        enforcement: await enforcement.snapshot(),
+        assembledAt: new Date().toISOString(),
+      }),
+    );
   });
 
   // ---- assistant -------------------------------------------------------

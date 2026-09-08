@@ -1,0 +1,252 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,300;6..72,400;6..72,500&family=Manrope:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Amiri:wght@400&display=swap">
+  <style>
+    body { margin: 0; -webkit-font-smoothing: antialiased; }
+    a { color: #164470; text-decoration: none; }
+  </style>
+</helmet>
+
+<div style="position: relative; width: 1440px; height: 900px; background: #FBF8F1; font-family: Manrope, system-ui, sans-serif; color: #191713; overflow: hidden; display: flex;">
+
+  <svg width="1440" height="900" viewBox="0 0 1440 900" style="position: absolute; inset: 0; pointer-events: none;">
+    <defs>
+      <linearGradient id="sweepA" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#164470" stop-opacity="0.055"/>
+        <stop offset="55%" stop-color="#164470" stop-opacity="0.018"/>
+        <stop offset="100%" stop-color="#164470" stop-opacity="0"/>
+      </linearGradient>
+      <linearGradient id="sweepB" x1="1" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#B08430" stop-opacity="0.07"/>
+        <stop offset="70%" stop-color="#B08430" stop-opacity="0"/>
+      </linearGradient>
+      <radialGradient id="glow" cx="0.74" cy="0.04" r="0.6">
+        <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.9"/>
+        <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <rect width="1440" height="900" fill="url(#glow)"/>
+    <path d="M268 -40 C 700 90, 980 210, 1440 150 L1440 -40 Z" fill="url(#sweepA)"/>
+    <path d="M1440 60 C 1120 190, 900 250, 700 470 C 560 640, 620 820, 700 940 L1440 940 Z" fill="url(#sweepB)"/>
+    <path d="M268 34 C 720 138, 1010 230, 1440 178" fill="none" stroke="#164470" stroke-opacity="0.10" stroke-width="1"/>
+    <path d="M268 52 C 720 158, 1010 250, 1440 198" fill="none" stroke="#B08430" stroke-opacity="0.13" stroke-width="1"/>
+  </svg>
+
+  <!-- rail: four doors, and nothing else above the fold -->
+  <div style="position: relative; width: 272px; flex-shrink: 0; background: rgba(247,243,234,0.72); backdrop-filter: blur(20px); display: flex; flex-direction: column; box-shadow: 1px 0 0 rgba(25,23,19,0.055);">
+
+    <div style="padding: 26px 24px 24px;">
+      <div style="display: flex; align-items: center; gap: 13px;">
+        <svg width="36" height="41" viewBox="0 0 36 41" fill="none">
+          <path d="M18 1.2 C26.9 1.2 33.6 8.3 33.6 17.6 L33.6 37.6 C33.6 38.7 32.7 39.6 31.6 39.6 L4.4 39.6 C3.3 39.6 2.4 38.7 2.4 37.6 L2.4 17.6 C2.4 8.3 9.1 1.2 18 1.2 Z" fill="#FFFFFF" stroke="#164470" stroke-width="1.3"/>
+          <path d="M18 10.6 L20.6 16.6 L26.6 19.2 L20.6 21.8 L18 27.8 L15.4 21.8 L9.4 19.2 L15.4 16.6 Z" fill="#B08430"/>
+        </svg>
+        <div>
+          <div style="font-family: Newsreader, serif; font-size: 22px; font-weight: 500; letter-spacing: -0.018em; line-height: 1;">Majlis</div>
+          <div style="font-family: Amiri, serif; font-size: 13.5px; color: #9C9284; margin-top: 4px; line-height: 1;">مجلس الرقابة الشرعية</div>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px; margin-top: 18px;">
+        <span style="width: 6px; height: 6px; border-radius: 999px; background: #2C6B57; box-shadow: 0 0 0 3px rgba(44,107,87,0.13);"></span>
+        <span style="font-size: 12px; color: #635C52;">Rakbank Shariah Board</span>
+      </div>
+    </div>
+
+    <div style="flex: 1; padding: 0 14px; overflow: hidden;">
+      <div style="font-size: 10px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: #B3A896; padding: 0 12px 12px;">A question travels</div>
+
+      <div style="display: flex; flex-direction: column; gap: 3px;">
+
+        <div style="display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 12px;">
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #B3A896; width: 15px;">01</span>
+          <span style="font-size: 13.5px; color: #4E483F; flex: 1;">Asked</span>
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #164470; font-weight: 500;">3</span>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 12px; background: #FFFFFF; box-shadow: 0 0 0 0.5px rgba(25,23,19,0.05), 0 1px 2px rgba(25,23,19,0.05), 0 6px 14px -8px rgba(25,23,19,0.13);">
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #C29438; width: 15px;">02</span>
+          <span style="font-size: 13.5px; font-weight: 600; letter-spacing: -0.005em; flex: 1;">Deciding</span>
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #FFFFFF; background: #9A3830; border-radius: 999px; padding: 2px 8px; font-weight: 500;">1</span>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 12px;">
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #B3A896; width: 15px;">03</span>
+          <span style="font-size: 13.5px; color: #4E483F; flex: 1;">In force</span>
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #B3A896;">41</span>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 12px;">
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #B3A896; width: 15px;">04</span>
+          <span style="font-size: 13.5px; color: #4E483F; flex: 1;">Checked</span>
+          <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #B08430; font-weight: 500;">6</span>
+        </div>
+
+      </div>
+
+      <div style="height: 1px; background: rgba(25,23,19,0.06); margin: 24px 14px;"></div>
+
+      <div style="display: flex; flex-direction: column; gap: 3px;">
+        <div style="padding: 10px 14px 10px 41px; border-radius: 12px;"><span style="font-size: 13px; color: #7C7466;">The board</span></div>
+        <div style="padding: 10px 14px 10px 41px; border-radius: 12px;"><span style="font-size: 13px; color: #7C7466;">Search everything</span></div>
+      </div>
+    </div>
+
+    <div style="padding: 18px 26px 24px; margin: 0 14px; border-top: 1px solid rgba(25,23,19,0.06);">
+      <div style="display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px;">
+        <span style="width: 5px; height: 5px; border-radius: 999px; background: #2C6B57; margin-top: 6px; flex-shrink: 0;"></span>
+        <span style="font-size: 11.5px; line-height: 1.45; color: #7C7466;">Terms read before every transaction</span>
+      </div>
+      <div style="display: flex; align-items: flex-start; gap: 10px;">
+        <span style="width: 5px; height: 5px; border-radius: 999px; background: #D5CBB8; margin-top: 6px; flex-shrink: 0;"></span>
+        <span style="font-size: 11.5px; line-height: 1.45; color: #7C7466;">No assistant configured</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- work area -->
+  <div style="position: relative; flex: 1; display: flex; flex-direction: column; min-width: 0;">
+
+    <div style="height: 64px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 40px;">
+      <div style="display: flex; align-items: center; gap: 10px; font-size: 13px; color: #B3A896;">
+        <span>Rakbank</span><span style="color: #DCD3C2;">/</span><span style="color: #4E483F;">Shariah Board</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 22px;">
+        <div style="display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.8); border-radius: 11px; padding: 8px 14px; width: 210px; box-shadow: 0 0 0 0.5px rgba(25,23,19,0.06);">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B3A896" stroke-width="2.1" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+          <span style="font-size: 12.5px; color: #B3A896;">Search everything</span>
+        </div>
+        <div style="display: flex; gap: 2px; background: rgba(25,23,19,0.045); border-radius: 10px; padding: 3px;">
+          <div style="font-size: 11.5px; padding: 5px 11px; border-radius: 7px; background: #FFFFFF; color: #191713; font-weight: 600; box-shadow: 0 1px 2px rgba(25,23,19,0.08);">EN</div>
+          <div style="font-family: Amiri, serif; font-size: 13.5px; padding: 4px 11px; border-radius: 7px; color: #7C7466;">العربية</div>
+          <div style="font-family: Amiri, serif; font-size: 13.5px; padding: 4px 11px; border-radius: 7px; color: #7C7466;">اردو</div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="text-align: right;">
+            <div style="font-size: 12.5px; line-height: 1.35; font-weight: 600; letter-spacing: -0.005em;">Mufti A. Omarjee</div>
+            <div style="font-size: 11px; line-height: 1.35; color: #9C9284;">Signatory · may vote</div>
+          </div>
+          <div style="width: 36px; height: 36px; border-radius: 999px; background: linear-gradient(150deg, #1E5A8A, #133A5F); display: flex; align-items: center; justify-content: center; font-family: Amiri, serif; font-size: 17px; color: #F2DFB5; box-shadow: 0 2px 6px -1px rgba(19,58,95,0.35);">ع</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="flex: 1; padding: 12px 40px 30px; overflow: hidden;">
+
+      <div style="display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 22px;">
+        <div>
+          <h1 style="font-family: Newsreader, serif; font-size: 34px; font-weight: 400; line-height: 1.06; margin: 0; letter-spacing: -0.026em;">One thing is yours today.</h1>
+          <div style="font-size: 13.5px; color: #9C9284; margin-top: 9px;">Everything this board holds is in the four rows below. Nothing lives anywhere else.</div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 9px; background: linear-gradient(150deg, #1E5A8A, #143E67); border-radius: 12px; padding: 11px 20px; box-shadow: 0 1px 2px rgba(19,58,95,0.2), 0 8px 18px -8px rgba(19,58,95,0.45);">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          <span style="font-size: 13.5px; color: #FFFFFF; font-weight: 600; letter-spacing: -0.005em;">Put something to the board</span>
+        </div>
+      </div>
+
+      <!-- 01 ASKED -->
+      <div style="position: relative; background: rgba(255,255,255,0.62); border-radius: 18px; padding: 20px 26px 20px 30px; box-shadow: 0 0 0 0.5px rgba(25,23,19,0.05), 0 1px 2px rgba(25,23,19,0.035); margin-bottom: 12px; overflow: hidden; display: flex; align-items: center; gap: 28px;">
+        <svg width="10" height="120" viewBox="0 0 10 120" style="position: absolute; left: 0; top: 0;"><path d="M0 0 C 4.4 16, 4.4 36, 3.2 60 C 2.4 84, 1.4 100, 0 120 Z" fill="#164470" fill-opacity="0.5"/></svg>
+        <div style="width: 216px; flex-shrink: 0;">
+          <div style="display: flex; align-items: baseline; gap: 10px;">
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #B3A896;">01</span>
+            <span style="font-family: Newsreader, serif; font-size: 21px; letter-spacing: -0.018em;">Asked</span>
+          </div>
+          <div style="font-size: 12.5px; line-height: 1.5; color: #9C9284; margin-top: 5px;">A question is in front of the board.</div>
+        </div>
+        <div style="flex: 1; min-width: 0;">
+          <div style="font-size: 14px; font-weight: 600; letter-spacing: -0.005em;">Tawarruq for interbank liquidity</div>
+          <div style="font-size: 12.5px; color: #9C9284; margin-top: 4px;">Rakbank Treasury · waiting 9 days · the longest of three</div>
+        </div>
+        <div style="text-align: right; flex-shrink: 0; width: 96px;">
+          <div style="font-family: Newsreader, serif; font-size: 34px; line-height: 1; color: #164470; font-variant-numeric: tabular-nums; letter-spacing: -0.03em;">3</div>
+          <div style="font-size: 11px; color: #9C9284; margin-top: 5px;">waiting</div>
+        </div>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#C7BDA9" stroke-width="2.2" stroke-linecap="round" style="flex-shrink: 0;"><path d="M9 5l7 7-7 7"/></svg>
+      </div>
+
+      <!-- 02 DECIDING, the one that needs you -->
+      <div style="position: relative; background: #FFFFFF; border-radius: 20px; padding: 26px 30px 26px 34px; box-shadow: 0 0 0 0.5px rgba(25,23,19,0.055), 0 1px 2px rgba(25,23,19,0.045), 0 12px 24px -14px rgba(25,23,19,0.16), 0 40px 64px -40px rgba(25,23,19,0.24); margin-bottom: 12px; overflow: hidden; display: flex; align-items: center; gap: 28px;">
+        <svg width="13" height="180" viewBox="0 0 13 180" style="position: absolute; left: 0; top: 0;"><path d="M0 0 C 5.6 22, 5.6 52, 4.2 90 C 3.2 124, 1.9 150, 0 180 Z" fill="#9A3830"/></svg>
+        <div style="width: 216px; flex-shrink: 0;">
+          <div style="display: flex; align-items: baseline; gap: 10px;">
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #C29438;">02</span>
+            <span style="font-family: Newsreader, serif; font-size: 23px; letter-spacing: -0.018em;">Deciding</span>
+          </div>
+          <div style="font-size: 12.5px; line-height: 1.5; color: #9C9284; margin-top: 5px;">The board is deliberating, or voting.</div>
+        </div>
+        <div style="flex: 1; min-width: 0;">
+          <div style="display: flex; align-items: center; gap: 11px; margin-bottom: 9px;">
+            <span style="font-size: 10.5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #9A3830; background: #FCF0EE; border-radius: 999px; padding: 4px 12px; box-shadow: 0 0 0 0.5px rgba(154,56,48,0.18);">Ratification overdue</span>
+            <span style="font-size: 12px; color: #B3A896;">2 days past</span>
+          </div>
+          <div style="font-family: Newsreader, serif; font-size: 24px; font-weight: 400; line-height: 1.2; letter-spacing: -0.02em;">Suspension of leveraged index instruments</div>
+          <div style="display: flex; align-items: center; margin-top: 14px;">
+            <div style="display: flex;">
+              <div style="width: 26px; height: 26px; border-radius: 999px; background: linear-gradient(150deg, #35806A, #24594A); border: 2px solid #FFFFFF; display: flex; align-items: center; justify-content: center; font-family: Newsreader, serif; font-size: 11px; color: #FFFFFF;">B</div>
+              <div style="width: 26px; height: 26px; border-radius: 999px; background: linear-gradient(150deg, #35806A, #24594A); border: 2px solid #FFFFFF; margin-left: -8px; display: flex; align-items: center; justify-content: center; font-family: Newsreader, serif; font-size: 11px; color: #FFFFFF;">C</div>
+              <div style="width: 26px; height: 26px; border-radius: 999px; background: #FBF8F1; border: 2px dashed #D5CBB8; margin-left: -8px; display: flex; align-items: center; justify-content: center; font-family: Amiri, serif; font-size: 12px; color: #B3A896;">ع</div>
+            </div>
+            <span style="font-size: 12.5px; color: #9C9284; margin-left: 13px;">2 of 4 ratified · you have not</span>
+          </div>
+        </div>
+        <div style="flex-shrink: 0; display: flex; align-items: center; gap: 9px; background: linear-gradient(150deg, #C29438, #A67A28); border-radius: 12px; padding: 12px 22px; box-shadow: 0 1px 2px rgba(166,122,40,0.24), 0 8px 18px -8px rgba(166,122,40,0.5);">
+          <span style="font-size: 14px; font-weight: 700; color: #FFFFFF; letter-spacing: -0.005em;">Open it</span>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h13M12 5l7 7-7 7"/></svg>
+        </div>
+      </div>
+
+      <!-- 03 IN FORCE -->
+      <div style="position: relative; background: rgba(255,255,255,0.62); border-radius: 18px; padding: 20px 26px 20px 30px; box-shadow: 0 0 0 0.5px rgba(25,23,19,0.05), 0 1px 2px rgba(25,23,19,0.035); margin-bottom: 12px; overflow: hidden; display: flex; align-items: center; gap: 28px;">
+        <svg width="10" height="120" viewBox="0 0 10 120" style="position: absolute; left: 0; top: 0;"><path d="M0 0 C 4.4 16, 4.4 36, 3.2 60 C 2.4 84, 1.4 100, 0 120 Z" fill="#2C6B57" fill-opacity="0.5"/></svg>
+        <div style="width: 216px; flex-shrink: 0;">
+          <div style="display: flex; align-items: baseline; gap: 10px;">
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #B3A896;">03</span>
+            <span style="font-family: Newsreader, serif; font-size: 21px; letter-spacing: -0.018em;">In force</span>
+          </div>
+          <div style="font-size: 12.5px; line-height: 1.5; color: #9C9284; margin-top: 5px;">What was decided, and what the bank may do under it.</div>
+        </div>
+        <div style="flex: 1; min-width: 0; display: flex; gap: 34px;">
+          <div><div style="font-family: 'IBM Plex Mono', monospace; font-size: 17px; color: #2C6B57;">41</div><div style="font-size: 11.5px; color: #9C9284; margin-top: 3px;">rulings standing</div></div>
+          <div><div style="font-family: 'IBM Plex Mono', monospace; font-size: 17px; color: #4E483F;">128</div><div style="font-size: 11.5px; color: #9C9284; margin-top: 3px;">holdings permitted</div></div>
+          <div><div style="font-family: 'IBM Plex Mono', monospace; font-size: 17px; color: #4E483F;">19</div><div style="font-size: 11.5px; color: #9C9284; margin-top: 3px;">contract shapes</div></div>
+        </div>
+        <div style="text-align: right; flex-shrink: 0; width: 130px;">
+          <div style="font-size: 12.5px; color: #2C6B57;">Nothing needs you here</div>
+        </div>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#C7BDA9" stroke-width="2.2" stroke-linecap="round" style="flex-shrink: 0;"><path d="M9 5l7 7-7 7"/></svg>
+      </div>
+
+      <!-- 04 CHECKED -->
+      <div style="position: relative; background: rgba(255,255,255,0.62); border-radius: 18px; padding: 20px 26px 20px 30px; box-shadow: 0 0 0 0.5px rgba(25,23,19,0.05), 0 1px 2px rgba(25,23,19,0.035); overflow: hidden; display: flex; align-items: center; gap: 28px;">
+        <svg width="10" height="120" viewBox="0 0 10 120" style="position: absolute; left: 0; top: 0;"><path d="M0 0 C 4.4 16, 4.4 36, 3.2 60 C 2.4 84, 1.4 100, 0 120 Z" fill="#B08430" fill-opacity="0.75"/></svg>
+        <div style="width: 216px; flex-shrink: 0;">
+          <div style="display: flex; align-items: baseline; gap: 10px;">
+            <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #B3A896;">04</span>
+            <span style="font-family: Newsreader, serif; font-size: 21px; letter-spacing: -0.018em;">Checked</span>
+          </div>
+          <div style="font-size: 12.5px; line-height: 1.5; color: #9C9284; margin-top: 5px;">Did the bank actually follow it.</div>
+        </div>
+        <div style="flex: 1; min-width: 0;">
+          <div style="font-size: 14px; font-weight: 600; letter-spacing: -0.005em;">SABIC moved out of the ratio this board set</div>
+          <div style="font-size: 12.5px; color: #9C9284; margin-top: 4px;">Debt is now 34.1% of market value. The ruling permits 30%.</div>
+        </div>
+        <div style="text-align: right; flex-shrink: 0; width: 106px;">
+          <div style="font-family: Newsreader, serif; font-size: 34px; line-height: 1; color: #B08430; font-variant-numeric: tabular-nums; letter-spacing: -0.03em;">6</div>
+          <div style="font-size: 11px; color: #9C9284; margin-top: 5px;">1 moved · 5 never looked at</div>
+        </div>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#C7BDA9" stroke-width="2.2" stroke-linecap="round" style="flex-shrink: 0;"><path d="M9 5l7 7-7 7"/></svg>
+      </div>
+
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

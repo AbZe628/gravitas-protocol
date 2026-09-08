@@ -250,6 +250,13 @@ export const api = {
   board: (id: string) => get<Board>(`/api/boards/${id}`),
   matters: () => get<MatterSummary[]>('/api/matters'),
   matter: (id: string) => get<Matter>(`/api/matters/${id}`),
+  /**
+   * Everything for one matter, in the order it is read.
+   *
+   * One call where the screen used to make five. The assembly is the server's,
+   * so two screens cannot disagree about what a matter's precedent is.
+   */
+  pack: (id: string) => get<Pack>(`/api/matters/${id}/pack`),
   rules: () => get<Rule[]>('/api/rules'),
   briefings: () => get<Briefing[]>('/api/briefings'),
   enforcement: () => get<EnforcementSnapshot>('/api/enforcement'),
@@ -1081,6 +1088,104 @@ export type CalculationKind =
   | 'tangibility'
   | 'late_payment';
 
+/**
+ * How a signer proved who they were.
+ *
+ * Three stated values rather than a boolean, because the document prints them
+ * in these words. A signature entered by the secretary at a sitting is a
+ * weaker thing than one given behind a one-time code, and the page should read
+ * that way to whoever relies on it.
+ */
+export type SigningProof =
+  | 'their own sign-in'
+  | 'their own sign-in and a one-time code'
+  | 'in person at a sitting, entered by the secretary';
+
+export interface Signing {
+  scholarId: string;
+  name: string;
+  title: string;
+  at: string;
+  provedBy: SigningProof;
+  /** The hash of the document this member actually signed. */
+  documentHash: string;
+  note?: string;
+}
+
+export interface DocumentSeal {
+  version: number;
+  documentHash: string;
+  /** The installation that attests. Shown, so a reader knows who. */
+  issuer: string;
+  at: string;
+  value: string;
+}
+
+/**
+ * The written decision, as much of it as a screen needs.
+ *
+ * Deliberately not the whole document: the printable page is the document, and
+ * a second rendering of the same prose in the application would be a second
+ * thing to keep in step. What is here is what a member needs in order to
+ * decide whether to sign.
+ */
+export interface SignedDocument {
+  kind: string;
+  reference: string;
+  title: string;
+  documentHash: string;
+  /** Null where this installation holds no sealing key. */
+  seal: DocumentSeal | null;
+  signings: Signing[];
+  quorumRequired: number;
+  quorumRecorded: number;
+}
+
+/**
+ * The pack: one matter, everything needed to decide it, in reading order.
+ *
+ * Assembled on the server from material that already existed on five separate
+ * screens. Nothing in it is composed, so nothing here needs interpreting on
+ * the way to the page — every field is either somebody's words or a figure a
+ * service already produced.
+ */
+export interface Pack {
+  matterId: string;
+  boardId: string;
+  title: string;
+  status: string;
+  direction: 'permit' | 'restrict';
+
+  question: {
+    text: string;
+    notDecided: string[];
+    mechanism: string;
+    openedAt: string;
+    arrivedAt: string | null;
+    /** Null once the matter is settled: a decided question is not waiting. */
+    waitedDays: number | null;
+    /** True where the wait is measured only from what this system can see. */
+    waitPartlyUnknown: boolean;
+  };
+
+  alreadySaid: { related: Related[]; nothingYet: boolean };
+  figures: { computations: Computation[]; terms: RuleParameter[] };
+  said: Deliberation[];
+  follows: { carrying: Carrying; assetIds: string[]; structureId: string | null };
+  evidence: SourceRef[];
+
+  /** What Majlis could not tell you. Never empty by omission. */
+  gaps: string[];
+
+  standing: {
+    required: number;
+    recorded: Reasoning[];
+    yetToSpeak: { scholarId: string; name: string }[];
+  };
+
+  assembledAt: string;
+}
+
 export interface Computation {
   id: string;
   kind: CalculationKind;
@@ -1338,6 +1443,26 @@ export const oversight = {
 
   setImplementation: (id: string, steps: string[]) =>
     send<Matter>(`/api/matters/${id}/implementation`, { steps }),
+
+  /**
+   * The written decision as a structure, so the screen can show who has signed
+   * it without opening the printable page.
+   *
+   * The same route the document is rendered from. Asking for JSON rather than
+   * keeping a second endpoint means the two can never disagree about what the
+   * document says.
+   */
+  document: (id: string) => get<SignedDocument>(`/api/matters/${id}/fatwa?format=json`),
+
+  /**
+   * Sign the written decision.
+   *
+   * The hash is not sent. The server computes it from the record at the moment
+   * of signing, so what a member signs is the document as it stands and not
+   * whatever a client chose to put in the request.
+   */
+  sign: (id: string, provedBy: SigningProof, note?: string) =>
+    send<Signing>(`/api/matters/${id}/sign`, { provedBy, ...(note ? { note } : {}) }),
 
   /** Addresses of the printable documents. Opened, never fetched. */
   hrefs: {

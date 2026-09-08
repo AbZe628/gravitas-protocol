@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useI18n } from '../lib/i18n.js';
+import { PageHead } from '../components/page.js';
 import Record from './Record.js';
 import Rules from './Rules.js';
-import { Display } from '../components/type.js';
 
 /**
  * What we decided, and what stands.
@@ -52,9 +52,11 @@ export default function WhatStands() {
 
   return (
     <div>
-      <div className="mb-8 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
-        <Display>{t('stands.title')}</Display>
-
+      <PageHead
+        phase="inforce"
+        title={t('stands.title')}
+        says={t('stands.lead')}
+        act={
         <div
           role="tablist"
           aria-label={t('stands.title')}
@@ -78,7 +80,8 @@ export default function WhatStands() {
             </button>
           ))}
         </div>
-      </div>
+        }
+      />
 
       {/*
         The pages themselves, unchanged. Nothing here reimplements either —

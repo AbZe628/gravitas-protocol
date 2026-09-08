@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { api, oversight, type Health, type Settings as SettingsData } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
+import { PageHead } from '../components/page.js';
 import { Card, DateText, ErrorText, Loading, Tag } from '../components/ui.js';
 
 /**
@@ -43,8 +44,10 @@ export default function Settings() {
 
   return (
     <div>
-      <h1 className="mb-1 font-display font-normal leading-[1.12] tracking-[-0.024em] text-[30px] sm:text-[34px]">{data.boardName}</h1>
-      <p className="mb-6 text-[13px] text-muted">{t('set.intro')}</p>
+      <PageHead
+        title={data.boardName}
+        says={t('set.intro')}
+      />
 
       {/*
         No credentials at all is not a misconfigured board. It is a development
@@ -80,7 +83,7 @@ export default function Settings() {
         </div>
       )}
 
-      <h2 className="mb-3 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+      <h2 className="mb-3 mt-8 border-t border-line pt-6 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
         {t('set.whoIsHere')}
       </h2>
       <ul className="mb-8 space-y-2">
@@ -118,7 +121,7 @@ export default function Settings() {
         ))}
       </ul>
 
-      <h2 className="mb-3 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+      <h2 className="mb-3 mt-8 border-t border-line pt-6 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
         {t('set.howItDecides')}
       </h2>
       <Card>
@@ -141,7 +144,7 @@ export default function Settings() {
         </p>
       </Card>
 
-      <h2 className="mb-3 mt-8 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+      <h2 className="mb-3 mt-8 border-t border-line pt-6 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
         {t('set.whatIsAttached')}
       </h2>
       <Card>

@@ -2,9 +2,10 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { theWayIn, type Delivery, type Notice, type Submission } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
-import { useIdentity, mayDeliberate } from '../lib/identity.js';
-import { Act, Card, Edge, Quiet, State } from '../components/kit.js';
+import { useIdentity, mayDeliberate, maySubmit } from '../lib/identity.js';
+import { Act, Card, Quiet, State } from '../components/kit.js';
 import TheNotice from '../components/TheNotice.js';
+import { Division, Gaps, Nothing, PageHead } from '../components/page.js';
 
 /**
  * What the institution has asked, and what the board did about it.
@@ -288,50 +289,88 @@ export default function Questions({ boardId }: { boardId: string }) {
   const open = all.filter((s) => s.standing === 'waiting');
   const settled = all.filter((s) => s.standing !== 'waiting');
 
+  /*
+   * The longest wait, above everything.
+   *
+   * It is the number this product is judged on and it was nowhere on the
+   * screen that holds it — a reader had to scan the list and compare. Floored
+   * to whole days for the same reason it is floored everywhere else.
+   */
+  const longest = open.reduce((most, s) => Math.max(most, s.waitedHours ?? 0), 0);
+
+  /*
+   * What this screen cannot tell you.
+   *
+   * Both of these were true before and neither was said. A board reading a
+   * queue of three has no way of knowing that the desk sent five, or that the
+   * clock on two of them starts later than the question did.
+   */
+  const gaps: string[] = [];
+  if (open.some((s) => !s.arrivedAt || s.arrivedAt === s.recordedAt)) {
+    gaps.push(t('queue.gap.arrival'));
+  }
+  if (all.length > 0) gaps.push(t('queue.gap.only'));
+
   return (
     <div className="mx-auto max-w-reading px-5 pb-16 pt-6">
-      <h1 className="font-display text-[27px] leading-tight tracking-[-0.018em]">
-        {t('queue.title')}
-      </h1>
-      <p className="mt-2 max-w-[62ch] text-[13px] leading-[1.65] text-muted">{t('queue.lead')}</p>
-
-      <Edge />
+      <PageHead
+        phase="asked"
+        title={t('queue.title')}
+        says={t('queue.lead')}
+        live={
+          open.length > 0 ? (
+            <>
+              <State tone={longest >= 24 * 7 ? 'attention' : 'plain'}>
+                {open.length} {t('spine.asked.count')}
+              </State>
+              <span className="text-[12.5px] text-muted">
+                {t('spine.longestWait')}{' '}
+                <span className="font-mono tabular-nums text-gold">{span(longest, t)}</span>
+              </span>
+            </>
+          ) : undefined
+        }
+        act={
+          maySubmit(identity?.role) ? <Act to="/ask">{t('door.asked.put')}</Act> : undefined
+        }
+      />
 
       {notice && (
-        <div className="mt-5">
+        <div className="mb-6">
           <TheNotice notice={notice.notice} delivery={notice.delivery} />
         </div>
       )}
 
-      {all.length === 0 && <p className="mt-6 text-[13px] text-muted">{t('queue.none')}</p>}
-
-      {open.length > 0 && (
-        <div className="mt-6 space-y-3">
-          {open.map((s) => (
-            <One
-              key={s.id}
-              s={s}
-              onDone={(n) => {
-                if (n) setNotice(n);
-                load();
-              }}
-            />
-          ))}
-        </div>
-      )}
+      <Division heading={t('queue.waitingHere')}>
+        {open.length === 0 ? (
+          <Nothing>{t('queue.none')}</Nothing>
+        ) : (
+          <div className="space-y-3">
+            {open.map((s) => (
+              <One
+                key={s.id}
+                s={s}
+                onDone={(n) => {
+                  if (n) setNotice(n);
+                  load();
+                }}
+              />
+            ))}
+          </div>
+        )}
+      </Division>
 
       {settled.length > 0 && (
-        <div className="mt-10">
-          <h2 className="mb-3 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
-            {t('record.title')}
-          </h2>
+        <Division heading={t('queue.settledHere')} note={t('queue.settledNote')}>
           <div className="space-y-3">
             {settled.map((s) => (
               <One key={s.id} s={s} onDone={load} />
             ))}
           </div>
-        </div>
+        </Division>
       )}
+
+      <Gaps items={gaps} />
 
       {/* Nothing here is a control: the route refuses regardless of what shows. */}
       {!canAct && all.length > 0 && (

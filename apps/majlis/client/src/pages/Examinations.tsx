@@ -8,8 +8,9 @@ import {
   type MatterSummary,
 } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
+import { Division, Nothing, PageHead } from '../components/page.js';
 import { useIdentity, mayRecordInstitutionAct } from '../lib/identity.js';
-import { Act, Card, Edge, Quiet, State } from '../components/kit.js';
+import { Act, Card, Quiet, State } from '../components/kit.js';
 
 /**
  * What was executed, against what the board approved.
@@ -210,12 +211,11 @@ export default function Examinations({ boardId }: { boardId: string }) {
 
   return (
     <div className="mx-auto max-w-reading px-5 pb-16 pt-6">
-      <h1 className="font-display text-[27px] leading-tight tracking-[-0.018em]">
-        {t('exam.title')}
-      </h1>
-      <p className="mt-2 max-w-[62ch] text-[13px] leading-[1.65] text-muted">{t('exam.lead')}</p>
-
-      <Edge />
+      <PageHead
+        phase="checked"
+        title={t('exam.title')}
+        says={t('exam.lead')}
+      />
 
       {mayRecord ? (
         <div className="mt-5">
@@ -365,9 +365,9 @@ export default function Examinations({ boardId }: { boardId: string }) {
         </p>
       )}
 
-      <div className="mt-8">
+      <Division heading={t('exam.recorded')}>
         {all.length === 0 ? (
-          <p className="text-[13px] text-muted">{t('exam.none')}</p>
+          <Nothing>{t('exam.none')}</Nothing>
         ) : (
           <div className="space-y-3">
             {all.map((e) => (
@@ -375,7 +375,7 @@ export default function Examinations({ boardId }: { boardId: string }) {
             ))}
           </div>
         )}
-      </div>
+      </Division>
 
       <p className="mt-8 max-w-[62ch] text-[12px] leading-[1.6] text-muted">
         {t('exam.notAVerdict')}

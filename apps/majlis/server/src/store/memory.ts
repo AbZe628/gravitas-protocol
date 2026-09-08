@@ -34,7 +34,7 @@ import {
   rules as seedRules,
   assets as seedAssets,
 } from '../data/seed.js';
-import { ASSISTANT_LOG_MAX, NotFound, type Store } from './store.js';
+import { ASSISTANT_LOG_MAX, NotFound, type Store, type StoredSigning } from './store.js';
 
 const copy = <T>(value: T): T => structuredClone(value);
 
@@ -69,6 +69,12 @@ export class MemoryStore implements Store {
   private readonly _meetings: Map<string, Meeting>;
   private readonly _submissions: Map<string, Submission>;
   private readonly _examinations: Map<string, Examination>;
+  /**
+   * An array, not a map. A signature has no id worth having, and a member may
+   * hold more than one on the same matter when the document was amended
+   * between them — a map keyed by member would silently drop the earlier.
+   */
+  private readonly _signings: StoredSigning[] = [];
   private readonly _log: AssistantExchange[] = [];
 
   constructor(seed: MemorySeed = {}) {
@@ -304,6 +310,15 @@ export class MemoryStore implements Store {
     }
     this._examinations.set(examination.id, copy(examination));
     return copy(examination);
+  }
+
+  async signings(matterId: string): Promise<StoredSigning[]> {
+    return copy(this._signings.filter((s) => s.matterId === matterId));
+  }
+
+  async recordSigning(signing: StoredSigning): Promise<StoredSigning> {
+    this._signings.push(copy(signing));
+    return copy(signing);
   }
 
   async submissions(boardId?: string): Promise<Submission[]> {
