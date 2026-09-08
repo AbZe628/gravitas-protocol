@@ -88,6 +88,14 @@ export const lifecycleMatters: Matter[] = [
       'market value. Above the limit, no new position is taken.',
     interactsWith: ['rule-pool-trading'],
     assetIds: ['asset-leveraged-index'],
+    /*
+     * The shape it is judged against.
+     *
+     * Without one the contract reading has no conditions to read against and
+     * refuses — which is right, and meant the reading refused on every matter
+     * in the demonstration record, so it could not be shown at all.
+     */
+    structureId: 'murabaha',
     proposedRule: {
       id: 'rule-leveraged-index',
       boardId: 'demo-board',

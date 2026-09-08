@@ -156,6 +156,19 @@ const voteSchema = z.object({
 const objectSchema = z.object({ reason: reasonSchema });
 
 /*
+ * A pasted contract.
+ *
+ * The shape is optional because the matter usually names one; where it does
+ * not, the caller says which conditions to read against. Nothing about the
+ * text is stored, so there is no size limit beyond the body limit the
+ * application already sets.
+ */
+const readingSchema = z.object({
+  text: z.string().min(1).max(200_000),
+  structureId: z.string().max(120).optional(),
+});
+
+/*
  * Signing.
  *
  * The hash is deliberately not a field. It is computed from the record at the
@@ -648,6 +661,52 @@ export function governanceRoutes(
    * which words and where, and why it says plainly that it does not know what
    * they mean.
    */
+  /**
+   * Read a contract somebody pasted in, against the conditions this board holds.
+   *
+   * The same reading as the route below, reached the way people actually reach
+   * it. Nothing is stored: the text is read, the findings come back, and it is
+   * gone. That is deliberate — a contract a bank pastes to see what a board
+   * would ask about is not yet a document of the record, and keeping it would
+   * make it one without anybody deciding to.
+   */
+  router.post(
+    '/matters/:id/reading',
+    handle(async (req, res) => {
+      const who = identityOf(req);
+      if (!requireRole(res, mayDeliberate(who.role), 'read a contract', who.role)) return;
+
+      const parsed = readingSchema.safeParse(req.body);
+      if (!parsed.success) return badRequest(res, parsed.error.issues);
+
+      const matter = await store.matter(req.params.id);
+      if (!matter) {
+        res.status(404).json({ error: 'not_found', message: 'No such matter.' });
+        return;
+      }
+
+      const structureId = parsed.data.structureId ?? matter.structureId;
+      const structure = structureId ? structureById(structureId) : undefined;
+      if (!structure) {
+        res.status(409).json({
+          error: 'no_structure',
+          message:
+            'This matter is not being judged against a contract shape, so there are no conditions to read it against. Set the shape first.',
+        });
+        return;
+      }
+
+      const adoptions = standingAdoptions(await store.adoptions(matter.boardId));
+      const adopted = adoptions.some(
+        (x) => x.structureId === structure.id && x.standing === 'adopted',
+      );
+
+      res.json(
+        readContract({ structure, adopted, text: parsed.data.text, readAt: now() }),
+      );
+    }),
+  );
+
   router.post(
     '/matters/:id/sources/:sourceId/against',
     handle(async (req, res) => {

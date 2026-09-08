@@ -8,6 +8,8 @@ import { State, toneForStatus } from '../components/kit.js';
 import VotePanel from '../components/VotePanel.js';
 import Deliberation from '../components/Deliberation.js';
 import SignTheDocument from '../components/SignTheDocument.js';
+import ReadTheContract from '../components/ReadTheContract.js';
+import Checklist from '../components/Checklist.js';
 
 /**
  * One matter, everything for it, one act.
@@ -230,7 +232,26 @@ export default function MatterPack() {
             </p>
           </Part>
 
-          <Part n="04" heading={t('pack.said')}>
+          {/*
+            The reading, and then the conditions a member actually rules on.
+
+            This is the step the whole flow was missing: a contract comes in,
+            somebody reads it against the conditions, the board looks at what
+            was found, changes what needs changing, and votes. Everything but
+            the reading existed — and the reading existed on the server and was
+            reachable from no screen at all.
+
+            It sits above the deliberation on purpose. You read the text, then
+            you say what you think about it.
+          */}
+          <Part n="04" heading={t('pack.reading')}>
+            <ReadTheContract matterId={matter.id} canRead={identity?.role !== 'observer'} />
+            <div className="mt-6 border-t border-line pt-5">
+              <Checklist matterId={matter.id} canRule={identity?.role !== 'observer'} />
+            </div>
+          </Part>
+
+          <Part n="05" heading={t('pack.said')}>
             <Deliberation
               matter={matter}
               canSpeak={identity?.role !== 'observer'}
@@ -238,7 +259,7 @@ export default function MatterPack() {
             />
           </Part>
 
-          <Part n="05" heading={t('pack.follows')}>
+          <Part n="06" heading={t('pack.follows')}>
             <p className="max-w-[58ch] text-[13.5px] leading-[1.65] text-sand">
               {pack.follows.carrying.whenChecked}
             </p>
@@ -253,7 +274,7 @@ export default function MatterPack() {
             The gaps. Same size and same weight as everything above, because a
             section that whispered would be read as a footnote.
           */}
-          <Part n="06" heading={t('pack.gaps')}>
+          <Part n="07" heading={t('pack.gaps')}>
             {pack.gaps.length === 0 ? (
               <p className="text-[13.5px] text-settled">{t('pack.noGaps')}</p>
             ) : (

@@ -1322,6 +1322,34 @@ export interface BoardBook {
   assembledAt: string;
 }
 
+/**
+ * A contract read against the conditions the board holds.
+ *
+ * There is no verdict and there is deliberately no "met": met is a finding,
+ * it carries a scholar's name and a reason, and a person records it. What
+ * comes back is where each condition is answered and where it is not.
+ */
+export interface ContractReading {
+  structureId: string;
+  structureName: string;
+  /** Whether the board adopted this shape, or it is the shipped draft. */
+  adopted: boolean;
+  conditions: {
+    conditionId: string;
+    requirement: string;
+    standing: 'found' | 'unclear' | 'absent';
+    /** The sentences it was found in, and where each starts. */
+    passages: { text: string; at: number }[];
+    note: string;
+    /** True where no reading of words could settle it, whatever was found. */
+    needsAPerson: boolean;
+  }[];
+  charactersRead: number;
+  /** Never empty. A reading with nothing it could not do would be a lie. */
+  limits: string[];
+  readAt: string;
+}
+
 export interface Computation {
   id: string;
   kind: CalculationKind;
@@ -1599,6 +1627,17 @@ export const oversight = {
    */
   sign: (id: string, provedBy: SigningProof, note?: string) =>
     send<Signing>(`/api/matters/${id}/sign`, { provedBy, ...(note ? { note } : {}) }),
+
+  /**
+   * Read a contract against the conditions this board holds.
+   *
+   * Pasted rather than uploaded. The upload path needs a configured volume,
+   * which most installations do not have and the demonstration record has no
+   * document in — so the reading existed and nobody could reach it. Nothing
+   * about the text is kept.
+   */
+  readContract: (matterId: string, text: string) =>
+    send<ContractReading>(`/api/matters/${matterId}/reading`, { text }),
 
   /** Addresses of the printable documents. Opened, never fetched. */
   hrefs: {
