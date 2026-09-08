@@ -135,13 +135,26 @@ function MeetingCard({
         ))}
       </ul>
 
-      <button
-        type="button"
-        onClick={() => setOpen(!open)}
-        className="text-[12px] text-muted underline underline-offset-2 hover:text-paper"
-      >
-        {open ? t('meet.hide') : t('meet.show')}
-      </button>
+      <div className="flex flex-wrap items-center gap-4">
+        {/*
+          The papers, before the toggle that opens the record of what happened.
+          A member arriving at a meeting that has not been held yet wants what
+          to read; one arriving after it wants what was decided.
+        */}
+        <Link
+          to={`/meetings/${row.meeting.id}/book`}
+          className="text-[12.5px] font-semibold text-lapis underline decoration-line underline-offset-4"
+        >
+          {t('book.open')}
+        </Link>
+        <button
+          type="button"
+          onClick={() => setOpen(!open)}
+          className="text-[12px] text-muted underline underline-offset-2 hover:text-paper"
+        >
+          {open ? t('meet.hide') : t('meet.show')}
+        </button>
+      </div>
 
       {open && (
         <div className="mt-3 space-y-3">

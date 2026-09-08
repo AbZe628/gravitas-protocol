@@ -443,14 +443,14 @@ export default function Shell({ children }: { children: React.ReactNode }) {
             */}
             <Link
               to="/search"
-              className="flex w-[210px] items-center gap-2.5 rounded-xl bg-raised/80 px-3.5 py-2 shadow-ring transition-shadow hover:shadow-card"
+              className="flex items-center gap-2 rounded-xl px-3 py-2 text-muted shadow-ring transition-colors hover:bg-raised/60 hover:text-paper"
             >
               <svg
                 width="13"
                 height="13"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="#B3A896"
+                stroke="currentColor"
                 strokeWidth="2.1"
                 strokeLinecap="round"
                 aria-hidden="true"
@@ -458,7 +458,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
                 <circle cx="11" cy="11" r="7" />
                 <path d="M20 20l-3.5-3.5" />
               </svg>
-              <span className="truncate text-[12.5px] text-muted">{t('besides.search')}</span>
+              <span className="text-[12.5px]">{t('besides.search')}</span>
             </Link>
 
             {/*

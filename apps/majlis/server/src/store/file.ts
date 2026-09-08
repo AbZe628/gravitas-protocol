@@ -55,6 +55,8 @@ import {
   assets as seedAssets,
 } from '../data/seed.js';
 import { ASSISTANT_LOG_MAX, NotFound, type Store, type StoredSigning } from './store.js';
+import type { Credential } from '../services/account.js';
+import type { Undertaking } from '../services/undertaking.js';
 
 interface Document {
   version: 1;
@@ -100,6 +102,10 @@ interface Document {
    * between signings, and both are part of the record.
    */
   signings?: StoredSigning[];
+  /** A member holds one credential or none; keyed rather than appended. */
+  credentials?: Credential[];
+  /** What somebody undertook to do at a sitting, and what became of it. */
+  undertakings?: Undertaking[];
   briefings: Briefing[];
 }
 
@@ -188,6 +194,8 @@ export class FileStore implements Store {
       loaded.submissions ??= [];
       loaded.examinations ??= [];
       loaded.signings ??= [];
+      loaded.credentials ??= [];
+      loaded.undertakings ??= [];
       this.doc = loaded;
       return;
     }
@@ -517,6 +525,57 @@ export class FileStore implements Store {
 
   async signings(matterId: string): Promise<StoredSigning[]> {
     return copy((this.doc.signings ?? []).filter((s) => s.matterId === matterId));
+  }
+
+  async credential(scholarId: string): Promise<Credential | null> {
+    return copy((this.doc.credentials ?? []).find((c) => c.scholarId === scholarId) ?? null);
+  }
+
+  async undertakings(boardId?: string): Promise<Undertaking[]> {
+    const all = this.doc.undertakings ?? [];
+    return copy(boardId === undefined ? all : all.filter((u) => u.boardId === boardId));
+  }
+
+  async undertaking(id: string): Promise<Undertaking | null> {
+    return copy((this.doc.undertakings ?? []).find((u) => u.id === id) ?? null);
+  }
+
+  async minuteUndertaking(undertaking: Undertaking): Promise<Undertaking> {
+    return this.serialise(() => {
+      this.doc.undertakings ??= [];
+      if (this.doc.undertakings.some((u) => u.id === undertaking.id)) {
+        throw new Error('An undertaking with id ' + undertaking.id + ' already exists.');
+      }
+      this.doc.undertakings.push(copy(undertaking));
+      this.persist();
+      return copy(undertaking);
+    });
+  }
+
+  async updateUndertaking(
+    id: string,
+    change: (current: Undertaking) => Undertaking,
+  ): Promise<Undertaking> {
+    return this.serialise(() => {
+      this.doc.undertakings ??= [];
+      const at = this.doc.undertakings.findIndex((u) => u.id === id);
+      if (at === -1) throw new NotFound('Undertaking', id);
+      const next = change(copy(this.doc.undertakings[at]));
+      this.doc.undertakings[at] = copy(next);
+      this.persist();
+      return copy(next);
+    });
+  }
+
+  async putCredential(credential: Credential): Promise<Credential> {
+    return this.serialise(() => {
+      this.doc.credentials ??= [];
+      const at = this.doc.credentials.findIndex((c) => c.scholarId === credential.scholarId);
+      if (at === -1) this.doc.credentials.push(copy(credential));
+      else this.doc.credentials[at] = copy(credential);
+      this.persist();
+      return copy(credential);
+    });
   }
 
   async recordSigning(signing: StoredSigning): Promise<StoredSigning> {

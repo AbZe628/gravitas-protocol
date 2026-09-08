@@ -37,6 +37,8 @@ import type {
   Examination,
 } from '../types.js';
 import type { Signing } from '../services/signature.js';
+import type { Credential } from '../services/account.js';
+import type { Undertaking } from '../services/undertaking.js';
 
 /**
  * A signature, with what it is a signature on.
@@ -211,6 +213,40 @@ export interface Store {
    * There is deliberately no way to remove one.
    */
   recordSigning(signing: StoredSigning): Promise<StoredSigning>;
+
+  // ── a member's own account ─────────────────────────────────────────────
+
+  /**
+   * The credential this member holds, or null.
+   *
+   * Null means nobody has set one in the store, and the environment file is
+   * still the authority for them — which is the ordinary state of a fresh
+   * installation and not a fault.
+   */
+  credential(scholarId: string): Promise<Credential | null>;
+
+  /**
+   * Write one, replacing whatever was there.
+   *
+   * There is no update-in-place: a credential is a small whole thing, and a
+   * partial write is how an outstanding reset code survives a password change
+   * it should have cleared.
+   */
+  putCredential(credential: Credential): Promise<Credential>;
+
+  // ── what somebody undertook to do ──────────────────────────────────────
+
+  undertakings(boardId?: string): Promise<Undertaking[]>;
+  undertaking(id: string): Promise<Undertaking | null>;
+
+  /** @throws if one with this id already exists. */
+  minuteUndertaking(undertaking: Undertaking): Promise<Undertaking>;
+
+  /**
+   * Read, change and write one atomically.
+   * @throws NotFound if there is no such undertaking.
+   */
+  updateUndertaking(id: string, change: (current: Undertaking) => Undertaking): Promise<Undertaking>;
 
   // ── the way in ─────────────────────────────────────────────────────────
 

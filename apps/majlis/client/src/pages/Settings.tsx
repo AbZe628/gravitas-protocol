@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { api, oversight, type Health, type Settings as SettingsData } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { PageHead } from '../components/page.js';
+import YourAccount from '../components/YourAccount.js';
 import { Card, DateText, ErrorText, Loading, Tag } from '../components/ui.js';
 
 /**
@@ -49,16 +50,14 @@ export default function Settings() {
         says={t('set.intro')}
       />
 
+      <YourAccount />
+
       {/*
-        No credentials at all is not a misconfigured board. It is a development
-        installation where everyone reads and nobody acts, and it is one calm
-        sentence rather than a warning on every row.
+        No credentials at all used to be said twice on this page, once here and
+        once by the account panel above, in two different wordings a sentence
+        apart. It is said once now, by the panel, because that is where the
+        person who can do something about it is already reading.
       */}
-      {!data.credentialsConfigured && (
-        <div className="mb-7 rounded-card shadow-ring bg-raised px-4 py-3 text-[13px] leading-relaxed text-muted">
-          {t('set.noCredentialsAtAll')}
-        </div>
-      )}
 
       {/*
         Above the composition, because a fault here makes the composition below

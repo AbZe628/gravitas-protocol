@@ -244,6 +244,80 @@ export interface EnforcementSnapshot {
   error?: string;
 }
 
+/**
+ * Who you are, and what this copy can honestly offer you.
+ *
+ * `stillOnTheSeed` is null where this copy holds no credentials at all — a
+ * development copy where everyone reads and nobody acts. Null and false are
+ * different answers, and the screen shows them differently.
+ */
+export interface Me {
+  scholarId: string;
+  role: string;
+  office: 'chair' | 'secretary' | null;
+  stillOnTheSeed: boolean | null;
+  passwordMinimum: number;
+  /** False where nobody can be let back in, because nothing holds a password. */
+  resetsPossible: boolean;
+}
+
+async function post<T>(path: string, body: unknown): Promise<T> {
+  const res = await fetch(path, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  const text = await res.text();
+  if (!res.ok) {
+    // The server's own words, which say what was refused and why. A status
+    // line would tell a member nothing they can act on.
+    let message = res.statusText;
+    try {
+      const parsed = JSON.parse(text) as { message?: string };
+      if (parsed.message) message = parsed.message;
+    } catch {
+      /* not JSON: the status line is all there is */
+    }
+    throw new Error(message);
+  }
+  return (text ? JSON.parse(text) : {}) as T;
+}
+
+/**
+ * A member's own account.
+ *
+ * Apart from the store and the routes, this is the whole of it: nothing here
+ * caches an identity, because a password change has to be reflected by the
+ * next request rather than by a page the interface remembers.
+ */
+export const account = {
+  me: () => get<Me>('/api/me'),
+
+  changePassword: (current: string, next: string) =>
+    post<{ scholarId: string; setAt: string }>('/api/me/password', { current, next }),
+
+  /**
+   * Issue a code for somebody who has forgotten theirs.
+   *
+   * `issued` comes back false, with no code, where nobody holds a credential
+   * for that member — the same shape as a success, so the door cannot be used
+   * to read a board's membership.
+   */
+  issueReset: (scholarId: string) =>
+    post<{ issued: boolean; code?: string; expiresAt?: string; message: string }>(
+      '/api/members/reset',
+      { scholarId },
+    ),
+
+  /** Set a new password with a code. Takes no credential, by design. */
+  redeemReset: (scholarId: string, code: string, next: string) =>
+    post<{ scholarId: string; setAt: string }>('/api/members/password/reset', {
+      scholarId,
+      code,
+      next,
+    }),
+};
+
 export const api = {
   health: () => get<Health>('/api/health'),
   boards: () => get<Board[]>('/api/boards'),
@@ -257,6 +331,13 @@ export const api = {
    * so two screens cannot disagree about what a matter's precedent is.
    */
   pack: (id: string) => get<Pack>(`/api/matters/${id}/pack`),
+  /**
+   * Everything for one sitting, in one document.
+   *
+   * What a director is handed before a meeting by every board portal sold to
+   * corporate boards, and the last of those this application did not have.
+   */
+  book: (meetingId: string) => get<BoardBook>(`/api/meetings/${meetingId}/book`),
   rules: () => get<Rule[]>('/api/rules'),
   briefings: () => get<Briefing[]>('/api/briefings'),
   enforcement: () => get<EnforcementSnapshot>('/api/enforcement'),
@@ -1183,6 +1264,61 @@ export interface Pack {
     yetToSpeak: { scholarId: string; name: string }[];
   };
 
+  assembledAt: string;
+}
+
+/**
+ * The board book: everything for one sitting, in one document.
+ *
+ * The agenda in order, a pack under every item that is a matter, who is
+ * expected, and the standing business the board carries whether or not
+ * anybody put it on the agenda.
+ */
+/**
+ * What somebody undertook to do at a sitting, and what became of it.
+ *
+ * Not a task list. It was minuted, it names a person who was in the room, and
+ * it is closed by an account of what happened rather than by a tick.
+ */
+export interface Undertaking {
+  id: string;
+  boardId: string;
+  meetingId: string;
+  matterId?: string;
+  what: string;
+  who: string;
+  /** Absent is a real answer: nothing is due unless the board said so. */
+  dueAt?: string;
+  minutedBy: string;
+  minutedAt: string;
+  state: 'open' | 'done' | 'dropped';
+  outcome?: { said: string; by: string; at: string };
+}
+
+export interface BoardBook {
+  meetingId: string;
+  boardId: string;
+  at: string;
+  state: string;
+  joinUrl: string | null;
+  items: {
+    number: number;
+    item: string;
+    matterId: string | null;
+    /** Null where the item is not a matter, or names one that is not here. */
+    pack: Pack | null;
+    missing: boolean;
+  }[];
+  /** present is null before anybody recorded it. Never false by default. */
+  expected: { scholarId: string; name: string; present: boolean | null; note?: string }[];
+  unaccountedFor: string[];
+  sinceWeMet: { kind: string; what: string; ref: string; note: string }[];
+  /** What was undertaken here, and what is still open from before. */
+  undertakings: {
+    fromThisSitting: Undertaking[];
+    stillOpenFromBefore: Undertaking[];
+  };
+  gaps: string[];
   assembledAt: string;
 }
 

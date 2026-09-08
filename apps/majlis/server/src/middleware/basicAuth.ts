@@ -31,7 +31,22 @@ import { membersFromEnv, type Identity, type Members } from '../auth/members.js'
  * It returns no board data; see `app.ts` for exactly what it exposes.
  */
 
-const EXEMPT = new Set(['/api/health']);
+/**
+ * The two paths that answer without a credential, and why each does.
+ *
+ * `/api/health` says whether the process is up, which a load balancer has to
+ * ask before anybody has signed in.
+ *
+ * `/api/members/password/reset` is where a member who has forgotten their
+ * password sets a new one. They have no credential to present — that is the
+ * whole situation — so requiring one would make the route useless. What stands
+ * in for it is the code: issued only by the secretary or the chair, valid for
+ * thirty minutes, stored only as a hash, compared in constant time, replaced
+ * rather than added to when a second is issued, and answering a member nobody
+ * holds a credential for exactly as it answers a wrong code. The login
+ * throttle sits in front of it like everything else.
+ */
+const EXEMPT = new Set(['/api/health', '/api/members/password/reset']);
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace

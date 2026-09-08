@@ -9,6 +9,10 @@ import { storeFromEnv, type Store } from './store/index.js';
 import { enforcementFromEnv, type Enforcement } from './services/enforcement.js';
 import { buildCarrying } from './services/carrying.js';
 import { assemblePack } from './services/pack.js';
+import { assembleBook, type StandingItem } from './services/board-book.js';
+import { reviewsDue } from './services/review.js';
+import { driftReport } from './services/drift.js';
+import { buildRegister } from './services/register.js';
 import { dictationFromEnv, WHERE_THE_AUDIO_GOES } from './services/dictation.js';
 import { askTheGuide, guideTopics } from './services/guide.js';
 import {
@@ -25,6 +29,8 @@ import { TIMELOCK_HOURS } from './types.js';
 import type { Language } from './types.js';
 import { LoginLimiter, loginThrottle } from './middleware/loginLimit.js';
 import { governanceRoutes } from './routes/governance.js';
+import { accountRoutes } from './routes/account.js';
+import { undertakingRoutes } from './routes/undertakings.js';
 import { adoptionRoutes } from './routes/adoption.js';
 import { segmentsOf } from './services/mentions.js';
 import { vaultFromEnv, type Vault } from './store/vault.js';
@@ -396,6 +402,74 @@ export function createApp(
   });
 
   /**
+   * The board book: everything for one sitting, in one document.
+   *
+   * Beside the pack, and here for the same reason — it needs the enforcement
+   * snapshot, because every pack inside it does.
+   *
+   * The standing business is gathered here rather than inside the assembler:
+   * the services that find drift, overdue reviews and unexamined holdings
+   * already exist and already say what each finding means, and a second
+   * opinion about any of them formed inside the book would be a second
+   * definition of the same word.
+   */
+  app.get('/api/meetings/:id/book', async (req: Request, res: Response) => {
+    const meeting = await store.meeting(req.params.id);
+    if (!meeting) {
+      res.status(404).json({ error: 'not_found', message: 'No such meeting.' });
+      return;
+    }
+    const board = await store.board(meeting.boardId);
+    if (!board) {
+      res.status(404).json({ error: 'not_found', message: 'No such board.' });
+      return;
+    }
+
+    const at = new Date().toISOString();
+    const matters = await store.matters(meeting.boardId);
+    const assets = await store.assets();
+    const rules = await store.rules(meeting.boardId);
+
+    const standing: StandingItem[] = [
+      ...reviewsDue(rules, at)
+        .filter((r) => r.overdue)
+        .map((r) => ({
+          kind: 'review_due' as const,
+          what: r.title,
+          ref: r.ruleId,
+          note: r.note,
+        })),
+      ...driftReport(assets, matters, at).drifting.map((d) => ({
+        kind: 'moved' as const,
+        what: d.assetName,
+        ref: d.matterId,
+        note: d.questionForBoard,
+      })),
+      ...buildRegister(assets, matters, at)
+        .assets.filter((a) => a.status === 'never_examined')
+        .map((a) => ({
+          kind: 'never_examined' as const,
+          what: a.asset.name,
+          ref: a.asset.id,
+          note: a.note,
+        })),
+    ];
+
+    res.json(
+      assembleBook({
+        board,
+        meeting,
+        allMatters: matters,
+        computations: await store.computations({ boardId: meeting.boardId }),
+        enforcement: await enforcement.snapshot(),
+        standing,
+        undertakings: await store.undertakings(meeting.boardId),
+        assembledAt: at,
+      }),
+    );
+  });
+
+  /**
    * The pack: one matter, everything needed to decide it, in reading order.
    *
    * It lives here rather than with the other matter routes because it needs
@@ -507,6 +581,15 @@ export function createApp(
   app.use('/api', submissionRoutes(store, notifier));
   app.use('/api', examinationRoutes(store));
   app.use('/api', meetingRoutes(store));
+  /*
+   * A member's own account.
+   *
+   * `auth.members` is handed in rather than read again, so a password written
+   * to the store takes effect on the very next request instead of at the next
+   * restart.
+   */
+  app.use('/api', accountRoutes(store, auth.members));
+  app.use('/api', undertakingRoutes(store));
 
   // ---- audit export ----------------------------------------------------
   app.get('/api/export/:boardId', async (req, res) => {

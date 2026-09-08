@@ -14,6 +14,8 @@ import type {
   Examination,
 } from '../types.js';
 import { NotFound, type Store, type StoredSigning } from './store.js';
+import type { Credential } from '../services/account.js';
+import type { Undertaking } from '../services/undertaking.js';
 
 /**
  * A store that can only see one institution.
@@ -328,6 +330,93 @@ export class TenantStore implements Store {
     const matter = await this.matter(matterId);
     if (!matter) return [];
     return this.inner.signings(matterId);
+  }
+
+  /*
+   * A credential belongs to a person, and a person belongs to a board this
+   * store either serves or does not. Scoped through the board's membership
+   * rather than through a field on the credential, for the same reason
+   * signatures are scoped through the matter: a field on the row is a claim
+   * the row makes about itself.
+   */
+  private async ours(credential: { scholarId: string; institutionId?: string }): Promise<boolean> {
+    // The row's own claim, where it makes one. Set from an identity the door
+    // has already checked, so it is not the credential vouching for itself.
+    if (credential.institutionId) return credential.institutionId === this.institutionId;
+
+    /*
+     * Otherwise, board membership — and the fallback matters. A member of the
+     * board is ours. Somebody on no board of ours is not, and that is right
+     * for a scholar. It was wrong for the `institution` role, which is a desk
+     * at the bank and sits on no member list, which is why the field above
+     * exists and why this is only the fallback.
+     */
+    const boards = await this.boards();
+    return boards.some((b) => b.members.some((m) => m.id === credential.scholarId));
+  }
+
+  async credential(scholarId: string): Promise<Credential | null> {
+    /*
+     * Fetched first, then checked against what the row itself says.
+     *
+     * Checking before fetching meant checking an id against board membership
+     * alone, which is the wrong question for a credential: the row carries its
+     * institution and the board list does not carry the institution role at
+     * all. Reading first is safe because nothing leaves this method until the
+     * check has passed.
+     */
+    const found = await this.inner.credential(scholarId);
+    if (!found) return null;
+    return (await this.ours(found)) ? found : null;
+  }
+
+  /*
+   * Undertakings are scoped through the board, like matters and incidents.
+   * An undertaking names what a member of one bank's board agreed to do, and
+   * there is nothing about it another bank should read.
+   */
+  async undertakings(boardId?: string): Promise<Undertaking[]> {
+    if (boardId && !(await this.owns(boardId))) return [];
+    const mine = await this.ownBoardIds();
+    const all = await this.inner.undertakings(boardId);
+    return all.filter((u) => mine.has(u.boardId));
+  }
+
+  async undertaking(id: string): Promise<Undertaking | null> {
+    const found = await this.inner.undertaking(id);
+    if (!found) return null;
+    return (await this.owns(found.boardId)) ? found : null;
+  }
+
+  async minuteUndertaking(undertaking: Undertaking): Promise<Undertaking> {
+    if (!(await this.owns(undertaking.boardId))) {
+      throw new OutsideInstitution('minute an undertaking on', undertaking.boardId);
+    }
+    return this.inner.minuteUndertaking(undertaking);
+  }
+
+  async updateUndertaking(
+    id: string,
+    change: (current: Undertaking) => Undertaking,
+  ): Promise<Undertaking> {
+    const found = await this.inner.undertaking(id);
+    // Indistinguishable from one that does not exist, deliberately.
+    if (!found || !(await this.owns(found.boardId))) throw new NotFound('undertaking', id);
+
+    return this.inner.updateUndertaking(id, (current) => {
+      const next = change(current);
+      if (next.boardId !== current.boardId) {
+        throw new OutsideInstitution('move an undertaking to', next.boardId);
+      }
+      return next;
+    });
+  }
+
+  async putCredential(credential: Credential): Promise<Credential> {
+    if (!(await this.ours(credential))) {
+      throw new OutsideInstitution('set a credential for', credential.scholarId);
+    }
+    return this.inner.putCredential(credential);
   }
 
   async recordSigning(signing: StoredSigning): Promise<StoredSigning> {

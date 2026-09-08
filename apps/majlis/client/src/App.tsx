@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import Dashboard from './pages/Dashboard.js';
 import Guided from './pages/Guided.js';
 import MatterPack from './pages/MatterPack.js';
+import BoardBook from './pages/BoardBook.js';
 import Questions from './pages/Questions.js';
 import Examinations from './pages/Examinations.js';
 import Ask from './pages/Ask.js';
@@ -91,6 +92,12 @@ export default function App() {
           <Route path="/calculations" element={<Calculations />} />
           <Route path="/calendar" element={<Calendar />} />
           <Route path="/meetings" element={<Meetings />} />
+          {/*
+            The papers for one sitting. What a director on any corporate board
+            is handed before a meeting, and the last thing every board portal
+            has that this application did not.
+          */}
+          <Route path="/meetings/:id/book" element={<BoardBook />} />
           <Route path="/incidents" element={<Incidents />} />
           <Route path="/incidents/:id" element={<IncidentDetail />} />
           <Route path="/briefings" element={<Briefings />} />

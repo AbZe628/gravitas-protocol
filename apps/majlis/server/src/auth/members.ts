@@ -193,9 +193,45 @@ export class Members {
    * unknown member id is checked against a decoy so that "no such member" and
    * "wrong password" take the same time and are the same answer.
    */
+  /**
+   * Passwords members have set for themselves, which beat the ones in the
+   * environment file.
+   *
+   * `MAJLIS_MEMBERS` is how a board is stood up; it is not where a member's
+   * password lives forever. Once somebody changes theirs the store holds it,
+   * and the store wins — otherwise a deployment that still carried the
+   * original environment variable would quietly undo the change.
+   *
+   * Held here, in memory, because this check has to be synchronous and the
+   * store is not. The application loads them at boot and sets one whenever a
+   * password is written, which is correct for the single instance this is
+   * deliberately deployed as; see the note in ARCHITECTURE.md.
+   */
+  private readonly overrides = new Map<string, string>();
+
+  /**
+   * The password the environment file carries for a member, if it carries one.
+   *
+   * Read once, when a member changes their own for the first time and the
+   * store has nothing for them yet. It is not an override and never wins over
+   * one.
+   */
+  seedSecret(scholarId: string): string | null {
+    for (const m of this.byId.values()) if (m.scholarId === scholarId) return m.secret;
+    return null;
+  }
+
+  /** Take a password set by the member themselves. */
+  setSecret(scholarId: string, secret: string): void {
+    this.overrides.set(scholarId, secret);
+  }
+
   authenticate(scholarId: string, password: string): Identity | null {
     const member = this.byId.get(scholarId);
-    const ok = verifyPassword(password, member?.secret ?? DECOY);
+    // The member's own password if they have set one, the seed otherwise, and
+    // the decoy when there is no such member — so all three cost the same.
+    const secret = (member && this.overrides.get(member.scholarId)) ?? member?.secret ?? DECOY;
+    const ok = verifyPassword(password, secret);
     if (!member || !ok) return null;
     return {
       scholarId: member.scholarId,

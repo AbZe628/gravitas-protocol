@@ -43,6 +43,8 @@ import {
 import { attentionList } from '../services/attention.js';
 import { paceOf, waitingNow } from '../services/clocks.js';
 import { assemble, render } from '../services/fatwa.js';
+import { readContract } from '../services/reading-a-contract.js';
+import { structureById } from '../data/structures.js';
 import { standingAdoptions } from '../services/adoption.js';
 import {
   assemble as assembleContract,
@@ -631,6 +633,99 @@ export function governanceRoutes(
         }
         throw e;
       }
+    }),
+  );
+
+  /**
+   * Read a contract somebody sent in, against the conditions this board holds.
+   *
+   * The competing products upload a contract and return a verdict. This
+   * returns where each condition is answered in the text and where it is not,
+   * and then stops — whether the answer is good enough is a finding, it
+   * carries a scholar's name, and it is recorded on the checklist.
+   *
+   * No model is involved. It reads words, which is why it can say exactly
+   * which words and where, and why it says plainly that it does not know what
+   * they mean.
+   */
+  router.post(
+    '/matters/:id/sources/:sourceId/against',
+    handle(async (req, res) => {
+      const who = identityOf(req);
+      if (!requireRole(res, mayDeliberate(who.role), 'read a contract', who.role)) return;
+
+      const matter = await store.matter(req.params.id);
+      if (!matter) {
+        res.status(404).json({ error: 'not_found', message: 'No such matter.' });
+        return;
+      }
+
+      const source = matter.sources.find((x) => x.id === req.params.sourceId);
+      if (!source?.file) {
+        res.status(404).json({ error: 'not_found', message: 'That source is not a document.' });
+        return;
+      }
+
+      /*
+       * The shape is the matter's own where it has one, so a board reading a
+       * murabaha contract is not asked which conditions to read it against.
+       */
+      const structureId =
+        typeof req.body?.structureId === 'string' ? req.body.structureId : matter.structureId;
+      const structure = structureId ? structureById(structureId) : undefined;
+      if (!structure) {
+        res.status(409).json({
+          error: 'no_structure',
+          message:
+            'This matter is not being judged against a contract shape, so there are no conditions to read it against. Set the shape first.',
+        });
+        return;
+      }
+
+      const bytes = await vault.get(source.file.key);
+      if (!bytes) {
+        res.status(404).json({
+          error: 'not_found',
+          message:
+            'The record cites a document this installation cannot find. That is a missing file rather than a missing citation.',
+        });
+        return;
+      }
+
+      /*
+       * Text only, and it says so rather than returning nonsense.
+       *
+       * A PDF's bytes decoded as UTF-8 are not the contract; they are the
+       * container. Reporting every condition absent because the words were
+       * never reachable would be the worst possible answer, so the refusal is
+       * explicit and names what would fix it.
+       */
+      const media = source.file.mediaType.toLowerCase();
+      const isText = media.startsWith('text/') || media.includes('json') || media.includes('xml');
+      if (!isText) {
+        res.status(501).json({
+          error: 'not_text',
+          message:
+            'This reads text, and that document is ' +
+            source.file.mediaType +
+            '. Nothing here extracts words from a PDF or a scan, so it would report every condition missing when the words are simply out of reach.',
+        });
+        return;
+      }
+
+      const adoptions = standingAdoptions(await store.adoptions(matter.boardId));
+      const adopted = adoptions.some(
+        (x) => x.structureId === structure.id && x.standing === 'adopted',
+      );
+
+      res.json(
+        readContract({
+          structure,
+          adopted,
+          text: Buffer.from(bytes).toString('utf8'),
+          readAt: now(),
+        }),
+      );
     }),
   );
 

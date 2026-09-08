@@ -35,6 +35,8 @@ import {
   assets as seedAssets,
 } from '../data/seed.js';
 import { ASSISTANT_LOG_MAX, NotFound, type Store, type StoredSigning } from './store.js';
+import type { Credential } from '../services/account.js';
+import type { Undertaking } from '../services/undertaking.js';
 
 const copy = <T>(value: T): T => structuredClone(value);
 
@@ -75,6 +77,9 @@ export class MemoryStore implements Store {
    * between them — a map keyed by member would silently drop the earlier.
    */
   private readonly _signings: StoredSigning[] = [];
+  /** Keyed by scholar: a member holds one credential or none. */
+  private readonly _credentials = new Map<string, Credential>();
+  private readonly _undertakings = new Map<string, Undertaking>();
   private readonly _log: AssistantExchange[] = [];
 
   constructor(seed: MemorySeed = {}) {
@@ -314,6 +319,45 @@ export class MemoryStore implements Store {
 
   async signings(matterId: string): Promise<StoredSigning[]> {
     return copy(this._signings.filter((s) => s.matterId === matterId));
+  }
+
+  async credential(scholarId: string): Promise<Credential | null> {
+    const found = this._credentials.get(scholarId);
+    return found ? copy(found) : null;
+  }
+
+  async undertakings(boardId?: string): Promise<Undertaking[]> {
+    const all = [...this._undertakings.values()];
+    return copy(boardId === undefined ? all : all.filter((u) => u.boardId === boardId));
+  }
+
+  async undertaking(id: string): Promise<Undertaking | null> {
+    const found = this._undertakings.get(id);
+    return found ? copy(found) : null;
+  }
+
+  async minuteUndertaking(undertaking: Undertaking): Promise<Undertaking> {
+    if (this._undertakings.has(undertaking.id)) {
+      throw new Error(`An undertaking with id ${undertaking.id} already exists.`);
+    }
+    this._undertakings.set(undertaking.id, copy(undertaking));
+    return copy(undertaking);
+  }
+
+  async updateUndertaking(
+    id: string,
+    change: (current: Undertaking) => Undertaking,
+  ): Promise<Undertaking> {
+    const current = this._undertakings.get(id);
+    if (!current) throw new NotFound('Undertaking', id);
+    const next = change(copy(current));
+    this._undertakings.set(id, copy(next));
+    return copy(next);
+  }
+
+  async putCredential(credential: Credential): Promise<Credential> {
+    this._credentials.set(credential.scholarId, copy(credential));
+    return copy(credential);
   }
 
   async recordSigning(signing: StoredSigning): Promise<StoredSigning> {

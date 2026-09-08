@@ -12,9 +12,54 @@ unfinished it says so, and where something is broken it says how it breaks.
 ## Verified, this save
 
 ```
-server   57 files   1445 tests   passed
-client   21 files    233 tests   passed
+server   63 files   1527 tests   passed
+client   21 files    234 tests   passed
 ```
+
+**New since the last save: a member is a person now.**
+
+The fault was one idea, not four features. A member was a line in
+`MAJLIS_MEMBERS` — a file the application reads and cannot write — so nobody
+could change their own password, a forgotten one needed shell access to the
+deployment, `notice.ts` had nowhere to send what it composed, and the calendar
+was a file to download rather than something to subscribe to.
+
+`services/account.ts`, `routes/account.ts`, and a credential in the store. The
+environment file becomes the seed; once a member sets their own, the store wins
+and it is live on the next request rather than the next restart. Recovery is
+the one a board of nine actually performs: the secretary or the chair issues a
+code and reads it out. Shown once, thirty minutes, stored as a hash, replaced
+rather than added to, and a member nobody holds a credential for is answered
+exactly as one who is. `POST /api/members/password/reset` is the only route in
+this application that takes no credential, and `basicAuth.ts` says why.
+
+**Three faults found by running it, not by testing it.** The `institution` role
+could never have changed its own password — a credential was scoped through
+board membership and a bank's desk sits on no board. The refusal came back as a
+500. And the read was blocked while the write succeeded, so the screen kept
+saying a member was still on the seed after they had changed it. All three are
+fixed; `Credential` carries its institution now, the way an asset does.
+
+**And three of the four things the competition had:**
+
+- **The board book** — `services/board-book.ts`. The agenda in order, a pack
+  under every item that is a matter, who is expected, and *since the board last
+  met*: overdue reviews, holdings that left the limits, holdings nobody has
+  examined. That last section is the one no corporate portal needs.
+- **Undertakings** — `services/undertaking.ts`. What somebody agreed to do at a
+  sitting. Not a task list: it is minuted, it names a person who was in the
+  room, nothing is due unless the board said so, and it is closed by an account
+  of what happened rather than a tick. Dropped is an outcome, never a deletion.
+- **Reading a contract** — `services/reading-a-contract.ts`. The competing
+  products return compliant, partially compliant, non-compliant. This returns
+  where each condition is answered in the text and where it is not, with the
+  sentence and the offset it starts at, and stops. There is deliberately no
+  `met`: that is a scholar's finding and it carries their name. A condition
+  about the order of events says a person has to read it, however many of the
+  words are present.
+
+**Still missing from the competition:** annotations on a document, and
+committees.
 
 **New since the last save: one shape for every page.**
 
