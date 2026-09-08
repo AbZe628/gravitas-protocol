@@ -247,7 +247,7 @@ describe('nothing was removed', () => {
      * rather than an intention: if a rearrangement drops a screen out of the
      * navigation, it fails here.
      */
-    for (const label of ['Holdings', 'Contracts', 'What stands', 'Search', 'Sittings', 'The board']) {
+    for (const label of ['Holdings', 'Contracts', 'What stands', 'Search', 'Meetings', 'The board']) {
       expect(
         screen.getAllByRole('link', { name: new RegExp(label) }).length,
         `${label} is not reachable from the rail`,

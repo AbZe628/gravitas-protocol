@@ -81,6 +81,7 @@ export default function ReadTheContract({
             onChange={(e) => setText(e.target.value)}
             rows={6}
             placeholder={t('read.placeholder')}
+            aria-label={t('read.placeholder')}
             className="w-full rounded-card bg-ink px-4 py-3 text-[13.5px] leading-[1.6] text-paper shadow-ring outline-none placeholder:text-muted focus:shadow-lift"
           />
           {failed && <p className="mt-2 text-[12.5px] text-breach">{failed}</p>}

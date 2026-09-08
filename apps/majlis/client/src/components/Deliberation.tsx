@@ -66,6 +66,7 @@ function Composer({
         value={body}
         onChange={(e) => setBody(e.target.value)}
         placeholder={t('say.placeholder')}
+            aria-label={t('say.placeholder')}
         rows={replyTo ? 2 : 3}
         className="w-full resize-y rounded bg-transparent text-[14px] leading-relaxed outline-none placeholder:text-muted"
       />

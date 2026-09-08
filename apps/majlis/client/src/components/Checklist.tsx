@@ -266,6 +266,7 @@ function Condition({
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
                 placeholder={t('chk.reasonHint')}
+            aria-label={t('chk.reasonHint')}
                 className="mb-2 h-20 w-full rounded-xl shadow-ring bg-raised px-3 py-2 text-[13.5px]"
               />
 
@@ -361,7 +362,7 @@ function Picker({
                   key={s.id}
                   type="button"
                   onClick={() => onChoose(s.id)}
-                  className="rounded-xl shadow-ring px-3 py-1.5 text-left text-[12.5px] text-muted transition-colors hover:text-paper"
+                  className="rounded-xl shadow-ring px-3 py-1.5 text-start text-[12.5px] text-muted transition-colors hover:text-paper"
                 >
                   {s.name}
                 </button>

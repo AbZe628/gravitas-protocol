@@ -205,6 +205,7 @@ export default function Guide() {
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
             placeholder={t('guide.placeholder')}
+            aria-label={t('guide.placeholder')}
             className="w-full rounded-card shadow-ring bg-raised px-3 py-2 text-[13.5px] outline-none transition-colors focus:shadow-[0_0_0_1.5px_rgba(22,68,112,0.35)]"
           />
           <button

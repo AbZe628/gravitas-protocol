@@ -127,7 +127,7 @@ export default function SignTheDocument({ matter }: { matter: Matter }) {
             >
               <span className="text-[13.5px] font-semibold">{s.name}</span>
               {s.title && <span className="text-[12px] text-muted">{s.title}</span>}
-              <span className="ml-auto font-mono text-[11.5px] text-muted">{day(s.at)}</span>
+              <span className="ms-auto font-mono text-[11.5px] text-muted">{day(s.at)}</span>
               <div className="w-full text-[12px] leading-[1.55] text-muted">
                 {t('sign.provedBy')} {s.provedBy}
                 {stale && (

@@ -63,11 +63,13 @@ export function YearPicker({
   year: number;
   onChange: (y: number) => void;
 }) {
+  const { t } = useI18n();
   const now = new Date().getUTCFullYear();
   const years = [0, 1, 2, 3, 4].map((n) => now - n);
 
   return (
     <select
+      aria-label={t('doc.year')}
       value={year}
       onChange={(e) => onChange(Number(e.target.value))}
       className="rounded-xl shadow-ring bg-raised px-2 py-1 text-[13px] tabular-nums"

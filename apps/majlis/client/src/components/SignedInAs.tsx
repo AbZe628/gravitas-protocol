@@ -26,7 +26,7 @@ export default function SignedInAs() {
   const observer = identity.role === 'observer';
 
   return (
-    <div className="text-right leading-tight">
+    <div className="text-end leading-tight">
       <div
         className={
           'text-[11px] font-medium ' + (observer ? 'text-muted' : 'text-lapis')

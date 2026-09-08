@@ -136,6 +136,7 @@ function One({
             onChange={(e) => setSaid(e.target.value)}
             rows={3}
             placeholder={t('und.whatHappened')}
+            aria-label={t('und.whatHappened')}
             className="w-full rounded-card bg-ink px-4 py-3 text-[13.5px] leading-[1.6] text-paper shadow-ring outline-none placeholder:text-muted"
           />
           {error && <p className="mt-2 text-[12.5px] text-breach">{error}</p>}

@@ -189,6 +189,7 @@ function MeetingCard({
                         value={notes[member.id] ?? ''}
                         onChange={(e) => setNotes({ ...notes, [member.id]: e.target.value })}
                         placeholder={t('meet.absenceNote')}
+            aria-label={t('meet.absenceNote')}
                         className="flex-1 rounded-xl shadow-ring bg-raised px-2 py-1 text-[12.5px]"
                       />
                     )}
@@ -243,6 +244,7 @@ function MeetingCard({
                   onChange={(e) => setMinute(e.target.value)}
                   rows={4}
                   placeholder={t('meet.minuteHint')}
+            aria-label={t('meet.minuteHint')}
                   className="w-full rounded-xl shadow-ring bg-raised px-3 py-2 text-[13px] leading-relaxed"
                 />
                 <button
