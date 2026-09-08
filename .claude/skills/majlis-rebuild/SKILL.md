@@ -107,6 +107,33 @@ saved you an hour, write it there.
 | Repo-wide audit | `docs/AUDIT.md` (protocol, site, `apps/web`) |
 | Other docs | `docs/` holds `DEPLOYMENT.md`, `INTEGRATION.md`, `KNOWN-ISSUES.md`, `MAJLIS-DEPLOYMENT.md`, `SECURITY_AUDIT_PREP.md`, `TECHNICAL_SPEC.md`, `whitepaper.md`, `testnet-evidence.md` |
 
+**Every top-level directory is in scope. All of it, every file:**
+
+| | |
+|---|---|
+| `contracts/` | Solidity — `GravitasPolicyRegistry.sol`, `TeleportV2/V3.sol`, `governance/`, `interfaces/`, `mocks/`. Foundry (`foundry.toml`, `script/`, `test/`, `broadcast/`, `out/`, `cache/`, `lib/`). |
+| `gravitas-sdk/` | the published SDK — `src/`, `dist/`, `examples/`, `PUBLISH.md`, `CHANGELOG.md` |
+| `integration-kit/` | `openapi/`, `mock-server/`, `policies/`, `scenarios/`, `sdk-examples/`, `PROTOCOL-TESTING.md` — this is what a bank's engineers are actually handed |
+| `apps/majlis/` | the board's application |
+| `apps/web/` | the protocol's web app |
+| `site/` and `_pages/` | the public website — `index.html`, `legal.html`, `privacy.html`, `risk.html`, `terms.html`, `assets/`, `sitemap.xml`, `CNAME` |
+| `design-renders/`, `proof-of-quality/` | drawn artboards and quality evidence |
+| root | `README.md`, `CHANGELOG.md`, `INVESTOR.md`, `DEPLOYMENT.md`, `CONTRIBUTING.md`, `LICENSE`, `render.yaml`, `check-coverage.py`, `fix-ci.sh` |
+
+### His other repositories
+
+`gh` is authenticated, so read them. Decide what belongs where, and say so —
+duplicated or contradictory material across repositories is itself a finding.
+
+| repository | |
+|---|---|
+| `AbZe628/gravitas-protocol` | public, TypeScript — this working copy |
+| `AbZe628/gravitas-protocol-frontend` | **private**, TypeScript — the protocol's front end. Check whether it duplicates or contradicts `apps/web` and `site/`. |
+| `AbZe628/Index` | public, HTML — "Gravitas Capital – Executive Investment Summary". Every claim in it must be true of the code, or it is a finding. |
+| `AbZe628/MindForge`, `tesla-bot-railway`, `tesla-bot-glitch` | private, older and unrelated. Confirm they are unrelated and leave them alone. |
+
+Clone what you need into a scratch directory, never into this working copy.
+
 Node 24, Windows 11, PowerShell and Git Bash both available. Ports in use:
 **4000** is the owner's instance — do not take it; use 4100 and upwards.
 
@@ -194,10 +221,26 @@ node scripts/remove-strings.mjs dead.txt       # delete, refuses if still used
 Not a sampling. Everything, and every finding must be a **counted fact with a
 file and line**, never an impression.
 
-Cover:
+**Read every file in the repository, and every file in his other
+repositories.** Not the interesting ones — every one. A file nobody has opened
+in a year is where the contradiction lives.
 
-- **The protocol** — contracts, deployment addresses, what is live on which
-  network, what `docs/AUDIT.md` already found and whether it is still true.
+Cover both halves of the product, because it is one product:
+
+- **Web3 — the protocol.** Every contract in `contracts/`, the governance
+  contracts and interfaces, the Foundry tests and scripts, what is deployed on
+  which network and at which address, and whether the old addresses are still
+  being handed out anywhere (they redeployed on 2026-08-23 and the old ones
+  still resolve — see `gravitas-chain-source-gap`). The SDK in `gravitas-sdk/`
+  against the contracts it claims to wrap. The `integration-kit/` — its
+  OpenAPI, its mock server, its policies and scenarios — against both.
+- **Web2 — Majlis and the web.** The board's application, `apps/web`, and the
+  public site.
+- **The seam between them.** Majlis has an enforcement adapter — `none` or
+  `gravitas-registry` — and the default does nothing and says so. Whether a
+  ruling reaches the registry, what happens when it cannot, and whether a bank
+  running Majlis with no chain sees an honest product or a crippled one, is one
+  of the most important questions in this audit. Answer it explicitly.
 - **`apps/web` and the marketing site** — every page, every claim made about
   the product, whether each claim is true of the code today, the lockfile
   problem noted in STATE.md.
@@ -242,6 +285,35 @@ The last session's findings, to be verified and gone far beyond:
 For each product: what it does, what its interface actually looks like, what a
 first-time user sees, what it charges, who buys it, and — the useful question —
 **what it makes easy that Majlis makes hard.**
+
+### And find out how this work is really done inside a bank
+
+This matters more than the competitor list, and nobody has done it yet. Majlis
+has been built from the outside, from what the software ought to be. Find out
+what the job actually is:
+
+- **The governance frameworks that bind them.** AAOIFI's governance standards,
+  including Standard 62 (2023) and the internal Shariah review requirements;
+  IFSB guidance; the central-bank rules where Islamic banking is regulated by
+  one — Bank Negara Malaysia's Shariah Governance framework, the UAE Higher
+  Shariah Authority, the SAMA and CBB regimes. What does each *oblige* a board
+  to produce, keep, and be able to show?
+- **The month in the life of a Shariah board.** How often it meets, what is
+  circulated before, who prepares it, what a fatwa document actually looks
+  like, who signs it and how, what the internal Shariah audit function does
+  between meetings, what the annual report to shareholders must contain, and
+  what happens when a breach is found.
+- **The documents.** Get real examples where they are public — published
+  fatwas, annual Shariah board reports, AAOIFI-conformant statements. What is
+  on the page, in what order, with what signatures.
+- **Where the work currently lives.** Banks do this in spreadsheets, email and
+  Word. Find out exactly which parts, because each one is a thing Majlis has to
+  replace or leave alone.
+
+**Then bring it into Majlis.** Every obligation the frameworks place on a board
+should have an answer in the product, or an honest statement that it does not.
+Write what you found to `apps/majlis/docs/HOW-A-BOARD-WORKS.md`, and make the
+architecture in Stage C answer it point by point.
 
 Then a feature-by-feature comparison table: every capability any of them has,
 against Majlis today, marked *have it and it is reachable* / *have it and it is
@@ -305,6 +377,31 @@ Rules while you build:
   language switch honest.
 - **After every change that a person could see: `vite build`, then open it.**
 
+### Stage D2 — documents in and documents out
+
+A Shariah board runs on documents, and Majlis handles them badly today. This is
+its own piece of work.
+
+**In.** A member must be able to upload a PDF — a draft contract, a term sheet,
+a statement — and have the application read it. Today `services/extraction.ts`
+says plainly that a PDF's bytes decoded as text are not the contract, and
+`routes/governance.ts` refuses to pretend otherwise, so a scan reports every
+condition missing. That honesty is right and the gap is still a gap: pick a
+text-layer extractor, say in the interface what it can and cannot read, and
+handle a scanned page by saying it is a scan rather than by returning nothing.
+Uploading needs a mounted volume; the application already refuses to offer an
+upload where there is none, and that must survive.
+
+**Out.** Every document the board produces must download as a real PDF, not as
+an HTML page a browser might print: the fatwa, the board book, the annual
+report to shareholders, the audit export, one holding's record, a matter's
+pack. `services/fatwa.ts` renders HTML for print and says a real PDF engine is
+a new function rather than a change to it — write that function. The seal in
+`services/signature.ts` must appear on the PDF, and an unsealed installation
+must say so on the page in the same place and the same size.
+
+Check every generated PDF by opening it yourself before you claim it works.
+
 ### Stage E — the package a bank can be sent
 
 The deliverable is not a repository. It is something the owner can send to a
@@ -323,6 +420,20 @@ bank's Shariah committee and have them use it without him in the room.
    of the code. Generate it with the `pdf` skill or ReportLab; check the
    rendered file yourself before handing it over.
 4. **An honest list of what is not finished**, in the PDF and in STATE.md.
+
+### Stage F — the website, last
+
+Only once Majlis is finished, because the site should describe what exists and
+not what is planned.
+
+Go through `site/`, `_pages/`, `apps/web` and the `Index` repository and bring
+every page up to what is now true: what the product does, what the protocol
+does, the screens, the figures, the deployed addresses, the standards it works
+under, and what it deliberately refuses to do. Remove every claim that is no
+longer true and every one that was never checked. Keep the register plain —
+this is a bank's Shariah committee reading it, not a venture audience.
+
+Ask him before publishing anything, the same as pushing.
 
 ---
 
