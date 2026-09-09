@@ -54,17 +54,23 @@ const STANDING: Record<string, { tone: string; key: string }> = {
 export default function ReadTheContract({
   matterId,
   structureId,
+  startWith,
   canRead,
 }: {
   /** Read against this matter's shape. */
   matterId?: string;
   /** Or against a shape named directly, with no matter involved. */
   structureId?: string;
+  /**
+   * A draft to arrive holding, so a press lands on the reading rather than on
+   * the empty form that would produce it.
+   */
+  startWith?: { name: string; text: string } | null;
   canRead: boolean;
 }) {
   const { t } = useI18n();
-  const [text, setText] = useState('');
-  const [took, setTook] = useState<string | null>(null);
+  const [text, setText] = useState(startWith?.text ?? '');
+  const [took, setTook] = useState<string | null>(startWith?.name ?? null);
   const [reading, setReading] = useState<ContractReading | null>(null);
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState<string | null>(null);

@@ -78,9 +78,20 @@ export interface OpenInput {
   awaiting: string;
   askedBy: string;
   attachments: string[];
+  /** The contract this question is about, read out of a file at the desk. */
+  draft?: { name: string; text: string } | null;
   /** When the desk actually asked. Defaults to now where the asker is submitting. */
   arrivedAt?: string;
 }
+
+/**
+ * The shortest draft worth reading against a set of conditions.
+ *
+ * Below this it is a title or a sentence fragment, and a reading of it would
+ * report every condition absent — which is a true statement about the string
+ * and a false one about the contract.
+ */
+const MIN_DRAFT = 200;
 
 /**
  * Put a question. Refuses the two things that make a submission useless.
@@ -132,6 +143,25 @@ export function submit(
     );
   }
 
+  /*
+   * A draft too short to read is refused rather than kept.
+   *
+   * Keeping it would put a fragment in front of the board under the heading
+   * *the contract*, and the reader would report every condition absent — which
+   * is true of the fragment and false of the agreement it came from. Saying so
+   * at the desk, while the person still has the file open, is the only moment
+   * anybody can fix it.
+   */
+  const draft = input.draft ?? null;
+  if (draft && draft.text.trim().length < MIN_DRAFT) {
+    throw new Refused(
+      'draft_too_short',
+      `There are ${draft.text.trim().length} characters of text in ${draft.name}, and a contract ` +
+        `read against a board's conditions needs at least ${MIN_DRAFT}. A scanned page has no text ` +
+        'in it at all; send the file the words came from, or leave it off and describe the terms.',
+    );
+  }
+
   return {
     id,
     boardId,
@@ -146,6 +176,9 @@ export function submit(
     background: input.background.trim(),
     awaiting: input.awaiting.trim(),
     attachments: input.attachments,
+    draft: draft
+      ? { name: draft.name.trim(), text: draft.text.trim(), readAt: now }
+      : null,
     dispositions: [],
   };
 }

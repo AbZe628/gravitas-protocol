@@ -24,6 +24,12 @@ export function dirFor(lang: Lang): 'ltr' | 'rtl' {
 type Dict = Record<string, string>;
 
 const en: Dict = {
+  "camewith.title": "The contract that came with this",
+  "camewith.looksLike": "Its words turn up in these kinds of contract. Open one to read the draft against that kind's conditions.",
+  "camewith.namesItself": "the draft says",
+  "camewith.ofConditions": "conditions of",
+  "camewith.show": "Show the contract",
+  "camewith.hide": "Hide the contract",
   "fromreg.title": "Take the figures from the register",
   "fromreg.note": "The board already holds what these holdings are made of. Choose one and the figures, the date and the document they came from are filled in.",
   "fromreg.parts": "parts",
@@ -1351,6 +1357,12 @@ const en: Dict = {
 };
 
 const ar: Dict = {
+  "camewith.title": "العقد الذي وصل مع هذا",
+  "camewith.looksLike": "تظهر كلماته في هذه الأنواع من العقود. افتح واحداً لتقرأ المسودة على شروط ذلك النوع.",
+  "camewith.namesItself": "المسودة تقول",
+  "camewith.ofConditions": "شروط من",
+  "camewith.show": "أظهر العقد",
+  "camewith.hide": "أخفِ العقد",
   "fromreg.title": "خذ الأرقام من السجل",
   "fromreg.note": "يحتفظ المجلس أصلاً بمكوّنات هذه الأصول. اختر واحداً فتُملأ الأرقام والتاريخ والمستند الذي جاءت منه.",
   "fromreg.parts": "أجزاء",
@@ -2621,6 +2633,12 @@ const ar: Dict = {
 };
 
 const ur: Dict = {
+  "camewith.title": "اس کے ساتھ آیا معاہدہ",
+  "camewith.looksLike": "اس کے الفاظ اِن اقسام کے معاہدوں میں ملتے ہیں۔ ایک کھولیں تاکہ مسودہ اُس قسم کی شرائط پر پڑھا جائے۔",
+  "camewith.namesItself": "مسودہ کہتا ہے",
+  "camewith.ofConditions": "شرائط از",
+  "camewith.show": "معاہدہ دکھائیں",
+  "camewith.hide": "معاہدہ چھپائیں",
   "fromreg.title": "اعداد رجسٹر سے لیں",
   "fromreg.note": "بورڈ کے پاس پہلے سے موجود ہے کہ یہ ملکیتیں کس چیز سے بنی ہیں۔ ایک چنیں اور اعداد، تاریخ اور ماخذ دستاویز خود بھر جائیں گے۔",
   "fromreg.parts": "حصے",

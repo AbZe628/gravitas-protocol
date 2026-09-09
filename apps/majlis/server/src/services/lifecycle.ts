@@ -82,7 +82,9 @@ export type RefusalCode =
   | 'exceptions_without_a_count'
   | 'held_with_exceptions'
   | 'backwards_period'
-  | 'not_in_this_ruling';
+  | 'not_in_this_ruling'
+  /** A draft with too few words in it to read against any set of conditions. */
+  | 'draft_too_short';
 
 export class Refused extends Error {
   constructor(

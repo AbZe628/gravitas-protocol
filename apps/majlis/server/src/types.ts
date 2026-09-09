@@ -1077,8 +1077,39 @@ export interface Submission {
   /** Documents attached by the asker. Ids into the vault, as elsewhere. */
   attachments: string[];
 
+  /**
+   * The draft the question is about, where the institution sent one.
+   *
+   * ── why the words and not the file ────────────────────────────────────
+   *
+   * `attachments` above is a list of vault ids, and a vault needs a mounted
+   * volume, which most installations do not have and none has by default. So
+   * the commonest question a bank asks — *here is a contract, is it
+   * acceptable* — arrived with the contract missing, and the board's own
+   * reader had nothing to read.
+   *
+   * The words travel with the question because they work everywhere. The
+   * desk's browser reads the file it chose and what reaches the board is what
+   * the board actually needs: the sentences its conditions are read against.
+   * Where a volume does exist the file goes to `attachments` as well, and the
+   * two are not alternatives — one is the document, this is its text.
+   *
+   * `name` is kept because a reading with no provenance is a reading of an
+   * anonymous string.
+   */
+  draft: SubmittedDraft | null;
+
   /** Appended in order. The one that stands is the last. */
   dispositions: Disposition[];
+}
+
+export interface SubmittedDraft {
+  /** The file it came out of, for the record. */
+  name: string;
+  /** The words, never rewritten — the same rule the question itself follows. */
+  text: string;
+  /** Read at the desk, so the board knows nobody retyped it in between. */
+  readAt: string;
 }
 
 // ── examining what was actually executed ──────────────────────────────────

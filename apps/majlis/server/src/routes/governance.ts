@@ -76,6 +76,7 @@ import { ACCEPTED, MAX_BYTES, NoVault, UnacceptableFile, type Vault } from '../s
 import { ExtractionRefused } from '../services/extraction.js';
 import { ReadingOff, ReadingUnavailable, type Reading } from '../services/reading.js';
 import { structures } from '../data/structures.js';
+import { recognise } from '../services/recognise.js';
 import { buildManual, renderManual } from '../services/manual.js';
 import { reviewStatus, reviewsDue } from '../services/review.js';
 import { assess, crossings, type Assessment, type Figures } from '../services/screening.js';
@@ -172,6 +173,11 @@ const readingSchema = z.object({
 const standaloneReadingSchema = z.object({
   text: z.string().min(1).max(200_000),
   structureId: z.string().min(1).max(120),
+});
+
+/** A draft, with no shape named — naming one is what this is for. */
+const recogniseSchema = z.object({
+  text: z.string().min(1).max(400_000),
 });
 
 /*
@@ -721,6 +727,43 @@ export function governanceRoutes(
       );
 
       res.json(readContract({ structure, adopted, text: parsed.data.text, readAt: now() }));
+    }),
+  );
+
+  /**
+   * Which of the nineteen shapes does this draft look like?
+   *
+   * The reader needs a shape named before it can read, and a scholar who has
+   * not opened the document cannot name one. So a bank's question arriving
+   * with a contract attached ended at the first step: nineteen buttons and no
+   * way to know which.
+   *
+   * This reads the draft against all of them with the same reader — never a
+   * second, looser matcher, which would sooner or later disagree with the
+   * reading a scholar gets when they act on its suggestion — and returns the
+   * ranking with its working. It suggests. The scholar chooses.
+   */
+  router.post(
+    '/recognise',
+    handle(async (req, res) => {
+      const who = identityOf(req);
+      if (!requireRole(res, mayDeliberate(who.role), 'read a contract', who.role)) return;
+
+      const parsed = recogniseSchema.safeParse(req.body);
+      if (!parsed.success) return badRequest(res, parsed.error.issues);
+
+      const boards = await store.boards();
+      if (!boards[0]) {
+        res.status(404).json({ error: 'not_found', message: 'No such board.' });
+        return;
+      }
+
+      const adoptions = standingAdoptions(await store.adoptions(boards[0].id));
+      const adopted = new Set(
+        adoptions.filter((x) => x.standing === 'adopted').map((x) => x.structureId),
+      );
+
+      res.json(recognise({ structures, adopted, text: parsed.data.text, readAt: now() }));
     }),
   );
 

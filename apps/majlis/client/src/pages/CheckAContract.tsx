@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { oversight, type Library } from '../lib/api.js';
+import { oversight, theWayIn, type Library } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { mayDeliberate, useIdentity } from '../lib/identity.js';
 import { Division, Nothing, PageHead } from '../components/page.js';
@@ -55,6 +55,36 @@ export default function CheckAContract() {
    */
   const [params] = useSearchParams();
   const [pick, setPick] = useState(params.get('shape') ?? '');
+
+  /*
+   * Arriving from a question that came with a contract.
+   *
+   * `?from=<submission>` fetches that question's draft and hands it straight
+   * to the reader. Without it the suggestion on the queue landed here with the
+   * shape chosen and the box empty, so a scholar who had just been shown the
+   * contract had to go back, find it, and paste it in — which is the copying
+   * this whole path exists to remove.
+   *
+   * Its failure costs the text and nothing else: the picker still works and
+   * the box can still be filled by hand or from a file.
+   */
+  const from = params.get('from');
+  const [came, setCame] = useState<{ name: string; text: string } | null>(null);
+
+  useEffect(() => {
+    if (!from) return;
+    let live = true;
+    theWayIn
+      .one(from)
+      .then((r) => {
+        const d = r?.submission?.draft;
+        if (live && d) setCame({ name: d.name, text: d.text });
+      })
+      .catch(() => undefined);
+    return () => {
+      live = false;
+    };
+  }, [from]);
 
   /*
    * The answer comes to the finger.
@@ -162,8 +192,9 @@ export default function CheckAContract() {
               heading would be a reading of the wrong conditions.
             */}
             <ReadTheContract
-              key={chosen.structure.id}
+              key={chosen.structure.id + (came ? ":" + came.name : "")}
               structureId={chosen.structure.id}
+              startWith={came}
               canRead={mayDeliberate(identity?.role)}
             />
           </Division>

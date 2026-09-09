@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { theWayIn, type Delivery, type Notice, type Submission } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
+import TheDraftThatCame from '../components/TheDraftThatCame.js';
 import { useIdentity, mayDeliberate, maySubmit } from '../lib/identity.js';
 import { Act, Card, Quiet, State } from '../components/kit.js';
 import TheNotice from '../components/TheNotice.js';
@@ -140,6 +141,14 @@ function One({
           <span className="font-semibold">{t('queue.awaiting')}</span> {s.awaiting}
         </p>
       )}
+
+      {/*
+        The contract, where one came with the question, and the shapes its
+        conditions turn up in. This is the step a scholar could not take: the
+        reader needs a shape named from nineteen before it will read, and
+        nobody can name one without having read the document first.
+      */}
+      {s.draft && <TheDraftThatCame draft={s.draft} submissionId={s.id} />}
 
       {/* What was said back, whichever way it went. */}
       {settled &&

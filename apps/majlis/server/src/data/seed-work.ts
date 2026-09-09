@@ -70,6 +70,46 @@ export const submissions: Submission[] = [
       'have priced it.',
     awaiting: 'Know whether to price the instrument for the September book.',
     attachments: [],
+    /*
+     * The commonest question a bank asks, with the contract attached, which is
+     * the case the whole reader exists for and which the record could not show
+     * until a submission could carry one.
+     *
+     * Fabricated, like everything else in this file, and deliberately partial:
+     * it answers some of the murabaha conditions and is silent on others, so a
+     * scholar opening it sees a real reading rather than a clean sheet.
+     */
+    draft: {
+      name: 'Commodity murabaha master agreement (illustrative draft).txt',
+      readAt: '2026-07-14T08:20:00Z',
+      text: [
+        'COMMODITY MURABAHA MASTER AGREEMENT (ILLUSTRATIVE DRAFT)',
+        '',
+        '1. Purchase. The Seller shall purchase the Commodity from the Supplier and shall take',
+        'ownership of the Commodity before any onward sale to the Buyer is concluded. Title to',
+        'the Commodity shall pass to the Seller upon the Supplier issuing the purchase',
+        'confirmation.',
+        '',
+        '2. Risk. The Seller bears the risk of loss of or damage to the Commodity from the moment',
+        'ownership passes to it until ownership passes to the Buyer.',
+        '',
+        '3. Sale to the Buyer. The Seller shall sell the Commodity to the Buyer at a price equal',
+        'to the cost of the Commodity plus a disclosed profit. The cost and the profit shall each',
+        'be stated to the Buyer in writing before the sale is concluded.',
+        '',
+        '4. Deferred payment. The Buyer shall pay the sale price on the maturity date. The sale',
+        'price, once concluded, shall not increase for any reason including late payment.',
+        '',
+        '5. Delivery. The Commodity shall be delivered by transfer of warrants. The parties',
+        'acknowledge that the Commodity is not physically moved.',
+        '',
+        '6. Broker. The Supplier and the onward purchaser may be the same party where market',
+        'conditions require it.',
+        '',
+        '7. Governing law. This agreement is governed by the laws of the jurisdiction of the',
+        'Buyer, without prejudice to the rulings of the Board.',
+      ].join('\n'),
+    },
     dispositions: [],
   },
   {
@@ -90,6 +130,7 @@ export const submissions: Submission[] = [
       'until the board has ruled.',
     awaiting: 'A rule we can write into the product terms.',
     attachments: [],
+    draft: null,
     dispositions: [],
   },
   {
@@ -109,6 +150,7 @@ export const submissions: Submission[] = [
     background: 'This has happened twice this year and was restored inside a week both times.',
     awaiting: 'Know whether to build a restoration window into the fund documentation.',
     attachments: [],
+    draft: null,
     dispositions: [
       {
         kind: 'opened',
@@ -143,6 +185,7 @@ export const submissions: Submission[] = [
       'signing, but the figure would still have been arrived at from the benchmark.',
     awaiting: 'Know whether to renegotiate the pricing basis before the facility renews.',
     attachments: [],
+    draft: null,
     dispositions: [],
   },
 ];

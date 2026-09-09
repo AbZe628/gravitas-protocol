@@ -1809,6 +1809,9 @@ export const oversight = {
    * the conditions this kind of arrangement is judged against, show me where
    * it answers each of them.
    */
+  /** Which of the shapes does this draft look like? It suggests; nobody decides. */
+  recognise: (text: string) => send<Recognition>('/api/recognise', { text }),
+
   readAgainstShape: (structureId: string, text: string) =>
     send<ContractReading>('/api/reading', { structureId, text }),
 
@@ -2273,6 +2276,32 @@ export interface Disposition {
  * with it, so no two screens can derive them differently — which is how a queue
  * and a detail page start disagreeing about whether something is still waiting.
  */
+/** A contract sent with a question, as words read out of a file at the desk. */
+export interface SubmittedDraft {
+  name: string;
+  text: string;
+  readAt: string;
+}
+
+/** One shape the draft might be, with the working that put it there. */
+export interface ShapeGuess {
+  structureId: string;
+  name: string;
+  found: number;
+  partly: number;
+  of: number;
+  matched: string[];
+  /** The shape's own name, in the draft's own words, where it appears. */
+  namedInTheDraft: string | null;
+}
+
+export interface Recognition {
+  readAt: string;
+  guesses: ShapeGuess[];
+  /** Said on the screen, never in a footnote: this counts words, it does not read. */
+  note: string;
+}
+
 export interface Submission {
   id: string;
   boardId: string;
@@ -2287,7 +2316,16 @@ export interface Submission {
   question: string;
   background: string;
   awaiting: string;
+  /** Vault ids, where the installation has a volume to keep files on. */
   attachments: string[];
+  /**
+   * The contract the question is about, where the institution sent one.
+   *
+   * The words rather than the file: a vault needs a mounted volume and most
+   * installations have none, so a question about a contract used to arrive
+   * with the contract missing.
+   */
+  draft: SubmittedDraft | null;
   dispositions: Disposition[];
 
   standing: SubmissionStanding;

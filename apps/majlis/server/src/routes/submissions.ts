@@ -55,6 +55,20 @@ const putSchema = z.object({
   /** When they actually asked, where that is not now. */
   arrivedAt: z.string().datetime().optional(),
   attachments: z.array(z.string().min(1).max(200)).max(20).default([]),
+  /*
+   * The contract the question is about, as words.
+   *
+   * Read out of a file in the desk's own browser, so it works on an
+   * installation with no mounted volume — which is every installation by
+   * default, and is why a question about a contract used to arrive with the
+   * contract missing.
+   */
+  draft: z
+    .object({
+      name: z.string().min(1).max(300),
+      text: z.string().min(1).max(400_000),
+    })
+    .nullish(),
 });
 
 /**
