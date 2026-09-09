@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { oversight, type Library } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { mayDeliberate, useIdentity } from '../lib/identity.js';
@@ -40,7 +41,30 @@ export default function CheckAContract() {
 
   const [library, setLibrary] = useState<Library | null>(null);
   const [failed, setFailed] = useState(false);
-  const [pick, setPick] = useState('');
+  /*
+   * Arriving with the shape already chosen.
+   *
+   * The contracts screen lists nineteen shapes and the reason a scholar is
+   * looking at one is almost always "I have a draft of this kind" — and there
+   * was no way to get from there to here carrying that. So every shape in the
+   * library now links to `/check?shape=<id>` and lands with the picker already
+   * on it, which is the path between the two screens that did not exist.
+   *
+   * An unknown id is ignored rather than reported: a stale bookmark should
+   * open the picker, not an error.
+   */
+  const [params] = useSearchParams();
+  const [pick, setPick] = useState(params.get('shape') ?? '');
+
+  /*
+   * The answer comes to the finger.
+   *
+   * Nineteen shapes make a tall picker, so the paste box a choice reveals sits
+   * roughly a screen and a half below the card that was pressed. Growing the
+   * page there and leaving the reader where they were is indistinguishable
+   * from nothing having happened, which is exactly what it was reported as.
+   */
+  const draft = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     oversight
@@ -48,6 +72,23 @@ export default function CheckAContract() {
       .then((r) => (r && Array.isArray(r.library) ? setLibrary(r) : setFailed(true)))
       .catch(() => setFailed(true));
   }, []);
+
+  /*
+   * After the block exists, not when the choice is made.
+   *
+   * Keying this on `pick` alone was wrong and measured wrong: arriving with
+   * `?shape=` already set, the effect ran on the first render, when the
+   * library was still loading and the block it wants to scroll to had not been
+   * rendered. The paste box then sat at 1,909px in an 812px viewport — the
+   * exact fault this was written to fix, surviving the fix.
+   *
+   * `library` in the dependencies is what makes it run again once there is
+   * something to scroll to.
+   */
+  useEffect(() => {
+    if (!pick || !library || !draft.current) return;
+    draft.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [pick, library]);
 
   if (failed) return <ErrorText />;
   if (!library) return <Loading />;
@@ -62,6 +103,20 @@ export default function CheckAContract() {
         title={t('check.title')}
         says={t('check.lead')}
       />
+
+      {/*
+        Before the picker, not after it.
+        A session that cannot run a reading used to be told so at the very
+        bottom of the page — measured at y=1858 for a press at y=488, which is
+        1.7 screens below the finger. From where the person was standing,
+        choosing a contract did nothing at all. If the answer is no, it is said
+        before the choice, not after it.
+      */}
+      {!mayDeliberate(identity?.role) && (
+        <div className="mb-7">
+          <Nothing>{t('check.readOnly')}</Nothing>
+        </div>
+      )}
 
       <Division heading={t('check.whichShape')} note={t('check.whichShapeNote')}>
         {shapes.length === 0 ? (
@@ -99,19 +154,20 @@ export default function CheckAContract() {
       </Division>
 
       {chosen && (
-        <Division heading={t('check.theText')}>
-          {/*
-            Keyed on the shape, so choosing another one clears a reading made
-            against the previous one. A result left standing under a new
-            heading would be a reading of the wrong conditions.
-          */}
-          <ReadTheContract
-            key={chosen.structure.id}
-            structureId={chosen.structure.id}
-            canRead={mayDeliberate(identity?.role)}
-          />
-          {!mayDeliberate(identity?.role) && <Nothing>{t('check.readOnly')}</Nothing>}
-        </Division>
+        <div ref={draft}>
+          <Division heading={t('check.theText')}>
+            {/*
+              Keyed on the shape, so choosing another one clears a reading made
+              against the previous one. A result left standing under a new
+              heading would be a reading of the wrong conditions.
+            */}
+            <ReadTheContract
+              key={chosen.structure.id}
+              structureId={chosen.structure.id}
+              canRead={mayDeliberate(identity?.role)}
+            />
+          </Division>
+        </div>
       )}
     </div>
   );

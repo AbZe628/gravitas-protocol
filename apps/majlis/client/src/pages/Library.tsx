@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api, oversight, type HeldStructure, type Library as LibraryData, type MatterSummary } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
-import { Division, PageHead } from '../components/page.js';
+import { Division, PageHead, Nothing } from '../components/page.js';
 import { mayVote, useIdentity } from '../lib/identity.js';
 import { ErrorText, Loading } from '../components/ui.js';
 import { Card, State, type Tone } from '../components/kit.js';
@@ -140,15 +140,22 @@ function Shape({
         never made — so the way forward is not a draft button but the
         matters that used the shape, and a way to raise one where none has.
       */}
-      <div className="mt-4 border-t border-line pt-3.5">
-        <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.14em] text-muted">
-          {t('adopt.usedIn')}
-        </div>
-        {(held.usedBy ?? []).length === 0 ? (
-          <p className="max-w-[58ch] text-[12.5px] leading-[1.6] text-muted">
-            {t('adopt.neverUsed')}
-          </p>
-        ) : (
+      {/*
+        Only where there is something to show.
+
+        This block used to render on every one of the nineteen shapes, and on a
+        board that has judged nothing yet that is the same paragraph — "no
+        matter has been judged against this shape, so there is no draft to
+        take" — repeated nineteen times down one page. Nineteen restatements of
+        *there is nothing here* is not information; it is the page telling a
+        reader nineteen times that it has nothing for them. It is said once,
+        above the list, where it is true of the whole library.
+      */}
+      {(held.usedBy ?? []).length > 0 && (
+        <div className="mt-4 border-t border-line pt-3.5">
+          <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.14em] text-muted">
+            {t('adopt.usedIn')}
+          </div>
           <ul className="space-y-1.5">
             {(held.usedBy ?? []).map((u) => (
               <li key={u.matterId} className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
@@ -170,8 +177,23 @@ function Shape({
               </li>
             ))}
           </ul>
-        )}
-      </div>
+        </div>
+      )}
+
+      {/*
+        The reason a scholar is looking at a shape at all.
+
+        Almost always it is "I have a draft of this kind and I want to know
+        what it answers". There was no way from here to the screen that does
+        that, so the two lived side by side in the same door and never met.
+      */}
+      <Link
+        to={`/check?shape=${encodeURIComponent(held.structure.id)}`}
+        className="mt-4 inline-block text-[12.5px] font-semibold text-lapis underline decoration-line underline-offset-4"
+      >
+        {t('adopt.checkADraft')}
+      </Link>
+
       {/*
         What the board said, where it said something. The amendments are the
         part a later reader is looking for: the difference between the board's
@@ -350,6 +372,16 @@ export default function Library() {
         title={t('adopt.title')}
         says={t('adopt.intro')}
       />
+
+      {/*
+        Said once, here, where it is true of the whole library — instead of
+        nineteen times, once inside every shape, which is what it was.
+      */}
+      {data.adopted === 0 && (
+        <div className="mb-7">
+          <Nothing>{t('adopt.neverUsed')}</Nothing>
+        </div>
+      )}
 
       <Division heading={t('adopt.shapes')}>
       <div className="flex flex-col gap-8 lg:flex-row lg:items-start">

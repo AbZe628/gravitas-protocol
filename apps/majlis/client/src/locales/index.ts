@@ -24,6 +24,7 @@ export function dirFor(lang: Lang): 'ltr' | 'rtl' {
 type Dict = Record<string, string>;
 
 const en: Dict = {
+  "adopt.checkADraft": "Check a draft against this",
   "decided.heading": "What this board has decided",
   "decided.none": "Nothing has been settled yet. A matter appears here once the board has closed it, whichever way it went.",
   "pressing.waitedFor": "A question has waited",
@@ -1299,6 +1300,7 @@ const en: Dict = {
 };
 
 const ar: Dict = {
+  "adopt.checkADraft": "افحص مسودة على أساس هذا",
   "decided.heading": "ما بتّت فيه هذه الهيئة",
   "decided.none": "لم يُبتّ في شيء بعد. تظهر المسألة هنا متى أغلقتها الهيئة، أياً كان وجه البتّ.",
   "pressing.waitedFor": "سؤال ينتظر منذ",
@@ -2517,6 +2519,7 @@ const ar: Dict = {
 };
 
 const ur: Dict = {
+  "adopt.checkADraft": "اس کے مقابل مسودہ جانچیں",
   "decided.heading": "اس بورڈ نے کیا طے کیا",
   "decided.none": "ابھی کچھ طے نہیں ہوا۔ معاملہ یہاں تب آتا ہے جب بورڈ اسے بند کر دے، نتیجہ جو بھی ہو۔",
   "pressing.waitedFor": "ایک سوال انتظار میں ہے",
