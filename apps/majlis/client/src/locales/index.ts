@@ -24,6 +24,12 @@ export function dirFor(lang: Lang): 'ltr' | 'rtl' {
 type Dict = Record<string, string>;
 
 const en: Dict = {
+  "attach.title": "The contract this is about",
+  "attach.note": "Send it and the board opens your question already reading it. The file stays on this computer; only its words travel.",
+  "attach.choose": "Choose a file",
+  "attach.remove": "Take it off",
+  "attach.cannotRead": "The words in this kind of file cannot be read here. Send it as text and the board can read it against the conditions:",
+  "attach.tooShort": "There is too little text in that for the board to read against its conditions.",
   "camewith.title": "The contract that came with this",
   "camewith.looksLike": "Its words turn up in these kinds of contract. Open one to read the draft against that kind's conditions.",
   "camewith.namesItself": "the draft says",
@@ -1357,6 +1363,12 @@ const en: Dict = {
 };
 
 const ar: Dict = {
+  "attach.title": "العقد موضوع هذا السؤال",
+  "attach.note": "أرسله فيفتح المجلس سؤالك وهو يقرأه أصلاً. يبقى الملف على هذا الجهاز، ولا تنتقل إلا كلماته.",
+  "attach.choose": "اختر ملفاً",
+  "attach.remove": "أزله",
+  "attach.cannotRead": "لا يمكن قراءة كلمات هذا النوع من الملفات هنا. أرسله نصاً ليقرأه المجلس على الشروط:",
+  "attach.tooShort": "النص فيه أقل من أن يقرأه المجلس على شروطه.",
   "camewith.title": "العقد الذي وصل مع هذا",
   "camewith.looksLike": "تظهر كلماته في هذه الأنواع من العقود. افتح واحداً لتقرأ المسودة على شروط ذلك النوع.",
   "camewith.namesItself": "المسودة تقول",
@@ -2633,6 +2645,12 @@ const ar: Dict = {
 };
 
 const ur: Dict = {
+  "attach.title": "وہ معاہدہ جس کے بارے میں یہ ہے",
+  "attach.note": "بھیجیں تو بورڈ آپ کا سوال پہلے سے پڑھتے ہوئے کھولے گا۔ فائل اسی کمپیوٹر پر رہتی ہے، صرف اس کے الفاظ جاتے ہیں۔",
+  "attach.choose": "فائل منتخب کریں",
+  "attach.remove": "ہٹا دیں",
+  "attach.cannotRead": "اس قسم کی فائل کے الفاظ یہاں نہیں پڑھے جا سکتے۔ اسے متن کے طور پر بھیجیں تاکہ بورڈ اسے شرائط پر پڑھ سکے:",
+  "attach.tooShort": "اس میں اتنا متن نہیں کہ بورڈ اسے اپنی شرائط پر پڑھ سکے۔",
   "camewith.title": "اس کے ساتھ آیا معاہدہ",
   "camewith.looksLike": "اس کے الفاظ اِن اقسام کے معاہدوں میں ملتے ہیں۔ ایک کھولیں تاکہ مسودہ اُس قسم کی شرائط پر پڑھا جائے۔",
   "camewith.namesItself": "مسودہ کہتا ہے",

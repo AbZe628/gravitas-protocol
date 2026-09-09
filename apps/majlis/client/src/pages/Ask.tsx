@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { theWayIn, type Delivery, type Notice, type Submission } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
+import AttachTheContract from '../components/AttachTheContract.js';
 import { useIdentity, isInstitution } from '../lib/identity.js';
 import { Act, Card, Edge, Quiet, State } from '../components/kit.js';
 import TheNotice from '../components/TheNotice.js';
@@ -101,6 +102,8 @@ export default function Ask({ boardId }: { boardId: string }) {
   const [awaiting, setAwaiting] = useState('');
   const [askedBy, setAskedBy] = useState('');
   const [arrivedAt, setArrivedAt] = useState('');
+  /* The contract the question is about, read out of a file at this desk. */
+  const [draft, setDraft] = useState<{ name: string; text: string } | null>(null);
 
   const [mine, setMine] = useState<Submission[] | null>(null);
   const [mineFailed, setMineFailed] = useState(false);
@@ -128,6 +131,7 @@ export default function Ask({ boardId }: { boardId: string }) {
         background,
         awaiting,
         askedBy,
+        ...(draft ? { draft } : {}),
         /*
          * Sent only when somebody actually gave one. A blank date field means
          * "they are asking now", and turning that into today's date explicitly
@@ -141,6 +145,7 @@ export default function Ask({ boardId }: { boardId: string }) {
       setBackground('');
       setAwaiting('');
       setArrivedAt('');
+      setDraft(null);
       load();
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
@@ -225,6 +230,16 @@ export default function Ask({ boardId }: { boardId: string }) {
               />
             </>
           )}
+
+          {/*
+            The contract the question is about.
+
+            Last, because it is optional and because a desk should have said
+            what it is asking before it attaches anything. When one is sent the
+            board opens the question already looking at the words, with the
+            shapes their conditions turn up in offered beside them.
+          */}
+          <AttachTheContract draft={draft} onDraft={setDraft} />
 
           {error && (
             <p className="mb-3 rounded-xl bg-[#FCF0EE] px-3.5 py-2.5 text-[12.5px] leading-[1.55] text-breach shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)]">

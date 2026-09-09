@@ -2368,6 +2368,8 @@ export interface PutQuestion {
   /** When they actually asked, where that is not now. */
   arrivedAt?: string;
   attachments?: string[];
+  /** The contract this question is about, read out of a file at the desk. */
+  draft?: { name: string; text: string } | null;
 }
 
 export const theWayIn = {

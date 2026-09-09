@@ -275,7 +275,33 @@ export function submissionRoutes(store: Store, notifier: Notifier): Router {
         timelockEndsAt: null,
         objections: [],
         inForceAt: null,
-        sources: [],
+        /*
+         * The contract the question came with travels into the matter.
+         *
+         * Without this the chain broke at its last step: a scholar was shown
+         * the draft on the queue, pressed *take it up*, and arrived at a matter
+         * with no contract attached to it — the document having reached the
+         * board and then been dropped on the way to the place it is decided.
+         *
+         * It is a source like any other, so everything already written about
+         * sources applies: it is withdrawn rather than deleted, it carries who
+         * put it there and when, and the reader on the matter page finds it
+         * where it finds every other source.
+         */
+        sources: found.draft
+          ? [
+              {
+                kind: 'document' as const,
+                label: found.draft.name,
+                ref: `submission:${found.id}`,
+                id: `src-${matterId}-draft`,
+                addedBy: who.scholarId,
+                at,
+                note: 'Sent by the institution with the question this matter came from.',
+                withdrawnAt: null,
+              },
+            ]
+          : [],
       };
 
       // The service refuses a question already answered, before anything is
