@@ -6,6 +6,7 @@ import { useHealth } from '../lib/health.js';
 import { useBoardName } from '../lib/board.js';
 import { LANGS, dirFor } from '../locales/index.js';
 import { BESIDES, DOORS, mainOf, phaseOf } from '../lib/spine.js';
+import { PhaseBar, WhatNext, WhatYouDo } from './Journey.js';
 
 /**
  * The application's frame.
@@ -584,7 +585,22 @@ export default function Shell({ children }: { children: React.ReactNode }) {
             </div>
           )}
 
+          {/*
+            ── the same three things on every screen ──────────────────────
+
+            Where you are, what you do here, and what happens next. They are
+            rendered by the frame rather than by each page on purpose: the
+            screens that most need them are the thin ones, and those are
+            exactly the ones that would have been forgotten. A dead end is now
+            impossible by construction — `lib/journey.ts` has no route without
+            an onward step.
+          */}
+          <PhaseBar />
+          <WhatYouDo />
+
           {children}
+
+          <WhatNext />
         </main>
       </div>
 
