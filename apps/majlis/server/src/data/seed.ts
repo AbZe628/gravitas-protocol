@@ -640,6 +640,116 @@ export const matters: Matter[] = [
     inForceAt: '2026-06-19T06:34:00Z',
     sources: [],
   },
+
+  /*
+   * A holding the board actually permitted.
+   *
+   * Measured across the register: of the five states a holding can be in, the
+   * record reached three — four never examined, two before the board, one
+   * lapsed. Not one holding was **permitted**, so the register a bank opens
+   * showed nothing this board had ever approved, and the whole left-hand side
+   * of what the register is for was missing from the demonstration.
+   *
+   * A permitting matter rather than a restricting one, deliberately: a
+   * restriction lapses unless the full board ratifies it inside the window,
+   * which is what happened to matter-2026-06-19 above and is why that asset
+   * reads `lapsed` rather than `restricted`. Reaching `restricted` honestly
+   * needs a ratification, and inventing one to colour a screen would be
+   * exactly the administration this application refuses.
+   *
+   * It names `asset-cash-backed`, which nothing else has an open matter on, so
+   * the register can settle on it. The rule it carries is the one already in
+   * the record — `rule-stablecoin-par` — because a second rule saying the same
+   * thing in different words would be the register and the rules disagreeing.
+   */
+  {
+    id: 'matter-2026-02-18',
+    assetIds: ['asset-cash-backed'],
+    boardId: 'demo-board',
+    title: 'Exchange of a cash-backed settlement token at par',
+    origin: 'institution_request',
+    direction: 'permit',
+    status: 'in_force',
+    openedAt: '2026-02-04T09:00:00Z',
+    proposal:
+      'The desk settles between its own books in a token representing nothing beyond the currency it ' +
+      'holds. The proposal is that exchanging it against that currency is permitted at par, and at par ' +
+      'only, and that it is not to be dealt in for gain in its own right.',
+    notDecided: [
+      'Whether the token may be held as an investment. It may not; this is about settlement.',
+      'What happens if the backing is ever less than one for one. That is a different question and the board has not been asked it.',
+    ],
+    mechanism:
+      'The token is added to the permitted set for exchange at par. A transaction at any other rate does ' +
+      'not execute. Redemption against the issuer is unaffected.',
+    interactsWith: [],
+    proposedRule: rule(
+      'rule-stablecoin-par',
+      'demo-board',
+      'Exchange of cash-backed tokens at par',
+      'A token representing nothing beyond monetary value may be exchanged against the currency it ' +
+        'represents only at par. It may not be dealt in as an instrument of trading gain in its own right.',
+      [
+        {
+          key: 'toleranceBps',
+          value: '0',
+          unit: 'basis points',
+          meaning: 'No deviation from par is permitted on either side.',
+        },
+        {
+          key: 'appliesTo',
+          value: 'assetClass:cash_backed_token',
+          meaning: 'Applies to tokens classified by the board as backed solely by monetary assets.',
+        },
+        {
+          key: 'onBreach',
+          value: 'revert',
+          meaning: 'A transaction attempting exchange at any rate other than par does not execute.',
+        },
+      ],
+      1,
+      '2026-02-18T00:00:00Z',
+      [
+        { kind: 'code', label: 'PolicyRegistry.parCheck', ref: 'contracts/GravitasPolicyRegistry.sol' },
+        { kind: 'test', label: 'par exchange rejects premium and discount', ref: 'test/PolicyRegistry.par.t.sol' },
+      ],
+    ),
+    simulation: null,
+    deliberation: [],
+    reasoning: [
+      {
+        scholarId: 'member-a',
+        position: 'for',
+        reason:
+          'A claim on money is money. Exchanging it for the currency it represents at anything but par is ' +
+          'an exchange of the same thing in unequal amounts, and the fact that one side is a token does ' +
+          'not change what is being exchanged.',
+        at: '2026-02-11T10:20:00Z',
+      },
+      {
+        scholarId: 'member-b',
+        position: 'for',
+        reason:
+          'For, and I would keep the second sentence of the proposal in the ruling rather than in the ' +
+          'reasoning. Permitting the exchange and permitting the trade are different permissions, and a ' +
+          'reader a year from now will need to see that the board said so.',
+        at: '2026-02-11T11:05:00Z',
+      },
+      {
+        scholarId: 'member-c',
+        position: 'for',
+        reason:
+          'For. The tolerance is nought and should stay nought: a band, however narrow, is a price ' +
+          'difference on an exchange of like for like, and the size of it is not what makes it one.',
+        at: '2026-02-11T14:40:00Z',
+      },
+    ],
+    timelockStartedAt: '2026-02-11T14:40:00Z',
+    timelockEndsAt: '2026-02-18T00:00:00Z',
+    objections: [],
+    inForceAt: '2026-02-18T00:00:00Z',
+    sources: [],
+  },
 ];
 
 export const briefings: Briefing[] = [
@@ -1052,6 +1162,95 @@ export const incidents: Incident[] = [
     submittedToRegulatorAt: null,
     purification: null,
     closedAt: null,
+    sources: [
+      {
+        kind: 'ruling',
+        ref: 'rule-wakil-mandate',
+        label: 'Deployment boundary for an investment agent',
+      },
+    ],
+  },
+
+  /*
+   * One that went all the way through, so the nine steps can be seen finished.
+   *
+   * The other three stop partway, which is honest about a live record and
+   * leaves a reader never seeing what completion looks like: the Directors
+   * approving, the filing with the supervisor, the money actually given away,
+   * and the breach closed. Those four steps existed in the code and in no
+   * demonstration.
+   *
+   * From last year, and small, so it reads as history rather than competing
+   * with the three that need attention now.
+   */
+  {
+    id: 'incident-2025-11-03',
+    boardId: 'demo-board',
+    reference: 'SNC-2025-011',
+    title: 'Profit share paid on a wakala at a rate the mandate did not carry',
+    report:
+      'The agent paid the profit share on the November distribution at 4.10% where the mandate provides for the actual return capped at 4.00%. Eleven investors were affected. The overpayment was 18,400 and was funded from the agent’s own fee.',
+    reportedBy: 'liaison-1',
+    reportedAt: '2025-11-03T10:00:00Z',
+
+    stage: 'closed',
+
+    concurrences: [
+      {
+        scholarId: 'member-a',
+        actual: true,
+        reason:
+          'A wakala pays what the investment earned. Paying a rate is paying a return the mandate does not promise, and it does not stop being that because the agent absorbed the difference.',
+        at: '2025-11-06T09:15:00Z',
+      },
+      {
+        scholarId: 'member-b',
+        actual: true,
+        reason:
+          'Concur. The agent funding it from its own fee is the part that would have hidden this: the investors saw nothing wrong and the ledger balanced.',
+        at: '2025-11-06T09:40:00Z',
+      },
+      {
+        scholarId: 'member-c',
+        actual: true,
+        reason: 'Actual. The cap is the mandate and the mandate is what the investors agreed to.',
+        at: '2025-11-06T11:20:00Z',
+      },
+    ],
+    determinedAt: '2025-11-06T11:20:00Z',
+    actual: true,
+
+    stopped: ['Paying the wakala distribution at a rate rather than at the actual return'],
+
+    plans: [
+      {
+        filedBy: 'liaison-1',
+        filedAt: '2025-11-10T08:30:00Z',
+        steps: [
+          'Recalculate the November distribution at the actual return and identify the overpayment per investor.',
+          'Change the distribution routine so a rate cannot be entered where the mandate carries a cap.',
+          'Report the total to the board for a purification direction.',
+        ],
+        completeBy: '2025-12-05T00:00:00Z',
+        endorsedBy: ['member-a', 'member-b', 'member-c'],
+        endorsedAt: '2025-11-13T14:00:00Z',
+        returnedReason: null,
+      },
+    ],
+    directorsApprovedAt: '2025-11-20T10:00:00Z',
+    submittedToRegulatorAt: '2025-11-24T09:00:00Z',
+
+    purification: {
+      amount: '18400.00',
+      currency: 'AED',
+      destination:
+        'A charitable purpose chosen by the board, disbursed by the institution and evidenced to the board. Not to be applied against any cost of the institution.',
+      prescribedAt: '2025-11-13T14:10:00Z',
+      paidAt: '2025-12-02T11:00:00Z',
+      paidReference: 'Disbursement advice 2025-1202-004 (illustrative)',
+    },
+
+    closedAt: '2025-12-04T16:00:00Z',
     sources: [
       {
         kind: 'ruling',

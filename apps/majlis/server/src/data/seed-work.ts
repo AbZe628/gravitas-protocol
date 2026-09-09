@@ -113,6 +113,50 @@ export const submissions: Submission[] = [
     },
     dispositions: [],
   },
+  /*
+   * One the board declined, because the queue showed only one outcome.
+   *
+   * Of the four standings a question can reach, the record reached two:
+   * waiting and opened. So a reader learned that the board takes questions up
+   * and never learned that it may not, or what a decline looks like — and a
+   * decline is the harder half. The refusal carries a reason, compulsorily,
+   * because a decline the desk cannot learn anything from is the board
+   * refusing to answer and refusing to say why.
+   *
+   * Deliberately a question the board is right to decline: it asks for a
+   * commercial judgement dressed as a Shariah one.
+   */
+  {
+    id: 'submission-2026-08-19',
+    boardId: BOARD,
+    institutionId: INSTITUTION,
+    arrivedAt: '2026-08-19T15:30:00Z',
+    recordedAt: '2026-08-19T15:30:00Z',
+    askedBy: 'Treasury desk (illustrative)',
+    recordedBy: 'member-b',
+    onBehalf: false,
+    subject: 'Which of two compliant funding structures we should use',
+    question:
+      'Both the commodity murabaha and the wakala route have been approved by this board. The wakala ' +
+      'is cheaper for us. Will the board confirm that we should use the wakala?',
+    background:
+      'Treasury would like the board on record so the choice is not questioned internally later.',
+    awaiting: 'Sign off the funding plan for the fourth quarter.',
+    attachments: [],
+    draft: null,
+    dispositions: [
+      {
+        kind: 'declined',
+        at: '2026-08-21T09:50:00Z',
+        by: 'member-a',
+        reason:
+          'Both are permitted and the board has said so. Which of two permitted structures the ' +
+          'institution uses is a commercial decision and is not the board’s to make; taking it would ' +
+          'put the board’s name on a pricing choice. If the question is whether the wakala remains ' +
+          'permitted on its current terms, ask that and it will be answered.',
+      },
+    ],
+  },
   {
     id: 'submission-2026-08-02',
     boardId: BOARD,

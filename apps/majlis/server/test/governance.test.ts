@@ -922,7 +922,22 @@ describe('the register, over HTTP', () => {
       .set('Authorization', as('member-a'))
       .expect(200);
     expect(res.body.composition).toBeNull();
-    expect(res.body.status).toBe('never_examined');
+
+    /*
+     * Permitted, not unexamined — and the difference is the point of the test.
+     *
+     * This asserted `never_examined`, which was true only because the record
+     * contained no matter that had ever settled on a holding. It now does:
+     * matter-2026-02-18 permits this token at par, so the register says
+     * `permitted` and the composition is still null.
+     *
+     * Those are two independent facts and the test is named for the second.
+     * A holding the board has ruled on can have nothing to read out — this one
+     * is a claim on money, there is no composition to break down — and reading
+     * an absent composition as "nobody has looked at it" is exactly the
+     * conflation the register exists to prevent.
+     */
+    expect(res.body.status).toBe('permitted');
   });
 
   it('404s for an asset that is not there', async () => {
