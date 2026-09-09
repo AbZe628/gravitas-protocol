@@ -1,7 +1,9 @@
 import { useState } from 'react';
-import { oversight, type Assessment, type Figures, type RatioResult } from '../lib/api.js';
+import { oversight, type Assessment, type Figures, type RatioResult, type Computation } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import ReadDocument from './ReadDocument.js';
+import FromTheLastTime from './FromTheLastTime.js';
+import RecordCalculation from './RecordCalculation.js';
 
 /**
  * The three screening ratios, against limits this board set.
@@ -142,8 +144,36 @@ export default function Screening() {
     }));
   };
 
+  /*
+   * What the board entered last time, brought across.
+   *
+   * The register cannot help here: it keeps compositions in basis points and
+   * screening wants money. What the board does have is its own previous
+   * screening, and most of a quarterly one is unchanged from the last — the
+   * currency, the document the figures came from, the fields that did not
+   * move. Only the figures come across; the result never does.
+   */
+  const takeLastTime = (from: Computation) =>
+    setFigures((was) => {
+      const f = from.figures ?? {};
+      const take = (k: string) => (f[k] === null || f[k] === undefined ? '' : String(f[k]));
+      return {
+        ...was,
+        currency: from.currency || was.currency,
+        source: from.source || was.source,
+        marketCapitalisation: take('marketCapitalisation') || was.marketCapitalisation,
+        interestBearingDebt: take('interestBearingDebt') || was.interestBearingDebt,
+        cashAndInterestBearingSecurities:
+          take('cashAndInterestBearingSecurities') || was.cashAndInterestBearingSecurities,
+        totalRevenue: take('totalRevenue') || was.totalRevenue,
+        nonPermissibleIncome: take('nonPermissibleIncome') || was.nonPermissibleIncome,
+      };
+    });
+
   return (
     <div className="rounded-card shadow-ring bg-raised p-4">
+      <FromTheLastTime kind="screening" onTake={takeLastTime} />
+
       <ReadDocument
         fields={FIELDS.map((f) => ({ key: f.key as string, label: t(f.label) }))}
         onConfirm={takeCandidate}
@@ -241,6 +271,47 @@ export default function Screening() {
           <p className="mt-3 rounded-xl shadow-ring bg-raised px-3 py-2.5 text-[12.5px] leading-relaxed text-muted">
             {result.note}
           </p>
+
+          {/*
+            Screening could not be recorded at all.
+
+            Every other calculation in this application offers it — purification,
+            zakat, distribution, tradability, late payment — and this one did
+            not, so a scholar worked out the three ratios and had nowhere to put
+            the answer. "Where does the calculation get written down" had, for
+            screening, no answer: the record could hold one, the seed contains
+            one, and the interface never offered to write it.
+
+            The figures recorded are the ones this form asked for, under the
+            names this form uses, so the next quarter can read them back.
+          */}
+          <RecordCalculation
+            wantsHolding
+            input={{
+              kind: 'screening',
+              method: 'ratios',
+              methodStated: result.ratios[0]?.basis ?? t('calc.screening.boardsLimit'),
+              currency: figures.currency,
+              source: figures.source,
+              figures: {
+                marketCapitalisation: figures.marketCapitalisation,
+                interestBearingDebt: figures.interestBearingDebt,
+                cashAndInterestBearingSecurities: figures.cashAndInterestBearingSecurities,
+                totalRevenue: figures.totalRevenue,
+                nonPermissibleIncome: figures.nonPermissibleIncome,
+              },
+              headline: t('screen.recordHeadline'),
+              amount: result.ratios.map((r) => (r.percent === null ? '—' : r.percent + '%')).join(' · '),
+              steps: result.ratios.map((r) => ({
+                label: r.label,
+                working: r.workings,
+                value: r.percent === null ? '—' : r.percent + '%',
+              })),
+              note: result.note,
+              periodFrom: figures.asOf,
+              periodTo: figures.asOf,
+            }}
+          />
         </div>
       )}
     </div>

@@ -210,10 +210,20 @@ export const computations: Computation[] = [
       'by this board in matter-2026-04-02. Majlis applied the method; it did not choose it.',
     currency: 'AED',
     source: 'Pool net asset value breakdown (illustrative) as at 30 June 2026',
+    /*
+     * Under the names the screening form asks for them.
+     *
+     * They were `marketValue`, `debt` and `interestBearing`, and the form
+     * calls the same three figures `marketCapitalisation`,
+     * `interestBearingDebt` and `cashAndInterestBearingSecurities`. The record
+     * and the screen disagreed about the names of the same numbers, so a board
+     * taking last quarter's figures across got the currency and the source and
+     * none of the money.
+     */
     figures: {
-      marketValue: 412_000_000,
-      debt: 96_400_000,
-      interestBearing: 11_200_000,
+      marketCapitalisation: 412_000_000,
+      interestBearingDebt: 96_400_000,
+      cashAndInterestBearingSecurities: 11_200_000,
       tangibleRatioBps: 5000,
     },
     headline: 'Tangible 50.00%, against the 51.00% this board requires',

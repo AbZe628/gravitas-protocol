@@ -24,6 +24,10 @@ export function dirFor(lang: Lang): 'ltr' | 'rtl' {
 type Dict = Record<string, string>;
 
 const en: Dict = {
+  "screen.recordHeadline": "The three ratios, against the limits this board set",
+  "lasttime.title": "Take the figures from a previous one",
+  "lasttime.note": "Most of this quarter is last quarter. The figures and the source come across; the result does not.",
+  "lasttime.noSource": "no source named",
   "attach.title": "The contract this is about",
   "attach.note": "Send it and the board opens your question already reading it. The file stays on this computer; only its words travel.",
   "attach.choose": "Choose a file",
@@ -1363,6 +1367,10 @@ const en: Dict = {
 };
 
 const ar: Dict = {
+  "screen.recordHeadline": "النسب الثلاث، مقابل الحدود التي وضعها هذا المجلس",
+  "lasttime.title": "خذ الأرقام من حساب سابق",
+  "lasttime.note": "معظم هذا الربع هو الربع السابق. تنتقل الأرقام والمصدر، ولا تنتقل النتيجة.",
+  "lasttime.noSource": "لم يُسمَّ مصدر",
   "attach.title": "العقد موضوع هذا السؤال",
   "attach.note": "أرسله فيفتح المجلس سؤالك وهو يقرأه أصلاً. يبقى الملف على هذا الجهاز، ولا تنتقل إلا كلماته.",
   "attach.choose": "اختر ملفاً",
@@ -2645,6 +2653,10 @@ const ar: Dict = {
 };
 
 const ur: Dict = {
+  "screen.recordHeadline": "تین تناسب، اُن حدود کے مقابل جو اس بورڈ نے مقرر کیں",
+  "lasttime.title": "اعداد پچھلے حساب سے لیں",
+  "lasttime.note": "اس سہ ماہی کا بیشتر حصہ پچھلی سہ ماہی جیسا ہے۔ اعداد اور ماخذ منتقل ہوتے ہیں، نتیجہ نہیں۔",
+  "lasttime.noSource": "ماخذ درج نہیں",
   "attach.title": "وہ معاہدہ جس کے بارے میں یہ ہے",
   "attach.note": "بھیجیں تو بورڈ آپ کا سوال پہلے سے پڑھتے ہوئے کھولے گا۔ فائل اسی کمپیوٹر پر رہتی ہے، صرف اس کے الفاظ جاتے ہیں۔",
   "attach.choose": "فائل منتخب کریں",
