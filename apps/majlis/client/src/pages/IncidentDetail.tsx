@@ -359,7 +359,34 @@ export default function IncidentDetail() {
           )}
         </>
       ) : (
-        <span className="text-muted">{t('snc.notPrescribed')}</span>
+        <>
+          <span className="text-muted">{t('snc.notPrescribed')}</span>
+          {/*
+            Where the figure comes from, said rather than left to be guessed.
+
+            The board is asked for an amount and given an empty box. It cannot
+            work this one out: it is the income wrongly taken, which only the
+            institution's own reconciliation produces — the endorsed plan on
+            this very page says so in its own words, "report the reconciled
+            figure to the board for a purification direction".
+
+            The three sums on the calculations screen are for a holding with
+            mixed income and would answer a different question. Sending a
+            scholar there would waste the trip, so this says what is actually
+            being waited for and when it was promised.
+          */}
+          {plan && (
+            <p className="mt-1.5 max-w-[58ch] text-[12.5px] leading-[1.6] text-muted">
+              {t('snc.amountComesFrom')}
+              {plan.completeBy && (
+                <>
+                  {' '}
+                  {t('snc.planDueBy')} <DateText iso={plan.completeBy} />
+                </>
+              )}
+            </p>
+          )}
+        </>
       ),
       action: (
         <>

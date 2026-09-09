@@ -944,6 +944,77 @@ export const incidents: Incident[] = [
       { kind: 'standard', ref: 'AAOIFI GS-2 Shariah Review', label: 'What a review does when it finds something' },
     ],
   },
+
+  /*
+   * A second breach, stopped short of the amount.
+   *
+   * The first one has its purification already prescribed, which is a complete
+   * story and hides the step that matters most: the board being asked for a
+   * figure it cannot work out, because the amount is the income wrongly taken
+   * and only the institution's reconciliation produces it. That state was
+   * unreachable in the demonstration record, so nobody was ever shown the one
+   * place this application has to say what it is waiting for.
+   *
+   * The same shape as the first and deliberately smaller, so the breaches
+   * screen shows two of different sizes rather than one.
+   */
+  {
+    id: 'incident-2026-09-02',
+    boardId: 'demo-board',
+    reference: 'SNC-2026-005',
+    title: 'Late payment charge taken to income instead of to charity',
+    report:
+      'A charge for late settlement was applied on 38 corporate invoices between May and August. The board has ruled that anything taken on a late instalment is given away and not kept. The charges were correctly calculated and were posted to fee income.',
+    reportedBy: 'liaison-1',
+    reportedAt: '2026-09-02T11:15:00Z',
+
+    stage: 'endorsed',
+
+    concurrences: [
+      {
+        scholarId: 'member-a',
+        actual: true,
+        reason:
+          'The ruling is not about whether a charge may be made. It is about where it goes, and it went to income. That is the breach.',
+        at: '2026-09-04T09:30:00Z',
+      },
+      {
+        scholarId: 'member-b',
+        actual: true,
+        reason:
+          'Concur. The posting rule was never changed in the ledger after the ruling, which is where I would look for the next one of these.',
+        at: '2026-09-04T10:05:00Z',
+      },
+    ],
+    determinedAt: '2026-09-04T10:05:00Z',
+    actual: true,
+
+    stopped: ['Applying the late settlement charge on new corporate invoices'],
+
+    plans: [
+      {
+        filedBy: 'liaison-1',
+        filedAt: '2026-09-05T14:00:00Z',
+        steps: [
+          'Change the posting rule so a late settlement charge cannot reach fee income.',
+          'Total the charges taken on the 38 invoices and report the figure to the board.',
+          'Ask the board for a purification direction once the figure is confirmed.',
+        ],
+        completeBy: '2026-09-30T00:00:00Z',
+        endorsedBy: ['member-a', 'member-b'],
+        endorsedAt: '2026-09-07T16:20:00Z',
+        returnedReason: null,
+      },
+    ],
+    directorsApprovedAt: null,
+    submittedToRegulatorAt: null,
+
+    /* Not yet. This is the state the first breach cannot show. */
+    purification: null,
+
+    closedAt: null,
+    sources: [],
+  },
 ];
 
 /**

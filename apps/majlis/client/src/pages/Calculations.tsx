@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useI18n } from '../lib/i18n.js';
 import { PageHead } from '../components/page.js';
 import Distribution from '../components/Distribution.js';
@@ -56,7 +57,22 @@ const TABS: Tab[] = ['screening', 'purification', 'zakat', 'distribution', 'trad
 
 export default function Calculations() {
   const { t } = useI18n();
-  const [tab, setTab] = useState<Tab>('screening');
+
+  /*
+   * Which sum, and what it is for, can arrive in the address.
+   *
+   * A board told on a breach that it must prescribe a purification amount had
+   * no way to reach the thing that works one out: the calculator lived on
+   * another screen, always opened on screening, and knew nothing about the
+   * breach. `?kind=purification&for=<incident>` opens the right sum already
+   * knowing what it is for, and the sum can then send its answer back.
+   *
+   * An unknown kind is ignored rather than reported. A stale link should open
+   * the calculations, not an error.
+   */
+  const [params] = useSearchParams();
+  const asked = params.get('kind') as Tab | null;
+  const [tab, setTab] = useState<Tab>(asked && TABS.includes(asked) ? asked : 'screening');
 
   return (
     <div>

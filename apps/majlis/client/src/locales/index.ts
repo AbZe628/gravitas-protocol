@@ -24,6 +24,8 @@ export function dirFor(lang: Lang): 'ltr' | 'rtl' {
 type Dict = Record<string, string>;
 
 const en: Dict = {
+  "snc.amountComesFrom": "The amount is the income wrongly taken. It comes from the institution's own reconciliation under the plan above, not from a calculation this board can run.",
+  "snc.planDueBy": "The plan is due by",
   "screen.recordHeadline": "The three ratios, against the limits this board set",
   "lasttime.title": "Take the figures from a previous one",
   "lasttime.note": "Most of this quarter is last quarter. The figures and the source come across; the result does not.",
@@ -1367,6 +1369,8 @@ const en: Dict = {
 };
 
 const ar: Dict = {
+  "snc.amountComesFrom": "المبلغ هو الدخل المأخوذ بغير وجه حق. يأتي من تسوية المؤسسة نفسها بموجب الخطة أعلاه، لا من حساب يجريه هذا المجلس.",
+  "snc.planDueBy": "موعد إتمام الخطة",
   "screen.recordHeadline": "النسب الثلاث، مقابل الحدود التي وضعها هذا المجلس",
   "lasttime.title": "خذ الأرقام من حساب سابق",
   "lasttime.note": "معظم هذا الربع هو الربع السابق. تنتقل الأرقام والمصدر، ولا تنتقل النتيجة.",
@@ -2653,6 +2657,8 @@ const ar: Dict = {
 };
 
 const ur: Dict = {
+  "snc.amountComesFrom": "رقم وہ آمدنی ہے جو ناحق لی گئی۔ یہ اوپر کے منصوبے کے تحت ادارے کی اپنی مطابقت سے آتی ہے، کسی ایسے حساب سے نہیں جو یہ بورڈ چلا سکے۔",
+  "snc.planDueBy": "منصوبے کی مقررہ تاریخ",
   "screen.recordHeadline": "تین تناسب، اُن حدود کے مقابل جو اس بورڈ نے مقرر کیں",
   "lasttime.title": "اعداد پچھلے حساب سے لیں",
   "lasttime.note": "اس سہ ماہی کا بیشتر حصہ پچھلی سہ ماہی جیسا ہے۔ اعداد اور ماخذ منتقل ہوتے ہیں، نتیجہ نہیں۔",
