@@ -1015,6 +1015,51 @@ export const incidents: Incident[] = [
     closedAt: null,
     sources: [],
   },
+
+  /*
+   * A breach nobody has determined yet.
+   *
+   * Measured across the record: of the eight stages a breach can be in, the
+   * demonstration reached **one**. Both of the others are `endorsed`, so the
+   * nine-step screen — which exists precisely to show a breach moving — showed
+   * a breach that had stopped moving, twice, and the step that actually needs
+   * a scholar was never on it.
+   *
+   * This one is at the first step and is the board's: reported, nobody has
+   * said whether it is actual. It is the only kind of breach that belongs on
+   * somebody's list of things to do today.
+   */
+  {
+    id: 'incident-2026-09-06',
+    boardId: 'demo-board',
+    reference: 'SNC-2026-006',
+    title: 'A wakala deployment outside the approved categories',
+    report:
+      'The investment agent placed 4.1m of pooled funds into a short-term paper programme during the week of 24 August. The programme is not among the categories the board approved for this mandate. The funds were returned to cash on 31 August. The desk reports it as a mandate error rather than a loss: the position was profitable.',
+    reportedBy: 'liaison-1',
+    reportedAt: '2026-09-06T08:40:00Z',
+
+    stage: 'reported',
+
+    /* Nobody has said yet. This is what the board is being asked for. */
+    concurrences: [],
+    determinedAt: null,
+    actual: null,
+
+    stopped: [],
+    plans: [],
+    directorsApprovedAt: null,
+    submittedToRegulatorAt: null,
+    purification: null,
+    closedAt: null,
+    sources: [
+      {
+        kind: 'ruling',
+        ref: 'rule-wakil-mandate',
+        label: 'Deployment boundary for an investment agent',
+      },
+    ],
+  },
 ];
 
 /**
@@ -1049,5 +1094,42 @@ export const meetings: Meeting[] = [
       'The drift matter was discussed and not put to a vote: the board asked for the operative terms to be drafted first, so that what is voted on is the terms rather than the intention. The reported non-compliance was determined actual, three signatories concurring, and the institution was asked to file a plan within ten days. On the library, the board agreed to take up the sale family first on the ground that most of what the institution offers sits in it, and left the rest untouched rather than adopting a list nobody had read.',
     recordedBy: 'liaison-1',
     closedAt: '2026-08-20T14:35:00Z',
+  },
+
+  /*
+   * One convened and still open, because a closed one shows none of the work.
+   *
+   * `Meetings.tsx` draws the attendance control and the minute field only
+   * while a meeting is not closed. With a single closed meeting the secretary
+   * — the one role a supervisor names as keeper of the minute — opened the
+   * screen to one button and no fields, so recording attendance, keeping the
+   * minute and closing a sitting, which is what every board portal is bought
+   * for, were invisible to everybody who was ever shown this.
+   *
+   * Dated ahead of the record's own today so it stays open as the data ages,
+   * and carrying no minute and no attendance on purpose: those are what a
+   * visitor fills in.
+   */
+  {
+    id: 'meeting-2026-10-15',
+    boardId: 'demo-board',
+    at: '2026-10-15T13:00:00Z',
+    joinUrl: null,
+    agenda: [
+      {
+        matterId: 'matter-2026-08-11',
+        item: 'Suspension of leveraged index instruments — the vote is open',
+      },
+      {
+        matterId: 'matter-2026-07-28',
+        item: 'A restoration window before a pool is reclassified — the waiting period has run',
+      },
+      { item: 'Reported non-compliance SNC-2026-006 — determination' },
+      { item: 'The four holdings nobody has examined' },
+    ],
+    attendance: [],
+    minute: '',
+    recordedBy: 'member-a',
+    closedAt: null,
   },
 ];

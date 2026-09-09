@@ -1,4 +1,5 @@
-import type { Computation, Examination, Submission } from '../types.js';
+import type { AdoptedStructure, Computation, Examination, Submission } from '../types.js';
+import { structureById } from './structures.js';
 import type { Undertaking } from '../services/undertaking.js';
 import type { Annotation } from '../services/annotation.js';
 import type { Committee, Referral } from '../services/committee.js';
@@ -298,6 +299,128 @@ export const computations: Computation[] = [
     withdrawnBy: null,
     withdrawalReason: null,
   },
+
+  /*
+   * Four of the six kinds had never been recorded.
+   *
+   * Measured across the record: screening and purification were there, and
+   * zakat, tangibility, late payment and profit distribution were not. Two
+   * things followed. *Recorded* — a tab of its own — listed two rows and read
+   * as a feature nobody uses. And "take the figures from a previous one",
+   * which is how a board avoids retyping a quarterly return, had nothing to
+   * offer on four of the six screens that carry it.
+   *
+   * Each below is a real shape for its kind: the figures the form asks for,
+   * under the names the form asks for them, so the next one can read them back.
+   */
+  {
+    id: 'computation-2026-06-30-tangibility',
+    kind: 'tangibility',
+    boardId: BOARD,
+    assetId: 'asset-mixed-pool',
+    periodFrom: '2026-06-30',
+    periodTo: '2026-06-30',
+    method: 'bands',
+    methodStated:
+      'Tangible assets and usufructs counted together, against the bands this board set in ' +
+      'matter-2026-04-02.',
+    currency: '—',
+    source: 'Pool net asset value breakdown (illustrative) as at 30 June 2026',
+    figures: {
+      countsAsTangible: 'tangible',
+      tangible: '50.00%',
+      receivable: '33.00%',
+      cash: '17.00%',
+    },
+    headline: 'Counted on the tangible side',
+    amount: '50.00%',
+    steps: [
+      { label: 'Leased equipment', working: '3100 bps', value: '31.00%' },
+      { label: 'Leased property', working: '1900 bps', value: '19.00%' },
+      { label: 'Counted as tangible', working: '3100 + 1900', value: '50.00%' },
+    ],
+    note:
+      'Below the 51.00% this board requires. Whether the pool may still be traded is a ruling, ' +
+      'and this figure is not one.',
+    recordedBy: 'member-b',
+    recordedAt: '2026-07-08T14:20:00Z',
+    supersedes: null,
+    withdrawnAt: null,
+    withdrawnBy: null,
+    withdrawalReason: null,
+  },
+  {
+    id: 'computation-2026-06-30-zakat',
+    kind: 'zakat',
+    boardId: BOARD,
+    assetId: null,
+    periodFrom: '2025-07-01',
+    periodTo: '2026-06-30',
+    method: 'net_assets',
+    methodStated:
+      'Net assets, on the lunar year, borne by the institution. The board chose the base and ' +
+      'the year; Majlis did the arithmetic.',
+    currency: 'AED',
+    source: 'Audited statement of financial position as at 30 June 2026 (illustrative)',
+    figures: {
+      cash: 84_200_000,
+      receivables: 31_500_000,
+      inventory: 4_800_000,
+      shortTermLiabilities: 27_400_000,
+      rate: '2.5775%',
+    },
+    headline: 'Zakat due on the net assets base',
+    amount: 'AED 2,401,431.75',
+    steps: [
+      { label: 'Zakatable assets', working: '84,200,000 + 31,500,000 + 4,800,000', value: 'AED 120,500,000' },
+      { label: 'Less short-term liabilities', working: '120,500,000 − 27,400,000', value: 'AED 93,100,000' },
+      { label: 'At the lunar rate', working: '93,100,000 × 0.025775', value: 'AED 2,399,652.50' },
+    ],
+    note:
+      'Whether the institution or the shareholders bear it is the board’s ruling, not a figure. ' +
+      'This was computed as borne by the institution because that is what the board said.',
+    recordedBy: 'member-b',
+    recordedAt: '2026-07-14T10:00:00Z',
+    supersedes: null,
+    withdrawnAt: null,
+    withdrawnBy: null,
+    withdrawalReason: null,
+  },
+  {
+    id: 'computation-2026-06-30-late-payment',
+    kind: 'late_payment',
+    boardId: BOARD,
+    assetId: null,
+    periodFrom: '2026-04-01',
+    periodTo: '2026-06-30',
+    method: 'actual_cost',
+    methodStated:
+      'The institution’s own cost of collection, evidenced. Anything above it is given away and ' +
+      'not kept, as this board ruled.',
+    currency: 'AED',
+    source: 'Collections cost schedule for the quarter (illustrative)',
+    figures: {
+      charged: 214_800,
+      actualCost: 61_200,
+      invoices: 38,
+    },
+    headline: 'To be given away, not kept',
+    amount: 'AED 153,600.00',
+    steps: [
+      { label: 'Charged on late settlement', working: '38 invoices', value: 'AED 214,800.00' },
+      { label: 'Evidenced cost of collection', working: 'schedule attached', value: 'AED 61,200.00' },
+      { label: 'Above the cost', working: '214,800 − 61,200', value: 'AED 153,600.00' },
+    ],
+    note:
+      'This is the figure behind SNC-2026-005. Majlis computed it; where it goes is the board’s ' +
+      'direction and is recorded on the breach.',
+    recordedBy: 'member-b',
+    recordedAt: '2026-09-08T09:30:00Z',
+    supersedes: null,
+    withdrawnAt: null,
+    withdrawnBy: null,
+    withdrawalReason: null,
+  },
 ];
 
 /**
@@ -516,5 +639,66 @@ export const referrals: Referral[] = [
         },
       ],
     },
+  },
+];
+
+/**
+ * The shapes this board has actually taken up.
+ *
+ * ── why this was empty, and what it cost ──────────────────────────────────
+ *
+ * There were no adoptions in the record at all. Nineteen shapes ship as a
+ * draft binding on nobody, and with nothing adopted every one of them read the
+ * same — *this board has not said what these rest on* — nineteen times down
+ * one page, beside a figure saying "19 never looked at". A reader learned that
+ * the library was empty, which is true of the demonstration and reads as true
+ * of the product.
+ *
+ * It also made three things unreachable. A reading against **the board's own**
+ * conditions could never happen, so the sentence distinguishing it from a
+ * reading against the shipped draft was never shown. `AdoptedStructure.basis`
+ * — the one place in this whole application where a standard may be named,
+ * because it is the board's own words about its own adoption — had no example.
+ * And a matter's checklist had no adopted shape to check against.
+ *
+ * Both are tied to a matter that carried and is in force, because nothing
+ * becomes binding by administration: an adoption names the decision it came
+ * from, or it is a button that changed the rules.
+ */
+export const adoptions: AdoptedStructure[] = [
+  {
+    id: 'adoption-murabaha-2026-04',
+    boardId: 'demo-board',
+    structureId: 'murabaha',
+    standing: 'adopted',
+    /* As shipped. The board read them and took them unchanged. */
+    conditions: structureById('murabaha')?.conditions ?? [],
+    amendments: [],
+    basis:
+      'AAOIFI Shariah Standard No. 8 as this board reads it, with the two additions minuted on 2 April 2026.',
+    matterId: 'matter-2026-04-02',
+    decidedBy: 'member-a',
+    decidedAt: '2026-04-02T15:00:00Z',
+    supersedes: null,
+  },
+  {
+    id: 'adoption-ijara-mbt-2026-04',
+    boardId: 'demo-board',
+    structureId: 'ijara-mbt',
+    standing: 'amended',
+    conditions: structureById('ijara-mbt')?.conditions ?? [],
+    /*
+     * What this board changed, in its own words. This is the part a later
+     * reader is looking for, and the shipped draft is silent on both.
+     */
+    amendments: [
+      'The transfer at the end is by gift, not by sale at a nominal price. A sale at a price nobody negotiated is the transfer dressed as a contract.',
+      'Where the asset is destroyed and the lessee was not at fault, rent stops on the day of destruction and is not apportioned to the end of the term.',
+    ],
+    basis: 'Our own view, minuted 2 April 2026. No external standard is adopted for this shape.',
+    matterId: 'matter-2026-04-02',
+    decidedBy: 'member-a',
+    decidedAt: '2026-04-02T15:20:00Z',
+    supersedes: null,
   },
 ];
