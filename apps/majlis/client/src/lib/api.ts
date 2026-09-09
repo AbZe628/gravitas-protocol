@@ -1918,6 +1918,13 @@ export interface AssetIdentifier {
   network?: string;
 }
 
+/** What a holding is made of, as the register already holds it. */
+export interface Composition {
+  asOf: string;
+  source: string;
+  parts: CompositionPart[];
+}
+
 export interface Asset {
   id: string;
   institutionId: string;
@@ -1927,6 +1934,14 @@ export interface Asset {
   source: 'registry' | 'institution' | 'member';
   addedAt: string;
   addedBy: string | null;
+  /**
+   * The server has always sent this and the client type did not declare it,
+   * so every screen was blind to figures that were arriving in the response.
+   * `TradabilityInput` wants exactly `{ asOf, source, parts }` and the register
+   * holds exactly `{ asOf, source, parts }` — and a scholar was asked to retype
+   * all of it because a type said the field was not there.
+   */
+  composition: Composition | null;
   retiredAt: string | null;
   retiredReason: string | null;
 }

@@ -24,6 +24,20 @@ export function dirFor(lang: Lang): 'ltr' | 'rtl' {
 type Dict = Record<string, string>;
 
 const en: Dict = {
+  "fromreg.title": "Take the figures from the register",
+  "fromreg.note": "The board already holds what these holdings are made of. Choose one and the figures, the date and the document they came from are filled in.",
+  "fromreg.parts": "parts",
+  "fromreg.noneHaveFigures": "The board holds no composition for any holding yet, so the figures have to be entered here.",
+  "fromreg.withoutFigures": "No composition is held for:",
+  "draftfrom.title": "Where the contract comes from",
+  "draftfrom.file": "A file from this computer",
+  "draftfrom.ours": "Our draft:",
+  "draftfrom.note": "A file is read here in your browser and never sent anywhere. Or paste the text below.",
+  "draftfrom.cannotRead": "The text of this kind of file cannot be read here:",
+  "draftfrom.tooShort": "There is too little text in that to read against the conditions.",
+  "draftfrom.draftFailed": "That draft could not be fetched just now.",
+  "draftfrom.took": "Taken from",
+  "draftfrom.characters": "characters",
   "journey.where": "Where you are",
   "journey.next": "What to do next",
   "do.home": "Start here. This shows the one thing most in need of you, and the four stages a question passes through.",
@@ -1337,6 +1351,20 @@ const en: Dict = {
 };
 
 const ar: Dict = {
+  "fromreg.title": "خذ الأرقام من السجل",
+  "fromreg.note": "يحتفظ المجلس أصلاً بمكوّنات هذه الأصول. اختر واحداً فتُملأ الأرقام والتاريخ والمستند الذي جاءت منه.",
+  "fromreg.parts": "أجزاء",
+  "fromreg.noneHaveFigures": "لا يحتفظ المجلس بمكوّنات أي أصل بعد، فتُدخل الأرقام هنا.",
+  "fromreg.withoutFigures": "لا توجد مكوّنات محفوظة لـ:",
+  "draftfrom.title": "من أين يأتي العقد",
+  "draftfrom.file": "ملف من هذا الجهاز",
+  "draftfrom.ours": "مسودتنا:",
+  "draftfrom.note": "يُقرأ الملف هنا في متصفحك ولا يُرسل إلى أي مكان. أو الصق النص أدناه.",
+  "draftfrom.cannotRead": "لا يمكن قراءة نص هذا النوع من الملفات هنا:",
+  "draftfrom.tooShort": "النص فيه أقل من أن يُقرأ على الشروط.",
+  "draftfrom.draftFailed": "تعذّر جلب تلك المسودة الآن.",
+  "draftfrom.took": "مأخوذ من",
+  "draftfrom.characters": "حرفاً",
   "journey.where": "أين أنت",
   "journey.next": "ما التالي",
   "do.home": "ابدأ من هنا. يعرض أكثر ما يحتاج إليك، والمراحل الأربع التي يمر بها أي سؤال.",
@@ -2593,6 +2621,20 @@ const ar: Dict = {
 };
 
 const ur: Dict = {
+  "fromreg.title": "اعداد رجسٹر سے لیں",
+  "fromreg.note": "بورڈ کے پاس پہلے سے موجود ہے کہ یہ ملکیتیں کس چیز سے بنی ہیں۔ ایک چنیں اور اعداد، تاریخ اور ماخذ دستاویز خود بھر جائیں گے۔",
+  "fromreg.parts": "حصے",
+  "fromreg.noneHaveFigures": "بورڈ کے پاس ابھی کسی ملکیت کا سالمہ نہیں، اس لیے اعداد یہاں درج کرنے ہوں گے۔",
+  "fromreg.withoutFigures": "اِن کے لیے سالمہ محفوظ نہیں:",
+  "draftfrom.title": "معاہدہ کہاں سے آتا ہے",
+  "draftfrom.file": "اس کمپیوٹر سے فائل",
+  "draftfrom.ours": "ہمارا مسودہ:",
+  "draftfrom.note": "فائل یہیں آپ کے براؤزر میں پڑھی جاتی ہے، کہیں نہیں بھیجی جاتی۔ یا نیچے متن چسپاں کریں۔",
+  "draftfrom.cannotRead": "اس قسم کی فائل کا متن یہاں نہیں پڑھا جا سکتا:",
+  "draftfrom.tooShort": "اس میں اتنا متن نہیں کہ شرائط کے مقابل پڑھا جا سکے۔",
+  "draftfrom.draftFailed": "وہ مسودہ ابھی حاصل نہیں ہو سکا۔",
+  "draftfrom.took": "سے لیا گیا",
+  "draftfrom.characters": "حروف",
   "journey.where": "آپ کہاں ہیں",
   "journey.next": "اب کیا کریں",
   "do.home": "یہیں سے شروع کریں۔ یہ وہ ایک چیز دکھاتا ہے جسے آپ کی سب سے زیادہ ضرورت ہے، اور وہ چار مرحلے جن سے سوال گزرتا ہے۔",

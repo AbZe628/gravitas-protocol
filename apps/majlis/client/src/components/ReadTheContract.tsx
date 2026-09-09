@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { oversight, type ContractReading } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
+import WhereTheDraftComesFrom from './WhereTheDraftComesFrom.js';
 import { Nothing } from './page.js';
 
 /**
@@ -63,6 +64,7 @@ export default function ReadTheContract({
 }) {
   const { t } = useI18n();
   const [text, setText] = useState('');
+  const [took, setTook] = useState<string | null>(null);
   const [reading, setReading] = useState<ContractReading | null>(null);
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState<string | null>(null);
@@ -90,14 +92,41 @@ export default function ReadTheContract({
       {!reading && (
         <>
           <p className="mb-3 max-w-[58ch] text-[13px] leading-[1.65] text-muted">{t('read.lead')}</p>
+
+          {/*
+            Three ways in, where there was one. A scholar's contract is a file,
+            or it is a draft this board already assembled from its own ruling,
+            and neither could be used: the only supported way to check a
+            contract was to open it elsewhere, select all, and paste.
+          */}
+          <WhereTheDraftComesFrom
+            structureId={structureId}
+            onText={(t_, from) => {
+              setText(t_);
+              setTook(from);
+            }}
+          />
+
           <textarea
             value={text}
-            onChange={(e) => setText(e.target.value)}
+            onChange={(e) => {
+              setText(e.target.value);
+              setTook(null);
+            }}
             rows={6}
             placeholder={t('read.placeholder')}
             aria-label={t('read.placeholder')}
             className="w-full rounded-card bg-ink px-4 py-3 text-[13.5px] leading-[1.6] text-paper shadow-ring outline-none placeholder:text-muted focus:shadow-lift"
           />
+
+          {/* Where the words came from, so a reading is traceable to a source. */}
+          {took && (
+            <p className="mt-2 text-[12px] text-muted">
+              {t('draftfrom.took')} {took}
+              <span className="mx-1.5 opacity-40">·</span>
+              {text.trim().length} {t('draftfrom.characters')}
+            </p>
+          )}
           {failed && <p className="mt-2 text-[12.5px] text-breach">{failed}</p>}
           <button
             type="button"

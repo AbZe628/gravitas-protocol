@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   oversight,
   PART_KINDS,
+  type Composition,
   type CompositionPart,
   type PartKind,
   type Tradability as Result_,
@@ -11,6 +12,7 @@ import {
 import { useI18n } from '../lib/i18n.js';
 import { Compute, Note, Refusal, Result, Text, useCalc } from './calc.js';
 import RecordCalculation from './RecordCalculation.js';
+import FromTheRegister from './FromTheRegister.js';
 
 /**
  * Whether a pool trades at its price, or is redeemed at par.
@@ -60,6 +62,27 @@ function BpsField({
   onChange: (bps: number) => void;
 }) {
   const [text, setText] = useState(String(bps / 100));
+
+  /*
+   * Follow the value when it is replaced from outside.
+   *
+   * This field keeps its own text so a half-typed "3." is not rewritten under
+   * the typist. That is right while a person is typing and wrong the moment
+   * the figures are filled in from the register: the rows that already existed
+   * kept their old text and the first part of the mixed pool showed 0 where
+   * the record says 31. Rows two to four looked correct only because they were
+   * newly mounted.
+   *
+   * So the local text follows the prop whenever the prop is not what the text
+   * already means — which leaves typing alone and fixes filling in.
+   */
+  useEffect(() => {
+    const asTyped = Math.round((Number(text) || 0) * 100);
+    if (asTyped !== bps) setText(String(bps / 100));
+    // Only when the value arrives from outside.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bps]);
+
   return (
     <label className="block">
       <span className="mb-1 block text-[10px] font-bold uppercase tracking-[0.15em] text-muted">{label}</span>
@@ -88,7 +111,23 @@ export default function Tradability() {
   const [parts, setParts] = useState<CompositionPart[]>([{ ...EMPTY_PART }]);
   const [counts, setCounts] = useState<PartKind[]>([]);
   const [bands, setBands] = useState<TradabilityBand[]>([{ ...EMPTY_BAND }]);
+  const [takenFrom, setTakenFrom] = useState<string | null>(null);
   const { result, error, busy, compute } = useCalc<TradabilityInput, Result_>(oversight.tradability);
+
+  /*
+   * The figures come from the register, because the register has them.
+   *
+   * All three fields at once — the parts, the date they were measured, and the
+   * document they came from. Taking the numbers and leaving the provenance
+   * behind would produce a recorded calculation nobody can trace, which is the
+   * failure the whole `source` field exists to prevent.
+   */
+  function takeFromRegister(from: { assetId: string; name: string; composition: Composition }) {
+    setParts(from.composition.parts.map((p) => ({ ...p })));
+    setAsOf((from.composition.asOf ?? '').slice(0, 10));
+    setSource(from.composition.source ?? '');
+    setTakenFrom(from.assetId);
+  }
 
   const total = parts.reduce((sum, p) => sum + (Number.isFinite(p.bps) ? p.bps : 0), 0);
 
@@ -107,6 +146,8 @@ export default function Tradability() {
         compute({ asOf, source, authority, parts, countsAsTangible: counts, bands });
       }}
     >
+      <FromTheRegister onTake={takeFromRegister} chosenId={takenFrom} />
+
       <div className="flex gap-2">
         <div className="flex-1">
           <Text label={t('trade.asOf')} type="date" value={asOf} onChange={setAsOf} />
