@@ -94,11 +94,32 @@ function One({ e, canReport }: { e: Examination; canReport: boolean }) {
             .filter((f) => f.held === 'exceptions')
             .map((f, i) => (
               <li key={i} className="rounded-xl bg-[#FCF0EE] px-3.5 py-2.5 shadow-[0_0_0_0.5px_rgba(154,56,48,0.18)]">
-                <div className="text-[11.5px] font-semibold text-breach">
-                  {f.against.replace(/^term:/, '')}
-                  <span className="ms-2 font-mono tabular-nums">{f.exceptions}</span>
+                {/*
+                  What the board wrote, not what the parameter is called.
+
+                  This printed the identifier — `minTangibleRatioBps` — with the
+                  exception count jammed against it and nothing saying what the
+                  number counted. The board's own sentence for that term is in
+                  the record and the server now sends it; the identifier stays
+                  underneath, in the mono face, because an auditor tracing a
+                  finding back to the parameter needs it and a scholar reading
+                  the examination does not.
+                */}
+                <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                  <span className="max-w-[54ch] text-[13px] font-semibold leading-snug text-breach">
+                    {f.inWords ?? f.against.replace(/^term:/, '')}
+                  </span>
+                  <span className="shrink-0 text-[11.5px] text-breach">
+                    <span className="font-mono tabular-nums">{f.exceptions}</span>{' '}
+                    {t('exam.exceptions')}
+                  </span>
                 </div>
-                <p className="mt-1 max-w-[62ch] text-[12.5px] leading-[1.6] text-muted">{f.note}</p>
+                {f.inWords && (
+                  <div className="mt-1 font-mono text-[10.5px] text-muted opacity-70">
+                    {f.against.replace(/^term:/, '')}
+                  </div>
+                )}
+                <p className="mt-1.5 max-w-[62ch] text-[12.5px] leading-[1.6] text-muted">{f.note}</p>
               </li>
             ))}
         </ul>

@@ -2413,9 +2413,28 @@ export const theWayIn = {
 
 // ── examining what was executed against what was approved ─────────────────
 
+/**
+ * What a person records against one condition or one operative term.
+ *
+ * The same fields as a stored finding minus `inWords`, which the server
+ * derives from the rule when it reads one back. A client sending it would be
+ * sending the board's own sentence back to the board.
+ */
+export type RecordedFinding = Omit<ExaminationFinding, 'inWords'>;
+
 export interface ExaminationFinding {
   /** A condition id of the shape, or `term:<key>` for an operative term. */
   against: string;
+  /**
+   * What that identifier is, in the board's own sentence.
+   *
+   * Resolved on the server from the rule this examination is against, so the
+   * screen, the annual report and the audit export all read the same words
+   * rather than each rendering an identifier. Null where the term or condition
+   * has since been removed from the rule — the finding is still evidence about
+   * what was examined, and inventing a sentence for it would be worse.
+   */
+  inWords: string | null;
   held: 'held' | 'exceptions' | 'not_examined';
   exceptions: number;
   note: string;
@@ -2490,6 +2509,6 @@ export const examinations = {
     howChosen: string;
     population: number | null;
     examined: number;
-    findings: ExaminationFinding[];
+    findings: RecordedFinding[];
   }) => send<{ examination: Examination }>('/api/examinations', input),
 };

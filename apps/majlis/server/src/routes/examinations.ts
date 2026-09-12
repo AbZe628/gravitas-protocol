@@ -69,8 +69,39 @@ async function withDerived(store: Store, e: Examination) {
     adoption && adoption.conditions.length > 0 ? adoption.conditions : (shipped?.conditions ?? []);
   const termKeys = (matter?.proposedRule.parameters ?? []).map((p) => p.key);
 
+  /*
+   * What each finding is *against*, in words.
+   *
+   * A finding stores the identifier it was recorded against — `minTangibleRatioBps`
+   * for an operative term, a condition id for a condition — and the screen
+   * printed that identifier. A scholar reading an examination saw
+   *
+   *     minTangibleRatioBps   3
+   *
+   * which is a machine's name for the thing and a number with no label. The
+   * board never wrote `minTangibleRatioBps`; it wrote "tangible assets and
+   * usufructs must be at least 51.00% of pool value", and that sentence is
+   * already in the record, on the rule this examination is against.
+   *
+   * Resolved here rather than on the screen so every reader gets the sentence
+   * — the annual report and the audit export as well, which is where an
+   * identifier would do the most damage.
+   *
+   * The key is kept beside it. An auditor tracing a finding back to the
+   * parameter it was recorded against needs the identifier, and a reader needs
+   * the sentence; they are different jobs.
+   */
+  const terms = new Map((matter?.proposedRule.parameters ?? []).map((p) => [p.key, p.meaning]));
+  const byCondition = new Map(conditions.map((c) => [c.id, c.requirement]));
+
+  const findings = e.findings.map((f) => ({
+    ...f,
+    inWords: terms.get(f.against) ?? byCondition.get(f.against) ?? null,
+  }));
+
   return {
     ...e,
+    findings,
     coverage: coverageOf(e),
     exceptions: exceptionsIn(e),
     /** Named rather than omitted: silence about a condition is not a pass. */
