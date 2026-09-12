@@ -83,6 +83,7 @@ import { assess, crossings, type Assessment, type Figures } from '../services/sc
 import { search, type SearchFilters } from '../services/search.js';
 import { relatedTo } from '../services/precedent.js';
 import { buildPassage } from '../services/passage.js';
+import { buildQueue } from '../services/queue.js';
 import { buildInheritance, checklistStanding } from '../services/inherit.js';
 import type { Store } from '../store/index.js';
 import type { Deliberation, Matter, SourceKind } from '../types.js';
@@ -1184,6 +1185,66 @@ export function governanceRoutes(
         outstanding: items.length,
         overdue: items.filter((i) => i.overdue).length,
         items,
+      });
+    }),
+  );
+
+  /**
+   * Everything waiting on somebody, of every kind, in one list.
+   *
+   * `/attention` answers *what do I owe* and sees matters only. This answers
+   * *what is waiting* across the whole record — questions, matters, rulings
+   * come round for review, undertakings, breaches — because that is the
+   * question a member actually arrives with, and answering it used to mean
+   * opening five screens and knowing which five.
+   *
+   * Assembled rather than judged: `services/queue.ts` calls the services that
+   * already decide what follows each kind of thing, and decides only the
+   * order. A second place saying what happens next would disagree with
+   * `passage.ts` the first time either changed.
+   *
+   * Open to observers. Seeing what is waiting is reading, and an observer who
+   * cannot see the board's backlog cannot audit it.
+   */
+  router.get(
+    '/queue',
+    handle(async (_req, res) => {
+      const at = now();
+      const [boards, submissions, matters, rules, incidents, undertakings] = await Promise.all([
+        store.boards(),
+        store.submissions(),
+        store.matters(),
+        store.rules(),
+        store.incidents(),
+        store.undertakings(),
+      ]);
+
+      /*
+       * One board per installation, and the store is already scoped to one
+       * institution. Where the record somehow holds none, the queue is empty
+       * rather than an error: nothing is waiting, which is true.
+       */
+      const board = boards[0];
+      if (!board) {
+        res.json({ asOf: at, rows: [], waiting: 0, overdue: 0 });
+        return;
+      }
+
+      const rows = buildQueue({
+        board,
+        submissions,
+        matters,
+        rules,
+        incidents,
+        undertakings,
+        now: at,
+      });
+
+      res.json({
+        asOf: at,
+        rows,
+        waiting: rows.length,
+        overdue: rows.filter((r) => r.overdue).length,
       });
     }),
   );

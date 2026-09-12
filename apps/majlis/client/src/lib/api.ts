@@ -655,8 +655,57 @@ export interface Related {
   relations: { kind: RelationKind; shared: string }[];
 }
 
+/** Which of the four stages a waiting thing stands in. */
+export type QueuePhase = 'asked' | 'deciding' | 'inforce' | 'checked';
+
+export type QueueKind = 'question' | 'matter' | 'review' | 'breach' | 'undertaking';
+
+/**
+ * One thing waiting on somebody.
+ *
+ * Every field is decided on the server — see `services/queue.ts`, which calls
+ * the services that already know what follows each kind of thing rather than
+ * working it out again. Nothing on this side derives an act or an owner: a
+ * second place saying what happens next would disagree with `passage.ts` the
+ * first time either changed, and the navigation in this application was once
+ * written in three places that did exactly that.
+ */
+export interface QueueRow {
+  kind: QueueKind;
+  id: string;
+  /** Where the row opens. */
+  to: string;
+  title: string;
+  phase: QueuePhase;
+  /** The act to do next, or null where it is waiting on a clock. */
+  next: string | null;
+  whose: 'board' | 'signatory' | 'liaison' | 'institution' | 'software' | 'clock' | null;
+  /** The person it belongs to, where the record names one. Undertakings only. */
+  whoName?: string;
+  /** Whole days it has stood here. */
+  days: number;
+  overdue: boolean;
+}
+
+export interface Queue {
+  asOf: string;
+  rows: QueueRow[];
+  waiting: number;
+  overdue: number;
+}
+
 export const governance = {
   attention: () => get<Attention>('/api/attention'),
+
+  /**
+   * Everything waiting on somebody, of every kind, in one list.
+   *
+   * `attention` answers what *you* owe and sees matters only. This answers
+   * what is waiting across the whole record, which is the question a member
+   * actually arrives with — and which used to mean opening five screens and
+   * knowing which five.
+   */
+  queue: () => get<Queue>('/api/queue'),
 
   /** Search the record. A query of only filters is valid. */
   search: (query: SearchQuery) => {

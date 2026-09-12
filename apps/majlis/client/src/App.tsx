@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import Dashboard from './pages/Dashboard.js';
 import Guided from './pages/Guided.js';
+import Queue from './pages/Queue.js';
 import MatterPack from './pages/MatterPack.js';
 import BoardBook from './pages/BoardBook.js';
 import Undertakings from './pages/Undertakings.js';
@@ -44,10 +45,21 @@ import { useIdentity, isInstitution } from './lib/identity.js';
  * Nothing waits on a blank screen. Until the identity answers this renders the
  * board's arrival, which is the common case and is harmless to a desk for the
  * half second before it is replaced.
+ *
+ * ── the board's arrival is now the queue ──────────────────────────────────
+ *
+ * It was `Guided`, which had no heading at all, opened with the same phase
+ * bar as every other screen, and showed the four stages again as cards — the
+ * third time they appeared on that one page. Whether anything was actually
+ * waiting lived on five other screens and a member had to know which five.
+ *
+ * `Guided` is not deleted. It answers at `/guided`, because a screen somebody
+ * has bookmarked should not stop existing, and because if the queue turns out
+ * to be the wrong idea the old arrival is one line away.
  */
 function Arrival() {
   const { identity } = useIdentity();
-  return isInstitution(identity?.role) ? <Ask boardId="demo-board" /> : <Guided />;
+  return isInstitution(identity?.role) ? <Ask boardId="demo-board" /> : <Queue />;
 }
 
 export default function App() {
@@ -69,6 +81,8 @@ export default function App() {
             arrival, where the four doors are.
           */}
           <Route path="/more" element={<Navigate to="/" replace />} />
+          {/* The arrival the queue replaced, kept at its own address. */}
+          <Route path="/guided" element={<Guided />} />
 
           {/*
             The way in. Two screens for one path, and which one a person gets

@@ -74,7 +74,19 @@ function stub(over: Record<string, unknown> = {}) {
   );
 }
 
-const show = (route = '/') =>
+/*
+ * `/guided`, not `/`.
+ *
+ * This screen was the board's arrival until the queue took that address. It
+ * was not deleted and nothing about it changed — a screen somebody has
+ * bookmarked should not stop existing, and if the queue turns out to be the
+ * wrong organising idea this is one line away from being the arrival again.
+ *
+ * So these tests still hold it shut, at the address it now answers on. The
+ * alternative — deleting fourteen tests because a route moved — would have
+ * thrown away the only thing checking a screen that still renders.
+ */
+const show = (route = '/guided') =>
   render(
     <I18nProvider>
       <MemoryRouter initialEntries={[route]}>
@@ -273,8 +285,21 @@ describe('nothing was removed', () => {
      * The page is gone; the address is not. Somebody has this bookmarked, or
      * written in an email to a colleague, and a dead link is a worse outcome
      * than a redirect to the screen that now holds all of it.
+     *
+     * Where it lands has moved once since: arrival used to be the four doors
+     * and is now the queue. The bookmark is still honoured and still arrives
+     * somewhere a person can work from, which is the whole of what this test
+     * is for — it holds the redirect shut, not the destination's contents.
      */
-    await waitFor(() => expect(screen.getByText('How it works')).toBeInTheDocument());
+    /*
+     * By heading, not by text. The rail's link to arrival carries the same
+     * words as the screen it opens — which is right, a link should say where
+     * it goes — so a plain text query could pass on the navigation while the
+     * page itself failed to render.
+     */
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: 'What needs you' })).toBeInTheDocument(),
+    );
   });
 });
 

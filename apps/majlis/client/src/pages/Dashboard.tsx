@@ -20,11 +20,25 @@ export default function Dashboard() {
   const [waits, setWaits] = useState<Map<string, Wait>>(new Map());
   const [failed, setFailed] = useState(false);
   const { identity } = useIdentity();
+  /*
+   * Closed unless somebody opened it.
+   *
+   * This was open unless somebody had closed it, and the difference cost
+   * 1,589 pixels: on any browser that had not dismissed it — a new machine, a
+   * cleared store, a demonstration, anyone arriving for the first time — four
+   * paragraphs explaining what a Shariah board is sat on top of the matters,
+   * and the page's own heading began almost two screens down.
+   *
+   * An explanation that opens by default on a work screen is onboarding
+   * pinned permanently into the workflow. Nothing is deleted: the panel is
+   * one press away and still remembers, and the press is now to open rather
+   * than to get rid of it.
+   */
   const [intro, setIntro] = useState(() => {
     try {
-      return localStorage.getItem('majlis.intro.read') !== 'yes';
+      return localStorage.getItem('majlis.intro.read') === 'no';
     } catch {
-      return true;
+      return false;
     }
   });
 
@@ -60,10 +74,21 @@ export default function Dashboard() {
   return (
     <div>
       {/*
-        What is waiting for this member comes first. A deadline that passes
-        because nobody looked is the failure this panel exists to prevent, so it
-        sits above the list of everything rather than below it.
+        The page says what it is, first.
+
+        This heading was rendered 855 pixels down, under four panels — who you
+        are, what a Shariah board is, what is waiting for you, and how long
+        the board takes. Each of them is worth having and not one of them is
+        this page. A screen whose name arrives after almost a full screen of
+        scrolling is a screen a person has to identify by its contents, and
+        the complaint that the application "jumps from screen to screen
+        illogically" is largely this: nothing at the top ever said where you
+        had landed.
       */}
+      <h1 className="mb-5 font-display text-[30px] font-normal leading-[1.12] tracking-[-0.024em] sm:text-[34px]">
+        {t('dash.title')}
+      </h1>
+
       {/*
         Before anything else. Someone who cannot act needs to know that before
         they go looking for the buttons, not after.
@@ -92,8 +117,6 @@ export default function Dashboard() {
       <div className="mb-5 rounded-card shadow-ring bg-raised px-4 py-3 text-[13px] text-muted">
         {t('dash.stageNotice')}
       </div>
-
-      <h1 className="mb-4 font-display font-normal leading-[1.12] tracking-[-0.024em] text-[30px] sm:text-[34px]">{t('dash.title')}</h1>
 
       {mayDeliberate(identity?.role) && <RaiseMatter boardId="demo-board" />}
 

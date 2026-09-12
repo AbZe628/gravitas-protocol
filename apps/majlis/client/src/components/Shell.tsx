@@ -14,7 +14,7 @@ import {
   mainOf,
   phaseOf,
 } from '../lib/spine.js';
-import { PhaseBar, WhatNext, WhatYouDo } from './Journey.js';
+import { WhatNext } from './Journey.js';
 import NotYourScreen from './NotYourScreen.js';
 
 /**
@@ -632,14 +632,31 @@ export default function Shell({ children }: { children: React.ReactNode }) {
           )}
 
           {/*
-            ── the same three things on every screen ──────────────────────
+            ── what used to sit here, and why it does not ─────────────────
 
-            Where you are, what you do here, and what happens next. They are
-            rendered by the frame rather than by each page on purpose: the
-            screens that most need them are the thin ones, and those are
-            exactly the ones that would have been forgotten. A dead end is now
-            impossible by construction — `lib/journey.ts` has no route without
-            an onward step.
+            The frame drew three things above every page: the four phases as a
+            bar, a line saying what you do here, and a strip of onward steps.
+            They were added to answer "the application has no flow", and they
+            made it worse in a way that took a measurement to see.
+
+            Every screen then began with the identical line —
+            `01 Asked › 02 Deciding › 03 In force › 04 Checked` — so moving
+            between screens changed nothing at the top and did not feel like
+            arriving anywhere. Underneath it the page's own heading was pushed
+            down: 160px on most screens, 242px on the queue, and 1589px on the
+            dashboard, where an explanatory box sat on top of the work. The
+            same four phases were on screen three times at once: here, in the
+            rail, and again as cards.
+
+            So the bar and the line are gone. What they were compensating for
+            was the real fault — twenty-five screens with no shared shape —
+            and signposting a maze is not the same as drawing a map.
+
+            `WhatNext` stays for now, deliberately. It sits at the foot, so it
+            costs nothing above the fold, and removing it before the queue
+            exists would restore the dead ends it was built to close. It comes
+            out when the queue has proved itself, and not in the same change,
+            because two removals at once cannot be told apart in a measurement.
           */}
           {/*
             A board screen opened by a bank says whose it is.
@@ -654,9 +671,6 @@ export default function Shell({ children }: { children: React.ReactNode }) {
             <NotYourScreen />
           ) : (
             <>
-              <PhaseBar />
-              <WhatYouDo />
-
               {children}
 
               <WhatNext />
