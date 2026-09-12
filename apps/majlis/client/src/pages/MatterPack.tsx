@@ -244,17 +244,36 @@ export default function MatterPack() {
                 {t('pack.noTerms')}
               </p>
             ) : (
+              /*
+                The figure and the board's sentence together, the identifier
+                under them.
+
+                This put the value and the key on the first line and the
+                board's own words underneath in a smaller, quieter face, so a
+                member reading the terms of a ruling met
+                `maxProviderBorrowingBps` and `suspend_new_positions` before
+                meeting anything the board had written. The third place in the
+                application with the same fault, after the examination finding
+                and the terms panel.
+
+                The key stays, small and in mono, for the engineer wiring the
+                ruling into the registry and the auditor tracing a finding.
+              */
               <ul className="space-y-2.5">
                 {pack.figures.terms.map((term) => (
                   <li key={term.key} className="rounded-card bg-ink px-4 py-3">
-                    <div className="flex flex-wrap items-baseline gap-x-3">
-                      <span className="font-mono text-[14px] text-lapis">
+                    <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                      <span className="max-w-[52ch] text-[13.5px] leading-[1.5] text-paper">
+                        {term.meaning}
+                      </span>
+                      <span className="shrink-0 font-mono text-[14px] text-lapis">
                         {term.value}
                         {term.unit ? ` ${term.unit}` : ''}
                       </span>
-                      <span className="font-mono text-[11.5px] text-muted">{term.key}</span>
                     </div>
-                    <div className="mt-1.5 text-[12.5px] leading-[1.55] text-sand">{term.meaning}</div>
+                    <div className="mt-1 font-mono text-[10.5px] text-muted opacity-70">
+                      {term.key}
+                    </div>
                   </li>
                 ))}
               </ul>

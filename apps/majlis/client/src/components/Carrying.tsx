@@ -100,9 +100,15 @@ export default function Carrying({ matterId }: { matterId: string }) {
             {carrying.terms.map((term) => (
               <li key={term.key} className="flex items-center justify-between gap-6 rounded-xl bg-ink px-5 py-3.5">
                 <div className="min-w-0">
-                  <div className="font-mono text-[12.5px]">{term.key}</div>
-                  {/* The board's own words. Never rewritten on the way through. */}
-                  <p className="mt-1.5 text-[12.5px] leading-[1.5] text-muted">{term.meaning}</p>
+                  {/*
+                    The board's own words first, never rewritten on the way
+                    through, and the identifier under them. This led with the
+                    key — the same fault as the terms panel and the examination
+                    finding: the software's name for a thing set above the
+                    sentence the board actually wrote.
+                  */}
+                  <p className="text-[13.5px] leading-[1.5] text-paper">{term.meaning}</p>
+                  <div className="mt-1 font-mono text-[10.5px] text-muted opacity-70">{term.key}</div>
                   {term.onBreach && (
                     <p className="mt-1.5 text-[12px] leading-[1.5] text-gold">
                       {t('carry.onBreach')} {term.onBreach}

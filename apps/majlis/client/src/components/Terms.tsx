@@ -75,9 +75,22 @@ export default function Terms({ matter, canEdit, onChanged }: Props) {
                 key={p.key}
                 className="flex items-center justify-between gap-6 rounded-xl bg-ink px-5 py-3.5"
               >
+                {/*
+                  The board's sentence first, the identifier under it.
+
+                  This led with `maxProviderBorrowingBps` in the reading face
+                  and put the board's own words below in muted grey, so the
+                  first thing a scholar's eye met on the terms of a ruling was
+                  a field name from the registry. The board wrote the sentence;
+                  the key is what the software calls it.
+
+                  It is kept, small and in mono, because an engineer wiring the
+                  ruling into the registry and an auditor tracing a finding
+                  both need it — the same reason the examination keeps it.
+                */}
                 <div className="min-w-0">
-                  <div className="font-mono text-[12.5px]">{p.key}</div>
-                  <p className="mt-1.5 text-[12.5px] leading-[1.5] text-muted">{p.meaning}</p>
+                  <p className="text-[13.5px] leading-[1.5] text-paper">{p.meaning}</p>
+                  <div className="mt-1 font-mono text-[10.5px] text-muted opacity-70">{p.key}</div>
                 </div>
                 <div className="shrink-0 text-end">
                   <div className="font-mono text-[18px] font-medium tabular-nums tracking-[-0.01em] text-lapis">
