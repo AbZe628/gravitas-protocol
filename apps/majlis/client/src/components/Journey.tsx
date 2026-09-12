@@ -1,6 +1,20 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useI18n } from '../lib/i18n.js';
-import { journeyFor, PHASE_BAR } from '../lib/journey.js';
+import { journeyFor, DESK_BAR, PHASE_BAR } from '../lib/journey.js';
+import { isInstitution, useIdentity } from '../lib/identity.js';
+
+/**
+ * Whose bar and whose words these are.
+ *
+ * Read once per component rather than threaded through, because every one of
+ * the three asks the same question and a component that forgot to ask would
+ * silently show a bank the board's line — which is the fault this overlay
+ * exists to close.
+ */
+function useDesk(): boolean {
+  const { identity } = useIdentity();
+  return isInstitution(identity?.role);
+}
 
 /**
  * The three things every screen owes a reader who has never seen this before.
@@ -29,14 +43,19 @@ import { journeyFor, PHASE_BAR } from '../lib/journey.js';
  */
 export function PhaseBar() {
   const { t } = useI18n();
-  const here = journeyFor(useLocation().pathname);
+  const desk = useDesk();
+  const here = journeyFor(useLocation().pathname, desk);
   const at = here?.phase ?? null;
-  const index = at ? PHASE_BAR.findIndex((p) => p.phase === at) : -1;
+
+  // A bank was shown the board's four stages above every screen, including
+  // its own. None of them is a place a bank stands.
+  const bar = desk ? DESK_BAR : PHASE_BAR;
+  const index = at ? bar.findIndex((p) => p.phase === at) : -1;
 
   return (
     <nav aria-label={t('journey.where')} className="mb-6 overflow-x-auto">
       <ol className="flex min-w-max items-center gap-1">
-        {PHASE_BAR.map((p, i) => {
+        {bar.map((p, i) => {
           const current = p.phase === at;
           const passed = index >= 0 && i < index;
           return (
@@ -56,7 +75,7 @@ export function PhaseBar() {
                 <span className="font-mono text-[10px] opacity-70">{p.ordinal}</span>
                 {t(p.label)}
               </Link>
-              {i < PHASE_BAR.length - 1 && (
+              {i < bar.length - 1 && (
                 <span aria-hidden="true" className="text-[11px] text-muted opacity-30">
                   ›
                 </span>
@@ -79,7 +98,7 @@ export function PhaseBar() {
  */
 export function WhatYouDo() {
   const { t } = useI18n();
-  const here = journeyFor(useLocation().pathname);
+  const here = journeyFor(useLocation().pathname, useDesk());
   if (!here) return null;
 
   return (
@@ -101,7 +120,7 @@ export function WhatYouDo() {
 export function WhatNext() {
   const { t } = useI18n();
   const path = useLocation().pathname;
-  const here = journeyFor(path);
+  const here = journeyFor(path, useDesk());
   if (!here || here.next.length === 0) return null;
 
   const onward = here.next.filter((n) => n.to !== path);

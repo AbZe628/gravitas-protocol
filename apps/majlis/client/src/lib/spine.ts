@@ -36,6 +36,17 @@
 
 export type Phase = 'asked' | 'deciding' | 'inforce' | 'checked';
 
+/**
+ * The bank's three. Kept a separate type from the board's four rather than
+ * widened into them: things that count per phase — the numbers on the four
+ * doors — are about the board's work, and a union would have made the
+ * compiler ask for a count of *I owe* in the middle of the board's rail.
+ */
+export type DeskPhase = 'iasked' | 'bindsme' | 'iowe';
+
+/** Either set, for the parts of the frame both kinds of person share. */
+export type AnyPhase = Phase | DeskPhase;
+
 export const PHASES: readonly Phase[] = ['asked', 'deciding', 'inforce', 'checked'];
 
 export interface Destination {
@@ -59,8 +70,8 @@ export interface Destination {
   needs?: 'assistant';
 }
 
-export interface Door {
-  phase: Phase;
+export interface Door<P extends AnyPhase = Phase> {
+  phase: P;
   /** `01` to `04`. The order is the sequence a question travels, so it is information. */
   ordinal: string;
   /** i18n keys. */
@@ -131,6 +142,118 @@ export const DOORS: readonly Door[] = [
 ];
 
 /**
+ * The bank's three doors.
+ *
+ * ── measured, not assumed ────────────────────────────────────────────────
+ *
+ * A bank signed in and was given the board's entire navigation: seventeen
+ * destinations and four doors, every one of them a screen for deciding
+ * things a bank does not decide. `/questions` — the board's own triage
+ * queue — opened with the instruction *take a question up as a matter, or
+ * say why you are not*. `/meetings` offered *convene a sitting*. `/matters`
+ * answered in two hundred characters whose only heading was the footer's.
+ * `/holdings` answered in fifty-five and had no heading at all.
+ *
+ * The acts were correctly absent, which is the rule working. The screens
+ * were not, which is the rule being applied to controls and not to
+ * navigation. A bank was left to work out for itself which of twenty-one
+ * places were meant for it.
+ *
+ * ── why these three and not four ─────────────────────────────────────────
+ *
+ * A bank is not deciding anything, so it has no *deciding*. What it has is
+ * three questions, and they are the only three it ever asks: what did I put
+ * to the board and what came back, what may I do and not do, and what do I
+ * still owe. Each door is one of those questions in the first person,
+ * because a bank opening this is not administering a board — it is finding
+ * out where it stands.
+ *
+ * *I owe* is the one that had nothing at all. `GET /disclosure` has
+ * assembled it since the incident work was written — how many breaches were
+ * found actual, what money is owed to charity and to whom, whether it is
+ * paid, which rectification steps remain — and nothing in the application
+ * ever called it.
+ */
+export const DESK_DOORS: readonly Door<DeskPhase>[] = [
+  {
+    phase: 'iasked',
+    ordinal: '01',
+    label: 'desk.asked',
+    meaning: 'desk.asked.meaning',
+    tone: 'lapis',
+    destinations: [{ to: '/ask', label: 'desk.asked.put', note: 'desk.asked.put.note', main: true }],
+  },
+  {
+    phase: 'bindsme',
+    ordinal: '02',
+    label: 'desk.binds',
+    meaning: 'desk.binds.meaning',
+    tone: 'settled',
+    destinations: [
+      { to: '/binds-me', label: 'desk.binds.rulings', note: 'desk.binds.rulings.note', main: true },
+      { to: '/library', label: 'desk.binds.contracts', note: 'desk.binds.contracts.note' },
+      { to: '/check', label: 'desk.binds.check', note: 'desk.binds.check.note' },
+    ],
+  },
+  {
+    phase: 'iowe',
+    ordinal: '03',
+    label: 'desk.owe',
+    meaning: 'desk.owe.meaning',
+    tone: 'breach',
+    destinations: [
+      { to: '/i-owe', label: 'desk.owe.outstanding', note: 'desk.owe.outstanding.note', main: true },
+      { to: '/undertakings', label: 'desk.owe.undertaken', note: 'desk.owe.undertaken.note' },
+    ],
+  },
+];
+
+/** Which of the bank's three a path is inside, or null. */
+export function deskPhaseOf(path: string): DeskPhase | null {
+  let best: { phase: DeskPhase; length: number } | null = null;
+  for (const door of DESK_DOORS) {
+    for (const d of door.destinations) {
+      if (path === d.to || path.startsWith(d.to + '/')) {
+        if (!best || d.to.length > best.length) best = { phase: door.phase, length: d.to.length };
+      }
+    }
+  }
+  return best?.phase ?? null;
+}
+
+/**
+ * Every screen a bank is meant to be on.
+ *
+ * Used to tell an institution that has landed on one of the board's screens
+ * that it is the board's, rather than showing it an empty version with the
+ * board's instructions across the top.
+ */
+export const DESK_ROUTES: readonly string[] = [
+  ...DESK_DOORS.flatMap((d) => d.destinations.map((x) => x.to)),
+  '/settings',
+  '/search',
+  '/account',
+  /*
+   * Its own breaches. Not a door of its own — a desk does not arrive asking
+   * to read the breach register — but *what I owe* links to the board's
+   * record of each event, and a link that landed on *this one is the
+   * board's* would be this file contradicting itself one screen later.
+   */
+  '/incidents',
+];
+
+/**
+ * Whether a bank has anything to do at this address.
+ *
+ * Arrival is always the bank's: it is a different screen for a desk than for
+ * a member, decided in `App`, and not a board screen with parts removed.
+ */
+export function isDeskRoute(path: string): boolean {
+  if (path === '/') return true;
+  return DESK_ROUTES.some((r) => path === r || path.startsWith(r + '/'));
+}
+
+/**
  * The two that belong to no phase.
  *
  * Kept apart rather than forced under one, because forcing them is exactly
@@ -145,7 +268,7 @@ export const BESIDES: readonly Destination[] = [
 ];
 
 /** The screen a phase's row and tab open. */
-export function mainOf(door: Door): string {
+export function mainOf(door: Door<AnyPhase>): string {
   return (door.destinations.find((d) => d.main) ?? door.destinations[0]).to;
 }
 

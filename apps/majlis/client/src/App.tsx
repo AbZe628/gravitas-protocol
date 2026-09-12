@@ -14,6 +14,8 @@ import AssetDetail from './pages/AssetDetail.js';
 import Calculations from './pages/Calculations.js';
 import Library from './pages/Library.js';
 import CheckAContract from './pages/CheckAContract.js';
+import BindsMe from './pages/BindsMe.js';
+import IOwe from './pages/IOwe.js';
 import Calendar from './pages/Calendar.js';
 import Meetings from './pages/Meetings.js';
 import Register from './pages/Register.js';
@@ -98,6 +100,16 @@ export default function App() {
             tell them whether there was anything to deliberate.
           */}
           <Route path="/check" element={<CheckAContract />} />
+          {/*
+            The bank's own two screens. The same record read the other way
+            round: what binds me, and what I still owe. A bank signed in and
+            was given the board's twenty-one destinations and none of its
+            own — and `/disclosure`, which holds everything a bank most needs
+            to know about itself, had been answering since the incident work
+            was written with nothing in the application calling it.
+          */}
+          <Route path="/binds-me" element={<BindsMe />} />
+          <Route path="/i-owe" element={<IOwe boardId="demo-board" />} />
           <Route path="/calculations" element={<Calculations />} />
           <Route path="/calendar" element={<Calendar />} />
           <Route path="/meetings" element={<Meetings />} />

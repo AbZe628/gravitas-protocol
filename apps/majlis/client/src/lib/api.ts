@@ -875,6 +875,33 @@ export interface IncidentList {
   incidents: Incident[];
 }
 
+/**
+ * The year's non-compliance, as an institution has to disclose it.
+ *
+ * Assembled on the server from what the board and the institution already
+ * wrote, never summarised. `count` is the figure a regulator asks for before
+ * any amount: a bank reporting money without a number of events has said
+ * almost nothing.
+ *
+ * Money is a string end to end. No float touches an amount owed to charity.
+ */
+export interface Disclosure {
+  year: number;
+  count: number;
+  events: {
+    reference: string;
+    /** What happened, in the board's words rather than a category. */
+    nature: string;
+    amount: string | null;
+    currency: string | null;
+    destination: string | null;
+    paid: boolean;
+    rectification: string[];
+    rectified: boolean;
+  }[];
+  purificationOutstanding: { currency: string; amounts: string[] }[];
+}
+
 // ── what this board already decided about a question of this shape ────────
 
 export type ProposalKind = 'condition' | 'term' | 'not_decided' | 'mechanism';
@@ -1637,6 +1664,22 @@ export const oversight = {
 
   incidents: () => get<IncidentList>('/api/incidents'),
   incident: (id: string) => get<Incident>(`/api/incidents/${id}`),
+
+  /**
+   * What the institution owes, and what it still has to do.
+   *
+   * The route has answered since the incident work was written and nothing
+   * in the application ever called it. Everything a bank most needs to see
+   * about itself was assembled on the server and reachable only with curl:
+   * how many breaches were found actual this year, what money is owed to
+   * charity and to whom, whether it has been paid, and which rectification
+   * steps are still open.
+   */
+  disclosure: (board: string, year?: number) =>
+    get<Disclosure>(
+      `/api/disclosure?board=${encodeURIComponent(board)}` +
+        (year === undefined ? '' : `&year=${year}`),
+    ),
 
   report: (input: { boardId: string; reference: string; title: string; report: string }) =>
     send<Incident>('/api/incidents', input),

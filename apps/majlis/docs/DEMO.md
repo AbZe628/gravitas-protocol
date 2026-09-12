@@ -68,6 +68,31 @@ Say this at the start rather than being caught by it. *"This installation has
 not been given its keys"* is a sentence the audience will respect; a button
 that does nothing is not.
 
+### And one thing that will be absent and should not be
+
+Without credentials the demonstration also runs entirely as the **board**, and
+the bank never sees its own side. That is not a deliberate absence and it is
+worth ten minutes to fix before showing this to one.
+
+```
+npm run member -w server -- desk-1 institution
+```
+
+Put the line it prints in `MAJLIS_MEMBERS`, restart, and sign in as `desk-1`.
+The navigation becomes the bank's three doors rather than the board's four —
+**I asked**, **Binds me**, **I owe** — and the screens that are the board's own
+say so instead of answering empty.
+
+*What binds me* is every ruling in force, read the way a desk reads one: the
+condition in the board's sentence, the figures to hold to, and a link to check
+a draft against it. *What I owe* is the year's non-compliance as an institution
+has to disclose it — the count first, then what money is owed and to whom,
+whether it has been paid, and the rectification steps still open, each one
+something the bank's own people wrote.
+
+This is the half of the product a bank is actually buying, and it is the half a
+credential-less demonstration cannot show at all.
+
 ---
 
 ## 2. The demonstration, in order

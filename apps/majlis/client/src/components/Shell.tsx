@@ -1,12 +1,21 @@
 
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { useI18n } from '../lib/i18n.js';
-import { useIdentity, maySubmit } from '../lib/identity.js';
+import { isInstitution, useIdentity, maySubmit } from '../lib/identity.js';
 import { useHealth } from '../lib/health.js';
 import { useBoardName } from '../lib/board.js';
 import { LANGS, dirFor } from '../locales/index.js';
-import { BESIDES, DOORS, mainOf, phaseOf } from '../lib/spine.js';
+import {
+  BESIDES,
+  DESK_DOORS,
+  DOORS,
+  deskPhaseOf,
+  isDeskRoute,
+  mainOf,
+  phaseOf,
+} from '../lib/spine.js';
 import { PhaseBar, WhatNext, WhatYouDo } from './Journey.js';
+import NotYourScreen from './NotYourScreen.js';
 
 /**
  * The application's frame.
@@ -201,7 +210,22 @@ function Avatar({ id }: { id?: string }) {
  */
 function TabBar() {
   const { t } = useI18n();
-  const here = phaseOf(useLocation().pathname);
+  const { identity } = useIdentity();
+  const path = useLocation().pathname;
+  const desk = isInstitution(identity?.role);
+  const here = desk ? deskPhaseOf(path) : phaseOf(path);
+
+  /*
+   * A bank gets its own three here for the same reason it gets them in the
+   * rail. The drawings are reused rather than redrawn: what a bank asked is
+   * still a question, what binds it is still a sealed page, and what it owes
+   * is still the thing somebody comes and checks.
+   */
+  const drawing: Record<string, string> = {
+    iasked: 'asked',
+    bindsme: 'inforce',
+    iowe: 'checked',
+  };
 
   /*
    * The same four words as the rail, so nothing is relearned on a phone.
@@ -211,10 +235,10 @@ function TabBar() {
    * extra steps. A member who learns `Asked, Deciding, In force, Checked` at
    * their desk finds the identical four here, in the identical order.
    */
-  const tabs = DOORS.map((door) => ({
+  const tabs = (desk ? DESK_DOORS : DOORS).map((door) => ({
     to: mainOf(door),
     label: t(door.label),
-    icon: door.phase,
+    icon: drawing[door.phase] ?? door.phase,
   }));
 
   /*
@@ -328,13 +352,28 @@ export default function Shell({ children }: { children: React.ReactNode }) {
    * from `lib/spine.ts`, so the rail, the tabs and the arrival screen cannot
    * drift apart — adding a screen in one place adds it in all three.
    */
-  const groups: { title: string; items: Item[] }[] = [
-    // Arrival on its own, above the four, because it is not one of them.
-    { title: '', items: [{ to: '/', label: t('guided.greeting'), end: true }] },
+  /*
+   * Whose doors these are.
+   *
+   * A bank used to be handed the board's entire rail: seventeen destinations
+   * and four doors, every one a screen for deciding things a bank does not
+   * decide. The board's triage queue opened for it with the instruction
+   * *take a question up as a matter*; `/meetings` offered *convene a
+   * sitting*. The acts on those screens were correctly absent, which is the
+   * rule working — but the rule was being applied to controls and never to
+   * navigation, so a bank was left to work out which of twenty-one places
+   * were meant for it.
+   */
+  const desk = isInstitution(identity?.role);
+  const doors = desk ? DESK_DOORS : DOORS;
 
-    // One group per phase, numbered, because the order is the order a
+  const groups: { title: string; items: Item[] }[] = [
+    // Arrival on its own, above the doors, because it is not one of them.
+    { title: '', items: [{ to: '/', label: t(desk ? 'desk.here' : 'guided.greeting'), end: true }] },
+
+    // One group per door, numbered, because the order is the order a
     // question actually travels and that is information rather than decoration.
-    ...DOORS.map((door) => ({
+    ...doors.map((door) => ({
       title: `${door.ordinal}  ${t(door.label)}`,
       items: door.destinations.map((d) => ({ to: d.to, label: t(d.label) })),
     })),
@@ -344,7 +383,14 @@ export default function Shell({ children }: { children: React.ReactNode }) {
       items: BESIDES.filter(
         // A control this installation cannot honour is absent, not disabled.
         (d) => d.needs !== 'assistant' || health?.assistantKind !== 'off',
-      ).map((d) => ({ to: d.to, label: t(d.label) })),
+      )
+        /*
+         * The assistant is the board's, not the desk's. A bank asking a model
+         * about its own question, inside the board's record, is the one place
+         * an answer could be mistaken for the board's.
+         */
+        .filter((d) => !desk || d.to !== '/assistant')
+        .map((d) => ({ to: d.to, label: t(d.label) })),
     },
   ];
 
@@ -595,12 +641,27 @@ export default function Shell({ children }: { children: React.ReactNode }) {
             impossible by construction — `lib/journey.ts` has no route without
             an onward step.
           */}
-          <PhaseBar />
-          <WhatYouDo />
+          {/*
+            A board screen opened by a bank says whose it is.
 
-          {children}
+            Decided here rather than inside each page, for the same reason the
+            journey is: the screens a bank would most need telling about are
+            the thin ones, and those are exactly the ones somebody would have
+            forgotten. `DESK_ROUTES` is the whole of it — a screen added for a
+            desk becomes reachable by being listed there and nowhere else.
+          */}
+          {desk && !isDeskRoute(path) ? (
+            <NotYourScreen />
+          ) : (
+            <>
+              <PhaseBar />
+              <WhatYouDo />
 
-          <WhatNext />
+              {children}
+
+              <WhatNext />
+            </>
+          )}
         </main>
       </div>
 

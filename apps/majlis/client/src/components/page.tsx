@@ -1,7 +1,9 @@
 import type { ReactNode } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useI18n } from '../lib/i18n.js';
-import { DOORS, type Phase } from '../lib/spine.js';
+import { isInstitution, useIdentity } from '../lib/identity.js';
+import { journeyFor } from '../lib/journey.js';
+import { DESK_DOORS, DOORS, isDeskRoute, type AnyPhase } from '../lib/spine.js';
 
 /**
  * One shape for every page.
@@ -33,9 +35,33 @@ import { DOORS, type Phase } from '../lib/spine.js';
  */
 
 /** Where this page sits, so a reader is never lost. */
-function Breadcrumb({ phase, tail }: { phase?: Phase; tail?: string }) {
+function Breadcrumb({ phase, tail }: { phase?: AnyPhase; tail?: string }) {
   const { t } = useI18n();
-  const door = DOORS.find((d) => d.phase === phase);
+  const { identity } = useIdentity();
+  const path = useLocation().pathname;
+  const desk = isInstitution(identity?.role);
+
+  /*
+   * A bank reading a shared screen sits under its own door, not the board's.
+   *
+   * The page declares the board's phase, which is right for a member and
+   * wrong for a desk: what was undertaken said *Deciding* above the heading,
+   * what went wrong said *Checked*, the contract library said *In force* —
+   * three stages of the board's work, offered as the place a bank is
+   * standing. The journey table already knows where a desk is on each of
+   * those screens, so the crumb asks it rather than trusting the prop.
+   */
+  /*
+   * And on a screen that is not the bank's at all, no crumb. The fall-through
+   * to the board's table gave *this one is the board's* the crumb *Asked* on
+   * `/questions` and *Deciding* on `/matters`, which puts a bank inside a
+   * phase of the board's work one line above being told it is not there.
+   */
+  if (desk && !isDeskRoute(path)) return null;
+
+  const at = desk ? (journeyFor(path, true)?.phase ?? phase) : phase;
+
+  const door = DOORS.find((d) => d.phase === at) ?? DESK_DOORS.find((d) => d.phase === at);
   if (!door) return null;
 
   return (
@@ -73,7 +99,7 @@ export function PageHead({
   live,
   act,
 }: {
-  phase?: Phase;
+  phase?: AnyPhase;
   tail?: string;
   title: ReactNode;
   says: string;

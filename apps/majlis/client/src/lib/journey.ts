@@ -1,4 +1,4 @@
-import { DOORS, type Phase } from './spine.js';
+import { DESK_DOORS, DOORS, type AnyPhase } from './spine.js';
 
 /**
  * What you do on each screen, and where you go afterwards.
@@ -40,7 +40,7 @@ export interface NextStep {
 }
 
 export interface Journey {
-  phase: Phase | null;
+  phase: AnyPhase | null;
   /**
    * What you do here, addressed to the reader, in the imperative or the
    * second person. Never a description of the screen.
@@ -244,6 +244,149 @@ export const JOURNEY: Readonly<Record<string, Journey>> = {
     does: 'do.assistant',
     next: [{ to: '/ask', label: 'do.next.ask' }],
   },
+
+  /*
+   * The bank's two screens.
+   *
+   * `phase` is null rather than one of the board's four: a bank is not
+   * anywhere in the board's process, and lighting *in force* above its
+   * screens would tell it that it is somewhere it is not. Its own three
+   * doors are the bar it gets, drawn from `DESK_DOORS`.
+   *
+   * The onward steps are the two a desk actually takes from each. From what
+   * binds it: check a contract against it, or ask the board. From what it
+   * owes: the board's own record of the event, or the sittings where the
+   * undertaking was given.
+   */
+  '/binds-me': {
+    phase: null,
+    does: 'do.binds',
+    next: [
+      { to: '/check', label: 'do.next.check' },
+      { to: '/ask', label: 'do.next.ask' },
+    ],
+  },
+  '/i-owe': {
+    phase: null,
+    does: 'do.owe',
+    next: [
+      { to: '/incidents', label: 'do.next.breaches' },
+      { to: '/undertakings', label: 'do.next.undertaken' },
+    ],
+  },
+};
+
+/**
+ * The same table, for a bank.
+ *
+ * ── why an overlay and not a flag on each entry ───────────────────────────
+ *
+ * Five screens are shared — putting a question, the kinds of contract,
+ * checking a draft, what was undertaken, what went wrong — and on every one
+ * of them the line a board member reads is the wrong line for a bank.
+ * *What somebody agreed at a sitting to do. Close one by saying what
+ * happened* was shown to a reader who attends no sitting and closes nothing.
+ * *Something went wrong. Nine steps from finding it to closing it* describes
+ * the board's procedure to the institution the procedure is about.
+ *
+ * The onward steps were worse than wrong: `/` offered a bank the board's
+ * queue, the matters in hand and the calendar, all three of which now answer
+ * *this one is the board's*. An onward step that lands on a wall is the dead
+ * end this file exists to make impossible.
+ *
+ * So: the same shape, the reader's own words, and only for the routes a bank
+ * can reach. Anything not listed here falls through to the board's entry —
+ * and a bank cannot reach those, because `isDeskRoute` decides that first.
+ */
+export const DESK_JOURNEY: Readonly<Record<string, Journey>> = {
+  '/': {
+    phase: 'iasked',
+    does: 'do.desk.home',
+    next: [
+      { to: '/binds-me', label: 'do.next.binds' },
+      { to: '/i-owe', label: 'do.next.owe' },
+    ],
+  },
+  '/ask': {
+    phase: 'iasked',
+    does: 'do.ask',
+    next: [
+      { to: '/check', label: 'do.next.check' },
+      { to: '/binds-me', label: 'do.next.binds' },
+    ],
+  },
+
+  '/binds-me': {
+    phase: 'bindsme',
+    does: 'do.binds',
+    next: [
+      { to: '/check', label: 'do.next.check' },
+      { to: '/ask', label: 'do.next.ask' },
+    ],
+  },
+  '/library': {
+    phase: 'bindsme',
+    does: 'do.desk.library',
+    next: [
+      { to: '/check', label: 'do.next.check' },
+      { to: '/binds-me', label: 'do.next.binds' },
+    ],
+  },
+  '/check': {
+    phase: 'bindsme',
+    does: 'do.check',
+    next: [
+      { to: '/ask', label: 'do.next.ask' },
+      { to: '/binds-me', label: 'do.next.binds' },
+    ],
+  },
+
+  '/i-owe': {
+    phase: 'iowe',
+    does: 'do.owe',
+    next: [
+      { to: '/incidents', label: 'do.next.breaches' },
+      { to: '/undertakings', label: 'do.next.undertaken' },
+    ],
+  },
+  '/incidents': {
+    phase: 'iowe',
+    does: 'do.desk.incidents',
+    next: [
+      { to: '/i-owe', label: 'do.next.owe' },
+      { to: '/ask', label: 'do.next.ask' },
+    ],
+  },
+  '/incidents/*': {
+    phase: 'iowe',
+    does: 'do.desk.incident',
+    next: [
+      { to: '/i-owe', label: 'do.next.owe' },
+      { to: '/incidents', label: 'do.next.breaches' },
+    ],
+  },
+  '/undertakings': {
+    phase: 'iowe',
+    does: 'do.desk.undertakings',
+    next: [
+      { to: '/i-owe', label: 'do.next.owe' },
+      { to: '/ask', label: 'do.next.ask' },
+    ],
+  },
+
+  '/settings': {
+    phase: null,
+    does: 'do.desk.settings',
+    next: [{ to: '/ask', label: 'do.next.ask' }],
+  },
+  '/search': {
+    phase: null,
+    does: 'do.desk.search',
+    next: [
+      { to: '/binds-me', label: 'do.next.binds' },
+      { to: '/ask', label: 'do.next.ask' },
+    ],
+  },
 };
 
 /**
@@ -253,9 +396,17 @@ export const JOURNEY: Readonly<Record<string, Journey>> = {
  * line and its own next steps. A `/classic/*` bookmark falls back to the
  * screen it is the older form of.
  */
-export function journeyFor(path: string): Journey | null {
+export function journeyFor(path: string, desk = false): Journey | null {
+  /*
+   * A bank reads its own table first, and the board's only where it has no
+   * entry of its own. The fall-through matters less than it looks: a bank
+   * cannot open a screen that is not in `DESK_ROUTES`, so in practice every
+   * route it reaches is listed above.
+   */
+  const table = desk ? { ...JOURNEY, ...DESK_JOURNEY } : JOURNEY;
+
   const match = (p: string): Journey | null => {
-    if (JOURNEY[p]) return JOURNEY[p];
+    if (table[p]) return table[p];
 
     /*
      * Longest stem wins, so `/register/x` finds `/register/*` and not `/`.
@@ -264,7 +415,7 @@ export function journeyFor(path: string): Journey | null {
      * reader looking at one matter to go and look at the matters.
      */
     let best: { stem: string; j: Journey } | null = null;
-    for (const [key, j] of Object.entries(JOURNEY)) {
+    for (const [key, j] of Object.entries(table)) {
       if (!key.endsWith('/*')) continue;
       const stem = key.slice(0, -2);
       if (p === stem || p.startsWith(stem + '/')) {
@@ -294,7 +445,23 @@ export function journeyFor(path: string): Journey | null {
 
 /** The four phases in order, for the bar at the top of every screen. */
 export const PHASE_BAR = DOORS.map((d) => ({
-  phase: d.phase,
+  phase: d.phase as string,
+  ordinal: d.ordinal,
+  label: d.label,
+  to: (d.destinations.find((x) => x.main) ?? d.destinations[0]).to,
+}));
+
+/**
+ * The same bar, with the bank's three.
+ *
+ * A bank was shown *Asked › Deciding › In force › Checked* above every screen
+ * it opened, including its own. Those are the four stages of the board's
+ * work, and none of them is a place a bank stands: it is being told where
+ * somebody else is in a process it is not part of. Its own three doors say
+ * where *it* stands, which is what the bar is for.
+ */
+export const DESK_BAR = DESK_DOORS.map((d) => ({
+  phase: d.phase as string,
   ordinal: d.ordinal,
   label: d.label,
   to: (d.destinations.find((x) => x.main) ?? d.destinations[0]).to,

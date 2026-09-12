@@ -80,6 +80,17 @@ const en: Dict = {
   "do.search": "Find anything this board decided, by word, by member or by kind.",
   "do.settings": "Who sits on this board, and your own credential.",
   "do.assistant": "Ask a question of mechanism. It explains and never rules.",
+  "do.binds": "See what this board has decided that you have to keep to, and the figures you hold to.",
+  "do.desk.home": "Start here. Put a question to the board, or see what already binds you and what is still outstanding.",
+  "do.desk.library": "The kinds of contract this board judges, and what it judges each against. Read one before you draft.",
+  "do.desk.incidents": "Everything reported about this institution, and where each one has reached.",
+  "do.desk.incident": "One reported event: what the board determined, and what is left for you to do.",
+  "do.desk.undertakings": "What was agreed at a sitting, and by when. The ones that are yours are yours to carry out.",
+  "do.desk.settings": "Who sits on this board, and your own credential.",
+  "do.desk.search": "Find anything this board decided, by word or by kind.",
+  "do.next.binds": "What binds you",
+  "do.next.owe": "What you owe",
+  "do.owe": "See what money is still owed, to whom, and which steps are still open.",
   "do.next.queue": "What the bank has asked",
   "do.next.open": "Matters in hand",
   "do.next.dates": "What is coming",
@@ -970,6 +981,10 @@ const en: Dict = {
   'role.advisory': "deliberates",
   'role.liaison': "answers on mechanism",
   'role.observer': "reads only",
+  // The institution. The role has existed since Stage Two and nothing ever
+  // rendered it, because no institution credential was configured anywhere —
+  // so the masthead printed the key itself, `role.institution`, at a bank.
+  'role.institution': "asks and is bound",
   'set.howItDecides': "How it decides",
   'set.quorumPermit': "To permit",
   'set.quorumRestrict': "To restrict",
@@ -1363,9 +1378,117 @@ const en: Dict = {
   'who.role.advisory': 'Advisory',
   'who.role.liaison': 'Liaison',
   'who.role.observer': 'Observer',
+  'who.role.institution': 'The institution',
 
   'common.opened': 'Opened',
   'common.none': 'None',
+
+  // ── the bank's three doors ──────────────────────────────────────────────
+  //
+  // Written in the first person throughout. A bank opening this is not
+  // administering a board: it is finding out where it stands, and the
+  // headings are the three questions it actually asks.
+  'desk.here': 'Where you stand',
+  'desk.asked': 'I asked',
+  'desk.asked.meaning': 'What you put to the board, and what came back.',
+  'desk.asked.put': 'Put a question',
+  'desk.asked.put.note': 'Ask, and read what the board said to everything you asked before.',
+  'desk.binds': 'Binds me',
+  'desk.binds.meaning': 'What this board has decided that you have to keep to.',
+  'desk.binds.rulings': 'What binds you',
+  'desk.binds.rulings.note': 'Each ruling in force, with the figures you have to hold to.',
+  'desk.binds.contracts': 'Kinds of contract',
+  'desk.binds.contracts.note': 'The shapes this board judges, and what it judges each against.',
+  'desk.binds.check': 'Check a contract',
+  'desk.binds.check.note': 'Read a draft against the conditions before you put it to the board.',
+  'desk.owe': 'I owe',
+  'desk.owe.meaning': 'What is outstanding, and what you still have to do about it.',
+  'desk.owe.outstanding': 'What is outstanding',
+  'desk.owe.outstanding.note': 'Money owed to charity, and the steps that are still open.',
+  'desk.owe.undertaken': 'What you undertook',
+  'desk.owe.undertaken.note': 'What somebody agreed at a sitting to do, and by when.',
+
+  // ── what is outstanding ─────────────────────────────────────────────────
+  'owe.title': 'What you still owe',
+  'owe.says':
+    'Where the board found something actually went wrong: what money is owed and to whom, ' +
+    'and which steps are still open. Assembled from what the board and your own people ' +
+    'wrote down, never summarised.',
+  'owe.moneyOutstanding': 'Money outstanding',
+  'owe.settled': 'Settled',
+  'owe.stepsOpen': 'Steps still open',
+  'owe.noneDirected':
+    'The board found this actual and has not directed a purification. That is not the same ' +
+    'as nothing being owed — no amount has been set yet.',
+  'owe.paid': 'Paid',
+  'owe.owed': 'Owed',
+  'owe.to': 'To',
+  'owe.steps': 'Still to be done',
+  'owe.stepsDone': 'What was done',
+  'owe.seeTheRecord': 'The board’s own record of this',
+  'owe.stepsAreYours':
+    'These steps are yours to carry out. Majlis records them and does not do them.',
+  'owe.noneThisYear': 'Nothing found actual this year',
+  'owe.foundActual': 'found actual in',
+  'owe.stillOwed': 'Still owed',
+  'owe.totalsNote':
+    'One line per currency. Nothing is added across currencies, because that would need an ' +
+    'exchange rate nobody recorded.',
+  'owe.nothing':
+    'Nothing reported this year has been found to be an actual non-compliance. Events that ' +
+    'were reported and examined are still in the record — they are simply not breaches.',
+  'owe.moneyFirst': 'Money still owed',
+  'owe.stillToDo': 'Steps still open',
+  'owe.closed': 'Closed',
+  'owe.gap.year':
+    'The year here is the year the board determined an event actual, which is not always the ' +
+    'year it happened.',
+  'owe.gap.determined':
+    'Something reported and not yet determined is not on this page at all. It is on the board’s ' +
+    'own record until the board has read it.',
+  'owe.gap.notAdvice':
+    'This is what the record holds. It is not advice about what to disclose, which is your ' +
+    'own decision with your own advisers.',
+
+  // ── what binds the institution ──────────────────────────────────────────
+  'binds.title': 'What binds you',
+  'binds.says':
+    'Every ruling this board has in force, read the way a desk reads one: the condition, the ' +
+    'figures you have to hold to, and where to check a contract against it.',
+  'binds.terms': 'The figures you hold to',
+  'binds.notYet': 'Not yet binding',
+  'binds.inForce': 'In force',
+  'binds.from': 'From',
+  'binds.since': 'Since',
+  'binds.checkAgainst': 'Check a contract against this',
+  'binds.askAboutIt': 'Ask the board about it',
+  'binds.noneYet': 'Nothing in force yet',
+  'binds.bindingNow': 'binding on you now',
+  'binds.nothing': 'This board has nothing in force. Nothing here binds you yet.',
+  'binds.bindsYouNow': 'Binding now',
+  'binds.bindsYouNow.note':
+    'Each of these is in force today. The figures are the board’s own, unconverted.',
+  'binds.willBind': 'Decided, not yet binding',
+  'binds.willBind.note':
+    'The board has decided these and each takes effect on the date shown. Acting on one before ' +
+    'its date is acting on a rule that is not yet in force.',
+  'binds.noneBinding': 'Nothing is in force today.',
+  'binds.gap.thisBoard':
+    'This is what this board decided. Which standard governs you is your own institution’s ' +
+    'decision, and Majlis names none.',
+  'binds.gap.notAdvice':
+    'A ruling is the board’s. Whether a particular transaction falls inside one is a question ' +
+    'for the board, not for this screen.',
+  'binds.gap.superseded':
+    'A ruling the board has since changed shows as it now stands. What it said before is in ' +
+    'the board’s own record, which is never overwritten.',
+
+  // ── a board screen, opened by a bank ────────────────────────────────────
+  'notyours.title': 'This one is the board’s',
+  'notyours.says':
+    'This screen is where the board does its own work. Nothing is hidden from you here — it is ' +
+    'simply not a screen you have anything to do on.',
+  'notyours.yours': 'What you came for is probably one of these',
 };
 
 const ar: Dict = {
@@ -1425,6 +1548,17 @@ const ar: Dict = {
   "do.search": "ابحث عن أي شيء قرره هذا المجلس، بالكلمة أو بالعضو أو بالنوع.",
   "do.settings": "من يجلس في هذا المجلس، وبيانات دخولك أنت.",
   "do.assistant": "اسأل عن آلية العمل. يشرح ولا يفتي.",
+  "do.binds": "اطلع على ما قرره هذا المجلس ويلزمك، والأرقام التي تلتزم بها.",
+  "do.desk.home": "ابدأ من هنا. اطرح سؤالاً على المجلس، أو اطلع على ما يلزمك وما بقي مستحقاً.",
+  "do.desk.library": "أنواع العقود التي يحكم فيها هذا المجلس، وبماذا يقيس كل نوع. اقرأ واحداً قبل أن تصوغ.",
+  "do.desk.incidents": "كل ما بُلّغ عنه بشأن هذه المؤسسة، وأين وصل كل واحد.",
+  "do.desk.incident": "حدث واحد مبلَّغ عنه: ما قرره المجلس، وما بقي عليك فعله.",
+  "do.desk.undertakings": "ما اتُّفق عليه في جلسة، وموعده. وما كان منها لك فتنفيذه عليك.",
+  "do.desk.settings": "من يجلس في هذا المجلس، وبيانات دخولك أنت.",
+  "do.desk.search": "ابحث عن أي شيء قرره هذا المجلس، بالكلمة أو بالنوع.",
+  "do.next.binds": "ما يلزمك",
+  "do.next.owe": "ما عليك",
+  "do.owe": "اطلع على المال الذي ما زال مستحقاً، ولمن، وأي الخطوات ما زالت مفتوحة.",
   "do.next.queue": "ما سألته المؤسسة",
   "do.next.open": "المسائل قيد النظر",
   "do.next.dates": "ما هو قادم",
@@ -1803,6 +1937,7 @@ const ar: Dict = {
   "who.role.advisory": "استشاري",
   "who.role.liaison": "وسيط",
   "who.role.observer": "مراقب",
+  "who.role.institution": "المؤسسة",
   "common.opened": "فُتحت",
   "common.none": "لا شيء",
   "dictate.notOn": "الإملاء الصوتي غير مفعّل هنا. فالمتصفح يرسل التسجيل خارجاً لتفريغه، فتختاره المؤسسة.",
@@ -2500,6 +2635,7 @@ const ar: Dict = {
   'role.advisory': "يتداول",
   'role.liaison': "يجيب عن الآلية",
   'role.observer': "يقرأ فقط",
+  'role.institution': "يسأل ويلتزم",
   'set.howItDecides': "كيف يقرر",
   'set.quorumPermit': "للإجازة",
   'set.quorumRestrict': "للتقييد",
@@ -2654,6 +2790,96 @@ const ar: Dict = {
   'record.export': 'تصدير للمراجعة',
   'common.back': 'رجوع',
   'common.loading': 'جارٍ التحميل…',
+
+  // ── أبواب المؤسسة الثلاثة ───────────────────────────────────────────────
+  'desk.here': 'أين تقف',
+  'desk.asked': 'ما سألتُ',
+  'desk.asked.meaning': 'ما رفعته إلى المجلس، وما عاد إليك.',
+  'desk.asked.put': 'اطرح سؤالاً',
+  'desk.asked.put.note': 'اسأل، واقرأ ما قاله المجلس في كل ما سألته من قبل.',
+  'desk.binds': 'ما يلزمني',
+  'desk.binds.meaning': 'ما قرره هذا المجلس ويجب عليك الالتزام به.',
+  'desk.binds.rulings': 'ما يلزمك',
+  'desk.binds.rulings.note': 'كل حكم نافذ، ومعه الأرقام التي عليك التزامها.',
+  'desk.binds.contracts': 'أنواع العقود',
+  'desk.binds.contracts.note': 'الصيغ التي يحكم فيها هذا المجلس، وبماذا يقيس كل صيغة.',
+  'desk.binds.check': 'افحص عقداً',
+  'desk.binds.check.note': 'اقرأ المسودة على الشروط قبل رفعها إلى المجلس.',
+  'desk.owe': 'ما عليَّ',
+  'desk.owe.meaning': 'ما بقي مستحقاً، وما عليك فعله بشأنه.',
+  'desk.owe.outstanding': 'ما بقي مستحقاً',
+  'desk.owe.outstanding.note': 'مال مستحق للصدقة، والخطوات التي ما زالت مفتوحة.',
+  'desk.owe.undertaken': 'ما التزمت به',
+  'desk.owe.undertaken.note': 'ما اتفق أحدهم في جلسة على القيام به، وموعده.',
+
+  // ── ما بقي مستحقاً ──────────────────────────────────────────────────────
+  'owe.title': 'ما بقي عليك',
+  'owe.says':
+    'حيث وجد المجلس أن خللاً وقع فعلاً: ما المال المستحق ولمن، وأي الخطوات ما زالت مفتوحة. ' +
+    'مجموع مما كتبه المجلس وكتبه العاملون عندك، دون تلخيص.',
+  'owe.moneyOutstanding': 'مال مستحق',
+  'owe.settled': 'منتهٍ',
+  'owe.stepsOpen': 'خطوات مفتوحة',
+  'owe.noneDirected':
+    'وجد المجلس أن هذا واقع ولم يوجّه بتطهير. وهذا ليس كعدم وجود مستحق — لم يُحدد مبلغ بعد.',
+  'owe.paid': 'مدفوع',
+  'owe.owed': 'مستحق',
+  'owe.to': 'إلى',
+  'owe.steps': 'ما بقي عمله',
+  'owe.stepsDone': 'ما تم عمله',
+  'owe.seeTheRecord': 'سجل المجلس نفسه في هذا',
+  'owe.stepsAreYours': 'هذه الخطوات عليك تنفيذها. مجلس يسجلها ولا يقوم بها.',
+  'owe.noneThisYear': 'لم يثبت شيء هذا العام',
+  'owe.foundActual': 'ثبتت وقوعها في',
+  'owe.stillOwed': 'ما زال مستحقاً',
+  'owe.totalsNote':
+    'سطر لكل عملة. لا يُجمع عبر العملات، لأن ذلك يحتاج سعر صرف لم يسجله أحد.',
+  'owe.nothing':
+    'لم يثبت أن شيئاً مما بُلّغ عنه هذا العام مخالفة واقعة. ما بُلّغ عنه وفُحص ما زال في السجل — ' +
+    'غير أنه ليس مخالفة.',
+  'owe.moneyFirst': 'مال ما زال مستحقاً',
+  'owe.stillToDo': 'خطوات ما زالت مفتوحة',
+  'owe.closed': 'مغلق',
+  'owe.gap.year':
+    'العام هنا هو عام تقرير المجلس وقوع الحدث، وليس دائماً عام وقوعه.',
+  'owe.gap.determined':
+    'ما بُلّغ عنه ولم يُقرَّر بعد ليس في هذه الصفحة أصلاً. يبقى في سجل المجلس حتى يقرأه المجلس.',
+  'owe.gap.notAdvice':
+    'هذا ما يحويه السجل. وليس مشورة في ما تفصح عنه، فذلك قرارك مع مستشاريك.',
+
+  // ── ما يلزم المؤسسة ─────────────────────────────────────────────────────
+  'binds.title': 'ما يلزمك',
+  'binds.says':
+    'كل حكم نافذ لهذا المجلس، مقروءاً كما يقرؤه العاملون: الشرط، والأرقام التي عليك التزامها، ' +
+    'وأين تفحص عقداً عليه.',
+  'binds.terms': 'الأرقام التي تلتزم بها',
+  'binds.notYet': 'غير نافذ بعد',
+  'binds.inForce': 'نافذ',
+  'binds.from': 'اعتباراً من',
+  'binds.since': 'منذ',
+  'binds.checkAgainst': 'افحص عقداً على هذا',
+  'binds.askAboutIt': 'اسأل المجلس عنه',
+  'binds.noneYet': 'لا شيء نافذ بعد',
+  'binds.bindingNow': 'يلزمك الآن',
+  'binds.nothing': 'لا شيء نافذ لهذا المجلس. لا شيء هنا يلزمك بعد.',
+  'binds.bindsYouNow': 'نافذ الآن',
+  'binds.bindsYouNow.note': 'كل هذا نافذ اليوم. الأرقام أرقام المجلس، دون تحويل.',
+  'binds.willBind': 'مقرَّر، وغير نافذ بعد',
+  'binds.willBind.note':
+    'قرر المجلس هذه وكل منها ينفذ في التاريخ المبيَّن. والعمل بأحدها قبل تاريخه عمل بحكم لم ينفذ بعد.',
+  'binds.noneBinding': 'لا شيء نافذ اليوم.',
+  'binds.gap.thisBoard':
+    'هذا ما قرره هذا المجلس. وأي معيار يحكمك قرار مؤسستك نفسها، ومجلس لا يسمي معياراً.',
+  'binds.gap.notAdvice':
+    'الحكم للمجلس. وهل تدخل معاملة بعينها تحته سؤال للمجلس، لا لهذه الشاشة.',
+  'binds.gap.superseded':
+    'الحكم الذي غيّره المجلس يظهر كما استقر عليه الآن. وما قاله قبل ذلك في سجل المجلس، ولا يُمحى.',
+
+  // ── شاشة للمجلس تفتحها المؤسسة ──────────────────────────────────────────
+  'notyours.title': 'هذه للمجلس',
+  'notyours.says':
+    'هذه الشاشة حيث يقوم المجلس بعمله. لا شيء مخفي عنك هنا — غير أنها ليست شاشة لك فيها عمل.',
+  'notyours.yours': 'ما جئت له على الأرجح أحد هذه',
 };
 
 const ur: Dict = {
@@ -2713,6 +2939,17 @@ const ur: Dict = {
   "do.search": "بورڈ کے کسی بھی فیصلے کو لفظ، رکن یا قسم سے تلاش کریں۔",
   "do.settings": "اس بورڈ میں کون بیٹھتا ہے، اور آپ کی اپنی سند۔",
   "do.assistant": "طریقۂ کار کے بارے میں پوچھیں۔ یہ سمجھاتا ہے، فیصلہ نہیں دیتا۔",
+  "do.binds": "دیکھیں کہ اس بورڈ نے کیا طے کیا جس کی آپ کو پابندی کرنی ہے، اور کن اعداد کی۔",
+  "do.desk.home": "یہیں سے شروع کریں۔ بورڈ کے سامنے سوال رکھیں، یا دیکھیں کہ کیا آپ پر لازم ہے اور کیا باقی ہے۔",
+  "do.desk.library": "وہ صورتیں جن پر یہ بورڈ حکم لگاتا ہے، اور ہر ایک کو کس کے مقابل پرکھتا ہے۔ مسودہ بنانے سے پہلے پڑھیں۔",
+  "do.desk.incidents": "اس ادارے کے بارے میں جو کچھ رپورٹ ہوا، اور ہر ایک کہاں تک پہنچا۔",
+  "do.desk.incident": "ایک رپورٹ شدہ واقعہ: بورڈ نے کیا طے کیا، اور آپ کے لیے کیا باقی ہے۔",
+  "do.desk.undertakings": "نشست میں جس پر اتفاق ہوا، اور کب تک۔ جو آپ کے ہیں وہ آپ کو کرنے ہیں۔",
+  "do.desk.settings": "اس بورڈ میں کون بیٹھتا ہے، اور آپ کی اپنی سند۔",
+  "do.desk.search": "بورڈ کے کسی بھی فیصلے کو لفظ یا قسم سے تلاش کریں۔",
+  "do.next.binds": "جو آپ پر لازم ہے",
+  "do.next.owe": "جو آپ پر واجب ہے",
+  "do.owe": "دیکھیں کہ کتنا مال ابھی واجب ہے، کس کے لیے، اور کون سے اقدامات ابھی کھلے ہیں۔",
   "do.next.queue": "بینک نے کیا پوچھا",
   "do.next.open": "زیرِ غور معاملات",
   "do.next.dates": "کیا آ رہا ہے",
@@ -3100,6 +3337,7 @@ const ur: Dict = {
   "who.role.advisory": "مشاورتی",
   "who.role.liaison": "رابطہ کار",
   "who.role.observer": "مشاہد",
+  "who.role.institution": "ادارہ",
   "common.opened": "کھولا گیا",
   "common.none": "کچھ نہیں",
   "dictate.notOn": "بول کر لکھنا یہاں چالو نہیں۔ براؤزر ریکارڈنگ باہر بھیجتا ہے تاکہ لکھی جائے، سو یہ ادارے کا انتخاب ہے۔",
@@ -3797,6 +4035,7 @@ const ur: Dict = {
   'role.advisory': "مشورہ دیتا ہے",
   'role.liaison': "طریقۂ کار پر جواب دیتا ہے",
   'role.observer': "صرف پڑھتا ہے",
+  'role.institution': "پوچھتا ہے اور پابند ہے",
   'set.howItDecides': "کیسے فیصلہ کرتا ہے",
   'set.quorumPermit': "اجازت کے لیے",
   'set.quorumRestrict': "پابندی کے لیے",
@@ -3942,6 +4181,104 @@ const ur: Dict = {
   'asst.limits': 'یہ معاون طریقۂ کار کی وضاحت کرتا ہے۔ یہ شرعی حکم نہیں دیتا۔',
   'common.back': 'واپس',
   'common.loading': 'لوڈ ہو رہا ہے…',
+
+  // ── ادارے کے تین دروازے ─────────────────────────────────────────────────
+  'desk.here': 'آپ کہاں کھڑے ہیں',
+  'desk.asked': 'میں نے پوچھا',
+  'desk.asked.meaning': 'جو آپ نے بورڈ کے سامنے رکھا، اور جو واپس آیا۔',
+  'desk.asked.put': 'سوال رکھیں',
+  'desk.asked.put.note': 'پوچھیں، اور پڑھیں کہ بورڈ نے آپ کے پچھلے ہر سوال پر کیا کہا۔',
+  'desk.binds': 'مجھ پر لازم',
+  'desk.binds.meaning': 'جو اس بورڈ نے طے کیا اور آپ کو اس کی پابندی کرنی ہے۔',
+  'desk.binds.rulings': 'جو آپ پر لازم ہے',
+  'desk.binds.rulings.note': 'ہر نافذ فیصلہ، اُن اعداد کے ساتھ جن کی آپ کو پابندی کرنی ہے۔',
+  'desk.binds.contracts': 'عقود کی اقسام',
+  'desk.binds.contracts.note': 'وہ صورتیں جن پر یہ بورڈ حکم لگاتا ہے، اور ہر ایک کو کس کے مقابل پرکھتا ہے۔',
+  'desk.binds.check': 'کوئی عقد پرکھیں',
+  'desk.binds.check.note': 'بورڈ کے سامنے رکھنے سے پہلے مسودہ شرائط کے مقابل پڑھیں۔',
+  'desk.owe': 'مجھ پر واجب',
+  'desk.owe.meaning': 'جو باقی ہے، اور اس بارے میں آپ کو کیا کرنا ہے۔',
+  'desk.owe.outstanding': 'جو باقی ہے',
+  'desk.owe.outstanding.note': 'صدقے کا واجب مال، اور وہ اقدامات جو ابھی کھلے ہیں۔',
+  'desk.owe.undertaken': 'جس کا آپ نے ذمہ لیا',
+  'desk.owe.undertaken.note': 'کسی نشست میں جو کرنے پر اتفاق ہوا، اور کب تک۔',
+
+  // ── جو باقی ہے ──────────────────────────────────────────────────────────
+  'owe.title': 'جو آپ پر ابھی باقی ہے',
+  'owe.says':
+    'جہاں بورڈ نے پایا کہ واقعی کچھ غلط ہوا: کتنا مال واجب ہے اور کس کے لیے، اور کون سے ' +
+    'اقدامات ابھی کھلے ہیں۔ بورڈ اور آپ کے اپنے لوگوں کے لکھے سے مرتب، بغیر خلاصے کے۔',
+  'owe.moneyOutstanding': 'مال باقی',
+  'owe.settled': 'طے شدہ',
+  'owe.stepsOpen': 'اقدامات کھلے',
+  'owe.noneDirected':
+    'بورڈ نے اسے واقع پایا اور تطہیر کی ہدایت نہیں دی۔ یہ اس کے برابر نہیں کہ کچھ واجب نہیں — ' +
+    'ابھی کوئی رقم مقرر نہیں ہوئی۔',
+  'owe.paid': 'ادا شدہ',
+  'owe.owed': 'واجب',
+  'owe.to': 'کس کے لیے',
+  'owe.steps': 'جو ابھی کرنا ہے',
+  'owe.stepsDone': 'جو کیا گیا',
+  'owe.seeTheRecord': 'اس بارے میں بورڈ کا اپنا ریکارڈ',
+  'owe.stepsAreYours': 'یہ اقدامات آپ کو کرنے ہیں۔ مجلس انہیں درج کرتی ہے، کرتی نہیں۔',
+  'owe.noneThisYear': 'اس سال کچھ واقع نہیں پایا گیا',
+  'owe.foundActual': 'واقع پایا گیا',
+  'owe.stillOwed': 'ابھی واجب',
+  'owe.totalsNote':
+    'ہر کرنسی کے لیے ایک سطر۔ کرنسیوں کو جمع نہیں کیا جاتا، کیونکہ اس کے لیے وہ شرحِ تبادلہ ' +
+    'درکار ہے جو کسی نے درج نہیں کی۔',
+  'owe.nothing':
+    'اس سال جو کچھ رپورٹ ہوا، اُس میں سے کوئی واقعی خلاف ورزی نہیں پائی گئی۔ جو رپورٹ ہوا اور ' +
+    'پرکھا گیا وہ ریکارڈ میں موجود ہے — بس وہ خلاف ورزی نہیں۔',
+  'owe.moneyFirst': 'مال جو ابھی واجب ہے',
+  'owe.stillToDo': 'اقدامات جو ابھی کھلے ہیں',
+  'owe.closed': 'بند',
+  'owe.gap.year':
+    'یہاں سال وہ ہے جس میں بورڈ نے واقعے کو واقع قرار دیا، ہمیشہ وہ سال نہیں جس میں وہ پیش آیا۔',
+  'owe.gap.determined':
+    'جو رپورٹ ہوا اور ابھی طے نہیں ہوا وہ اس صفحے پر ہے ہی نہیں۔ جب تک بورڈ اسے نہ پڑھے وہ ' +
+    'بورڈ کے اپنے ریکارڈ میں رہتا ہے۔',
+  'owe.gap.notAdvice':
+    'یہ وہ ہے جو ریکارڈ میں ہے۔ یہ اس بارے میں مشورہ نہیں کہ آپ کیا ظاہر کریں، وہ آپ کا اپنا ' +
+    'فیصلہ ہے اپنے مشیروں کے ساتھ۔',
+
+  // ── جو ادارے پر لازم ہے ─────────────────────────────────────────────────
+  'binds.title': 'جو آپ پر لازم ہے',
+  'binds.says':
+    'اس بورڈ کا ہر نافذ فیصلہ، اُسی طرح پڑھا جیسے کام کرنے والا پڑھتا ہے: شرط، وہ اعداد جن کی ' +
+    'پابندی آپ کو کرنی ہے، اور کہاں کوئی عقد اس کے مقابل پرکھنا ہے۔',
+  'binds.terms': 'وہ اعداد جن کی پابندی آپ کرتے ہیں',
+  'binds.notYet': 'ابھی لازم نہیں',
+  'binds.inForce': 'نافذ',
+  'binds.from': 'سے',
+  'binds.since': 'تب سے',
+  'binds.checkAgainst': 'اس کے مقابل عقد پرکھیں',
+  'binds.askAboutIt': 'اس بارے میں بورڈ سے پوچھیں',
+  'binds.noneYet': 'ابھی کچھ نافذ نہیں',
+  'binds.bindingNow': 'اب آپ پر لازم',
+  'binds.nothing': 'اس بورڈ کا کچھ نافذ نہیں۔ یہاں ابھی کچھ آپ پر لازم نہیں۔',
+  'binds.bindsYouNow': 'اب لازم',
+  'binds.bindsYouNow.note': 'یہ سب آج نافذ ہیں۔ اعداد بورڈ کے اپنے ہیں، بغیر تبدیلی کے۔',
+  'binds.willBind': 'طے شدہ، ابھی لازم نہیں',
+  'binds.willBind.note':
+    'بورڈ نے یہ طے کر لیے اور ہر ایک دکھائی گئی تاریخ پر نافذ ہوگا۔ تاریخ سے پہلے کسی پر عمل ' +
+    'اُس حکم پر عمل ہے جو ابھی نافذ نہیں۔',
+  'binds.noneBinding': 'آج کچھ نافذ نہیں۔',
+  'binds.gap.thisBoard':
+    'یہ وہ ہے جو اس بورڈ نے طے کیا۔ آپ پر کون سا معیار لاگو ہے، یہ آپ کے ادارے کا اپنا فیصلہ ' +
+    'ہے، اور مجلس کسی معیار کا نام نہیں لیتی۔',
+  'binds.gap.notAdvice':
+    'فیصلہ بورڈ کا ہے۔ کوئی خاص معاملہ اس میں آتا ہے یا نہیں، یہ سوال بورڈ کا ہے، اس اسکرین کا نہیں۔',
+  'binds.gap.superseded':
+    'جو فیصلہ بورڈ نے بعد میں بدلا وہ اپنی موجودہ حالت میں دکھتا ہے۔ اس سے پہلے جو کہا گیا وہ ' +
+    'بورڈ کے اپنے ریکارڈ میں ہے، جو کبھی مٹایا نہیں جاتا۔',
+
+  // ── بورڈ کی اسکرین، جسے ادارہ کھولے ─────────────────────────────────────
+  'notyours.title': 'یہ بورڈ کی ہے',
+  'notyours.says':
+    'یہ اسکرین وہ جگہ ہے جہاں بورڈ اپنا کام کرتا ہے۔ یہاں آپ سے کچھ چھپایا نہیں گیا — بس یہ ' +
+    'ایسی اسکرین نہیں جس پر آپ کا کوئی کام ہو۔',
+  'notyours.yours': 'آپ غالباً اِن میں سے کسی کے لیے آئے',
 };
 
 const DICTS: Record<Lang, Dict> = { en, ar, ur };
