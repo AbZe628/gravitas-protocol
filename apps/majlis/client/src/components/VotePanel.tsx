@@ -3,6 +3,7 @@ import { Refused, governance, type Matter, type Tally } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import Dictate from './Dictate.js';
 import { Card } from './ui.js';
+import { Field } from './field.js';
 
 /**
  * Where the vote stands, and what this member can still do about it.
@@ -205,14 +206,30 @@ export default function VotePanel({ matter, role, scholarId, onChanged }: Props)
             ))}
           </div>
 
-          <label className="mb-2 block text-[12.5px] text-muted">{t('vote.reason')}</label>
-          <textarea
-            value={reason}
-            onChange={(e) => setReason(e.target.value)}
-            rows={4}
-            className="w-full resize-y rounded-card bg-raised px-4 py-3 font-display text-[15.5px] leading-[1.55] shadow-ring outline-none focus:shadow-[0_0_0_1.5px_rgba(22,68,112,0.35)]"
-          />
-          <p className="mt-2 text-[11.5px] leading-[1.55] text-muted">{t('vote.reasonHelp')}</p>
+          {/*
+            The help follows the box here rather than preceding it, because a
+            member arriving at this point has already read the matter and the
+            positions: the sentence is a reminder while they write, not an
+            instruction before they start. It is joined to the box either way,
+            so it is read out with it.
+          */}
+          <Field
+            label={t('vote.reason')}
+            headingClass="mb-2 block text-[12.5px] text-muted"
+            help={t('vote.reasonHelp')}
+            helpClass="order-last mt-2 text-[11.5px] leading-[1.55] text-muted"
+            className="flex flex-col"
+          >
+            {(attrs) => (
+              <textarea
+                {...attrs}
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+                rows={4}
+                className="w-full resize-y rounded-card bg-raised px-4 py-3 font-display text-[15.5px] leading-[1.55] shadow-ring outline-none focus:shadow-[0_0_0_1.5px_rgba(22,68,112,0.35)]"
+              />
+            )}
+          </Field>
 
           {/*
             Speaking it rather than typing it. The words stay the member's own —

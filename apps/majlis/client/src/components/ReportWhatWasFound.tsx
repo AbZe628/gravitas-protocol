@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { oversight, type Examination } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
+import { Field, HEADING } from './field.js';
 
 /**
  * From a review that found something, to the board.
@@ -102,20 +103,28 @@ export default function ReportWhatWasFound({
     <div className="mt-4 rounded-card bg-ink px-4 py-4 shadow-ring">
       <p className="mb-3 max-w-[58ch] text-[12.5px] leading-[1.6] text-muted">{t('found.lead')}</p>
 
-      <label className="mb-1.5 block text-[12px] text-muted">{t('found.title')}</label>
-      <input
-        value={title}
-        onChange={(ev) => setTitle(ev.target.value)}
-        className="mb-3 w-full rounded-card bg-raised px-4 py-2.5 text-[13.5px] text-paper shadow-ring outline-none"
-      />
+      <Field label={t('found.title')} className="mb-3" headingClass={HEADING}>
+        {(attrs) => (
+          <input
+            {...attrs}
+            value={title}
+            onChange={(ev) => setTitle(ev.target.value)}
+            className="w-full rounded-card bg-raised px-4 py-2.5 text-[13.5px] text-paper shadow-ring outline-none"
+          />
+        )}
+      </Field>
 
-      <label className="mb-1.5 block text-[12px] text-muted">{t('found.what')}</label>
-      <textarea
-        value={report}
-        onChange={(ev) => setReport(ev.target.value)}
-        rows={8}
-        className="w-full rounded-card bg-raised px-4 py-3 font-mono text-[12.5px] leading-[1.6] text-paper shadow-ring outline-none"
-      />
+      <Field label={t('found.what')} headingClass={HEADING}>
+        {(attrs) => (
+          <textarea
+            {...attrs}
+            value={report}
+            onChange={(ev) => setReport(ev.target.value)}
+            rows={8}
+            className="w-full rounded-card bg-raised px-4 py-3 font-mono text-[12.5px] leading-[1.6] text-paper shadow-ring outline-none"
+          />
+        )}
+      </Field>
 
       {error && <p className="mt-2 text-[12.5px] text-breach">{error}</p>}
 

@@ -6,6 +6,7 @@ import { useIdentity, isInstitution } from '../lib/identity.js';
 import { Act, Card, Edge, Quiet, State } from '../components/kit.js';
 import TheNotice from '../components/TheNotice.js';
 import { ErrorText } from '../components/ui.js';
+import { Field } from '../components/field.js';
 
 /**
  * The bank's own screen: put a question, and see what became of it.
@@ -71,13 +72,17 @@ function Mine({ s, onWithdraw }: { s: Submission; onWithdraw: (id: string, why: 
       {s.standing === 'waiting' &&
         (open ? (
           <div className="mt-3">
-            <label className={label}>{t('ask.withdrawWhy')}</label>
-            <textarea
-              value={why}
-              onChange={(e) => setWhy(e.target.value)}
-              rows={2}
-              className={field + ' mb-2 resize-y'}
-            />
+            <Field label={t('ask.withdrawWhy')} className="mb-2" headingClass={label}>
+              {(attrs) => (
+                <textarea
+                  {...attrs}
+                  value={why}
+                  onChange={(e) => setWhy(e.target.value)}
+                  rows={2}
+                  className={field + ' resize-y'}
+                />
+              )}
+            </Field>
             <Act onClick={() => onWithdraw(s.id, why)} disabled={!why.trim()}>
               {t('ask.withdraw')}
             </Act>
@@ -172,37 +177,63 @@ export default function Ask({ boardId }: { boardId: string }) {
 
       <div className="mt-6">
         <Card>
-          <label className={label}>{t('ask.subject')}</label>
-          <input
-            value={subject}
-            onChange={(e) => setSubject(e.target.value)}
-            className={field + ' mb-4'}
-          />
+          <Field label={t('ask.subject')} className="mb-4" headingClass={label}>
+            {(attrs) => (
+              <input
+                {...attrs}
+                value={subject}
+                onChange={(e) => setSubject(e.target.value)}
+                className={field}
+              />
+            )}
+          </Field>
 
-          <label className={label}>{t('ask.question')}</label>
-          <p className={help}>{t('ask.questionHelp')}</p>
-          <textarea
-            value={question}
-            onChange={(e) => setQuestion(e.target.value)}
-            rows={5}
-            className={field + ' mb-4 resize-y'}
-          />
+          <Field
+            label={t('ask.question')}
+            help={t('ask.questionHelp')}
+            className="mb-4"
+            headingClass={label}
+            helpClass={help}
+          >
+            {(attrs) => (
+              <textarea
+                {...attrs}
+                value={question}
+                onChange={(e) => setQuestion(e.target.value)}
+                rows={5}
+                className={field + ' resize-y'}
+              />
+            )}
+          </Field>
 
-          <label className={label}>{t('ask.background')}</label>
-          <textarea
-            value={background}
-            onChange={(e) => setBackground(e.target.value)}
-            rows={3}
-            className={field + ' mb-4 resize-y'}
-          />
+          <Field label={t('ask.background')} className="mb-4" headingClass={label}>
+            {(attrs) => (
+              <textarea
+                {...attrs}
+                value={background}
+                onChange={(e) => setBackground(e.target.value)}
+                rows={3}
+                className={field + ' resize-y'}
+              />
+            )}
+          </Field>
 
-          <label className={label}>{t('ask.awaiting')}</label>
-          <p className={help}>{t('ask.awaitingHelp')}</p>
-          <input
-            value={awaiting}
-            onChange={(e) => setAwaiting(e.target.value)}
-            className={field + ' mb-4'}
-          />
+          <Field
+            label={t('ask.awaiting')}
+            help={t('ask.awaitingHelp')}
+            className="mb-4"
+            headingClass={label}
+            helpClass={help}
+          >
+            {(attrs) => (
+              <input
+                {...attrs}
+                value={awaiting}
+                onChange={(e) => setAwaiting(e.target.value)}
+                className={field}
+              />
+            )}
+          </Field>
 
           {/*
             Only a member sees these two. A desk asking its own question is the
@@ -211,23 +242,41 @@ export default function Ask({ boardId }: { boardId: string }) {
           */}
           {!own && (
             <>
-              <label className={label}>{t('ask.askedBy')}</label>
-              <p className={help}>{t('ask.askedByHelp')}</p>
-              <input
-                value={askedBy}
-                onChange={(e) => setAskedBy(e.target.value)}
-                placeholder={t('ask.askedByHint')}
-                className={field + ' mb-4'}
-              />
+              <Field
+                label={t('ask.askedBy')}
+                help={t('ask.askedByHelp')}
+                className="mb-4"
+                headingClass={label}
+                helpClass={help}
+              >
+                {(attrs) => (
+                  <input
+                    {...attrs}
+                    value={askedBy}
+                    onChange={(e) => setAskedBy(e.target.value)}
+                    placeholder={t('ask.askedByHint')}
+                    className={field}
+                  />
+                )}
+              </Field>
 
-              <label className={label}>{t('ask.arrivedAt')}</label>
-              <p className={help}>{t('ask.arrivedHelp')}</p>
-              <input
-                type="date"
-                value={arrivedAt}
-                onChange={(e) => setArrivedAt(e.target.value)}
-                className={field + ' mb-4'}
-              />
+              <Field
+                label={t('ask.arrivedAt')}
+                help={t('ask.arrivedHelp')}
+                className="mb-4"
+                headingClass={label}
+                helpClass={help}
+              >
+                {(attrs) => (
+                  <input
+                    {...attrs}
+                    type="date"
+                    value={arrivedAt}
+                    onChange={(e) => setArrivedAt(e.target.value)}
+                    className={field}
+                  />
+                )}
+              </Field>
             </>
           )}
 

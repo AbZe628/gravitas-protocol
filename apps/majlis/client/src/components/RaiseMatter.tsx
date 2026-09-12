@@ -3,6 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { Refused, governance } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { Card } from './ui.js';
+import { Field } from './field.js';
+
+/** This form sets its headings and help tighter than the ordinary screens. */
+const TIGHT = 'mb-1 block text-[12px] text-muted';
+const HELP = 'mb-1.5 text-[11.5px] leading-relaxed text-muted';
 
 /**
  * Raising a matter.
@@ -93,15 +98,45 @@ export default function RaiseMatter({ boardId }: { boardId: string }) {
     <Card>
       <div className="mb-3 text-[13px] font-medium">{t('raise.title')}</div>
 
-      <label className="mb-1 block text-[12px] text-muted">{t('raise.subject')}</label>
-      <input value={title} onChange={(e) => setTitle(e.target.value)} className={field + ' mb-3'} />
+      <Field label={t('raise.subject')} className="mb-3" headingClass={TIGHT}>
+        {(attrs) => (
+          <input
+            {...attrs}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className={field}
+          />
+        )}
+      </Field>
 
-      <label className="mb-1 block text-[12px] text-muted">{t('raise.proposal')}</label>
-      <textarea value={proposal} onChange={(e) => setProposal(e.target.value)} rows={3} className={field + ' mb-3 resize-y'} />
+      <Field label={t('raise.proposal')} className="mb-3" headingClass={TIGHT}>
+        {(attrs) => (
+          <textarea
+            {...attrs}
+            value={proposal}
+            onChange={(e) => setProposal(e.target.value)}
+            rows={3}
+            className={field + ' resize-y'}
+          />
+        )}
+      </Field>
 
-      <label className="mb-1 block text-[12px] text-muted">{t('raise.direction')}</label>
-      <p className="mb-2 text-[11.5px] leading-relaxed text-muted">{t('raise.directionHelp')}</p>
-      <div className="mb-3 flex flex-wrap gap-2">
+      {/*
+        A choice between two buttons, not a box to fill in, so the words above
+        it head a group rather than pointing at one control.
+      */}
+      <div className="mb-1 block text-[12px] text-muted" id="raise-direction">
+        {t('raise.direction')}
+      </div>
+      <p id="raise-direction-help" className="mb-2 text-[11.5px] leading-relaxed text-muted">
+        {t('raise.directionHelp')}
+      </p>
+      <div
+        role="group"
+        aria-labelledby="raise-direction"
+        aria-describedby="raise-direction-help"
+        className="mb-3 flex flex-wrap gap-2"
+      >
         {(['permit', 'restrict'] as const).map((d) => (
           <button
             key={d}
@@ -117,18 +152,22 @@ export default function RaiseMatter({ boardId }: { boardId: string }) {
         ))}
       </div>
 
-      <label className="mb-1 block text-[12px] text-muted">{t('raise.origin')}</label>
-      <select
-        value={origin}
-        onChange={(e) => setOrigin(e.target.value as (typeof ORIGINS)[number])}
-        className={field + ' mb-3'}
-      >
-        {ORIGINS.map((o) => (
-          <option key={o} value={o}>
-            {t(`matter.origin.${o}`)}
-          </option>
-        ))}
-      </select>
+      <Field label={t('raise.origin')} className="mb-3" headingClass={TIGHT}>
+        {(attrs) => (
+          <select
+            {...attrs}
+            value={origin}
+            onChange={(e) => setOrigin(e.target.value as (typeof ORIGINS)[number])}
+            className={field}
+          >
+            {ORIGINS.map((o) => (
+              <option key={o} value={o}>
+                {t(`matter.origin.${o}`)}
+              </option>
+            ))}
+          </select>
+        )}
+      </Field>
 
       {/*
         When the institution asked, which is not when somebody found time to
@@ -136,18 +175,40 @@ export default function RaiseMatter({ boardId }: { boardId: string }) {
         part only — an understated figure that says so beats a confident wrong
         one, and this is the number people put in front of a board.
       */}
-      <label className="mb-1 block text-[12px] text-muted">{t('raise.arrivedAt')}</label>
-      <p className="mb-1.5 text-[11.5px] leading-relaxed text-muted">{t('raise.arrivedAtHelp')}</p>
-      <input
-        type="date"
-        value={arrivedAt}
-        onChange={(e) => setArrivedAt(e.target.value)}
-        className={field + ' mb-3'}
-      />
+      <Field
+        label={t('raise.arrivedAt')}
+        help={t('raise.arrivedAtHelp')}
+        className="mb-3"
+        headingClass={TIGHT}
+        helpClass={HELP}
+      >
+        {(attrs) => (
+          <input
+            {...attrs}
+            type="date"
+            value={arrivedAt}
+            onChange={(e) => setArrivedAt(e.target.value)}
+            className={field}
+          />
+        )}
+      </Field>
 
-      <label className="mb-1 block text-[12px] text-muted">{t('raise.notDecided')}</label>
-      <p className="mb-1.5 text-[11.5px] leading-relaxed text-muted">{t('raise.notDecidedHelp')}</p>
-      <textarea value={notDecided} onChange={(e) => setNotDecided(e.target.value)} rows={2} className={field + ' resize-y'} />
+      <Field
+        label={t('raise.notDecided')}
+        help={t('raise.notDecidedHelp')}
+        headingClass={TIGHT}
+        helpClass={HELP}
+      >
+        {(attrs) => (
+          <textarea
+            {...attrs}
+            value={notDecided}
+            onChange={(e) => setNotDecided(e.target.value)}
+            rows={2}
+            className={field + ' resize-y'}
+          />
+        )}
+      </Field>
 
       {refusal && <p className="mt-2 text-[12px] leading-relaxed text-breach">{refusal}</p>}
 

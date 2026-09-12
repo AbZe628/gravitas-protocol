@@ -5,6 +5,8 @@ import { useI18n } from '../lib/i18n.js';
 import { Division, Nothing, PageHead } from '../components/page.js';
 import { DateText, ErrorText, Loading, Tag } from '../components/ui.js';
 import { mayDeliberate, useIdentity } from '../lib/identity.js';
+import { useStillThere } from '../lib/stillThere.js';
+import { Field, HEADING } from '../components/field.js';
 
 /**
  * Reported non-compliance.
@@ -60,6 +62,8 @@ export default function Incidents() {
   const { t } = useI18n();
   const [data, setData] = useState<IncidentList | null>(null);
   const [failed, setFailed] = useState(false);
+  /** A failed refresh keeps a screen that is already there. */
+  const there = useStillThere();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ reference: '', title: '', report: '' });
   const [error, setError] = useState<string | null>(null);
@@ -68,8 +72,11 @@ export default function Incidents() {
   const load = () =>
     oversight
       .incidents()
-      .then(setData)
-      .catch(() => setFailed(true));
+      .then((d) => {
+        there.arrived();
+        setData(d);
+      })
+      .catch(() => there.lost(setFailed));
 
   useEffect(() => {
     void load();
@@ -110,30 +117,54 @@ export default function Incidents() {
         <div className="mb-6">
           {open ? (
             <form onSubmit={report} className="rounded-sheet bg-raised px-6 py-5 shadow-card">
-              <label className="mb-1 block text-[12px] text-muted">{t('snc.reference')}</label>
-              <input
-                value={form.reference}
-                onChange={(e) => setForm({ ...form, reference: e.target.value })}
-                className="mb-3 w-full rounded-xl shadow-ring bg-raised px-3 py-2 text-[14px]"
-                placeholder="SNC-2026-001"
-                required
-              />
-              <label className="mb-1 block text-[12px] text-muted">{t('snc.whatHappened')}</label>
-              <input
-                value={form.title}
-                onChange={(e) => setForm({ ...form, title: e.target.value })}
-                className="mb-3 w-full rounded-xl shadow-ring bg-raised px-3 py-2 text-[14px]"
-                required
-                minLength={3}
-              />
-              <label className="mb-1 block text-[12px] text-muted">{t('snc.account')}</label>
-              <textarea
-                value={form.report}
-                onChange={(e) => setForm({ ...form, report: e.target.value })}
-                className="mb-1 h-24 w-full rounded-xl shadow-ring bg-raised px-3 py-2 text-[14px]"
-                required
-              />
-              <p className="mb-3 text-[11px] leading-relaxed text-muted">{t('snc.accountHint')}</p>
+              <Field label={t('snc.reference')} className="mb-3" headingClass={HEADING}>
+                {(attrs) => (
+                  <input
+                    {...attrs}
+                    value={form.reference}
+                    onChange={(e) => setForm({ ...form, reference: e.target.value })}
+                    className="w-full rounded-xl shadow-ring bg-raised px-3 py-2 text-[14px]"
+                    placeholder="SNC-2026-001"
+                    required
+                  />
+                )}
+              </Field>
+
+              <Field label={t('snc.whatHappened')} className="mb-3" headingClass={HEADING}>
+                {(attrs) => (
+                  <input
+                    {...attrs}
+                    value={form.title}
+                    onChange={(e) => setForm({ ...form, title: e.target.value })}
+                    className="w-full rounded-xl shadow-ring bg-raised px-3 py-2 text-[14px]"
+                    required
+                    minLength={3}
+                  />
+                )}
+              </Field>
+
+              {/*
+                The hint stays under the box: somebody is writing an account of
+                what happened, and the reminder of what to include is useful
+                while they write rather than before they start.
+              */}
+              <Field
+                label={t('snc.account')}
+                help={t('snc.accountHint')}
+                helpClass="order-last mb-3 text-[11px] leading-relaxed text-muted"
+                className="mb-0 flex flex-col"
+                headingClass={HEADING}
+              >
+                {(attrs) => (
+                  <textarea
+                    {...attrs}
+                    value={form.report}
+                    onChange={(e) => setForm({ ...form, report: e.target.value })}
+                    className="mb-1 h-24 w-full rounded-xl shadow-ring bg-raised px-3 py-2 text-[14px]"
+                    required
+                  />
+                )}
+              </Field>
 
               {error && <p className="mb-3 text-[13px] text-breach">{error}</p>}
 

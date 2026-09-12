@@ -7,7 +7,9 @@ import { useIdentity, mayDeliberate, maySubmit } from '../lib/identity.js';
 import { Act, Card, Quiet, State } from '../components/kit.js';
 import TheNotice from '../components/TheNotice.js';
 import { Division, Gaps, Nothing, PageHead } from '../components/page.js';
+import { Field } from '../components/field.js';
 import { ErrorText, Loading } from '../components/ui.js';
+import { useStillThere } from '../lib/stillThere.js';
 
 /**
  * What the institution has asked, and what the board did about it.
@@ -199,22 +201,41 @@ function One({
             </p>
           )}
 
-          <label className={label}>{t('queue.yourReading')}</label>
-          <p className="mb-2 max-w-[62ch] text-[11.5px] leading-[1.6] text-muted">
-            {t('queue.yourReadingHelp')}
-          </p>
-          <input value={title} onChange={(e) => setTitle(e.target.value)} className={field + ' mb-3'} />
+          <Field label={t('queue.yourReading')} help={t('queue.yourReadingHelp')} className="mb-3">
+            {(attrs) => (
+              <input
+                {...attrs}
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className={field}
+              />
+            )}
+          </Field>
 
-          <label className={label}>{t('raise.proposal')}</label>
-          <textarea
-            value={proposal}
-            onChange={(e) => setProposal(e.target.value)}
-            rows={3}
-            className={field + ' mb-3 resize-y'}
-          />
+          <Field label={t('raise.proposal')} className="mb-3">
+            {(attrs) => (
+              <textarea
+                {...attrs}
+                value={proposal}
+                onChange={(e) => setProposal(e.target.value)}
+                rows={3}
+                className={field + ' resize-y'}
+              />
+            )}
+          </Field>
 
-          <label className={label}>{t('raise.direction')}</label>
-          <div className="mb-3 flex flex-wrap gap-2">
+          {/*
+            A choice between two buttons, not a box to fill in — so the words
+            above it head a group rather than pointing at a single control.
+          */}
+          <div className={label} id="direction-heading">
+            {t('raise.direction')}
+          </div>
+          <div
+            role="group"
+            aria-labelledby="direction-heading"
+            className="mb-3 flex flex-wrap gap-2"
+          >
             {(['permit', 'restrict'] as const).map((d) => (
               <button
                 key={d}
@@ -249,16 +270,17 @@ function One({
 
       {act === 'decline' && (
         <div className="mt-4">
-          <label className={label}>{t('queue.declineWhy')}</label>
-          <p className="mb-2 max-w-[62ch] text-[11.5px] leading-[1.6] text-muted">
-            {t('queue.declineHelp')}
-          </p>
-          <textarea
-            value={reason}
-            onChange={(e) => setReason(e.target.value)}
-            rows={3}
-            className={field + ' mb-3 resize-y'}
-          />
+          <Field label={t('queue.declineWhy')} help={t('queue.declineHelp')} className="mb-3">
+            {(attrs) => (
+              <textarea
+                {...attrs}
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+                rows={3}
+                className={field + ' resize-y'}
+              />
+            )}
+          </Field>
 
           {error && (
             <p className="mb-3 rounded-xl bg-[#FCF0EE] px-3.5 py-2.5 text-[12.5px] text-breach shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)]">
@@ -283,6 +305,8 @@ export default function Questions({ boardId }: { boardId: string }) {
   const { identity } = useIdentity();
   const [all, setAll] = useState<Submission[] | null>(null);
   const [failed, setFailed] = useState(false);
+  /** A failed refresh keeps a screen that is already there. */
+  const there = useStillThere();
   const [notice, setNotice] = useState<{ notice: Notice; delivery: Delivery } | null>(null);
 
   const load = () => {
@@ -290,8 +314,11 @@ export default function Questions({ boardId }: { boardId: string }) {
       .list(boardId)
       // A 200 with the wrong shape crashes a whole page; every fetch here
       // checks before it sets.
-      .then((r) => setAll(Array.isArray(r.submissions) ? r.submissions : []))
-      .catch(() => setFailed(true));
+      .then((r) => {
+        there.arrived();
+        setAll(Array.isArray(r.submissions) ? r.submissions : []);
+      })
+      .catch(() => there.lost(setFailed));
   };
 
   useEffect(load, [boardId]);

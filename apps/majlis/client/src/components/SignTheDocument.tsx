@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { oversight, type Matter, type SignedDocument } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { useIdentity, mayVote } from '../lib/identity.js';
+import { Field } from './field.js';
 
 /**
  * Signing the written decision.
@@ -148,17 +149,22 @@ export default function SignTheDocument({ matter }: { matter: Matter }) {
       {/* The act. Absent, not disabled, for anyone who may not sign. */}
       {canSign && !current && (
         <div className="mt-5">
-          <label className="block text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
-            {t('sign.noteLabel')}
-          </label>
-          <textarea
-            value={note}
-            onChange={(e) => setNote(e.target.value)}
-            rows={2}
-            maxLength={600}
-            placeholder={t('sign.notePlaceholder')}
-            className="mt-2 w-full rounded-card bg-ink px-4 py-3 text-[13.5px] leading-[1.6] text-paper shadow-ring outline-none placeholder:text-muted focus:shadow-lift"
-          />
+          <Field
+            label={t('sign.noteLabel')}
+            headingClass="block text-[10px] font-bold uppercase tracking-[0.15em] text-muted"
+          >
+            {(attrs) => (
+              <textarea
+                {...attrs}
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                rows={2}
+                maxLength={600}
+                placeholder={t('sign.notePlaceholder')}
+                className="mt-2 w-full rounded-card bg-ink px-4 py-3 text-[13.5px] leading-[1.6] text-paper shadow-ring outline-none placeholder:text-muted focus:shadow-lift"
+              />
+            )}
+          </Field>
           <button
             type="button"
             onClick={put}

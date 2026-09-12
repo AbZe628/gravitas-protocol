@@ -2,6 +2,11 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Refused, governance } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
+import { Field } from './field.js';
+
+/** This form sets its headings and help tighter than the ordinary screens. */
+const TIGHT = 'mb-1 block text-[12px] text-muted';
+const HELP = 'mb-1.5 text-[11.5px] leading-relaxed text-muted';
 
 /**
  * Putting a question to the board, in the words the person putting it uses.
@@ -114,8 +119,17 @@ export default function SmartRaise({ boardId }: { boardId: string }) {
 
       {/* ── one: what kind of decision ─────────────────────────────────── */}
 
-      <div className="mb-1 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">{t('smart.whatKind')}</div>
-      <div className="mb-4 grid gap-2 sm:grid-cols-2">
+      <div
+        id="smart-kind"
+        className="mb-1 text-[10px] font-bold uppercase tracking-[0.15em] text-muted"
+      >
+        {t('smart.whatKind')}
+      </div>
+      <div
+        role="group"
+        aria-labelledby="smart-kind"
+        className="mb-4 grid gap-2 sm:grid-cols-2"
+      >
         {KINDS.map((k) => (
           <button
             key={k}
@@ -149,26 +163,52 @@ export default function SmartRaise({ boardId }: { boardId: string }) {
             {t(`matter.direction.${RECORDS[kind].direction}Note`)}
           </p>
 
-          <label className="mb-1 block text-[12px] text-muted">{t('raise.subject')}</label>
-          <input value={title} onChange={(e) => setTitle(e.target.value)} className={field + ' mb-3'} />
+          <Field label={t('raise.subject')} className="mb-3" headingClass={TIGHT}>
+            {(attrs) => (
+              <input
+                {...attrs}
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className={field}
+              />
+            )}
+          </Field>
 
-          <label className="mb-1 block text-[12px] text-muted">{t('smart.question')}</label>
-          <p className="mb-1.5 text-[11.5px] leading-relaxed text-muted">{t('smart.questionHelp')}</p>
-          <textarea
-            value={proposal}
-            onChange={(e) => setProposal(e.target.value)}
-            rows={3}
-            className={field + ' mb-3 resize-y'}
-          />
+          <Field
+            label={t('smart.question')}
+            help={t('smart.questionHelp')}
+            className="mb-3"
+            headingClass={TIGHT}
+            helpClass={HELP}
+          >
+            {(attrs) => (
+              <textarea
+                {...attrs}
+                value={proposal}
+                onChange={(e) => setProposal(e.target.value)}
+                rows={3}
+                className={field + ' resize-y'}
+              />
+            )}
+          </Field>
 
-          <label className="mb-1 block text-[12px] text-muted">{t('raise.arrivedAt')}</label>
-          <p className="mb-1.5 text-[11.5px] leading-relaxed text-muted">{t('smart.arrivedShort')}</p>
-          <input
-            type="date"
-            value={arrivedAt}
-            onChange={(e) => setArrivedAt(e.target.value)}
-            className={field + ' mb-3'}
-          />
+          <Field
+            label={t('raise.arrivedAt')}
+            help={t('smart.arrivedShort')}
+            className="mb-3"
+            headingClass={TIGHT}
+            helpClass={HELP}
+          >
+            {(attrs) => (
+              <input
+                {...attrs}
+                type="date"
+                value={arrivedAt}
+                onChange={(e) => setArrivedAt(e.target.value)}
+                className={field}
+              />
+            )}
+          </Field>
 
           {refusal && (
             <p className="mb-3 rounded-xl shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)] px-3 py-2 text-[12.5px] leading-relaxed text-breach">

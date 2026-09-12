@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from 'react';
 import type { CalcStep } from '../lib/api.js';
+import { Field as Joined } from './field.js';
 
 /**
  * The parts every calculation surface is built from.
@@ -25,6 +26,18 @@ import type { CalcStep } from '../lib/api.js';
  * nothing else. The same words travel with the figures wherever they go.
  */
 
+/**
+ * A figure to enter, headed by what it is.
+ *
+ * This used to wrap the box in the label element, which names it, but swept
+ * the hint into the name with it: a member reading by ear heard the heading
+ * and the whole explanatory sentence read out as the name of the box, every
+ * time they landed on it. Now the heading names it and the hint is joined
+ * separately, so it is read once, after, and can be skipped.
+ *
+ * The joining itself is `Field` in `field.tsx`, which is the one place in the
+ * application that makes an identifier and hands it over.
+ */
 export function Field({
   label,
   hint,
@@ -32,14 +45,18 @@ export function Field({
 }: {
   label: string;
   hint?: string;
-  children: ReactNode;
+  children: (attrs: { id: string; 'aria-describedby': string | undefined }) => ReactNode;
 }) {
   return (
-    <label className="mb-2.5 block">
-      <span className="mb-1 block text-[10px] font-bold uppercase tracking-[0.15em] text-muted">{label}</span>
+    <Joined
+      label={label}
+      help={hint}
+      className="mb-2.5"
+      helpClass="mb-1.5 block text-[11px] leading-relaxed text-muted opacity-80"
+      headingClass="mb-1 block text-[10px] font-bold uppercase tracking-[0.15em] text-muted"
+    >
       {children}
-      {hint && <span className="mt-1 block text-[11px] leading-relaxed text-muted opacity-80">{hint}</span>}
-    </label>
+    </Joined>
   );
 }
 
@@ -60,13 +77,16 @@ export function Money({
 }) {
   return (
     <Field label={label} hint={hint}>
-      <input
-        inputMode="decimal"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder="0"
-        className={INPUT + ' font-mono tabular-nums'}
-      />
+      {(attrs) => (
+        <input
+          {...attrs}
+          inputMode="decimal"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder="0"
+          className={INPUT + ' font-mono tabular-nums'}
+        />
+      )}
     </Field>
   );
 }
@@ -88,13 +108,16 @@ export function Text({
 }) {
   return (
     <Field label={label} hint={hint}>
-      <input
-        type={type ?? 'text'}
-        value={value}
-        placeholder={placeholder}
-        onChange={(e) => onChange(e.target.value)}
-        className={INPUT + ' text-[13px]'}
-      />
+      {(attrs) => (
+        <input
+          {...attrs}
+          type={type ?? 'text'}
+          value={value}
+          placeholder={placeholder}
+          onChange={(e) => onChange(e.target.value)}
+          className={INPUT + ' text-[13px]'}
+        />
+      )}
     </Field>
   );
 }
@@ -122,8 +145,10 @@ export function Rate({
 
   return (
     <Field label={label} hint={hint}>
+      {(attrs) => (
       <div className="flex items-center gap-2">
         <input
+          {...attrs}
           inputMode="decimal"
           value={text}
           placeholder="0.00"
@@ -139,6 +164,7 @@ export function Rate({
         />
         <span className="text-[13px] text-muted">%</span>
       </div>
+      )}
     </Field>
   );
 }

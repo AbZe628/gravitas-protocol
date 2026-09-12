@@ -14,6 +14,7 @@ import { Division, Nothing, PageHead } from '../components/page.js';
 import { ErrorText, Loading } from '../components/ui.js';
 import { useIdentity, mayRecordInstitutionAct, mayDeliberate } from '../lib/identity.js';
 import { Act, Card, Quiet, State } from '../components/kit.js';
+import { Field } from '../components/field.js';
 
 /**
  * What was executed, against what the board approved.
@@ -266,22 +267,34 @@ export default function Examinations({ boardId }: { boardId: string }) {
             <Act onClick={() => setOpen(true)}>{t('exam.record')}</Act>
           ) : (
             <Card>
-              <label className={label}>{t('exam.whichRuling')}</label>
+              {/*
+                With nothing settled there is no box, so there is nothing to
+                head: the sentence says why on its own rather than heading an
+                absent control.
+              */}
               {settled.length === 0 ? (
-                <p className="mb-3 text-[12.5px] text-muted">{t('exam.noSettled')}</p>
+                <>
+                  <div className={label}>{t('exam.whichRuling')}</div>
+                  <p className="mb-3 text-[12.5px] text-muted">{t('exam.noSettled')}</p>
+                </>
               ) : (
-                <select
-                  value={subject?.matterId ?? ''}
-                  onChange={(e) => void choose(e.target.value)}
-                  className={field + ' mb-4'}
-                >
-                  <option value="">—</option>
-                  {settled.map((m) => (
-                    <option key={m.id} value={m.id}>
-                      {m.title}
-                    </option>
-                  ))}
-                </select>
+                <Field label={t('exam.whichRuling')} className="mb-4" headingClass={label}>
+                  {(attrs) => (
+                    <select
+                      {...attrs}
+                      value={subject?.matterId ?? ''}
+                      onChange={(e) => void choose(e.target.value)}
+                      className={field}
+                    >
+                      <option value="">—</option>
+                      {settled.map((m) => (
+                        <option key={m.id} value={m.id}>
+                          {m.title}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                </Field>
               )}
 
               {subject && (
@@ -297,14 +310,23 @@ export default function Examinations({ boardId }: { boardId: string }) {
                     </label>
                   </div>
 
-                  <label className={label}>{t('exam.howChosen')}</label>
-                  <p className={help}>{t('exam.howChosenHelp')}</p>
-                  <textarea
-                    value={howChosen}
-                    onChange={(e) => setHowChosen(e.target.value)}
-                    rows={3}
-                    className={field + ' mb-4 resize-y'}
-                  />
+                  <Field
+                    label={t('exam.howChosen')}
+                    help={t('exam.howChosenHelp')}
+                    className="mb-4"
+                    headingClass={label}
+                    helpClass={help}
+                  >
+                    {(attrs) => (
+                      <textarea
+                        {...attrs}
+                        value={howChosen}
+                        onChange={(e) => setHowChosen(e.target.value)}
+                        rows={3}
+                        className={field + ' resize-y'}
+                      />
+                    )}
+                  </Field>
 
                   <div className="mb-4 flex gap-3">
                     <label className="flex-1">

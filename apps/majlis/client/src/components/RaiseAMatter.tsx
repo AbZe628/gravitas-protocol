@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { governance } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
+import { Field, HEADING } from './field.js';
 
 /**
  * Open a matter about the thing you are looking at.
@@ -99,20 +100,28 @@ export default function RaiseAMatter({
     <div className="mt-3 rounded-card bg-ink px-4 py-4 shadow-ring">
       <p className="mb-3 max-w-[58ch] text-[12.5px] leading-[1.6] text-muted">{t('raise.lead')}</p>
 
-      <label className="mb-1.5 block text-[12px] text-muted">{t('raise.title')}</label>
-      <input
-        value={theTitle}
-        onChange={(e) => setTheTitle(e.target.value)}
-        className="mb-3 w-full rounded-card bg-raised px-4 py-2.5 text-[13.5px] text-paper shadow-ring outline-none"
-      />
+      <Field label={t('raise.title')} className="mb-3" headingClass={HEADING}>
+        {(attrs) => (
+          <input
+            {...attrs}
+            value={theTitle}
+            onChange={(e) => setTheTitle(e.target.value)}
+            className="w-full rounded-card bg-raised px-4 py-2.5 text-[13.5px] text-paper shadow-ring outline-none"
+          />
+        )}
+      </Field>
 
-      <label className="mb-1.5 block text-[12px] text-muted">{t('raise.proposal')}</label>
-      <textarea
-        value={theProposal}
-        onChange={(e) => setTheProposal(e.target.value)}
-        rows={5}
-        className="w-full rounded-card bg-raised px-4 py-3 text-[13.5px] leading-[1.6] text-paper shadow-ring outline-none"
-      />
+      <Field label={t('raise.proposal')} headingClass={HEADING}>
+        {(attrs) => (
+          <textarea
+            {...attrs}
+            value={theProposal}
+            onChange={(e) => setTheProposal(e.target.value)}
+            rows={5}
+            className="w-full rounded-card bg-raised px-4 py-3 text-[13.5px] leading-[1.6] text-paper shadow-ring outline-none"
+          />
+        )}
+      </Field>
 
       {error && <p className="mt-2 text-[12.5px] text-breach">{error}</p>}
 
