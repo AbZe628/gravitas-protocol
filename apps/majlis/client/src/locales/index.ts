@@ -91,6 +91,7 @@ const en: Dict = {
   "do.next.binds": "What binds you",
   "do.next.owe": "What you owe",
   "do.owe": "See what money is still owed, to whom, and which steps are still open.",
+  "do.figure": "One calculation the board recorded: the figure, the method, every step, and what it does not say.",
   "do.next.queue": "What the bank has asked",
   "do.next.open": "Matters in hand",
   "do.next.dates": "What is coming",
@@ -985,6 +986,32 @@ const en: Dict = {
   // rendered it, because no institution credential was configured anywhere —
   // so the masthead printed the key itself, `role.institution`, at a bank.
   'role.institution': "asks and is bound",
+  // ── one recorded calculation, at its own address ────────────────────────
+  'figure.says':
+    'One calculation the board recorded: the figure, the method it stated, every step of ' +
+    'the arithmetic, and what it does not say.',
+  'figure.theFigure': 'The figure',
+  'figure.method': 'The method the board stated',
+  'figure.working': 'The working',
+  'figure.working.note': 'Every step, in the order it was done. Nothing is rounded on the way.',
+  'figure.doesNotSay': 'What this does not say',
+  'figure.related': 'Where it sits',
+  'figure.replaces': 'The calculation this replaced',
+  'figure.theHolding': 'The holding this was worked out for',
+  'figure.tell': 'Tell the institution',
+  'figure.noneTitle': 'No such calculation',
+  'figure.noneSays': 'Nothing is recorded at this address.',
+  'figure.none':
+    'This address does not name a calculation this board has recorded. A link from an old ' +
+    'notice may have been mistyped, or the calculation may belong to another board.',
+  'figure.allOfThem': 'Every calculation this board recorded',
+  'figure.gap.notPaid':
+    'Recording a figure is not doing anything about it. Whether an amount was paid, given ' +
+    'away or set aside is something the institution records, and Majlis does not know it.',
+  'figure.gap.notAgreed':
+    'Nothing here says the board agreed with the figure. It says the board was shown it, ' +
+    'by whom, and on what date.',
+  'recorded.openIt': 'Open this calculation',
   'set.howItDecides': "How it decides",
   'set.quorumPermit': "To permit",
   'set.quorumRestrict': "To restrict",
@@ -1559,6 +1586,7 @@ const ar: Dict = {
   "do.next.binds": "ما يلزمك",
   "do.next.owe": "ما عليك",
   "do.owe": "اطلع على المال الذي ما زال مستحقاً، ولمن، وأي الخطوات ما زالت مفتوحة.",
+  "do.figure": "حساب واحد سجله المجلس: الرقم، والطريقة، وكل خطوة، وما لا يقوله.",
   "do.next.queue": "ما سألته المؤسسة",
   "do.next.open": "المسائل قيد النظر",
   "do.next.dates": "ما هو قادم",
@@ -2636,6 +2664,28 @@ const ar: Dict = {
   'role.liaison': "يجيب عن الآلية",
   'role.observer': "يقرأ فقط",
   'role.institution': "يسأل ويلتزم",
+  'figure.says':
+    'حساب واحد سجله المجلس: الرقم، والطريقة التي نص عليها، وكل خطوة من العملية، وما لا يقوله.',
+  'figure.theFigure': 'الرقم',
+  'figure.method': 'الطريقة التي نص عليها المجلس',
+  'figure.working': 'العملية',
+  'figure.working.note': 'كل خطوة بترتيب إجرائها. ولا يُقرَّب شيء في الطريق.',
+  'figure.doesNotSay': 'ما لا يقوله هذا',
+  'figure.related': 'أين يقع',
+  'figure.replaces': 'الحساب الذي حل محله',
+  'figure.theHolding': 'الأصل الذي حُسب له',
+  'figure.tell': 'أبلغ المؤسسة',
+  'figure.noneTitle': 'لا حساب بهذا العنوان',
+  'figure.noneSays': 'لا شيء مسجل على هذا العنوان.',
+  'figure.none':
+    'هذا العنوان لا يسمي حساباً سجله هذا المجلس. قد يكون رابط من إشعار قديم كُتب خطأً، أو ' +
+    'يكون الحساب لمجلس آخر.',
+  'figure.allOfThem': 'كل حساب سجله هذا المجلس',
+  'figure.gap.notPaid':
+    'تسجيل الرقم ليس فعلاً به. وهل دُفع المبلغ أو تُصدق به أو أُفرد، فذلك تسجله المؤسسة، ولا يعلمه مجلس.',
+  'figure.gap.notAgreed':
+    'لا شيء هنا يقول إن المجلس وافق على الرقم. بل يقول إن المجلس عُرض عليه، وممن، وفي أي تاريخ.',
+  'recorded.openIt': 'افتح هذا الحساب',
   'set.howItDecides': "كيف يقرر",
   'set.quorumPermit': "للإجازة",
   'set.quorumRestrict': "للتقييد",
@@ -2950,6 +3000,7 @@ const ur: Dict = {
   "do.next.binds": "جو آپ پر لازم ہے",
   "do.next.owe": "جو آپ پر واجب ہے",
   "do.owe": "دیکھیں کہ کتنا مال ابھی واجب ہے، کس کے لیے، اور کون سے اقدامات ابھی کھلے ہیں۔",
+  "do.figure": "ایک حساب جو بورڈ نے درج کیا: رقم، طریقہ، ہر قدم، اور جو یہ نہیں کہتا۔",
   "do.next.queue": "بینک نے کیا پوچھا",
   "do.next.open": "زیرِ غور معاملات",
   "do.next.dates": "کیا آ رہا ہے",
@@ -4036,6 +4087,28 @@ const ur: Dict = {
   'role.liaison': "طریقۂ کار پر جواب دیتا ہے",
   'role.observer': "صرف پڑھتا ہے",
   'role.institution': "پوچھتا ہے اور پابند ہے",
+  'figure.says':
+    'ایک حساب جو بورڈ نے درج کیا: رقم، وہ طریقہ جو اس نے بیان کیا، عمل کا ہر قدم، اور جو یہ نہیں کہتا۔',
+  'figure.theFigure': 'رقم',
+  'figure.method': 'وہ طریقہ جو بورڈ نے بیان کیا',
+  'figure.working': 'عمل',
+  'figure.working.note': 'ہر قدم اُسی ترتیب میں جس میں کیا گیا۔ راستے میں کچھ گول نہیں کیا جاتا۔',
+  'figure.doesNotSay': 'یہ کیا نہیں کہتا',
+  'figure.related': 'یہ کہاں بیٹھتا ہے',
+  'figure.replaces': 'وہ حساب جس کی جگہ یہ آیا',
+  'figure.theHolding': 'وہ ملکیت جس کے لیے یہ نکالا گیا',
+  'figure.tell': 'ادارے کو بتائیں',
+  'figure.noneTitle': 'اس پتے پر کوئی حساب نہیں',
+  'figure.noneSays': 'اس پتے پر کچھ درج نہیں۔',
+  'figure.none':
+    'یہ پتہ اس بورڈ کے درج کردہ کسی حساب کا نام نہیں لیتا۔ ممکن ہے کسی پرانے نوٹس کا لنک غلط ' +
+    'لکھا گیا ہو، یا حساب کسی اور بورڈ کا ہو۔',
+  'figure.allOfThem': 'اس بورڈ کا درج کردہ ہر حساب',
+  'figure.gap.notPaid':
+    'رقم درج کرنا اس پر عمل نہیں۔ رقم ادا ہوئی، صدقہ ہوئی یا الگ رکھی گئی — یہ ادارہ درج کرتا ہے، مجلس نہیں جانتی۔',
+  'figure.gap.notAgreed':
+    'یہاں کچھ یہ نہیں کہتا کہ بورڈ نے رقم سے اتفاق کیا۔ یہ کہتا ہے کہ بورڈ کو دکھائی گئی، کس نے، اور کس تاریخ کو۔',
+  'recorded.openIt': 'یہ حساب کھولیں',
   'set.howItDecides': "کیسے فیصلہ کرتا ہے",
   'set.quorumPermit': "اجازت کے لیے",
   'set.quorumRestrict': "پابندی کے لیے",

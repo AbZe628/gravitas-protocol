@@ -12,6 +12,7 @@ import MatterDetail from './pages/MatterDetail.js';
 import Rules from './pages/Rules.js';
 import AssetDetail from './pages/AssetDetail.js';
 import Calculations from './pages/Calculations.js';
+import Figure from './pages/Figure.js';
 import Library from './pages/Library.js';
 import CheckAContract from './pages/CheckAContract.js';
 import BindsMe from './pages/BindsMe.js';
@@ -111,6 +112,14 @@ export default function App() {
           <Route path="/binds-me" element={<BindsMe />} />
           <Route path="/i-owe" element={<IOwe boardId="demo-board" />} />
           <Route path="/calculations" element={<Calculations />} />
+          {/*
+            One recorded calculation, at an address of its own. The route
+            answering it has existed since the computations work was written
+            and nothing called it, so a figure the board recorded had nowhere
+            to point at — and the notice telling the bank about one carried
+            the amount with no working and no link.
+          */}
+          <Route path="/figures/:id" element={<Figure />} />
           <Route path="/calendar" element={<Calendar />} />
           <Route path="/meetings" element={<Meetings />} />
           {/*

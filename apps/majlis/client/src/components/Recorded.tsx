@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { oversight, type ComputationList, type HistoryEntry } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import TellTheBank from './TellTheBank.js';
@@ -79,13 +80,28 @@ function Entry({ entry }: { entry: HistoryEntry }) {
         </p>
       )}
 
-      <button
-        type="button"
-        onClick={() => setOpen(!open)}
-        className="mt-2 text-[12px] text-muted underline underline-offset-2 hover:text-paper"
-      >
-        {open ? t('recorded.hideWorking') : t('recorded.showWorking')}
-      </button>
+      {/*
+        Two different things, and a list that offered only the first left a
+        figure with nowhere to point at: opening the working here, and going
+        to the calculation's own address — which is what a notice to the bank
+        names, what an auditor comes back to, and what a colleague means when
+        they mention a figure.
+      */}
+      <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1.5">
+        <button
+          type="button"
+          onClick={() => setOpen(!open)}
+          className="text-[12px] text-muted underline underline-offset-2 hover:text-paper"
+        >
+          {open ? t('recorded.hideWorking') : t('recorded.showWorking')}
+        </button>
+        <Link
+          to={`/figures/${c.id}`}
+          className="text-[12px] font-semibold text-lapis underline underline-offset-2"
+        >
+          {t('recorded.openIt')}
+        </Link>
+      </div>
 
       {open && (
         <div className="mt-2">

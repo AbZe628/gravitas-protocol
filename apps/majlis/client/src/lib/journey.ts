@@ -193,6 +193,20 @@ export const JOURNEY: Readonly<Record<string, Journey>> = {
       { to: '/ask', label: 'do.next.ask' },
     ],
   },
+  /*
+   * One recorded calculation at its own address. A figure is arrived at from
+   * a notice, from an audit trail or from a colleague naming it, so the
+   * onward steps are the two a reader takes from one: the rest of them, or
+   * the holding it was worked out for.
+   */
+  '/figures/*': {
+    phase: 'inforce',
+    does: 'do.figure',
+    next: [
+      { to: '/calculations', label: 'do.next.figures' },
+      { to: '/register', label: 'do.next.register' },
+    ],
+  },
   '/briefings': {
     phase: 'inforce',
     does: 'do.briefings',

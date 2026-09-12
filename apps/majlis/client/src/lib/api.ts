@@ -188,7 +188,35 @@ async function get<T>(path: string): Promise<T> {
   // Through `reach`, so a screen that cannot load says the connection failed
   // rather than printing whatever word the browser chose for it.
   const res = await reach(path, {});
-  if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+
+  if (!res.ok) {
+    /*
+     * The same shape a write refusal has, and for the same reason.
+     *
+     * This threw `new Error('404 Not Found')` — a string and nothing else —
+     * so no screen in the application could tell *there is no such thing* from
+     * *the server failed*, and every one of them said the same words for both.
+     * Those are different facts with different remedies: one is a wrong
+     * address, recoverable by going back, and the other is ours and is
+     * recoverable by trying again. A reader given the second sentence for the
+     * first goes hunting for a typo in a link that was right.
+     *
+     * The server's own words are used where it sent any, exactly as `send`
+     * does, so a route that explains itself is not talked over.
+     */
+    let payload: { error?: string; message?: string } = {};
+    try {
+      payload = (await res.json()) as typeof payload;
+    } catch {
+      // A response with no JSON body: fall through to the status.
+    }
+    throw new Refused(
+      payload.error ?? 'unknown',
+      payload.message ?? `${res.status} ${res.statusText}`,
+      res.status,
+    );
+  }
+
   return (await res.json()) as T;
 }
 
@@ -1774,6 +1802,19 @@ export const oversight = {
     ).toString();
     return get<ComputationList>('/api/computations' + (search ? '?' + search : ''));
   },
+  /**
+   * One recorded calculation, at an address of its own.
+   *
+   * The route has answered since the computations work was written and
+   * nothing called it, so a figure the board recorded had no place to point
+   * at. A notice went to the bank saying *a figure has been recorded* with
+   * the amount, the method and the source in the body — and no working and
+   * nowhere to open. The desk that has to act on it could read what the
+   * figure was and never how it was arrived at.
+   */
+  computation: (id: string) =>
+    get<{ computation: Computation; whatRecordingMeans: string }>(`/api/computations/${id}`),
+
   recordComputation: (input: RecordInput) =>
     send<{ computation: Computation; whatRecordingMeans: string }>('/api/computations', input),
   withdrawComputation: (id: string, reason: string) =>
