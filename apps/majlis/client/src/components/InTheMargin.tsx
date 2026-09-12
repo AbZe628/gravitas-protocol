@@ -3,6 +3,7 @@ import { oversight, type Margin, type AnnotationThread } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { mayDeliberate, useIdentity } from '../lib/identity.js';
 import { Nothing } from './page.js';
+import { useStillThere } from '../lib/stillThere.js';
 
 /**
  * The papers, with what members wrote in the margin beside them.
@@ -234,6 +235,8 @@ export default function InTheMargin({
   const { identity } = useIdentity();
   const [margin, setMargin] = useState<Margin | null>(null);
   const [failed, setFailed] = useState(false);
+  /** A failed refresh keeps notes that are already on screen. */
+  const there = useStillThere();
 
   /** What the reader has selected inside the text, if anything. */
   const [selected, setSelected] = useState('');
@@ -245,8 +248,15 @@ export default function InTheMargin({
     setFailed(false);
     oversight
       .margin(on, subjectId)
-      .then((m) => (m && Array.isArray(m.threads) && typeof m.text === 'string' ? setMargin(m) : setFailed(true)))
-      .catch(() => setFailed(true));
+      .then((m) => {
+        if (m && Array.isArray(m.threads) && typeof m.text === 'string') {
+          there.arrived();
+          setMargin(m);
+        } else {
+          there.lost(setFailed);
+        }
+      })
+      .catch(() => there.lost(setFailed));
   }
 
   useEffect(load, [on, subjectId]);

@@ -12,6 +12,7 @@ import { useI18n } from '../lib/i18n.js';
 import { Division, Nothing, PageHead } from '../components/page.js';
 import { useIdentity } from '../lib/identity.js';
 import { Card, DateText, ErrorText, Loading, Tag } from '../components/ui.js';
+import { useStillThere } from '../lib/stillThere.js';
 
 /**
  * Meetings, as a record rather than a room.
@@ -300,6 +301,8 @@ export default function Meetings() {
   const [data, setData] = useState<MeetingsData | null>(null);
   const [board, setBoard] = useState<Board | null>(null);
   const [failed, setFailed] = useState(false);
+  /** A failed refresh keeps a screen that is already there. */
+  const there = useStillThere();
 
   const [convening, setConvening] = useState(false);
   const [at, setAt] = useState('');
@@ -313,13 +316,14 @@ export default function Meetings() {
       .meetings()
       .then((d) => {
         if (!d || !Array.isArray(d.meetings)) {
-          setFailed(true);
+          there.lost(setFailed);
           return;
         }
+        there.arrived();
         setData(d);
         return api.board(d.boardId).then(setBoard).catch(() => undefined);
       })
-      .catch(() => setFailed(true));
+      .catch(() => there.lost(setFailed));
 
   useEffect(() => {
     void load();

@@ -6,6 +6,7 @@ import { Division, PageHead, Nothing } from '../components/page.js';
 import { mayVote, useIdentity } from '../lib/identity.js';
 import { ErrorText, Loading } from '../components/ui.js';
 import { Card, State, type Tone } from '../components/kit.js';
+import { useStillThere } from '../lib/stillThere.js';
 
 /**
  * The library as this board holds it.
@@ -336,18 +337,21 @@ export default function Library() {
   const [data, setData] = useState<LibraryData | null>(null);
   const [carried, setCarried] = useState<MatterSummary[]>([]);
   const [failed, setFailed] = useState(false);
+  /** A failed refresh keeps a screen that is already there. */
+  const there = useStillThere();
 
   const load = () =>
     oversight
       .library()
       .then((d) => {
         if (!d || !Array.isArray(d.library)) {
-          setFailed(true);
+          there.lost(setFailed);
           return;
         }
+        there.arrived();
         setData(d);
       })
-      .catch(() => setFailed(true));
+      .catch(() => there.lost(setFailed));
 
   useEffect(() => {
     void load();

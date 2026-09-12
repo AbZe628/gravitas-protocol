@@ -6,6 +6,7 @@ import { useIdentity, mayKeepMinutes } from '../lib/identity.js';
 import { Loading, ErrorText } from '../components/ui.js';
 import { State } from '../components/kit.js';
 import { Division, Gaps, Nothing, PageHead } from '../components/page.js';
+import { useStillThere } from '../lib/stillThere.js';
 
 /**
  * What was undertaken, and what became of it.
@@ -169,9 +170,17 @@ export default function Undertakings() {
   const { identity } = useIdentity();
   const [data, setData] = useState<Awaited<ReturnType<typeof oversight.undertakings>> | null>(null);
   const [failed, setFailed] = useState(false);
+  /** A failed refresh keeps a screen that is already there. */
+  const there = useStillThere();
 
   function load() {
-    oversight.undertakings().then(setData).catch(() => setFailed(true));
+    oversight
+      .undertakings()
+      .then((d) => {
+        there.arrived();
+        setData(d);
+      })
+      .catch(() => there.lost(setFailed));
   }
   useEffect(load, []);
 

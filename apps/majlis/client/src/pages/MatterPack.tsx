@@ -14,6 +14,7 @@ import ReadTheContract from '../components/ReadTheContract.js';
 import Evidence from '../components/Evidence.js';
 import TellTheBank from '../components/TellTheBank.js';
 import Checklist from '../components/Checklist.js';
+import { useStillThere } from '../lib/stillThere.js';
 
 /**
  * One matter, everything for it, one act.
@@ -91,6 +92,8 @@ export default function MatterPack() {
   const [packFailed, setPackFailed] = useState(false);
   const [matter, setMatter] = useState<Matter | null>(null);
   const [failed, setFailed] = useState(false);
+  /** A failed refresh keeps a screen that is already there. */
+  const there = useStillThere();
 
   function load() {
     if (!id) return;
@@ -104,12 +107,15 @@ export default function MatterPack() {
      */
     api
       .matter(id)
-      .then((m) =>
-        m && Array.isArray(m.notDecided) && Array.isArray(m.reasoning)
-          ? setMatter(m)
-          : setFailed(true),
-      )
-      .catch(() => setFailed(true));
+      .then((m) => {
+        if (m && Array.isArray(m.notDecided) && Array.isArray(m.reasoning)) {
+          there.arrived();
+          setMatter(m);
+        } else {
+          there.lost(setFailed);
+        }
+      })
+      .catch(() => there.lost(setFailed));
     setPackFailed(false);
     api
       .pack(id)

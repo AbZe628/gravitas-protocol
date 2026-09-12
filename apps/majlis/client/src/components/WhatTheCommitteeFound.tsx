@@ -3,6 +3,7 @@ import { oversight, type ReferralOnMatter } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { mayDeliberate, useIdentity } from '../lib/identity.js';
 import { Nothing } from './page.js';
+import { useStillThere } from '../lib/stillThere.js';
 
 /**
  * What the board asked a committee to look at, and what came back.
@@ -135,6 +136,8 @@ export default function WhatTheCommitteeFound({ matterId }: { matterId: string }
 
   const [data, setData] = useState<{ referrals: ReferralOnMatter[]; note: string } | null>(null);
   const [failed, setFailed] = useState(false);
+  /** A failed refresh keeps a screen that is already there. */
+  const there = useStillThere();
 
   /* Referring one, where the board keeps a committee to refer it to. */
   const [committees, setCommittees] = useState<{ id: string; name: string }[] | null>(null);
@@ -148,8 +151,15 @@ export default function WhatTheCommitteeFound({ matterId }: { matterId: string }
     setFailed(false);
     oversight
       .referrals(matterId)
-      .then((r) => (r && Array.isArray(r.referrals) ? setData(r) : setFailed(true)))
-      .catch(() => setFailed(true));
+      .then((r) => {
+        if (r && Array.isArray(r.referrals)) {
+          there.arrived();
+          setData(r);
+        } else {
+          there.lost(setFailed);
+        }
+      })
+      .catch(() => there.lost(setFailed));
   }
 
   useEffect(load, [matterId]);
