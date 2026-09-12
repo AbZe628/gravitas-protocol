@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { useParams } from 'react-router-dom';
 import { oversight, type Incident } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
@@ -111,7 +111,24 @@ export default function IncidentDetail() {
   const [incident, setIncident] = useState<Incident | null>(null);
   const [failed, setFailed] = useState(false);
   const [refusal, setRefusal] = useState<string | null>(null);
+  /** Whether this breach has ever rendered. See the note on `load` below. */
+  const shown = useRef(false);
 
+  /*
+   * A failed refresh must not take away a screen that is already there.
+   *
+   * Measured: press *Record: this is a breach* with no connection, and the
+   * act correctly set its refusal — then `act` called this, this failed, and
+   * `failed` replaced the entire page with "Could not load." The nine steps,
+   * the report, the concurrences and the refusal itself all went, and a
+   * scholar was left with three words that did not mention the thing they
+   * had just pressed.
+   *
+   * So the failure is only fatal while there is nothing to show. Once the
+   * breach has loaded, a later refresh that cannot reach the board leaves
+   * what is on screen exactly where it is, and the act's own sentence is
+   * what the reader sees.
+   */
   const load = () =>
     oversight
       .incident(id)
@@ -120,12 +137,17 @@ export default function IncidentDetail() {
        * wrong shape threw inside render and React unmounted the whole tree, so
        * one absent field turned the nine steps into a blank page.
        */
-      .then((r) =>
-        r && Array.isArray(r.concurrences) && Array.isArray(r.stopped) && Array.isArray(r.plans)
-          ? setIncident(r)
-          : setFailed(true),
-      )
-      .catch(() => setFailed(true));
+      .then((r) => {
+        if (r && Array.isArray(r.concurrences) && Array.isArray(r.stopped) && Array.isArray(r.plans)) {
+          shown.current = true;
+          setIncident(r);
+        } else if (!shown.current) {
+          setFailed(true);
+        }
+      })
+      .catch(() => {
+        if (!shown.current) setFailed(true);
+      });
 
   useEffect(() => {
     void load();

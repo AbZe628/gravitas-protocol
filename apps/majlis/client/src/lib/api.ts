@@ -185,7 +185,9 @@ export interface AssistantExchange {
 }
 
 async function get<T>(path: string): Promise<T> {
-  const res = await fetch(path);
+  // Through `reach`, so a screen that cannot load says the connection failed
+  // rather than printing whatever word the browser chose for it.
+  const res = await reach(path, {});
   if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
   return (await res.json()) as T;
 }
@@ -519,12 +521,41 @@ export interface ReferralOnMatter {
   stood: HowItStood | null;
 }
 
+/**
+ * The request never reached the board.
+ *
+ * `fetch` rejects with a `TypeError` whose message is whatever the browser
+ * feels like — "Failed to fetch" in Chrome, "Load failed" in Safari,
+ * "NetworkError when attempting to fetch resource" in Firefox. Every screen
+ * in this application prints `e.message`, so a scholar on a train read a
+ * browser's diagnostic in English, three words long, with nothing about what
+ * had happened to the thing they pressed.
+ *
+ * Turned into a refusal like any other, with a code a screen can recognise
+ * and a sentence that says the two things that matter: nothing was recorded,
+ * and pressing it again when there is a connection is safe. Done here so it
+ * holds for all sixty-five acts rather than in each of them.
+ */
+export const UNREACHABLE = 'unreachable';
+
+const UNREACHABLE_SENTENCE =
+  'That did not reach the board, so nothing was recorded. The connection failed rather than the ' +
+  'board refusing: try it again when you are back online and it will go through.';
+
+async function reach(path: string, init: RequestInit): Promise<Response> {
+  try {
+    return await fetch(path, init);
+  } catch {
+    throw new Refused(UNREACHABLE, UNREACHABLE_SENTENCE, 0);
+  }
+}
+
 async function send<T>(
   path: string,
   body?: unknown,
   method: 'POST' | 'PUT' | 'DELETE' = 'POST',
 ): Promise<T> {
-  const res = await fetch(path, {
+  const res = await reach(path, {
     method,
     headers: { 'Content-Type': 'application/json' },
     // A DELETE with a body confuses proxies more often than it helps.
