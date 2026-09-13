@@ -79,19 +79,23 @@ koraka stoji otvoreno umjesto da se otvara jedan po jedan.
 
 | šta dokument obećava (pogl. 4) | stanje |
 |---|---|
-| **Uslovi forme postaju koraci predmeta** | POLA — numerisani su i nose svoj alat; jedan po jedan otvaranje još nije |
+| **Uslovi forme postaju koraci predmeta** | DA — numerisani, jedan otvoren u isto vrijeme, ostali sklopljeni u red. Uslov oko kojeg se odbor ne slaže se nikad ne sklapa |
 | **Korak koji traži brojku otvara kalkulator u sebi** | DA — kalkulator se bira iz onoga što oblik imenuje. Popunjavanje iz dokumenta ostaje (traži ključ za asistenta) |
-| Svaka brojka pokazuje stranicu iz koje je uzeta | KOD — `extraction.ts` to zna, nije spojeno |
+| Svaka brojka pokazuje stranicu iz koje je uzeta | DA — `ReadDocument` je oduvijek unutar četiri kalkulatora. Nisam to bio primijetio i napravio sam drugi isti alat, pa ga izvadio |
 | Rezultat ostaje na uslovu, ne odlazi na poseban ekran | DA — kalkulacija pamti predmet i uslov |
-| Korak koji dokument ne odgovara postaje pitanje banci | NE |
-| Sat na predmetu staje dok banka odgovara | NE |
+| Korak koji dokument ne odgovara postaje pitanje banci | DA — nacrt se otvara sa samim uslovom u sebi; banka odgovara na svom ekranu; član odbora ne može odgovoriti umjesto banke |
+| Sat na predmetu staje dok banka odgovara | DA — vrijeme kod banke se **odvaja, ne skriva**: proteklo ostaje proteklo, a pored njega piše koliko je bilo odborovo. Preklapajuća pitanja se broje jednom |
 | **Glasanje se ne otvara dok svi koraci nisu odgovoreni** | DA — odbijanje, ne upozorenje. Izuzet uslov se broji kao odgovoren |
 | Uslov koji odbor izuzme putuje na pisanu odluku | DA — već je radilo, provjereno u fatwa.ts |
 
-**Ocjena koraka nakon 13.09: četiri od osam.** Kalkulator je u koraku,
+**Ocjena koraka: osam od osam, 14.09. ujutro.** Kalkulator je u koraku,
 rezultat ostaje na uslovu, glasanje je zaključano, izuzeti uslov ide na
-odluku. Ostaje: otvaranje jednog koraka po jedan, brojke sa stranicom izvora,
-pitanje banci iz koraka, i sat koji staje dok banka odgovara.
+odluku, koraci se otvaraju jedan po jedan, brojke nose stranicu izvora,
+korak može postaviti pitanje banci, i sat odvaja vrijeme kod banke.
+
+Poglavlje 4 je time zatvoreno. Ono što **nije** zatvoreno je da stranica
+predmeta i dalje ima dvanaest odjeljaka oko tih koraka — koraci vode, okvir
+oko njih još ne. To nije obećanje iz poglavlja 4, nego posao za sljedeći put.
 
 ### Kalkulatori, po trećem pragu
 
@@ -197,9 +201,7 @@ stavku. Kolona **put** je treći prag.
 
 ## 4. Kako softver vodi
 
-Vidi A3. **Četiri od osam ispunjeno 13.09.** Ostale četiri su: jedan korak
-otvoren u isto vrijeme, brojke sa stranicom izvora, pitanje banci iz koraka, i
-sat koji staje dok banka odgovara.
+Vidi A3. **Osam od osam, zatvoreno 14.09.**
 
 ## 5. Alati
 
@@ -365,18 +367,17 @@ tabele su tačne.
 Po drugom pragu, dostupnosti, sada je **skoro sve zatvoreno**: ostala je jedna
 stvar koja radi a nema ekran, i ona pripada koraku 5.
 
-Po **trećem pragu**, onom koji je vlasnik tražio, glavni tok predmeta je 13.09.
-navečer prešao **četiri od osam** obećanja poglavlja 4: kalkulator je u koraku,
-rezultat ostaje na uslovu, glasanje je zaključano dok uslovi nisu odgovoreni, i
-izuzet uslov ide na pisanu odluku.
+Po **trećem pragu**, onom koji je vlasnik tražio, glavni tok predmeta je
+**zatvorio svih osam** obećanja poglavlja 4 (13.09. navečer i 14.09. ujutro).
 
 Brojevi u tabeli iznad se zbog toga nisu pomjerili, i to je namjerno: Dio B
 nabraja poglavlje 4 kao jedan red koji upućuje na Dio A, pa se napredak unutar
 njega tamo i vidi. Dizati broj u zbiru zbog toga bilo bi tačno ono protiv čega
 je ovaj popis napravljen.
 
-Ostaju četiri: jedan korak otvoren u isto vrijeme, brojke sa stranicom izvora,
-pitanje banci iz koraka, i sat koji staje dok banka odgovara.
+Ono što ostaje nije poglavlje 4 nego okvir oko njega: stranica predmeta ima
+dvanaest odjeljaka, koraci unutar nje vode, a sve ostalo stoji jedno ispod
+drugog. To je sljedeći posao.
 
 ## Osam stvari koje su radile a nijedan ekran ih nije zvao
 

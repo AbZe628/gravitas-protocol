@@ -118,12 +118,71 @@ disabling the gate and watching four of them fail.
 **A set-aside condition already travelled onto the written ruling** — verified
 in `services/fatwa.ts`, not built.
 
-Four left, and they are the next session's work: opening one step at a time
-rather than all six at once; figures carrying the page they were read from
-(`services/extraction.ts` knows this and is wired to nothing, and it needs a
-model key); a step the document cannot answer becoming a question to the bank
-(`TellingEvent` has no kind for it); and the case clock pausing while the bank
-answers (no pause mechanism exists).
+### Step four finished, 14 September, early hours
+
+All eight promises of handbook section 4 are now met. The four added after the
+first pass:
+
+**One step at a time.** The step being worked on is open and the rest are
+lines carrying their number, their answer and the requirement, one press away.
+`firstUnanswered` is worked out fresh each render from `answeredBy.length ===
+0`, which is the same measure the vote gate uses — two places disagreeing
+about what an answered step is would mean a member seeing no work left and a
+chair being refused the vote. **A contested step is never folded**, whichever
+step the work is on: a test caught that by opening a contested condition and
+not being able to see the readings.
+
+**A question to the desk, from the step.** `services/asking.ts`,
+`POST /matters/:id/asked` and `/asked/:questionId/answer`. The draft opens with
+the requirement in it. Two questions on one condition at once are refused. Only
+the institution or its liaison may answer — a board member gets 403, checked
+live. The desk answers in `components/WhatTheBoardAsked.tsx`, mounted on
+`/i-owe` above the money.
+
+**The clock separates the wait.** `hoursWithTheInstitution` in `asking.ts`,
+used by `waitOn`. `Wait` gained `withTheInstitution`, `boardHours`,
+`boardDays`, `askedAndUnanswered`. Elapsed stays elapsed and the bank's share
+is reported beside it: a clock that quietly shrank would reward asking and be
+a figure a bank could not audit. Overlapping questions count once, merged.
+Fourteen tests in `test/asking.test.ts`, proved by breaking the merge.
+
+**Figures with the page they came from was already built.** `ReadDocument` has
+been inside Screening, Purification, Zakat and Distribution all along: it lists
+the board's documents, asks the reading service for that calculation's fields,
+shows each candidate beside its sentence and page, fills only on confirm, and
+writes the document, page, quote and confirming member into the calculation's
+source. **I wrote a second one before noticing, and took it out again.** The
+comment in `components/TheCalculator.tsx` says where the real one lives so
+nobody writes a third.
+
+### What is actually left
+
+Not section 4. The **frame** around the steps: `MatterPack` is still twelve
+parts stacked, and the steps inside part 05 lead while everything around them
+does not. That is the next piece of work and it is a design question, not a
+missing feature.
+
+Then, from `docs/POPIS.md`: settings for a member (name, title, photograph,
+email with confirmation, telephone, notifications, signature — all NE), the
+instrument dropdown for the bank's desks, passkey signing, the per-holding and
+per-ruling web2/web3 marker, and the handbook rewrite. Email and the registry
+write stay VANI; password reset stays ZID until the owner decides about the
+auth boundary.
+
+### Three faults this session, all found by running it
+
+`revert` was missing from the breach-behaviour list, so two of three rulings
+could not say what happens if they fail. The implementation editor went onto
+`MatterDetail`, which nothing links to. And the second document reader above.
+None of the three could have been caught by a test that was already written.
+
+### Two i18n collisions, both mine
+
+New `ask.*` keys collided with the Ask-the-board screen, and the rename I
+reached for took three of that screen's keys with it before I noticed. Then
+`read.*` collided with the contract reader. Both fixed; the new namespaces are
+`toDesk.*` and, for the removed reader, nothing. **Grep the dictionary for a
+prefix before adding one.**
 
 ### How to run it
 
@@ -131,10 +190,36 @@ The demo server is on **4102** (4000 is the owner's own instance, never touch
 it). It serves `client/dist`, which nothing rebuilds — run `npx vite build`
 in `client/` after editing or the browser shows the old bundle.
 
-Headless Edge with CDP on **9333**; the driver is
-`scratchpad/cdp.mjs`, and `scratchpad/step2.mjs` walks the converted routes
-and measures them. Basic auth `member-a` / `t9WPZnLlOYawo4xaF8NX` is carried
-by `Network.setExtraHTTPHeaders`.
+**Kill the old server before starting a new one.** Twice this session the new
+process died on `EADDRINUSE` while the old one kept serving, and both times I
+spent a while testing code that was not running. `kill %1` does not reach a
+process from an earlier Bash call. This does:
+
+```
+powershell -NoProfile -Command "Get-NetTCPConnection -LocalPort 4102 -State Listen -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id \$_.OwningProcess -Force }"
+```
+
+Then, from `server/`, with `MAJLIS_MEMBERS` set from the scratchpad's
+`members.env` (newlines turned into `;`):
+
+```
+PORT=4102 npx tsx src/index.ts
+```
+
+Credentials are in `scratchpad/creds.txt` — throwaways, generated locally.
+`member-a` is signatory and chair; `desk-treasury` is the institution.
+Always check the log for `listening on :4102` before believing a health check.
+
+Headless Edge with CDP on **9333**; the driver is `scratchpad/cdp.mjs`.
+`step2.mjs`, `step3.mjs`, `six.mjs`, `askflow.mjs` and `onestep.mjs` walk and
+measure. Basic auth is carried by `Network.setExtraHTTPHeaders`.
+
+**Three traps in those probe scripts**, each of which cost time:
+`innerText` returns text as the CSS transforms it, so an uppercase heading
+will not match a lowercase needle — compare case-insensitively. A quoted
+heredoc collapses `\s` and `\d` inside a page-side regex, so avoid
+backslash classes in `p.ev`. And `/tmp` in Node on this machine means
+`C:\tmp`, which does not exist.
 
 ### Standing instructions from the owner
 
