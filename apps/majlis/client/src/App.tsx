@@ -15,6 +15,8 @@ import AssetDetail from './pages/AssetDetail.js';
 import Calculations from './pages/Calculations.js';
 import Figure from './pages/Figure.js';
 import Library from './pages/Library.js';
+import StructureDetail from './pages/StructureDetail.js';
+import RuleDetail from './pages/RuleDetail.js';
 import CheckAContract from './pages/CheckAContract.js';
 import BindsMe from './pages/BindsMe.js';
 import IOwe from './pages/IOwe.js';
@@ -25,6 +27,7 @@ import Settings from './pages/Settings.js';
 import Incidents from './pages/Incidents.js';
 import IncidentDetail from './pages/IncidentDetail.js';
 import Briefings from './pages/Briefings.js';
+import BriefingDetail from './pages/BriefingDetail.js';
 import Assistant from './pages/Assistant.js';
 import Record from './pages/Record.js';
 import Search from './pages/Search.js';
@@ -107,7 +110,9 @@ export default function App() {
           <Route path="/register/:id" element={<AssetDetail />} />
           <Route path="/rules" element={<WhatStands />} />
           <Route path="/classic/rules" element={<Rules />} />
+          <Route path="/rules/:id" element={<RuleDetail />} />
           <Route path="/library" element={<Library />} />
+          <Route path="/library/:id" element={<StructureDetail />} />
           {/*
             Reading a draft against the conditions, with no matter opened.
             It lived inside a matter only, so a scholar had to decide to
@@ -150,6 +155,7 @@ export default function App() {
           <Route path="/incidents" element={<Incidents />} />
           <Route path="/incidents/:id" element={<IncidentDetail />} />
           <Route path="/briefings" element={<Briefings />} />
+          <Route path="/briefings/:id" element={<BriefingDetail />} />
           <Route path="/assistant" element={<Assistant />} />
           <Route path="/search" element={<Search />} />
           {/*

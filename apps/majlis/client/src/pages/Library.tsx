@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { api, oversight, type HeldStructure, type Library as LibraryData, type MatterSummary } from '../lib/api.js';
+import { oversight, type HeldStructure, type Library as LibraryData } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
-import { Division, PageHead, Nothing } from '../components/page.js';
-import { mayVote, useIdentity } from '../lib/identity.js';
+import { Division, Nothing } from '../components/page.js';
+import { ListPage, Row, Rows } from '../components/shapes.js';
 import { ErrorText, Loading } from '../components/ui.js';
-import { Card, State, type Tone } from '../components/kit.js';
+import { State, type Tone } from '../components/kit.js';
 import { useStillThere } from '../lib/stillThere.js';
 
 /**
@@ -15,32 +14,25 @@ import { useStillThere } from '../lib/stillThere.js';
  * with one, its conditions are somebody else's reading — offered so a scholar
  * stops composing a question from an empty box, and binding on nobody.
  *
- * This is where that changes, and the page is arranged around the state most
- * shapes are in on the day a board starts: **untouched**. Those come first,
- * because the useful question here is not "what have we adopted" but "what
- * have we never looked at" — the same reason the register puts the unexamined
- * holdings at the top.
+ * The page is arranged around the state most shapes are in on the day a board
+ * starts: **untouched**. Those come first, because the useful question here is
+ * not "what have we adopted" but "what have we never looked at" — the same
+ * reason the register puts the unexamined holdings at the top.
  *
  * ── what adopting is, and is not ──────────────────────────────────────────
  *
  * It is not approving a product. It is the board saying: when we judge a
  * murabaha, these are the conditions we judge it against. A board may amend
- * them, or rule against using the shape at all, and either way says why.
+ * them, or rule against using the shape at all, and either way says why. That
+ * happens on the shape's own page, under a decision of this board.
  *
- * ── and it happens under a decision ───────────────────────────────────────
+ * ── this screen is a list and nothing else ────────────────────────────────
  *
- * Every adoption names a matter of this board that carried and is in force.
- * The page will not offer to adopt without one, because a form that let a
- * signatory pick a shape and press a button would make the library binding by
- * administration rather than by decision — and the timelock, which exists so a
- * signatory can object before a ruling takes effect, would be skipped.
- *
- * ── the counts stand beside the list, not above it ────────────────────────
- *
- * They were a line of three figures in the running text, which is where a
- * number goes to be skipped. On the work area they are a column of their own,
- * and the one that matters — how much of the library nobody has looked at — is
- * the size of a figure rather than of a sentence.
+ * It used to print all nineteen shapes in full, each with its conditions, its
+ * history and its adoption form, so a member looking for one scrolled past
+ * eighteen. The counts stood in a sidebar as a forty-point figure, which made
+ * this a third page shape — neither a list nor a record. They are now one line
+ * beside the heading, where every other count in this application goes.
  */
 
 /*
@@ -57,291 +49,15 @@ function toneFor(held: HeldStructure): Tone {
 /** Untouched first: it is the state most shapes are in and the one worth acting on. */
 const ORDER: HeldStructure['source'][] = ['draft', 'amended', 'adopted'];
 
-function Shape({
-  held,
-  boardId,
-  canRule,
-  carried,
-  onAdopted,
-}: {
-  held: HeldStructure;
-  /** From the library response. A shape nobody has touched carries no adoption
-   *  to read it off, and an empty one would be refused as a board that does
-   *  not exist. */
-  boardId: string;
-  canRule: boolean;
-  carried: MatterSummary[];
-  onAdopted: () => void;
-}) {
-  const { t } = useI18n();
-  const [open, setOpen] = useState(false);
-  const [matterId, setMatterId] = useState('');
-  const [reason, setReason] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
-
-  async function take(standing: 'adopted' | 'declined') {
-    setBusy(true);
-    setError(null);
-    try {
-      await oversight.adopt({
-        structureId: held.structure.id,
-        boardId,
-        standing,
-        matterId,
-        amendments: reason.trim() ? [reason.trim()] : undefined,
-        supersedes: held.adoption?.id ?? null,
-      });
-      setOpen(false);
-      onAdopted();
-    } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  return (
-    <Card tone="quiet">
-      {/*
-        On a phone the standing sits above the name rather than beside it. A
-        pill holding 150px of a 375px row leaves a shape called "Murabaha,
-        including commodity murabaha and tawarruq" breaking over five lines.
-      */}
-      <div className="flex flex-col gap-2.5 sm:flex-row sm:items-start sm:justify-between sm:gap-5">
-        <div className="min-w-0 sm:order-first">
-          <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1.5">
-            <span className="font-display text-[20px] leading-snug tracking-[-0.014em] text-paper">
-              {held.structure.name}
-            </span>
-            <span className="text-[11px] uppercase tracking-[0.1em] text-muted">
-              {t(`family.${held.structure.family}`)}
-            </span>
-          </div>
-          <p className="mt-2 text-[12.5px] text-muted">
-            {held.adoption?.basis ?? t('adopt.noBasis')}
-            <span className="mx-2 opacity-40">·</span>
-            <span className="tabular-nums">{held.structure.conditions.length}</span>{' '}
-            {t('adopt.conditions')}
-          </p>
-        </div>
-        <div className="order-first shrink-0 sm:order-none">
-          <State tone={toneFor(held)}>
-            {t(held.declined ? 'adopt.declined' : `adopt.${held.source}`)}
-          </State>
-        </div>
-      </div>
-
-      {/*
-        Where this shape has actually been used, and what came of it.
-
-        The screen listed nineteen descriptions and offered nothing to do
-        with any of them. A draft is assembled from a ruling — which is
-        right, a contract drafted from nothing is an agreement the board
-        never made — so the way forward is not a draft button but the
-        matters that used the shape, and a way to raise one where none has.
-      */}
-      {/*
-        Only where there is something to show.
-
-        This block used to render on every one of the nineteen shapes, and on a
-        board that has judged nothing yet that is the same paragraph — "no
-        matter has been judged against this shape, so there is no draft to
-        take" — repeated nineteen times down one page. Nineteen restatements of
-        *there is nothing here* is not information; it is the page telling a
-        reader nineteen times that it has nothing for them. It is said once,
-        above the list, where it is true of the whole library.
-      */}
-      {(held.usedBy ?? []).length > 0 && (
-        <div className="mt-4 border-t border-line pt-3.5">
-          <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.14em] text-muted">
-            {t('adopt.usedIn')}
-          </div>
-          <ul className="space-y-1.5">
-            {(held.usedBy ?? []).map((u) => (
-              <li key={u.matterId} className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                <Link to={`/matters/${u.matterId}`} className="text-[13px] text-lapis hover:underline">
-                  {u.title}
-                </Link>
-                <span className="text-[11.5px] text-muted">{t(`matter.status.${u.status}`)}</span>
-                {/* Offered only where the route will honour it. */}
-                {u.hasDraft && (
-                  <a
-                    href={oversight.hrefs.contract(u.matterId)}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-[12.5px] font-semibold text-lapis underline decoration-line underline-offset-4"
-                  >
-                    {t('adopt.theDraft')}
-                  </a>
-                )}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {/*
-        The reason a scholar is looking at a shape at all.
-
-        Almost always it is "I have a draft of this kind and I want to know
-        what it answers". There was no way from here to the screen that does
-        that, so the two lived side by side in the same door and never met.
-      */}
-      <Link
-        to={`/check?shape=${encodeURIComponent(held.structure.id)}`}
-        className="mt-4 inline-block text-[12.5px] font-semibold text-lapis underline decoration-line underline-offset-4"
-      >
-        {t('adopt.checkADraft')}
-      </Link>
-
-      {/*
-        What the board said, where it said something. The amendments are the
-        part a later reader is looking for: the difference between the board's
-        version and the shipped one — so they are set in the serif behind a
-        gold rule, which is what the board's own words look like everywhere
-        else in this application.
-      */}
-      {held.adoption && held.adoption.amendments.length > 0 && (
-        <ul className="mt-4 space-y-2 border-s-2 border-gold/50 ps-4">
-          {held.adoption.amendments.map((a, i) => (
-            <li key={i} className="font-display text-[15px] leading-[1.55] text-paper">
-              {a}
-            </li>
-          ))}
-        </ul>
-      )}
-
-      {held.adoption && (
-        <p className="mt-3 text-[12px] text-muted">
-          {t('adopt.under')}{' '}
-          <Link
-            to={`/matters/${held.adoption.matterId}`}
-            className="font-mono underline underline-offset-2 hover:text-paper"
-          >
-            {held.adoption.matterId}
-          </Link>
-          <span className="mx-1.5 opacity-40">·</span>
-          {held.adoption.decidedBy}
-        </p>
-      )}
-
-      {canRule && !open && (
-        <button
-          type="button"
-          onClick={() => setOpen(true)}
-          className="mt-4 rounded-xl bg-raised px-3.5 py-2 text-[12.5px] text-sand shadow-ring transition-colors hover:text-paper"
-        >
-          {held.source === 'draft' && !held.declined ? t('adopt.take') : t('adopt.reconsider')}
-        </button>
-      )}
-
-      {canRule && open && (
-        <div className="mt-4 rounded-card bg-ink/70 px-4 py-4 shadow-ring">
-          {/*
-            No matter, no adoption. The list holds only decisions of this board
-            that carried and are in force — one still inside its timelock is a
-            decision a signatory may yet object to.
-          */}
-          {carried.length === 0 ? (
-            <p className="text-[12.5px] leading-relaxed text-muted">{t('adopt.noDecision')}</p>
-          ) : (
-            <>
-              <label className="mb-3 block">
-                <span className="mb-1.5 block text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
-                  {t('adopt.decidedIn')}
-                </span>
-                <select
-                  value={matterId}
-                  onChange={(e) => setMatterId(e.target.value)}
-                  className="w-full rounded-xl bg-raised px-3 py-2.5 text-[13px] shadow-ring"
-                >
-                  <option value="">{t('adopt.pickDecision')}</option>
-                  {carried.map((m) => (
-                    <option key={m.id} value={m.id}>
-                      {m.title}
-                    </option>
-                  ))}
-                </select>
-              </label>
-
-              <label className="mb-3 block">
-                <span className="mb-1.5 block text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
-                  {t('adopt.reason')}
-                </span>
-                <textarea
-                  value={reason}
-                  onChange={(e) => setReason(e.target.value)}
-                  rows={2}
-                  placeholder={t('adopt.reasonHint')}
-                  className="w-full rounded-xl bg-raised px-3 py-2.5 text-[13px] shadow-ring"
-                />
-              </label>
-
-              {error && (
-                <p className="mb-3 rounded-xl bg-[#FCF0EE] px-3.5 py-2.5 text-[12.5px] leading-relaxed text-breach shadow-[0_0_0_0.5px_rgba(154,56,48,0.18)]">
-                  {error}
-                </p>
-              )}
-
-              <div className="flex flex-wrap items-center gap-2">
-                <button
-                  type="button"
-                  disabled={busy || !matterId}
-                  onClick={() => take('adopted')}
-                  className="rounded-xl bg-lapis px-4 py-2 text-[12.5px] font-semibold text-white shadow-act transition-all hover:bg-lapissoft disabled:opacity-40"
-                >
-                  {t('adopt.confirm')}
-                </button>
-                <button
-                  type="button"
-                  disabled={busy || !matterId}
-                  onClick={() => take('declined')}
-                  className="rounded-xl bg-raised px-4 py-2 text-[12.5px] font-medium text-breach shadow-[0_0_0_0.5px_rgba(154,56,48,0.25)] disabled:opacity-40"
-                >
-                  {t('adopt.decline')}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setOpen(false);
-                    setError(null);
-                  }}
-                  className="rounded-xl px-4 py-2 text-[12.5px] text-muted transition-colors hover:text-paper"
-                >
-                  {t('common.cancel')}
-                </button>
-              </div>
-
-              {/*
-                Amending a condition's text is not offered here. Rewriting a
-                condition in a textarea on a card is the wrong shape for the
-                act: it is drafting, and it belongs beside the condition it
-                changes. Adopting, declining and reconsidering are what this
-                page is for.
-              */}
-              <p className="mt-3 text-[11.5px] leading-relaxed text-muted">
-                {t('adopt.amendElsewhere')}
-              </p>
-            </>
-          )}
-        </div>
-      )}
-    </Card>
-  );
-}
-
 export default function Library() {
   const { t } = useI18n();
-  const { identity } = useIdentity();
   const [data, setData] = useState<LibraryData | null>(null);
-  const [carried, setCarried] = useState<MatterSummary[]>([]);
   const [failed, setFailed] = useState(false);
   /** A failed refresh keeps a screen that is already there. */
   const there = useStillThere();
 
-  const load = () =>
-    oversight
+  useEffect(() => {
+    void oversight
       .library()
       .then((d) => {
         if (!d || !Array.isArray(d.library)) {
@@ -352,31 +68,37 @@ export default function Library() {
         setData(d);
       })
       .catch(() => there.lost(setFailed));
-
-  useEffect(() => {
-    void load();
-    // Only decisions that carried and are in force. Offering one still in its
-    // timelock would offer a decision that can still be objected to.
-    api
-      .matters()
-      .then((all) => setCarried(all.filter((m) => m.status === 'in_force')))
-      .catch(() => setCarried([]));
   }, []);
 
   if (failed) return <ErrorText />;
   if (!data) return <Loading />;
 
-  const canRule = mayVote(identity?.role);
   const untouched = data.total - data.adopted - data.declined;
 
-  return (
-    <div>
-      <PageHead
-        phase="inforce"
-        title={t('adopt.title')}
-        says={t('adopt.intro')}
-      />
+  const groups = ORDER.map((source) => ({
+    source,
+    items: data.library.filter((h) => (h.declined ? source === 'draft' : h.source === source)),
+  })).filter((g) => g.items.length > 0);
 
+  return (
+    <ListPage
+      phase="inforce"
+      title={t('adopt.title')}
+      says={t('adopt.intro')}
+      live={
+        <span className="text-[13px] text-muted">
+          <span className="font-mono tabular-nums text-paper">{untouched}</span>{' '}
+          <span>{t('adopt.untouched')}</span>
+          <span className="mx-2 opacity-40">·</span>
+          <span className="font-mono tabular-nums text-paper">{data.adopted}</span>{' '}
+          <span>{t('adopt.taken')}</span>
+          <span className="mx-2 opacity-40">·</span>
+          <span className="font-mono tabular-nums text-paper">{data.declined}</span>{' '}
+          <span>{t('adopt.declinedCount')}</span>
+        </span>
+      }
+      limits={data.notes.draft}
+    >
       {/*
         Said once, here, where it is true of the whole library — instead of
         nineteen times, once inside every shape, which is what it was.
@@ -387,56 +109,48 @@ export default function Library() {
         </div>
       )}
 
-      <Division heading={t('adopt.shapes')}>
-      <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
-        <ul className="min-w-0 flex-1 space-y-2">
-          {ORDER.flatMap((source) =>
-            data.library
-              .filter((h) => (h.declined ? source === 'draft' : h.source === source))
-              .map((h) => (
-                <li key={h.structure.id}>
-                  <Shape
-                    held={h}
-                    boardId={data.boardId}
-                    canRule={canRule}
-                    carried={carried}
-                    onAdopted={() => void load()}
-                  />
-                </li>
-              )),
-          )}
-        </ul>
-
-        <aside className="w-full shrink-0 space-y-4 lg:w-[306px]">
-          {/*
-            The count that matters is how much of the library nobody has looked
-            at, for the same reason the register leads with the unexamined
-            holdings. The other two are context and are set as context.
-          */}
-          <div className="rounded-sheet bg-raised/60 px-6 py-5 shadow-ring">
-            <div className="font-display text-[40px] leading-[0.92] tabular-nums tracking-[-0.028em] text-paper">
-              {untouched}
-            </div>
-            <p className="mt-3.5 text-[13px] leading-[1.6] text-sand">{t('adopt.untouched')}</p>
-
-            <div className="mt-5 flex gap-6 border-t border-line pt-4 text-[12.5px]">
-              <span>
-                <span className="tabular-nums text-paper">{data.adopted}</span>{' '}
-                <span className="text-muted">{t('adopt.taken')}</span>
-              </span>
-              <span>
-                <span className="tabular-nums text-paper">{data.declined}</span>{' '}
-                <span className="text-muted">{t('adopt.declinedCount')}</span>
-              </span>
-            </div>
-          </div>
-
-          <p className="rounded-sheet bg-raised/60 px-6 py-5 text-[12.5px] leading-[1.6] text-muted shadow-ring">
-            {data.notes.draft}
-          </p>
-        </aside>
-      </div>
-      </Division>
-    </div>
+      {groups.map((g) => (
+        <Division
+          key={g.source}
+          heading={`${t(g.source === 'draft' ? 'adopt.draft' : `adopt.${g.source}`)} · ${g.items.length}`}
+        >
+          <Rows>
+            {g.items.map((h) => (
+              <Row
+                key={h.structure.id}
+                to={`/library/${h.structure.id}`}
+                phase="inforce"
+                kind={t(`family.${h.structure.family}`)}
+                title={h.structure.name}
+                /*
+                  The basis only where the board has stated one. Seventeen
+                  untouched shapes each carrying "this board has not said what
+                  these rest on" is the page telling a reader seventeen times
+                  that it has nothing for them — which is what the count at the
+                  top already said once.
+                */
+                note={
+                  <>
+                    {h.adoption?.basis ? (
+                      <>
+                        {h.adoption.basis}
+                        <span className="mx-2 opacity-40">·</span>
+                      </>
+                    ) : null}
+                    <span className="tabular-nums">{h.structure.conditions.length}</span>{' '}
+                    {t('adopt.conditions')}
+                  </>
+                }
+                standing={
+                  <State tone={toneFor(h)}>
+                    {t(h.declined ? 'adopt.declined' : `adopt.${h.source}`)}
+                  </State>
+                }
+              />
+            ))}
+          </Rows>
+        </Division>
+      ))}
+    </ListPage>
   );
 }

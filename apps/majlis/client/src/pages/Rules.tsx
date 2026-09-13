@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { api, oversight, type ReviewStatus, type Rule } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
-import ReconsiderThis from '../components/ReconsiderThis.js';
-import { mayDeliberate, useIdentity } from '../lib/identity.js';
-import { Card, DateText, ErrorText, Loading, Sources, Tag } from '../components/ui.js';
 import { DocumentLink } from '../components/Documents.js';
+import { Nothing } from '../components/page.js';
+import { ListPage, Row, Rows } from '../components/shapes.js';
+import { DateText, ErrorText, Loading } from '../components/ui.js';
+import { State, type Tone } from '../components/kit.js';
 
 /**
  * What is in force, and when each of it comes back to the board.
@@ -18,66 +19,34 @@ import { DocumentLink } from '../components/Documents.js';
  * late, because it is the same failure further along: a ruling quietly
  * governing a structure that has changed. The difference is only that nobody
  * has noticed yet.
+ *
+ * ── the ruling itself is a page now ───────────────────────────────────────
+ *
+ * This screen used to print every ruling in full — statement, figures, hash
+ * and sources — so the most consequential record in the application existed
+ * only as a card in a column and could not be linked to. Each one has its own
+ * page; what is left here is the list, and the one fact a member scans for,
+ * which is whether it is due back.
  */
 
-function ReviewLine({
-  review,
-  rule,
-  canOpen,
-}: {
-  review: ReviewStatus | undefined;
-  rule: Rule;
-  canOpen: boolean;
-}) {
-  const { t } = useI18n();
-  if (!review) return null;
+/** Where a ruling stands with its review, and the one colour that is entitled to. */
+function reviewTone(review: ReviewStatus | undefined): Tone {
+  if (!review) return 'plain';
+  if (review.overdue || review.state === 'unscheduled') return 'breach';
+  if (review.state === 'due') return 'attention';
+  return 'settled';
+}
 
-  if (review.state === 'unscheduled') {
-    return (
-      <div className="mt-3 border-t border-line pt-2.5 text-[12px] leading-relaxed">
-        <Tag tone="warn">{t('review.unscheduled')}</Tag>
-        <p className="mt-1.5 text-muted">{t('review.unscheduledNote')}</p>
-        <ReconsiderThis rule={rule} canOpen={canOpen} />
-      </div>
-    );
-  }
-
-  if (review.state === 'not_applicable') return null;
-
-  const days = Math.round(Math.abs(review.daysUntilDue ?? 0));
-  return (
-    <div className="mt-3 flex flex-wrap items-baseline gap-x-2 gap-y-1 border-t border-line pt-2.5 text-[12px]">
-      {review.overdue ? (
-        <>
-          <Tag tone="warn">{t('review.overdue')}</Tag>
-          <span className="tabular-nums text-warn">
-            {days} {t('attention.days')}
-          </span>
-        </>
-      ) : review.state === 'due' ? (
-        <Tag tone="gold">{t('review.due')}</Tag>
-      ) : (
-        <span className="text-muted">
-          {t('review.next')} <DateText iso={review.dueAt} />
-        </span>
-      )}
-      {/*
-        The one act, where the date has actually passed. A rule not yet due
-        does not need looking at, and offering it would invite a board to
-        reopen everything it has ever decided.
-      */}
-      {(review.overdue || review.state === 'due') && (
-        <div className="w-full">
-          <ReconsiderThis rule={rule} canOpen={canOpen} />
-        </div>
-      )}
-    </div>
-  );
+function reviewWord(review: ReviewStatus | undefined, t: (k: string) => string): string {
+  if (!review) return t('rule.inForce');
+  if (review.state === 'unscheduled') return t('review.unscheduled');
+  if (review.overdue) return t('review.overdue');
+  if (review.state === 'due') return t('review.due');
+  return t('rule.inForce');
 }
 
 export default function Rules({ embedded = false }: { embedded?: boolean }) {
   const { t } = useI18n();
-  const { identity } = useIdentity();
   const [rules, setRules] = useState<Rule[] | null>(null);
   const [reviews, setReviews] = useState<Map<string, ReviewStatus>>(new Map());
   const [dueCount, setDueCount] = useState(0);
@@ -102,76 +71,87 @@ export default function Rules({ embedded = false }: { embedded?: boolean }) {
   if (failed) return <ErrorText />;
   if (!rules) return <Loading />;
 
-  return (
-    <div>
-      {!embedded && (<h1 className="mb-1 font-display font-normal leading-[1.12] tracking-[-0.024em] text-[30px] sm:text-[34px]">{t('nav.rules')}</h1>)}
+  const list =
+    rules.length === 0 ? (
+      <Nothing>{t('rule.none')}</Nothing>
+    ) : (
+      <Rows>
+        {rules.map((r) => {
+          const review = reviews.get(r.id);
+          return (
+            <Row
+              key={r.id}
+              to={`/rules/${r.id}`}
+              phase="inforce"
+              kind={`${t('rule.version')} ${r.version}`}
+              title={r.title}
+              note={
+                <>
+                  <span className="line-clamp-2">{r.statement}</span>
+                  {r.inForceFrom && (
+                    <span className="mt-0.5 block text-[11.5px]">
+                      {t('rule.inForceFrom')} <DateText iso={r.inForceFrom} />
+                    </span>
+                  )}
+                </>
+              }
+              standing={<State tone={reviewTone(review)}>{reviewWord(review, t)}</State>}
+            />
+          );
+        })}
+      </Rows>
+    );
 
-      <div className="mb-5 flex flex-wrap items-baseline gap-x-4 gap-y-1 text-[13px] text-muted">
-        <span className="tabular-nums">
-          {rules.length} {t('rule.inForce')}
-        </span>
-        {dueCount > 0 && (
-          <span className="text-goldsoft tabular-nums">
-            {dueCount} {t('review.dueCount')}
-          </span>
-        )}
+  const live = (
+    <span className="text-[13px] text-muted">
+      <span className="font-mono tabular-nums text-paper">{rules.length}</span>{' '}
+      <span>{t('rule.inForce')}</span>
+      {dueCount > 0 && (
+        <>
+          <span className="mx-2 opacity-40">·</span>
+          <span className="font-mono tabular-nums text-goldsoft">{dueCount}</span>{' '}
+          <span className="text-goldsoft">{t('review.dueCount')}</span>
+        </>
+      )}
+    </span>
+  );
+
+  /*
+   * Inside "What stands" this is one of two views under a heading that is
+   * already set, so it contributes the list and nothing above it. On its own
+   * path it is a list screen like every other.
+   */
+  if (embedded) {
+    return (
+      <div>
+        <div className="mb-5 flex flex-wrap items-baseline justify-between gap-3">
+          {live}
+          <DocumentLink
+            href={oversight.hrefs.manual()}
+            label={t('doc.manual')}
+            note={t('doc.manualNote')}
+          />
+        </div>
+        {list}
       </div>
+    );
+  }
 
-      <div className="mb-7">
+  return (
+    <ListPage
+      phase="inforce"
+      title={t('nav.rules')}
+      says={t('rule.lead')}
+      live={live}
+      act={
         <DocumentLink
           href={oversight.hrefs.manual()}
           label={t('doc.manual')}
           note={t('doc.manualNote')}
         />
-      </div>
-
-      <ul className="space-y-4">
-        {rules.map((r) => (
-          <li key={r.id}>
-            <Card>
-              <div className="mb-2 flex flex-wrap items-center gap-2">
-                <Tag tone="gold">
-                  {t('rule.version')} {r.version}
-                </Tag>
-                {r.parameterHashVerified ? (
-                  <Tag tone="ok">{t('rule.hashOk')}</Tag>
-                ) : (
-                  <Tag tone="warn">{t('rule.hashBad')}</Tag>
-                )}
-              </div>
-              <h2 className="text-[15px] font-medium leading-snug">{r.title}</h2>
-              <div className="mt-1 text-[12px] text-muted">
-                {t('rule.inForceFrom')} <DateText iso={r.inForceFrom} />
-              </div>
-
-              <div className="mt-3 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
-                {t('rule.statement')}
-              </div>
-              <p className="mt-1 text-[14px] text-sand">{r.statement}</p>
-
-              <dl className="mt-4 space-y-2.5 border-t border-line pt-3">
-                {r.parameters.map((p) => (
-                  <div key={p.key}>
-                    <dt className="font-mono text-[12px] text-lapis break-all">
-                      {p.key} = {p.value}
-                      {p.unit ? <span className="text-muted"> {p.unit}</span> : null}
-                    </dt>
-                    <dd className="mt-0.5 text-[13px] text-sand">{p.meaning}</dd>
-                  </div>
-                ))}
-              </dl>
-
-              <ReviewLine review={reviews.get(r.id)} rule={r} canOpen={mayDeliberate(identity?.role)} />
-
-              <div className="mt-3 font-mono text-[10px] break-all text-muted">
-                {r.parameterHash}
-              </div>
-
-              <Sources sources={r.sources} />
-            </Card>
-          </li>
-        ))}
-      </ul>
-    </div>
+      }
+    >
+      {list}
+    </ListPage>
   );
 }

@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { api, oversight, type AssistantExchange, type Health, type MatterSummary } from '../lib/api.js';
-import { Link } from 'react-router-dom';
 import { useI18n } from '../lib/i18n.js';
 import { Card, DateText, ErrorText, Loading, Tag } from '../components/ui.js';
 import { DocumentLink, YearPicker } from '../components/Documents.js';
+import { Row, Rows } from '../components/shapes.js';
+import { State } from '../components/kit.js';
 
 /** Everything this board has settled, newest first. */
 const SETTLED = ['in_force', 'rejected', 'lapsed', 'withdrawn'];
@@ -28,37 +29,28 @@ function Decided({ matters }: { matters: MatterSummary[] | null }) {
           {t('decided.none')}
         </p>
       ) : (
-        <ul className="space-y-2">
+        <Rows>
           {settled.map((m) => (
-            <li key={m.id}>
-              <Link
-                to={`/matters/${m.id}`}
-                className="block rounded-card bg-raised/75 px-5 py-4 shadow-ring transition-shadow hover:shadow-card"
-              >
-                <div className="mb-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-1">
-                  {/*
-                    The two facts a reader scans for, before the title: what
-                    became of it, and which way it went. A list of titles with
-                    the outcome buried in the sentence is a list nobody can
-                    read at a glance.
-                  */}
-                  <Tag tone={m.status === 'in_force' ? 'ok' : 'neutral'}>
-                    {t(`matter.status.${m.status}`)}
-                  </Tag>
-                  <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-muted">
-                    {t(`matter.direction.${m.direction}`)}
-                  </span>
-                  <span className="font-mono text-[11.5px] text-muted">
-                    {m.openedAt.slice(0, 10)}
-                  </span>
-                </div>
-                <div className="max-w-[52ch] font-display text-[16.5px] leading-snug text-paper">
-                  {m.title}
-                </div>
-              </Link>
-            </li>
+            /*
+              The two facts a reader scans for, before the title: which way it
+              went, and what became of it. A list of titles with the outcome
+              buried in the sentence is a list nobody can read at a glance.
+            */
+            <Row
+              key={m.id}
+              to={`/matters/${m.id}`}
+              phase="inforce"
+              kind={t(`matter.direction.${m.direction}`)}
+              title={m.title}
+              note={<span className="font-mono text-[11.5px]">{m.openedAt.slice(0, 10)}</span>}
+              standing={
+                <State tone={m.status === 'in_force' ? 'settled' : 'plain'}>
+                  {t(`matter.status.${m.status}`)}
+                </State>
+              }
+            />
           ))}
-        </ul>
+        </Rows>
       )}
     </div>
   );

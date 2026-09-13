@@ -123,26 +123,42 @@ const PHASE_TONE: Record<string, string> = {
 /**
  * One row, everywhere.
  *
- * Three columns and no more: how long it has stood here, what it is, and the
- * act itself. An earlier version carried a fourth — a state pill — and it
- * said the same thing as the act twice over. *Voting* and *record your
- * position* are one fact, and the button is the better half of it.
+ * ── the two kinds of list, and why the row serves both ────────────────────
  *
- * Where the act is not this reader's to press, the column says **who holds
- * it** instead. The commonest way anything here stalls is that each side
- * believes it is with the other.
+ * The first version assumed every list was a list of things **waiting**, and
+ * put an age in the left column. That is right for a queue, for questions,
+ * for breaches and for undertakings, where how long something has stood
+ * there is the thing a reader scans for.
+ *
+ * It is wrong for the register and the contract library. A holding does not
+ * have an age anybody acts on; it has a **standing**. Forcing a number into
+ * that column would have meant either an invented figure or an empty box on
+ * a third of the screens, and either one is how a second row component gets
+ * written and the shapes start drifting apart.
+ *
+ * So the left column is an age where there is one and a mark where there is
+ * not, and everything else is shared.
+ *
+ * ── three columns, never four ─────────────────────────────────────────────
+ *
+ * An earlier version carried a state pill *and* an act, which said the same
+ * thing twice: *voting* and *record your position* are one fact, and the
+ * button is the better half of it. So the right-hand column is the act, or
+ * who is holding it, or the standing — one of the three and never two.
  */
 export function Row({
   to,
   kind,
   phase,
   title,
+  note,
   days,
   daysLabel,
   overdue,
   act,
   onAct,
   heldBy,
+  standing,
 }: {
   /** Where the title opens. Reading, not acting. */
   to: string;
@@ -150,14 +166,19 @@ export function Row({
   kind: string;
   phase: AnyPhase;
   title: string;
-  days: number;
-  daysLabel: string;
+  /** One quiet line under the title, where the record carries one. */
+  note?: ReactNode;
+  /** How long it has stood here. Absent on a list of things that are not waiting. */
+  days?: number;
+  daysLabel?: string;
   overdue?: boolean;
   /** The one act, on the row. One press does it. */
   act?: string;
   onAct?: () => void;
   /** Where there is no act for this reader: who is holding it. */
   heldBy?: string;
+  /** Where nothing is waiting on anybody: what standing this thing has. */
+  standing?: ReactNode;
 }) {
   return (
     <li
@@ -168,17 +189,26 @@ export function Row({
           : 'bg-raised shadow-ring')
       }
     >
-      <div className="w-[3.75rem] shrink-0 text-end">
-        <div
-          className={
-            'font-mono text-[17px] leading-none tabular-nums ' +
-            (overdue ? 'text-breach' : 'text-paper')
-          }
-        >
-          {days}
+      {days === undefined ? (
+        /* No age to show, so the column holds the stage's own colour and
+           nothing else. It keeps every row on the same left edge. */
+        <span
+          aria-hidden="true"
+          className={'h-[7px] w-[7px] shrink-0 rounded-full bg-current ' + (PHASE_TONE[phase] ?? 'text-muted')}
+        />
+      ) : (
+        <div className="w-[3.75rem] shrink-0 text-end">
+          <div
+            className={
+              'font-mono text-[17px] leading-none tabular-nums ' +
+              (overdue ? 'text-breach' : 'text-paper')
+            }
+          >
+            {days}
+          </div>
+          <div className="mt-1 text-[9px] uppercase tracking-[0.1em] text-muted">{daysLabel}</div>
         </div>
-        <div className="mt-1 text-[9px] uppercase tracking-[0.1em] text-muted">{daysLabel}</div>
-      </div>
+      )}
 
       <div className="min-w-0 flex-1">
         <div
@@ -195,6 +225,7 @@ export function Row({
         >
           {title}
         </Link>
+        {note && <div className="mt-1 text-[12.5px] leading-[1.5] text-muted">{note}</div>}
       </div>
 
       {act && onAct ? (
@@ -207,6 +238,8 @@ export function Row({
         </button>
       ) : heldBy ? (
         <span className="shrink-0 whitespace-nowrap text-[12.5px] text-muted">{heldBy}</span>
+      ) : standing ? (
+        <span className="shrink-0">{standing}</span>
       ) : null}
     </li>
   );

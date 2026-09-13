@@ -1,7 +1,8 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import Library from './pages/Library.js';
+import StructureDetail from './pages/StructureDetail.js';
 import { I18nProvider } from './lib/i18n.js';
 
 /**
@@ -11,6 +12,13 @@ import { I18nProvider } from './lib/i18n.js';
  * not offer to do it without one. A form that let a signatory pick a shape and
  * press a button would make the library binding by administration rather than
  * by decision, and skip the timelock a signatory objects inside.
+ *
+ * ── two screens, since the library became a list ──────────────────────────
+ *
+ * The adopting used to happen on the list, where all nineteen shapes were
+ * printed in full. It happens on the shape's own page now, so these tests
+ * render whichever of the two the behaviour they guard actually lives on.
+ * Nothing they assert changed; only where it is done.
  */
 
 const DRAFT_NOTE =
@@ -86,6 +94,18 @@ const show = () =>
     </I18nProvider>,
   );
 
+/** One shape's own page, which is where a board takes it or rules against it. */
+const showShape = (id = 'murabaha') =>
+  render(
+    <I18nProvider>
+      <MemoryRouter initialEntries={[`/library/${id}`]}>
+        <Routes>
+          <Route path="/library/:id" element={<StructureDetail />} />
+        </Routes>
+      </MemoryRouter>
+    </I18nProvider>,
+  );
+
 afterEach(() => {
   vi.unstubAllGlobals();
   matters = [];
@@ -141,7 +161,7 @@ describe('what the page leads with', () => {
         total: 1,
       }),
     );
-    show();
+    showShape();
 
     await waitFor(() => expect(screen.getByText('Taken with changes')).toBeInTheDocument());
     expect(screen.getByText(/warehouse receipt/)).toBeInTheDocument();
@@ -156,10 +176,10 @@ describe('it will not adopt without a decision', () => {
   it('says so instead of offering a button', async () => {
     matters = [];
     stub(library());
-    show();
+    showShape();
 
     await waitFor(() => screen.getAllByText('Shipped draft'));
-    fireEvent.click(screen.getAllByRole('button', { name: /Take this shape/ })[0]);
+    fireEvent.click(screen.getByRole('button', { name: /Take this shape/ }));
 
     await waitFor(() =>
       expect(screen.getByText(/No ruling of this board is in force/)).toBeInTheDocument(),
@@ -175,10 +195,10 @@ describe('it will not adopt without a decision', () => {
       { id: 'm-open', title: 'Still being argued', status: 'deliberation' },
     ];
     stub(library());
-    show();
+    showShape();
 
     await waitFor(() => screen.getAllByText('Shipped draft'));
-    fireEvent.click(screen.getAllByRole('button', { name: /Take this shape/ })[0]);
+    fireEvent.click(screen.getByRole('button', { name: /Take this shape/ }));
 
     await waitFor(() => expect(screen.getByText('A ruling in force')).toBeInTheDocument());
     expect(screen.queryByText('Still in its timelock')).toBeNull();
@@ -188,10 +208,10 @@ describe('it will not adopt without a decision', () => {
   it('will not send until a decision is chosen', async () => {
     matters = [{ id: 'm-live', title: 'A ruling in force', status: 'in_force' }];
     stub(library());
-    show();
+    showShape();
 
     await waitFor(() => screen.getAllByText('Shipped draft'));
-    fireEvent.click(screen.getAllByRole('button', { name: /Take this shape/ })[0]);
+    fireEvent.click(screen.getByRole('button', { name: /Take this shape/ }));
 
     await waitFor(() => screen.getByRole('button', { name: /Take it as ours/ }));
     expect(screen.getByRole('button', { name: /Take it as ours/ })).toBeDisabled();
@@ -203,9 +223,9 @@ describe('taking a shape, and ruling against one', () => {
   const openFirst = async () => {
     matters = [{ id: 'm-live', title: 'A ruling in force', status: 'in_force' }];
     stub(library());
-    show();
+    showShape();
     await waitFor(() => screen.getAllByText('Shipped draft'));
-    fireEvent.click(screen.getAllByRole('button', { name: /Take this shape/ })[0]);
+    fireEvent.click(screen.getByRole('button', { name: /Take this shape/ }));
     await waitFor(() => screen.getByRole('button', { name: /Take it as ours/ }));
     fireEvent.change(screen.getByRole('combobox'), { target: { value: 'm-live' } });
   };
@@ -262,10 +282,10 @@ describe('taking a shape, and ruling against one', () => {
         return json(library());
       }),
     );
-    show();
+    showShape();
 
     await waitFor(() => screen.getAllByText('Shipped draft'));
-    fireEvent.click(screen.getAllByRole('button', { name: /Take this shape/ })[0]);
+    fireEvent.click(screen.getByRole('button', { name: /Take this shape/ }));
     await waitFor(() => screen.getByRole('button', { name: /Rule against it/ }));
     fireEvent.change(screen.getByRole('combobox'), { target: { value: 'm-live' } });
     fireEvent.click(screen.getByRole('button', { name: /Rule against it/ }));
@@ -284,7 +304,7 @@ describe('who is offered the act', () => {
     identity = { scholarId: 'advisor-1', role: 'advisory' };
     matters = [{ id: 'm-live', title: 'A ruling in force', status: 'in_force' }];
     stub(library());
-    show();
+    showShape();
 
     await waitFor(() => screen.getAllByText('Shipped draft'));
     expect(screen.queryByRole('button', { name: /Take this shape/ })).toBeNull();

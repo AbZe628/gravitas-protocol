@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { oversight, type Cadence, type Calendar as CalendarData, type CalendarEntry } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
-import { PageHead } from '../components/page.js';
-import { DateText, ErrorText, Loading, Tag } from '../components/ui.js';
+import { Division, Gaps, Nothing } from '../components/page.js';
+import { ListPage, Row, Rows } from '../components/shapes.js';
+import { DateText, ErrorText, Loading } from '../components/ui.js';
 
 /**
  * What is coming.
@@ -47,43 +48,42 @@ function linkFor(entry: CalendarEntry): string | null {
   return '/rules';
 }
 
-function Entry({ entry }: { entry: CalendarEntry }) {
-  const { t } = useI18n();
-  const to = linkFor(entry);
-
-  const body = (
-    <div
-      className={
-        'rounded-card px-5 py-4 ' +
-        (entry.overdue
-          ? 'bg-[#FCF0EE] shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)]'
-          : 'bg-raised shadow-ring')
+/**
+ * One date, as a row.
+ *
+ * No age in the left column: what a person reads here is when a thing lands,
+ * not how long it has been standing. The date takes the right-hand column, in
+ * red where it has already passed.
+ */
+function entryRow(entry: CalendarEntry, t: (k: string) => string) {
+  return (
+    <Row
+      key={entry.id}
+      to={linkFor(entry) ?? '/rules'}
+      phase="deciding"
+      kind={t(`cal.kind.${entry.kind}`)}
+      title={entry.title}
+      overdue={entry.overdue}
+      note={
+        <>
+          {entry.note}
+          {entry.waitingOn.length > 0 && (
+            <span className="mt-0.5 block text-[11.5px]">
+              {t('cal.notYetFrom')} {entry.waitingOn.join(', ')}
+            </span>
+          )}
+        </>
       }
-    >
-      <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-2">
-        <Tag tone={entry.overdue ? 'breach' : undefined}>{t(`cal.kind.${entry.kind}`)}</Tag>
-        <span className={entry.overdue ? 'text-[12px] font-semibold text-breach' : 'text-[12px] text-muted'}>
+      standing={
+        <span
+          className={
+            entry.overdue ? 'text-[12.5px] font-semibold text-breach' : 'text-[12.5px] text-muted'
+          }
+        >
           <DateText iso={entry.at} />
         </span>
-      </div>
-      <div className="max-w-[46ch] font-display text-[18px] leading-snug tracking-[-0.012em]">
-        {entry.title}
-      </div>
-      <p className="mt-2 max-w-[62ch] text-[12.5px] leading-[1.6] text-muted">{entry.note}</p>
-      {entry.waitingOn.length > 0 && (
-        <p className="mt-3 border-t border-line pt-2.5 text-[11.5px] text-muted">
-          {t('cal.notYetFrom')} {entry.waitingOn.join(', ')}
-        </p>
-      )}
-    </div>
-  );
-
-  return to ? (
-    <Link to={to} className="block">
-      {body}
-    </Link>
-  ) : (
-    body
+      }
+    />
   );
 }
 
@@ -197,13 +197,19 @@ export default function Calendar() {
   })).filter((g) => g.items.length > 0);
 
   return (
-    <div>
-      <PageHead
-        phase="deciding"
-        title={t('cal.title')}
-        says={t('cal.intro')}
-      />
-
+    <ListPage
+      phase="deciding"
+      title={t('cal.title')}
+      says={t('cal.intro')}
+      live={
+        entries.length > 0 ? (
+          <span className="text-[13px] text-muted">
+            <span className="font-mono tabular-nums text-paper">{entries.length}</span>{' '}
+            <span>{t('cal.entries')}</span>
+          </span>
+        ) : undefined
+      }
+    >
       {/*
         The rhythm first, because it is the only obligation on this page with a
         supervisor behind it and the only one that comes with something to do.
@@ -213,21 +219,12 @@ export default function Calendar() {
       <Rhythm cadence={cadence} nextConvened={nextConvened} />
 
       {entries.length === 0 ? (
-        <p className="mb-7 text-[14px] text-muted">{t('cal.none')}</p>
+        <Nothing>{t('cal.none')}</Nothing>
       ) : (
         grouped.map((g) => (
-          <section key={g.band} className="mb-7">
-            <h2 className="mb-3 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
-              {t(`cal.band.${g.band}`)}
-            </h2>
-            <ul className="space-y-2.5">
-              {g.items.map((e) => (
-                <li key={e.id}>
-                  <Entry entry={e} />
-                </li>
-              ))}
-            </ul>
-          </section>
+          <Division key={g.band} heading={`${t(`cal.band.${g.band}`)} · ${g.items.length}`}>
+            <Rows>{g.items.map((e) => entryRow(e, t))}</Rows>
+          </Division>
         ))
       )}
 
@@ -235,20 +232,7 @@ export default function Calendar() {
         On the page rather than in a footnote. A calendar trusted to be complete
         and missing the six-month cadence would be worse than none at all.
       */}
-      {Array.isArray(data.gaps) && data.gaps.length > 0 && (
-        <div className="mt-8 rounded-card shadow-ring px-4 py-3">
-          <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
-            {t('cal.notHere')}
-          </div>
-          <ul className="space-y-2">
-            {data.gaps.map((g, i) => (
-              <li key={i} className="text-[12.5px] leading-relaxed text-muted">
-                {g}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+      {Array.isArray(data.gaps) && data.gaps.length > 0 && <Gaps items={data.gaps} />}
 
       {/*
         Last, because taking the dates away with you is what you do once you
@@ -266,6 +250,6 @@ export default function Calendar() {
         </div>
         <p className="mt-1 text-[12.5px] leading-relaxed text-muted">{t('cal.feedNote')}</p>
       </a>
-    </div>
+    </ListPage>
   );
 }

@@ -3,8 +3,9 @@ import { Link } from 'react-router-dom';
 import { oversight, type AssetStanding, type AssetStatus, type Register as RegisterData } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { ErrorText, Loading } from '../components/ui.js';
-import { Card, State, type Tone } from '../components/kit.js';
+import { State, type Tone } from '../components/kit.js';
 import { Division, Gaps, Nothing, PageHead } from '../components/page.js';
+import { Row, Rows } from '../components/shapes.js';
 
 /**
  * The universe the board rules on.
@@ -51,55 +52,35 @@ function toneFor(status: AssetStatus): Tone {
   return 'plain';
 }
 
-const DOT: Record<Tone, string> = {
-  breach: 'bg-breach ring-[3.5px] ring-breach/15',
-  attention: 'bg-gold ring-[3.5px] ring-gold/15',
-  settled: 'bg-settled ring-[3.5px] ring-settled/15',
-  lapis: 'bg-lapis ring-[3.5px] ring-lapis/15',
-  plain: 'bg-line',
-};
-
-function Row({ standing }: { standing: AssetStanding }) {
-  const { t } = useI18n();
-  const a = standing.asset;
-  const tone = toneFor(standing.status);
-
+/**
+ * A holding, as a row.
+ *
+ * No age: a holding has a standing rather than a wait, so the left column
+ * carries a mark and the right carries what the board has said about it.
+ * The identifiers sit under the name because that is what a desk matches
+ * against when it is looking for one particular instrument.
+ */
+function holdingRow(s: AssetStanding, t: (k: string) => string) {
   return (
-    <Card to={`/register/${a.id}`} tone="quiet" className="!py-4">
-      {/* The standing drops below the name on a phone, for the reason the
-          library's rows do: a pill beside a title on a 375px row leaves the
-          title breaking over five lines. */}
-      <div className="flex flex-col items-start gap-3 sm:flex-row sm:gap-4">
-        <span className={'mt-2 hidden h-[7px] w-[7px] shrink-0 rounded-full sm:block ' + DOT[tone]} />
-
-        <div className="order-last min-w-0 flex-1 sm:order-none">
-          <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1.5">
-            <span className="font-display text-[19px] leading-snug tracking-[-0.014em] text-paper">
-              {a.name}
+    <Row
+      key={s.asset.id}
+      to={`/register/${s.asset.id}`}
+      phase="inforce"
+      kind={t(`reg.kind.${s.asset.kind}`)}
+      title={s.asset.name}
+      note={
+        <>
+          {s.asset.identifiers.map((id, i) => (
+            <span key={i} className="me-3 break-all font-mono text-[11.5px]">
+              {id.value}
+              {id.network ? <span className="opacity-60"> · {id.network}</span> : null}
             </span>
-            <span className="text-[11px] uppercase tracking-[0.1em] text-muted">
-              {t(`reg.kind.${a.kind}`)}
-            </span>
-          </div>
-
-          <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[11.5px] text-muted">
-            {a.identifiers.map((id, i) => (
-              <span key={i} className="break-all font-mono">
-                {id.value}
-                {id.network ? <span className="opacity-60"> · {id.network}</span> : null}
-              </span>
-            ))}
-          </div>
-
-          <p className="mt-2 text-[12.5px] leading-relaxed text-muted">{standing.note}</p>
-        </div>
-
-        <div className="flex shrink-0 items-center gap-2.5">
-          <span className={'h-[7px] w-[7px] shrink-0 rounded-full sm:hidden ' + DOT[tone]} />
-          <State tone={tone}>{t(`reg.status.${standing.status}`)}</State>
-        </div>
-      </div>
-    </Card>
+          ))}
+          <span className="block">{s.note}</span>
+        </>
+      }
+      standing={<State tone={toneFor(s.status)}>{t(`reg.status.${s.status}`)}</State>}
+    />
   );
 }
 
@@ -183,13 +164,7 @@ export default function Register() {
         <>
           {grouped.map((g) => (
             <Division key={g.band} heading={`${t(`reg.status.${g.band}`)} · ${g.items.length}`}>
-              <ul className="space-y-2">
-                {g.items.map((s) => (
-                  <li key={s.asset.id}>
-                    <Row standing={s} />
-                  </li>
-                ))}
-              </ul>
+              <Rows>{g.items.map((s) => holdingRow(s, t))}</Rows>
             </Division>
           ))}
 
