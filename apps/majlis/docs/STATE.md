@@ -90,6 +90,41 @@ by `Network.setExtraHTTPHeaders`.
 - Do not edit `.tsx` through `sed`, heredocs or `node -e`. On Windows they eat
   backticks and escapes. `Register.tsx` was corrupted that way once already.
 
+### The standard everything is judged by
+
+The owner's words, and the reason POPIS.md was rewritten the same day:
+
+> Every function connected through the UI, so a person entering for the first
+> time knows what to do without ever having used it. Not merely reachable by
+> clicking: **in the path**. When a question arrives the tools insert
+> themselves into each step, as the application leads the person.
+
+Three thresholds, each stricter: **postoji** (the service works), **dostupno**
+(a screen calls it), **u putu** (it arrives by itself at the step that needs
+it). Grade on the third. The first pass graded on the second and marked all six
+calculators done because `/calculations` exists; on the third only one of six
+is close.
+
+### Where it actually stands, measured
+
+Routes: 34, of which 30 are linked from somewhere. The four that are not are
+`/guided` (the old arrival screen, replaced by `/`) and three `/classic/*`
+fallbacks, all deliberate.
+
+`MatterDetail.tsx` — the main journey and the one a bank would be shown — is
+twelve sections stacked one under the other. Every capability is present and
+nothing leads. Of the eight promises in handbook section 4, none is met.
+
+Eight things work and no screen calls them: `addAsset`, `retireAsset`,
+`setImplementation`, `withdrawComputation`, `adoptionHistory`,
+`reportOnReferral`, `redeemReset`, and `services/extraction.ts` which knows
+which page a figure came from and is wired to nothing.
+
+**Can it go to a bank?** It can be shown. It cannot be handed over. The demo
+itself holds: no internet or API key needed, five seeded roles, three languages
+with right-to-left, and a restart resets it because without `MAJLIS_DB` the
+record is in memory. What is missing is the path.
+
 ### §0b — end of the 13 September save
 
 ---
