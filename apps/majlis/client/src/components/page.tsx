@@ -120,7 +120,10 @@ export function PageHead({
           >
             {title}
           </h1>
-          <p className="mt-3 max-w-[62ch] text-[13.5px] leading-[1.65] text-muted">{says}</p>
+          {/* A record has no standing sentence: its title and its state say what it is. */}
+          {says && (
+            <p className="mt-3 max-w-[62ch] text-[13.5px] leading-[1.65] text-muted">{says}</p>
+          )}
         </div>
         {act && <div className="shrink-0">{act}</div>}
       </div>

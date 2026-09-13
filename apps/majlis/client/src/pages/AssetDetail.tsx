@@ -7,6 +7,7 @@ import { mayDeliberate, useIdentity } from '../lib/identity.js';
 import { DriftForAsset } from '../components/Drift.js';
 import { DocumentLink } from '../components/Documents.js';
 import Recorded from '../components/Recorded.js';
+import { ActionPanel, Facts, RecordPage } from '../components/shapes.js';
 
 /**
  * One holding: where it stands, what the board has said about it, what it is
@@ -82,70 +83,85 @@ export default function AssetDetail() {
     }
   }
 
-  return (
-    <article>
-      <Link to="/register" className="mb-4 inline-block text-[13px] text-muted hover:text-paper">
-        ← {t('reg.title')}
-      </Link>
+  /*
+   * No stage bar on a holding.
+   *
+   * The other records have one because their stages are a sequence: a matter
+   * is opened, read, argued, voted, and comes into force in that order. A
+   * holding's standing is not a line. It can be permitted or restricted from
+   * the same starting point, and it can be retired from anywhere. Drawing it
+   * as a track would claim an order the record does not have.
+   */
+  const aside = (
+    <>
+      {canRaise ? (
+        <ActionPanel next={t('reg.putToTheBoardNext')} whose={t('passage.whose.board')}>
+          <button
+            onClick={putToTheBoard}
+            disabled={busy}
+            className="w-full rounded-xl bg-lapis px-4 py-2.5 text-[13px] font-semibold text-white shadow-act disabled:opacity-50"
+          >
+            {t('reg.putToTheBoard')}
+          </button>
+          {refusal && <p className="mt-2.5 text-[12.5px] text-breach">{refusal}</p>}
+        </ActionPanel>
+      ) : null}
 
-      <div className="mb-3 flex flex-wrap items-center gap-2">
-        <Tag
-          tone={
-            data.status === 'restricted' || data.status === 'lapsed'
-              ? 'warn'
-              : data.status === 'never_examined'
-                ? 'gold'
-                : data.status === 'permitted'
-                  ? 'ok'
-                  : undefined
-          }
-        >
-          {t(`reg.status.${data.status}`)}
-        </Tag>
-        <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
-          {t(`reg.kind.${a.kind}`)}
-        </span>
-      </div>
-
-      <h1 className="mb-2 font-display font-normal leading-[1.12] tracking-[-0.024em] text-[30px] sm:text-[34px]">{a.name}</h1>
-      <p className="mb-7 max-w-[62ch] text-[13.5px] leading-[1.65] text-muted">{data.note}</p>
-
-      {refusal && (
-        <div className="mb-5 rounded-card shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)] bg-[#FCF0EE] px-4 py-3 text-[13px] leading-relaxed text-breach">
-          {refusal}
-        </div>
-      )}
+      <Facts
+        rows={[
+          { label: t('reg.kindLabel'), value: t(`reg.kind.${a.kind}`) },
+          { label: t('reg.statusLabel'), value: t(`reg.status.${data.status}`) },
+        ]}
+      />
 
       {/*
-        Above the composition it concerns, so a reader looking at 50.00% sees at
-        once what the board set rather than assembling it from two places.
+        The page an auditor is handed. It is a link rather than a fetch: the
+        browser opens it as a tab the reader can save as a PDF, which is what
+        a scholar actually wants.
       */}
-      <DriftForAsset assetId={a.id} />
-
-      {/*
-        The page an auditor is handed.
-        Offered here rather than only in the record, because the question it
-        answers — how did this holding get where it is — is asked while looking
-        at the holding. It is a link, not a fetch: the browser opens it as a tab
-        the reader can save as a PDF, which is what a scholar actually wants.
-      */}
-      <div className="mb-7">
+      <div className="mt-3.5">
         <DocumentLink
           href={oversight.hrefs.holding(a.id)}
           label={t('doc.holding')}
           note={t('doc.holdingNote')}
         />
       </div>
+    </>
+  );
 
-      {canRaise && (
-        <button
-          onClick={putToTheBoard}
-          disabled={busy}
-          className="mb-7 rounded-xl bg-raised shadow-ring px-4 py-2 text-[13px] text-lapis font-medium disabled:opacity-50"
-        >
-          {t('reg.putToTheBoard')}
-        </button>
-      )}
+  return (
+    <RecordPage
+      phase="inforce"
+      title={a.name}
+      states={
+        <>
+          <Tag
+            tone={
+              data.status === 'restricted' || data.status === 'lapsed'
+                ? 'warn'
+                : data.status === 'never_examined'
+                  ? 'gold'
+                  : data.status === 'permitted'
+                    ? 'ok'
+                    : undefined
+            }
+          >
+            {t(`reg.status.${data.status}`)}
+          </Tag>
+          <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+            {t(`reg.kind.${a.kind}`)}
+          </span>
+        </>
+      }
+      aside={aside}
+    >
+      <p className="mb-7 max-w-[62ch] text-[13.5px] leading-[1.65] text-muted">{data.note}</p>
+
+      {/*
+        Above the composition it concerns, so a reader looking at 50.00% sees at
+        once what the board set rather than assembling it from two places.
+      */}
+      <DriftForAsset assetId={a.id} />
 
       <Section title={t('reg.identifiers')}>
         <ul className="space-y-1.5">
@@ -260,6 +276,6 @@ export default function AssetDetail() {
           <p className="mt-2 text-[12px] leading-relaxed text-muted">{t('reg.retiredNote')}</p>
         </div>
       )}
-    </article>
+    </RecordPage>
   );
 }
