@@ -977,6 +977,16 @@ const en: Dict = {
   // Entering a holding by hand. The server has always taken one; no screen asked.
   'common.remove': "Remove step",
 
+  // A step of the work, and the tool it needs.
+  'step.workItOut': "Work it out here",
+  'step.calcLead':
+    "Worked out here, it is kept against this condition. The same calculator, opened from the calculations screen, answers nobody's question in particular.",
+  'step.whichCalculator': "Which of these answers this condition is the board's to decide.",
+  'step.noCalculator':
+    "This condition rests on a figure and this shape names no calculator for it. Work it out however the board already does, and record the finding with the figure in it.",
+  'step.closeCalculator': "Close the calculator",
+  'step.theWorking': "The working",
+
   // Withdrawing a recorded figure. Marked, never deleted.
   // A committee's account going back to the board. The read side always
   // existed; nothing could write one.
@@ -2842,6 +2852,15 @@ const ar: Dict = {
 
   'common.remove': "احذف الخطوة",
 
+  'step.workItOut': "احسبه هنا",
+  'step.calcLead':
+    "ما يُحسب هنا يُحفظ على هذا الشرط. والحاسبة نفسها، إن فُتحت من شاشة الحسابات، لا تجيب عن سؤال بعينه.",
+  'step.whichCalculator': "أيُّها يجيب عن هذا الشرط أمرٌ يقرره المجلس.",
+  'step.noCalculator':
+    "هذا الشرط يقوم على مقدار، وهذه الصيغة لا تسمّي له حاسبة. احسبه بما يعمل به المجلس أصلاً، وسجّل النتيجة ومعها المقدار.",
+  'step.closeCalculator': "أغلِق الحاسبة",
+  'step.theWorking': "الحساب",
+
   'cttee.report': "ارفع التقرير إلى المجلس",
   'cttee.reportLead':
     "ما نظرت فيه اللجنة وما وجدته، بكلماتك. هو بيان يقرؤه المجلس لا قرار: اللجنة لا تفصل في شيء، والمجلس يصوّت على ما قرأ.",
@@ -4398,6 +4417,15 @@ const ur: Dict = {
   'reg.kind.token': "ٹوکن",
 
   'common.remove': "قدم ہٹائیں",
+
+  'step.workItOut': "یہیں نکالیں",
+  'step.calcLead':
+    "جو یہاں نکالا جائے وہ اسی شرط کے ساتھ رکھا جاتا ہے۔ وہی کیلکولیٹر اگر حسابات کی اسکرین سے کھولیں تو وہ کسی خاص سوال کا جواب نہیں دیتا۔",
+  'step.whichCalculator': "ان میں سے کون سا اس شرط کا جواب دیتا ہے، یہ بورڈ طے کرے گا۔",
+  'step.noCalculator':
+    "یہ شرط ایک مقدار پر کھڑی ہے اور یہ صورت اس کے لیے کوئی کیلکولیٹر نہیں بتاتی۔ جیسے بورڈ پہلے سے نکالتا ہے ویسے نکالیں، اور نتیجہ مقدار سمیت درج کریں۔",
+  'step.closeCalculator': "کیلکولیٹر بند کریں",
+  'step.theWorking': "حساب",
 
   'cttee.report': "بورڈ کو رپورٹ دیں",
   'cttee.reportLead':

@@ -49,6 +49,9 @@ export interface RecordInput {
   note: string;
   /** The computation this replaces, where it replaces one. */
   supersedes?: string | null;
+  /** The case and the condition it was opened from, where it was opened from one. */
+  forMatterId?: string | null;
+  forConditionId?: string | null;
 }
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}/;
@@ -187,6 +190,13 @@ export function buildComputation(
     amount: input.amount,
     steps: input.steps,
     note: input.note,
+    /*
+      What it was worked out for, where it was worked out for something. A
+      calculation opened from a step of a case keeps the step; one done at the
+      workbench keeps nothing, because it answers nobody's question yet.
+    */
+    forMatterId: input.forMatterId ?? null,
+    forConditionId: input.forConditionId ?? null,
     recordedBy: by,
     recordedAt: at,
     supersedes,

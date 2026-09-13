@@ -1,14 +1,17 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
   oversight,
   Refused,
   type Checklist as ChecklistData,
+  type Computation,
   type ConditionState,
   type Proposal,
   type Structure,
 } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { Tag } from './ui.js';
+import TheCalculator from './TheCalculator.js';
 
 /**
  * The conditions of a contract shape, ruled on one at a time.
@@ -114,6 +117,11 @@ function Condition({
   carried,
   onCarry,
   onRecord,
+  n,
+  matterId,
+  calculations,
+  worked,
+  onWorked,
 }: {
   state: ConditionState;
   contested: boolean;
@@ -122,6 +130,14 @@ function Condition({
   carried?: { proposal: Proposal; taken: boolean; busy: boolean } | null;
   onCarry?: () => void;
   onRecord: (holds: (typeof HOLDS)[number], reason: string) => Promise<void>;
+  /** Which step of the work this is. The list is the work, in order. */
+  n: number;
+  matterId: string;
+  /** What the shape says it calculates with. Never inferred from the wording. */
+  calculations: string[];
+  /** Figures already worked out for this condition. */
+  worked: Computation[];
+  onWorked: () => void;
 }) {
   const { t } = useI18n();
   const [open, setOpen] = useState(false);
@@ -161,6 +177,10 @@ function Condition({
       }
     >
       <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-2">
+        {/* The step's number. The list is the work, and the work is in order. */}
+        <span className="font-mono text-[11px] tabular-nums text-muted">
+          {String(n).padStart(2, '0')}
+        </span>
         {mine ? (
           <Tag tone={toneFor(mine.holds)}>{t(`chk.${mine.holds}`)}</Tag>
         ) : (
@@ -173,6 +193,66 @@ function Condition({
       </div>
 
       <p className="max-w-[62ch] font-display text-[16px] leading-[1.55]">{c.requirement}</p>
+
+      {/*
+        A step that needs a figure carries the calculator, and what has already
+        been worked out for it.
+
+        The condition says what it rests on — `evidence` — and where that is a
+        figure, the tool belongs here rather than on a screen the member has to
+        go and find. A figure worked out here is recorded against this step, so
+        the next reader sees the answer on the question instead of in a list of
+        everything the board has ever calculated.
+      */}
+      {c.evidence === 'figure' && (
+        <div>
+          {worked.length > 0 && (
+            <ul className="mt-3 space-y-2">
+              {worked.map((w) => (
+                <li
+                  key={w.id}
+                  className={
+                    'rounded-xl px-4 py-2.5 shadow-ring ' +
+                    (w.withdrawnAt ? 'bg-raised/50 opacity-60' : 'bg-[#EBF3EF]')
+                  }
+                >
+                  <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                    <span className="text-[13px] text-paper">
+                      {w.headline} <span className="font-semibold">{w.amount}</span>
+                    </span>
+                    <Link
+                      to={`/figures/${w.id}`}
+                      className="text-[12px] text-lapis underline decoration-line underline-offset-4"
+                    >
+                      {t('step.theWorking')}
+                    </Link>
+                  </div>
+                  <p className="mt-0.5 text-[11.5px] text-muted">
+                    {t(`calc.tab.${w.kind}`)}
+                    <span className="mx-1.5 opacity-40">·</span>
+                    {w.periodFrom} — {w.periodTo}
+                    {w.withdrawnAt ? (
+                      <>
+                        <span className="mx-1.5 opacity-40">·</span>
+                        {t('recorded.withdrawn')}
+                      </>
+                    ) : null}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {canRule && (
+            <TheCalculator
+              matterId={matterId}
+              conditionId={c.id}
+              offered={calculations}
+              onWorked={onWorked}
+            />
+          )}
+        </div>
+      )}
 
       {/*
         The reason the condition exists, so a scholar can disagree with the
@@ -394,6 +474,30 @@ export default function Checklist({ matterId, canRule }: { matterId: string; can
   const [carrying, setCarrying] = useState(false);
   const [carryRefusal, setCarryRefusal] = useState<string | null>(null);
 
+  /*
+   * Figures already worked out on this case, by the condition they were worked
+   * out for.
+   *
+   * Fetched whole and filtered here rather than once per step: a case with
+   * fourteen conditions would otherwise make fourteen requests for one list.
+   * A failure is silent for the same reason the inheritance is — the checklist
+   * is the record and this is what has been computed against it, so losing the
+   * second must not cost the first.
+   */
+  const [worked, setWorked] = useState<Computation[]>([]);
+
+  const loadWorked = () =>
+    oversight
+      .computations()
+      .then((r) =>
+        setWorked(
+          (r.history ?? [])
+            .map((h) => h.computation)
+            .filter((c) => c.forMatterId === matterId),
+        ),
+      )
+      .catch(() => setWorked([]));
+
   useEffect(() => {
     let live = true;
     oversight
@@ -438,6 +542,7 @@ export default function Checklist({ matterId, canRule }: { matterId: string; can
 
   useEffect(() => {
     void load();
+    void loadWorked();
     oversight
       .structures()
       .then((s) => setStructures(s.structures))
@@ -551,9 +656,14 @@ export default function Checklist({ matterId, canRule }: { matterId: string; can
       )}
 
       <ul className="space-y-2.5">
-        {data.conditions.map((c) => (
+        {data.conditions.map((c, i) => (
           <Condition
             key={c.condition.id}
+            n={i + 1}
+            matterId={matterId}
+            calculations={data.structure.calculations ?? []}
+            worked={worked.filter((w) => w.forConditionId === c.condition.id)}
+            onWorked={() => void loadWorked()}
             state={c}
             contested={data.contested.includes(c.condition.id)}
             canRule={canRule}

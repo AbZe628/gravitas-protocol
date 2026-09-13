@@ -960,12 +960,68 @@ export function governanceRoutes(
     }),
   );
 
-  /** Open the vote. Refused if nothing has been said. */
+  /**
+   * Open the vote. Refused if nothing has been said, and refused while a
+   * condition of the shape is unanswered.
+   *
+   * ── why this refusal and not a warning ────────────────────────────────
+   *
+   * A board that votes with conditions unexamined has voted on something it
+   * has not read, and the written ruling that follows says the conditions were
+   * the basis of the decision. A warning would be a screen asking a chair to
+   * hold themselves to it while the button stayed lit; the handbook says the
+   * vote cannot open, so it cannot.
+   *
+   * **Answered includes set aside.** A board may decide a condition does not
+   * apply, and that is an answer — recorded as *not applicable* with the
+   * board's reason, and carried onto the ruling under what it does not decide.
+   * What is refused is silence.
+   *
+   * A matter judged against no shape has no conditions and passes straight
+   * through. That is an ordinary matter, not an unexamined one.
+   */
   router.post(
     '/matters/:id/voting',
     handle(async (req, res) => {
       const who = identityOf(req);
       if (!requireRole(res, mayVote(who.role), 'open a vote', who.role)) return;
+
+      const matter = await store.matter(req.params.id);
+      if (!matter) {
+        res.status(404).json({ error: 'not_found', message: 'No such matter.' });
+        return;
+      }
+
+      if (matter.structureId) {
+        const checklist = checklistFor(matter, who.scholarId, await store.adoptions(matter.boardId));
+        if (checklist.unanswered.length > 0) {
+          /*
+           * In the board's words, not in identifiers.
+           *
+           * `checklistFor` reports the unanswered as condition ids while
+           * `contract.ts` reports them as requirements — the two services
+           * disagree about what the same word holds. A chair reading
+           * `no-fee-for-the-guarantee-itself` learns nothing, so the mapping
+           * happens here rather than the refusal carrying a slug.
+           */
+          const requirementOf = new Map(
+            checklist.conditions.map((c) => [c.condition.id, c.condition.requirement]),
+          );
+          const unanswered = checklist.unanswered.map((id) => requirementOf.get(id) ?? id);
+
+          res.status(409).json({
+            error: 'conditions_unanswered',
+            message:
+              `${unanswered.length} of the ${checklist.total} conditions of this shape ` +
+              'have no answer from anybody on the board. A board that votes with conditions ' +
+              'unexamined has voted on something it has not read. Answer each one, or set it ' +
+              'aside with a reason, and the vote opens.',
+            unanswered,
+          });
+          return;
+        }
+      }
+
       res.json(await store.updateMatter(req.params.id, openVoting));
     }),
   );

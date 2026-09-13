@@ -1633,6 +1633,9 @@ export interface Computation {
   amount: string;
   steps: CalcStep[];
   note: string;
+  /** The case and the condition it was worked out for. Null at the workbench. */
+  forMatterId: string | null;
+  forConditionId: string | null;
   recordedBy: string;
   recordedAt: string;
   supersedes: string | null;
@@ -1670,6 +1673,15 @@ export interface RecordInput {
   steps: CalcStep[];
   note: string;
   supersedes?: string | null;
+  /**
+   * The case and the condition this was opened from.
+   *
+   * Null at the workbench. Set when a calculator opens inside a step, so the
+   * answer stays on the question rather than disappearing into a list of
+   * everything the board has ever worked out.
+   */
+  forMatterId?: string | null;
+  forConditionId?: string | null;
 }
 
 // ── the manual ────────────────────────────────────────────────────────────

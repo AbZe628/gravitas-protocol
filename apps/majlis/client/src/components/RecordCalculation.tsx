@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { api, oversight, type Asset, type RecordInput } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { Refusal, Text } from './calc.js';
+import { useWorkedOutFor } from '../lib/workedOutFor.js';
 
 /**
  * Noting a calculation against a period.
@@ -37,9 +38,18 @@ export interface RecordProps {
   };
   /** Whether the calculation is about one holding. Zakat and distribution are not. */
   wantsHolding?: boolean;
+  /** Told when the figure lands, so a step can show it without a reload. */
+  onRecorded?: (computationId: string) => void;
 }
 
-export default function RecordCalculation({ input, wantsHolding = false }: RecordProps) {
+export default function RecordCalculation({
+  input,
+  wantsHolding = false,
+  onRecorded,
+}: RecordProps) {
+  /* Set when this calculator was opened from a step of a case. Null at the workbench. */
+  const forStep = useWorkedOutFor();
+
   const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const [from, setFrom] = useState(input.periodFrom ?? '');
@@ -80,8 +90,20 @@ export default function RecordCalculation({ input, wantsHolding = false }: Recor
         assetId: wantsHolding ? assetId || null : null,
         periodFrom: from,
         periodTo: to,
+        /*
+          Which question this answers, where it was opened from one.
+
+          A figure worked out on a step of a case used to go to the
+          calculations screen with nothing saying what it had been asked
+          about, and the step it came from showed no sign of it. Null at the
+          workbench, which is honest: that figure is not for anything yet.
+        */
+        forMatterId: forStep?.matterId ?? null,
+        forConditionId: forStep?.conditionId ?? null,
       });
       setDone(saved.computation.id);
+      onRecorded?.(saved.computation.id);
+      forStep?.onRecorded?.(saved.computation.id);
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
     } finally {

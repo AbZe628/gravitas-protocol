@@ -888,6 +888,22 @@ export interface Computation {
   /** The sentence saying what the calculation did not answer. */
   note: string;
 
+  /**
+   * The matter and the condition this was worked out for.
+   *
+   * Both absent on a calculation done on its own — the workbench is open to
+   * anybody with figures and a question, and that is not a lesser use. They
+   * are set when the calculation is opened from a step of a case, so the
+   * answer stays on the condition it answers instead of disappearing into a
+   * list of everything the board has ever worked out.
+   *
+   * That disappearance was the fault. A scholar worked out a tangible share
+   * for one condition of one matter, and the figure went to the calculations
+   * screen where nothing said which question it had been asked about.
+   */
+  forMatterId: string | null;
+  forConditionId: string | null;
+
   recordedBy: string;
   recordedAt: string;
 

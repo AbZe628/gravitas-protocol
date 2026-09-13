@@ -77,6 +77,10 @@ const recordSchema = z.object({
   steps: z.array(stepSchema).max(100),
   note: z.string().max(4_000),
   supersedes: z.string().min(1).max(64).nullish(),
+  // What it was worked out for. Absent on a calculation done at the workbench,
+  // which is an ordinary use and not a lesser one.
+  forMatterId: z.string().min(1).max(64).nullish(),
+  forConditionId: z.string().min(1).max(120).nullish(),
 });
 
 /** Long enough that "wrong" is not a reason. The same floor a concurrence uses. */
