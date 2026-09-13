@@ -47,6 +47,22 @@ export type CalculationKind =
   | 'tangibility'
   | 'late_payment';
 
+/*
+ * ── the figures from the bank's document are not wired here ───────────────
+ *
+ * They are already inside the calculators. `ReadDocument` sits in Screening,
+ * Purification, Zakat and Distribution; it lists the board's documents, asks
+ * the reading service for the fields that calculation wants, shows each
+ * candidate beside the sentence it came from and the page it was on, and fills
+ * the field only when a member confirms it — writing the document, the page,
+ * the quote and the confirming member into the calculation's source, which is
+ * what reaches the fatwa.
+ *
+ * A second reader was written here before that was noticed, and taken out
+ * again. Two ways to do one thing is how one of them ends up weaker, and this
+ * one would have been: it had no provenance line and no test.
+ */
+
 const KNOWN: CalculationKind[] = [
   'screening',
   'purification',
