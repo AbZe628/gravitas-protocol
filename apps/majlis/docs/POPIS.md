@@ -129,14 +129,14 @@ nije ispunjeno u obliku koji vodi.
 | šta treba | stanje |
 |---|---|
 | Pravilo ima svoju stranicu | DA — od 13.09. |
-| **Šest pitanja na istih šest mjesta** (pogl. 12) | 2 od 6, i to na pogrešnom ekranu |
+| **Šest pitanja na istih šest mjesta** (pogl. 12) | DA — od 13.09. na /rules/:id, sva tri pravila provjerena u browseru |
 | Šta odbor odlučio, njegovim riječima | DA |
-| Kako se mjeri | POLA — kroz `meaning` parametra |
-| Kreće li se | NE |
-| Kad se provjerava | postoji u `carrying.ts`, **vidi se samo na predmetu prije glasanja** |
-| Šta se dešava ako padne | isto |
-| Ko se obavještava | NE |
-| Gdje pravilo nije mjerenje, reći da ga ništa ne mjeri | NE |
+| Kako se mjeri | DA — četiri odgovora: iz izvora, brojka bez izvora, protiv popisa, ili ništa ne mjeri |
+| Kreće li se | DA — čita se pri svakoj transakciji, ili se mijenja samo kad odbor promijeni |
+| Kad se provjerava | DA — premješteno sa predmeta na pravilo |
+| Šta se dešava ako padne | DA — i popravljeno: riječ `revert` je nedostajala, pa dva od tri pravila nisu imala odgovor |
+| Ko se obavještava | DA — uključujući da se email ne šalje dok banka ne da relay |
+| Gdje pravilo nije mjerenje, reći da ga ništa ne mjeri | DA |
 
 ## A7. Banka radi po odluci
 
@@ -157,7 +157,7 @@ nije ispunjeno u obliku koji vodi.
 | Prekršaj kroz osam faza, 30 dana od nalaza | DA |
 | Purifikacija se računa, ne kuca napamet | DA |
 | Drift kao pitanje, ne kao prekršaj | DA |
-| **Provedba: je li urađeno ono što je odbor tražio** | KOD — ruta postoji, nijedan ekran je ne zove |
+| **Provedba: šta odbor traži da se uradi** | DA — na MatterPack, dio 07. Zamrzava se sa uslovima kad glasanje počne |
 | Podsjetnici na sat od 30 dana | VANI — email |
 
 ## A9. Godina za revizora
@@ -211,7 +211,7 @@ Vidi tabelu u A3. Šest postoji, nijedan se ne otvara iz koraka.
 |---|---|
 | Novac kao tačan decimalni broj | DA |
 | Svaki izračun ima adresu i pokazuje aritmetiku | DA |
-| Povlačenje izračuna | KOD |
+| Povlačenje izračuna | DA — sa obaveznim razlogom |
 
 ### Odlučivanje
 
@@ -223,7 +223,7 @@ Vidi tabelu u A3. Šest postoji, nijedan se ne otvara iz koraka.
 | Šta pravilo radi u praksi | DA na predmetu | NE na pravilu |
 | Dokazi za i protiv | DA | DOST |
 | Komisije: formiranje i čitanje | DA | DOST |
-| Komisije: izvještaj nazad | KOD | NE |
+| Komisije: izvještaj nazad | DA | DOST — nudi se samo onome ko je sjedio u komisiji |
 | Brojanje glasova | DA | DA |
 | Prigovor | DA | DA |
 | Nacrt klauzula | DA | DOST |
@@ -236,7 +236,7 @@ Vidi tabelu u A3. Šest postoji, nijedan se ne otvara iz koraka.
 | Drift | DA |
 | Pregledi na redu | DA |
 | Rokovi | DA |
-| Provedba | KOD |
+| Provedba | DA |
 | Tempo | DA |
 | Kalendar sa pretplatom | DA |
 
@@ -245,11 +245,11 @@ Vidi tabelu u A3. Šest postoji, nijedan se ne otvara iz koraka.
 | alat | stanje |
 |---|---|
 | Registar za čitanje | DA |
-| Dodavanje holdinga | KOD |
-| Povlačenje holdinga | KOD |
+| Dodavanje holdinga | DA |
+| Povlačenje holdinga | DA — složeno pod «još» na stranici holdinga |
 | Dosje holdinga | DA |
 | Forme ugovora, svaka sa svojom stranicom | DA |
-| Historija izmjena forme | KOD |
+| Historija izmjena forme | DA |
 | Priručnik usklađenosti | DA |
 | Papiri za sjednicu | DA |
 | Godišnji paket | DA |
@@ -294,7 +294,7 @@ Vidi A8 i A9. Sve DA osim provedbe (KOD) i podsjetnika (VANI).
 |---|---|
 | Padajući popis instrumenata iz registra | NE |
 | Red za ono što odboru nikad nije postavljeno | NE |
-| Šest pitanja po pravilu | 2 od 6 |
+| Šest pitanja po pravilu | DA |
 
 ## 13. Šta sistem šalje
 
@@ -318,7 +318,7 @@ Vidi A8 i A9. Sve DA osim provedbe (KOD) i podsjetnika (VANI).
 | Koje obavijesti stižu | NE |
 | Potpis | NE |
 | Povrat lozinke: izdavanje | DA |
-| Povrat lozinke: unovčavanje | KOD |
+| Povrat lozinke: unovčavanje | ZID — vidi ispod |
 | Predsjedavajući mijenja članove, kvorum, intervale | NE — sve se samo vidi |
 | Ime odbora i serija brojeva odluka | NE |
 | Šta ova kopija može, na dnu navigacije | DA |
@@ -334,38 +334,58 @@ Svih osam obećanja održano i pokriveno testovima. Ništa otvoreno.
 Prebrojano iz Dijela B, koji je popis po poglavljima i jedini se broji. Dio A
 je isto gradivo poredano po putu korisnika, pa bi zbrajanje oba bilo duplo.
 
-| | broj |
-|---|---|
-| DA | 51 |
-| DOST (postoji, ali ga moraš tražiti) | 7 |
-| KOD (radi, nijedan ekran ne zove) | 8 |
-| NE | 20 |
-| VANI | 4 |
-| ukupno stavki | 90 |
+Stanje nakon koraka 3, prebrojano iz Dijela B.
+
+| | bilo ujutro | sada |
+|---|---|---|
+| DA | 51 | **58** |
+| DOST (postoji, ali ga moraš tražiti) | 7 | 8 |
+| KOD (radi, nijedan ekran ne zove) | 8 | **1** |
+| NE | 20 | 19 |
+| VANI (čeka banku ili izmjenu ugovora) | 4 | 4 |
+| ZID (traži odluku o sigurnosti) | 0 | 1 |
+| ukupno stavki | 90 | 91 |
 
 Prvi put sam ovakve brojeve napisao napamet i sva četiri su bila pogrešna.
 Ovi su prebrojani naredbom nad samim fajlom. Ako se ikad ne slažu sa tabelama,
 tabele su tačne.
 
-Po drugom pragu, dostupnosti, oko **dvije trećine je gotovo**. Po **trećem
-pragu**, onom koji je vlasnik tražio, glavni tok predmeta ne vodi nikoga
-nigdje: od osam obećanja poglavlja 4, nijedno.
+Po drugom pragu, dostupnosti, sada je **skoro sve zatvoreno**: ostala je jedna
+stvar koja radi a nema ekran, i ona pripada koraku 5.
 
-## Osam stvari koje rade a nijedan ekran ih ne zove
+Po **trećem pragu**, onom koji je vlasnik tražio, glavni tok predmeta i dalje
+ne vodi nikoga nigdje: **od osam obećanja poglavlja 4, nijedno.** To je cijeli
+korak 4 i to je ono što dijeli pokazati od predati.
 
-Najjeftiniji posao u cijelom popisu, jer je server gotov.
+## Osam stvari koje su radile a nijedan ekran ih nije zvao
 
-1. `oversight.addAsset` — dodavanje holdinga
-2. `oversight.retireAsset` — povlačenje holdinga
-3. `oversight.setImplementation` — provedba odluke
-4. `oversight.withdrawComputation` — povlačenje izračuna
-5. `oversight.adoptionHistory` — historija izmjena forme
-6. `oversight.reportOnReferral` — izvještaj komisije nazad
-7. `account.redeemReset` — unovčavanje povrata lozinke
-8. `extraction.ts` — brojke sa stranicom izvora, nikad spojeno na korak
+Stanje 13. septembra, uveče. Šest zatvoreno, jedno ostaje za korak 5, jedno
+nije propust nego zid.
+
+| | stanje |
+|---|---|
+| Dodavanje holdinga | zatvoreno — dugme na registru |
+| Povlačenje holdinga | zatvoreno — pod «još» na stranici holdinga |
+| Provedba odluke | zatvoreno — na predmetu, dio 07 |
+| Povlačenje izračuna | zatvoreno — na stranici izračuna |
+| Historija izmjena forme | zatvoreno — na stranici forme |
+| Izvještaj komisije nazad | zatvoreno — samo za onoga ko je sjedio u komisiji |
+| Brojke sa stranicom izvora | ostaje za korak 5, jer pripada kalkulatoru u koraku |
+| Unovčavanje povrata lozinke | **zid**, vidi ispod |
+
+### Zašto povrat lozinke nije propust nego zid
+
+Ruta na serveru je otvorena kako treba: pozovi je bez lozinke i vrati 400, ne
+401. Ali **cijela aplikacija je iza lozinke**, pa čovjek koji je lozinku
+zaboravio dobije 401 na samu stranicu i ne može ni doći do polja u koje bi
+upisao kod.
+
+Da bi radilo, jedna putanja mora biti otvorena bez lozinke. To mijenja
+sigurnosnu granicu aplikacije i nije odluka koju ja donosim sam. Predsjedavajući
+danas može izdati kod; niko ga ne može unovčiti.
 
 Plus `components/SignedInAs.tsx` koju ništa ne prikazuje, i `pages/Guided.tsx`
-na `/guided` do koje ne vodi nijedan link.
+na `/guided` do koje ne vodi nijedan link. Oboje su ostaci, ne propusti.
 
 ---
 
@@ -419,9 +439,14 @@ Kad ovih sedam bude zatvoreno i osmo rečeno, odgovor je da. Ne prije.
 
 # Dio E — Redoslijed
 
-**Korak 3. Pravilo govori.** Šest pitanja na stranici pravila, `carrying.ts`
-premješten sa predmeta na pravilo. Osam mrtvih ruta dobija mjesto. Najveći
-dobitak po uloženom satu.
+**Korak 3. Pravilo govori. GOTOVO 13.09.** Šest pitanja na stranici pravila,
+sa `carrying.ts` premještenim sa predmeta na pravilo. Šest od osam mrtvih ruta
+dobilo svoje mjesto; sedma pripada koraku 5, osma je zid.
+
+Usput nađeno i popravljeno: riječ `revert`, koju ugovori koriste za odbijanje,
+nije bila na popisu ponašanja, pa dva od tri pravila nisu mogla odgovoriti šta
+se dešava ako padnu. I prvi nacrt trećeg pitanja tvrdio je da prag prati
+tržište, što je na pravilu o paru bilo naprosto netačno.
 
 **Korak 4. Predmet vodi.** Poglavlje 4 u cijelosti. Uslovi postaju koraci,
 kalkulator se otvara u koraku i sam se popuni iz dokumenta, glasanje se ne

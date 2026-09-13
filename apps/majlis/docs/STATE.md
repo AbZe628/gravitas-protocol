@@ -68,6 +68,37 @@ browser: 99–103px. No screen scrolls sideways. No screen without a heading.
 nothing. This is the cheapest work in the whole list because the server is
 already done.
 
+### Step three, done the same evening
+
+Six of those seven now have a place in the interface. `/rules/:id` answers the
+six questions the handbook promises, built from facts the server sends with
+the sentences composed in the dictionaries so an Arabic board reads Arabic.
+`carrying.ts` grew `buildDayToDay`; the old `buildCarrying` is untouched and
+still serves the matter before a vote.
+
+Two faults found by running it rather than reading it. The word `revert` was
+missing from the list of breach behaviours, so two of the three seeded rulings
+could not answer *what happens if it fails* — on the matter screen either. And
+the first draft of question three claimed a threshold follows the market,
+which on a ruling fixing exchange at par is false; it now says the thing true
+of both.
+
+One more worth remembering: the implementation editor first went onto
+`MatterDetail`, which is the classic fallback nothing links to. **The live
+matter screen is `MatterPack`.** Same mistake as the whole problem, caught by
+a browser and not by a test.
+
+`redeemReset` is left alone on purpose. Its route is already exempt from basic
+auth (it answers 400 without a credential, not 401), but the application is
+behind basic auth, so somebody who has forgotten their password gets 401 on
+the page itself. Making it usable means opening a path, which changes the auth
+boundary and is the owner's call.
+
+**What is left is step four, and it is the whole of handbook section 4.** Of
+its eight promises — conditions as steps, the calculator opening inside the
+step already filled, the vote locked until every step is answered — none is
+met. That is the difference between showing Majlis and handing it over.
+
 ### How to run it
 
 The demo server is on **4102** (4000 is the owner's own instance, never touch
