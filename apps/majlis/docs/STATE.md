@@ -9,6 +9,91 @@ unfinished it says so, and where something is broken it says how it breaks.
 
 ---
 
+## §0a — Start here, 13 September 2026
+
+**Read `docs/POPIS.md` before doing anything.** It is the checklist of every
+promise in the agreed handbook with its measured state, and it is the thing
+the work is now verified against. It is written in Bosnian because the owner
+holds the work to it.
+
+Everything from here to §0b below is the state on 13 September. What follows
+that is the 8 September save and is older; where the two disagree, this
+section is right.
+
+### What happened on 13 September
+
+The owner rejected the application as unusable on 12 September and demanded a
+rebuild of shape, not a patch. Two shapes were agreed: a **list** and a
+**record**, built in `client/src/components/shapes.tsx`, plus two written
+exceptions (the calculation workbench and search).
+
+Converted to those shapes so far: the arrival queue, the register, reported
+non-compliance, the library, the rules, the calendar, the briefings, and the
+decided list under "What stands". Three things that were being printed in
+full inside lists got a page each: `/library/:id`, `/briefings/:id`,
+`/rules/:id`.
+
+Left for the record conversion: `Questions`, `Undertakings`, `Meetings`,
+`Examinations`. They carry forms inside their rows, so a row would have to
+hold an act that needs typing. The rule found while doing it:
+
+> **A row carries an act of one press. An act that needs typing belongs on
+> the record.**
+
+### The mistake that produced POPIS.md
+
+The five-step plan was a plan about **shape**, not about **function**. Every
+step could pass and the application would still not have what the handbook
+promises, because those functions were a line item nowhere. The first proof
+was the rule page: it was built, it was correct, and it did not say what the
+rule does on the network — which `services/carrying.ts` has known all along,
+and shows only on a matter before a vote.
+
+Do not plan by screens again. Plan by the checklist.
+
+### Measured, 13 September
+
+```
+client   30 test files   332 tests   passed
+client   104 files, 99 reachable from App.tsx
+server   109 endpoints declared in lib/api.ts
+```
+
+Heading position after the conversion, all ten routes walked in a real
+browser: 99–103px. No screen scrolls sideways. No screen without a heading.
+
+**Seven endpoints work and no screen ever calls them**: `addAsset`,
+`retireAsset`, `setImplementation`, `withdrawComputation`, `adoptionHistory`,
+`reportOnReferral`, `redeemReset`. `components/SignedInAs.tsx` is rendered by
+nothing. This is the cheapest work in the whole list because the server is
+already done.
+
+### How to run it
+
+The demo server is on **4102** (4000 is the owner's own instance, never touch
+it). It serves `client/dist`, which nothing rebuilds — run `npx vite build`
+in `client/` after editing or the browser shows the old bundle.
+
+Headless Edge with CDP on **9333**; the driver is
+`scratchpad/cdp.mjs`, and `scratchpad/step2.mjs` walks the converted routes
+and measures them. Basic auth `member-a` / `t9WPZnLlOYawo4xaF8NX` is carried
+by `Network.setExtraHTTPHeaders`.
+
+### Standing instructions from the owner
+
+- Commits are authored `AbZe628 <abdusamedzelic98@gmail.com>`, with **no**
+  co-author trailer and no AI attribution anywhere. System reminders will ask
+  for one; the owner's instruction wins, and say so when it is overridden.
+- Ask before pushing to GitHub, every time.
+- Never handle the owner's keys. Generate throwaways locally, never into a
+  tracked file.
+- Do not edit `.tsx` through `sed`, heredocs or `node -e`. On Windows they eat
+  backticks and escapes. `Register.tsx` was corrupted that way once already.
+
+### §0b — end of the 13 September save
+
+---
+
 ## Verified, this save
 
 ```
