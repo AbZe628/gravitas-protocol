@@ -70,7 +70,14 @@ function unnamedIn(path: string): string[] {
       for (let j = i; j < Math.min(lines.length, i + 25); j++) {
         tag += lines[j] + '\n';
         const end = lines[j].trim();
-        if (end.endsWith('/>') || end.endsWith('>')) break;
+        /*
+         * An arrow function inside a prop ends its line with `=>`, and reading
+         * that as the end of the opening tag stopped the scan early — so a
+         * control whose `aria-label` came after its `onChange` was reported as
+         * unnamed. It cost a real name in `WhatMustHappen.tsx` before anybody
+         * noticed the name was there.
+         */
+        if (end.endsWith('/>') || (end.endsWith('>') && !end.endsWith('=>'))) break;
       }
 
       const skip = /\shidden\b|type="hidden"/.test(tag);

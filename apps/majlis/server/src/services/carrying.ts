@@ -95,15 +95,41 @@ export interface Carrying {
  * inference `drift.ts` refuses to make. A board that called its breach term
  * `onFailure` is served the same as one that called it `onBreach`.
  */
+const REFUSALS = [
+  'block',
+  'suspend',
+  'halt',
+  'reclassify',
+  'freeze',
+  /*
+   * `revert` is the word a contract uses for refusing, and it was missing.
+   * Two of the three seeded rulings say `revert` and neither of them could
+   * answer *what happens if this fails* — on the matter screen either, since
+   * that reads the same list. Found by running the list against the seed
+   * rather than by reading it.
+   */
+  'revert',
+  'reject',
+  'refuse',
+  'decline',
+  'stop',
+];
+
 function isBreachBehaviour(term: RuleParameter): boolean {
   const value = term.value.toLowerCase();
-  return (
-    value.includes('block') ||
-    value.includes('suspend') ||
-    value.includes('halt') ||
-    value.includes('reclassify') ||
-    value.includes('freeze')
-  );
+  return REFUSALS.some((word) => value.includes(word));
+}
+
+/**
+ * A term that fixes a figure, as opposed to one that names something.
+ *
+ * Read off the value and never off the key, for the reason above. `5100` is a
+ * figure; `pool.navBreakdown` and `leased_property,trade_finance` name a place
+ * to look and a set to be inside. A ruling with no figure in it is a standard
+ * of conduct, and the difference decides two of the six answers below.
+ */
+function isFigure(term: RuleParameter): boolean {
+  return /^-?\d+(\.\d+)?$/.test(term.value.trim());
 }
 
 /**
@@ -134,6 +160,126 @@ const ATTACHED_LIMITS = [
   'Majlis reads what the registry currently says. It does not write to it, and a decision taken here does not itself change what is enforced — that is a separate act by whoever holds the key.',
   'A term the registry does not implement is not enforced by being written here. What is carried out is what the registry was configured to read.',
 ];
+
+/**
+ * What a ruling in force means from one day to the next.
+ *
+ * ── the six answers, and why they are not six sentences ───────────────────
+ *
+ * The handbook promises that every ruling answers the same six questions in
+ * the same six places: what the board decided, how it is measured, whether it
+ * moves, when it is checked, what happens if it fails, and who is told. A
+ * ruling that says *the tangible share must stay above fifty-one per cent*
+ * tells a person about to place a trade almost nothing on its own.
+ *
+ * This returns the **facts** and not the sentences. The sentences are built in
+ * the interface, out of the dictionaries, because this application is read in
+ * English, Arabic and Urdu and prose assembled here would be English in all
+ * three. `whenChecked` and `drift` above are older and are English wherever
+ * they appear, which is a fault this does not repeat.
+ *
+ * The board's own words are the exception and travel unchanged: a term's
+ * `meaning` is what the board wrote and nothing here rewrites or translates
+ * it.
+ *
+ * ── where nothing answers, it says so ─────────────────────────────────────
+ *
+ * A ruling that is a standard of conduct rather than a measurement has nothing
+ * that measures it, and only a person reading the file can tell whether it is
+ * being kept. That is an answer and it is given. An empty box is not: a board
+ * that never sees the question assumes the software has it covered.
+ */
+export interface DayToDay {
+  ruleId: string;
+  /** Whether anything is attached that reads these terms. */
+  attached: boolean;
+  carrier: string | null;
+  cadence: CheckCadence;
+  /** The board's own words. Never rewritten, never translated. */
+  statement: string;
+  /** Terms that fix a figure. */
+  figures: TermCarried[];
+  /** Terms that name a place to look or a set to be inside. */
+  names: TermCarried[];
+  /** Terms that say what happens when the ruling is not met. */
+  behaviours: TermCarried[];
+  /**
+   * Whether the thing being measured can change without anybody acting.
+   *
+   * A figure read from a source moves with whatever that source reports. A set
+   * of permitted categories does not move at all: it changes when the board
+   * changes it and at no other time.
+   */
+  moves: 'with_what_it_is_read_from' | 'only_when_the_board_changes_it';
+  /** What Majlis cannot see about this, named rather than glossed. */
+  limits: string[];
+}
+
+export function buildDayToDay(
+  rule: { id: string; statement: string; parameters: RuleParameter[] },
+  snapshot: EnforcementSnapshot,
+): DayToDay {
+  const parameters = rule.parameters ?? [];
+  const behaviours = parameters.filter(isBreachBehaviour);
+  const rest = parameters.filter((p) => !isBreachBehaviour(p));
+  const figures = rest.filter(isFigure);
+  const names = rest.filter((p) => !isFigure(p));
+
+  const carried = (list: RuleParameter[]): TermCarried[] =>
+    list.map((p) => ({
+      key: p.key,
+      value: p.value,
+      unit: p.unit,
+      meaning: p.meaning,
+      onBreach: null,
+    }));
+
+  /*
+   * It moves only if there is a figure and something that says where the
+   * figure is read from. A figure with no source named is a figure somebody
+   * supplies by hand, and calling that "it follows the market" would be this
+   * file inventing a mechanism the ruling does not describe.
+   */
+  const moves =
+    figures.length > 0 && names.length > 0
+      ? 'with_what_it_is_read_from'
+      : 'only_when_the_board_changes_it';
+
+  const limits = snapshot.configured ? [...ATTACHED_LIMITS] : [...NOTHING_ATTACHED_LIMITS];
+
+  /*
+   * Nobody is told by this software. Notices are composed and the sending is
+   * off unless the institution wires its own relay, and a board reading "the
+   * desk is told" would believe an email goes out. It is a limit and it is
+   * named here rather than left for somebody to discover.
+   */
+  limits.push(
+    'Majlis composes a notice when something happens, and sends nothing unless this installation ' +
+      'has been given the institution’s own mail relay. Until it has, whoever needs to know is ' +
+      'told by somebody reading this screen.',
+  );
+
+  if (snapshot.configured && snapshot.reachable === false) {
+    limits.unshift(
+      `${snapshot.label ?? 'The enforcing registry'} could not be read just now` +
+        `${snapshot.error ? `: ${snapshot.error}` : '.'} What is above is what it was configured ` +
+        'to do, not a confirmation that it is doing it.',
+    );
+  }
+
+  return {
+    ruleId: rule.id,
+    attached: snapshot.configured,
+    carrier: snapshot.configured ? (snapshot.label ?? 'the enforcing registry') : null,
+    cadence: snapshot.configured ? 'before_every_transaction' : 'when_someone_looks',
+    statement: rule.statement,
+    figures: carried(figures),
+    names: carried(names),
+    behaviours: carried(behaviours),
+    moves,
+    limits,
+  };
+}
 
 export function buildCarrying(matter: Matter, snapshot: EnforcementSnapshot): Carrying {
   const parameters = matter.proposedRule.parameters ?? [];

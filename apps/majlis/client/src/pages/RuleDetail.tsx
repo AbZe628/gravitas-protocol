@@ -5,6 +5,7 @@ import { useI18n } from '../lib/i18n.js';
 import { mayDeliberate, useIdentity } from '../lib/identity.js';
 import ReconsiderThis from '../components/ReconsiderThis.js';
 import { DocumentLink } from '../components/Documents.js';
+import WhatItMeans from '../components/WhatItMeans.js';
 import { Nothing } from '../components/page.js';
 import { ActionPanel, Facts, RecordPage } from '../components/shapes.js';
 import { DateText, ErrorText, Loading, Section, Sources, Tag } from '../components/ui.js';
@@ -127,27 +128,30 @@ export default function RuleDetail() {
         </p>
       </Section>
 
-      <Section title={t('rule.parameters')}>
-        <dl className="space-y-3">
-          {rule.parameters.map((p) => (
-            <div key={p.key} className="rounded-card bg-raised px-4 py-3 shadow-ring">
-              <dt className="break-all font-mono text-[12.5px] text-lapis">
-                {p.key} = {p.value}
-                {p.unit ? <span className="text-muted"> {p.unit}</span> : null}
-              </dt>
-              <dd className="mt-1 text-[13px] leading-[1.6] text-sand">{p.meaning}</dd>
-            </div>
-          ))}
-        </dl>
+      {/*
+        The terms are not listed here first.
 
-        {/*
-          The hash is what a later reader checks the figures against. It is
-          named rather than left as a line of characters under a card.
-        */}
-        <p className="mt-3 text-[11.5px] text-muted">
-          {t('rule.hashLabel')} <span className="break-all font-mono">{rule.parameterHash}</span>
-        </p>
-      </Section>
+        They were, and the page then printed every term twice: once as a list
+        under a heading, and again inside the six answers, split across the
+        questions each one belongs to. On a ruling that fixes no figure at all
+        the heading was also a small lie, since it said *the figures this
+        fixes* above a set of categories.
+
+        Each term is shown once, under the question it answers. A term that
+        says what happens on a breach appears at question five, where somebody
+        is looking for it, rather than third in a list where it reads as a
+        setting.
+      */}
+      <WhatItMeans ruleId={rule.id} />
+
+      {/*
+        The fingerprint is what a later reader checks the terms against, so it
+        follows them rather than leading. Named, not left as a bare line of
+        characters.
+      */}
+      <p className="mt-4 text-[11.5px] text-muted">
+        {t('rule.hashLabel')} <span className="break-all font-mono">{rule.parameterHash}</span>
+      </p>
 
       <Sources sources={rule.sources} />
     </RecordPage>

@@ -6,6 +6,8 @@ import { ErrorText, Loading } from '../components/ui.js';
 import { State, type Tone } from '../components/kit.js';
 import { Division, Gaps, Nothing, PageHead } from '../components/page.js';
 import { Row, Rows } from '../components/shapes.js';
+import { mayDeliberate, useIdentity } from '../lib/identity.js';
+import EnterAHolding from '../components/EnterAHolding.js';
 
 /**
  * The universe the board rules on.
@@ -86,14 +88,18 @@ function holdingRow(s: AssetStanding, t: (k: string) => string) {
 
 export default function Register() {
   const { t } = useI18n();
+  const { identity } = useIdentity();
   const [data, setData] = useState<RegisterData | null>(null);
   const [failed, setFailed] = useState(false);
 
-  useEffect(() => {
+  const load = () =>
     oversight
       .register()
       .then(setData)
       .catch(() => setFailed(true));
+
+  useEffect(() => {
+    void load();
   }, []);
 
   if (failed) return <ErrorText />;
@@ -157,6 +163,15 @@ export default function Register() {
           ) : undefined
         }
       />
+
+      {/*
+        The one thing a person comes here to start.
+
+        The register could be read and never added to, on a screen whose whole
+        subject is what the board has not looked at yet. The route to add one
+        has always worked; nothing asked for it.
+      */}
+      {mayDeliberate(identity?.role) && <EnterAHolding onEntered={() => void load()} />}
 
       {assets.length === 0 ? (
         <Nothing>{t('reg.none')}</Nothing>

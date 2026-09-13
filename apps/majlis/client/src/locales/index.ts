@@ -970,6 +970,48 @@ const en: Dict = {
   'reg.status.lapsed': "Lapsed",
   'reg.status.retired': "Withdrawn",
   'reg.kind.token': "Token",
+
+  // Entering a holding by hand. The server has always taken one; no screen asked.
+  'common.remove': "Remove step",
+
+  // What the institution has to do once a ruling carries. The record has held
+  // these all along and printed them on the written ruling; nothing set them.
+  'doing.title': "What must happen once this carries",
+  'doing.lead':
+    "The steps the institution follows once this is in force. One line each, in the order they happen. They are printed on the written ruling and in the compliance manual.",
+  'doing.noneYet':
+    "No steps have been written. The ruling will say what is permitted and nothing about what the institution is expected to do.",
+  'doing.noneEver':
+    "The board wrote no steps for this ruling, so the written ruling says nothing about how it is carried out.",
+  'doing.write': "Write the steps",
+  'doing.change': "Change the steps",
+  'doing.addStep': "Another step",
+  'doing.step': "Step",
+  'doing.save': "Keep these steps",
+  'doing.freezeWarning':
+    "These stop moving when the vote opens, with the terms and for the same reason: a ruling whose implementation could be rewritten afterwards is a ruling nobody signed.",
+  'doing.frozen':
+    "Fixed when the vote opened. What is above is what was signed.",
+
+  'reg.enter': "Enter a holding",
+  'reg.enterLead':
+    "For a holding nobody has entered yet. This puts it in the register so the board can see it. It is not a ruling and it permits nothing: the holding stands as never examined until the board is asked about it.",
+  'reg.enterIt': "Put it in the register",
+  'reg.enterNote':
+    "Recorded as entered by you, on today's date. A holding entered by a person is marked as such, because nobody has ruled on this and nobody has even told us about this are different states.",
+  'reg.nameLabel': "What it is called",
+  'reg.schemeLabel': "Identified by",
+  'reg.identifierLabel': "The identifier",
+  'reg.networkLabel': "Network",
+  'reg.scheme.chain': "Chain address",
+  'reg.scheme.isin': "ISIN",
+  'reg.scheme.ticker': "Ticker",
+  'reg.scheme.internal': "Internal reference",
+  'reg.retire': "Retire this holding",
+  'reg.retireLead':
+    "For a holding the institution no longer holds. It stays in the record with everything the board said about it: retired, never deleted.",
+  'reg.retireWhy': "Why it is being retired",
+  'reg.retireIt': "Retire it",
   'reg.kind.pool': "Pool",
   'reg.kind.security': "Security",
   'reg.kind.instrument': "Instrument",
@@ -1298,8 +1340,48 @@ const en: Dict = {
   'rule.notFound': 'No ruling with that reference.',
   'rule.nextDue': 'The date this was to be looked at again has passed.',
   'rule.nextStands': 'This stands. Nothing is waiting on the board.',
-  'rule.parameters': 'The figures this fixes',
   'rule.hashLabel': 'Fingerprint of the figures:',
+
+  // The six questions every ruling answers, in the same six places.
+  'six.title': 'What this means from day to day',
+  'six.lead':
+    'The same six questions for every ruling, in the same order. Where nothing in the ruling answers one, it says so rather than leaving it blank.',
+  'six.readBy': 'Read by',
+  'six.q1': 'What the board decided',
+  'six.q2': 'How it is measured',
+  'six.q3': 'Does it move',
+  'six.q4': 'When it is checked',
+  'six.q5': 'What happens if it fails',
+  'six.q6': 'Who is told',
+  'six.measured.fromASource':
+    'It is read from what the board named, at the moment it is needed.',
+  'six.measured.againstAList':
+    'Not as a figure. Nothing here is counted. It is checked against what the board listed:',
+  'six.measured.nothingMeasures':
+    'Nothing measures this. It is a standard of conduct rather than a figure, and only a person reading the file can tell whether it is being kept.',
+  'six.measured.figureNoSource':
+    'The ruling fixes a figure and does not say where the figure is read from. Somebody supplies it by hand, and only a person reading the file can tell from what.',
+  /*
+    Read at the moment of each transaction, rather than "it follows the
+    market". The first version said the market one, and on a ruling that fixes
+    exchange at par — where nothing moves at all — it was simply false. The
+    software cannot tell a threshold that drifts from one that does not, so it
+    says the thing that is true of both.
+  */
+  'six.moves.withSource':
+    'It is read at the moment of each transaction, so the answer can differ from one transaction to the next without anybody having acted.',
+  'six.moves.onlyBoard':
+    'No. It does not move on its own. It changes when the board changes it, and at no other time.',
+  'six.checked.everyTransaction':
+    'Before every transaction that depends on it. A transaction that would breach it does not execute: it is refused at the moment of the attempt rather than found afterwards.',
+  'six.checked.whenSomeoneLooks':
+    'When somebody looks. Nothing is attached to this installation, so this is carried out by whatever the institution already uses, and the ruling is tested at a review rather than continuously.',
+  'six.fails.nothingSays':
+    'No term in this ruling says what happens when it is not met. Whatever happens is decided by whoever notices.',
+  'six.told.attached':
+    'The desk is refused at the moment of the attempt, so it learns at once. Majlis does not watch the registry, so the board learns when somebody reports it here.',
+  'six.told.notAttached':
+    'Nobody is told automatically. Whoever notices raises it here.',
 
   'brief.question': 'Question for the board',
   'brief.none': 'Nothing has been published to this board yet.',
@@ -2065,8 +2147,40 @@ const ar: Dict = {
   "rule.notFound": "لا يوجد حكم بهذا المرجع.",
   "rule.nextDue": "مضى الموعد الذي كان يُنظر فيه هذا من جديد.",
   "rule.nextStands": "هذا قائم. لا شيء ينتظر الهيئة.",
-  "rule.parameters": "المقادير التي يثبّتها",
   "rule.hashLabel": "بصمة المقادير:",
+
+  "six.title": "ماذا يعني هذا في العمل اليومي",
+  "six.lead":
+    "الأسئلة الستة نفسها لكل حكم، وبالترتيب نفسه. وحيث لا يجيب الحكم عن واحد منها، يُقال ذلك صراحةً بدل أن يُترك فارغاً.",
+  "six.readBy": "يقرؤه",
+  "six.q1": "ما الذي قرره المجلس",
+  "six.q2": "كيف يُقاس",
+  "six.q3": "هل يتحرك",
+  "six.q4": "متى يُفحص",
+  "six.q5": "ماذا يحدث إذا لم يُستوفَ",
+  "six.q6": "من يُبلَّغ",
+  "six.measured.fromASource":
+    "يُقرأ ممّا سمّاه المجلس، في اللحظة التي يُحتاج إليه فيها.",
+  "six.measured.againstAList":
+    "ليس بمقدار. لا شيء هنا يُعَدّ. يُقاس على ما عدّده المجلس:",
+  "six.measured.nothingMeasures":
+    "لا شيء يقيس هذا. هو معيار سلوك لا مقدار، ولا يستطيع أحد أن يعرف إن كان مرعيّاً إلا من يقرأ الملف.",
+  "six.measured.figureNoSource":
+    "الحكم يثبّت مقداراً ولا يقول من أين يُقرأ هذا المقدار. يورده إنسان بيده، ولا يعرف من أين إلا من يقرأ الملف.",
+  "six.moves.withSource":
+    "يُقرأ عند كل معاملة، فقد يختلف الجواب من معاملة إلى أخرى دون أن يفعل أحد شيئاً.",
+  "six.moves.onlyBoard":
+    "لا. لا يتحرك من تلقاء نفسه. يتغير حين يغيّره المجلس، ولا يتغير في غير ذلك.",
+  "six.checked.everyTransaction":
+    "قبل كل معاملة تتوقف عليه. المعاملة التي تخالفه لا تُنفَّذ: تُرفض عند المحاولة لا تُكتشف بعد وقوعها.",
+  "six.checked.whenSomeoneLooks":
+    "حين ينظر أحد. لا شيء موصول بهذه النسخة، فتنفيذ هذا يجري بما تستعمله المؤسسة أصلاً، ويُفحص الحكم عند المراجعة لا على الدوام.",
+  "six.fails.nothingSays":
+    "ليس في هذا الحكم شرط يقول ماذا يحدث إذا لم يُستوفَ. ما يحدث يقرره من يلحظ الأمر.",
+  "six.told.attached":
+    "يُرفض الطلب عند المحاولة، فيعلم المكتب في حينه. ولا يراقب المجلس السجلّ، فيعلم المجلس حين يُبلِّغ أحد هنا.",
+  "six.told.notAttached":
+    "لا يُبلَّغ أحد تلقائياً. من يلحظ الأمر يرفعه هنا.",
   "brief.raisedBy": "أثارها",
   "brief.raisedBy.technical_team": "الفريق التقني",
   "brief.raisedBy.board_member": "عضو في المجلس",
@@ -2695,6 +2809,44 @@ const ar: Dict = {
   'reg.status.lapsed': "ساقط",
   'reg.status.retired': "مسحوب",
   'reg.kind.token': "رمز",
+
+  'common.remove': "احذف الخطوة",
+
+  'doing.title': "ما الذي يجب أن يحدث بعد نفاذ هذا",
+  'doing.lead':
+    "الخطوات التي تتبعها المؤسسة بعد سريان هذا. سطر لكل خطوة، بترتيب وقوعها. تُطبع على الحكم المكتوب وفي دليل الالتزام.",
+  'doing.noneYet':
+    "لم تُكتب أي خطوة. سيقول الحكم ما هو مباح ولا يقول شيئاً عمّا يُنتظر من المؤسسة أن تفعله.",
+  'doing.noneEver':
+    "لم يكتب المجلس خطوات لهذا الحكم، فالحكم المكتوب لا يقول شيئاً عن كيفية تنفيذه.",
+  'doing.write': "اكتب الخطوات",
+  'doing.change': "غيّر الخطوات",
+  'doing.addStep': "خطوة أخرى",
+  'doing.step': "خطوة",
+  'doing.save': "أثبِت هذه الخطوات",
+  'doing.freezeWarning':
+    "تتوقف هذه عن التغيّر عند فتح التصويت، مع الشروط وللسبب نفسه: الحكم الذي يمكن إعادة كتابة تنفيذه بعد التصويت حكم لم يوقّعه أحد.",
+  'doing.frozen': "ثبتت عند فتح التصويت. ما فوق هو ما وُقِّع عليه.",
+
+  'reg.enter': "أدخِل أصلاً",
+  'reg.enterLead':
+    "لأصل لم يُدخِله أحد بعد. هذا يضعه في السجلّ ليراه المجلس. ليس حكماً ولا يُبيح شيئاً: يبقى الأصل «لم يُنظر فيه» حتى يُسأل المجلس عنه.",
+  'reg.enterIt': "ضَعه في السجلّ",
+  'reg.enterNote':
+    "يُسجَّل أنك أدخلته، بتاريخ اليوم. والأصل الذي يُدخِله إنسان يُعلَّم بذلك، لأن «لم يحكم أحد في هذا» و«لم يخبرنا أحد بهذا» حالان مختلفان.",
+  'reg.nameLabel': "الاسم",
+  'reg.schemeLabel': "يُعرَّف بـ",
+  'reg.identifierLabel': "المعرّف",
+  'reg.networkLabel': "الشبكة",
+  'reg.scheme.chain': "عنوان على السلسلة",
+  'reg.scheme.isin': "رقم آيزن",
+  'reg.scheme.ticker': "الرمز المختصر",
+  'reg.scheme.internal': "مرجع داخلي",
+  'reg.retire': "اسحب هذا الأصل",
+  'reg.retireLead':
+    "لأصل لم تعد المؤسسة تملكه. يبقى في السجلّ بكل ما قاله المجلس عنه: يُسحب ولا يُحذف.",
+  'reg.retireWhy': "سبب السحب",
+  'reg.retireIt': "اسحبه",
   'reg.kind.pool': "مجمع",
   'reg.kind.security': "ورقة مالية",
   'reg.kind.instrument': "أداة",
@@ -3528,8 +3680,40 @@ const ur: Dict = {
   "rule.notFound": "اس حوالے سے کوئی فیصلہ نہیں۔",
   "rule.nextDue": "جس تاریخ پر اسے دوبارہ دیکھنا تھا وہ گزر چکی ہے۔",
   "rule.nextStands": "یہ قائم ہے۔ بورڈ پر کچھ باقی نہیں۔",
-  "rule.parameters": "وہ مقدار جو یہ طے کرتا ہے",
   "rule.hashLabel": "مقداروں کا نشان:",
+
+  "six.title": "روزمرہ میں اس کا کیا مطلب ہے",
+  "six.lead":
+    "ہر فیصلے کے لیے وہی چھ سوال، اسی ترتیب سے۔ جہاں فیصلہ کسی ایک کا جواب نہیں دیتا، وہاں یہ کہہ دیا جاتا ہے، خالی نہیں چھوڑا جاتا۔",
+  "six.readBy": "پڑھنے والا",
+  "six.q1": "بورڈ نے کیا طے کیا",
+  "six.q2": "اسے کیسے ناپا جاتا ہے",
+  "six.q3": "کیا یہ بدلتا رہتا ہے",
+  "six.q4": "کب جانچا جاتا ہے",
+  "six.q5": "اگر پورا نہ ہو تو کیا ہوتا ہے",
+  "six.q6": "کس کو بتایا جاتا ہے",
+  "six.measured.fromASource":
+    "جو بورڈ نے نامزد کیا، اسی سے پڑھا جاتا ہے، عین اُس وقت جب ضرورت ہو۔",
+  "six.measured.againstAList":
+    "مقدار کے طور پر نہیں۔ یہاں کچھ گنا نہیں جاتا۔ اسے اُس فہرست پر پرکھا جاتا ہے جو بورڈ نے لکھی:",
+  "six.measured.nothingMeasures":
+    "اسے کوئی چیز نہیں ناپتی۔ یہ مقدار نہیں بلکہ طرزِ عمل کا معیار ہے، اور یہ صرف وہی بتا سکتا ہے جو فائل پڑھے۔",
+  "six.measured.figureNoSource":
+    "فیصلہ ایک مقدار طے کرتا ہے مگر یہ نہیں کہتا کہ وہ کہاں سے پڑھی جائے۔ اسے کوئی ہاتھ سے درج کرتا ہے، اور کہاں سے، یہ صرف فائل پڑھنے والا جانتا ہے۔",
+  "six.moves.withSource":
+    "یہ ہر لین دین کے وقت پڑھا جاتا ہے، سو جواب ایک لین دین سے دوسرے میں بدل سکتا ہے، بغیر اس کے کہ کسی نے کچھ کیا ہو۔",
+  "six.moves.onlyBoard":
+    "نہیں۔ یہ خود سے نہیں بدلتا۔ یہ تب بدلتا ہے جب بورڈ بدلے، اور کسی اور وقت نہیں۔",
+  "six.checked.everyTransaction":
+    "ہر اُس لین دین سے پہلے جو اس پر منحصر ہے۔ جو لین دین اس کی خلاف ورزی کرے وہ چلتا ہی نہیں: کوشش کے وقت ہی روک دیا جاتا ہے، بعد میں پکڑا نہیں جاتا۔",
+  "six.checked.whenSomeoneLooks":
+    "جب کوئی دیکھے۔ اس نسخے سے کچھ منسلک نہیں، سو یہ اسی نظام سے چلتا ہے جو ادارہ پہلے سے استعمال کرتا ہے، اور فیصلہ مسلسل نہیں بلکہ جائزے پر جانچا جاتا ہے۔",
+  "six.fails.nothingSays":
+    "اس فیصلے میں کوئی شرط نہیں بتاتی کہ پورا نہ ہونے پر کیا ہوگا۔ جو ہوگا وہ اس کا فیصلہ ہے جو اسے دیکھے۔",
+  "six.told.attached":
+    "کوشش کے وقت ہی انکار ہو جاتا ہے، سو ڈیسک کو فوراً پتہ چل جاتا ہے۔ مجلس رجسٹری کو نہیں دیکھتی، سو بورڈ کو تب پتہ چلتا ہے جب کوئی یہاں اطلاع دے۔",
+  "six.told.notAttached":
+    "کسی کو خود بخود نہیں بتایا جاتا۔ جو دیکھے وہ یہاں اٹھائے۔",
   "brief.raisedBy": "اٹھانے والا",
   "brief.raisedBy.technical_team": "تکنیکی ٹیم",
   "brief.raisedBy.board_member": "بورڈ کا ایک رکن",
@@ -4158,6 +4342,44 @@ const ur: Dict = {
   'reg.status.lapsed': "ساقط",
   'reg.status.retired': "واپس لیا گیا",
   'reg.kind.token': "ٹوکن",
+
+  'common.remove': "قدم ہٹائیں",
+
+  'doing.title': "نافذ ہونے کے بعد کیا ہونا چاہیے",
+  'doing.lead':
+    "وہ اقدامات جو ادارہ نافذ ہونے کے بعد کرے گا۔ ہر ایک الگ سطر میں، اسی ترتیب سے جس میں ہوں گے۔ یہ تحریری فیصلے اور تعمیل کے دستور میں چھپتے ہیں۔",
+  'doing.noneYet':
+    "کوئی قدم نہیں لکھا گیا۔ فیصلہ بتائے گا کہ کیا جائز ہے، اور یہ نہیں کہ ادارے سے کیا توقع ہے۔",
+  'doing.noneEver':
+    "بورڈ نے اس فیصلے کے لیے کوئی قدم نہیں لکھا، سو تحریری فیصلہ اس کے نفاذ کے بارے میں کچھ نہیں کہتا۔",
+  'doing.write': "اقدامات لکھیں",
+  'doing.change': "اقدامات بدلیں",
+  'doing.addStep': "ایک اور قدم",
+  'doing.step': "قدم",
+  'doing.save': "یہ اقدامات رکھیں",
+  'doing.freezeWarning':
+    "ووٹ کھلتے ہی یہ شرائط کے ساتھ اور اسی وجہ سے رک جاتے ہیں: جس فیصلے کا نفاذ بعد میں دوبارہ لکھا جا سکے، اُس پر کسی نے دستخط نہیں کیے۔",
+  'doing.frozen': "ووٹ کھلنے پر طے ہو گئے۔ اوپر جو ہے وہی دستخط شدہ ہے۔",
+
+  'reg.enter': "کوئی ملکیت درج کریں",
+  'reg.enterLead':
+    "اُس ملکیت کے لیے جو ابھی کسی نے درج نہیں کی۔ یہ اسے رجسٹر میں ڈالتا ہے تاکہ بورڈ دیکھ سکے۔ یہ فیصلہ نہیں اور کسی چیز کی اجازت نہیں دیتا: جب تک بورڈ سے نہ پوچھا جائے، یہ «کبھی نہیں دیکھی گئی» ہی رہے گی۔",
+  'reg.enterIt': "رجسٹر میں ڈالیں",
+  'reg.enterNote':
+    "آج کی تاریخ کے ساتھ آپ کے نام سے درج ہوگا۔ جو ملکیت کوئی شخص درج کرے اس پر نشان لگتا ہے، کیونکہ «اس پر کسی نے فیصلہ نہیں دیا» اور «اس کے بارے میں کسی نے بتایا ہی نہیں» دو الگ باتیں ہیں۔",
+  'reg.nameLabel': "نام",
+  'reg.schemeLabel': "شناخت کس سے",
+  'reg.identifierLabel': "شناخت",
+  'reg.networkLabel': "نیٹ ورک",
+  'reg.scheme.chain': "چین ایڈریس",
+  'reg.scheme.isin': "آئی ایس آئی این",
+  'reg.scheme.ticker': "ٹکر",
+  'reg.scheme.internal': "اندرونی حوالہ",
+  'reg.retire': "یہ ملکیت واپس لیں",
+  'reg.retireLead':
+    "اُس ملکیت کے لیے جو ادارے کے پاس نہیں رہی۔ بورڈ نے اس بارے میں جو کہا وہ سب ریکارڈ میں رہتا ہے: واپس لی جاتی ہے، مٹائی نہیں جاتی۔",
+  'reg.retireWhy': "واپس لینے کی وجہ",
+  'reg.retireIt': "واپس لیں",
   'reg.kind.pool': "پول",
   'reg.kind.security': "سیکیورٹی",
   'reg.kind.instrument': "آلہ",

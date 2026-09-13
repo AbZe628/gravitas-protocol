@@ -8,6 +8,7 @@ import { DriftForAsset } from '../components/Drift.js';
 import { DocumentLink } from '../components/Documents.js';
 import Recorded from '../components/Recorded.js';
 import { ActionPanel, Facts, RecordPage } from '../components/shapes.js';
+import { Field, HEADING } from '../components/field.js';
 
 /**
  * One holding: where it stands, what the board has said about it, what it is
@@ -33,6 +34,8 @@ export default function AssetDetail() {
   const [failed, setFailed] = useState(false);
   const [busy, setBusy] = useState(false);
   const [refusal, setRefusal] = useState<string | null>(null);
+  const [retiring, setRetiring] = useState(false);
+  const [reason, setReason] = useState('');
 
   useEffect(() => {
     oversight
@@ -54,6 +57,31 @@ export default function AssetDetail() {
 
   const a = data.asset;
   const canRaise = mayDeliberate(identity?.role) && !a.retiredAt;
+
+  /**
+   * Withdraw it from the universe.
+   *
+   * Retired, never deleted: a holding that is gone still has a history the
+   * board is answerable for. The page reloads rather than patching its own
+   * copy, so what a reader sees afterwards is what the record says.
+   */
+  async function retire(e: React.FormEvent) {
+    e.preventDefault();
+    if (busy) return;
+    setBusy(true);
+    setRefusal(null);
+    try {
+      await oversight.retireAsset(a.id, reason.trim());
+      const fresh = await oversight.asset(a.id);
+      setRetiring(false);
+      setReason('');
+      setData(fresh);
+    } catch (error) {
+      setRefusal(error instanceof Error ? error.message : String(error));
+    } finally {
+      setBusy(false);
+    }
+  }
 
   /**
    * Open a matter that already knows what it is about.
@@ -95,7 +123,64 @@ export default function AssetDetail() {
   const aside = (
     <>
       {canRaise ? (
-        <ActionPanel next={t('reg.putToTheBoardNext')} whose={t('passage.whose.board')}>
+        <ActionPanel
+          next={t('reg.putToTheBoardNext')}
+          whose={t('passage.whose.board')}
+          /*
+            Retiring is folded away rather than offered beside the act.
+            It is the rarer thing by far, it is not what the board is
+            waiting for, and a control that removes a holding from the
+            universe should take one more press than the one that puts
+            it to the board.
+          */
+          more={
+            <div>
+              {!retiring ? (
+                <button
+                  type="button"
+                  onClick={() => setRetiring(true)}
+                  className="text-start text-[12.5px] text-breach underline decoration-line underline-offset-4"
+                >
+                  {t('reg.retire')}
+                </button>
+              ) : (
+                <form onSubmit={retire}>
+                  <p className="mb-2 text-[11.5px] leading-[1.6] text-muted">
+                    {t('reg.retireLead')}
+                  </p>
+                  <Field label={t('reg.retireWhy')} headingClass={HEADING}>
+                    {(attrs) => (
+                      <textarea
+                        {...attrs}
+                        value={reason}
+                        onChange={(e) => setReason(e.target.value)}
+                        rows={3}
+                        className="w-full rounded-xl bg-raised px-3 py-2 text-[12.5px] shadow-ring outline-none"
+                        required
+                      />
+                    )}
+                  </Field>
+                  <div className="mt-2 flex flex-wrap items-center gap-3">
+                    <button
+                      type="submit"
+                      disabled={busy || reason.trim().length === 0}
+                      className="rounded-xl bg-raised px-3.5 py-2 text-[12.5px] font-medium text-breach shadow-[0_0_0_0.5px_rgba(154,56,48,0.25)] disabled:opacity-40"
+                    >
+                      {t('reg.retireIt')}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setRetiring(false)}
+                      className="text-[12px] text-muted"
+                    >
+                      {t('common.cancel')}
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
+          }
+        >
           <button
             onClick={putToTheBoard}
             disabled={busy}

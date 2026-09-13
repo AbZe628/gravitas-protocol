@@ -133,6 +133,14 @@ export interface Matter extends MatterSummary {
   mechanism: string;
   interactsWith: string[];
   proposedRule: Rule;
+  /**
+   * What the institution does once this carries.
+   *
+   * Frozen with the terms when the vote opens, and printed on the written
+   * ruling and in the compliance manual. Optional because a matter may carry
+   * none, which is a real state and one the screen names rather than hides.
+   */
+  implementationSteps?: string[];
   simulation: Simulation | null;
   deliberation: Deliberation[];
   reasoning: Reasoning[];
@@ -1041,6 +1049,30 @@ export interface Carrying {
   limits: string[];
 }
 
+/**
+ * What a ruling in force means from one day to the next.
+ *
+ * Facts, not sentences. The six answers the handbook promises are composed in
+ * `components/WhatItMeans.tsx` out of the dictionaries, so that they are Arabic
+ * on an Arabic screen. The board's own words — the statement and each term's
+ * meaning — travel in here unchanged and are never translated.
+ */
+export interface DayToDay {
+  ruleId: string;
+  attached: boolean;
+  carrier: string | null;
+  cadence: CheckCadence;
+  statement: string;
+  /** Terms that fix a figure. */
+  figures: TermCarried[];
+  /** Terms that name a place to look or a set to be inside. */
+  names: TermCarried[];
+  /** Terms that say what happens when the ruling is not met. */
+  behaviours: TermCarried[];
+  moves: 'with_what_it_is_read_from' | 'only_when_the_board_changes_it';
+  limits: string[];
+}
+
 // ── the passage a matter makes ────────────────────────────────────────────
 
 export type StepState = 'done' | 'open' | 'ahead' | 'skipped' | 'not_applicable';
@@ -1796,6 +1828,15 @@ export const oversight = {
    * which is most of them.
    */
   carrying: (matterId: string) => get<Carrying>(`/api/matters/${matterId}/carrying`),
+
+  /**
+   * The same question asked of a ruling that is already in force.
+   *
+   * Before the vote a board asks *what will this do*. Afterwards a desk asks
+   * *what does this mean for me today*, and until now the answer disappeared
+   * the moment the matter carried.
+   */
+  dayToDay: (ruleId: string) => get<DayToDay>(`/api/rules/${ruleId}/day-to-day`),
 
   /**
    * What this board already decided about a question of this shape.

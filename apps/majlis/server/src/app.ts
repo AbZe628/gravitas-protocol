@@ -7,7 +7,7 @@ import { z } from 'zod';
 import { storeFromEnv, type Store } from './store/index.js';
 
 import { enforcementFromEnv, type Enforcement } from './services/enforcement.js';
-import { buildCarrying } from './services/carrying.js';
+import { buildCarrying, buildDayToDay } from './services/carrying.js';
 import { assemblePack } from './services/pack.js';
 import { assembleBook, type StandingItem } from './services/board-book.js';
 import { reviewsDue } from './services/review.js';
@@ -239,6 +239,21 @@ export function createApp(
       ...rule,
       parameterHashVerified: verifyParameters(rule.parameters, rule.parameterHash),
     });
+  });
+
+  /*
+   * What this ruling means from one day to the next.
+   *
+   * The six questions the handbook promises every ruling answers. Facts only:
+   * which terms fix a figure, which name where it is read from, which say what
+   * happens when it fails, and whether anything is attached that applies them.
+   * The sentences are built in the interface so that they are Arabic on an
+   * Arabic screen.
+   */
+  app.get('/api/rules/:id/day-to-day', async (req, res) => {
+    const rule = await store.rule(req.params.id);
+    if (!rule) return res.status(404).json({ error: 'not_found', message: 'No such ruling.' });
+    res.json(buildDayToDay(rule, await enforcement.snapshot()));
   });
 
   // ---- matters ---------------------------------------------------------

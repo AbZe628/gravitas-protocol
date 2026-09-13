@@ -8,6 +8,7 @@ import Deliberation from '../components/Deliberation.js';
 import Evidence from '../components/Evidence.js';
 import Precedent from '../components/Precedent.js';
 import Terms from '../components/Terms.js';
+import WhatMustHappen from '../components/WhatMustHappen.js';
 import Checklist from '../components/Checklist.js';
 import Screening from '../components/Screening.js';
 import VotePanel from '../components/VotePanel.js';
@@ -185,6 +186,20 @@ export default function MatterDetail() {
             </div>
           )}
         </Card>
+      </Section>
+
+      {/*
+        Beside the terms, because it is the other half of the same decision.
+        The terms say what the ruling requires; these say what the institution
+        does about it. Both freeze when the vote opens, and until now only one
+        of the two could be written at all.
+      */}
+      <Section title={t('doing.title')}>
+        <WhatMustHappen
+          matter={matter}
+          canEdit={mayDeliberate(identity?.role)}
+          onChanged={setMatter}
+        />
       </Section>
 
       {matter.simulation && (
