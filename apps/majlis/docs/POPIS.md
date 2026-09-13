@@ -73,36 +73,46 @@ alat pojavi sam od sebe na pravom mjestu.
 
 Ovo je srce aplikacije i najslabiji dio.
 
-Danas je stranica predmeta **zid od dvanaest odjeljaka**, jedan ispod drugog:
-prolaz, naslijeđeno, gdje završava, potpis, šta radi u praksi, uslovi,
-vijećanje, dokazi, lista za kvačicu, screening, presedan, izvori, glasanje.
-
-Sve postoji. Ništa ne vodi.
+Stranica predmeta je i dalje duga, ali uslovi su sada numerisani koraci i
+svaki nosi alat koji mu treba. Ono što još ne vodi je redoslijed: svih šest
+koraka stoji otvoreno umjesto da se otvara jedan po jedan.
 
 | šta dokument obećava (pogl. 4) | stanje |
 |---|---|
-| **Uslovi forme postaju koraci predmeta** | NE — `Checklist.tsx` je popis za kvačicu, ne koraci |
-| **Korak koji traži brojku otvara kalkulator u sebi, već popunjen** | NE |
+| **Uslovi forme postaju koraci predmeta** | POLA — numerisani su i nose svoj alat; jedan po jedan otvaranje još nije |
+| **Korak koji traži brojku otvara kalkulator u sebi** | DA — kalkulator se bira iz onoga što oblik imenuje. Popunjavanje iz dokumenta ostaje (traži ključ za asistenta) |
 | Svaka brojka pokazuje stranicu iz koje je uzeta | KOD — `extraction.ts` to zna, nije spojeno |
-| Rezultat ostaje na uslovu, ne odlazi na poseban ekran | NE |
+| Rezultat ostaje na uslovu, ne odlazi na poseban ekran | DA — kalkulacija pamti predmet i uslov |
 | Korak koji dokument ne odgovara postaje pitanje banci | NE |
 | Sat na predmetu staje dok banka odgovara | NE |
-| **Glasanje se ne otvara dok svi koraci nisu odgovoreni** | NE — ruta za glasanje ovo ne provjerava |
-| Uslov koji odbor izuzme putuje na pisanu odluku | NE |
+| **Glasanje se ne otvara dok svi koraci nisu odgovoreni** | DA — odbijanje, ne upozorenje. Izuzet uslov se broji kao odgovoren |
+| Uslov koji odbor izuzme putuje na pisanu odluku | DA — već je radilo, provjereno u fatwa.ts |
 
-**Ocjena koraka: ovdje je posao.** Od osam obećanja iz poglavlja 4, nijedno
-nije ispunjeno u obliku koji vodi.
+**Ocjena koraka nakon 13.09: četiri od osam.** Kalkulator je u koraku,
+rezultat ostaje na uslovu, glasanje je zaključano, izuzeti uslov ide na
+odluku. Ostaje: otvaranje jednog koraka po jedan, brojke sa stranicom izvora,
+pitanje banci iz koraka, i sat koji staje dok banka odgovara.
 
 ### Kalkulatori, po trećem pragu
 
-| kalkulator | postoji | otvara se sam iz koraka |
+Svih šest se sada otvara iz koraka koji ih treba. Koji se nudi ne pogađa se iz
+teksta uslova nego dolazi iz onoga što sam oblik ugovora imenuje; gdje oblik
+imenuje više njih, bira član, jer koji od njih odgovara baš na ovaj uslov je
+prosudba.
+
+| kalkulator | postoji | otvara se iz koraka |
 |---|---|---|
-| Screening | DA | skoro — jedini je na stranici predmeta, ali kao odjeljak, ne kao korak |
-| Tangibilnost | DA | NE |
-| Purifikacija | DA | NE |
-| Zekat | DA | NE |
-| Raspodjela dobiti | DA | NE |
-| Zatezna kamata | DA | NE |
+| Screening | DA | DA |
+| Tangibilnost | DA | DA |
+| Purifikacija | DA | DA |
+| Zekat | DA | DA |
+| Raspodjela dobiti | DA | DA |
+| Zatezna kamata | DA | DA |
+
+Provjereno u browseru na predmetu sukuka: tri koraka traže brojku, kalkulator
+tangibilnosti se otvara **unutar** koraka sa dvanaest polja, i uslov se i dalje
+vidi iznad njega. Zapisana brojka od 61% stoji na svom koraku sa linkom na
+račun.
 
 ## A4. Glasanje i period čekanja
 
@@ -187,7 +197,9 @@ stavku. Kolona **put** je treći prag.
 
 ## 4. Kako softver vodi
 
-Vidi A3. **Nijedna od osam stavki nije ispunjena.**
+Vidi A3. **Četiri od osam ispunjeno 13.09.** Ostale četiri su: jedan korak
+otvoren u isto vrijeme, brojke sa stranicom izvora, pitanje banci iz koraka, i
+sat koji staje dok banka odgovara.
 
 ## 5. Alati
 
@@ -205,7 +217,7 @@ Vidi A3. **Nijedna od osam stavki nije ispunjena.**
 
 ### Kalkulatori
 
-Vidi tabelu u A3. Šest postoji, nijedan se ne otvara iz koraka.
+Vidi tabelu u A3. Šest postoji i svih šest se otvara iz koraka koji ih treba.
 
 | stavka | stanje |
 |---|---|
@@ -353,9 +365,18 @@ tabele su tačne.
 Po drugom pragu, dostupnosti, sada je **skoro sve zatvoreno**: ostala je jedna
 stvar koja radi a nema ekran, i ona pripada koraku 5.
 
-Po **trećem pragu**, onom koji je vlasnik tražio, glavni tok predmeta i dalje
-ne vodi nikoga nigdje: **od osam obećanja poglavlja 4, nijedno.** To je cijeli
-korak 4 i to je ono što dijeli pokazati od predati.
+Po **trećem pragu**, onom koji je vlasnik tražio, glavni tok predmeta je 13.09.
+navečer prešao **četiri od osam** obećanja poglavlja 4: kalkulator je u koraku,
+rezultat ostaje na uslovu, glasanje je zaključano dok uslovi nisu odgovoreni, i
+izuzet uslov ide na pisanu odluku.
+
+Brojevi u tabeli iznad se zbog toga nisu pomjerili, i to je namjerno: Dio B
+nabraja poglavlje 4 kao jedan red koji upućuje na Dio A, pa se napredak unutar
+njega tamo i vidi. Dizati broj u zbiru zbog toga bilo bi tačno ono protiv čega
+je ovaj popis napravljen.
+
+Ostaju četiri: jedan korak otvoren u isto vrijeme, brojke sa stranicom izvora,
+pitanje banci iz koraka, i sat koji staje dok banka odgovara.
 
 ## Osam stvari koje su radile a nijedan ekran ih nije zvao
 

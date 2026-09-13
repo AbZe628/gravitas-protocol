@@ -94,10 +94,36 @@ behind basic auth, so somebody who has forgotten their password gets 401 on
 the page itself. Making it usable means opening a path, which changes the auth
 boundary and is the owner's call.
 
-**What is left is step four, and it is the whole of handbook section 4.** Of
-its eight promises — conditions as steps, the calculator opening inside the
-step already filled, the vote locked until every step is answered — none is
-met. That is the difference between showing Majlis and handing it over.
+### Step four, four of its eight promises
+
+**The calculator opens inside the step.** A condition whose `evidence` is
+`figure` carries it. Which calculator comes from the shape's own
+`calculations` list and is never inferred from a condition's wording; where a
+shape names several the member picks; where it names none the step says so.
+`components/TheCalculator.tsx`.
+
+**What is worked out stays on the question.** `Computation` gained
+`forMatterId` and `forConditionId`. They travel from the step to
+`RecordCalculation` through a context (`lib/workedOutFor.tsx`) rather than as
+props, because six calculators hand one recorder a finished input and
+threading two fields through all six is six chances to forget one. Null at the
+workbench, which is honest.
+
+**The vote is refused while a condition is unanswered**, in
+`routes/governance.ts` at `/matters/:id/voting`. A refusal, not a warning. A
+condition set aside counts as answered. A matter judged against no shape goes
+straight through. Seven tests in `test/the-vote-waits.test.ts`, proved by
+disabling the gate and watching four of them fail.
+
+**A set-aside condition already travelled onto the written ruling** — verified
+in `services/fatwa.ts`, not built.
+
+Four left, and they are the next session's work: opening one step at a time
+rather than all six at once; figures carrying the page they were read from
+(`services/extraction.ts` knows this and is wired to nothing, and it needs a
+model key); a step the document cannot answer becoming a question to the bank
+(`TellingEvent` has no kind for it); and the case clock pausing while the bank
+answers (no pause mechanism exists).
 
 ### How to run it
 
