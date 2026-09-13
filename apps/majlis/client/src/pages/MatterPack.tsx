@@ -323,7 +323,15 @@ export default function MatterPack() {
             <ReadTheContract matterId={matter.id} canRead={identity?.role !== 'observer'} />
             </div>
             <div className="mt-6 border-t border-line pt-5">
-              <Checklist matterId={matter.id} canRule={identity?.role !== 'observer'} />
+              <Checklist
+                matterId={matter.id}
+                canRule={identity?.role !== 'observer'}
+                /* Passed from the matter this page already holds, rather than
+                   fetched again: a second copy of one record can disagree with
+                   the first, and the step would then show a stale question. */
+                asked={matter.asked ?? []}
+                onAsked={load}
+              />
             </div>
           </Part>
 

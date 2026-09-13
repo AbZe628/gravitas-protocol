@@ -275,7 +275,11 @@ export default function MatterDetail() {
         to a single product.
       */}
       <Section title={t('chk.title')}>
-        <Checklist matterId={matter.id} canRule={mayDeliberate(identity?.role)} />
+        <Checklist
+          matterId={matter.id}
+          canRule={mayDeliberate(identity?.role)}
+          asked={matter.asked ?? []}
+        />
       </Section>
 
       {/*

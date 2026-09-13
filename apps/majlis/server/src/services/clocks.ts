@@ -30,6 +30,7 @@
  */
 
 import { quorumFor, ratificationDeadline, tally } from './lifecycle.js';
+import { hoursWithTheInstitution } from './asking.js';
 import type { Board, Matter, MatterStatus } from '../types.js';
 
 const HOUR = 3_600_000;
@@ -62,6 +63,20 @@ export interface Wait {
   hours: number;
   /** The same figure in days, to one decimal. What an interface shows. */
   days: number;
+
+  /**
+   * Of that, the hours spent waiting on the institution to answer something.
+   *
+   * Overlapping questions count once. Reported beside the elapsed figure
+   * rather than taken out of it, because the elapsed figure is what a bank
+   * audits and a clock that shrank on its own would reward asking.
+   */
+  withTheInstitution: number;
+  /** Elapsed less the above: the board's own time, which is what pace means. */
+  boardHours: number;
+  boardDays: number;
+  /** How many questions are outstanding right now. */
+  askedAndUnanswered: number;
 
   /**
    * True when the wait is measured from `openedAt` because `arrivedAt` was
@@ -185,6 +200,16 @@ export function waitOn(board: Board, matter: Matter, now: string): Wait {
   const h = hours(from, to);
   const days = Math.round((h / 24) * 10) / 10;
 
+  /*
+   * Time spent waiting on the institution, separated out.
+   *
+   * Elapsed stays elapsed: a clock that quietly shrank whenever somebody asked
+   * a question would be one a bank could not audit, and would reward asking.
+   * What is reported beside it is how much of the wait was the board's own.
+   */
+  const withTheInstitution = hoursWithTheInstitution(matter, from, to);
+  const boardHours = Math.max(0, h - withTheInstitution);
+
   return {
     matterId: matter.id,
     boardId: matter.boardId,
@@ -193,6 +218,10 @@ export function waitOn(board: Board, matter: Matter, now: string): Wait {
     phase,
     hours: h,
     days,
+    withTheInstitution,
+    boardHours,
+    boardDays: Math.round((boardHours / 24) * 10) / 10,
+    askedAndUnanswered: (matter.asked ?? []).filter((q) => q.answeredAt === null).length,
     partial,
     inferredSettlement: inferred !== null,
     waitingOn,

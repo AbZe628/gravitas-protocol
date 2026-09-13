@@ -978,6 +978,27 @@ const en: Dict = {
   'common.remove': "Remove step",
 
   // A step of the work, and the tool it needs.
+  // A question to the desk, from the step that needs it.
+  'toDesk.title': "Ask the desk about this",
+  'toDesk.lead':
+    "For a condition the draft does not answer. The case is still waiting on the board until this comes back, but the record will show the waiting as the institution's rather than yours.",
+  'toDesk.whatToAsk': "What to ask",
+  'toDesk.send': "Send it to the desk",
+  'toDesk.draftPrefix': "The board is examining this arrangement against the following condition and the draft does not say:",
+  'toDesk.draftTail': "What does the institution do here, and what shows it?",
+  'toDesk.waiting': "With the desk",
+  'toDesk.answered': "Answered",
+  'toDesk.theySaid': "The desk said, through",
+  'toDesk.clockNote':
+    "The case clock counts this as time with the institution rather than as the board's own.",
+  'toDesk.none': "Nothing has been asked of the desk on this case.",
+  'toDesk.answerIt': "Answer this",
+  'toDesk.yourAnswer': "What the institution says",
+  'toDesk.sendAnswer': "Send it to the board",
+  'toDesk.onCase': "On the case",
+
+  'chk.onStep': "On step",
+  'chk.allAnswered': "Every condition has been answered. The vote can open.",
   'step.workItOut': "Work it out here",
   'step.calcLead':
     "Worked out here, it is kept against this condition. The same calculator, opened from the calculations screen, answers nobody's question in particular.",
@@ -2852,6 +2873,25 @@ const ar: Dict = {
 
   'common.remove': "احذف الخطوة",
 
+  'toDesk.title': "اسأل المكتب عن هذا",
+  'toDesk.lead':
+    "لشرطٍ لا يجيب عنه المسودة. تبقى القضية منتظِرة عند المجلس حتى يعود الجواب، لكن السجلّ سيُظهر الانتظار على المؤسسة لا عليكم.",
+  'toDesk.whatToAsk': "نصّ السؤال",
+  'toDesk.send': "أرسِله إلى المكتب",
+  'toDesk.draftPrefix': "ينظر المجلس في هذا الترتيب على الشرط التالي، والمسودة لا تذكره:",
+  'toDesk.draftTail': "ماذا تفعل المؤسسة هنا، وما الذي يُثبته؟",
+  'toDesk.waiting': "عند المكتب",
+  'toDesk.answered': "أُجيب",
+  'toDesk.theySaid': "قال المكتب، عبر",
+  'toDesk.clockNote': "يحتسب ساعةُ القضية هذا وقتاً عند المؤسسة لا وقتاً للمجلس.",
+  'toDesk.none': "لم يُسأل المكتب شيئاً في هذه القضية.",
+  'toDesk.answerIt': "أجِب عن هذا",
+  'toDesk.yourAnswer': "ما تقوله المؤسسة",
+  'toDesk.sendAnswer': "أرسِله إلى المجلس",
+  'toDesk.onCase': "في القضية",
+
+  'chk.onStep': "عند الخطوة",
+  'chk.allAnswered': "أُجيب عن كل الشروط. يمكن فتح التصويت.",
   'step.workItOut': "احسبه هنا",
   'step.calcLead':
     "ما يُحسب هنا يُحفظ على هذا الشرط. والحاسبة نفسها، إن فُتحت من شاشة الحسابات، لا تجيب عن سؤال بعينه.",
@@ -4418,6 +4458,25 @@ const ur: Dict = {
 
   'common.remove': "قدم ہٹائیں",
 
+  'toDesk.title': "اس بارے میں ڈیسک سے پوچھیں",
+  'toDesk.lead':
+    "اُس شرط کے لیے جس کا جواب مسودے میں نہیں۔ جواب آنے تک مقدمہ بورڈ ہی کے پاس رکا رہے گا، مگر ریکارڈ انتظار کو ادارے کے کھاتے میں لکھے گا، آپ کے نہیں۔",
+  'toDesk.whatToAsk': "کیا پوچھنا ہے",
+  'toDesk.send': "ڈیسک کو بھیجیں",
+  'toDesk.draftPrefix': "بورڈ اس ترتیب کو درج ذیل شرط پر پرکھ رہا ہے، اور مسودہ اس بارے میں خاموش ہے:",
+  'toDesk.draftTail': "ادارہ یہاں کیا کرتا ہے، اور اس کا ثبوت کیا ہے؟",
+  'toDesk.waiting': "ڈیسک کے پاس",
+  'toDesk.answered': "جواب آ گیا",
+  'toDesk.theySaid': "ڈیسک نے کہا، بذریعہ",
+  'toDesk.clockNote': "مقدمے کی گھڑی اسے ادارے کا وقت گنتی ہے، بورڈ کا نہیں۔",
+  'toDesk.none': "اس مقدمے میں ڈیسک سے کچھ نہیں پوچھا گیا۔",
+  'toDesk.answerIt': "اس کا جواب دیں",
+  'toDesk.yourAnswer': "ادارہ کیا کہتا ہے",
+  'toDesk.sendAnswer': "بورڈ کو بھیجیں",
+  'toDesk.onCase': "مقدمے پر",
+
+  'chk.onStep': "قدم",
+  'chk.allAnswered': "ہر شرط کا جواب آ گیا۔ ووٹ کھل سکتا ہے۔",
   'step.workItOut': "یہیں نکالیں",
   'step.calcLead':
     "جو یہاں نکالا جائے وہ اسی شرط کے ساتھ رکھا جاتا ہے۔ وہی کیلکولیٹر اگر حسابات کی اسکرین سے کھولیں تو وہ کسی خاص سوال کا جواب نہیں دیتا۔",

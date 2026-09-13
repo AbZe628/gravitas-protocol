@@ -4,6 +4,7 @@ import {
   oversight,
   Refused,
   type Checklist as ChecklistData,
+  type AskedOfTheInstitution,
   type Computation,
   type ConditionState,
   type Proposal,
@@ -12,6 +13,7 @@ import {
 import { useI18n } from '../lib/i18n.js';
 import { Tag } from './ui.js';
 import TheCalculator from './TheCalculator.js';
+import AskTheBank from './AskTheBank.js';
 
 /**
  * The conditions of a contract shape, ruled on one at a time.
@@ -118,10 +120,14 @@ function Condition({
   onCarry,
   onRecord,
   n,
+  here,
+  onHere,
   matterId,
   calculations,
   worked,
   onWorked,
+  asked,
+  onAsked,
 }: {
   state: ConditionState;
   contested: boolean;
@@ -132,12 +138,24 @@ function Condition({
   onRecord: (holds: (typeof HOLDS)[number], reason: string) => Promise<void>;
   /** Which step of the work this is. The list is the work, in order. */
   n: number;
+  /**
+   * Whether this is the step being worked on.
+   *
+   * One at a time. Six conditions open at once is a wall a member reads past;
+   * the one in front of them is the work, and the rest are a list of what is
+   * behind and what is ahead.
+   */
+  here: boolean;
+  onHere: () => void;
   matterId: string;
   /** What the shape says it calculates with. Never inferred from the wording. */
   calculations: string[];
   /** Figures already worked out for this condition. */
   worked: Computation[];
   onWorked: () => void;
+  /** Questions put to the desk about this condition. */
+  asked: AskedOfTheInstitution[];
+  onAsked: () => void;
 }) {
   const { t } = useI18n();
   const [open, setOpen] = useState(false);
@@ -163,6 +181,45 @@ function Condition({
     } finally {
       setBusy(false);
     }
+  }
+
+  /*
+   * A step that is not the one being worked on is a line.
+   *
+   * Its number, what was decided, and the first words of the requirement — so
+   * a member can see what is behind them and what is ahead without six
+   * conditions, six disclosures and six forms all open at once. One press
+   * brings any of them back.
+   */
+  /*
+   * A contested step is never folded away, whichever step the work is on.
+   *
+   * Two members reading one condition differently is the work rather than a
+   * fault, and a disagreement reduced to a truncated line is a disagreement a
+   * board votes without having read. Found by a test that opened a contested
+   * condition and could not see the readings.
+   */
+  if (!here && !contested) {
+    return (
+      <li>
+        <button
+          type="button"
+          onClick={onHere}
+          className="flex w-full items-center gap-3 rounded-card bg-raised/40 px-5 py-2.5 text-start shadow-ring transition-colors hover:bg-raised/70"
+        >
+          <span className="font-mono text-[11px] tabular-nums text-muted">
+            {String(n).padStart(2, '0')}
+          </span>
+          {mine ? (
+            <Tag tone={toneFor(mine.holds)}>{t(`chk.${mine.holds}`)}</Tag>
+          ) : (
+            <Tag>{t('chk.unanswered')}</Tag>
+          )}
+          {contested && <Tag tone="gold">{t('chk.contested')}</Tag>}
+          <span className="min-w-0 flex-1 truncate text-[13px] text-sand">{c.requirement}</span>
+        </button>
+      </li>
+    );
   }
 
   return (
@@ -253,6 +310,23 @@ function Condition({
           )}
         </div>
       )}
+
+      {/*
+        And where the draft does not answer the step at all, the question that
+        gets it answered.
+
+        On every step rather than only on the figure ones: a condition about
+        the order of events is at least as likely to need the desk as one about
+        a ratio. The clock then reports the waiting as the institution's.
+      */}
+      <AskTheBank
+        matterId={matterId}
+        conditionId={c.id}
+        requirement={c.requirement}
+        asked={asked}
+        canAsk={canRule}
+        onAsked={onAsked}
+      />
 
       {/*
         The reason the condition exists, so a scholar can disagree with the
@@ -455,7 +529,24 @@ function Picker({
   );
 }
 
-export default function Checklist({ matterId, canRule }: { matterId: string; canRule: boolean }) {
+export default function Checklist({
+  matterId,
+  canRule,
+  asked = [],
+  onAsked,
+}: {
+  matterId: string;
+  canRule: boolean;
+  /**
+   * Questions already put to the desk on this case.
+   *
+   * Passed in rather than fetched: they live on the matter, which the page
+   * above already holds, and a second fetch of the same record is a second
+   * copy that can disagree with the first.
+   */
+  asked?: AskedOfTheInstitution[];
+  onAsked?: () => void;
+}) {
   const { t } = useI18n();
   const [data, setData] = useState<ChecklistData | null>(null);
   const [structures, setStructures] = useState<Structure[] | null>(null);
@@ -485,6 +576,16 @@ export default function Checklist({ matterId, canRule }: { matterId: string; can
    * second must not cost the first.
    */
   const [worked, setWorked] = useState<Computation[]>([]);
+
+  /**
+   * The step being worked on.
+   *
+   * Null means *the first one nobody has answered*, worked out on each render
+   * so that answering a step moves the work on by itself. A member who opens
+   * a step deliberately pins it there until they answer it or open another —
+   * the software leads, it does not drag.
+   */
+  const [pinned, setPinned] = useState<string | null>(null);
 
   const loadWorked = () =>
     oversight
@@ -548,6 +649,16 @@ export default function Checklist({ matterId, canRule }: { matterId: string; can
       .then((s) => setStructures(s.structures))
       .catch(() => setStructures(null));
   }, [matterId]);
+
+  /*
+   * The first step nobody has answered, worked out fresh each render.
+   *
+   * "Answered" is by anybody on the board, which is the same measure the vote
+   * gate uses. Two places disagreeing about what an answered step is would
+   * mean a member seeing no work left and a chair being refused the vote.
+   */
+  const firstUnanswered =
+    data?.conditions.find((c) => c.answeredBy.length === 0)?.condition.id ?? null;
 
   async function choose(structureId: string) {
     await oversight.setStructure(matterId, structureId);
@@ -649,6 +760,22 @@ export default function Checklist({ matterId, canRule }: { matterId: string; can
         )}
       </p>
 
+      {/*
+        Which step the work is on now, above the list.
+
+        A member arriving at a case should not have to scan six rows to find
+        where they got to. Where every one has been answered it says that
+        instead, because "nothing left" is the fact a chair is looking for
+        before they open the vote.
+      */}
+      <p className="mb-3 text-[12.5px] text-muted">
+        {firstUnanswered
+          ? `${t('chk.onStep')} ${String(
+              data.conditions.findIndex((c) => c.condition.id === (pinned ?? firstUnanswered)) + 1,
+            ).padStart(2, '0')} ${t('reg.of')} ${data.total}`
+          : t('chk.allAnswered')}
+      </p>
+
       {carryRefusal && (
         <p className="mb-3 rounded-xl bg-[#FCF0EE] px-4 py-2.5 text-[12.5px] leading-[1.55] text-breach shadow-[0_0_0_0.5px_rgba(154,56,48,0.18)]">
           {carryRefusal}
@@ -660,10 +787,14 @@ export default function Checklist({ matterId, canRule }: { matterId: string; can
           <Condition
             key={c.condition.id}
             n={i + 1}
+            here={c.condition.id === (pinned ?? firstUnanswered)}
+            onHere={() => setPinned(c.condition.id)}
             matterId={matterId}
             calculations={data.structure.calculations ?? []}
             worked={worked.filter((w) => w.forConditionId === c.condition.id)}
             onWorked={() => void loadWorked()}
+            asked={asked.filter((q) => q.conditionId === c.condition.id)}
+            onAsked={() => onAsked?.()}
             state={c}
             contested={data.contested.includes(c.condition.id)}
             canRule={canRule}

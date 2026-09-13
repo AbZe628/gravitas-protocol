@@ -54,6 +54,7 @@ import { assembleAnnualReport, renderAnnualReport } from '../services/annual.js'
 import { buildCalendar, toICalendar } from '../services/calendar.js';
 import { buildRegister, readComposition, standingOf } from '../services/register.js';
 import { checklistFor, recordFinding, setStructure } from '../services/structure.js';
+import { answerFromTheInstitution, askTheInstitution } from '../services/asking.js';
 import { PURIFICATION_METHODS, purify, type PurificationInput } from '../services/purification.js';
 import { distribute, type DistributionInput } from '../services/distribution.js';
 import { assessTradability, type TradabilityInput } from '../services/tradability.js';
@@ -266,6 +267,18 @@ const structureSchema = z.object({ structureId: z.string().min(1).max(120).nulla
 const stepsSchema = z.object({
   steps: z.array(z.string().min(3).max(2_000)).max(60),
 });
+
+/*
+ * No minimums here on purpose. The service refuses a question too short to act
+ * on and says why in a sentence a member can read; zod would answer
+ * "invalid_request" first and the useful message would never be seen.
+ */
+const askSchema = z.object({
+  conditionId: z.string().min(1).max(120).nullish(),
+  asking: z.string().max(8_000),
+});
+
+const answerSchema = z.object({ answer: z.string().max(8_000) });
 
 const sourceSchema = z.object({
   kind: z.enum(SOURCE_KINDS as [SourceKind, ...SourceKind[]]),
@@ -947,6 +960,62 @@ export function governanceRoutes(
       });
 
       res.json(updated);
+    }),
+  );
+
+  /**
+   * Ask the institution something about this case.
+   *
+   * Usually from a step: a condition requires something the draft never
+   * mentions, and the board needs the desk to say. Asking does not answer the
+   * condition and does not open the vote — what it changes is whose delay the
+   * waiting is, which the clock then reports separately.
+   */
+  router.post(
+    '/matters/:id/asked',
+    handle(async (req, res) => {
+      const who = identityOf(req);
+      if (!requireRole(res, mayDeliberate(who.role), 'ask the institution', who.role)) return;
+
+      const parsed = askSchema.safeParse(req.body);
+      if (!parsed.success) return badRequest(res, parsed.error.issues);
+
+      res.status(201).json(
+        await store.updateMatter(req.params.id, (m) =>
+          askTheInstitution(m, parsed.data, who.scholarId ?? 'unknown', now()),
+        ),
+      );
+    }),
+  );
+
+  /**
+   * The institution's answer.
+   *
+   * Open to the institution's own desk and to the liaison who carries messages
+   * for it. Not to the board: a board that could answer its own question would
+   * be recording the desk's words without the desk having said them.
+   */
+  router.post(
+    '/matters/:id/asked/:questionId/answer',
+    handle(async (req, res) => {
+      const who = identityOf(req);
+      const mayAnswer = who.role === 'institution' || who.role === 'liaison';
+      if (!requireRole(res, mayAnswer, 'answer for the institution', who.role)) return;
+
+      const parsed = answerSchema.safeParse(req.body);
+      if (!parsed.success) return badRequest(res, parsed.error.issues);
+
+      res.json(
+        await store.updateMatter(req.params.id, (m) =>
+          answerFromTheInstitution(
+            m,
+            req.params.questionId,
+            parsed.data.answer,
+            who.scholarId ?? 'the institution',
+            now(),
+          ),
+        ),
+      );
     }),
   );
 

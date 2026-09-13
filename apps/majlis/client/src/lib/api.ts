@@ -132,6 +132,15 @@ export interface Matter extends MatterSummary {
   structureId?: string;
   mechanism: string;
   interactsWith: string[];
+  /**
+   * Questions the board has put to the institution about this case.
+   *
+   * Asking is not answering: a condition with a question outstanding is still
+   * unanswered and the vote still waits for it. What the question changes is
+   * whose delay the waiting is.
+   */
+  asked?: AskedOfTheInstitution[];
+
   proposedRule: Rule;
   /**
    * What the institution does once this carries.
@@ -147,6 +156,19 @@ export interface Matter extends MatterSummary {
   objections: { scholarId: string; reason: string; at: string }[];
   inForceAt: string | null;
   sources: SourceRef[];
+}
+
+/** A question the board put to the institution, and what came back. */
+export interface AskedOfTheInstitution {
+  id: string;
+  /** The condition it came from. Null where it is about the case at large. */
+  conditionId: string | null;
+  asking: string;
+  askedBy: string;
+  askedAt: string;
+  answer: string | null;
+  answeredBy: string | null;
+  answeredAt: string | null;
 }
 
 export interface Briefing {
@@ -747,6 +769,19 @@ export const governance = {
   openDeliberation: (id: string) => send<Matter>(`/api/matters/${id}/open`),
   say: (id: string, body: string, replyTo?: string | null) =>
     send<Matter>(`/api/matters/${id}/deliberation`, { body, replyTo: replyTo ?? null }),
+
+  /**
+   * Ask the institution something about a case, usually from a step.
+   *
+   * The clock then reports the waiting as the institution's rather than the
+   * board's. It does not answer the condition and it does not open the vote.
+   */
+  ask: (id: string, asking: string, conditionId: string | null = null) =>
+    send<Matter>(`/api/matters/${id}/asked`, { asking, conditionId }),
+
+  /** The institution's answer. Refused to anyone but the desk or its liaison. */
+  answerAsked: (id: string, questionId: string, answer: string) =>
+    send<Matter>(`/api/matters/${id}/asked/${questionId}/answer`, { answer }),
 
   openVoting: (id: string) => send<Matter>(`/api/matters/${id}/voting`),
   vote: (id: string, position: 'for' | 'against' | 'abstain', reason: string) =>

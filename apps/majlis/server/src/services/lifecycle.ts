@@ -68,6 +68,13 @@ export type RefusalCode =
   | 'wrong_standing'
   | 'reason_too_short'
   | 'no_reason'
+  // ── a question the board put to the institution ──
+  | 'already_settled'
+  | 'no_question'
+  | 'already_asked'
+  | 'no_such_question'
+  | 'already_answered'
+  | 'no_answer'
   // ── a draft assembled from a ruling ──
   | 'no_structure'
   | 'shape_declined'

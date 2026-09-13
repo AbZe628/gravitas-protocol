@@ -367,6 +367,21 @@ export interface Matter {
    */
   findings?: ConditionFinding[];
 
+  /**
+   * Questions the board has put to the institution about this case.
+   *
+   * A condition often asks for something the draft never mentions — whether
+   * the asset is owned before the sale, what the custodian actually confirms.
+   * Until there was somewhere to put that, the board either guessed or the
+   * question left the software: an email nobody could later find, and a case
+   * that sat at *waiting* with no record of what it was waiting for.
+   *
+   * Append-only like everything else. An answer is recorded against the
+   * question rather than replacing it, so a later reader sees what was asked
+   * as well as what came back.
+   */
+  asked?: AskedOfTheInstitution[];
+
   proposedRule: Rule;
   simulation: Simulation | null;
   deliberation: Deliberation[];
@@ -774,6 +789,40 @@ export interface StructureCondition {
   why: string;
   /** How it is shown: a document, an order of events, a figure, an undertaking. */
   evidence: 'document' | 'sequence' | 'figure' | 'undertaking';
+}
+
+/**
+ * A question the board has put to the institution about one case.
+ *
+ * ── why the case clock stops for this ─────────────────────────────────────
+ *
+ * A board waiting for an answer from the bank is not a board being slow, and
+ * the pace measure has to be able to tell the two apart or it becomes a figure
+ * nobody trusts. The hours between the question and its answer are counted
+ * separately and taken off the board's own time.
+ *
+ * They are **not hidden**. The elapsed time is still the elapsed time; what
+ * the record says is how much of it was spent waiting on somebody else. A
+ * clock that quietly shrank would be a clock a bank could not audit.
+ *
+ * ── and an unanswered question does not answer a condition ────────────────
+ *
+ * Asking is not answering. A step with a question outstanding is still
+ * unanswered, and the vote still waits for it. What the question changes is
+ * whose delay it is.
+ */
+export interface AskedOfTheInstitution {
+  id: string;
+  /** The condition it came from. Null where the board asked about the case at large. */
+  conditionId: string | null;
+  /** What was asked, in the words that were sent. */
+  asking: string;
+  askedBy: string;
+  askedAt: string;
+  /** What came back, and when. Null while it is outstanding. */
+  answer: string | null;
+  answeredBy: string | null;
+  answeredAt: string | null;
 }
 
 /**

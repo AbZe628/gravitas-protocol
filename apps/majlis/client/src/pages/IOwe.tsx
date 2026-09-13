@@ -6,6 +6,7 @@ import { Division, Gaps, Nothing, PageHead } from '../components/page.js';
 import { Card, State } from '../components/kit.js';
 import { ErrorText, Loading } from '../components/ui.js';
 import { useStillThere } from '../lib/stillThere.js';
+import WhatTheBoardAsked from '../components/WhatTheBoardAsked.js';
 
 /**
  * What this institution still owes, and what it still has to do.
@@ -187,6 +188,13 @@ export default function IOwe({ boardId }: { boardId: string }) {
             : `${d.count} ${t('owe.foundActual')} ${d.year}`
         }
       />
+
+      {/*
+        What the board is waiting on this desk for, above the money.
+        An unanswered question holds a whole case up, and it is the one thing
+        here that somebody can clear this morning.
+      */}
+      <WhatTheBoardAsked boardId={boardId} />
 
       {/*
         The totals, where money is owed. One line per currency, because a
