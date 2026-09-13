@@ -11,6 +11,7 @@ import { useI18n } from '../lib/i18n.js';
 import { mayVote, useIdentity } from '../lib/identity.js';
 import { Nothing } from '../components/page.js';
 import { ActionPanel, Facts, RecordPage } from '../components/shapes.js';
+import HowItChanged from '../components/HowItChanged.js';
 import { ErrorText, Loading, Section } from '../components/ui.js';
 import { State, type Tone } from '../components/kit.js';
 
@@ -291,6 +292,13 @@ export default function StructureDetail() {
           </p>
         </Section>
       )}
+
+      {/*
+        How the board got to what it holds today. Promised by the handbook as
+        "this board's amendments with their history" and, until now, a route
+        that worked with nothing calling it.
+      */}
+      <HowItChanged structureId={s.id} />
 
       <Section title={t('adopt.usedIn')}>
         {(held.usedBy ?? []).length === 0 ? (

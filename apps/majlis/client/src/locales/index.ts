@@ -579,6 +579,9 @@ const en: Dict = {
   "adopt.reasonHint": "Required when ruling against a shape; useful either way.",
   "adopt.amendElsewhere": "Rewording a condition is drafting, and belongs beside the condition it changes rather than in a box on a card. This page takes a shape, rules against one, or reconsiders.",
   "adopt.notFound": "No shape with that reference.",
+  "adopt.howItChanged": "How this board got here",
+  "adopt.howItChangedLead":
+    "What this board held before what it holds now, newest first, each under the decision it was made in. What stands today is at the top of the page and is not repeated here.",
   "adopt.theConditions": "The conditions",
   "adopt.family": "Family",
   "adopt.nextUntouched": "This board has not said what it judges this shape against.",
@@ -973,6 +976,30 @@ const en: Dict = {
 
   // Entering a holding by hand. The server has always taken one; no screen asked.
   'common.remove': "Remove step",
+
+  // Withdrawing a recorded figure. Marked, never deleted.
+  // A committee's account going back to the board. The read side always
+  // existed; nothing could write one.
+  'cttee.report': "Report back to the board",
+  'cttee.reportLead':
+    "What the committee looked at and what it found, in your own words. It is an account for the board to read, not a decision: a committee settles nothing, and the board votes on what it has read.",
+  'cttee.whatWasFound': "What the committee found",
+  'cttee.whoStoodWhere': "Where each member stood",
+  'cttee.stood.silent': "Recorded nothing",
+  'cttee.stood.agrees': "Agreed",
+  'cttee.stood.dissents': "Did not agree",
+  'cttee.whatTheySaid': "What they said instead",
+  'cttee.dissentNeedsWords':
+    "A member who did not agree needs words beside their name. Without them the board learns only that somebody was unhappy.",
+  'cttee.sendReport': "Send it to the board",
+  'cttee.noVerdict':
+    "There is no field here for permit or restrict, and that is deliberate. A committee returning a verdict would have the board reading a result instead of reading the work.",
+
+  'figure.withdraw': "Withdraw this figure",
+  'figure.withdrawLead':
+    "For a figure worked out on the wrong period, or on figures the desk has since corrected. It is marked withdrawn and stays in the record with its arithmetic untouched, because somebody may have acted on it and the record has to show what they saw.",
+  'figure.withdrawWhy': "Why it is being withdrawn",
+  'figure.withdrawIt': "Withdraw it",
 
   // What the institution has to do once a ruling carries. The record has held
   // these all along and printed them on the written ruling; nothing set them.
@@ -2418,6 +2445,9 @@ const ar: Dict = {
   "adopt.reasonHint": "مطلوب عند رفض الصيغة، ومفيد في الحالين.",
   "adopt.amendElsewhere": "إعادة صياغة الشرط تحرير، ومحلّه بجانب الشرط الذي يُغيَّر لا في صندوق على بطاقة. هذه الصفحة تأخذ صيغة أو ترفضها أو تعيد النظر فيها.",
   "adopt.notFound": "لا توجد صيغة بهذا المرجع.",
+  "adopt.howItChanged": "كيف وصل المجلس إلى هذا",
+  "adopt.howItChangedLead":
+    "ما كان يأخذ به هذا المجلس قبل ما يأخذ به الآن، الأحدث أولاً، كلٌّ تحت القرار الذي اتُّخذ فيه. وما هو قائم اليوم في أعلى الصفحة ولا يُكرَّر هنا.",
   "adopt.theConditions": "الشروط",
   "adopt.family": "العائلة",
   "adopt.nextUntouched": "لم تقل هذه الهيئة بعد على أي شروط تحكم هذه الصيغة.",
@@ -2811,6 +2841,27 @@ const ar: Dict = {
   'reg.kind.token': "رمز",
 
   'common.remove': "احذف الخطوة",
+
+  'cttee.report': "ارفع التقرير إلى المجلس",
+  'cttee.reportLead':
+    "ما نظرت فيه اللجنة وما وجدته، بكلماتك. هو بيان يقرؤه المجلس لا قرار: اللجنة لا تفصل في شيء، والمجلس يصوّت على ما قرأ.",
+  'cttee.whatWasFound': "ما وجدته اللجنة",
+  'cttee.whoStoodWhere': "أين وقف كل عضو",
+  'cttee.stood.silent': "لم يسجّل شيئاً",
+  'cttee.stood.agrees': "وافق",
+  'cttee.stood.dissents': "لم يوافق",
+  'cttee.whatTheySaid': "ما قاله بدلاً من ذلك",
+  'cttee.dissentNeedsWords':
+    "العضو الذي لم يوافق يحتاج كلمات بجانب اسمه. بدونها لا يعلم المجلس إلا أن أحداً لم يرتَحْ.",
+  'cttee.sendReport': "أرسِله إلى المجلس",
+  'cttee.noVerdict':
+    "لا يوجد هنا حقل للإباحة أو المنع، وذلك مقصود. لجنة تعيد حكماً تجعل المجلس يقرأ نتيجة بدل أن يقرأ العمل.",
+
+  'figure.withdraw': "اسحب هذا الرقم",
+  'figure.withdrawLead':
+    "لرقم حُسب على مدة خاطئة، أو على أرقام صحّحها المكتب بعد ذلك. يُعلَّم مسحوباً ويبقى في السجلّ بحسابه كما هو، لأن أحداً قد يكون تصرّف بناءً عليه وعلى السجلّ أن يُظهر ما رآه.",
+  'figure.withdrawWhy': "سبب السحب",
+  'figure.withdrawIt': "اسحبه",
 
   'doing.title': "ما الذي يجب أن يحدث بعد نفاذ هذا",
   'doing.lead':
@@ -3951,6 +4002,9 @@ const ur: Dict = {
   "adopt.reasonHint": "صورت مسترد کرتے وقت لازم؛ دونوں صورتوں میں مفید۔",
   "adopt.amendElsewhere": "کسی شرط کو دوبارہ لکھنا مسودہ سازی ہے، اور اس کا محل خود اس شرط کے پہلو میں ہے، نہ کہ کارڈ پر ایک خانے میں۔ یہ صفحہ صورت لیتا ہے، مسترد کرتا ہے، یا نظرِ ثانی کرتا ہے۔",
   "adopt.notFound": "اس حوالے سے کوئی صورت نہیں۔",
+  "adopt.howItChanged": "یہ بورڈ یہاں تک کیسے پہنچا",
+  "adopt.howItChangedLead":
+    "اس بورڈ نے اب سے پہلے کیا رکھا تھا، نیا پہلے، ہر ایک اُس فیصلے کے تحت جس میں طے ہوا۔ آج جو قائم ہے وہ صفحے کے اوپر ہے اور یہاں دہرایا نہیں جاتا۔",
   "adopt.theConditions": "شرائط",
   "adopt.family": "خاندان",
   "adopt.nextUntouched": "اس بورڈ نے ابھی نہیں کہا کہ وہ اس صورت کو کن شرائط پر پرکھتا ہے۔",
@@ -4344,6 +4398,27 @@ const ur: Dict = {
   'reg.kind.token': "ٹوکن",
 
   'common.remove': "قدم ہٹائیں",
+
+  'cttee.report': "بورڈ کو رپورٹ دیں",
+  'cttee.reportLead':
+    "کمیٹی نے کیا دیکھا اور کیا پایا، آپ کے اپنے الفاظ میں۔ یہ بورڈ کے پڑھنے کے لیے بیان ہے، فیصلہ نہیں: کمیٹی کچھ طے نہیں کرتی، اور بورڈ اُسی پر ووٹ دیتا ہے جو اُس نے پڑھا۔",
+  'cttee.whatWasFound': "کمیٹی نے کیا پایا",
+  'cttee.whoStoodWhere': "ہر رکن کہاں کھڑا تھا",
+  'cttee.stood.silent': "کچھ درج نہیں کیا",
+  'cttee.stood.agrees': "متفق",
+  'cttee.stood.dissents': "متفق نہیں",
+  'cttee.whatTheySaid': "اس کے بجائے انہوں نے کیا کہا",
+  'cttee.dissentNeedsWords':
+    "جو رکن متفق نہ ہو، اس کے نام کے ساتھ الفاظ چاہییں۔ ورنہ بورڈ کو صرف یہ پتہ چلتا ہے کہ کوئی ناخوش تھا۔",
+  'cttee.sendReport': "بورڈ کو بھیجیں",
+  'cttee.noVerdict':
+    "یہاں اجازت یا پابندی کا کوئی خانہ نہیں، اور یہ جان بوجھ کر ہے۔ کمیٹی اگر فیصلہ لوٹائے تو بورڈ کام پڑھنے کے بجائے نتیجہ پڑھنے لگتا ہے۔",
+
+  'figure.withdraw': "یہ عدد واپس لیں",
+  'figure.withdrawLead':
+    "اُس عدد کے لیے جو غلط مدت پر نکالا گیا، یا اُن اعداد پر جنہیں ڈیسک نے بعد میں درست کیا۔ اس پر واپسی کا نشان لگتا ہے اور یہ اپنے حساب سمیت ریکارڈ میں رہتا ہے، کیونکہ ہو سکتا ہے کسی نے اس پر عمل کیا ہو اور ریکارڈ کو دکھانا ہے کہ اُس نے کیا دیکھا تھا۔",
+  'figure.withdrawWhy': "واپس لینے کی وجہ",
+  'figure.withdrawIt': "واپس لیں",
 
   'doing.title': "نافذ ہونے کے بعد کیا ہونا چاہیے",
   'doing.lead':

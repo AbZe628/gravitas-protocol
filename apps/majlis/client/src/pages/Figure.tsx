@@ -6,6 +6,8 @@ import { Division, Gaps, Nothing, PageHead } from '../components/page.js';
 import { Steps } from '../components/calc.js';
 import { State } from '../components/kit.js';
 import TellTheBank from '../components/TellTheBank.js';
+import { Field, HEADING } from '../components/field.js';
+import { mayDeliberate, useIdentity } from '../lib/identity.js';
 import { ErrorText, Loading } from '../components/ui.js';
 import { useStillThere } from '../lib/stillThere.js';
 
@@ -54,6 +56,34 @@ export default function Figure() {
   /** Absent because there is no such calculation, which is not a failure. */
   const [missing, setMissing] = useState(false);
   const [failed, setFailed] = useState(false);
+  const [reason, setReason] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [refusal, setRefusal] = useState<string | null>(null);
+  const { identity } = useIdentity();
+
+  /**
+   * Mark it withdrawn.
+   *
+   * Never deleted, and the arithmetic is left exactly as it was. The page
+   * reloads from the record afterwards rather than editing its own copy, so
+   * what a reader sees is what the record says rather than what this screen
+   * believes it did.
+   */
+  async function withdraw(e: React.FormEvent) {
+    e.preventDefault();
+    if (busy || !id) return;
+    setBusy(true);
+    setRefusal(null);
+    try {
+      const { computation } = await oversight.withdrawComputation(id, reason.trim());
+      setReason('');
+      setC(computation);
+    } catch (error) {
+      setRefusal(error instanceof Refused ? error.message : String(error));
+    } finally {
+      setBusy(false);
+    }
+  }
   /** A failed refresh keeps a screen that is already there. */
   const there = useStillThere();
 
@@ -226,6 +256,54 @@ export default function Figure() {
         <Division heading={t('figure.tell')}>
           <TellTheBank kind="figure" id={c.id} />
         </Division>
+      )}
+
+      {/*
+        Withdrawing one, which the record has always allowed and no screen
+        offered.
+
+        A figure worked out on the wrong period, or on figures the desk later
+        corrected, does not stop being wrong because it was recorded. It is
+        marked withdrawn and never deleted: the arithmetic stays exactly as it
+        was, because somebody may have acted on it and the record has to show
+        what they saw.
+
+        It is last on the page and behind a disclosure for the same reason the
+        retire control is on a holding. It is rare, it is not what anybody came
+        here to do, and a reason is required — a figure withdrawn without one
+        tells a later reader nothing.
+      */}
+      {!withdrawn && mayDeliberate(identity?.role) && (
+        <details className="mt-6">
+          <summary className="cursor-pointer text-[12.5px] text-muted hover:text-paper">
+            {t('figure.withdraw')}
+          </summary>
+          <form onSubmit={withdraw} className="mt-3 rounded-card bg-raised px-5 py-4 shadow-ring">
+            <p className="mb-3 max-w-[62ch] text-[12.5px] leading-[1.6] text-muted">
+              {t('figure.withdrawLead')}
+            </p>
+            <Field label={t('figure.withdrawWhy')} headingClass={HEADING}>
+              {(attrs) => (
+                <textarea
+                  {...attrs}
+                  rows={3}
+                  value={reason}
+                  onChange={(e) => setReason(e.target.value)}
+                  className="w-full rounded-xl bg-raised px-3 py-2 text-[13px] shadow-ring outline-none"
+                  required
+                />
+              )}
+            </Field>
+            {refusal && <p className="mt-2.5 text-[12.5px] text-breach">{refusal}</p>}
+            <button
+              type="submit"
+              disabled={busy || reason.trim().length === 0}
+              className="mt-3 rounded-xl bg-raised px-4 py-2 text-[12.5px] font-medium text-breach shadow-[0_0_0_0.5px_rgba(154,56,48,0.25)] disabled:opacity-40"
+            >
+              {t('figure.withdrawIt')}
+            </button>
+          </form>
+        </details>
       )}
 
       <div className="mt-6 rounded-card bg-raised px-5 py-4 text-[12.5px] leading-[1.65] text-muted shadow-ring">

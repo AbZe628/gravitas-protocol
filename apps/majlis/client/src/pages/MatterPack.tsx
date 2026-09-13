@@ -6,6 +6,7 @@ import { mayDeliberate, useIdentity } from '../lib/identity.js';
 import { Loading, ErrorText } from '../components/ui.js';
 import InTheMargin from '../components/InTheMargin.js';
 import WhatTheCommitteeFound from '../components/WhatTheCommitteeFound.js';
+import WhatMustHappen from '../components/WhatMustHappen.js';
 import { State, toneForStatus } from '../components/kit.js';
 import VotePanel from '../components/VotePanel.js';
 import Deliberation from '../components/Deliberation.js';
@@ -343,6 +344,27 @@ export default function MatterPack() {
                 {pack.follows.carrying.drift}
               </p>
             )}
+
+            {/*
+              And what the institution does about it.
+
+              This belongs in the part about what follows, because it is the
+              other half of it: the paragraphs above say when the terms get
+              tested, and these say what the people in the bank do. They are
+              printed on the written ruling and in the compliance manual, and
+              nothing ever set them — so every ruling issued from here had an
+              empty implementation section.
+            */}
+            <div className="mt-6 border-t border-line pt-5">
+              <div className="mb-2.5 text-[10px] font-bold uppercase tracking-[0.14em] text-muted">
+                {t('doing.title')}
+              </div>
+              <WhatMustHappen
+                matter={matter}
+                canEdit={mayDeliberate(identity?.role)}
+                onChanged={setMatter}
+              />
+            </div>
           </Part>
 
           {/*

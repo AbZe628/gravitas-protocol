@@ -3,6 +3,7 @@ import { oversight, type ReferralOnMatter } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { mayDeliberate, useIdentity } from '../lib/identity.js';
 import { Nothing } from './page.js';
+import ReportBack from './ReportBack.js';
 import { useStillThere } from '../lib/stillThere.js';
 
 /**
@@ -72,7 +73,16 @@ function Standing({ r }: { r: ReferralOnMatter }) {
   );
 }
 
-function One({ r }: { r: ReferralOnMatter }) {
+function One({
+  r,
+  mine,
+  onReported,
+}: {
+  r: ReferralOnMatter;
+  /** Whether the person reading this sat on the committee. */
+  mine: boolean;
+  onReported: () => void;
+}) {
   const { t } = useI18n();
 
   return (
@@ -123,6 +133,18 @@ function One({ r }: { r: ReferralOnMatter }) {
       {/* Waiting, and nothing has come back. Said, rather than left blank. */}
       {r.state === 'waiting' && (
         <p className="mt-3 text-[12.5px] leading-[1.6] text-muted">{t('cttee.stillWaiting')}</p>
+      )}
+
+      {/*
+        And, for somebody who actually sat on it, the way to end the waiting.
+
+        Offered only to a member of this committee: the service refuses anybody
+        else, and a control that leads to a refusal is a control that lied. The
+        board at large sees the sentence above and nothing to press, which is
+        the honest state of things for them.
+      */}
+      {r.state === 'waiting' && r.committee && mine && (
+        <ReportBack referralId={r.referral.id} committee={r.committee} onReported={onReported} />
       )}
 
       <Standing r={r} />
@@ -212,7 +234,14 @@ export default function WhatTheCommitteeFound({ matterId }: { matterId: string }
         <>
           <ul className="space-y-3">
             {data.referrals.map((r) => (
-              <One key={r.referral.id} r={r} />
+              <One
+                key={r.referral.id}
+                r={r}
+                mine={Boolean(
+                  identity?.scholarId && r.committee?.members.includes(identity.scholarId),
+                )}
+                onReported={load}
+              />
             ))}
           </ul>
           {/* The server's own sentence, so no screen can soften it. */}
