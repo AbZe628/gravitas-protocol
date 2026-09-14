@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { api, oversight, type Matter, type Pack } from '../lib/api.js';
+import { api, oversight, type Matter, type Pack, type SignedDocument } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { mayDeliberate, useIdentity } from '../lib/identity.js';
 import { Loading, ErrorText } from '../components/ui.js';
@@ -15,6 +15,8 @@ import ReadTheContract from '../components/ReadTheContract.js';
 import Evidence from '../components/Evidence.js';
 import TellTheBank from '../components/TellTheBank.js';
 import Checklist from '../components/Checklist.js';
+import Fold from '../components/Fold.js';
+import NextAct, { whatToDoNow } from '../components/NextAct.js';
 import { useStillThere } from '../lib/stillThere.js';
 
 /**
@@ -51,43 +53,6 @@ import { useStillThere } from '../lib/stillThere.js';
  * and a member would vote on it as though it were.
  */
 
-/** A part of the pack: its number, its heading, and what is in it. */
-function Part({
-  n,
-  heading,
-  children,
-}: {
-  n: string;
-  heading: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <section className="border-t border-line py-6 first:border-t-0 first:pt-0">
-      <div className="flex gap-5">
-        <span aria-hidden="true" className="w-5 shrink-0 pt-1 font-mono text-[11px] text-muted">
-          {n}
-        </span>
-        <div className="min-w-0 flex-1">
-          {/*
-            A heading, not a styled div.
-
-            Eight parts on this page had no heading anywhere in the
-            accessibility tree, so a member using a screen reader met one long
-            article with two headings in it and no way to move between the
-            parts. It looks identical; it is navigable now. The number is
-            hidden from the reading because "01" spoken before every heading is
-            noise, and the order is already carried by the document.
-          */}
-          <h2 className="mb-2.5 text-[10px] font-bold uppercase tracking-[0.14em] text-muted">
-            {heading}
-          </h2>
-          {children}
-        </div>
-      </div>
-    </section>
-  );
-}
-
 /** The statuses a decision exists for. Mirrors SETTLED in services/fatwa.ts. */
 const DECIDED_STATUSES = ['in_force', 'timelock', 'rejected', 'lapsed', 'withdrawn'];
 
@@ -112,6 +77,14 @@ export default function MatterPack() {
    * checklist would disagree the moment a finding was recorded.
    */
   const [stepsOutstanding, setStepsOutstanding] = useState(0);
+  /**
+   * The written decision, for the card at the top.
+   *
+   * Fetched here rather than asked of the signing panel, because the card has
+   * to know whether this member has signed before the panel is ever opened —
+   * it is folded shut, and the whole point is that they are told to open it.
+   */
+  const [doc, setDoc] = useState<SignedDocument | null>(null);
   const [failed, setFailed] = useState(false);
   /** A failed refresh keeps a screen that is already there. */
   const there = useStillThere();
@@ -145,6 +118,28 @@ export default function MatterPack() {
         else setPackFailed(true);
       })
       .catch(() => setPackFailed(true));
+
+    /* Only a settled matter has one, and not knowing is a state: the card
+       then says what is true before the document exists. */
+    oversight
+      .document(id)
+      .then(setDoc)
+      .catch(() => setDoc(null));
+
+    /*
+     * How many conditions are unanswered, read here rather than reported up
+     * by the checklist.
+     *
+     * It used to come from the checklist as it drew itself. Folding that part
+     * shut broke it in the worst possible way: nothing rendered, nothing
+     * reported, the count stayed at zero, and the card cheerfully said the
+     * vote could open on a matter the server would refuse. A screen must not
+     * depend on a child having been drawn to know what is true.
+     */
+    oversight
+      .checklist(id)
+      .then((c) => setStepsOutstanding(c?.unanswered?.length ?? 0))
+      .catch(() => setStepsOutstanding(0));
   }
 
   useEffect(load, [id]);
@@ -153,6 +148,38 @@ export default function MatterPack() {
   if (!matter) return <Loading />;
 
   const q = pack?.question ?? null;
+
+  /**
+   * What this member does next, and where pressing it takes them.
+   *
+   * Scrolling rather than routing: everything is on this one screen, and a
+   * member who is sent somewhere else loses the question they were reading.
+   * The part being sent to opens itself, because arriving at a shut row would
+   * be the same as not arriving.
+   */
+  const doing = whatToDoNow({
+    matter,
+    identity,
+    stepsOutstanding,
+    saidCount: matter.deliberation?.length ?? 0,
+    doc,
+    t,
+    go: (where) => {
+      const target = document.getElementById(`at-${where}`);
+      target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    },
+  });
+
+  /** Which part the act points at, so that one is drawn open. */
+  const pointingAt = doing.act
+    ? (doing.says === t('doing.readyToVote') || matter.status === 'voting'
+        ? 'vote'
+        : matter.status === 'in_force'
+          ? 'sign'
+          : stepsOutstanding > 0
+            ? 'steps'
+            : 'discussion')
+    : null;
 
   return (
     <article className="flex flex-col gap-9 lg:flex-row lg:items-start">
@@ -189,9 +216,14 @@ export default function MatterPack() {
         >
           {matter.title}
         </h1>
-        <p className="mb-8 max-w-[62ch] text-[13.5px] leading-[1.6] text-muted">
-          {t('pack.intro')}
-        </p>
+        {/*
+          What you do now, before anything else on the page.
+
+          The paragraph that used to sit here explained what a pack was. A
+          member does not arrive wanting to know what a pack is; they arrive
+          wanting to know what is wanted of them.
+        */}
+        <NextAct doing={doing} />
 
         {/*
           The first part needs no assembling, so it is outside the guard.
@@ -202,7 +234,7 @@ export default function MatterPack() {
           failure this application was built to prevent. Hiding them behind
           the availability of five other services would be exactly wrong.
         */}
-        <Part n="01" heading={t('pack.question')}>
+        <Fold heading={t('pack.question')} alwaysOpen>
           {/*
             The proposal, and what members marked in it. The words and the
             notes are one thing: a board portal that keeps its comments on a
@@ -227,20 +259,20 @@ export default function MatterPack() {
               </ul>
             </div>
           )}
-        </Part>
+        </Fold>
 
         {/*
           Outside the guard, and second, for one reason: a member votes from
           this screen, and a committee that was not of one mind is the thing
           they most need in front of them before they do.
         */}
-        <Part n="02" heading={t('cttee.heading')}>
+        <Fold heading={t('cttee.heading')}>
           <WhatTheCommitteeFound matterId={matter.id} />
-        </Part>
+        </Fold>
 
         {pack && q ? (
           <>
-          <Part n="03" heading={t('pack.alreadySaid')}>
+          <Fold heading={t('pack.alreadySaid')} summary={pack.alreadySaid.nothingYet ? t('fold.noPrecedent') : `${pack.alreadySaid.related.length} ${t('fold.precedent')}`}>
             {pack.alreadySaid.nothingYet ? (
               <p className="max-w-[58ch] text-[13.5px] leading-[1.65] text-sand">
                 {t('pack.noPrecedent')}
@@ -263,9 +295,9 @@ export default function MatterPack() {
                 ))}
               </ul>
             )}
-          </Part>
+          </Fold>
 
-          <Part n="04" heading={t('pack.figures')}>
+          <Fold heading={t('pack.figures')} summary={`${pack.figures.terms.length} ${t('fold.terms')}`}>
             {pack.figures.terms.length === 0 ? (
               <p className="max-w-[58ch] text-[13.5px] leading-[1.65] text-sand">
                 {t('pack.noTerms')}
@@ -310,7 +342,7 @@ export default function MatterPack() {
             <p className="mt-4 max-w-[58ch] text-[12.5px] leading-[1.6] text-muted">
               {t('pack.whoseMethod')}
             </p>
-          </Part>
+          </Fold>
 
           {/*
             The reading, and then the conditions a member actually rules on.
@@ -324,7 +356,8 @@ export default function MatterPack() {
             It sits above the deliberation on purpose. You read the text, then
             you say what you think about it.
           */}
-          <Part n="05" heading={t('pack.reading')}>
+          <div id="at-steps" />
+          <Fold heading={t('pack.reading')} summary={stepsOutstanding > 0 ? `${stepsOutstanding} ${t('fold.stepsLeft')}` : t('fold.stepsDone')} open={pointingAt === 'steps'}>
             {/*
               The documents themselves, and then reading one against the
               conditions. Attaching was reachable only from the classic
@@ -354,17 +387,18 @@ export default function MatterPack() {
                 onProgress={(p) => setStepsOutstanding(p.unanswered)}
               />
             </div>
-          </Part>
+          </Fold>
 
-          <Part n="06" heading={t('pack.said')}>
+          <div id="at-discussion" />
+          <Fold heading={t('pack.said')} summary={`${matter.deliberation?.length ?? 0} ${t('fold.said')}`} open={pointingAt === 'discussion'}>
             <Deliberation
               matter={matter}
               canSpeak={identity?.role !== 'observer'}
               onChanged={setMatter}
             />
-          </Part>
+          </Fold>
 
-          <Part n="07" heading={t('pack.follows')}>
+          <Fold heading={t('pack.follows')} summary={t('fold.follows')}>
             <p className="max-w-[58ch] text-[13.5px] leading-[1.65] text-sand">
               {pack.follows.carrying.whenChecked}
             </p>
@@ -444,13 +478,13 @@ export default function MatterPack() {
                 onChanged={setMatter}
               />
             </div>
-          </Part>
+          </Fold>
 
           {/*
             The gaps. Same size and same weight as everything above, because a
             section that whispered would be read as a footnote.
           */}
-          <Part n="08" heading={t('pack.gaps')}>
+          <Fold heading={t('pack.gaps')} summary={pack.gaps.length === 0 ? t('fold.noGaps') : `${pack.gaps.length} ${t('fold.gaps')}`}>
             {pack.gaps.length === 0 ? (
               <p className="text-[13.5px] text-settled">{t('pack.noGaps')}</p>
             ) : (
@@ -463,7 +497,7 @@ export default function MatterPack() {
                 ))}
               </ul>
             )}
-          </Part>
+          </Fold>
           </>
         ) : (
           /*
@@ -482,6 +516,8 @@ export default function MatterPack() {
 
       {/* ── the act, which does not move ──────────────────────────── */}
       <div className="w-full shrink-0 lg:sticky lg:top-6 lg:w-[352px]">
+        <div id="at-vote" />
+        <div id="at-object" />
         <VotePanel
           stepsOutstanding={stepsOutstanding}
           matter={matter}
@@ -535,6 +571,7 @@ export default function MatterPack() {
 
         {/* Signing, once there is a written decision to sign. */}
         <div className="mt-5">
+          <div id="at-sign" />
           <SignTheDocument matter={matter} />
         </div>
 

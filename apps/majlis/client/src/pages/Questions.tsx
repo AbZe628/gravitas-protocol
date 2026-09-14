@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { theWayIn, type Delivery, type Notice, type Submission } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import TheDraftThatCame from '../components/TheDraftThatCame.js';
+import Fold from '../components/Fold.js';
 import { useIdentity, mayDeliberate, maySubmit } from '../lib/identity.js';
 import { Act, Card, Quiet, State } from '../components/kit.js';
 import TheNotice from '../components/TheNotice.js';
@@ -134,15 +135,29 @@ function One({
         <p className="max-w-[62ch] font-display text-[15.5px] leading-[1.55]">{s.question}</p>
       </div>
 
-      {s.background && (
-        <p className="mt-2.5 max-w-[62ch] text-[12.5px] leading-[1.6] text-muted">{s.background}</p>
-      )}
+      {/*
+        Everything below the question folds.
 
+        The queue printed the background, what the desk was waiting for, the
+        file that came with it and a reading of which of nineteen shapes its
+        words match — for every question, all at once. Three questions came to
+        819 words and the first act sat 1,043 pixels down. A queue is a place
+        to pick something up, not to read it.
+      */}
       {s.awaiting && (
         <p className="mt-2.5 max-w-[62ch] text-[12.5px] leading-[1.6] text-muted">
           <span className="font-semibold">{t('queue.awaiting')}</span> {s.awaiting}
         </p>
       )}
+
+      {(s.background || s.draft) && (
+        <div className="mt-3">
+          <Fold heading={t('queue.moreOnThis')} summary={s.draft ? t('queue.withDraft') : undefined}>
+            {s.background && (
+              <p className="max-w-[62ch] text-[12.5px] leading-[1.6] text-muted">{s.background}</p>
+            )}
+
+
 
       {/*
         The contract, where one came with the question, and the shapes its
@@ -150,7 +165,10 @@ function One({
         reader needs a shape named from nineteen before it will read, and
         nobody can name one without having read the document first.
       */}
-      {s.draft && <TheDraftThatCame draft={s.draft} submissionId={s.id} />}
+            {s.draft && <TheDraftThatCame draft={s.draft} submissionId={s.id} />}
+          </Fold>
+        </div>
+      )}
 
       {/* What was said back, whichever way it went. */}
       {settled &&
