@@ -441,7 +441,7 @@ mogu tačno reći šta mora biti istina da bi odgovor bio da.
 
 | uslov | danas |
 |---|---|
-| Priručnik proizvoda, čitljiv nekome ko prvi put čita | POLA — postoji, vlasnik ga je ocijenio kao loš i treba prepisati |
+| Priručnik proizvoda, čitljiv nekome ko prvi put čita | POLA — prepisan tamo gdje je bio netačan (navigacija, potpis, lanac po holdingu, brojevi stranica koji su se ponavljali). Jezik je **izmjeren, ne procijenjen**: 11,8 riječi po rečenici, nijedan trag mašinskog pisanja. Ostaje POLA dok vlasnik ne kaže šta mu tačno nije valjalo |
 | Godišnji paket na uzorku podataka | DA |
 | Primjer fatve sa brojem i potpisom | DA |
 | Popis šta radi bez lanca i šta sa lancem | DA u dokumentu |

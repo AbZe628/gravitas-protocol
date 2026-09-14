@@ -461,7 +461,40 @@ From `docs/POPIS.md`, in the order they are worth doing:
    `MatterDetail`, the fallback nothing links to. The live screen is
    `MatterPack` and the split had to go into part 07 there. Third time this
    session's family of mistakes — build on the surface people reach.
-6. **The handbook rewrite**, which the owner called a catastrophe.
+6. **The guide for banks** (`docs/MAJLIS-GUIDE.html` and its PDF) — the
+   correctness pass is done, 14 September. The style question is still open
+   and needs the owner.
+
+   **What was actually wrong, measured.** Four things, none of them style:
+
+   - §2 described navigation that no longer exists (`Work / Record / Coming /
+     More / Guide`). It is the four doors now, and a bank officer following
+     the guide would not have found the screens.
+   - §7 framed chain and no chain as a property of the installation, which is
+     the framing the handbook forbids and which this session's own work
+     replaced. It carries the handbook's two-column table now.
+   - §9 said signing was "designed and not built". Passkey signing is built;
+     what is not built is the registry write. Both entries are now precise.
+   - The page footers read 2,3,3,4,4,5,7,6,7 — two numbers repeated and one
+     pair out of order, on a document sent to a bank. Now 2 to 10.
+
+   Plus the vote gate, the ruling's number in the board's series, the signing
+   step, and a bank question about how scholars sign. Test count 1,632 to
+   2,090, measured.
+
+   **The prose is not measurably machine-written**, which is why the style
+   question needs the owner rather than another pass by me. `scripts/
+   measure-prose.mjs` puts a document through the same test the interface
+   strings went through: **11.8 words a sentence, no tells**. My own additions
+   introduced four em dashes into a document that had none, and the script
+   caught them. Ask the owner what he disliked before rewriting further —
+   rewriting by taste, against a measurement that says it is fine, is how a
+   good document gets worse.
+
+   To rebuild: edit `docs/GUIDE-BODY.html`, splice it into
+   `docs/MAJLIS-GUIDE.html` after the inlined fonts (the seam is the first
+   `<div class="sheet cover">`), then print headless with `printBackground`
+   and `preferCSSPageSize`.
 
 Email and the registry write stay VANI. Password reset stays ZID until the
 owner decides about the auth boundary.
