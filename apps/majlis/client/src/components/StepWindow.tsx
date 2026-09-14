@@ -54,6 +54,7 @@ export default function StepWindow({
   children,
   aside,
   acts,
+  consequences,
 }: {
   title: string;
   chips?: ReactNode;
@@ -63,6 +64,16 @@ export default function StepWindow({
   children: ReactNode;
   aside?: ReactNode;
   acts: ReactNode;
+  /**
+   * What the acts in the bar will cause, said before any of them is pressed.
+   *
+   * The owner asked where these buttons lead, and it was a fair question:
+   * *not met* puts a clause in the draft the bank receives, with a line saying
+   * the agreement must provide for it, and *does not apply* drafts no clause
+   * at all. Neither button said so. A person pressing one had no way to know
+   * what they were causing, which is the opposite of a guided path.
+   */
+  consequences?: ReactNode;
 }) {
   const { t } = useI18n();
 
@@ -126,8 +137,13 @@ export default function StepWindow({
         presses the wrong thing — found by looking at the screen rather than
         by reasoning about it.
       */}
-      <div className="flex flex-wrap items-center justify-end gap-2 border-t border-line bg-ink/40 px-5 py-3 sm:px-6 lg:pe-[7.5rem]">
-        {acts}
+      <div className="border-t border-line bg-ink/40">
+        {consequences && (
+          <div className="px-5 pt-3 sm:px-6">{consequences}</div>
+        )}
+        <div className="flex flex-wrap items-center justify-end gap-2 px-5 py-3 sm:px-6 lg:pe-[7.5rem]">
+          {acts}
+        </div>
       </div>
     </div>
   );

@@ -14,6 +14,8 @@ import { ErrorText, Loading } from '../components/ui.js';
 import { State, toneForStatus } from '../components/kit.js';
 import StepWindow, { type Step } from '../components/StepWindow.js';
 import TheCalculator from '../components/TheCalculator.js';
+import AskTheBank from '../components/AskTheBank.js';
+import Dialog from '../components/Dialog.js';
 import VotePanel from '../components/VotePanel.js';
 import SignTheDocument from '../components/SignTheDocument.js';
 import { useStillThere } from '../lib/stillThere.js';
@@ -72,6 +74,16 @@ export default function MatterFlow() {
   const [why, setWhy] = useState('');
   const [busy, setBusy] = useState(false);
   const [refusal, setRefusal] = useState<string | null>(null);
+
+  /**
+   * Which act is being confirmed, if any.
+   *
+   * An act that reaches outside this screen opens a window first: it says
+   * what is about to happen and to whom, the member writes the reason, and
+   * then it happens. A finding recorded because somebody pressed a word in
+   * a bar is a finding nobody can defend afterwards.
+   */
+  const [confirming, setConfirming] = useState<'not_met' | 'not_applicable' | null>(null);
 
   function load() {
     if (!id) return;
@@ -304,6 +316,22 @@ export default function MatterFlow() {
       steps={strip}
       heading={`${t('win.step')} ${n} ${t('win.of')} ${conditions.length}`}
       aside={aside}
+      /*
+       * What each button in the bar will cause, before it is pressed.
+       *
+       * Not a tooltip. A member recording *not met* is putting a clause into
+       * the draft the bank receives, with a line saying the agreement must
+       * provide for it; one recording *does not apply* is drafting no clause
+       * at all. Those are different outcomes for the institution and the
+       * screen said neither.
+       */
+      consequences={
+        canRule ? (
+          <p className="max-w-[76ch] text-[11.5px] leading-[1.6] text-muted">
+            {t('win.whatTheseDo')}
+          </p>
+        ) : null
+      }
       acts={
         <>
           {refusal && (
@@ -313,7 +341,7 @@ export default function MatterFlow() {
             <>
               <button
                 type="button"
-                onClick={() => void record('not_applicable')}
+                onClick={() => setConfirming('not_applicable')}
                 disabled={busy}
                 className="rounded-xl bg-raised px-4 py-2.5 text-[12.5px] font-semibold text-sand shadow-ring disabled:opacity-50"
               >
@@ -321,7 +349,7 @@ export default function MatterFlow() {
               </button>
               <button
                 type="button"
-                onClick={() => void record('not_met')}
+                onClick={() => setConfirming('not_met')}
                 disabled={busy}
                 className="rounded-xl bg-raised px-4 py-2.5 text-[12.5px] font-semibold text-breach shadow-ring disabled:opacity-50"
               >
@@ -369,6 +397,34 @@ export default function MatterFlow() {
             </div>
           )}
 
+          {/*
+            Where this member found it not met, the thing that follows is
+            telling the bank what has to change.
+
+            The draft opens with the condition already in it. It is not sent
+            by the software and it is not written by it: a requirement the
+            institution must answer carries a member's name, and the member
+            is the author of it.
+          */}
+          {already?.holds === 'not_met' && (
+            <div className="mb-5 rounded-card bg-[#FCF6EC] px-4 py-3.5 shadow-ring">
+              <div className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-gold">
+                {t('win.notMetNext')}
+              </div>
+              <p className="mb-3 max-w-[62ch] text-[12.5px] leading-[1.6] text-sand">
+                {t('win.notMetMeans')}
+              </p>
+              <AskTheBank
+                matterId={matter.id}
+                conditionId={step.condition.id}
+                requirement={step.condition.requirement}
+                asked={(matter.asked ?? []).filter((q) => q.conditionId === step.condition.id)}
+                canAsk={canRule}
+                onAsked={load}
+              />
+            </div>
+          )}
+
           {/* What this member already said, if anything. */}
           {already && (
             <p className="mb-4 rounded-card bg-ink px-4 py-3 text-[12.5px] leading-[1.6] text-sand">
@@ -411,6 +467,70 @@ export default function MatterFlow() {
           )}
         </>
       )}
+
+      {/*
+        The window that opens on an act with a consequence.
+
+        It says what the finding does — which for *not met* is a clause in
+        the draft the bank receives, with a line saying the agreement must
+        provide for it — and it takes the reason before recording anything.
+      */}
+      <Dialog
+        open={confirming !== null}
+        title={t(confirming === 'not_met' ? 'ask.notMetTitle' : 'ask.notApplyTitle')}
+        onClose={() => setConfirming(null)}
+        acts={
+          <>
+            <button
+              type="button"
+              onClick={() => setConfirming(null)}
+              className="text-[12.5px] text-muted underline decoration-line underline-offset-4"
+            >
+              {t('common.cancel')}
+            </button>
+            <button
+              type="button"
+              disabled={busy || why.trim().length === 0}
+              onClick={() => {
+                const holds = confirming;
+                if (!holds) return;
+                setConfirming(null);
+                void record(holds);
+              }}
+              className="rounded-xl bg-lapis px-5 py-2.5 text-[13px] font-semibold text-white shadow-act disabled:opacity-40"
+            >
+              {t(confirming === 'not_met' ? 'ask.notMetDo' : 'ask.notApplyDo')}
+            </button>
+          </>
+        }
+      >
+        <p className="mb-4 max-w-[58ch] text-[13.5px] leading-[1.65] text-sand">
+          {t(confirming === 'not_met' ? 'ask.notMetMeans' : 'ask.notApplyMeans')}
+        </p>
+
+        {step && (
+          <p className="mb-4 rounded-card bg-ink px-4 py-3 font-display text-[14px] leading-[1.5] text-paper">
+            {step.condition.requirement}
+          </p>
+        )}
+
+        <label className="block">
+          <span className="mb-1.5 block text-[10px] font-bold uppercase tracking-[0.14em] text-muted">
+            {t(confirming === 'not_met' ? 'ask.notMetWhy' : 'ask.notApplyWhy')}
+          </span>
+          <textarea
+            value={why}
+            onChange={(e) => setWhy(e.target.value)}
+            rows={4}
+            placeholder={t('win.whyHint')}
+            className="w-full rounded-xl bg-ink px-4 py-3 text-[13.5px] leading-[1.6] text-paper shadow-ring outline-none placeholder:text-muted focus:shadow-lift"
+          />
+        </label>
+
+        <p className="mt-3 max-w-[58ch] text-[12px] leading-[1.6] text-muted">
+          {t('ask.reasonIsRequired')}
+        </p>
+      </Dialog>
     </StepWindow>
   );
 }
