@@ -997,6 +997,22 @@ const en: Dict = {
   'toDesk.sendAnswer': "Send it to the board",
   'toDesk.onCase': "On the case",
 
+  // What a desk may deal in, taken from the register rather than kept by hand.
+  'deal.title': "What you may deal in",
+  'deal.says':
+    "Every instrument the board has been asked about, and where each one stands today. Taken from the register, not kept by hand.",
+  'deal.onConditionThat': "On condition that",
+  'deal.under': "Under",
+  'deal.permittedCount': "permitted",
+  'deal.unaskedCount': "never put to the board",
+  'deal.neverAsked':
+    "Not permitted, and not forbidden. Nobody has asked the board about these. If you want to deal in one, put the question.",
+  'deal.none': "Nothing is in the register yet.",
+  'deal.limits':
+    "This is what the board has decided, as at the date above. It does not show what the institution actually holds, and an instrument missing from this list is one nobody has entered rather than one that does not exist.",
+  'desk.binds.deal': "What you may deal in",
+  'desk.binds.deal.note': "The instruments, and the condition each one carries.",
+
   'vote.stepsFirst':
     "conditions of this shape have no answer yet. The vote opens once each one is answered, or set aside with a reason. They are in the part headed the contract, read.",
 
@@ -2893,6 +2909,21 @@ const ar: Dict = {
   'toDesk.sendAnswer': "أرسِله إلى المجلس",
   'toDesk.onCase': "في القضية",
 
+  'deal.title': "ما الذي يجوز لكم التعامل فيه",
+  'deal.says':
+    "كل أداة سُئل عنها المجلس، وأين تقف كلٌّ منها اليوم. مأخوذة من السجلّ، لا مُمسَكة باليد.",
+  'deal.onConditionThat': "بشرط أن",
+  'deal.under': "بموجب",
+  'deal.permittedCount': "مباحة",
+  'deal.unaskedCount': "لم تُعرض على المجلس",
+  'deal.neverAsked':
+    "ليست مباحة وليست ممنوعة. لم يسأل أحد المجلس عنها. فإن أردتم التعامل في واحدة منها، فاطرحوا السؤال.",
+  'deal.none': "لا شيء في السجلّ بعد.",
+  'deal.limits':
+    "هذا ما قرره المجلس، بتاريخ ما هو مذكور أعلاه. ولا يُظهر ما تملكه المؤسسة فعلاً، والأداة الغائبة عن هذه القائمة هي أداة لم يُدخِلها أحد لا أداة غير موجودة.",
+  'desk.binds.deal': "ما يجوز لكم التعامل فيه",
+  'desk.binds.deal.note': "الأدوات، والشرط الذي تحمله كلٌّ منها.",
+
   'vote.stepsFirst':
     "من شروط هذه الصيغة لا جواب لها بعد. يُفتح التصويت متى أُجيب عن كلٍّ منها أو نُحّي بسبب. وهي في القسم المعنون: العقد، مقروءاً.",
 
@@ -4480,6 +4511,21 @@ const ur: Dict = {
   'toDesk.yourAnswer': "ادارہ کیا کہتا ہے",
   'toDesk.sendAnswer': "بورڈ کو بھیجیں",
   'toDesk.onCase': "مقدمے پر",
+
+  'deal.title': "آپ کن میں لین دین کر سکتے ہیں",
+  'deal.says':
+    "ہر وہ آلہ جس کے بارے میں بورڈ سے پوچھا گیا، اور آج ہر ایک کہاں کھڑا ہے۔ رجسٹر سے لیا گیا، ہاتھ سے رکھی فہرست نہیں۔",
+  'deal.onConditionThat': "اس شرط پر کہ",
+  'deal.under': "بموجب",
+  'deal.permittedCount': "اجازت شدہ",
+  'deal.unaskedCount': "بورڈ کے سامنے کبھی نہیں آئے",
+  'deal.neverAsked':
+    "نہ اجازت ہے نہ ممانعت۔ ان کے بارے میں کسی نے بورڈ سے پوچھا ہی نہیں۔ اگر کسی میں لین دین کرنا ہو تو سوال رکھیں۔",
+  'deal.none': "رجسٹر میں ابھی کچھ نہیں۔",
+  'deal.limits':
+    "یہ وہ ہے جو بورڈ نے طے کیا، اوپر درج تاریخ تک۔ یہ نہیں دکھاتا کہ ادارہ اصل میں کیا رکھتا ہے، اور جو آلہ اس فہرست میں نہیں وہ ایسا ہے جسے کسی نے درج نہیں کیا، نہ کہ ایسا جو موجود نہیں۔",
+  'desk.binds.deal': "آپ کن میں لین دین کر سکتے ہیں",
+  'desk.binds.deal.note': "آلات، اور ہر ایک کے ساتھ جو شرط ہے۔",
 
   'vote.stepsFirst':
     "شرائط کا ابھی کوئی جواب نہیں۔ ووٹ تب کھلے گا جب ہر ایک کا جواب آ جائے، یا وجہ کے ساتھ الگ رکھ دیا جائے۔ یہ اُس حصے میں ہیں جس کا عنوان ہے: معاہدہ، پڑھا ہوا۔",

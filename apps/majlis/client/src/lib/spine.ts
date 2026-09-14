@@ -191,6 +191,7 @@ export const DESK_DOORS: readonly Door<DeskPhase>[] = [
     tone: 'settled',
     destinations: [
       { to: '/binds-me', label: 'desk.binds.rulings', note: 'desk.binds.rulings.note', main: true },
+      { to: '/may-deal', label: 'desk.binds.deal', note: 'desk.binds.deal.note' },
       { to: '/library', label: 'desk.binds.contracts', note: 'desk.binds.contracts.note' },
       { to: '/check', label: 'desk.binds.check', note: 'desk.binds.check.note' },
     ],

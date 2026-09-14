@@ -19,6 +19,7 @@ import StructureDetail from './pages/StructureDetail.js';
 import RuleDetail from './pages/RuleDetail.js';
 import CheckAContract from './pages/CheckAContract.js';
 import BindsMe from './pages/BindsMe.js';
+import MayDeal from './pages/MayDeal.js';
 import IOwe from './pages/IOwe.js';
 import Calendar from './pages/Calendar.js';
 import Meetings from './pages/Meetings.js';
@@ -128,6 +129,7 @@ export default function App() {
             to know about itself, had been answering since the incident work
             was written with nothing in the application calling it.
           */}
+          <Route path="/may-deal" element={<MayDeal />} />
           <Route path="/binds-me" element={<BindsMe />} />
           <Route path="/i-owe" element={<IOwe boardId="demo-board" />} />
           <Route path="/calculations" element={<Calculations />} />
