@@ -9,6 +9,125 @@ unfinished it says so, and where something is broken it says how it breaks.
 
 ---
 
+## §00 — Start here, 14 September 2026, evening
+
+This is the newest section. Where it disagrees with anything below, this is
+right. It is written so that the next session can begin work in two or three
+tool calls instead of re-reading the codebase.
+
+### Measured now, not remembered
+
+```
+server   75 test files   1679 tests   passed
+client   31 test files    336 tests   passed
+POPIS.md Dio B: 76 items — 58 DA, 9 NE, 4 VANI, 2 DOST, 1 POLA, 1 KOD, 1 ZID
+git: 23 commits on main unpushed. The owner is asked before every push.
+```
+
+The POPIS.md count comes from the command written beside its table. Never
+quote a figure from memory here — three have been wrong so far.
+
+### What was finished on 14 September
+
+1. A member's own name, title, email and telephone (`yourself.ts`).
+2. The chair's constitution settings: quorum, confirmation window, board name
+   (`constitution.ts`, `HowItDecides.tsx`).
+3. **The numbering series for rulings** (`2ac92f1`) — §14's chair section is
+   now closed. See item 3 in the list further down for the design.
+
+Each of the three needed a record change first, all of the same family: a
+value read live today would have rewritten what a document said years ago.
+Names on `Reasoning`/`ConditionFinding`, `Matter.quorumWhenOpened`, and now
+`Matter.reference`. If a fourth such field is ever added, stamp the seed in
+`store/index.ts` as well — `memory.ts` is bypassed by the demo.
+
+### Where to pick up: passkey signing (handbook §10)
+
+Nothing of it is written yet. Everything below was measured this evening, so
+it does not need measuring again.
+
+**What the handbook asks for** (`MAJLIS-ALGORITAM.html` on the Desktop, §10,
+"Signing a decision"): a member signs by pressing a button and confirming
+with the fingerprint reader, face recognition or PIN they already use. They
+enrol the devices they already own; the key is made inside the device and
+never leaves it; Majlis keeps only the public half against the member's name.
+No wallet, no seed phrase, no fee, nothing to install. The section also
+promises the document is numbered in the board's own series — that part is
+done as of today.
+
+**Where it plugs in, exactly:**
+
+| what | where |
+|---|---|
+| the proof union printed on the document | `server/src/services/signature.ts`, `SigningProof` and `PROOFS` |
+| the route's copy of that list | `server/src/routes/governance.ts:198` (zod enum) |
+| the sign route itself | `server/src/routes/governance.ts` ~2288–2330 |
+| how it prints on the ruling | `server/src/services/fatwa.ts:541` |
+| the screen | `client/src/components/SignTheDocument.tsx` |
+
+**The one paragraph that has to be rewritten when this lands.** The header of
+`services/signature.ts` says, in those words, that no member's own key ever
+touches a document and that what signs is the installation attesting to an
+authentication it performed. For a passkey signature that stops being true,
+and leaving it would make the application lie about the strongest thing it
+does. What a passkey signature proves is possession of an enrolled device plus
+a user-verification gesture on it — not the identity of the person — and that
+is what the page should say.
+
+**Design decisions already taken, with the reasons:**
+
+- The challenge is 32 random bytes issued for one (member, matter, document
+  hash) and usable once. Not the document hash itself: that is predictable,
+  and a captured assertion could then be replayed onto the same document.
+- No new dependency. Verification is `node:crypto` with the COSE key turned
+  into a JWK (`{kty:'EC',crv:'P-256',x,y}` for ES256), which `crypto.verify`
+  takes directly. What is needed is a small CBOR reader for two things only:
+  the `attestationObject` map and the COSE key inside `authData`.
+- Require the user-verification flag on both enrolment and signing. A device
+  that merely exists is not a member confirming anything.
+- Keep the signature counter and refuse one that goes backwards.
+
+**The constraint to build for, not discover at the bank.** WebAuthn needs a
+secure context. `localhost` is one; `http://<an IP on the bank's LAN>` is not,
+and the API is simply absent there. So the enrolment control must be absent
+with a sentence saying why, in the same way as everything else here — never a
+button that throws. Decide early whether the demo is served over TLS.
+
+**Still open before writing code:** where an enrolled device lives. The store
+has no home for one. `updateBoard` exists and membership lives on the board,
+but a device is not part of a board's constitution. Most likely a collection
+of its own, scoped by institution like the rest.
+
+**Testing it is possible headless.** Edge's CDP has a virtual authenticator
+(`WebAuthn.enable`, then `WebAuthn.addVirtualAuthenticator`), so the whole
+path can be walked in the browser rather than only unit-tested.
+
+### Running it, and where the local files are
+
+The demo server is on **4102**. The throwaway credentials, the CDP driver and
+every probe script are now outside the repository, at:
+
+```
+work/majlis-local/
+```
+
+`creds.txt` holds the eight sign-ins, `members.env` the hashed form for
+`MAJLIS_MEMBERS`, `cdp.mjs` the driver. They are kept outside the repository
+on purpose and must never be committed. To start the server:
+
+```
+powershell -NoProfile -Command "Get-NetTCPConnection -LocalPort 4102 -State Listen -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id \$_.OwningProcess -Force }"
+cd apps/majlis/client && npx vite build
+cd ../server && MAJLIS_MEMBERS="$(tr -d '\r' < ../../../majlis-local/members.env | tr '\n' ';')" PORT=4102 npx tsx src/index.ts
+```
+
+The boot line then says **"1 member credential configured"** and that is not a
+fault: it counts newlines and the variable is joined with semicolons. All
+eight are loaded. Check the log for `listening on :4102` before believing a
+health check.
+
+---
+
 ## §0a — Start here, 13 September 2026
 
 **Read `docs/POPIS.md` before doing anything.** It is the checklist of every
