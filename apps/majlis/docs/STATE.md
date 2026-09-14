@@ -155,12 +155,56 @@ source. **I wrote a second one before noticing, and took it out again.** The
 comment in `components/TheCalculator.tsx` says where the real one lives so
 nobody writes a third.
 
+### The frame, 14 September
+
+Three things around the steps, all found by opening the page and looking at
+it.
+
+**The vote button was lit while the gate refused.** I put the gate on the
+server and left the control alone, so a chair pressed it, read a refusal, and
+had no way to know what would let them. It is absent now while a condition is
+unanswered, with a line in its place saying how many are left and which part
+of the pack they are in. The count is reported up by the checklist after each
+load — two readers of one checklist disagree the moment a finding is recorded.
+Guarded by `TheVoteIsNotOffered.test.tsx`, proved by relighting the button.
+
+**The contract reader stood permanently open.** A six-row paste box between a
+member and the steps of their case, on every matter including the ones with no
+contract to read. It folds to a button inside a matter and opens as it always
+did on `/check`, where a scholar arrived precisely to use it. The page went
+from 5124px to 4337px.
+
+**Eight parts had no heading in the accessibility tree.** They are `h2` now
+and look identical; the part number is `aria-hidden` because "01" spoken
+before every heading is noise.
+
+### The desk can see what it may deal in
+
+`/may-deal`, in the bank's own rail under what binds me. Taken from the
+register and filtered by standing, with the ruling behind each row and the
+board's own sentence for every term, unconverted. The group nobody has asked
+about is named as such with its own sentence, because a list of permitted and
+restricted lets a desk read silence as approval. That closes handbook
+section 12.
+
 ### What is actually left
 
-Not section 4. The **frame** around the steps: `MatterPack` is still twelve
-parts stacked, and the steps inside part 05 lead while everything around them
-does not. That is the next piece of work and it is a design question, not a
-missing feature.
+From `docs/POPIS.md`, in the order they are worth doing:
+
+1. **Member settings** — name and title as they appear on a ruling,
+   photograph, email with confirmation, telephone, notification preferences,
+   signature. Seven rows, all NE. `components/YourAccount.tsx` holds the
+   password work and is where these belong.
+2. **Chair and secretary settings** — quorum, waiting period, review
+   intervals and the board's name are shown and cannot be changed.
+3. **Passkey signing** — zero results for `passkey` or `webauthn` in the
+   whole repository.
+4. **The per-holding and per-ruling web2/web3 marker** — today enforcement is
+   a property of the installation, not of a holding.
+5. **The handbook rewrite**, which the owner called a catastrophe.
+
+Email and the registry write stay VANI. Password reset stays ZID until the
+owner decides about the auth boundary.
 
 Then, from `docs/POPIS.md`: settings for a member (name, title, photograph,
 email with confirmation, telephone, notifications, signature — all NE), the

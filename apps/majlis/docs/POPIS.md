@@ -71,16 +71,17 @@ alat pojavi sam od sebe na pravom mjestu.
 
 ## A3. Predmet se radi
 
-Ovo je srce aplikacije i najslabiji dio.
+Ovo je srce aplikacije, i od 14.09. najjači dio umjesto najslabijeg.
 
-Stranica predmeta je i dalje duga, ali uslovi su sada numerisani koraci i
-svaki nosi alat koji mu treba. Ono što još ne vodi je redoslijed: svih šest
-koraka stoji otvoreno umjesto da se otvara jedan po jedan.
+Uslovi su numerisani koraci, jedan otvoren u isto vrijeme, i svaki nosi alat
+koji mu treba. Okvir oko njih je 14.09. skraćen: čitač ugovora se sklopio u
+dugme, dijelovi su dobili prave naslove, i stranica je pala sa 5124 na 4337
+piksela.
 
 | šta dokument obećava (pogl. 4) | stanje |
 |---|---|
 | **Uslovi forme postaju koraci predmeta** | DA — numerisani, jedan otvoren u isto vrijeme, ostali sklopljeni u red. Uslov oko kojeg se odbor ne slaže se nikad ne sklapa |
-| **Korak koji traži brojku otvara kalkulator u sebi** | DA — kalkulator se bira iz onoga što oblik imenuje. Popunjavanje iz dokumenta ostaje (traži ključ za asistenta) |
+| **Korak koji traži brojku otvara kalkulator u sebi** | DA — kalkulator se bira iz onoga što oblik imenuje, i sam nosi čitanje brojki iz dokumenta banke |
 | Svaka brojka pokazuje stranicu iz koje je uzeta | DA — `ReadDocument` je oduvijek unutar četiri kalkulatora. Nisam to bio primijetio i napravio sam drugi isti alat, pa ga izvadio |
 | Rezultat ostaje na uslovu, ne odlazi na poseban ekran | DA — kalkulacija pamti predmet i uslov |
 | Korak koji dokument ne odgovara postaje pitanje banci | DA — nacrt se otvara sa samim uslovom u sebi; banka odgovara na svom ekranu; član odbora ne može odgovoriti umjesto banke |
@@ -93,9 +94,14 @@ rezultat ostaje na uslovu, glasanje je zaključano, izuzeti uslov ide na
 odluku, koraci se otvaraju jedan po jedan, brojke nose stranicu izvora,
 korak može postaviti pitanje banci, i sat odvaja vrijeme kod banke.
 
-Poglavlje 4 je time zatvoreno. Ono što **nije** zatvoreno je da stranica
-predmeta i dalje ima dvanaest odjeljaka oko tih koraka — koraci vode, okvir
-oko njih još ne. To nije obećanje iz poglavlja 4, nego posao za sljedeći put.
+Poglavlje 4 je time zatvoreno.
+
+**Okvir, 14.09.** Uz to je popravljeno troje oko koraka. Dugme "otvori
+glasanje" više ne stoji upaljeno kad je glasanje zaključano — nema ga, a na
+njegovom mjestu piše koliko uslova još čeka. Čitač ugovora se sklopio u dugme
+umjesto da stoji kao velika kutija između člana i njegovog posla. I osam
+dijelova paketa je dobilo prave naslove, pa se sa čitačem ekrana može kretati
+kroz njih.
 
 ### Kalkulatori, po trećem pragu
 
@@ -158,8 +164,8 @@ račun.
 |---|---|
 | Banka ima svoja tri vrata i ne vidi odborove ekrane | DA |
 | Šta me obavezuje, operativno | DA — `BindsMe.tsx` |
-| **Padajući popis dozvoljenih instrumenata iz registra** | NE |
-| Popis pokazuje i ono što odboru nikad nije postavljeno | NE |
+| **Popis dozvoljenih instrumenata iz registra** | DA — ekran /may-deal u vratima banke, uzet iz registra i filtriran po stanju |
+| Popis pokazuje i ono što odboru nikad nije postavljeno | DA — svoja grupa i svoja rečenica: nije dozvoljeno i nije zabranjeno |
 | Šta dugujem | DA — `IOwe.tsx` |
 
 ## A8. Kasnije: pregled, prekršaj, drift
@@ -306,8 +312,8 @@ Vidi A8 i A9. Sve DA osim provedbe (KOD) i podsjetnika (VANI).
 
 | stavka | stanje |
 |---|---|
-| Padajući popis instrumenata iz registra | NE |
-| Red za ono što odboru nikad nije postavljeno | NE |
+| Popis instrumenata iz registra | DA — ekran `/may-deal` |
+| Red za ono što odboru nikad nije postavljeno | DA |
 | Šest pitanja po pravilu | DA |
 
 ## 13. Šta sistem šalje
@@ -350,15 +356,15 @@ je isto gradivo poredano po putu korisnika, pa bi zbrajanje oba bilo duplo.
 
 Stanje nakon koraka 3, prebrojano iz Dijela B.
 
-| | bilo ujutro | sada |
-|---|---|---|
-| DA | 51 | **58** |
-| DOST (postoji, ali ga moraš tražiti) | 7 | 8 |
-| KOD (radi, nijedan ekran ne zove) | 8 | **1** |
-| NE | 20 | 19 |
-| VANI (čeka banku ili izmjenu ugovora) | 4 | 4 |
-| ZID (traži odluku o sigurnosti) | 0 | 1 |
-| ukupno stavki | 90 | 91 |
+| | 13.09. ujutro | 13.09. navečer | 14.09. |
+|---|---|---|---|
+| DA | 51 | 58 | **60** |
+| DOST (postoji, ali ga moraš tražiti) | 7 | 8 | 8 |
+| KOD (radi, nijedan ekran ne zove) | 8 | 1 | 1 |
+| NE | 20 | 19 | **17** |
+| VANI (čeka banku ili izmjenu ugovora) | 4 | 4 | 4 |
+| ZID (traži odluku o sigurnosti) | 0 | 1 | 1 |
+| ukupno stavki | 90 | 91 | 91 |
 
 Prvi put sam ovakve brojeve napisao napamet i sva četiri su bila pogrešna.
 Ovi su prebrojani naredbom nad samim fajlom. Ako se ikad ne slažu sa tabelama,
@@ -446,10 +452,11 @@ pokaže tok koji vodi vidi proizvod.
 
 1. Poglavlje 4 napravljeno: uslovi kao koraci, kalkulator u koraku, glasanje
    zaključano dok koraci nisu odgovoreni
-2. Šest pitanja na svakoj stranici pravila
-3. Osam mrtvih ruta dobije mjesto u sučelju
+2. ~~Šest pitanja na svakoj stranici pravila~~ — gotovo 13.09.
+3. ~~Osam mrtvih ruta dobije mjesto u sučelju~~ — gotovo 13.09., osim povrata
+   lozinke koji je zid
 4. Postavke člana: ime, titula, slika, email, telefon, obavijesti, potpis
-5. Padajući popis instrumenata za stolove banke
+5. ~~Popis instrumenata za stolove banke~~ — gotovo 14.09.
 6. Passkey potpis
 7. Priručnik prepisan ljudskim jezikom
 8. Email i upis u registry ostaju VANI, i to se banci kaže otvoreno, jer
