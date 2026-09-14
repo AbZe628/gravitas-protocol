@@ -191,12 +191,29 @@ section 12.
 
 From `docs/POPIS.md`, in the order they are worth doing:
 
-1. **Member settings** — name and title as they appear on a ruling,
-   photograph, email with confirmation, telephone, notification preferences,
-   signature. Seven rows, all NE. `components/YourAccount.tsx` holds the
-   password work and is where these belong.
+1. ~~**Member settings**~~ — done 14 September, except a photograph.
+   `components/WhoYouAreOnPaper.tsx` and `services/yourself.ts`. Name, title,
+   email and telephone; a member may change four fields of their own entry and
+   nothing else, because whether somebody may bind the institution is the
+   board's constitution rather than a preference.
+
+   **The part worth knowing before touching any of this again:** offering it
+   needed a change to the record first. A written ruling looked the signer's
+   name up in the *current* membership every time it was rendered, so a
+   correction made today would have rewritten the signature block of a ruling
+   issued years ago. `Reasoning` and `ConditionFinding` now keep the name they
+   were recorded under, `services/fatwa.ts` prefers that and falls back to the
+   live membership only for entries that predate the field, and the seed is
+   stamped in `store/index.ts` where the demonstration record is assembled —
+   not in `memory.ts`, which the demo bypasses.
+
+   Notification preferences and a signature are deliberately absent, with the
+   reason on the screen: nothing is sent, and an image kept here would look
+   like a signature and be nothing of the kind.
+
 2. **Chair and secretary settings** — quorum, waiting period, review
    intervals and the board's name are shown and cannot be changed.
+   `store.updateBoard` now exists, scoped by institution, so the path is open.
 3. **Passkey signing** — zero results for `passkey` or `webauthn` in the
    whole repository.
 4. **The per-holding and per-ruling web2/web3 marker** — today enforcement is

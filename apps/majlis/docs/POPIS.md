@@ -331,12 +331,12 @@ Vidi A8 i A9. Sve DA osim provedbe (KOD) i podsjetnika (VANI).
 |---|---|
 | Lozinka | DA |
 | Jezik: engleski, arapski, urdu | DA |
-| Ime i titula kako stoje na odluci | NE |
+| Ime i titula kako stoje na odluci | DA — i izdana odluka ne mijenja se: pozicija i nalaz pamte ime pod kojim su zapisani |
 | Fotografija | NE |
-| Email sa potvrdom nove adrese | NE |
-| Telefon | NE |
-| Koje obavijesti stižu | NE |
-| Potpis | NE |
+| Email sa potvrdom nove adrese | POLA — adresa se čuva i označi kao nepotvrđena, jer potvrda znači slanje a ova instalacija ne šalje |
+| Telefon | DA |
+| Koje obavijesti stižu | NE — namjerno, i rečeno na ekranu: ništa se ne šalje, pa bi panel postavki lagao |
+| Potpis | NE — namjerno, i rečeno na ekranu: slika ovdje bi izgledala kao potpis a ne bi bila |
 | Povrat lozinke: izdavanje | DA |
 | Povrat lozinke: unovčavanje | ZID — vidi ispod |
 | Predsjedavajući mijenja članove, kvorum, intervale | NE — sve se samo vidi |
@@ -358,10 +358,11 @@ Stanje nakon koraka 3, prebrojano iz Dijela B.
 
 | | 13.09. ujutro | 13.09. navečer | 14.09. |
 |---|---|---|---|
-| DA | 51 | 58 | **60** |
+| DA | 51 | 58 | **62** |
+| POLA | 0 | 0 | 1 |
 | DOST (postoji, ali ga moraš tražiti) | 7 | 8 | 8 |
 | KOD (radi, nijedan ekran ne zove) | 8 | 1 | 1 |
-| NE | 20 | 19 | **17** |
+| NE | 20 | 19 | **14** |
 | VANI (čeka banku ili izmjenu ugovora) | 4 | 4 | 4 |
 | ZID (traži odluku o sigurnosti) | 0 | 1 | 1 |
 | ukupno stavki | 90 | 91 | 91 |
