@@ -3,6 +3,7 @@ import Dashboard from './pages/Dashboard.js';
 import Guided from './pages/Guided.js';
 import Queue from './pages/Queue.js';
 import MatterPack from './pages/MatterPack.js';
+import MatterFlow from './pages/MatterFlow.js';
 import BoardBook from './pages/BoardBook.js';
 import Undertakings from './pages/Undertakings.js';
 import Questions from './pages/Questions.js';
@@ -104,7 +105,13 @@ export default function App() {
             to do. Every section still exists, unchanged, at the classic path —
             what changed is that they no longer compete with the act.
           */}
-          <Route path="/matters/:id" element={<MatterPack />} />
+          {/*
+            A question, answered a step at a time, ending in a vote and a
+            document. The dossier it replaces is at /classic/matters/:id,
+            unchanged and one link away from the foot of the flow.
+          */}
+          <Route path="/matters/:id" element={<MatterFlow />} />
+          <Route path="/dossier/matters/:id" element={<MatterPack />} />
           <Route path="/classic/matters/:id" element={<MatterDetail />} />
           <Route path="/classic" element={<Dashboard />} />
           <Route path="/register" element={<Register />} />

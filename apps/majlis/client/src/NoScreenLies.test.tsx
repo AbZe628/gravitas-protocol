@@ -173,12 +173,20 @@ describe('no screen claims a failure it has not had', () => {
    * has the matter, so it renders — and this is the frame in which it used to
    * announce that the pack could not be put together.
    */
-  it('the matter pack waits for the pack instead of declaring it lost', async () => {
+  it('the matter waits for its steps instead of declaring them lost', async () => {
     vi.stubGlobal(
       'fetch',
       vi.fn(async (input: RequestInfo | URL) => {
         const url = String(input);
-        if (url.includes('/pack')) return new Promise<Response>(() => {});
+        /*
+         * The steps, not the pack.
+         *
+         * A matter is a flow now and the pack is the dossier behind it, so
+         * the slow dependency on this screen is the checklist. What is being
+         * held is the same thing it always was: a screen must not report a
+         * failure it has not had.
+         */
+        if (url.includes('/checklist')) return new Promise<Response>(() => {});
         const body = url.includes('/api/matters/')
           ? {
               id: 'matter-1',
@@ -219,9 +227,16 @@ describe('no screen claims a failure it has not had', () => {
      * rather than asserted once: the pack's placeholder is painted in the
      * render after the matter's, and reading between the two made this flaky.
      */
-    await waitFor(() => {
-      expect(document.body.textContent ?? '').toMatch(/Loading/i);
-    });
+    /*
+     * The question is on the screen while the steps are still coming, and
+     * nothing on it claims a failure. There is no placeholder to wait for
+     * any more: the part that is slow is a list of steps, and an absent list
+     * is drawn as no steps rather than as a spinner.
+     */
+    expect(document.body.textContent ?? '').toContain(
+      'The proposal, which belongs to the matter and not to the pack.',
+    );
     expect(document.body.textContent ?? '').not.toMatch(/could not be put together/i);
+    expect(document.body.textContent ?? '').not.toMatch(/unavailable/i);
   });
 });
