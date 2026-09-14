@@ -63,9 +63,9 @@ interface Item {
 
 function Group({ title, items }: { title: string; items: Item[] }) {
   return (
-    <div className={title ? 'mb-7' : 'mb-6'}>
+    <div className={title ? 'mb-5' : 'mb-4'}>
       {title && (
-        <div className="mb-2.5 px-3 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+        <div className="mb-1.5 px-3 text-[9.5px] font-bold uppercase tracking-[0.16em] text-muted">
           {title}
         </div>
       )}
@@ -76,7 +76,7 @@ function Group({ title, items }: { title: string; items: Item[] }) {
               to={item.to}
               end={item.end}
               className={({ isActive }) =>
-                'relative block rounded-xl px-3.5 py-2.5 text-[13.5px] transition-all ' +
+                'relative block rounded-lg px-3 py-[7px] text-[13px] transition-all ' +
                 (isActive
                   ? 'bg-raised font-semibold text-paper shadow-card'
                   : 'text-sand hover:bg-raised/60 hover:text-paper')
@@ -91,55 +91,41 @@ function Group({ title, items }: { title: string; items: Item[] }) {
   );
 }
 
-function Installation() {
+/**
+ * What this copy is, along the foot of the window.
+ *
+ * The same three facts the rail carried as three sentences, flat and short,
+ * where an application puts them. A paragraph of small print down the side of
+ * a screen is the shape of a page; a status bar is the shape of software, and
+ * it stays out of the way while never being more than a glance away.
+ */
+function StatusBar() {
   const { t } = useI18n();
+  const { identity } = useIdentity();
   const health = useHealth();
   if (!health) return null;
 
   const enforced = health.enforcement === 'gravitas-registry';
+  const dot = (on: boolean) =>
+    'h-1.5 w-1.5 shrink-0 rounded-full ' + (on ? 'bg-settled' : 'bg-line');
 
   return (
-    <div className="border-t border-line px-3 pt-4">
-      <div className="mb-2.5 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
-        {t('shell.installation')}
-      </div>
-
-      <div className="space-y-2 text-[12px]">
-        {/*
-          What used to sit under the product's name as "Stage Two — the board
-          decides here. Nothing here signs." It is a true and important thing
-          to say and it was the first sentence anybody read, in a vocabulary
-          from our own roadmap: a bank does not know what Stage Two is, and a
-          reader learned nothing about what the application does. The claim
-          belongs here, with everything else this copy does and does not do.
-        */}
-        <div className="flex items-start gap-2.5">
-          <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-line" />
-          <span className="leading-snug text-muted">{t('shell.nothingSigns')}</span>
-        </div>
-        <div className="flex items-start gap-2.5">
-          <span
-            className={
-              'mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full ' +
-              (enforced ? 'bg-settled ring-[3px] ring-settled/15' : 'bg-line')
-            }
-          />
-          <span className="leading-snug text-muted">
-            {t(enforced ? 'shell.enforced' : 'shell.notEnforced')}
-          </span>
-        </div>
-        <div className="flex items-start gap-2.5">
-          <span
-            className={
-              'mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full ' +
-              (health.assistantKind === 'off' ? 'bg-line' : 'bg-settled ring-[3px] ring-settled/15')
-            }
-          />
-          <span className="leading-snug text-muted">
-            {t(health.assistantKind === 'off' ? 'shell.noAssistant' : 'shell.assistant')}
-          </span>
-        </div>
-      </div>
+    <div className="fixed inset-x-0 bottom-0 z-20 hidden items-center gap-x-6 gap-y-1 border-t border-line bg-ink/85 px-4 py-1.5 text-[11px] text-muted backdrop-blur-xl lg:flex lg:ps-[272px]">
+      <span className="flex items-center gap-2">
+        <span className={dot(false)} />
+        {t('shell.nothingSigns')}
+      </span>
+      <span className="flex items-center gap-2">
+        <span className={dot(enforced)} />
+        {t(enforced ? 'shell.enforced' : 'shell.notEnforced')}
+      </span>
+      <span className="flex items-center gap-2">
+        <span className={dot(health.assistantKind !== 'off')} />
+        {t(health.assistantKind === 'off' ? 'shell.noAssistant' : 'shell.assistant')}
+      </span>
+      <span className="ms-auto font-mono">
+        {identity?.scholarId ?? t('shell.anonymous')}
+      </span>
     </div>
   );
 }
@@ -463,7 +449,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
         ))}
       </nav>
 
-      <Installation />
+      {/* What this copy is now lives in the status bar along the foot. */}
     </div>
   );
 
@@ -670,8 +656,13 @@ export default function Shell({ children }: { children: React.ReactNode }) {
         <main
           key={path}
           className={
-            'mx-auto w-full px-5 py-8 pb-[calc(6.5rem+env(safe-area-inset-bottom))] sm:px-8 lg:pb-24 ' +
-            (atWorkArea(path) ? 'max-w-work' : 'max-w-reading')
+            /*
+             * A work screen fills the region it is given. A reading column
+             * centred in a wide field is the shape of an article, and it was
+             * making every screen read as one however tight its contents.
+             */
+            'w-full px-4 py-4 pb-[calc(6.5rem+env(safe-area-inset-bottom))] sm:px-6 lg:pb-12 ' +
+            (atWorkArea(path) ? '' : 'mx-auto max-w-reading sm:px-8')
           }
           style={{ animation: 'shellFade 220ms ease-out' }}
         >
@@ -740,6 +731,8 @@ export default function Shell({ children }: { children: React.ReactNode }) {
             </>
           )}
         </main>
+
+        <StatusBar />
       </div>
 
       <TabBar />

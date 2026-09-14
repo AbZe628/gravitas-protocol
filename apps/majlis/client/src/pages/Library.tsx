@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import SlideOver from '../components/SlideOver.js';
+import StructureDetail from './StructureDetail.js';
 import { oversight, type HeldStructure, type Library as LibraryData } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { Division, Nothing } from '../components/page.js';
@@ -51,6 +53,14 @@ function toneFor(held: HeldStructure): Tone {
 const ORDER: HeldStructure['source'][] = ['draft', 'amended', 'adopted'];
 
 export default function Library() {
+  /**
+   * Which shape is open beside the list.
+   *
+   * Nineteen shapes is a list of choices, and pressing one used to navigate
+   * away from it. It opens beside the list now and closes back to exactly
+   * where the member was, which is what choosing from a list should do.
+   */
+  const [open, setOpen] = useState<{ id: string; name: string } | null>(null);
   const { t } = useI18n();
   const [data, setData] = useState<LibraryData | null>(null);
   const [failed, setFailed] = useState(false);
@@ -129,7 +139,7 @@ export default function Library() {
             {g.items.map((h) => (
               <Row
                 key={h.structure.id}
-                to={`/library/${h.structure.id}`}
+                onPress={() => setOpen({ id: h.structure.id, name: h.structure.name })}
                 phase="inforce"
                 kind={t(`family.${h.structure.family}`)}
                 title={h.structure.name}
@@ -162,6 +172,20 @@ export default function Library() {
           </Rows>
         </Division>
       ))}
+      {/*
+        The shape, beside the list rather than instead of it.
+
+        The same screen that answers at /library/:id, so nothing is a second
+        version of anything — it takes the id as a prop here and from the
+        address there.
+      */}
+      <SlideOver
+        open={open !== null}
+        title={open?.name ?? ''}
+        onClose={() => setOpen(null)}
+      >
+        {open && <StructureDetail structureId={open.id} />}
+      </SlideOver>
     </ListPage>
   );
 }

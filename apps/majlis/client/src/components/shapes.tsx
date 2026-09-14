@@ -148,6 +148,7 @@ const PHASE_TONE: Record<string, string> = {
  */
 export function Row({
   to,
+  onPress,
   kind,
   phase,
   title,
@@ -160,8 +161,15 @@ export function Row({
   heldBy,
   standing,
 }: {
-  /** Where the title opens. Reading, not acting. */
-  to: string;
+  /** Where the title opens. Reading, not acting. Absent where it opens beside the list. */
+  to?: string;
+  /**
+   * Opens it in a slide beside the list rather than navigating to it.
+   *
+   * A list of choices — nineteen contract shapes — should not take a member
+   * off the list when they look at one. Given instead of , never as well.
+   */
+  onPress?: () => void;
   /** What kind of thing this is, in the reader's words. */
   kind: string;
   phase: AnyPhase;
@@ -219,12 +227,22 @@ export function Row({
         >
           {kind}
         </div>
-        <Link
-          to={to}
-          className="font-display text-[15px] leading-snug text-paper hover:underline hover:underline-offset-[3px]"
-        >
-          {title}
-        </Link>
+        {onPress ? (
+          <button
+            type="button"
+            onClick={onPress}
+            className="text-start font-display text-[15px] leading-snug text-paper hover:underline hover:underline-offset-[3px]"
+          >
+            {title}
+          </button>
+        ) : (
+          <Link
+            to={to ?? '#'}
+            className="font-display text-[15px] leading-snug text-paper hover:underline hover:underline-offset-[3px]"
+          >
+            {title}
+          </Link>
+        )}
         {note && <div className="mt-1 text-[12.5px] leading-[1.5] text-muted">{note}</div>}
       </div>
 

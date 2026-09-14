@@ -46,8 +46,15 @@ function toneFor(held: HeldStructure): Tone {
   return 'settled';
 }
 
-export default function StructureDetail() {
-  const { id = '' } = useParams();
+export default function StructureDetail({ structureId }: { structureId?: string } = {}) {
+  /*
+   * From a prop when it is opened in a slide beside the library, from the
+   * address when it is opened on its own. The same screen either way, which
+   * is the point: a shape a member opens from a list of nineteen should not
+   * take them off the list.
+   */
+  const { id: fromRoute = '' } = useParams();
+  const id = structureId ?? fromRoute;
   const { t } = useI18n();
   const { identity } = useIdentity();
 
