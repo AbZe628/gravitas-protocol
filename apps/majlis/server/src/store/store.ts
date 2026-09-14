@@ -101,6 +101,17 @@ export interface Store {
    */
   updateMatter(id: string, change: (current: Matter) => Matter): Promise<Matter>;
 
+  /**
+   * Change a board, the same way a matter is changed.
+   *
+   * Added for the one thing a member has to be able to do for themselves:
+   * correct their own name, title and contact details, which live on the
+   * board as part of its membership. Who may call it, and on whose entry,
+   * is the service layer's to decide — this only guarantees the change is
+   * applied to a copy and cannot half-write.
+   */
+  updateBoard(id: string, change: (current: Board) => Board): Promise<Board>;
+
   // ── reported non-compliance ────────────────────────────────────────────
   //
   // Kept apart from matters because it is not one. A matter is a proposal to

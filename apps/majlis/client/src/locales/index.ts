@@ -997,6 +997,25 @@ const en: Dict = {
   'toDesk.sendAnswer': "Send it to the board",
   'toDesk.onCase': "On the case",
 
+  // A member's own name, title and where they can be reached.
+  'you.heading': "How you appear on a ruling",
+  'you.note':
+    "Your name and title are printed on every ruling you sign. Changing them here changes how you appear from now on; a ruling already signed keeps the name it was signed under.",
+  'you.name': "Name",
+  'you.title': "Title",
+  'you.titleHelp': "Leave it empty if you do not use one.",
+  'you.email': "Email",
+  'you.telephone': "Telephone",
+  'you.keep': "Keep these",
+  'you.kept': "Kept.",
+  'you.confirmed': "This address has been confirmed.",
+  'you.notConfirmed':
+    "This address has not been confirmed. Confirming means sending to it, and this installation sends nothing until the institution gives it a mail relay.",
+  'you.noNotifications':
+    "There is no choice of which notifications reach you, because nothing is sent. The notices are written and held; the sending is a setting this installation does not have.",
+  'you.noSignature':
+    "There is nowhere to keep a signature. Signing is done with a key held on your own device and that is not built yet, and an image kept here would look like a signature and be nothing of the kind.",
+
   // What a desk may deal in, taken from the register rather than kept by hand.
   'deal.title': "What you may deal in",
   'deal.says':
@@ -2909,6 +2928,24 @@ const ar: Dict = {
   'toDesk.sendAnswer': "أرسِله إلى المجلس",
   'toDesk.onCase': "في القضية",
 
+  'you.heading': "كيف تظهر على الحكم",
+  'you.note':
+    "اسمك ولقبك يُطبعان على كل حكم توقّعه. وتغييرهما هنا يغيّر ظهورك من الآن فصاعداً؛ أما حكم وُقّع من قبل فيبقى بالاسم الذي وُقّع به.",
+  'you.name': "الاسم",
+  'you.title': "اللقب",
+  'you.titleHelp': "اتركه فارغاً إن لم تكن تستعمل لقباً.",
+  'you.email': "البريد",
+  'you.telephone': "الهاتف",
+  'you.keep': "أثبِت هذه",
+  'you.kept': "أُثبِتت.",
+  'you.confirmed': "هذا العنوان مؤكَّد.",
+  'you.notConfirmed':
+    "هذا العنوان غير مؤكَّد. والتأكيد يعني الإرسال إليه، وهذه النسخة لا ترسل شيئاً حتى تمنحها المؤسسة مُرحِّل بريد.",
+  'you.noNotifications':
+    "لا خيار لك في أي الإشعارات تصلك، لأن شيئاً لا يُرسَل. الإشعارات تُكتب وتُحفظ؛ أما الإرسال فإعداد لا تملكه هذه النسخة.",
+  'you.noSignature':
+    "لا مكان هنا لحفظ توقيع. التوقيع يجري بمفتاح محفوظ في جهازك، وذلك لم يُبنَ بعد، وصورة تُحفظ هنا ستبدو توقيعاً وليست به.",
+
   'deal.title': "ما الذي يجوز لكم التعامل فيه",
   'deal.says':
     "كل أداة سُئل عنها المجلس، وأين تقف كلٌّ منها اليوم. مأخوذة من السجلّ، لا مُمسَكة باليد.",
@@ -4511,6 +4548,24 @@ const ur: Dict = {
   'toDesk.yourAnswer': "ادارہ کیا کہتا ہے",
   'toDesk.sendAnswer': "بورڈ کو بھیجیں",
   'toDesk.onCase': "مقدمے پر",
+
+  'you.heading': "فیصلے پر آپ کیسے نظر آتے ہیں",
+  'you.note':
+    "آپ کا نام اور عہدہ ہر اُس فیصلے پر چھپتا ہے جس پر آپ دستخط کریں۔ یہاں بدلنے سے آگے کے لیے بدلے گا؛ جس فیصلے پر دستخط ہو چکے، وہ اُسی نام کے ساتھ رہے گا۔",
+  'you.name': "نام",
+  'you.title': "عہدہ",
+  'you.titleHelp': "اگر استعمال نہیں کرتے تو خالی چھوڑ دیں۔",
+  'you.email': "ای میل",
+  'you.telephone': "ٹیلیفون",
+  'you.keep': "یہ رکھیں",
+  'you.kept': "رکھ لیا گیا۔",
+  'you.confirmed': "یہ پتہ تصدیق شدہ ہے۔",
+  'you.notConfirmed':
+    "یہ پتہ تصدیق شدہ نہیں۔ تصدیق کا مطلب ہے اس پر بھیجنا، اور یہ نسخہ کچھ نہیں بھیجتا جب تک ادارہ اسے میل ریلے نہ دے۔",
+  'you.noNotifications':
+    "کون سی اطلاعات آپ تک پہنچیں، اس کا کوئی انتخاب نہیں، کیونکہ کچھ بھیجا ہی نہیں جاتا۔ اطلاعات لکھی اور رکھی جاتی ہیں؛ بھیجنا ایک ایسی ترتیب ہے جو اس نسخے کے پاس نہیں۔",
+  'you.noSignature':
+    "یہاں دستخط رکھنے کی جگہ نہیں۔ دستخط آپ کے اپنے آلے میں رکھی کنجی سے ہوتے ہیں اور وہ ابھی نہیں بنا، اور یہاں رکھی تصویر دستخط جیسی لگے گی مگر ہوگی نہیں۔",
 
   'deal.title': "آپ کن میں لین دین کر سکتے ہیں",
   'deal.says':

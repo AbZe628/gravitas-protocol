@@ -3,6 +3,7 @@ import { api, oversight, type Health, type Settings as SettingsData } from '../l
 import { useI18n } from '../lib/i18n.js';
 import { PageHead } from '../components/page.js';
 import YourAccount from '../components/YourAccount.js';
+import WhoYouAreOnPaper from '../components/WhoYouAreOnPaper.js';
 import { Card, DateText, ErrorText, Loading, Tag } from '../components/ui.js';
 import TheCommittees from '../components/TheCommittees.js';
 
@@ -50,6 +51,13 @@ export default function Settings() {
         title={data.boardName}
         says={t('set.intro')}
       />
+
+      {/*
+        Who you are on paper, above the password.
+        A member arriving at settings is far likelier to be correcting their
+        title than changing a credential.
+      */}
+      <WhoYouAreOnPaper />
 
       <YourAccount />
 

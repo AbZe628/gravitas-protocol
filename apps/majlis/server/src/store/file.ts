@@ -289,6 +289,19 @@ export class FileStore implements Store {
     return copy(this.doc.boards.find((b) => b.id === id) ?? null);
   }
 
+  async updateBoard(id: string, change: (current: Board) => Board): Promise<Board> {
+    return this.serialise(() => {
+      const index = this.doc.boards.findIndex((b) => b.id === id);
+      if (index === -1) throw new NotFound('Board', id);
+
+      // Against a copy and before persist(), so a refusal writes nothing.
+      const next = change(copy(this.doc.boards[index]));
+      this.doc.boards[index] = copy(next);
+      this.persist();
+      return copy(next);
+    });
+  }
+
   async rules(boardId?: string): Promise<Rule[]> {
     return copy(boardId ? this.doc.rules.filter((r) => r.boardId === boardId) : this.doc.rules);
   }

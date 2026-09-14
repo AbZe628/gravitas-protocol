@@ -46,6 +46,25 @@ export interface Scholar {
   board: string;
   /** Whether this member holds signing authority. Advisory members do not. */
   signatory: boolean;
+
+  /**
+   * Where this member can be reached.
+   *
+   * Optional: a board seeded from a deployment configuration has neither, and
+   * a member who has not filled them in is an ordinary state rather than an
+   * incomplete one.
+   *
+   * ── unconfirmed, and saying so ────────────────────────────────────────
+   *
+   * The handbook asks that a new address be confirmed before it takes effect.
+   * Confirming means sending to it, and this installation sends nothing until
+   * the institution wires its own mail relay. So an address is kept and
+   * marked unconfirmed, and the screen says which — rather than the software
+   * claiming a confirmation it never performed.
+   */
+  email?: string;
+  emailConfirmed?: boolean;
+  telephone?: string;
 }
 
 /**
@@ -229,6 +248,27 @@ export interface Reasoning {
    * Absent on positions recorded before the field existed.
    */
   onParameterHash?: string;
+
+  /**
+   * The member's name and title as they stood when this was recorded.
+   *
+   * ── why the document does not read them live ──────────────────────────
+   *
+   * A written ruling prints who signed it. Until now that name was looked up
+   * in the board's current membership every time the document was rendered,
+   * so a member who corrected their title would have changed the signature
+   * block of every ruling they had ever signed — silently, and years later.
+   *
+   * The record here is append-only, and an issued document is part of it. A
+   * position keeps the name it was recorded under; the member's own details
+   * may change as often as they like and no past ruling moves.
+   *
+   * Absent on positions recorded before the fields existed, where the
+   * document falls back to the current membership and is no worse off than it
+   * was.
+   */
+  name?: string;
+  title?: string;
 
   /**
    * When this position stopped counting, if it has.
@@ -832,7 +872,15 @@ export interface AskedOfTheInstitution {
  * genuinely do not bear on a given product, and forcing a met/not-met choice
  * would put a false finding in the record.
  */
+/**
+ * `name` is the member's name as it stood when the finding was recorded, for
+ * the same reason `Reasoning.name` carries one: a finding is printed on the
+ * written ruling beside the member who made it, and a member correcting their
+ * own details afterwards must not rewrite a document already issued.
+ */
 export interface ConditionFinding {
+  /** The name this was recorded under. Absent on findings that predate it. */
+  name?: string;
   conditionId: string;
   holds: 'met' | 'not_met' | 'not_applicable';
   /** Compulsory, in all three directions. A finding without a reason is a tick. */

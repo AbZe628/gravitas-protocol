@@ -35,6 +35,19 @@ import {
 import type { Members } from '../auth/members.js';
 import type { Store } from '../store/index.js';
 import { handle, badRequest, identityOf } from './http.js';
+import { changeYourOwnDetails } from '../services/yourself.js';
+
+/*
+ * No minimums here. The service refuses an empty name and a malformed address
+ * with a sentence a member can act on; zod would answer "invalid_request"
+ * first and the useful message would never be seen.
+ */
+const detailsSchema = z.object({
+  name: z.string().max(400).optional(),
+  title: z.string().max(400).optional(),
+  email: z.string().max(400).nullish(),
+  telephone: z.string().max(120).nullish(),
+});
 
 const changeSchema = z.object({
   current: z.string().min(1).max(400),
@@ -136,6 +149,48 @@ export function accountRoutes(
          */
         resetsPossible: members !== null,
       });
+    }),
+  );
+
+  /**
+   * Your own name, title and where you can be reached.
+   *
+   * Only your own entry, and only these four fields: whether a member may bind
+   * the institution is the board's constitution rather than a preference. The
+   * identity is the credential's, never the body's.
+   *
+   * A ruling already issued does not move. A position keeps the name and title
+   * it was recorded under, which is what makes offering this safe at all.
+   */
+  router.post(
+    '/me/details',
+    handle(async (req, res) => {
+      const who = identityOf(req);
+      if (!who.scholarId) {
+        res.status(403).json({
+          error: 'no_identity',
+          message: 'This credential is not a member of a board, so there is no entry to change.',
+        });
+        return;
+      }
+
+      const parsed = detailsSchema.safeParse(req.body);
+      if (!parsed.success) return badRequest(res, parsed.error.issues);
+
+      const boards = await store.boards();
+      const board = boards.find((b) => b.members.some((m) => m.id === who.scholarId));
+      if (!board) {
+        res.status(404).json({
+          error: 'not_found',
+          message: 'No board here holds an entry for you.',
+        });
+        return;
+      }
+
+      const updated = await store.updateBoard(board.id, (current) =>
+        changeYourOwnDetails(current, who.scholarId as string, parsed.data),
+      );
+      res.json(updated.members.find((m) => m.id === who.scholarId));
     }),
   );
 

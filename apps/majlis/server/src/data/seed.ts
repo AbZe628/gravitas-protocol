@@ -1332,3 +1332,47 @@ export const meetings: Meeting[] = [
     closedAt: null,
   },
 ];
+
+/**
+ * Stamp each seeded position with the name it was signed under.
+ *
+ * ── why the seed needs this at all ────────────────────────────────────────
+ *
+ * A written ruling prints who signed it, and a position now carries the name
+ * and title it was recorded under so that a member correcting their own
+ * details afterwards does not rewrite a document issued years earlier.
+ *
+ * Positions recorded before that field existed fall back to the current
+ * membership, which is the right fallback for a real board's history: it is no
+ * worse than what it had. But every position in this seed is one of those, so
+ * a demonstration board renaming a member would watch the signature block of
+ * a two-year-old ruling change in front of them — which is exactly the fault
+ * the field was added to prevent, showing itself in the one place people look.
+ *
+ * The seed is fabricated, so giving it the field it would have had is not
+ * inventing anything. It is done here, once, rather than by hand on fifteen
+ * entries in two files.
+ */
+export function asSignedThen(all: Matter[], board: Board = boards[0]): Matter[] {
+  const who = new Map(board.members.map((m) => [m.id, m]));
+
+  return all.map((matter) => ({
+    ...matter,
+    findings: (matter.findings ?? []).map((f) => {
+      const member = who.get(f.scholarId);
+      return !member || f.name ? f : { ...f, name: member.name };
+    }),
+    reasoning: (matter.reasoning ?? []).map((r) => {
+      const member = who.get(r.scholarId);
+      if (!member || r.name) return r;
+      return {
+        ...r,
+        name: member.name,
+        ...(member.title ? { title: member.title } : {}),
+      };
+    }),
+  }));
+}
+
+/** The seeded matters, each position carrying the name it was signed under. */
+export const mattersAsSigned: Matter[] = asSignedThen(matters, boards[0]);

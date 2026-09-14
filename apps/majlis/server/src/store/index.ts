@@ -24,7 +24,7 @@ import {
   referrals as seedReferrals,
   adoptions as seedAdoptions,
 } from '../data/seed-work.js';
-import { matters as seedMatters } from '../data/seed.js';
+import { matters as seedMatters, asSignedThen } from '../data/seed.js';
 import { lifecycleMatters } from '../data/seed-lifecycle.js';
 import { TenantStore } from './tenant.js';
 import type { Store } from './store.js';
@@ -111,7 +111,16 @@ export function storeFromEnv(): Store {
      * this product is about could not be reached at all. Somebody showing it
      * had to open a vote in front of the room to prove voting existed.
      */
-    matters: [...seedMatters, ...lifecycleMatters],
+    /*
+     * Stamped with the name each position was signed under.
+     *
+     * A position recorded from now on keeps its signer's name so that a
+     * member correcting their own details does not rewrite an issued ruling.
+     * Every position in this seed predates that field, so without this a
+     * demonstration board renaming a member would watch a two-year-old
+     * signature block change in front of them.
+     */
+    matters: asSignedThen([...seedMatters, ...lifecycleMatters]),
     incidents: seedIncidents,
     meetings: seedMeetings,
     submissions: seedSubmissions,

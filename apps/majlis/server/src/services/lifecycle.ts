@@ -508,11 +508,29 @@ export function recordVote(
     );
   }
 
+  /*
+   * The name and title this position is signed under, taken now.
+   *
+   * The written ruling used to look them up in the current membership every
+   * time it was rendered, so a member correcting their title would have
+   * changed the signature block of every ruling they had ever signed. The
+   * record is append-only and an issued document is part of it.
+   */
+  const signer = board.members.find((m) => m.id === vote.scholarId);
+
   return {
     ...matter,
     reasoning: [
       ...matter.reasoning,
-      { scholarId: vote.scholarId, position: vote.position, reason, at, onParameterHash },
+      {
+        scholarId: vote.scholarId,
+        position: vote.position,
+        reason,
+        at,
+        onParameterHash,
+        ...(signer?.name ? { name: signer.name } : {}),
+        ...(signer?.title ? { title: signer.title } : {}),
+      },
     ],
   };
 }

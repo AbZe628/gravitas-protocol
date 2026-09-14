@@ -190,7 +190,17 @@ export interface Board {
   quorumRestrict: number;
   totalSignatories: number;
   ratificationWindowHours: number;
-  members: { id: string; name: string; title: string; signatory: boolean }[];
+  members: {
+    id: string;
+    name: string;
+    title: string;
+    signatory: boolean;
+    /** Where the member can be reached. Absent until they fill it in. */
+    email?: string;
+    /** False until an installation with a mail relay has confirmed it. */
+    emailConfirmed?: boolean;
+    telephone?: string;
+  }[];
 }
 
 export interface RegistrySnapshot {
@@ -352,6 +362,20 @@ async function post<T>(path: string, body: unknown): Promise<T> {
  */
 export const account = {
   me: () => get<Me>('/api/me'),
+
+  /**
+   * Your own name, title and where you can be reached.
+   *
+   * Only your own entry, and only these four: whether a member may bind the
+   * institution is the board's constitution rather than a preference. A
+   * ruling already signed keeps the name it was signed under.
+   */
+  changeDetails: (input: {
+    name?: string;
+    title?: string;
+    email?: string | null;
+    telephone?: string | null;
+  }) => post<Board['members'][number]>('/api/me/details', input),
 
   changePassword: (current: string, next: string) =>
     post<{ scholarId: string; setAt: string }>('/api/me/password', { current, next }),

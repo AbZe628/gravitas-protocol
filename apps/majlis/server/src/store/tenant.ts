@@ -89,6 +89,21 @@ export class TenantStore implements Store {
     return board?.institutionId === this.institutionId ? board : null;
   }
 
+  async updateBoard(id: string, change: (current: Board) => Board): Promise<Board> {
+    const board = await this.inner.board(id);
+    // Indistinguishable from a board that does not exist, deliberately.
+    if (!board || board.institutionId !== this.institutionId) throw new NotFound('board', id);
+
+    return this.inner.updateBoard(id, (current) => {
+      const next = change(current);
+      // A change may not move a board out of the institution it belongs to.
+      if (next.institutionId !== current.institutionId) {
+        throw new OutsideInstitution('move a board to', next.institutionId);
+      }
+      return next;
+    });
+  }
+
   async rules(boardId?: string): Promise<Rule[]> {
     // Asking for another institution's board is answered as an empty board,
     // not as a refusal.

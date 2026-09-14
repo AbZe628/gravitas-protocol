@@ -30,7 +30,7 @@ import {
   boards as seedBoards,
   briefings as seedBriefings,
   institutions as seedInstitutions,
-  matters as seedMatters,
+  mattersAsSigned as seedMatters,
   rules as seedRules,
   assets as seedAssets,
 } from '../data/seed.js';
@@ -178,6 +178,17 @@ export class MemoryStore implements Store {
     // through cannot leave the stored matter half-modified.
     const next = change(copy(current));
     this._matters.set(id, copy(next));
+    return copy(next);
+  }
+
+  async updateBoard(id: string, change: (current: Board) => Board): Promise<Board> {
+    const index = this._boards.findIndex((b) => b.id === id);
+    if (index === -1) throw new NotFound('Board', id);
+
+    // Against a copy, so a change that throws part-way cannot leave the
+    // stored board half-modified.
+    const next = change(copy(this._boards[index]));
+    this._boards[index] = copy(next);
     return copy(next);
   }
 

@@ -224,6 +224,12 @@ export function recordFinding(
   );
 
   const recorded: ConditionFinding = {
+    /*
+     * The name this is signed under, taken now. The written ruling prints a
+     * finding beside whoever made it, and reading that live meant a member
+     * correcting their own details rewrote documents already issued.
+     */
+    ...(member.name ? { name: member.name } : {}),
     conditionId: finding.conditionId,
     holds: finding.holds,
     reason,

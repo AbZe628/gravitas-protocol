@@ -218,8 +218,16 @@ function signature(board: Board, r: Reasoning, hashInForce: string): FatwaSignat
   const who = member(board, r.scholarId);
   return {
     scholarId: r.scholarId,
-    name: who?.name ?? r.scholarId,
-    title: who?.title ?? '',
+    /*
+      What the position was signed under, where it was kept.
+
+      Falling back to the current membership only for positions recorded
+      before the snapshot existed. Reading it live for all of them meant a
+      member correcting their title rewrote the signature block of every
+      ruling they had ever signed.
+    */
+    name: r.name ?? who?.name ?? r.scholarId,
+    title: r.title ?? who?.title ?? '',
     position: r.position,
     reason: r.reason,
     at: r.at,
@@ -263,7 +271,8 @@ function structureOf(
         holds: f.holds,
         reason: f.reason,
         scholarId: f.scholarId,
-        name: board.members.find((m) => m.id === f.scholarId)?.name ?? f.scholarId,
+        // What it was recorded under, falling back only for older findings.
+        name: f.name ?? board.members.find((m) => m.id === f.scholarId)?.name ?? f.scholarId,
       });
     }
   }
