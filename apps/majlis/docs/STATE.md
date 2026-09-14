@@ -211,14 +211,29 @@ From `docs/POPIS.md`, in the order they are worth doing:
    reason on the screen: nothing is sent, and an image kept here would look
    like a signature and be nothing of the kind.
 
-2. **Chair and secretary settings** — quorum, waiting period, review
-   intervals and the board's name are shown and cannot be changed.
-   `store.updateBoard` now exists, scoped by institution, so the path is open.
-3. **Passkey signing** — zero results for `passkey` or `webauthn` in the
+2. ~~**Chair and secretary settings**~~ — done 14 September.
+   `services/constitution.ts`, `components/HowItDecides.tsx`, `POST
+   /api/settings`. Quorum, confirmation window and the board's name; chair or
+   secretary only; a reason of at least twenty characters, recorded with what
+   moved and who moved it; the history under the figures for every member.
+
+   **The serious part, and the second record change this week.** `tally` read
+   the quorum off the board every time it ran, so a chair could lower the
+   threshold mid-vote and carry a matter on fewer signatures than the members
+   were asked for. `Matter.quorumWhenOpened` is frozen when the vote opens and
+   the tally prefers it. Walked it: a matter needing two was met, the chair
+   raised the restricting quorum to four, it still needs two. The seed is
+   stamped in `data/seed.ts` for the same reason the names are.
+
+   Membership is deliberately absent and is not coming.
+
+3. **The numbering series for rulings** — the one part of §14's chair section
+   still NE.
+4. **Passkey signing** — zero results for `passkey` or `webauthn` in the
    whole repository.
-4. **The per-holding and per-ruling web2/web3 marker** — today enforcement is
+5. **The per-holding and per-ruling web2/web3 marker** — today enforcement is
    a property of the installation, not of a holding.
-5. **The handbook rewrite**, which the owner called a catastrophe.
+6. **The handbook rewrite**, which the owner called a catastrophe.
 
 Email and the registry write stay VANI. Password reset stays ZID until the
 owner decides about the auth boundary.

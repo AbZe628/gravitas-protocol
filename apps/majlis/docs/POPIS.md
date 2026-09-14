@@ -339,8 +339,9 @@ Vidi A8 i A9. Sve DA osim provedbe (KOD) i podsjetnika (VANI).
 | Potpis | NE — namjerno, i rečeno na ekranu: slika ovdje bi izgledala kao potpis a ne bi bila |
 | Povrat lozinke: izdavanje | DA |
 | Povrat lozinke: unovčavanje | ZID — vidi ispod |
-| Predsjedavajući mijenja članove, kvorum, intervale | NE — sve se samo vidi |
-| Ime odbora i serija brojeva odluka | NE |
+| Predsjedavajući mijenja kvorum, prozor potvrde, ime odbora | DA — sa obaveznim razlogom i historijom svake promjene. Glasanje koje je već otvoreno sudi se po pragu pod kojim je otvoreno |
+| Predsjedavajući mijenja članove | NE — namjerno, i nikad neće: aplikacija koja uređuje svoj odbor odlučivala bi ko sjedi u šerijatskom odboru |
+| Serija brojeva odluka | NE |
 | Šta ova kopija može, na dnu navigacije | DA |
 
 ## 15. Šta Majlis ne radi
@@ -358,14 +359,14 @@ Stanje nakon koraka 3, prebrojano iz Dijela B.
 
 | | 13.09. ujutro | 13.09. navečer | 14.09. |
 |---|---|---|---|
-| DA | 51 | 58 | **62** |
+| DA | 51 | 58 | **63** |
 | POLA | 0 | 0 | 1 |
 | DOST (postoji, ali ga moraš tražiti) | 7 | 8 | 8 |
 | KOD (radi, nijedan ekran ne zove) | 8 | 1 | 1 |
 | NE | 20 | 19 | **14** |
 | VANI (čeka banku ili izmjenu ugovora) | 4 | 4 | 4 |
 | ZID (traži odluku o sigurnosti) | 0 | 1 | 1 |
-| ukupno stavki | 90 | 91 | 91 |
+| ukupno stavki | 90 | 91 | 92 |
 
 Prvi put sam ovakve brojeve napisao napamet i sva četiri su bila pogrešna.
 Ovi su prebrojani naredbom nad samim fajlom. Ako se ikad ne slažu sa tabelama,
