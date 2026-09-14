@@ -59,6 +59,18 @@ client   104 files, 99 reachable from App.tsx
 server   109 endpoints declared in lib/api.ts
 ```
 
+### Measured, 14 September, evening
+
+```
+server   75 test files   1679 tests   passed
+client   31 test files    336 tests   passed
+```
+
+`docs/POPIS.md` counts 76 items in Dio B: 58 DA, 9 NE, 4 VANI, 2 DOST, 1 each
+of POLA, KOD and ZID. Its own earlier figure of 92 was wrong; the command that
+produces these is written next to the table there, and is the only count that
+should be quoted.
+
 Heading position after the conversion, all ten routes walked in a real
 browser: 99–103px. No screen scrolls sideways. No screen without a heading.
 
@@ -227,8 +239,30 @@ From `docs/POPIS.md`, in the order they are worth doing:
 
    Membership is deliberately absent and is not coming.
 
-3. **The numbering series for rulings** — the one part of §14's chair section
-   still NE.
+3. ~~**The numbering series for rulings**~~ — done 14 September, `2ac92f1`.
+   `services/numbering.ts`, wired into both paths to force in `lifecycle.ts`,
+   with the pattern on the chair's form and the reference above the signatures
+   in `SignTheDocument.tsx`. §14's chair section is now closed.
+
+   **The three rules, and they are the whole design.** The reference is taken
+   once, when the ruling comes into force — not at open, because most matters
+   never become rulings and a series full of holes reads as missing decisions.
+   It never moves afterwards; changing the pattern decides what the *next* one
+   is called. And the counter is read off the references already assigned
+   rather than kept as a number, so it cannot drift from the record.
+
+   `{year}` and `{n}` are the only placeholders, everything else is the
+   board's own text copied literally. A board with no series is not
+   misconfigured — its rulings are quoted by matter id and the screen says so.
+   The demonstration board issues under `SSB/{year}/{n}`; the seeded rulings
+   are numbered in `data/seed.ts` by `inForceAt`, not by the order the entries
+   happen to be written in.
+
+   The fault the tests caught: `usable()` asked a `/g` regex whether the
+   pattern held `{n}`. A global regex remembers where it stopped, so it
+   answers yes and then no on the same string, and the board's second ruling
+   of the day would have lost its number in silence.
+
 4. **Passkey signing** — zero results for `passkey` or `webauthn` in the
    whole repository.
 5. **The per-holding and per-ruling web2/web3 marker** — today enforcement is
