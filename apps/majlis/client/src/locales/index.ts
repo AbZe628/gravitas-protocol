@@ -997,6 +997,9 @@ const en: Dict = {
   'toDesk.sendAnswer': "Send it to the board",
   'toDesk.onCase': "On the case",
 
+  'vote.stepsFirst':
+    "conditions of this shape have no answer yet. The vote opens once each one is answered, or set aside with a reason. They are in the part headed the contract, read.",
+
   'chk.onStep': "On step",
   'chk.allAnswered': "Every condition has been answered. The vote can open.",
   'step.workItOut': "Work it out here",
@@ -2890,6 +2893,9 @@ const ar: Dict = {
   'toDesk.sendAnswer': "أرسِله إلى المجلس",
   'toDesk.onCase': "في القضية",
 
+  'vote.stepsFirst':
+    "من شروط هذه الصيغة لا جواب لها بعد. يُفتح التصويت متى أُجيب عن كلٍّ منها أو نُحّي بسبب. وهي في القسم المعنون: العقد، مقروءاً.",
+
   'chk.onStep': "عند الخطوة",
   'chk.allAnswered': "أُجيب عن كل الشروط. يمكن فتح التصويت.",
   'step.workItOut': "احسبه هنا",
@@ -4474,6 +4480,9 @@ const ur: Dict = {
   'toDesk.yourAnswer': "ادارہ کیا کہتا ہے",
   'toDesk.sendAnswer': "بورڈ کو بھیجیں",
   'toDesk.onCase': "مقدمے پر",
+
+  'vote.stepsFirst':
+    "شرائط کا ابھی کوئی جواب نہیں۔ ووٹ تب کھلے گا جب ہر ایک کا جواب آ جائے، یا وجہ کے ساتھ الگ رکھ دیا جائے۔ یہ اُس حصے میں ہیں جس کا عنوان ہے: معاہدہ، پڑھا ہوا۔",
 
   'chk.onStep': "قدم",
   'chk.allAnswered': "ہر شرط کا جواب آ گیا۔ ووٹ کھل سکتا ہے۔",

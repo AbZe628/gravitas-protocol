@@ -64,11 +64,23 @@ function Part({
   return (
     <section className="border-t border-line py-6 first:border-t-0 first:pt-0">
       <div className="flex gap-5">
-        <span className="w-5 shrink-0 pt-1 font-mono text-[11px] text-muted">{n}</span>
+        <span aria-hidden="true" className="w-5 shrink-0 pt-1 font-mono text-[11px] text-muted">
+          {n}
+        </span>
         <div className="min-w-0 flex-1">
-          <div className="mb-2.5 text-[10px] font-bold uppercase tracking-[0.14em] text-muted">
+          {/*
+            A heading, not a styled div.
+
+            Eight parts on this page had no heading anywhere in the
+            accessibility tree, so a member using a screen reader met one long
+            article with two headings in it and no way to move between the
+            parts. It looks identical; it is navigable now. The number is
+            hidden from the reading because "01" spoken before every heading is
+            noise, and the order is already carried by the document.
+          */}
+          <h2 className="mb-2.5 text-[10px] font-bold uppercase tracking-[0.14em] text-muted">
             {heading}
-          </div>
+          </h2>
           {children}
         </div>
       </div>
@@ -92,6 +104,14 @@ export default function MatterPack() {
   // Null while it is still coming; true only once it actually failed.
   const [packFailed, setPackFailed] = useState(false);
   const [matter, setMatter] = useState<Matter | null>(null);
+  /*
+   * How much of the shape is still unanswered.
+   *
+   * Reported up by the checklist rather than fetched here. The act column
+   * needs it to know whether to offer the vote at all, and two readers of one
+   * checklist would disagree the moment a finding was recorded.
+   */
+  const [stepsOutstanding, setStepsOutstanding] = useState(0);
   const [failed, setFailed] = useState(false);
   /** A failed refresh keeps a screen that is already there. */
   const there = useStillThere();
@@ -331,6 +351,7 @@ export default function MatterPack() {
                    the first, and the step would then show a stale question. */
                 asked={matter.asked ?? []}
                 onAsked={load}
+                onProgress={(p) => setStepsOutstanding(p.unanswered)}
               />
             </div>
           </Part>
@@ -412,6 +433,7 @@ export default function MatterPack() {
       {/* ── the act, which does not move ──────────────────────────── */}
       <div className="w-full shrink-0 lg:sticky lg:top-6 lg:w-[352px]">
         <VotePanel
+          stepsOutstanding={stepsOutstanding}
           matter={matter}
           role={identity?.role}
           scholarId={identity?.scholarId}

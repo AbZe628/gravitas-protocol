@@ -534,6 +534,7 @@ export default function Checklist({
   canRule,
   asked = [],
   onAsked,
+  onProgress,
 }: {
   matterId: string;
   canRule: boolean;
@@ -546,6 +547,13 @@ export default function Checklist({
    */
   asked?: AskedOfTheInstitution[];
   onAsked?: () => void;
+  /**
+   * How far the work has got, reported after every load.
+   *
+   * The page above needs it for the act column, and this is the only thing
+   * that fetches the checklist. One fetch, one answer, no drift.
+   */
+  onProgress?: (p: { answered: number; total: number; unanswered: number }) => void;
 }) {
   const { t } = useI18n();
   const [data, setData] = useState<ChecklistData | null>(null);
@@ -630,15 +638,29 @@ export default function Checklist({
         if (!c || !c.structure || !Array.isArray(c.conditions)) {
           setData(null);
           setNone(true);
+          /* No shape means no conditions, so nothing is holding the vote. */
+          onProgress?.({ answered: 0, total: 0, unanswered: 0 });
           return;
         }
         setData(c);
         setNone(false);
+        /*
+         * Told upward so the act column can say what is holding the vote.
+         * Reported from here rather than fetched again above: two readers of
+         * one checklist can disagree the moment a finding is recorded, and a
+         * member would see no work left while the chair was still refused.
+         */
+        onProgress?.({
+          answered: c.answered,
+          total: c.total,
+          unanswered: c.unanswered.length,
+        });
       })
       .catch(() => {
         // Not being judged against a shape is a state, not a failure.
         setData(null);
         setNone(true);
+        onProgress?.({ answered: 0, total: 0, unanswered: 0 });
       });
 
   useEffect(() => {

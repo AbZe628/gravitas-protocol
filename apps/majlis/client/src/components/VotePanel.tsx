@@ -24,6 +24,14 @@ interface Props {
   role: string | undefined;
   scholarId: string | undefined;
   onChanged: (matter: Matter) => void;
+  /**
+   * Conditions of the shape nobody on the board has answered.
+   *
+   * The server refuses to open a vote while any stands, so the button for it
+   * is absent rather than shown and refused. Zero where the case is judged
+   * against no shape, which is the ordinary case and is not held up.
+   */
+  stepsOutstanding?: number;
 }
 
 const MIN_REASON = 20;
@@ -54,7 +62,13 @@ function Refusal({ message }: { message: string | null }) {
   return <p className="mt-2 text-[12px] leading-relaxed text-breach">{message}</p>;
 }
 
-export default function VotePanel({ matter, role, scholarId, onChanged }: Props) {
+export default function VotePanel({
+  matter,
+  role,
+  scholarId,
+  onChanged,
+  stepsOutstanding = 0,
+}: Props) {
   const { t } = useI18n();
   const [tally, setTally] = useState<Tally | null>(null);
   const [busy, setBusy] = useState(false);
@@ -325,12 +339,35 @@ export default function VotePanel({ matter, role, scholarId, onChanged }: Props)
         </Card>
       )}
 
+      {/*
+        What is holding the vote up, where something is.
+
+        Above the acts rather than beside them, because it is the reason one of
+        them is missing. A chair reading this is being told the next thing to
+        do, which is the whole point of the column.
+      */}
+      {matter.status === 'deliberation' && signatory && stepsOutstanding > 0 && (
+        <p className="mb-3 rounded-xl bg-[#FBF4E4] px-4 py-3 text-[12.5px] leading-[1.6] text-[#6b5220] shadow-[0_0_0_0.5px_rgba(176,132,48,0.24)]">
+          {stepsOutstanding} {t('vote.stepsFirst')}
+        </p>
+      )}
+
       {/* Moving the matter along */}
       <div className="flex flex-wrap gap-2">
         {matter.status === 'draft' && deliberator &&
           button(t('action.openDeliberation'), () => run(() => governance.openDeliberation(matter.id)))}
 
-        {matter.status === 'deliberation' && signatory &&
+        {/*
+          The vote opens only when the conditions have been answered.
+
+          The server refuses otherwise, and a button that leads to a refusal is
+          a button that lied — the same rule this application applies
+          everywhere else: a control that cannot be honoured is absent, not
+          disabled. What stands in its place says how many conditions are left
+          and where they are, because a chair who cannot open the vote needs to
+          know what would let them.
+        */}
+        {matter.status === 'deliberation' && signatory && stepsOutstanding === 0 &&
           button(t('action.openVoting'), () => run(() => governance.openVoting(matter.id)))}
 
         {matter.status === 'voting' && signatory &&
