@@ -18,9 +18,9 @@ tool calls instead of re-reading the codebase.
 ### Measured now, not remembered
 
 ```
-server   77 test files   1725 tests   passed
-client   32 test files    342 tests   passed
-POPIS.md Dio B: 76 items — 60 DA, 7 NE, 4 VANI, 2 DOST, 1 POLA, 1 KOD, 1 ZID
+server   78 test files   1743 tests   passed
+client   33 test files    347 tests   passed
+POPIS.md Dio B: 76 items — 61 DA, 6 NE, 4 VANI, 2 DOST, 1 POLA, 1 KOD, 1 ZID
 git: 25 commits on main unpushed. The owner is asked before every push.
 ```
 
@@ -41,13 +41,16 @@ Names on `Reasoning`/`ConditionFinding`, `Matter.quorumWhenOpened`, and now
 `Matter.reference`. If a fourth such field is ever added, stamp the seed in
 `store/index.ts` as well — `memory.ts` is bypassed by the demo.
 
-### Where to pick up: the web2/web3 marker (item 5 below)
+### Where to pick up: the handbook rewrite (item 6 below)
 
-Passkey signing was finished on the evening of 14 September — everything from
-here to the end of this subsection is what was established before it was
-written, and is kept because it explains the shape of what is there. Item 5 is
-the next open one: today enforcement is a property of the installation rather
-than of a holding.
+Items 1 to 5 are all done as of the evening of 14 September. What is left in
+that list is **the handbook rewrite**, which the owner called a catastrophe,
+plus the two decisions that are his and not mine: the auth boundary for
+password reset, and pushing.
+
+Everything from here to the end of this subsection is what was established
+before passkey signing was written, and is kept because it explains the shape
+of what is there.
 
 #### What was established before writing it
 
@@ -428,8 +431,36 @@ From `docs/POPIS.md`, in the order they are worth doing:
    back to `http://localhost:<port>`, which is right for the demonstration and
    wrong everywhere else — and a mismatch fails every signature rather than
    accepting anything.
-5. **The per-holding and per-ruling web2/web3 marker** — today enforcement is
-   a property of the installation, not of a holding.
+5. ~~**The per-holding and per-ruling web2/web3 marker**~~ — done 14 September.
+   `services/marking.ts`, `components/HowThisIsHeld.tsx`, and the split inside
+   part 07 of the matter screen. Handbook §11's one open line is closed.
+
+   **What was wrong.** Enforcement was a property of the installation, so in a
+   bank with a registry attached *every* ruling was told a contract refuses
+   breaching transactions — comfortable, and false for every conventional
+   holding it named. A bank with a registry still holds conventional assets,
+   and the handbook says the distinction is marked on each holding and each
+   ruling, "not by running two different systems".
+
+   **The mark, and its basis.** `Asset.heldAs` is the board's answer. Absent,
+   a contract address in the register is read as tokenised **and the screen
+   says it is reading** — so a board that was never asked can see it was never
+   asked and mark it in one press. A holding with neither is conventional as
+   far as anything here knows, in those words.
+
+   **Where nothing is attached, none of it appears.** Not hidden: there is
+   nothing to distinguish, and a badge on every row would make the ordinary
+   installation look like a reduced one. `applies()` is the first question
+   every screen asks.
+
+   **The mixed ruling is the case it exists for**, and the seeded pool ruling
+   now names one tokenised holding and one conventional sukuk so the
+   demonstration shows it: *carried out two ways at once*.
+
+   **And the trap caught again:** the `Carrying` panel is mounted only on
+   `MatterDetail`, the fallback nothing links to. The live screen is
+   `MatterPack` and the split had to go into part 07 there. Third time this
+   session's family of mistakes — build on the surface people reach.
 6. **The handbook rewrite**, which the owner called a catastrophe.
 
 Email and the registry write stay VANI. Password reset stays ZID until the

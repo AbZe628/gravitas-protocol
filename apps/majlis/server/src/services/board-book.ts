@@ -42,7 +42,7 @@ import { assemblePack, type Pack } from './pack.js';
 import { stateOf, unaccountedFor, type MeetingState } from './meeting.js';
 import type { EnforcementSnapshot } from './enforcement.js';
 import type { Undertaking } from './undertaking.js';
-import type { Board, Computation, Matter, Meeting } from '../types.js';
+import type { Asset, Board, Computation, Matter, Meeting } from '../types.js';
 
 export interface BookItem {
   /** Where it sits on the agenda, from one. */
@@ -122,11 +122,14 @@ export interface BookInput {
   standing?: readonly StandingItem[];
   /** Every undertaking of this board. Split here, not by the caller. */
   undertakings?: readonly Undertaking[];
+  /** The register, so each pack can say what carries its ruling out. */
+  holdings?: readonly Asset[];
   assembledAt: string;
 }
 
 export function assembleBook(input: BookInput): BoardBook {
   const { board, meeting, allMatters, computations, enforcement, assembledAt } = input;
+  const holdings = input.holdings ?? [];
 
   const byId = new Map(allMatters.map((m) => [m.id, m]));
 
@@ -139,7 +142,7 @@ export function assembleBook(input: BookInput): BoardBook {
       item: entry.item,
       matterId,
       pack: matter
-        ? assemblePack({ board, matter, allMatters, computations, enforcement, assembledAt })
+        ? assemblePack({ board, matter, allMatters, computations, enforcement, holdings, assembledAt })
         : null,
       missing: Boolean(matterId) && matter === undefined,
     };

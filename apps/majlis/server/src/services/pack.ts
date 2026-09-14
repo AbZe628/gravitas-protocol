@@ -40,9 +40,11 @@
 import { quorumFor } from './lifecycle.js';
 import { relatedTo, type Related } from './precedent.js';
 import { buildCarrying, type Carrying } from './carrying.js';
+import type { CarriedOut } from './marking.js';
 import { standing as standingComputations } from './computation.js';
 import type { EnforcementSnapshot } from './enforcement.js';
 import type {
+  Asset,
   Board,
   ChangeDirection,
   Computation,
@@ -101,6 +103,14 @@ export interface PackFigures {
 export interface PackFollows {
   /** When the terms are tested, and what happens on a breach. */
   carrying: Carrying;
+  /**
+   * Which of the holdings it names a contract can refuse a breach on, and
+   * which are carried out by people. Empty where no chain is attached, where
+   * there is nothing to distinguish.
+   */
+  carriedOut: CarriedOut;
+  /** The one sentence for the top of that, composed from the two numbers. */
+  carriedInAWord: string;
   /** Holdings this matter names. */
   assetIds: string[];
   /** The contract shape it is being judged against, if any. */
@@ -237,6 +247,13 @@ export function assemblePack(input: {
   allMatters: readonly Matter[];
   computations: readonly Computation[];
   enforcement: EnforcementSnapshot;
+  /**
+   * The register, so the pack can say what carries this ruling out holding by
+   * holding. Optional: a caller with no register gets the ruling reported as
+   * naming no holding, which is what a pack assembled without one can honestly
+   * say.
+   */
+  holdings?: readonly Asset[];
   assembledAt: string;
 }): Pack {
   const { board, matter, allMatters, computations, enforcement, assembledAt } = input;
@@ -279,8 +296,13 @@ export function assemblePack(input: {
     terms: [...matter.proposedRule.parameters],
   };
 
+  // One computation, read in two places: the panel sentence and the split.
+  const carrying = buildCarrying(matter, enforcement, input.holdings ?? []);
+
   const follows: PackFollows = {
-    carrying: buildCarrying(matter, enforcement),
+    carrying,
+    carriedOut: carrying.carriedOut,
+    carriedInAWord: carrying.carriedInAWord,
     assetIds: [...(matter.assetIds ?? [])],
     structureId: matter.structureId ?? null,
   };

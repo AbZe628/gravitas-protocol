@@ -280,7 +280,17 @@ const proposedRatioRule = rule(
 export const poolRuling: Matter = {
   id: 'matter-2026-04-02',
   boardId: 'demo-board',
-  assetIds: ['asset-mixed-pool'],
+  /**
+   * Two holdings, and deliberately not both of a kind.
+   *
+   * The tangible-proportion test is the same question whether the pool is a
+   * token or a five-year sukuk sitting in the bank's book, and a real board
+   * would rule on both at once. It also makes the demonstration show the case
+   * this application had wrong until now: one ruling carried out two ways, by
+   * contract on the token and by people on the sukuk. A record where every
+   * ruling happened to name only tokens would have hidden that.
+   */
+  assetIds: ['asset-mixed-pool', 'asset-sukuk-ijara'],
   /**
    * Judged against the sukuk shape, and answered.
    *
@@ -917,6 +927,13 @@ export const assets: Asset[] = [
       { scheme: 'isin', value: 'XS0000000000' },
       { scheme: 'internal', value: 'SUK-IJ-05' },
     ],
+    /*
+     * Marked rather than left to be read. A holding with no contract address
+     * would be reported as conventional anyway, but "the board said so" and
+     * "nothing here says otherwise" are different answers and the register
+     * shows which — so the demonstration carries one of each.
+     */
+    heldAs: 'conventional',
     source: 'institution',
     addedAt: '2026-04-08T00:00:00Z',
     addedBy: null,

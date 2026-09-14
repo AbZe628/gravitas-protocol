@@ -8,6 +8,7 @@ import { DriftForAsset } from '../components/Drift.js';
 import { DocumentLink } from '../components/Documents.js';
 import Recorded from '../components/Recorded.js';
 import { ActionPanel, Facts, RecordPage } from '../components/shapes.js';
+import HowThisIsHeld from '../components/HowThisIsHeld.js';
 import { Field, HEADING } from '../components/field.js';
 
 /**
@@ -246,6 +247,13 @@ export default function AssetDetail() {
         Above the composition it concerns, so a reader looking at 50.00% sees at
         once what the board set rather than assembling it from two places.
       */}
+      {/*
+        How it is held, above the drift it explains. Whether a breach is
+        refused at the transaction or found at the next review is the first
+        thing a reader of the figures below needs to know.
+      */}
+      <HowThisIsHeld asset={a} />
+
       <DriftForAsset assetId={a.id} />
 
       <Section title={t('reg.identifiers')}>

@@ -530,6 +530,17 @@ describe('api', () => {
       // The register, and the calculations the board records against it.
       'POST /api/assets',
       'POST /api/assets/:id/retire',
+      /*
+       * How a holding is held: conventionally, or tokenised. A fact about the
+       * holding rather than a ruling on it, so whoever may add to the register
+       * may mark it. It decides which sentence every ruling over this holding
+       * gets about who carries it out — see `services/marking.ts`.
+       *
+       * This route is also what caught the guard above being broken: it was
+       * added, it tripped nothing, and that is how the walk into mounted
+       * routers came to be written.
+       */
+      'POST /api/assets/:id/held-as',
       'POST /api/computations',
       'POST /api/computations/:id/withdraw',
       'POST /api/screening',

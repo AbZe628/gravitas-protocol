@@ -48,7 +48,8 @@
  */
 
 import type { EnforcementSnapshot } from './enforcement.js';
-import type { Matter, RuleParameter } from '../types.js';
+import { carriedOut, inAWord, type CarriedOut } from './marking.js';
+import type { Asset, Matter, RuleParameter } from '../types.js';
 
 /**
  * When a term is tested against reality. The distinction the whole file is for.
@@ -85,6 +86,19 @@ export interface Carrying {
   terms: TermCarried[];
   /** What Majlis cannot see about this, named rather than glossed. */
   limits: string[];
+
+  /**
+   * Which of the holdings this ruling names a contract can refuse a breach
+   * on, and which are carried out by people.
+   *
+   * The sentences above answer for the installation. This answers for the
+   * holdings, which is what the handbook actually asks for: a bank with a
+   * registry still holds conventional assets, and a ruling over one of those
+   * is carried out by people exactly as it would be with no chain anywhere.
+   */
+  carriedOut: CarriedOut;
+  /** The one sentence for that, composed from the two numbers. */
+  carriedInAWord: string;
 }
 
 /*
@@ -281,7 +295,18 @@ export function buildDayToDay(
   };
 }
 
-export function buildCarrying(matter: Matter, snapshot: EnforcementSnapshot): Carrying {
+export function buildCarrying(
+  matter: Matter,
+  snapshot: EnforcementSnapshot,
+  /**
+   * The register, so the split below can be made. Absent where a caller has
+   * none, and the ruling is then reported as naming no holding — which is
+   * what a caller without a register can honestly say.
+   */
+  holdings: readonly Asset[] = [],
+): Carrying {
+  const carried = carriedOut(matter, holdings, snapshot);
+  const marked = { carriedOut: carried, carriedInAWord: inAWord(carried) };
   const parameters = matter.proposedRule.parameters ?? [];
 
   const behaviours = parameters.filter(isBreachBehaviour);
@@ -314,6 +339,7 @@ export function buildCarrying(matter: Matter, snapshot: EnforcementSnapshot): Ca
         'in the ruling rather than in an assumption.',
       terms,
       limits: NOTHING_ATTACHED_LIMITS,
+      ...marked,
     };
   }
 
@@ -353,6 +379,7 @@ export function buildCarrying(matter: Matter, snapshot: EnforcementSnapshot): Ca
   }
 
   return {
+    ...marked,
     matterId: matter.id,
     attached: true,
     carrier,

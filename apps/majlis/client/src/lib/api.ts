@@ -1095,6 +1095,24 @@ export interface TermCarried {
   onBreach: string | null;
 }
 
+/** How a holding is held, and where that answer came from. */
+export interface Held {
+  assetId: string;
+  name: string;
+  mark: 'conventional' | 'tokenised';
+  basis: 'recorded' | 'read from the register' | 'nothing says otherwise';
+  address?: string;
+  network?: string;
+}
+
+export interface CarriedOut {
+  matterId: string;
+  attached: boolean;
+  byContract: Held[];
+  byPeople: Held[];
+  namesNoHolding: boolean;
+}
+
 export interface Carrying {
   matterId: string;
   attached: boolean;
@@ -1106,6 +1124,9 @@ export interface Carrying {
   terms: TermCarried[];
   /** What Majlis cannot see about this, named rather than glossed. */
   limits: string[];
+  /** Which holdings a contract carries this out on, and which people do. */
+  carriedOut: CarriedOut;
+  carriedInAWord: string;
 }
 
 /**
@@ -1584,7 +1605,14 @@ export interface Pack {
   alreadySaid: { related: Related[]; nothingYet: boolean };
   figures: { computations: Computation[]; terms: RuleParameter[] };
   said: Deliberation[];
-  follows: { carrying: Carrying; assetIds: string[]; structureId: string | null };
+  follows: {
+    carrying: Carrying;
+    /** Which holdings a contract carries this out on, and which people do. */
+    carriedOut: CarriedOut;
+    carriedInAWord: string;
+    assetIds: string[];
+    structureId: string | null;
+  };
   evidence: SourceRef[];
 
   /** What Majlis could not tell you. Never empty by omission. */
@@ -1801,6 +1829,15 @@ export const oversight = {
     ratificationWindowHours?: number;
     rulingSeries?: string;
   }) => send<Settings>('/api/settings', input),
+
+  /**
+   * Mark how a holding is held.
+   *
+   * A fact about the holding rather than a ruling on it, so whoever may add
+   * to the register may mark it.
+   */
+  markHolding: (id: string, heldAs: 'conventional' | 'tokenised') =>
+    send<Asset>(`/api/assets/${encodeURIComponent(id)}/held-as`, { heldAs }),
 
   register: () => get<Register>('/api/register'),
   drift: () => get<DriftReport>('/api/drift'),
@@ -2301,6 +2338,14 @@ export interface Asset {
   source: 'registry' | 'institution' | 'member';
   addedAt: string;
   addedBy: string | null;
+  /**
+   * How the institution holds this: conventionally, or tokenised.
+   *
+   * Absent means nobody has said. Where the holding carries a contract
+   * address the screen reads that as tokenised and says it is reading — the
+   * board has not been asked, and being able to see that is the point.
+   */
+  heldAs?: 'conventional' | 'tokenised';
   /**
    * The server has always sent this and the client type did not declare it,
    * so every screen was blind to figures that were arriving in the response.

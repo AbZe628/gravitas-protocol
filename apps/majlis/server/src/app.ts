@@ -498,7 +498,9 @@ export function createApp(
       res.status(404).json({ error: 'not_found', message: 'No such matter.' });
       return;
     }
-    res.json(buildCarrying(matter, await enforcement.snapshot()));
+    // The register too: who carries this out is a fact about each holding
+    // the ruling names, not about the installation. See services/marking.ts.
+    res.json(buildCarrying(matter, await enforcement.snapshot(), await store.assets()));
   });
 
   /**
@@ -564,6 +566,7 @@ export function createApp(
         enforcement: await enforcement.snapshot(),
         standing,
         undertakings: await store.undertakings(meeting.boardId),
+        holdings: await store.assets(),
         assembledAt: at,
       }),
     );
@@ -601,6 +604,9 @@ export function createApp(
         allMatters: await store.matters(matter.boardId),
         computations: await store.computations({ boardId: matter.boardId }),
         enforcement: await enforcement.snapshot(),
+        // The register, so the pack says what carries this ruling out holding
+        // by holding rather than giving the whole installation one answer.
+        holdings: await store.assets(),
         assembledAt: new Date().toISOString(),
       }),
     );

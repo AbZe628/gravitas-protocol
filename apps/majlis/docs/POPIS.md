@@ -305,7 +305,7 @@ Vidi A8 i A9. Sve DA osim provedbe (KOD) i podsjetnika (VANI).
 | Radi potpuno bez lanca | DA |
 | Čitanje policy registryja | DA |
 | Upis u registry | VANI |
-| **Oznaka na svakom holdingu i svakom pravilu: konvencionalno ili tokenizirano** | NE — danas je to postavka cijele instalacije, ne osobina holdinga |
+| **Oznaka na svakom holdingu i svakom pravilu: konvencionalno ili tokenizirano** | DA — oznaka stoji na holdingu; gdje je odbor nije postavio, čita se iz ugovorne adrese i piše da se čita. Odluka nad mješavinom kaže oba broja umjesto da izabere povoljniju polovinu. Gdje lanac nije prikačen, razlike nema nigdje na ekranu |
 | Obrazloženje nikad na lanac | DA po dizajnu |
 
 ## 12. Stolovi u banci
@@ -359,11 +359,11 @@ Stanje nakon koraka 3, prebrojano iz Dijela B.
 
 | | 13.09. ujutro | 13.09. navečer | 14.09. navečer |
 |---|---|---|---|
-| DA | 51 | 58 | **60** |
+| DA | 51 | 58 | **61** |
 | POLA | 0 | 0 | 1 |
 | DOST (postoji, ali ga moraš tražiti) | 7 | 8 | 2 |
 | KOD (radi, nijedan ekran ne zove) | 8 | 1 | 1 |
-| NE | 20 | 19 | **7** |
+| NE | 20 | 19 | **6** |
 | VANI (čeka banku ili izmjenu ugovora) | 4 | 4 | 4 |
 | ZID (traži odluku o sigurnosti) | 0 | 1 | 1 |
 | ukupno stavki | 90 | 91 | 76 |

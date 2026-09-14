@@ -16,6 +16,22 @@ import { api, type Health } from './api.js';
 let cached: Health | null = null;
 let inflight: Promise<Health | null> | null = null;
 
+/**
+ * Forget what was read, so the next caller reads again.
+ *
+ * For tests, and it is honest about that. A test that renders the same screen
+ * against an installation with a chain and one without would otherwise get the
+ * first answer twice — the second case silently passing on the first case's
+ * data, which is the shape of a test that proves nothing.
+ *
+ * Nothing in the application calls it. The health of an installation describes
+ * how the server was started, and that does not change while anyone is looking.
+ */
+export function forgetHealth(): void {
+  cached = null;
+  inflight = null;
+}
+
 function load(): Promise<Health | null> {
   if (cached) return Promise.resolve(cached);
   inflight ??= api

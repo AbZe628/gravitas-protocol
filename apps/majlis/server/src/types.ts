@@ -774,6 +774,32 @@ export interface Asset {
 
   composition: Composition | null;
 
+  /**
+   * How the institution holds this: conventionally, or tokenised.
+   *
+   * ── why this is a field and not a lookup ──────────────────────────────
+   *
+   * The two can sit side by side in one bank, and the difference decides four
+   * things a board has to know about every ruling over this holding: who
+   * carries it out, how it is checked, when drift shows up, and what a
+   * contract cannot see. Running two systems would answer that by having two
+   * screens; one mark on the holding answers it in one.
+   *
+   * ── absent is a real answer ───────────────────────────────────────────
+   *
+   * Nobody has said. Where a holding carries a contract address the register
+   * can read the answer off that, and the screen says it is reading rather
+   * than reporting — the board has not been asked. A holding with neither a
+   * mark nor an address is conventional as far as anything here knows, and
+   * that is also said in those words rather than assumed into a badge.
+   *
+   * **Where no chain is attached to the installation, this does not appear at
+   * all.** Not hidden — there is nothing to distinguish, every holding is
+   * carried out by people, and a mark saying so on every row would be noise
+   * that made an ordinary installation look like a reduced one.
+   */
+  heldAs?: 'conventional' | 'tokenised';
+
   /** Withdrawn from the universe. Kept, never deleted. */
   retiredAt: string | null;
   retiredReason: string | null;

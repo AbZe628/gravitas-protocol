@@ -375,6 +375,56 @@ export default function MatterPack() {
             )}
 
             {/*
+              Holding by holding, where a chain is attached.
+
+              The two paragraphs above answer for the installation, and for a
+              bank that holds both kinds that is only half true: a ruling over
+              a conventional holding is carried out by people exactly as it
+              would be with no chain anywhere. Saying otherwise is a
+              comfortable sentence and a false one.
+
+              Absent where nothing is attached, and where the ruling names no
+              holding. Neither is a gap — there is simply nothing to
+              distinguish.
+            */}
+            {pack.follows.carriedOut?.attached && !pack.follows.carriedOut.namesNoHolding && (
+              <div className="mt-4 rounded-card bg-ink px-5 py-4">
+                <p className="max-w-[58ch] text-[13px] leading-[1.6] text-paper">
+                  {pack.follows.carriedInAWord}
+                </p>
+
+                <div className="mt-3 space-y-2.5">
+                  {[
+                    { held: pack.follows.carriedOut.byContract, how: 'carry.byContract' },
+                    { held: pack.follows.carriedOut.byPeople, how: 'carry.byPeople' },
+                  ]
+                    .filter((group) => group.held.length > 0)
+                    .map((group) => (
+                      <div key={group.how}>
+                        <div className="mb-1 text-[10px] font-bold uppercase tracking-[0.14em] text-muted">
+                          {t(group.how)}
+                        </div>
+                        <ul className="space-y-1">
+                          {group.held.map((h) => (
+                            <li key={h.assetId} className="text-[12.5px] leading-[1.5] text-sand">
+                              {h.name}
+                              {/*
+                                Where the answer came from. A board that was
+                                never asked can see that it was never asked.
+                              */}
+                              <span className="ms-2 text-[11.5px] text-muted">
+                                {t(`carry.basis.${h.basis}`)}
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            )}
+
+            {/*
               And what the institution does about it.
 
               This belongs in the part about what follows, because it is the

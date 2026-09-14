@@ -266,6 +266,13 @@ const assetSchema = z.object({
 
 const retireSchema = z.object({ reason: z.string().min(3).max(2_000) });
 
+/*
+ * How a holding is held. Two values and no third: a board that is unsure has
+ * not marked it, and the register says so in those words rather than offering
+ * an 'unknown' that would read as a state somebody chose.
+ */
+const heldAsSchema = z.object({ heldAs: z.enum(['conventional', 'tokenised']) });
+
 /**
  * What to look for in a document.
  *
@@ -2103,6 +2110,36 @@ export function governanceRoutes(
           ...current,
           retiredAt: at,
           retiredReason: parsed.data.reason,
+        })),
+      );
+    }),
+  );
+
+  /**
+   * Mark how a holding is held: conventionally, or tokenised.
+   *
+   * It decides four things about every ruling over this holding — who carries
+   * it out, how it is checked, when drift shows up, and what a contract cannot
+   * see — so it is recorded rather than inferred. Where nobody has marked it,
+   * the register reads a contract address as tokenised and says it is reading.
+   *
+   * Whoever may add to the register may mark it. The register is the bank's
+   * own description of what it holds, and this is a fact about a holding
+   * rather than a ruling on one.
+   */
+  router.post(
+    '/assets/:id/held-as',
+    handle(async (req, res) => {
+      const who = identityOf(req);
+      if (!requireRole(res, mayDeliberate(who.role), 'mark a holding', who.role)) return;
+
+      const parsed = heldAsSchema.safeParse(req.body);
+      if (!parsed.success) return badRequest(res, parsed.error.issues);
+
+      res.json(
+        await store.updateAsset(req.params.id, (current) => ({
+          ...current,
+          heldAs: parsed.data.heldAs,
         })),
       );
     }),
