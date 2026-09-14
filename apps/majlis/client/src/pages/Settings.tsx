@@ -5,6 +5,7 @@ import { PageHead } from '../components/page.js';
 import YourAccount from '../components/YourAccount.js';
 import WhoYouAreOnPaper from '../components/WhoYouAreOnPaper.js';
 import YourDevices from '../components/YourDevices.js';
+import Fold from '../components/Fold.js';
 import HowItDecides from '../components/HowItDecides.js';
 import { Card, DateText, ErrorText, Loading, Tag } from '../components/ui.js';
 import TheCommittees from '../components/TheCommittees.js';
@@ -59,16 +60,22 @@ export default function Settings() {
         A member arriving at settings is far likelier to be correcting their
         title than changing a credential.
       */}
-      <WhoYouAreOnPaper />
+      <Fold heading={t('set.foldYou')} open>
+        <WhoYouAreOnPaper />
+      </Fold>
 
-      <YourAccount />
+      <Fold heading={t('set.foldPassword')}>
+        <YourAccount />
+      </Fold>
 
       {/*
         The devices you sign with, under the password rather than beside it.
         A member who has just set a password is the one most likely to be
         thinking about how they prove who they are.
       */}
-      <YourDevices />
+      <Fold heading={t('set.foldDevices')}>
+        <YourDevices />
+      </Fold>
 
       {/*
         No credentials at all used to be said twice on this page, once here and
@@ -100,10 +107,11 @@ export default function Settings() {
         </div>
       )}
 
-      <h2 className="mb-3 mt-8 border-t border-line pt-6 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
-        {t('set.whoIsHere')}
-      </h2>
-      <ul className="mb-8 space-y-2">
+      <Fold
+        heading={t('set.whoIsHere')}
+        summary={`${data.members.length} ${t('set.foldMembers')}`}
+      >
+      <ul className="space-y-2">
         {data.members.map((m) => (
           <li key={m.scholarId} className="rounded-sheet bg-raised/75 px-6 py-5 shadow-ring">
             <div>
@@ -137,15 +145,16 @@ export default function Settings() {
           </li>
         ))}
       </ul>
+      </Fold>
 
-      <h2 className="mb-3 mt-8 border-t border-line pt-6 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
-        {t('set.committees')}
-      </h2>
-      <TheCommittees />
+      <Fold heading={t('set.committees')}>
+        <TheCommittees />
+      </Fold>
 
-      <h2 className="mb-3 mt-8 border-t border-line pt-6 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
-        {t('set.howItDecides')}
-      </h2>
+      <Fold
+        heading={t('set.howItDecides')}
+        summary={`${data.decides.quorumPermit} ${t('set.foldQuorum')}`}
+      >
       <Card>
         <dl className="space-y-2.5 text-[13px]">
           <Row label={t('set.quorumPermit')} value={String(data.decides.quorumPermit)} />
@@ -176,9 +185,9 @@ export default function Settings() {
         </div>
       </Card>
 
-      <h2 className="mb-3 mt-8 border-t border-line pt-6 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
-        {t('set.whatIsAttached')}
-      </h2>
+      </Fold>
+
+      <Fold heading={t('set.whatIsAttached')}>
       <Card>
         <dl className="space-y-2.5 text-[13px]">
           <Row
@@ -193,6 +202,7 @@ export default function Settings() {
           </p>
         )}
       </Card>
+      </Fold>
     </div>
   );
 }
