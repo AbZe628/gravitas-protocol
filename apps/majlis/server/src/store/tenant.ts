@@ -15,6 +15,7 @@ import type {
 } from '../types.js';
 import { NotFound, type Store, type StoredSigning } from './store.js';
 import type { Credential } from '../services/account.js';
+import type { EnrolledDevice } from '../auth/passkeys.js';
 import type { Undertaking } from '../services/undertaking.js';
 import type { Annotation } from '../services/annotation.js';
 import type { Committee, Referral } from '../services/committee.js';
@@ -557,6 +558,37 @@ export class TenantStore implements Store {
       throw new OutsideInstitution('sign a document for', signing.boardId);
     }
     return this.inner.recordSigning(signing);
+  }
+
+  /*
+   * A device is scoped through its board, the way a signature is. It carries
+   * one, and a board is either served by this store or it is not — so there is
+   * no case where a device has to vouch for itself.
+   */
+  async devices(scholarId?: string): Promise<EnrolledDevice[]> {
+    const mine = await this.ownBoardIds();
+    const all = await this.inner.devices(scholarId);
+    return all.filter((d) => mine.has(d.boardId));
+  }
+
+  async device(id: string): Promise<EnrolledDevice | null> {
+    const found = await this.inner.device(id);
+    if (!found) return null;
+    return (await this.owns(found.boardId)) ? found : null;
+  }
+
+  async putDevice(device: EnrolledDevice): Promise<EnrolledDevice> {
+    if (!(await this.owns(device.boardId))) {
+      throw new OutsideInstitution('enrol a device for', device.boardId);
+    }
+    return this.inner.putDevice(device);
+  }
+
+  async forgetDevice(id: string): Promise<void> {
+    // Reading first is what scopes it: a device outside this institution is
+    // not found here, and a delete that was never reached cannot reach it.
+    if (!(await this.device(id))) return;
+    return this.inner.forgetDevice(id);
   }
 
   // ── the way in ──────────────────────────────────────────────────────────

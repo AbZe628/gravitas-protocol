@@ -22,6 +22,12 @@
 
 import express, { Router, type Response } from 'express';
 import { badRequest, handle, identityOf, requireRole } from './http.js';
+import {
+  PasskeyRefused,
+  checkSignature,
+  type Challenges,
+  type Expected,
+} from '../auth/passkeys.js';
 import { z } from 'zod';
 import { mayDeliberate, mayOpenMatter, mayVote } from '../auth/members.js';
 import {
@@ -199,7 +205,22 @@ const signSchema = z.object({
     'their own sign-in',
     'their own sign-in and a one-time code',
     'in person at a sitting, entered by the secretary',
+    'a device they enrolled, unlocked by its owner',
   ]),
+  /**
+   * What the device answered, where the member signed with one.
+   *
+   * Required for that proof and refused for the others: a claim to have used
+   * a device, with nothing to check, is exactly the claim this is for.
+   */
+  device: z
+    .object({
+      id: z.string().min(1).max(1_000),
+      clientDataJSON: z.string().min(1).max(20_000),
+      authenticatorData: z.string().min(1).max(20_000),
+      signature: z.string().min(1).max(20_000),
+    })
+    .optional(),
   /** Anything the member wants recorded beside their name. Rare. */
   note: z.string().trim().min(1).max(600).optional(),
 });
@@ -287,6 +308,24 @@ const sourceSchema = z.object({
   note: z.string().max(2_000).optional(),
 });
 
+/**
+ * The challenge a device answered, read out of what the browser sent.
+ *
+ * Taken from the signed client data rather than from a field beside it, so
+ * the challenge that is looked up is the one the device actually put its
+ * signature over. A separate field would be the caller's word for it.
+ */
+function challengeOf(clientDataJSON: string): string {
+  try {
+    const parsed = JSON.parse(Buffer.from(clientDataJSON, 'base64url').toString('utf8')) as {
+      challenge?: unknown;
+    };
+    return typeof parsed.challenge === 'string' ? parsed.challenge : '';
+  } catch {
+    return '';
+  }
+}
+
 export function governanceRoutes(
   store: Store,
   now: () => string = () => new Date().toISOString(),
@@ -306,6 +345,14 @@ export function governanceRoutes(
    * different size.
    */
   reading: Reading = new ReadingOff(),
+  /**
+   * Signing with a device, where this installation offers it.
+   *
+   * Optional: a test that does not care hands over nothing and the route
+   * keeps the three proofs it always had. Where it is given, the challenge is
+   * issued against one document and spent once.
+   */
+  passkeys?: { challenges: Challenges; expected: Expected },
 ): Router {
   const router = Router();
 
@@ -2287,6 +2334,67 @@ export function governanceRoutes(
    * not a party to it, and the secretary entering an in-person signature does
    * so under their own credential with `provedBy` saying exactly that.
    */
+  /**
+   * Ask for a request to sign this document with a device.
+   *
+   * The challenge is issued against the document as it stands at this moment,
+   * and the hash is computed here from the record — never accepted from the
+   * caller. A member whose draft moved while their phone was in their hand is
+   * told so rather than signing the older one.
+   */
+  router.post(
+    '/matters/:id/sign/request',
+    handle(async (req, res) => {
+      const who = identityOf(req);
+      if (!requireRole(res, mayVote(who.role), 'sign a document', who.role)) return;
+
+      if (!passkeys) {
+        res.status(409).json({
+          error: 'no_devices_here',
+          message: 'This installation does not take device signatures.',
+        });
+        return;
+      }
+
+      const board = await boardFor(store, res, req.params.id);
+      if (!board) return;
+
+      const matter = await store.matter(req.params.id);
+      if (!matter) return;
+
+      const mine = await store.devices(who.scholarId);
+      if (mine.length === 0) {
+        res.status(409).json({
+          error: 'no_device_enrolled',
+          message:
+            'You have no device enrolled. Enrol one on the board screen, then sign with it.',
+        });
+        return;
+      }
+
+      const at = now();
+      const adoptions = matter.structureId ? await store.adoptions(matter.boardId) : [];
+      const adoption =
+        standingAdoptions(adoptions).find(
+          (a) => a.structureId === matter.structureId && a.standing !== 'declined',
+        ) ?? null;
+      const fatwa = assemble(board, matter, at, adoption, await store.signings(matter.id));
+
+      const issued = passkeys.challenges.issue('sign', who.scholarId, at, {
+        matterId: matter.id,
+        documentHash: fatwa.documentHash,
+      });
+
+      res.json({
+        challenge: issued.challenge,
+        rpId: passkeys.expected.rpId,
+        documentHash: fatwa.documentHash,
+        /** Which devices may answer. Yours, and only yours. */
+        devices: mine.map((d) => ({ id: d.id, label: d.label })),
+      });
+    }),
+  );
+
   router.post(
     '/matters/:id/sign',
     handle(async (req, res) => {
@@ -2318,6 +2426,83 @@ export function governanceRoutes(
       const fatwa = assemble(board, matter, at, adoption, await store.signings(matter.id));
 
       const member = board.members.find((m) => m.id === who.scholarId);
+
+      /*
+       * Signing with a device.
+       *
+       * The claim and the proof are one thing: the proof that names a device
+       * requires a device answer, and an answer is refused with any other
+       * proof. Otherwise the strongest line on the document would be the one
+       * easiest to type.
+       */
+      const byDevice = parsed.data.provedBy === 'a device they enrolled, unlocked by its owner';
+      let signedWith: string | undefined;
+
+      if (byDevice || parsed.data.device) {
+        if (!passkeys) {
+          res.status(409).json({
+            error: 'no_devices_here',
+            message:
+              'This installation does not take device signatures. Nothing has been recorded.',
+          });
+          return;
+        }
+        if (!byDevice || !parsed.data.device) {
+          res.status(400).json({
+            error: 'proof_does_not_match',
+            message:
+              'A device signature is the answer from a device. It cannot be claimed without one, '
+              + 'and an answer cannot be filed under another kind of proof.',
+          });
+          return;
+        }
+
+        const device = await store.device(parsed.data.device.id);
+        if (!device || device.scholarId !== who.scholarId) {
+          res.status(409).json({
+            error: 'device_not_enrolled',
+            message:
+              'That device is not enrolled to you on this board. Enrol it from the board screen '
+              + 'before signing with it.',
+          });
+          return;
+        }
+
+        try {
+          const issued = passkeys.challenges.spend(
+            challengeOf(parsed.data.device.clientDataJSON),
+            'sign',
+            who.scholarId,
+            at,
+          );
+
+          /*
+           * The challenge was issued for one document. If the draft moved
+           * between asking and answering, what the member confirmed on their
+           * phone is not what is in front of them now.
+           */
+          if (issued.matterId !== matter.id || issued.documentHash !== fatwa.documentHash) {
+            res.status(409).json({
+              error: 'document_moved',
+              message:
+                'The document changed between the request and the answer. Nothing has been '
+                + 'recorded. Read it again and sign the version in front of you.',
+            });
+            return;
+          }
+
+          const moved = checkSignature(parsed.data.device, device, issued, passkeys.expected, at);
+          await store.putDevice(moved);
+          signedWith = moved.label;
+        } catch (e) {
+          if (e instanceof PasskeyRefused) {
+            res.status(409).json({ error: e.code, message: e.message });
+            return;
+          }
+          throw e;
+        }
+      }
+
       const stored = await store.recordSigning({
         matterId: matter.id,
         boardId: matter.boardId,
@@ -2327,6 +2512,7 @@ export function governanceRoutes(
         at,
         provedBy: parsed.data.provedBy,
         documentHash: fatwa.documentHash,
+        ...(signedWith ? { signedWith } : {}),
         ...(parsed.data.note ? { note: parsed.data.note } : {}),
       });
 

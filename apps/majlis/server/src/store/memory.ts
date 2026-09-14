@@ -36,6 +36,7 @@ import {
 } from '../data/seed.js';
 import { ASSISTANT_LOG_MAX, NotFound, type Store, type StoredSigning } from './store.js';
 import type { Credential } from '../services/account.js';
+import type { EnrolledDevice } from '../auth/passkeys.js';
 import type { Undertaking } from '../services/undertaking.js';
 import type { Annotation } from '../services/annotation.js';
 import type { Committee, Referral } from '../services/committee.js';
@@ -83,6 +84,7 @@ export class MemoryStore implements Store {
    * between them — a map keyed by member would silently drop the earlier.
    */
   private readonly _signings: StoredSigning[] = [];
+  private readonly _devices = new Map<string, EnrolledDevice>();
   /** Keyed by scholar: a member holds one credential or none. */
   private readonly _credentials = new Map<string, Credential>();
   private readonly _undertakings: Map<string, Undertaking>;
@@ -476,6 +478,25 @@ export class MemoryStore implements Store {
   async recordSigning(signing: StoredSigning): Promise<StoredSigning> {
     this._signings.push(copy(signing));
     return copy(signing);
+  }
+
+  async devices(scholarId?: string): Promise<EnrolledDevice[]> {
+    const all = [...this._devices.values()];
+    return copy(scholarId === undefined ? all : all.filter((d) => d.scholarId === scholarId));
+  }
+
+  async device(id: string): Promise<EnrolledDevice | null> {
+    const found = this._devices.get(id);
+    return found ? copy(found) : null;
+  }
+
+  async putDevice(device: EnrolledDevice): Promise<EnrolledDevice> {
+    this._devices.set(device.id, copy(device));
+    return copy(device);
+  }
+
+  async forgetDevice(id: string): Promise<void> {
+    this._devices.delete(id);
   }
 
   async submissions(boardId?: string): Promise<Submission[]> {

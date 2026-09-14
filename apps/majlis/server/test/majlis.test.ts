@@ -442,6 +442,17 @@ describe('api', () => {
     // `PATCH /api/matters/:id` is added tomorrow. This one enumerates what is
     // actually registered, so any new mutating route fails here until it is
     // added to the allowlist deliberately.
+    //
+    // ── it did not, for most of them ──────────────────────────────────────
+    //
+    // Until 14 September this walked only the layers registered directly on
+    // `app`, and every route in `routes/*.ts` is mounted on a router under
+    // `/api`. So it watched two routes and believed it watched all of them,
+    // and seventy-odd could have been added without a word. It was found by
+    // adding four that should have tripped it and being told nothing.
+    //
+    // The list below is therefore long, and that is the point: it is what this
+    // application actually exposes, and a new one has to be put here by hand.
     const ALLOWED = new Set([
       'POST /api/assistant/ask',
       /*
@@ -457,24 +468,150 @@ describe('api', () => {
        * shut.
        */
       'POST /api/settings',
+
+      /*
+       * The devices a member signs with.
+       *
+       * Three routes and each is about the caller's own name: there is no
+       * parameter for enrolling a device onto somebody else, listing another
+       * member's, or forgetting one. `DELETE` is the only deletion in this
+       * application and it removes a key rather than a record — signatures
+       * already made name the device they were made with and stand.
+       * `test/passkeys.test.ts` holds the verification shut.
+       */
+      'POST /api/devices/request',
+      'POST /api/devices',
+
+      'DELETE /api/devices/:id',
+
+      // The matter, from raised to settled.
+      'POST /api/matters',
+      'POST /api/matters/:id/deliberation',
+      'POST /api/matters/:id/open',
+      'POST /api/matters/:id/voting',
+      'POST /api/matters/:id/vote',
+      'POST /api/matters/:id/close',
+      'POST /api/matters/:id/object',
+      'POST /api/matters/:id/force',
+      'POST /api/matters/:id/withdraw',
+      'POST /api/matters/:id/reopen',
+      'PUT /api/matters/:id/parameters',
+      'PUT /api/matters/:id/structure',
+      'POST /api/matters/:id/findings',
+      'POST /api/matters/:id/implementation',
+
+      // What a matter is asked and what it rests on.
+      'POST /api/matters/:id/asked',
+      'POST /api/matters/:id/asked/:questionId/answer',
+      'POST /api/matters/:id/sources',
+      'POST /api/matters/:id/sources/file',
+      'POST /api/matters/:id/sources/:sourceId/against',
+      'POST /api/matters/:id/sources/:sourceId/extract',
+      'DELETE /api/matters/:id/sources/:sourceId',
+      'POST /api/matters/:id/reading',
+
+      // Signing the written decision, and asking to sign it with a device.
+      'POST /api/matters/:id/sign',
+      'POST /api/matters/:id/sign/request',
+
+      // Reported non-compliance, and what follows a finding.
+      'POST /api/incidents',
+      'POST /api/incidents/:id/concurrence',
+      'POST /api/incidents/:id/stopped',
+      'POST /api/incidents/:id/directors',
+      'POST /api/incidents/:id/plan',
+      'POST /api/incidents/:id/plan/endorse',
+      'POST /api/incidents/:id/plan/return',
+      'POST /api/incidents/:id/purification',
+      'POST /api/incidents/:id/purification/paid',
+      'POST /api/incidents/:id/submission',
+      'POST /api/incidents/:id/close',
+
+      // The register, and the calculations the board records against it.
+      'POST /api/assets',
+      'POST /api/assets/:id/retire',
+      'POST /api/computations',
+      'POST /api/computations/:id/withdraw',
+      'POST /api/screening',
+      'POST /api/purification',
+      'POST /api/zakat',
+      'POST /api/distribution',
+      'POST /api/tradability',
+      'POST /api/late-payment',
+      'POST /api/recognise',
+      'POST /api/reading',
+
+      // What the board adopts, who it asks, and what it undertakes.
+      'POST /api/adoptions',
+      'POST /api/committees',
+      'POST /api/committees/:id/dissolve',
+      'POST /api/referrals',
+      'POST /api/referrals/:id/report',
+      'POST /api/referrals/:id/withdraw',
+      'POST /api/undertakings',
+      'POST /api/undertakings/:id/close',
+      'POST /api/annotations',
+      'POST /api/annotations/:id/withdraw',
+      'POST /api/examinations',
+
+      // Sittings.
+      'POST /api/meetings',
+      'PUT /api/meetings/:id/attendance',
+      'PUT /api/meetings/:id/minute',
+      'POST /api/meetings/:id/close',
+
+      // The desk at the bank, asking.
+      'POST /api/submissions',
+      'POST /api/submissions/:id/open',
+      'POST /api/submissions/:id/decline',
+      'POST /api/submissions/:id/withdraw',
+
+      // A member's own account. The reset is the one unauthenticated route.
+      'POST /api/me/password',
+      'POST /api/me/details',
+      'POST /api/members/reset',
+      'POST /api/members/password/reset',
     ]);
 
-    const stack =
-      (app as any)._router?.stack ?? (app as any).router?.stack ?? [];
+    /**
+     * Every mutating route, including the ones on mounted routers.
+     *
+     * The mount path is recovered from the layer's own regular expression,
+     * which is how Express stores it. The shape below is what `app.use('/api',
+     * …)` produces, and anything that does not match it is left as the empty
+     * prefix rather than guessed at.
+     */
     const mutating: string[] = [];
-    for (const layer of stack) {
-      if (!layer.route) continue;
-      const path = layer.route.path;
-      const methods = Object.keys(layer.route.methods ?? {});
-      for (const m of methods) {
-        const verb = m.toUpperCase();
-        if (verb === 'GET' || verb === 'HEAD' || verb === 'OPTIONS') continue;
-        mutating.push(`${verb} ${path}`);
+    const walk = (stack: any[], prefix: string): void => {
+      for (const layer of stack) {
+        if (layer.route) {
+          for (const m of Object.keys(layer.route.methods ?? {})) {
+            const verb = m.toUpperCase();
+            if (verb === 'GET' || verb === 'HEAD' || verb === 'OPTIONS') continue;
+            mutating.push(`${verb} ${prefix}${layer.route.path}`);
+          }
+          continue;
+        }
+        if (!layer.handle?.stack) continue;
+
+        const source: string = layer.regexp?.source ?? '';
+        const mount = source
+          .replace(/^\^/, '')
+          .replace(/\\\/\?\(\?=\\\/\|\$\)\$?$/, '')
+          .replace(/\\\//g, '/')
+          .replace(/\$$/, '');
+        walk(layer.handle.stack, prefix + (mount === '/?' ? '' : mount));
       }
-    }
+    };
+
+    const stack = (app as any)._router?.stack ?? (app as any).router?.stack ?? [];
+    walk(stack, '');
 
     expect(stack.length).toBeGreaterThan(0); // guard: introspection actually worked
-    expect(mutating.sort()).toEqual([...ALLOWED].sort());
+    // And that it reached past the top level, which is what it failed to do
+    // before. Without this line the walker could quietly stop recursing again.
+    expect(mutating.length).toBeGreaterThan(50);
+    expect([...new Set(mutating)].sort()).toEqual([...ALLOWED].sort());
   });
 
   it('still refuses to write a rule directly', async () => {

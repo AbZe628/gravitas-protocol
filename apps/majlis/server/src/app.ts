@@ -33,6 +33,8 @@ import type { Language } from './types.js';
 import { LoginLimiter, loginThrottle } from './middleware/loginLimit.js';
 import { governanceRoutes } from './routes/governance.js';
 import { accountRoutes } from './routes/account.js';
+import { deviceRoutes, expectedFrom } from './routes/devices.js';
+import { Challenges } from './auth/passkeys.js';
 import { undertakingRoutes } from './routes/undertakings.js';
 import { annotationRoutes } from './routes/annotations.js';
 import { committeeRoutes } from './routes/committees.js';
@@ -671,8 +673,21 @@ export function createApp(
     res.json(await store.assistantLog());
   });
 
+  /*
+   * Signing with a device.
+   *
+   * The challenges are held by this process, for minutes at a time, and the
+   * origin comes from the installation rather than from any request — see
+   * routes/devices.ts for why both of those are the whole security of it.
+   */
+  const passkeys = {
+    challenges: new Challenges(),
+    expected: expectedFrom(Number(process.env.PORT ?? 4000)),
+  };
+
   // ---- governance ------------------------------------------------------
-  app.use('/api', governanceRoutes(store, undefined, vault, reading));
+  app.use('/api', governanceRoutes(store, undefined, vault, reading, passkeys));
+  app.use('/api', deviceRoutes(store, passkeys.challenges, passkeys.expected));
   app.use('/api', incidentRoutes(store));
   app.use('/api', computationRoutes(store));
   app.use('/api', adoptionRoutes(store));

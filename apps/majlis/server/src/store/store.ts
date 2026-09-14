@@ -38,6 +38,7 @@ import type {
 } from '../types.js';
 import type { Signing } from '../services/signature.js';
 import type { Credential } from '../services/account.js';
+import type { EnrolledDevice } from '../auth/passkeys.js';
 import type { Undertaking } from '../services/undertaking.js';
 import type { Annotation } from '../services/annotation.js';
 import type { Committee, Referral } from '../services/committee.js';
@@ -226,6 +227,37 @@ export interface Store {
    * There is deliberately no way to remove one.
    */
   recordSigning(signing: StoredSigning): Promise<StoredSigning>;
+
+  // ── the devices members sign with ──────────────────────────────────────
+  //
+  // A device is not part of the record. It is how a member proves they are
+  // themselves, like a credential, and it lives beside one for the same
+  // reason: the board record says who signs, and this says what they sign
+  // with. Nothing secret is here — the private half never leaves the device
+  // — but a credential id is still a member's own business and is scoped by
+  // institution like everything else.
+
+  /** The devices this member has enrolled, or every device when no one is named. */
+  devices(scholarId?: string): Promise<EnrolledDevice[]>;
+  device(id: string): Promise<EnrolledDevice | null>;
+
+  /**
+   * Keep a device, whether new or moved on.
+   *
+   * One method rather than an add and an update, because the counter moves on
+   * every signature and a second path is a second chance to forget it.
+   */
+  putDevice(device: EnrolledDevice): Promise<EnrolledDevice>;
+
+  /**
+   * Forget a device — a laptop that was lost, or one the member no longer has.
+   *
+   * The one deletion in this store, and it is right: a device is a key, not a
+   * record of anything the board decided. **Signatures already made stand.**
+   * They name the device they were made with, so a ruling signed last year
+   * does not change because a laptop was replaced this morning.
+   */
+  forgetDevice(id: string): Promise<void>;
 
   // ── a member's own account ─────────────────────────────────────────────
 

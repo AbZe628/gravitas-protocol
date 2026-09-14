@@ -539,6 +539,8 @@ ${fatwa.evidence
         <div class="who"><strong>${esc(s.name)}</strong>${s.title ? `<span>${esc(s.title)}</span>` : ''}</div>
         ${s.note ? `<p class="reason">${esc(s.note)}</p>` : ''}
         <p class="stamp">Signed ${date(s.at)} · identity proved by ${esc(s.provedBy)}${
+          s.signedWith ? ` (${esc(s.signedWith)})` : ''
+        }${
           elsewhere
             ? ' · <strong>signed a different draft from this one; their signature does not cover the text above</strong>'
             : ''

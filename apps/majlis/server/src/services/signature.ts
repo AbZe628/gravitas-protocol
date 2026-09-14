@@ -66,12 +66,21 @@ export type SigningProof =
   /** Their credential and a one-time code sent to them. */
   | 'their own sign-in and a one-time code'
   /** Signed on paper at a sitting; the secretary recorded it here. */
-  | 'in person at a sitting, entered by the secretary';
+  | 'in person at a sitting, entered by the secretary'
+  /**
+   * A device the member enrolled, unlocked by fingerprint, face or PIN.
+   *
+   * The strongest of these, and the only one where a key this installation
+   * has never held made the signature. See `auth/passkeys.ts` for what it
+   * proves and — just as important — what it does not.
+   */
+  | 'a device they enrolled, unlocked by its owner';
 
 export const PROOFS: readonly SigningProof[] = [
   'their own sign-in',
   'their own sign-in and a one-time code',
   'in person at a sitting, entered by the secretary',
+  'a device they enrolled, unlocked by its owner',
 ];
 
 export interface Signing {
@@ -97,6 +106,15 @@ export interface Signing {
    * carry.
    */
   note?: string;
+  /**
+   * Which device it was signed with, in the member's own words for it.
+   *
+   * Kept on the signature rather than looked up, and that is the point: a
+   * member who loses a laptop forgets the device, and a ruling signed last
+   * year must still say what it was signed with. Absent on every proof but
+   * the device one.
+   */
+  signedWith?: string;
 }
 
 export interface Seal {
@@ -245,6 +263,10 @@ function manifest(hash: string, at: string, iss: string, signings: readonly Sign
         check('proof', s.provedBy),
         check('signed hash', s.documentHash),
         check('note', s.note ?? ''),
+        // What it was signed with. Inside the seal because it is printed on
+        // the page: a device name a later reader can see, that the seal did
+        // not cover, would be a claim nothing stands behind.
+        check('signed with', s.signedWith ?? ''),
       ].join(FIELD_SEP),
     );
   }

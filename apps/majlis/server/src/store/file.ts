@@ -56,6 +56,7 @@ import {
 } from '../data/seed.js';
 import { ASSISTANT_LOG_MAX, NotFound, type Store, type StoredSigning } from './store.js';
 import type { Credential } from '../services/account.js';
+import type { EnrolledDevice } from '../auth/passkeys.js';
 import type { Undertaking } from '../services/undertaking.js';
 import type { Annotation } from '../services/annotation.js';
 import type { Committee, Referral } from '../services/committee.js';
@@ -106,6 +107,9 @@ interface Document {
   signings?: StoredSigning[];
   /** A member holds one credential or none; keyed rather than appended. */
   credentials?: Credential[];
+
+  /** The devices members sign with. A key, not a record — see the Store interface. */
+  devices?: EnrolledDevice[];
   /** What somebody undertook to do at a sitting, and what became of it. */
   undertakings?: Undertaking[];
   annotations?: Annotation[];
@@ -200,6 +204,7 @@ export class FileStore implements Store {
       loaded.examinations ??= [];
       loaded.signings ??= [];
       loaded.credentials ??= [];
+      loaded.devices ??= [];
       loaded.undertakings ??= [];
       loaded.annotations ??= [];
       loaded.committees ??= [];
@@ -715,6 +720,33 @@ export class FileStore implements Store {
       this.doc.signings.push(copy(signing));
       this.persist();
       return copy(signing);
+    });
+  }
+
+  async devices(scholarId?: string): Promise<EnrolledDevice[]> {
+    const all = this.doc.devices ?? [];
+    return copy(scholarId === undefined ? all : all.filter((d) => d.scholarId === scholarId));
+  }
+
+  async device(id: string): Promise<EnrolledDevice | null> {
+    return copy((this.doc.devices ?? []).find((d) => d.id === id) ?? null);
+  }
+
+  async putDevice(device: EnrolledDevice): Promise<EnrolledDevice> {
+    return this.serialise(() => {
+      this.doc.devices ??= [];
+      const at = this.doc.devices.findIndex((d) => d.id === device.id);
+      if (at === -1) this.doc.devices.push(copy(device));
+      else this.doc.devices[at] = copy(device);
+      this.persist();
+      return copy(device);
+    });
+  }
+
+  async forgetDevice(id: string): Promise<void> {
+    return this.serialise(() => {
+      this.doc.devices = (this.doc.devices ?? []).filter((d) => d.id !== id);
+      this.persist();
     });
   }
 
