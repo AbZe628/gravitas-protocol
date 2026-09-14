@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { api, oversight, type AssistantExchange, type Health, type MatterSummary } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { Card, DateText, ErrorText, Loading, Tag } from '../components/ui.js';
@@ -105,6 +106,18 @@ export default function Record({ embedded = false }: { embedded?: boolean }) {
         made last week is the one somebody is looking for.
       */}
       <Decided matters={decided} />
+
+      {/*
+        The briefings, which left the rail with seven others when it was cut
+        to the nine places the drawing shows. A briefing is a paper about the
+        record, so the record is where it is reached from.
+      */}
+      <Link
+        to="/briefings"
+        className="mb-5 inline-block rounded-xl bg-raised px-4 py-2 text-[12.5px] font-semibold text-lapis shadow-ring"
+      >
+        {t('record.toPapers')}
+      </Link>
 
       {health?.recordSince && (
         <div className="mb-5 rounded-card shadow-ring bg-raised px-4 py-3">

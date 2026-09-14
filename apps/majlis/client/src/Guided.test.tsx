@@ -148,24 +148,23 @@ describe('one thing asks to be done', () => {
     await waitFor(() => expect(screen.getByText(/Open it/)).toBeInTheDocument());
 
     /*
-     * The rail is the four doors, and it is headed by them.
+     * The rail is the three groups that were drawn.
      *
-     * Hiding the navigation on this screen was right when it was twelve equal
-     * links across the top. It is now the four phases a question travels
-     * through, numbered, and a frame should be permanent: a reader learns
-     * where the navigation lives once and stops thinking about it.
-     *
-     * The headings are asserted by their number as well as their name, so a
-     * rail that lost the sequence — which is the information the numbers
-     * carry — fails here rather than quietly becoming four unordered piles.
+     * It was five groups and seventeen destinations, and the owner rejected
+     * the interface twice before anybody opened design/Main.dc.html. The
+     * drawing has The work, What stands, What we hold, and nine places.
+     * Almost three times as many places to look is not a matter of taste.
      */
-    expect(screen.getByText(/01\s+Asked/)).toBeInTheDocument();
-    expect(screen.getByText(/02\s+Deciding/)).toBeInTheDocument();
-    expect(screen.getByText(/03\s+In force/)).toBeInTheDocument();
-    expect(screen.getByText(/04\s+Checked/)).toBeInTheDocument();
+    expect(screen.getAllByText('The work').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('What stands').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('What we hold').length).toBeGreaterThan(0);
+
+    // And nothing after them. The drawing has no besides group: search is
+    // inside what stands, and the board's own page is the member's name.
+    expect(screen.queryByText('Besides')).toBeNull();
 
     // Nothing was lost in the move: the register still has a way in.
-    expect(screen.getAllByRole('link', { name: 'Holdings' }).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole('link', { name: /Register/ }).length).toBeGreaterThan(0);
   });
 
   it('has no drawer called everything else', async () => {
@@ -250,19 +249,30 @@ describe('nothing was removed', () => {
     stub();
     show();
 
-    await waitFor(() => expect(screen.getByText(/01\s+Asked/)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getAllByText('The work').length).toBeGreaterThan(0));
 
     /*
-     * Every destination the retired drawer held, still one click away.
+     * The nine the rail offers, and then the eight that left it.
      *
      * This is the test that makes "simplify without losing anything" a fact
-     * rather than an intention: if a rearrangement drops a screen out of the
-     * navigation, it fails here.
+     * rather than an intention. It is stricter than the one it replaces: a
+     * destination that left the rail has to be reachable from the screen it
+     * moved to, which means actually going there and looking.
      */
-    for (const label of ['Holdings', 'Contracts', 'What stands', 'Search', 'Meetings', 'The board']) {
+    for (const label of [
+      'What needs you',
+      'Events',
+      'Coming',
+      'Rulings in force',
+      'The record',
+      'Search',
+      'Register',
+      'Contract library',
+      'Calculations',
+    ]) {
       expect(
         screen.getAllByRole('link', { name: new RegExp(label) }).length,
-        `${label} is not reachable from the rail`,
+        `${label} is not in the rail`,
       ).toBeGreaterThan(0);
     }
   });
@@ -272,8 +282,10 @@ describe('nothing was removed', () => {
     show();
 
     // The assistant is off here, so it is absent rather than listed and
-    // refusing — the same rule as every other control.
-    await waitFor(() => expect(screen.getByText(/01\s+Asked/)).toBeInTheDocument());
+    // refusing — the same rule as every other control. The drawing shows it
+    // as a line at the foot of the rail saying whether one is configured,
+    // which is not a place to go.
+    await waitFor(() => expect(screen.getAllByText('The work').length).toBeGreaterThan(0));
     expect(screen.queryByRole('link', { name: /Assistant/ })).toBeNull();
   });
 

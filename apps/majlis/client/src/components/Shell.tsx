@@ -9,6 +9,7 @@ import {
   BESIDES,
   DESK_DOORS,
   DOORS,
+  RAIL,
   deskPhaseOf,
   isDeskRoute,
   mainOf,
@@ -235,11 +236,25 @@ function TabBar() {
    * extra steps. A member who learns `Asked, Deciding, In force, Checked` at
    * their desk finds the identical four here, in the identical order.
    */
-  const tabs = (desk ? DESK_DOORS : DOORS).map((door) => ({
-    to: mainOf(door),
-    label: t(door.label),
-    icon: drawing[door.phase] ?? door.phase,
-  }));
+  /*
+   * The phone carries the rail, not a second navigation.
+   *
+   * Three tabs for the board, one per drawn group, opening that group's main
+   * screen. A member who learns The work, What stands, What we hold at their
+   * desk finds the same three here. The desk keeps its own doors, which were
+   * drawn nowhere and are already only three.
+   */
+  const tabs = desk
+    ? DESK_DOORS.map((door) => ({
+        to: mainOf(door),
+        label: t(door.label),
+        icon: drawing[door.phase] ?? door.phase,
+      }))
+    : RAIL.map((group, i) => ({
+        to: (group.destinations.find((d) => d.main) ?? group.destinations[0]).to,
+        label: t(group.label),
+        icon: (['asked', 'inforce', 'checked'] as const)[i] ?? 'asked',
+      }));
 
   /*
    * One drawing per phase, each of the thing itself rather than a symbol to
@@ -367,18 +382,43 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   const desk = isInstitution(identity?.role);
   const doors = desk ? DESK_DOORS : DOORS;
 
-  const groups: { title: string; items: Item[] }[] = [
-    // Arrival on its own, above the doors, because it is not one of them.
-    { title: '', items: [{ to: '/', label: t(desk ? 'desk.here' : 'guided.greeting'), end: true }] },
+  /*
+   * The board reads its rail from the drawing; the desk still reads its own
+   * doors, which were drawn nowhere and are already only six.
+   *
+   * Three groups and nine places, against five and seventeen. Everything that
+   * left the rail is reached from where it belongs — spine.ts lists each one
+   * and where it went, and a test fails if any of them becomes unreachable.
+   */
+  const groups: { title: string; items: Item[] }[] = desk
+    ? [
+        { title: '', items: [{ to: '/', label: t('desk.here'), end: true }] },
+        ...doors.map((door) => ({
+          title: `${door.ordinal}  ${t(door.label)}`,
+          items: door.destinations.map((d) => ({ to: d.to, label: t(d.label) })),
+        })),
+      ]
+    : /*
+       * Three groups and nothing after them.
+       *
+       * The drawing has no *besides* group. Search is inside *what stands*
+       * where it was drawn; the board's own page is reached from the member's
+       * name in the header, which is where a person looks for their own
+       * settings in every application they already use; and the assistant is
+       * a line at the foot of the rail saying whether one is configured,
+       * which is what the drawing shows rather than a place to go.
+       */
+      RAIL.map((group) => ({
+        title: t(group.label),
+        items: group.destinations.map((d) => ({
+          to: d.to,
+          label: t(d.label),
+          ...(d.to === '/' ? { end: true } : {}),
+        })),
+      }));
 
-    // One group per door, numbered, because the order is the order a
-    // question actually travels and that is information rather than decoration.
-    ...doors.map((door) => ({
-      title: `${door.ordinal}  ${t(door.label)}`,
-      items: door.destinations.map((d) => ({ to: d.to, label: t(d.label) })),
-    })),
-
-    {
+  if (desk) {
+    groups.push({
       title: t('spine.besides'),
       items: BESIDES.filter(
         // A control this installation cannot honour is absent, not disabled.
@@ -389,10 +429,10 @@ export default function Shell({ children }: { children: React.ReactNode }) {
          * about its own question, inside the board's record, is the one place
          * an answer could be mistaken for the board's.
          */
-        .filter((d) => !desk || d.to !== '/assistant')
+        .filter((d) => d.to !== '/assistant')
         .map((d) => ({ to: d.to, label: t(d.label) })),
-    },
-  ];
+    });
+  }
 
   const rail = (
     <div className="flex h-full flex-col">
@@ -588,9 +628,21 @@ export default function Shell({ children }: { children: React.ReactNode }) {
               ))}
             </div>
 
-            {/* Who is here, and what they may do. It decides what half the
-                controls in this application are allowed to be. */}
-            <div className="flex items-center gap-3">
+            {/*
+              Who is here, what they may do, and the way to their own page.
+
+              It decides what half the controls in this application are
+              allowed to be — and it is now the way to the board's page, which
+              left the rail. The drawing puts the name and the role here and
+              nothing in a *besides* group, and a person looking for their own
+              settings looks at their own name in every application they
+              already use.
+            */}
+            <Link
+              to="/settings"
+              className="flex items-center gap-3 rounded-xl px-2 py-1 transition-colors hover:bg-raised/60"
+              aria-label={t('shell.yourPage')}
+            >
               <div className="text-end">
                 <div className="text-[12.5px] font-semibold leading-tight text-paper">
                   {identity?.scholarId ?? t('shell.anonymous')}
@@ -600,7 +652,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
                 </div>
               </div>
               <Avatar id={identity?.scholarId} />
-            </div>
+            </Link>
           </div>
         </header>
 

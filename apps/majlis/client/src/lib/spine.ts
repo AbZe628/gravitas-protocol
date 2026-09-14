@@ -83,6 +83,81 @@ export interface Door<P extends AnyPhase = Phase> {
   destinations: readonly Destination[];
 }
 
+/**
+ * The rail, as it was drawn.
+ *
+ * ── why this is not the four doors ────────────────────────────────────────
+ *
+ * `design/Main.dc.html` shows three groups and nine destinations. The rail
+ * that was built has five groups and seventeen, and the owner rejected the
+ * interface twice before anybody opened the drawing. Almost three times as
+ * many places to look is not a matter of taste, and it is the whole of
+ * *I cannot find my way at all*.
+ *
+ * The four doors stay, below, and they stay for what they are actually good
+ * at: naming the phase a matter is in, and colouring a record by it. They
+ * stopped being the navigation.
+ *
+ * ── what happened to the other eight ──────────────────────────────────────
+ *
+ * Nothing was deleted and no address changed. Each one is reached from where
+ * it belongs, which is what the drawing implies rather than a rail entry:
+ *
+ *   `/questions`, `/classic`   the arrival screen is the queue of everything
+ *                              waiting, questions and matters together
+ *   `/ask`                     from the queue, where a member enters one on
+ *                              the institution's behalf
+ *   `/check`                   from the contract library, which is what you
+ *                              are checking a draft against
+ *   `/meetings`, `/undertakings`, `/examinations`
+ *                              from `Coming`, which is where every date the
+ *                              board is held to already lives
+ *   `/briefings`               from `The record`
+ *   `/settings`                from the member's own name in the header
+ *   `/assistant`               the drawing shows it as a status line at the
+ *                              foot of the rail, not as a place to go
+ *
+ * A destination that is in neither this list nor one of those places is
+ * unreachable, and `Reachable.test.tsx` fails rather than letting it hide.
+ */
+export interface RailGroup {
+  /** The i18n key for the heading. Three of them, as drawn. */
+  label: string;
+  destinations: readonly Destination[];
+}
+
+export const RAIL: readonly RailGroup[] = [
+  {
+    label: 'rail.work',
+    destinations: [
+      { to: '/', label: 'rail.needsYou', note: 'rail.needsYou.note', main: true },
+      { to: '/incidents', label: 'rail.events', note: 'rail.events.note' },
+      { to: '/calendar', label: 'rail.coming', note: 'rail.coming.note' },
+    ],
+  },
+  {
+    label: 'rail.stands',
+    destinations: [
+      { to: '/rules', label: 'rail.rulings', note: 'rail.rulings.note', main: true },
+      { to: '/record', label: 'rail.record', note: 'rail.record.note' },
+      { to: '/search', label: 'rail.search', note: 'rail.search.note' },
+    ],
+  },
+  {
+    label: 'rail.hold',
+    destinations: [
+      { to: '/register', label: 'rail.register', note: 'rail.register.note', main: true },
+      { to: '/library', label: 'rail.library', note: 'rail.library.note' },
+      { to: '/calculations', label: 'rail.calculations', note: 'rail.calculations.note' },
+    ],
+  },
+];
+
+/** Every address the rail itself offers. Used by the reachability test. */
+export const RAIL_ROUTES: readonly string[] = RAIL.flatMap((g) =>
+  g.destinations.map((d) => d.to),
+);
+
 export const DOORS: readonly Door[] = [
   {
     phase: 'asked',

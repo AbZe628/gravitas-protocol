@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { oversight, type HeldStructure, type Library as LibraryData } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { Division, Nothing } from '../components/page.js';
@@ -85,6 +86,16 @@ export default function Library() {
       phase="inforce"
       title={t('adopt.title')}
       says={t('adopt.intro')}
+      /* Checking a draft is done against these shapes, so it is offered from
+         here rather than from a rail entry of its own. */
+      act={(
+        <Link
+          to="/check"
+          className="rounded-xl bg-lapis px-4 py-2 text-[12.5px] font-semibold text-white shadow-act"
+        >
+          {t('adopt.toCheck')}
+        </Link>
+      )}
       live={
         <span className="text-[13px] text-muted">
           <span className="font-mono tabular-nums text-paper">{untouched}</span>{' '}

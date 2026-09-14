@@ -213,6 +213,30 @@ export default function Queue() {
         ))}
       </div>
 
+      {/*
+        The two full lists, under the queue rather than in the rail.
+
+        This screen shows what is waiting on somebody. The complete list of
+        questions and the complete list of matters are a different thing —
+        wanted occasionally, by somebody looking for one that is not waiting
+        on anybody. They left the rail with six others when it was cut to the
+        nine places the drawing shows, and this is the screen they belong to.
+      */}
+      <nav className="mb-6 flex flex-wrap gap-2">
+        {[
+          ['/questions', 'needs.allQuestions'],
+          ['/classic', 'needs.allMatters'],
+        ].map(([to, key]) => (
+          <Link
+            key={to}
+            to={to}
+            className="text-[12.5px] text-muted underline decoration-line underline-offset-4 hover:text-paper"
+          >
+            {t(key)}
+          </Link>
+        ))}
+      </nav>
+
       {shown.length === 0 ? (
         <Nothing>{t(rows.length === 0 ? 'queue.nothing' : 'queue.noneHere')}</Nothing>
       ) : (

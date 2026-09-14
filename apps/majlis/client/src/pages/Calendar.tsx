@@ -211,6 +211,31 @@ export default function Calendar() {
       }
     >
       {/*
+        The three places a date on this page comes from.
+
+        Sittings, what members undertook, and the reviews all left the rail
+        when it was cut to the nine places the drawing shows. Every one of
+        them is a date the board is held to, which is what this page already
+        is — so this is where they belong rather than three more lines in a
+        rail somebody has to read past every day.
+      */}
+      <nav className="mb-7 flex flex-wrap gap-2">
+        {[
+          ['/meetings', 'cal.toSittings'],
+          ['/undertakings', 'cal.toUndertakings'],
+          ['/examinations', 'cal.toReviews'],
+        ].map(([to, key]) => (
+          <Link
+            key={to}
+            to={to}
+            className="rounded-xl bg-raised px-4 py-2 text-[12.5px] font-semibold text-lapis shadow-ring"
+          >
+            {t(key)}
+          </Link>
+        ))}
+      </nav>
+
+      {/*
         The rhythm first, because it is the only obligation on this page with a
         supervisor behind it and the only one that comes with something to do.
         The download used to sit here, above every date: a person opening this
