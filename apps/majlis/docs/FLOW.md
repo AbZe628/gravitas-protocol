@@ -369,4 +369,165 @@ oblika) i rezultat se **veže za uslov**. Iz trake bira **član** i rezultat se
 
 ---
 
+---
+
+# 11 · Kako se ovo ponaša kao aplikacija
+
+Do ovdje je pisalo **šta** se dešava. Ovaj dio piše **kako** — i to je razlika
+između aplikacije i stranice na koju se klika. Stranica se učita, pročita i
+napusti. Aplikacija je **sesija rada**: pamti gdje si, ne gubi ono što si
+otkucao, odgovara na tastaturu, i nikad te ne baci na početak.
+
+Svako pravilo ispod je obavezno na svakom čvoru. Ako neki čvor to ne radi, to
+je greška, a ne stvar ukusa.
+
+## 11.1 · Nikad se ne gubi mjesto
+
+| pravilo | zašto |
+|---|---|
+| Zatvaranje slajda ili dijaloga vraća **tačno** gdje si bio — ista pozicija skrola, isto otvoreno okno | Ako te vrati na vrh liste od 19 ugovora, to je stranica |
+| Čin koji uspije **ne prebacuje** te na drugi ekran sam od sebe | Prebacivanje odlučuje umjesto tebe; „šta slijedi" ti daje izbor |
+| Povratak na predmet otvara **stanicu na kojoj si stao**, ne prvi korak | Predmet od šest koraka se radi u više sjedanja |
+| Osvježavanje stranice (F5) vraća isti čvor | Adresa nosi stanje: `/matters/x?step=03` |
+| Naprijed/nazad u browseru rade kroz stanice | Stanica je stanje, ne stranica |
+
+**NEMA danas:** stanica nije u adresi; F5 vraća na prvi neodgovoreni korak.
+
+## 11.2 · Otkucano se ne gubi
+
+| pravilo |
+|---|
+| Razlog otkucan u koraku **preživi** otvaranje kalkulatora, bočnog okna, i prelazak na drugu stanicu i nazad |
+| Zatvaranje dijaloga sa otkucanim tekstom **pita** prije nego ga baci |
+| Odbijanje sa servera **ne prazni** polja — ni jedno |
+| Nacrt pitanja banci se čuva kao nacrt dok se ne pošalje |
+
+**NEMA danas:** prelazak na drugu stanicu briše otkucani razlog.
+
+## 11.3 · Tastatura
+
+| tipka | gdje | šta radi |
+|---|---|---|
+| `Esc` | dijalog, slajd | zatvara — **radi** |
+| `Tab` | svuda | kroz kontrole redom kako se čitaju |
+| `Enter` | polje jednog reda | glavni čin tog prozora |
+| `Ctrl+Enter` | polje više redova | glavni čin — jer `Enter` tu pravi novi red |
+| `←` `→` | traka stanica | prethodna / sljedeća stanica |
+| `?` | svuda | šta tipke rade ovdje |
+| `/` | svuda | pretraga |
+
+**NEMA danas:** sve osim `Esc`.
+
+## 11.4 · Čekanje
+
+| pravilo | zašto |
+|---|---|
+| Ekran koji je već tu **ostaje** dok se osvježava | Prazan ekran sa vrtuljkom je korak unazad |
+| Sporo se javlja **na mjestu gdje je** — u traci činova, ne preko cijelog ekrana | Cijeli ekran blokiran zbog jednog polja je stranica |
+| Gumb koji radi piše da radi i **ne može se pritisnuti dvaput** | Dva ista nalaza iz dva klika su greška u zapisu |
+| Ako traje duže od dvije sekunde, kaže **šta** čeka | „Učitavanje" ne govori ništa |
+
+**IMA:** ekran ostaje (`useStillThere`). **NEMA:** ostalo.
+
+## 11.5 · Greške
+
+| pravilo |
+|---|
+| Greška se pojavi **uz kontrolu** koja ju je izazvala, ne na vrhu ekrana |
+| Tekst kaže **šta uraditi**, ne šifru |
+| Ekran ostaje upotrebljiv — ostali činovi rade |
+| Server koji ćuti ≠ *nema ničega*. To su dvije različite rečenice |
+| Greška koja se ponovi tri puta nudi **šta dalje** (osvježi, javi vezni) |
+
+**IMA:** prve četiri. **NEMA:** zadnja.
+
+## 11.6 · Prozori se slažu, ne zamjenjuju
+
+```
+RADNI prozor
+  └── SLAJD (alat, ugovor)        ← radni ostaje iza, vidljiv
+        └── DIJALOG (čin)          ← slajd ostaje iza
+```
+
+| pravilo |
+|---|
+| `Esc` zatvara **samo najgornji** |
+| Ono ispod **ostaje živo** i vidi se |
+| Nikad tri nivoa — ako treba, čvor je pogrešno zamišljen |
+| Fokus ulazi u novi prozor i **vraća se** na gumb koji ga je otvorio |
+
+**IMA:** fokus i Esc. **NEMA:** pravilo o tri nivoa nije nigdje provjereno.
+
+## 11.7 · Brojevi koji žive
+
+| gdje | šta |
+|---|---|
+| Traka: `Šta te treba` | broj se mijenja čim se nešto riješi, bez osvježavanja |
+| Traka stanica | stanica postane zelena čim se nalaz zapiše |
+| Glasanje | `2 od 3` se mijenja čim neko glasa |
+| Statusna traka | šta instalacija ima — uvijek tačno |
+
+**NEMA danas:** sve se mijenja tek na sljedeće učitavanje.
+
+## 11.8 · Ništa se ne briše
+
+| čin | šta se stvarno desi |
+|---|---|
+| „Povuci" bilo šta | ostaje u zapisu, označeno povučenim, sa razlogom i imenom |
+| Ispravka nalaza | novi nalaz **zamjenjuje** stari; stari se vidi u historiji |
+| Jedini pravi brisač | **uređaj za potpis** — to je ključ, ne zapis. Potpisi ostaju |
+
+**IMA.** Ovo je već tako i mora ostati.
+
+## 11.9 · Aplikacija predlaže, čovjek odlučuje
+
+| aplikacija smije | aplikacija ne smije |
+|---|---|
+| otvoriti alat koji oblik imenuje | izabrati alat iz teksta uslova |
+| popuniti brojku iz dokumenta, sa citatom | upisati je u račun bez potvrde |
+| ponuditi raniji nalaz odbora o istom uslovu | zapisati ga kao tvoj |
+| reći da prag nije met | zaključiti da je nešto dozvoljeno |
+| složiti PDF čim odluka stupi na snagu | poslati ga bez čovjeka |
+
+**Ovo je granica cijelog proizvoda.** Sve iznad je automatizam koji skida
+posao; sve ispod je softver koji presuđuje umjesto odbora.
+
+## 11.10 · Šta se vidi bez ijednog klika
+
+Na svakom čvoru, bez otvaranja ičega:
+
+1. **gdje si** — naslov i traka stanica
+2. **šta se traži od tebe sada** — jedna rečenica
+3. **šta možeš uraditi** — traka činova, uvijek na istom mjestu
+4. **šta je stanje** — čipovi, brojevi, statusna traka
+
+Ako nešto od ova četiri traži klik, čvor je pogrešno složen.
+
+---
+
+# 12 · Čvorovi koji još nisu razrađeni
+
+Iskreno: gore je razrađeno oko 15 čvorova. Ovo su ostali, i svaki traži isti
+tretman — prozor, ulaz, alat, činovi sa uslovima, izlaz:
+
+| područje | čvorovi |
+|---|---|
+| **Registar** | lista · holding · unos · povlačenje · oznaka konvencionalno/tokenizirano · drift na holdingu · spajanje instrumenata *(nema rute)* |
+| **Pregledi** | lista · zapisivanje pregleda · uzorak · nalaz po uslovu · pokrivenost nepoznata |
+| **Sjednice** | saziv · dnevni red · prisustvo · zapisnik · zatvaranje · knjiga sjednice |
+| **Obaveze** | zapis · dospijeće · zatvaranje · ko duguje |
+| **Komiteti** | osnivanje · upućivanje · izvještaj · povlačenje · raspuštanje |
+| **Biblioteka** | 19 oblika · uzimanje · preispitivanje · odbijanje · izmjena uslova |
+| **Provjera nacrta** | unos teksta · izbor oblika · čitanje · nalaz po uslovu · otvaranje predmeta |
+| **Papiri** | odluka · klauzule · priručnik · godišnji · holding · izvoz · kalendar |
+| **Nalog** | ime i titula · lozinka · uređaji · povratak pristupa |
+| **Odbor** | članovi · kvorum · prozor potvrde · serija brojeva · historija izmjena |
+| **Pretraga** | upit · rezultati po vrsti · otvaranje |
+| **Banka** | tri ekrana · odgovor odboru · plaćanje *(nema)* · prijava *(nema)* |
+
+**Redoslijed razrade:** registar → provjera nacrta → sjednice → pregledi →
+ostalo. Prvo ono što se dodiruje sa predmetom.
+
+---
+
 *Gradi se tek kad ovo bude potvrđeno.*
