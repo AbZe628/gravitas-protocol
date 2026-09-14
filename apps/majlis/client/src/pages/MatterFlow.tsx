@@ -15,6 +15,8 @@ import { State, toneForStatus } from '../components/kit.js';
 import StepWindow, { type Step } from '../components/StepWindow.js';
 import TheCalculator from '../components/TheCalculator.js';
 import AskTheBank from '../components/AskTheBank.js';
+import WhatTheySent from '../components/WhatTheySent.js';
+import { useHealth } from '../lib/health.js';
 import Dialog from '../components/Dialog.js';
 import VotePanel from '../components/VotePanel.js';
 import SignTheDocument from '../components/SignTheDocument.js';
@@ -58,10 +60,21 @@ const SETTLED = ['in_force', 'timelock', 'rejected', 'lapsed', 'withdrawn'];
 /** The last stop in the strip. Not a condition, so it carries no id of one. */
 const VOTE = 'vote';
 
+/**
+ * The first stop: what arrived and what the work will be.
+ *
+ * It was built, the owner saw it, and I dropped it when this screen was
+ * rewritten as a window — a regression, and the kind that is only found by
+ * somebody reading the file. It is a stop in the strip now rather than a
+ * separate screen, which is where it belonged in the first place.
+ */
+const BRIEF = 'brief';
+
 export default function MatterFlow() {
   const { id } = useParams<{ id: string }>();
   const { t } = useI18n();
   const { identity } = useIdentity();
+  const health = useHealth();
 
   const [matter, setMatter] = useState<Matter | null>(null);
   const [list, setList] = useState<ChecklistData | null>(null);
@@ -136,6 +149,15 @@ export default function MatterFlow() {
   const onVote = here === VOTE;
 
   const strip: Step[] = [
+    {
+      id: BRIEF,
+      ordinal: t('win.briefShort'),
+      state: (here === BRIEF ? 'here' : 'done') as Step['state'],
+      onOpen: () => {
+        setAt(BRIEF);
+        setRefusal(null);
+      },
+    },
     ...conditions.map((c, i) => ({
       id: c.condition.id,
       ordinal: String(i + 1).padStart(2, '0'),
@@ -263,6 +285,36 @@ export default function MatterFlow() {
         }
       >
         <SignTheDocument matter={matter} />
+      </StepWindow>
+    );
+  }
+
+  // ── the briefing, as the first stop ────────────────────────────────────
+
+  if (here === BRIEF) {
+    return (
+      <StepWindow
+        title={matter.title}
+        chips={chips}
+        steps={strip}
+        heading={t('sent.title')}
+        aside={aside}
+        acts={
+          <button
+            type="button"
+            onClick={() => setAt(firstOpen?.condition.id ?? VOTE)}
+            className="rounded-xl bg-lapis px-5 py-2.5 text-[13px] font-semibold text-white shadow-act"
+          >
+            {t('sent.understood')}
+          </button>
+        }
+      >
+        <WhatTheySent
+          matter={matter}
+          list={list}
+          assistantOn={health?.assistantKind !== 'off' && health?.assistantKind !== undefined}
+          onStart={() => setAt(firstOpen?.condition.id ?? VOTE)}
+        />
       </StepWindow>
     );
   }

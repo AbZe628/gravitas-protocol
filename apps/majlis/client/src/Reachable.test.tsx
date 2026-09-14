@@ -90,6 +90,7 @@ function addressesLinked(): Set<string> {
  * hold it, which is the thing somebody needs in order to put it back.
  */
 const MOVED: readonly { route: string; nowReachedFrom: string }[] = [
+  { route: '/calculations', nowReachedFrom: 'the Tools panel in the bar' },
   { route: '/questions', nowReachedFrom: 'the arrival queue' },
   { route: '/classic', nowReachedFrom: 'the arrival queue' },
   { route: '/ask', nowReachedFrom: 'the questions queue, and the phone masthead' },
@@ -102,16 +103,15 @@ const MOVED: readonly { route: string; nowReachedFrom: string }[] = [
 ];
 
 describe('the rail is the one that was drawn', () => {
-  it('offers nine destinations, in three groups', () => {
-    expect(RAIL_ROUTES).toHaveLength(9);
-    expect([...new Set(RAIL_ROUTES)]).toHaveLength(9);
+  it('offers eight destinations, in three groups', () => {
+    expect(RAIL_ROUTES).toHaveLength(8);
+    expect([...new Set(RAIL_ROUTES)]).toHaveLength(8);
   });
 
   it('offers exactly what the drawing offers', () => {
     expect([...RAIL_ROUTES].sort()).toEqual(
       [
         '/',
-        '/calculations',
         '/calendar',
         '/incidents',
         '/library',

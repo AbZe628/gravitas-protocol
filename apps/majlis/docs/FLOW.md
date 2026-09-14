@@ -4,8 +4,24 @@ Vlasnik je bio u pravu dva puta. Prvo: radio sam u hodu, bez plana. Drugo:
 prvi pokušaj ovog dokumenta pokrio je put jednog pitanja i to nije ni 10%
 Majlisa.
 
-Ovo je cijelo. **36 ekrana, 74 čina** — prebrojano iz `App.tsx` i iz popisa
-ruta u `test/majlis.test.ts`, ne po sjećanju. Svaki čin je ovdje.
+Ovo je cijelo. **36 ruta (~29 radnih ekrana), 76 čina** — prebrojano iz
+`App.tsx` i iz popisa ruta u `server/test/majlis.test.ts`.
+
+> **Drugi čitalac je ovo provjerio na GitHubu i našao šest grešaka. Svih šest
+> sam provjerio u kodu — sve su tačne.** Moj broj je bio 74, tačan je **76**;
+> treći put da sam brojku napisao napamet umjesto da je prebrojim. Šest ruta je
+> legacy i ne broji se kao radni ekran: `/guided`, `/classic` ×4, `/record`,
+> `/more`.
+>
+> Ispravljeno ispod, sa dokazom iz koda:
+>
+> | bilo | jeste |
+> |---|---|
+> | Postavi odboru · Povuci pitanje · Uzmi kao predmet — **DIO** | **IMA** — forme rade, razlog obavezan |
+> | „Provjeri nacrt opet bira oblik" | **netačno** — `/check?shape=` nosi oblik, `?from=` nosi i ugovor |
+> | Plati purifikaciju — **DIO** | **NEMA** — `/i-owe` je samo za čitanje, banka ne može platiti |
+> | Prepoznaj kao isti instrument — **DIO** | **NEMA** — nema rute |
+> | „Pročitao sam — kreni" — **IMA** | bio sam ga **izbrisao** pri prepisivanju ekrana; vraćen kao prva stanica `i` |
 
 Prvo se dogovori. Tek onda se gradi.
 
@@ -202,14 +218,67 @@ traži · hoće li brojke doći popunjene* → **Pročitao sam — kreni** · IM
 
 ---
 
-# L. Red kojim se gradi
+# L. Uloge — ista stranica, različiti činovi
 
-1. **Dugme „Alati" → slajd** — alati nemaju nijedan put
-2. **Prozor + „šta slijedi" na svakih 74 čina** — danas ih ima ~6
-3. **„Provjeri nacrt" iz oblika** otvara čitač sa već izabranim oblikom
-4. **Automatsko izdavanje** kad odluka stupi na snagu
-5. **Notifikacija** kad pitanje stigne
-6. KLJUČ · 7. BANKA
+Bez ovoga nisu pokrivene „sve moguće situacije". Svaki čin gore važi samo za
+neke od pet uloga.
+
+| uloga | šta smije |
+|---|---|
+| **potpisnik** | sve na odborovim ekranima: glasa, zatvara, prigovara, potpisuje |
+| **savjetodavni** | čita i raspravlja, **ne glasa** — dugmeta nema, ne siva su |
+| **tehnički vezni** | objašnjava mehanizam, unosi šta je banka uradila, ne glasa |
+| **banka** | samo svoja troja vrata; odborovi ekrani nisu ni u navigaciji |
+| **posmatrač** | čita sve, ne dira ništa; ekran to kaže rečenicom |
+| **predsjedavajući / sekretar** | uz svoju ulogu: kvorum, serija, vraćanje pristupa |
+
+---
+
+# M. Stanja koja nisu činovi
+
+| situacija | šta ekran radi | |
+|---|---|---|
+| server ne odgovara | *ne zna se* ≠ *ništa ne čeka* | IMA |
+| ništa u listi | rečenica šta to znači, ne prazno | IMA |
+| asistent isključen | paneli **odsutni**, ne sivi | IMA |
+| bez lanca | kolona tokeniziranog **ne postoji** | IMA |
+| jezik en/ar/ur | mijenja i smjer teksta | IMA |
+| **obavještenja** | *ništa se ne šalje* — rečeno na ekranu | BANKA |
+| timelock odbrojava | **NEMA** — šta se desi kad istekne, nije rečeno |
+| prekoračen rok u redu | crveni red | IMA |
+| 30 dana od prekršaja | broji | IMA |
+| stara adresa `/classic`, `/record` | **NEMA** — nema preusmjerenja ni poruke |
+| `/dossier/matters/:id` | sve ostalo o predmetu | IMA |
+| `/briefings` + `/:id` | tehnički tim podigne pitanje → odbor otvori predmet | DIO |
+
+---
+
+# N. Tri stvari kojih nema **ni u kodu**
+
+Ovo nisu greške u zapisu nego **odluke koje niko nije donio**:
+
+1. **Izuzeće člana (recusal).** Nema rute, nema čina. Šerijatski odbor bez
+   mogućnosti da se član izuzme je ozbiljna rupa.
+2. **Ratifikacija zabrane.** `ratificationWindowHours` postoji u tipu, **rute
+   nema**. Zabrana stupi na snagu i mora biti potvrđena ili ističe — taj čin ne
+   postoji.
+3. **Banka ne može prijaviti prekršaj.** Forma je vidljiva samo odboru, a
+   dogovor kaže „bilo koja strana". Isto i za plaćanje purifikacije.
+
+---
+
+# O. Red kojim se gradi
+
+1. ~~Dugme „Alati" → slajd~~ — **napravljeno.** Sedam kartica, otvara se
+   svuda, `Kalkulacije` skinute sa trake
+2. ~~„Provjeri nacrt" iz oblika~~ — **već je radilo**, `/check?shape=`
+3. ~~„Pročitao sam — kreni"~~ — **vraćeno** kao prva stanica `i` u traci
+4. **Prozor + „šta slijedi" na svih 76 činova** — danas ih ima oko osam
+5. **Tri odluke iz N** — izuzeće, ratifikacija zabrane, ko smije prijaviti
+   prekršaj i platiti purifikaciju
+6. **Automatsko izdavanje** kad odluka stupi na snagu
+7. **Notifikacija** kad pitanje stigne · **timelock kad istekne** · stare adrese
+8. KLJUČ · 9. BANKA
 
 ---
 

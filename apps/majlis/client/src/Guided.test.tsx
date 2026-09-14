@@ -268,7 +268,6 @@ describe('nothing was removed', () => {
       'Search',
       'Register',
       'Contract library',
-      'Calculations',
     ]) {
       expect(
         screen.getAllByRole('link', { name: new RegExp(label) }).length,

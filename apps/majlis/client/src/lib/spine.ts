@@ -148,7 +148,16 @@ export const RAIL: readonly RailGroup[] = [
     destinations: [
       { to: '/register', label: 'rail.register', note: 'rail.register.note', main: true },
       { to: '/library', label: 'rail.library', note: 'rail.library.note' },
-      { to: '/calculations', label: 'rail.calculations', note: 'rail.calculations.note' },
+      /*
+       * The calculations left the rail.
+       *
+       * The drawing has them here, and the owner's instruction is later and
+       * explicit: the toolkits come off the main page and the application
+       * opens the one a step needs. A member who wants one for themselves
+       * opens the Tools panel from the bar, which is on every screen.
+       *
+       * The address still answers, and Reachable.test.tsx holds it shut.
+       */
     ],
   },
 ];

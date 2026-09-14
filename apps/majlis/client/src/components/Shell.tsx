@@ -1,4 +1,5 @@
 
+import { useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { useI18n } from '../lib/i18n.js';
 import { isInstitution, useIdentity, maySubmit } from '../lib/identity.js';
@@ -17,6 +18,7 @@ import {
 } from '../lib/spine.js';
 import { WhatNext } from './Journey.js';
 import NotYourScreen from './NotYourScreen.js';
+import Tools from './Tools.js';
 
 /**
  * The application's frame.
@@ -349,6 +351,14 @@ function TabBar() {
 }
 
 export default function Shell({ children }: { children: React.ReactNode }) {
+  /**
+   * The toolkits, open from anywhere.
+   *
+   * It belongs to the frame rather than to a screen: a member wanting to work
+   * a purification out wants it wherever they are, and opening it should not
+   * take them off what they were reading.
+   */
+  const [tools, setTools] = useState(false);
   const { t, lang, setLang } = useI18n();
   const { identity } = useIdentity();
   const health = useHealth();
@@ -599,6 +609,21 @@ export default function Shell({ children }: { children: React.ReactNode }) {
             )}
 
             {/*
+              The toolkits. Not a destination and never was one: the six
+              calculators open in a panel beside whatever the member is
+              reading, and close back to it.
+            */}
+            {!desk && (
+              <button
+                type="button"
+                onClick={() => setTools(true)}
+                className="rounded-xl bg-raised px-3.5 py-2 text-[12.5px] font-semibold text-lapis shadow-ring"
+              >
+                {t('tools.open')}
+              </button>
+            )}
+
+            {/*
               A segmented control: the container is the recess, the chosen one
               is a raised sheet. Three outlined buttons said nothing about
               which of them was in force.
@@ -733,6 +758,8 @@ export default function Shell({ children }: { children: React.ReactNode }) {
         </main>
 
         <StatusBar />
+
+        <Tools open={tools} onClose={() => setTools(false)} />
       </div>
 
       <TabBar />
