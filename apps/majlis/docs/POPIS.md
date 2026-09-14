@@ -39,6 +39,14 @@ samo jedan od šest je i blizu.
 
 ---
 
+> **14.09. navečer — vlasnik je odbio UI dva puta.** Drugi put nakon sklapanja
+> ekrana u redove: *i dalje prekomplicirano, promjena je minimalna i neprihvatljiva,
+> UI je katastrofa, sve mora iznova.* Ocjene DA ispod se odnose na to **postoji li
+> funkcija i vodi li do nje put**, a ne na to da je ekran prihvaćen. Prije bilo
+> kakvog daljeg rada pročitaj §000 u STATE.md: crteži u `design/` su specifikacija
+> i aplikacija ih ne prati — 8 odredišta nacrtano naspram 22 napravljena, 7
+> odjeljaka na predmetu nacrtano naspram 12 napravljenih.
+
 # Dio A — Put korisnika
 
 Ovdje se vidi šta zapravo ne valja. Ovo nije popis funkcija nego redoslijed

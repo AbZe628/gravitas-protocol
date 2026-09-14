@@ -9,7 +9,122 @@ unfinished it says so, and where something is broken it says how it breaks.
 
 ---
 
-## §00 — Start here, 14 September 2026, evening
+## §000 — READ THIS FIRST. 14 September 2026, night.
+
+**The owner tested the application and rejected the interface twice in one
+evening.** The second time, after the change described in §00b below, his words
+were: still overcomplicated, still confusing, the change is minimal and
+unacceptable in every sense, the UI is a catastrophe, all of it has to be done
+again in detail.
+
+Do not open the next session by simplifying screens further. That is what was
+just rejected.
+
+### What was actually found, after he rejected it
+
+**The drawings exist and the application does not match them.** `design/` holds
+six artboards — `Main`, `Matter`, `Register`, `Library`, `Calculations`,
+`Phone` — and there is a memory saying they are the specification. They were
+not being matched. The gap is not a matter of taste and it can be counted:
+
+| | drawn | built |
+|---|---|---|
+| destinations in the rail | **8**, in 3 groups | **22**, in 5 groups |
+| sections on a matter | **7** | **12** |
+
+The drawn rail is:
+
+```
+The work          What needs you (2) · Events · Coming (3)
+What stands       Rulings in force (14)
+The record        Search
+What we hold      Register (5) · Contract library · Calculations
+```
+
+The built rail is `What needs you`, then `01 Asked` (Waiting, Ask the board),
+`02 Deciding` (Open matters, Meetings, Undertakings, Dates), `03 In force`
+(What stands, Holdings, Contracts, Check a contract, Figures, Papers),
+`04 Checked` (Reviews, Breaches), `Besides` (The board, Search). **Almost three
+times as many places to look.** That alone answers *I cannot find my way at
+all*.
+
+The drawn matter screen is, in order: the status chips and how long it has been
+here; the title; **the question put to the board**; **held outside this
+question**; **what these terms will do**, with each term's plain sentence and
+its value; **where the vote stands**, with the positions and their quotes; and
+**your position**, with the reason box. Seven things and one act, all visible,
+nothing folded.
+
+The built matter screen has those plus: what a committee was asked, what this
+board already said, the figures panel, the evidence and the contract reader and
+the checklist, what follows if this passes, what must happen once it carries,
+and what we could not tell you. **Twelve sections where seven were drawn.**
+
+### So the next session's work, and it is not my taste
+
+**Rebuild each screen to its artboard.** The rule is simple and checkable:
+*anything the artboard does not have is not on that screen.* Where a capability
+then has nowhere to live, it goes behind the record it belongs to, or it goes —
+and the list of what went is written down and put in front of the owner rather
+than quietly kept.
+
+Order: the rail first, because it is the frame every screen sits in and it is
+the worst offender by ratio. Then `Matter`, which is the heart. Then `Register`,
+`Library`, `Calculations`, and the phone layout.
+
+**Before writing code, open the artboards.** They are `.dc.html` files; read
+them as text (`sed 's/<[^>]*>/\n/g'`) or open one in the browser pane. Do not
+work from this summary of them.
+
+### The one thing to ask him first
+
+He said *the application does not lead me through anything the way I imagined*.
+Three rejections in a row means there is a picture in his head that is not
+being matched, and two attempts to guess at it have failed. **Ask him to name
+one screen and say what he expects to see on it, in order, before building
+anything.** The artboards are the best evidence of that picture and they are
+where to start, but a confirmation costs one message and has now been worth two
+sessions of work twice over.
+
+### What was built this evening, and its measured effect
+
+Kept because it is not wrong, only far too small. `components/NextAct.tsx`
+computes what a person does next on a matter and offers one button for it;
+`components/Fold.tsx` turns a part of a record into a row that opens, with a
+summary line on the closed row. Applied to the matter screen, the settings
+screen and the queue:
+
+```
+matter, in force      3,920 -> 1,601 px   1,033 -> 362 words   act 815 -> 370
+matter, being worked  4,849 -> 3,080 px   1,103 -> 688 words   act 1,072 -> 419
+settings              4,062 -> 1,554 px     615 -> 247 words
+the queue             3,407 -> 3,158 px     819 -> 624 words
+```
+
+Real reductions, and he is right that they are not a rebuild: the structure is
+the old one with the excess collapsed rather than removed.
+
+**`work/majlis-local/weigh.mjs`** is the script that produced those figures — height,
+words, headings, controls, and how far down the first real act sits. Keep using
+it. It is the only thing in this argument that is not opinion. The last figure
+is the one that matters: a screen where the thing you came to do is a thousand
+pixels below the fold does not lead anybody anywhere.
+
+### Two faults worth not repeating
+
+**A screen must not depend on a child having been drawn to know what is true.**
+The count of unanswered conditions came from the checklist as it rendered.
+Folding that part shut meant nothing rendered, nothing reported, the count
+stayed at zero, and the card said the vote could open on a matter the server
+would refuse. It is read at the page now.
+
+**Running a key-adding script twice put 96 duplicate keys in the dictionaries.**
+Silent override, in one language or all three. `work/majlis-local/dedupe.mjs` removed
+them. Check `grep -c` on a new key before and after adding it.
+
+---
+
+## §00 — 14 September 2026, evening
 
 This is the newest section. Where it disagrees with anything below, this is
 right. It is written so that the next session can begin work in two or three
