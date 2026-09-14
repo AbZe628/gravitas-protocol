@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import AfterAct from '../components/AfterAct.js';
 import {
   api,
   oversight,
@@ -67,6 +68,14 @@ export default function StructureDetail({ structureId }: { structureId?: string 
   const [reason, setReason] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  /**
+   * What was just done, so the panel can say what follows from it.
+   *
+   * Taking a shape changes what this board judges every arrangement of that
+   * kind by, from that moment on. It used to end by closing a form and
+   * reloading a list, which left the member to work out what they had caused.
+   */
+  const [just, setJust] = useState<'adopted' | 'declined' | null>(null);
 
   const load = () =>
     oversight
@@ -106,6 +115,7 @@ export default function StructureDetail({ structureId }: { structureId?: string 
         supersedes: held.adoption?.id ?? null,
       });
       setOpen(false);
+      setJust(standing);
       await load();
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
@@ -114,11 +124,54 @@ export default function StructureDetail({ structureId }: { structureId?: string 
     }
   }
 
+  /**
+   * What follows taking a shape, which is not the same from both doors.
+   *
+   * Opened from inside a matter, the next thing is the matter itself: its
+   * conditions are the board's own now instead of the shipped draft, and
+   * that is what the member came to change.
+   *
+   * Opened from the library with no question behind it — a scholar reading
+   * the shapes on their own — the next thing is using it: checking a draft
+   * against it, or putting a question to the board judged by it.
+   */
+  const after = just ? (
+    <AfterAct
+      did={t(just === 'adopted' ? 'after.tookShape' : 'after.declinedShape')}
+      means={t(just === 'adopted' ? 'after.tookShapeMeans' : 'after.declinedShapeMeans')}
+      onClose={() => setJust(null)}
+      next={
+        matterId
+          ? [
+              {
+                to: `/matters/${matterId}`,
+                label: t('after.backToMatter'),
+                says: t('after.backToMatterSays'),
+              },
+            ]
+          : [
+              {
+                to: `/check?structure=${held?.structure.id ?? ''}`,
+                label: t('after.checkADraft'),
+                says: t('after.checkADraftSays'),
+              },
+              {
+                to: '/ask',
+                label: t('after.putAQuestion'),
+                says: t('after.putAQuestionSays'),
+              },
+            ]
+      }
+    />
+  ) : null;
+
   const aside = (
     <>
       {canRule && (
         <ActionPanel next={untouched ? t('adopt.nextUntouched') : t('adopt.nextHeld')}>
-          {!open ? (
+          {after ? (
+            after
+          ) : !open ? (
             <button
               type="button"
               onClick={() => setOpen(true)}
