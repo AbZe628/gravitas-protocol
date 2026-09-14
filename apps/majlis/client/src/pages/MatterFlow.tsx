@@ -329,6 +329,7 @@ export default function MatterFlow() {
         canRule ? (
           <p className="max-w-[76ch] text-[11.5px] leading-[1.6] text-muted">
             {t('win.whatTheseDo')}
+            {why.trim().length === 0 ? ' ' + t('win.needAReason') : ''}
           </p>
         ) : null
       }
@@ -355,10 +356,19 @@ export default function MatterFlow() {
               >
                 {t('win.notMet')}
               </button>
+              {/*
+                Dead until there is a reason, because the server requires one
+                and refuses without it.
+
+                It was live, sent an empty reason, took a 400, and printed the
+                refusal as small text at the far end of the bar — which reads
+                as the button doing nothing. A control that cannot be honoured
+                is absent or dead, never live and then sorry.
+              */}
               <button
                 type="button"
                 onClick={() => void record('met')}
-                disabled={busy}
+                disabled={busy || why.trim().length === 0}
                 className="rounded-xl bg-lapis px-5 py-2.5 text-[13px] font-semibold text-white shadow-act disabled:opacity-50"
               >
                 {busy ? t('common.loading') : t('win.metAndOn')}
