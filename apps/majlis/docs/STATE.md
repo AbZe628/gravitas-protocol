@@ -21,7 +21,7 @@ tool calls instead of re-reading the codebase.
 server   78 test files   1743 tests   passed
 client   33 test files    347 tests   passed
 POPIS.md Dio B: 76 items — 61 DA, 6 NE, 4 VANI, 2 DOST, 1 POLA, 1 KOD, 1 ZID
-git: 27 commits on main unpushed. The owner is asked before every push.
+git: 30 commits on main unpushed. The owner is asked before every push.
 ```
 
 The POPIS.md count comes from the command written beside its table. Never
