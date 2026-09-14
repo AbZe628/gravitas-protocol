@@ -1,5 +1,11 @@
 # Where Majlis stands
 
+> **Ne počinji odavde.** Hladan start je `docs/RESUME.md` — jedna stranica:
+> šta je blokirano, koje odluke čekaju vlasnika, kako se pokreće, i zamke.
+> Ovaj fajl je arhiva; otvara se kad zatreba nešto iz historije, ne da bi se
+> počelo. Otvaranje ovoga na početku je potrošilo 30% budžeta prije nego je
+> ijedan posao počeo.
+
 Last written **8 September 2026**, second save of the day. Read this first,
 and read §0 before anything else — it is written so that picking the work
 back up costs a few minutes rather than an hour of re-reading the codebase.
