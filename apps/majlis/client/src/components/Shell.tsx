@@ -181,10 +181,21 @@ function Mark() {
  * one ran a paragraph across 1,100 pixels, which is the rule in
  * `tailwind.config.js` demonstrating itself.
  */
+/*
+ * Screens that are a work area rather than a column of prose.
+ *
+ * A matter is one now: it is a window with a strip, two panes and an act bar,
+ * and a reading width would squeeze it into a third of the screen.
+ */
 const WORK_AREA = ['/register', '/library', '/calculations'];
 
 function atWorkArea(path: string): boolean {
-  return WORK_AREA.includes(path) || path.startsWith('/classic/matters/');
+  return (
+    WORK_AREA.includes(path) ||
+    path.startsWith('/matters/') ||
+    path.startsWith('/classic/matters/') ||
+    path.startsWith('/dossier/matters/')
+  );
 }
 
 /** The member, as a mark. Same in both mastheads, so it is written once. */
