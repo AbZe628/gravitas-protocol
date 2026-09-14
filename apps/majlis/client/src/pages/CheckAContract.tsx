@@ -192,6 +192,7 @@ export default function CheckAContract() {
               heading would be a reading of the wrong conditions.
             */}
             <ReadTheContract
+              onItsOwnScreen
               key={chosen.structure.id + (came ? ":" + came.name : "")}
               structureId={chosen.structure.id}
               startWith={came}

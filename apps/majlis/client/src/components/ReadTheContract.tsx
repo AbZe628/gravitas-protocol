@@ -56,6 +56,7 @@ export default function ReadTheContract({
   structureId,
   startWith,
   canRead,
+  onItsOwnScreen = false,
 }: {
   /** Read against this matter's shape. */
   matterId?: string;
@@ -67,6 +68,13 @@ export default function ReadTheContract({
    */
   startWith?: { name: string; text: string } | null;
   canRead: boolean;
+  /**
+   * True on the screen a scholar opened in order to read a draft.
+   *
+   * There the form is what they came for and opens straight away. Inside a
+   * matter it is a tool among others and folds until asked for.
+   */
+  onItsOwnScreen?: boolean;
 }) {
   const { t } = useI18n();
   const [text, setText] = useState(startWith?.text ?? '');
@@ -74,6 +82,8 @@ export default function ReadTheContract({
   const [reading, setReading] = useState<ContractReading | null>(null);
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState<string | null>(null);
+  /* Opened by a press inside a matter; already open where it is the point. */
+  const [open, setOpen] = useState(Boolean(startWith));
 
   if (!canRead) return null;
 
@@ -91,6 +101,34 @@ export default function ReadTheContract({
     } finally {
       setBusy(false);
     }
+  }
+
+  /*
+   * Folded until asked for, on the matter's own page.
+   *
+   * ── why this changed ──────────────────────────────────────────────────
+   *
+   * A six-row paste box stood permanently open between a member and the steps
+   * of their case. It is a tool somebody reaches for once, early, on the
+   * minority of matters that arrive with a draft attached — and it was the
+   * largest object on the way to the work on every matter, including the ones
+   * with no contract to read at all.
+   *
+   * It is one press away and says what it is for. On its own screen, where a
+   * scholar arrived precisely to read a draft, it opens as it always did:
+   * folding the thing somebody came for would be the same fault the other way
+   * round.
+   */
+  if (!reading && !open && !onItsOwnScreen) {
+    return (
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="rounded-xl bg-raised px-4 py-2 text-[12.5px] font-semibold text-lapis shadow-ring transition-colors hover:text-paper"
+      >
+        {t('read.doIt')}
+      </button>
+    );
   }
 
   return (
