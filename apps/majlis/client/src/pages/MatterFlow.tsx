@@ -9,6 +9,8 @@ import Checklist from '../components/Checklist.js';
 import VotePanel from '../components/VotePanel.js';
 import SignTheDocument from '../components/SignTheDocument.js';
 import Deliberation from '../components/Deliberation.js';
+import WhatTheySent from '../components/WhatTheySent.js';
+import { useHealth } from '../lib/health.js';
 import { useStillThere } from '../lib/stillThere.js';
 
 /**
@@ -57,6 +59,7 @@ export default function MatterFlow() {
   const { id } = useParams<{ id: string }>();
   const { t } = useI18n();
   const { identity } = useIdentity();
+  const health = useHealth();
 
   const [matter, setMatter] = useState<Matter | null>(null);
   const [list, setList] = useState<ChecklistData | null>(null);
@@ -143,6 +146,20 @@ export default function MatterFlow() {
       >
         {matter.title}
       </h1>
+
+      {/*
+        What arrived, what is asked, and what the work will be — before any of
+        it starts. A member should know what they are being asked to do before
+        they are three steps into doing it.
+      */}
+      {!settled && (
+        <WhatTheySent
+          matter={matter}
+          list={list}
+          assistantOn={health?.assistantKind !== 'off' && health?.assistantKind !== undefined}
+          onStart={() => undefined}
+        />
+      )}
 
       {/*
         The question, and it stays. A member three steps in must not have to
