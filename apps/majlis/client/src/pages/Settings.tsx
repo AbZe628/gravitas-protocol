@@ -4,6 +4,7 @@ import { useI18n } from '../lib/i18n.js';
 import { PageHead } from '../components/page.js';
 import YourAccount from '../components/YourAccount.js';
 import WhoYouAreOnPaper from '../components/WhoYouAreOnPaper.js';
+import HowItDecides from '../components/HowItDecides.js';
 import { Card, DateText, ErrorText, Loading, Tag } from '../components/ui.js';
 import TheCommittees from '../components/TheCommittees.js';
 
@@ -155,6 +156,16 @@ export default function Settings() {
         <p className="mt-3 border-t border-line pt-3 text-[12.5px] leading-relaxed text-muted">
           {t('set.asymmetry')}
         </p>
+
+        {/*
+          Changing them, for the chair and the secretary — and the record of
+          every time they moved, for everybody. A quorum is the number of
+          signatures that bind the institution, and the board is who has to
+          see when it changed.
+        */}
+        <div className="mt-4 border-t border-line pt-4">
+          <HowItDecides settings={data} onChanged={setData} />
+        </div>
       </Card>
 
       <h2 className="mb-3 mt-8 border-t border-line pt-6 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">

@@ -198,7 +198,15 @@ export function quorumFor(board: Board, direction: ChangeDirection): number {
 }
 
 export function tally(board: Board, matter: Matter): Tally {
-  const required = quorumFor(board, matter.direction);
+  /*
+   * The threshold this question was put under, where it was kept.
+   *
+   * Falling back to the board only for matters that opened before the field
+   * existed. Reading it live for all of them would let a board lower its own
+   * quorum mid-vote and carry something on fewer signatures than were
+   * required when the members were asked.
+   */
+  const required = matter.quorumWhenOpened ?? quorumFor(board, matter.direction);
   const counts = { for: 0, against: 0, abstain: 0 };
   const voted = new Set<string>();
 
@@ -430,7 +438,7 @@ export function openDeliberation(matter: Matter, at: string): Matter {
  * on an unread proposal produces a decision it cannot defend, and the whole
  * argument for this system is that the reasoning is the valuable part.
  */
-export function openVoting(matter: Matter): Matter {
+export function openVoting(matter: Matter, board?: Board): Matter {
   requireStatus(matter, ['deliberation']);
   if (matter.deliberation.length === 0) {
     throw new Refused(
@@ -438,9 +446,26 @@ export function openVoting(matter: Matter): Matter {
       'Nothing has been said on this matter yet. Voting opens after deliberation, not instead of it.'
     );
   }
+
+  /*
+   * The threshold stops moving here, with the terms.
+   *
+   * The tally used to read the quorum off the board every time it was
+   * computed. A board that can change its own quorum — which is what the
+   * handbook asks for — could then lower the threshold while a vote was open
+   * and carry a matter on fewer signatures than were required when the
+   * question was put. That is the institution bound by a number nobody voted
+   * under.
+   *
+   * `board` is optional so the older callers and the tests that hold only a
+   * matter still work; where it is absent nothing is frozen and the tally
+   * falls back to the board, exactly as it did before.
+   */
+  const frozen = board ? { quorumWhenOpened: quorumFor(board, matter.direction) } : {};
+
   // The terms stop moving here, and the hash is what every position below is
   // recorded against.
-  return freezeParameters({ ...matter, status: 'voting' });
+  return freezeParameters({ ...matter, ...frozen, status: 'voting' });
 }
 
 /**

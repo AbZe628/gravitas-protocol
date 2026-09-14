@@ -442,7 +442,22 @@ describe('api', () => {
     // `PATCH /api/matters/:id` is added tomorrow. This one enumerates what is
     // actually registered, so any new mutating route fails here until it is
     // added to the allowlist deliberately.
-    const ALLOWED = new Set(['POST /api/assistant/ask']);
+    const ALLOWED = new Set([
+      'POST /api/assistant/ask',
+      /*
+       * How the board decides: the quorum, the confirmation window, the name
+       * it issues under. Added deliberately, and it is the most consequential
+       * mutating route in this file — so what guards it is written here as
+       * well as there.
+       *
+       * The chair or the secretary and nobody else. Every change is recorded
+       * with its reason. And a vote already open is judged on the threshold it
+       * opened under, so lowering the quorum cannot carry a matter the members
+       * were not asked about. `test/constitution.test.ts` holds that last one
+       * shut.
+       */
+      'POST /api/settings',
+    ]);
 
     const stack =
       (app as any)._router?.stack ?? (app as any).router?.stack ?? [];

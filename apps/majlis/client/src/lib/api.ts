@@ -1780,6 +1780,21 @@ export const oversight = {
   calendar: () => get<Calendar>('/api/calendar'),
   settings: () => get<Settings>('/api/settings'),
 
+  /**
+   * Change how the board decides. The chair or the secretary only.
+   *
+   * A reason is required and recorded. A vote already open is judged on the
+   * threshold it opened under, so this cannot carry something the members
+   * were not asked about.
+   */
+  changeHowItDecides: (input: {
+    reason: string;
+    name?: string;
+    quorumPermit?: number;
+    quorumRestrict?: number;
+    ratificationWindowHours?: number;
+  }) => send<Settings>('/api/settings', input),
+
   register: () => get<Register>('/api/register'),
   drift: () => get<DriftReport>('/api/drift'),
 
@@ -2152,6 +2167,18 @@ export interface SeatedMember {
   office: 'chair' | 'secretary' | null;
 }
 
+/** One change to how a board decides, as the record keeps it. */
+export interface BoardChange {
+  field: string;
+  /** What the field is called, in the words the record uses. */
+  called: string;
+  from: string;
+  to: string;
+  by: string;
+  at: string;
+  reason: string;
+}
+
 export interface Mismatch {
   kind: 'no_credential' | 'not_on_board' | 'vote_discarded' | 'cannot_vote';
   scholarId: string;
@@ -2174,6 +2201,14 @@ export interface Settings {
     ratificationWindowHours: number;
     timelockHours: number;
   };
+  /**
+   * Every time this board changed how it decides.
+   *
+   * Append-only. The quorum is the number of signatures that bind the
+   * institution, and one that moved from three to two and back would
+   * otherwise leave a ruling carried on two with nothing explaining how.
+   */
+  changes?: BoardChange[];
   /** Where the board record and the credential file disagree. Empty is the goal. */
   mismatches: Mismatch[];
   fixIn: string;

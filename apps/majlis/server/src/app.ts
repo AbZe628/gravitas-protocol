@@ -25,6 +25,9 @@ import { verifyParameters } from './services/hash.js';
 import { Limiter, REFUSAL_MESSAGES } from './services/limits.js';
 import { basicAuth, authFromEnv } from './middleware/basicAuth.js';
 import { buildSettings } from './services/settings.js';
+import { changeHowItDecides } from './services/constitution.js';
+import { Refused as LifecycleRefused } from './services/lifecycle.js';
+import { handle, badRequest, identityOf, sendRefusal } from './routes/http.js';
 import { TIMELOCK_HOURS } from './types.js';
 import type { Language } from './types.js';
 import { LoginLimiter, loginThrottle } from './middleware/loginLimit.js';
@@ -324,6 +327,19 @@ export function createApp(
     res.json(b);
   });
 
+  /*
+   * No minimums on the reason here. The service refuses a short one with a
+   * sentence a chair can act on; zod would answer "invalid_request" first
+   * and the useful message would never be seen.
+   */
+  const constitutionSchema = z.object({
+    reason: z.string().max(4_000),
+    name: z.string().max(400).optional(),
+    quorumPermit: z.number().int().min(0).max(1_000).optional(),
+    quorumRestrict: z.number().int().min(0).max(1_000).optional(),
+    ratificationWindowHours: z.number().int().min(0).max(100_000).optional(),
+  });
+
   // ---- settings --------------------------------------------------------
   //
   // Who is on this board and how it decides — and the one check nothing has
@@ -342,13 +358,70 @@ export function createApp(
       return;
     }
 
-    res.json(
-      buildSettings({
+    res.json({
+      ...buildSettings({
         board,
         members: auth.members,
         timelockHours: TIMELOCK_HOURS.permit,
       }),
-    );
+      /*
+       * Every time this board changed how it decides. Shown rather than kept
+       * for an export: a quorum that moved is the first thing an auditor asks
+       * about, and the board itself is the one that has to notice.
+       */
+      changes: board.changes ?? [],
+    });
+  });
+
+  /**
+   * Change how this board decides.
+   *
+   * The chair or the secretary, and nobody else — the same two offices that
+   * may let a member back in. Every change is recorded with its reason, and a
+   * vote already open is judged on the threshold it opened under, so lowering
+   * the quorum cannot carry something the members were not asked about.
+   *
+   * Membership is not here and is not coming. An application that edited its
+   * own board would be deciding who sits on a Shariah board.
+   */
+  app.post('/api/settings', async (req: Request, res: Response) => {
+    const who = identityOf(req);
+    if (who.office !== 'chair' && who.office !== 'secretary') {
+      res.status(403).json({
+        error: 'not_an_office',
+        message:
+          'Only the chair or the secretary may change how this board decides. That is who does it ' +
+          'on a real board, and it puts a name in the record against every occasion it moved.',
+      });
+      return;
+    }
+
+    const parsed = constitutionSchema.safeParse(req.body);
+    if (!parsed.success) return badRequest(res, parsed.error.issues);
+
+    const boards = await store.boards();
+    const wanted = typeof req.query.board === 'string' ? req.query.board : boards[0]?.id;
+    if (!wanted) {
+      res.status(404).json({ error: 'not_found', message: 'No such board.' });
+      return;
+    }
+
+    try {
+      const { reason, ...change } = parsed.data;
+      const updated = await store.updateBoard(wanted, (current) =>
+        changeHowItDecides(current, change, who.scholarId ?? 'unknown', new Date().toISOString(), reason),
+      );
+      res.json({
+        ...buildSettings({ board: updated, members: auth.members, timelockHours: TIMELOCK_HOURS.permit }),
+        changes: updated.changes ?? [],
+      });
+    } catch (e) {
+      if (e instanceof LifecycleRefused) {
+        sendRefusal(res, e);
+        return;
+      }
+      throw e;
+    }
   });
 
   // ---- enforcement -----------------------------------------------------

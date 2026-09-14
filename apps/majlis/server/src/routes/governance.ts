@@ -1091,7 +1091,14 @@ export function governanceRoutes(
         }
       }
 
-      res.json(await store.updateMatter(req.params.id, openVoting));
+      /*
+       * The board is handed in so the threshold is frozen onto the matter
+       * here, with the terms. A board may change its own quorum, and a vote
+       * judged against whatever the number happens to be at closing time
+       * could be carried by lowering it mid-vote.
+       */
+      const board = await store.board(matter.boardId);
+      res.json(await store.updateMatter(req.params.id, (m) => openVoting(m, board ?? undefined)));
     }),
   );
 

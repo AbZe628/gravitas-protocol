@@ -1356,8 +1356,17 @@ export const meetings: Meeting[] = [
 export function asSignedThen(all: Matter[], board: Board = boards[0]): Matter[] {
   const who = new Map(board.members.map((m) => [m.id, m]));
 
+  /* A vote that has opened was put under a threshold, and the record should say which. */
+  const OPENED = ['voting', 'timelock', 'in_force', 'rejected', 'lapsed'];
+
   return all.map((matter) => ({
     ...matter,
+    ...(OPENED.includes(matter.status) && matter.quorumWhenOpened === undefined
+      ? {
+          quorumWhenOpened:
+            matter.direction === 'permit' ? board.quorumPermit : board.quorumRestrict,
+        }
+      : {}),
     findings: (matter.findings ?? []).map((f) => {
       const member = who.get(f.scholarId);
       return !member || f.name ? f : { ...f, name: member.name };

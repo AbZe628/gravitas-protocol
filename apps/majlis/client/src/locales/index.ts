@@ -997,6 +997,16 @@ const en: Dict = {
   'toDesk.sendAnswer': "Send it to the board",
   'toDesk.onCase': "On the case",
 
+  // How the board decides, and every time it changed.
+  'decides.change': "Change how this board decides",
+  'decides.lead':
+    "The quorum is the number of signatures that bind the institution. A change here is recorded with your name and your reason, and it does not reach a vote that is already open: a matter is judged on the threshold it opened under.",
+  'decides.boardName': "The board's name, as it appears on everything it issues",
+  'decides.why': "Why this is changing",
+  'decides.whyHelp': "A sentence a later reader can review. At least twenty characters.",
+  'decides.keep': "Keep this, and record it",
+  'decides.history': "Every time this changed",
+
   // A member's own name, title and where they can be reached.
   'you.heading': "How you appear on a ruling",
   'you.note':
@@ -2928,6 +2938,15 @@ const ar: Dict = {
   'toDesk.sendAnswer': "أرسِله إلى المجلس",
   'toDesk.onCase': "في القضية",
 
+  'decides.change': "غيّر كيف يقرر هذا المجلس",
+  'decides.lead':
+    "النصاب هو عدد التوقيعات التي تُلزم المؤسسة. والتغيير هنا يُسجَّل باسمك وسببك، ولا يبلغ تصويتاً مفتوحاً بالفعل: تُقاس المسألة على النصاب الذي فُتحت عليه.",
+  'decides.boardName': "اسم المجلس، كما يظهر على كل ما يصدره",
+  'decides.why': "سبب التغيير",
+  'decides.whyHelp': "جملة يستطيع قارئ لاحق مراجعتها. عشرون حرفاً على الأقل.",
+  'decides.keep': "أثبِت هذا وسجّله",
+  'decides.history': "كل مرة تغيّر فيها",
+
   'you.heading': "كيف تظهر على الحكم",
   'you.note':
     "اسمك ولقبك يُطبعان على كل حكم توقّعه. وتغييرهما هنا يغيّر ظهورك من الآن فصاعداً؛ أما حكم وُقّع من قبل فيبقى بالاسم الذي وُقّع به.",
@@ -4548,6 +4567,15 @@ const ur: Dict = {
   'toDesk.yourAnswer': "ادارہ کیا کہتا ہے",
   'toDesk.sendAnswer': "بورڈ کو بھیجیں",
   'toDesk.onCase': "مقدمے پر",
+
+  'decides.change': "یہ بورڈ کیسے فیصلہ کرتا ہے، بدلیں",
+  'decides.lead':
+    "کورم وہ تعداد ہے جتنے دستخط ادارے کو پابند کرتے ہیں۔ یہاں کی تبدیلی آپ کے نام اور وجہ کے ساتھ درج ہوتی ہے، اور پہلے سے کھلے ووٹ تک نہیں پہنچتی: معاملہ اُسی حد پر پرکھا جاتا ہے جس پر وہ کھلا تھا۔",
+  'decides.boardName': "بورڈ کا نام، جیسا ہر جاری چیز پر آتا ہے",
+  'decides.why': "یہ کیوں بدل رہا ہے",
+  'decides.whyHelp': "ایک جملہ جسے بعد میں کوئی پڑھ کر جانچ سکے۔ کم از کم بیس حروف۔",
+  'decides.keep': "یہ رکھیں اور درج کریں",
+  'decides.history': "ہر بار جب یہ بدلا",
 
   'you.heading': "فیصلے پر آپ کیسے نظر آتے ہیں",
   'you.note':

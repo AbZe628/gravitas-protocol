@@ -92,6 +92,26 @@ export interface Institution {
   shortName?: string;
 }
 
+/**
+ * One change to how a board decides.
+ *
+ * The quorum is the number of signatures that bind the institution, and an
+ * auditor asking how many a ruling needed must not be answered with whatever
+ * the setting says today. Append-only, with the reason: a quorum that went
+ * from three to two and back would otherwise leave a ruling carried on two
+ * signatures with nothing in the record explaining how.
+ */
+export interface BoardChange {
+  field: string;
+  /** What the field is called, in the words the record uses. */
+  called: string;
+  from: string;
+  to: string;
+  by: string;
+  at: string;
+  reason: string;
+}
+
 export interface Board {
   id: string;
   /** Whose board this is. Everything below a board inherits its institution. */
@@ -105,6 +125,9 @@ export interface Board {
   /** Hours a restriction stands before it must be ratified or lapses. */
   ratificationWindowHours: number;
   members: Scholar[];
+
+  /** Every time the board changed how it decides. Absent until the first one. */
+  changes?: BoardChange[];
 }
 
 /** A single operative parameter as it would be written to the registry. */
@@ -426,6 +449,20 @@ export interface Matter {
   simulation: Simulation | null;
   deliberation: Deliberation[];
   reasoning: Reasoning[];
+
+  /**
+   * The number of signatures this question was put under.
+   *
+   * Frozen when the vote opens, with the terms and for the same reason. A
+   * board may change its own quorum, and without this a chair could lower the
+   * threshold while a vote was open and carry a matter on fewer signatures
+   * than were required when the members were asked — the institution bound by
+   * a number nobody voted under.
+   *
+   * Absent on matters that opened before the field existed, where the tally
+   * falls back to the board and is no worse off than it was.
+   */
+  quorumWhenOpened?: number;
 
   /** Set once the threshold is met and the timelock begins. */
   timelockStartedAt: string | null;
