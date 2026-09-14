@@ -377,6 +377,7 @@ const en: Dict = {
   "spine.besides": "Besides",
   "sign.title": "Sign it",
   "sign.what": "You voted on what was proposed. This is signing what was written up. The bank files this, and an auditor asks for it.",
+  "sign.calledIt": "This board files it as",
   "sign.nobodyYet": "Nobody has signed yet.",
   "sign.provedBy": "Proved who they were by",
   "sign.differentDraft": "signed an earlier version, not this one",
@@ -1002,6 +1003,11 @@ const en: Dict = {
   'decides.lead':
     "The quorum is the number of signatures that bind the institution. A change here is recorded with your name and your reason, and it does not reach a vote that is already open: a matter is judged on the threshold it opened under.",
   'decides.boardName': "The board's name, as it appears on everything it issues",
+  'decides.series': "How rulings are numbered",
+  'decides.seriesHelp':
+    "Write {n} where the number goes and {year} for the year. Everything else is copied exactly as typed: SSB/{year}/{n} gives SSB/2026/1. Changing this renumbers nothing already issued — it decides what the next ruling is called. Leave it empty and rulings are quoted by their matter number.",
+  'decides.next': "next:",
+  'decides.noSeries': "This board keeps no series of its own. Its rulings are quoted by their matter number, which is what a reader will be handed.",
   'decides.why': "Why this is changing",
   'decides.whyHelp': "A sentence a later reader can review. At least twenty characters.",
   'decides.keep': "Keep this, and record it",
@@ -2097,6 +2103,7 @@ const ar: Dict = {
   "spine.besides": "إلى جانب ذلك",
   "sign.title": "التوقيع",
   "sign.what": "صوّتّ على ما اقتُرح. هنا توقّع على ما كُتب. البنك يحفظ هذه الورقة، والمدقّق يطلبها.",
+  "sign.calledIt": "يحفظه هذا المجلس باسم",
   "sign.nobodyYet": "لم يوقّع أحد بعد.",
   "sign.provedBy": "أثبت هويته بـ",
   "sign.differentDraft": "وقّع نسخة سابقة، لا هذه",
@@ -2942,6 +2949,11 @@ const ar: Dict = {
   'decides.lead':
     "النصاب هو عدد التوقيعات التي تُلزم المؤسسة. والتغيير هنا يُسجَّل باسمك وسببك، ولا يبلغ تصويتاً مفتوحاً بالفعل: تُقاس المسألة على النصاب الذي فُتحت عليه.",
   'decides.boardName': "اسم المجلس، كما يظهر على كل ما يصدره",
+  'decides.series': "كيف تُرقَّم القرارات",
+  'decides.seriesHelp':
+    "اكتب ‏{n}‏ في موضع الرقم و‏{year}‏ للسنة. وكل ما عداهما يُنسخ كما كُتب تماماً: ‏SSB/{year}/{n}‏ يعطي ‏SSB/2026/1‏. وتغيير هذا لا يعيد ترقيم ما صدر؛ إنما يحدد اسم القرار القادم. واتركه فارغاً فتُذكر القرارات برقم مسألتها.",
+  'decides.next': "التالي:",
+  'decides.noSeries': "لا يحتفظ هذا المجلس بسلسلة خاصة به. وتُذكر قراراته برقم مسألتها، وهو ما سيُسلَّم إلى القارئ.",
   'decides.why': "سبب التغيير",
   'decides.whyHelp': "جملة يستطيع قارئ لاحق مراجعتها. عشرون حرفاً على الأقل.",
   'decides.keep': "أثبِت هذا وسجّله",
@@ -3715,6 +3727,7 @@ const ur: Dict = {
   "spine.besides": "اس کے علاوہ",
   "sign.title": "دستخط",
   "sign.what": "آپ نے تجویز پر ووٹ دیا۔ یہاں آپ لکھی ہوئی بات پر دستخط کرتے ہیں۔ بینک یہی کاغذ رکھتا ہے اور آڈیٹر یہی مانگتا ہے۔",
+  "sign.calledIt": "یہ بورڈ اسے اس نام سے رکھتا ہے",
   "sign.nobodyYet": "ابھی کسی نے دستخط نہیں کیے۔",
   "sign.provedBy": "شناخت ثابت کی",
   "sign.differentDraft": "پہلے والے مسودے پر دستخط کیے، اس پر نہیں",
@@ -4572,6 +4585,11 @@ const ur: Dict = {
   'decides.lead':
     "کورم وہ تعداد ہے جتنے دستخط ادارے کو پابند کرتے ہیں۔ یہاں کی تبدیلی آپ کے نام اور وجہ کے ساتھ درج ہوتی ہے، اور پہلے سے کھلے ووٹ تک نہیں پہنچتی: معاملہ اُسی حد پر پرکھا جاتا ہے جس پر وہ کھلا تھا۔",
   'decides.boardName': "بورڈ کا نام، جیسا ہر جاری چیز پر آتا ہے",
+  'decides.series': "فیصلوں کو نمبر کیسے دیے جاتے ہیں",
+  'decides.seriesHelp':
+    "جہاں نمبر آنا ہے وہاں ‏{n}‏ لکھیں اور سال کے لیے ‏{year}‏۔ باقی سب ہو بہو ویسا ہی نقل ہوتا ہے جیسا لکھا گیا: ‏SSB/{year}/{n}‏ سے ‏SSB/2026/1‏ بنتا ہے۔ اسے بدلنے سے جاری شدہ کسی فیصلے کا نمبر نہیں بدلتا؛ یہ صرف طے کرتا ہے کہ اگلا فیصلہ کس نام سے آئے گا۔ خالی چھوڑ دیں تو فیصلے اپنے معاملے کے نمبر سے ذکر ہوں گے۔",
+  'decides.next': "اگلا:",
+  'decides.noSeries': "یہ بورڈ اپنی کوئی سیریز نہیں رکھتا۔ اس کے فیصلے اپنے معاملے کے نمبر سے ذکر ہوتے ہیں، اور پڑھنے والے کو یہی دیا جائے گا۔",
   'decides.why': "یہ کیوں بدل رہا ہے",
   'decides.whyHelp': "ایک جملہ جسے بعد میں کوئی پڑھ کر جانچ سکے۔ کم از کم بیس حروف۔",
   'decides.keep': "یہ رکھیں اور درج کریں",

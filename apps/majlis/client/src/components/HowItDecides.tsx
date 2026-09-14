@@ -58,6 +58,7 @@ export default function HowItDecides({
   const [restrict, setRestrict] = useState(String(settings.decides.quorumRestrict));
   const [hours, setHours] = useState(String(settings.decides.ratificationWindowHours));
   const [name, setName] = useState(settings.boardName ?? '');
+  const [series, setSeries] = useState(settings.decides.rulingSeries ?? '');
   const [reason, setReason] = useState('');
 
   const [busy, setBusy] = useState(false);
@@ -74,6 +75,7 @@ export default function HowItDecides({
       const next = await oversight.changeHowItDecides({
         reason: reason.trim(),
         name: name.trim(),
+        rulingSeries: series.trim(),
         quorumPermit: Number(permit),
         quorumRestrict: Number(restrict),
         ratificationWindowHours: Number(hours),
@@ -166,6 +168,29 @@ export default function HowItDecides({
             </Field>
           </div>
 
+          {/*
+            How rulings are numbered. Changing it renumbers nothing already
+            issued — a reference the bank has filed does not move — so the help
+            line says what it actually decides: what the next one is called.
+          */}
+          <div className="mt-3">
+            <Field
+              label={t('decides.series')}
+              help={t('decides.seriesHelp')}
+              headingClass={HEADING}
+            >
+              {(attrs) => (
+                <input
+                  {...attrs}
+                  value={series}
+                  onChange={(e) => setSeries(e.target.value)}
+                  placeholder="SSB/{year}/{n}"
+                  className={`${BOX} font-mono`}
+                />
+              )}
+            </Field>
+          </div>
+
           <div className="mt-3">
             <Field label={t('decides.why')} help={t('decides.whyHelp')} headingClass={HEADING}>
               {(attrs) => (
@@ -201,6 +226,34 @@ export default function HowItDecides({
           </div>
         </form>
       )}
+
+      {/*
+        What this board calls its rulings, for everybody rather than only the
+        chair. A member asked for *SSB/2026/14* has to be able to see that the
+        board issues under that series at all, and what the next one will be —
+        the pattern alone is a form field, the example is the answer.
+      */}
+      <div className="mt-5 border-t border-line pt-4">
+        <div className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-muted">
+          {t('decides.series')}
+        </div>
+        {settings.decides.rulingSeries ? (
+          <p className="max-w-[62ch] text-[12.5px] leading-[1.65] text-sand">
+            <span className="font-mono text-paper">{settings.decides.rulingSeries}</span>
+            {settings.decides.nextReference && (
+              <>
+                <span className="mx-1.5 opacity-40">·</span>
+                {t('decides.next')}{' '}
+                <span className="font-mono text-lapis">{settings.decides.nextReference}</span>
+              </>
+            )}
+          </p>
+        ) : (
+          <p className="max-w-[62ch] text-[12.5px] leading-[1.65] text-muted">
+            {t('decides.noSeries')}
+          </p>
+        )}
+      </div>
 
       {/*
         What moved, and when. Under the figures rather than behind a link: a

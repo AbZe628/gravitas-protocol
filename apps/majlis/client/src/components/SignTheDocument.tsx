@@ -114,6 +114,19 @@ export default function SignTheDocument({ matter }: { matter: Matter }) {
         {t('sign.what')}
       </p>
 
+      {/*
+        What the board calls this one, where it keeps a series of its own. This
+        is the string that leaves the building — filed by the bank, quoted by a
+        regulator — so it belongs above the signatures rather than only on the
+        printed page. Absent where the reference is just the matter id, which
+        is already in the address bar and would be said twice.
+      */}
+      {doc.reference !== matter.id && (
+        <p className="mt-3 text-[12.5px] text-muted">
+          {t('sign.calledIt')} <span className="font-mono text-paper">{doc.reference}</span>
+        </p>
+      )}
+
       {/* Who has signed. Names, dates, and how each proved who they were. */}
       <div className="mt-5 space-y-2.5">
         {signings.length === 0 && (

@@ -354,7 +354,7 @@ export function assemble(
 
   return {
     kind,
-    reference: matter.id,
+    reference: matter.reference ?? matter.id,
     title: matter.title,
     boardName: board.name,
     institutionId: board.institutionId,

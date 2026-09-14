@@ -126,6 +126,16 @@ export interface Board {
   ratificationWindowHours: number;
   members: Scholar[];
 
+  /**
+   * How this board refers to its own rulings.
+   *
+   * A pattern with two placeholders and nothing else: `{year}` and `{n}`. The
+   * rest is the board's own text, copied out as written. Absent where a board
+   * has set no series, and its rulings are then quoted by their matter id —
+   * an ordinary arrangement rather than a misconfiguration.
+   */
+  rulingSeries?: string;
+
   /** Every time the board changed how it decides. Absent until the first one. */
   changes?: BoardChange[];
 }
@@ -463,6 +473,16 @@ export interface Matter {
    * falls back to the board and is no worse off than it was.
    */
   quorumWhenOpened?: number;
+
+  /**
+   * What this board calls this ruling, once it is one.
+   *
+   * Taken at the moment it comes into force and never moved: the bank has
+   * filed it under this, and a reference that changed would be a reference
+   * pointing at nothing. Absent on matters that never became rulings and on
+   * boards that keep no series, where the matter id is what is quoted.
+   */
+  reference?: string;
 
   /** Set once the threshold is met and the timelock begins. */
   timelockStartedAt: string | null;

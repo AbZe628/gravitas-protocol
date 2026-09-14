@@ -1793,6 +1793,7 @@ export const oversight = {
     quorumPermit?: number;
     quorumRestrict?: number;
     ratificationWindowHours?: number;
+    rulingSeries?: string;
   }) => send<Settings>('/api/settings', input),
 
   register: () => get<Register>('/api/register'),
@@ -2200,6 +2201,10 @@ export interface Settings {
     signatoriesSeated: number;
     ratificationWindowHours: number;
     timelockHours: number;
+    /** The pattern rulings are numbered by. Absent where the board keeps no series. */
+    rulingSeries?: string;
+    /** What the next ruling would be called, so the pattern reads as a result. */
+    nextReference?: string;
   };
   /**
    * Every time this board changed how it decides.

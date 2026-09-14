@@ -338,6 +338,7 @@ export function createApp(
     quorumPermit: z.number().int().min(0).max(1_000).optional(),
     quorumRestrict: z.number().int().min(0).max(1_000).optional(),
     ratificationWindowHours: z.number().int().min(0).max(100_000).optional(),
+    rulingSeries: z.string().max(400).optional(),
   });
 
   // ---- settings --------------------------------------------------------
@@ -363,6 +364,7 @@ export function createApp(
         board,
         members: auth.members,
         timelockHours: TIMELOCK_HOURS.permit,
+        matters: await store.matters(board.id),
       }),
       /*
        * Every time this board changed how it decides. Shown rather than kept
@@ -412,7 +414,12 @@ export function createApp(
         changeHowItDecides(current, change, who.scholarId ?? 'unknown', new Date().toISOString(), reason),
       );
       res.json({
-        ...buildSettings({ board: updated, members: auth.members, timelockHours: TIMELOCK_HOURS.permit }),
+        ...buildSettings({
+          board: updated,
+          members: auth.members,
+          timelockHours: TIMELOCK_HOURS.permit,
+          matters: await store.matters(updated.id),
+        }),
         changes: updated.changes ?? [],
       });
     } catch (e) {

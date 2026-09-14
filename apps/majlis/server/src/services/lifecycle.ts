@@ -37,6 +37,7 @@ import type {
 } from '../types.js';
 import { TIMELOCK_HOURS } from '../types.js';
 import { hashParameters } from './hash.js';
+import { giveItAReference } from './numbering.js';
 
 /** Refusals carry a code so an interface can respond to the kind, not the prose. */
 export type RefusalCode =
@@ -573,7 +574,18 @@ export interface Closed {
  * object and halt it. A restricting change takes effect at once and must be
  * ratified inside the board's window or it lapses — the asymmetry is the point.
  */
-export function closeVoting(board: Board, matter: Matter, at: string): Closed {
+export function closeVoting(
+  board: Board,
+  matter: Matter,
+  at: string,
+  /**
+   * Every matter this board holds, so a ruling coming into force can take the
+   * next number in the board's series. Empty where the caller has none to hand,
+   * which numbers from one — correct for a board issuing its first ruling and
+   * harmless for a board that keeps no series at all.
+   */
+  held: readonly Matter[] = [],
+): Closed {
   requireStatus(matter, ['voting']);
   const result = tally(board, matter);
 
@@ -589,8 +601,15 @@ export function closeVoting(board: Board, matter: Matter, at: string): Closed {
 
   const hours = TIMELOCK_HOURS[matter.direction];
   if (hours === 0) {
+    // A restriction is a ruling the moment the vote closes, so this is where it
+    // takes its reference. A permit takes one later, when its timelock ends.
     return {
-      matter: { ...matter, status: 'in_force', inForceAt: at, settledAt: at },
+      matter: giveItAReference(
+        { ...matter, status: 'in_force', inForceAt: at, settledAt: at },
+        board.rulingSeries,
+        held,
+        at,
+      ),
       outcome: 'in_force',
     };
   }
@@ -637,7 +656,13 @@ export function timelockElapsed(matter: Matter, now: string): boolean {
   return new Date(now).getTime() >= new Date(matter.timelockEndsAt).getTime();
 }
 
-export function bringIntoForce(matter: Matter, now: string): Matter {
+export function bringIntoForce(
+  matter: Matter,
+  now: string,
+  /** The board and everything it holds, so the ruling can take its reference. */
+  board?: Board,
+  held: readonly Matter[] = [],
+): Matter {
   requireStatus(matter, ['timelock']);
   if (matter.objections.length > 0) {
     throw new Refused(
@@ -651,7 +676,12 @@ export function bringIntoForce(matter: Matter, now: string): Matter {
       `The timelock runs until ${matter.timelockEndsAt}. It cannot be shortened from inside the system.`
     );
   }
-  return { ...matter, status: 'in_force', inForceAt: now };
+  return giveItAReference(
+    { ...matter, status: 'in_force', inForceAt: now },
+    board?.rulingSeries,
+    held,
+    now,
+  );
 }
 
 // ── ratification of a restriction ─────────────────────────────────────────

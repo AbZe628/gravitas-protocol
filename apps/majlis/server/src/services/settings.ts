@@ -30,7 +30,8 @@
  */
 
 import type { Members, Office, Role } from '../auth/members.js';
-import type { Board } from '../types.js';
+import type { Board, Matter } from '../types.js';
+import { nextReference } from './numbering.js';
 
 export interface SeatedMember {
   scholarId: string;
@@ -68,6 +69,12 @@ export interface HowItDecides {
   signatoriesSeated: number;
   ratificationWindowHours: number;
   timelockHours: number;
+
+  /** The pattern rulings are numbered by. Absent where the board keeps no series. */
+  rulingSeries?: string;
+
+  /** What the next ruling would be called, so the pattern can be read as a result. */
+  nextReference?: string;
 }
 
 export interface Settings {
@@ -106,6 +113,12 @@ export function buildSettings(params: {
   board: Board;
   members: Members | null;
   timelockHours: number;
+  /**
+   * Everything the board holds, so the next reference can be shown. Optional:
+   * callers that only want the roster need not read every matter, and the
+   * screen then shows the pattern without the example.
+   */
+  matters?: readonly Matter[];
 }): Settings {
   const { board, members } = params;
 
@@ -196,6 +209,10 @@ export function buildSettings(params: {
       signatoriesSeated: board.members.filter((m) => m.signatory).length,
       ratificationWindowHours: board.ratificationWindowHours,
       timelockHours: params.timelockHours,
+      ...(board.rulingSeries ? { rulingSeries: board.rulingSeries } : {}),
+      ...(board.rulingSeries && params.matters
+        ? { nextReference: nextReference(board.rulingSeries, params.matters, new Date().toISOString()) }
+        : {}),
     },
     mismatches,
     fixIn: FIX_IN,

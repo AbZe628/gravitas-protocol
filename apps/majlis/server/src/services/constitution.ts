@@ -46,6 +46,7 @@ export interface ConstitutionChange {
   quorumPermit?: number;
   quorumRestrict?: number;
   ratificationWindowHours?: number;
+  rulingSeries?: string;
 }
 
 /** What each field is called when a change is described in the record. */
@@ -54,7 +55,11 @@ const CALLED: Record<keyof ConstitutionChange, string> = {
   quorumPermit: 'the signatures needed to permit',
   quorumRestrict: 'the signatures needed to restrict',
   ratificationWindowHours: 'the confirmation window, in hours',
+  rulingSeries: 'how rulings are numbered',
 };
+
+/** How an absent value reads in the history, rather than the word "undefined". */
+const NONE = '—';
 
 export function changeHowItDecides(
   board: Board,
@@ -118,6 +123,33 @@ export function changeHowItDecides(
   }
 
   /*
+   * How rulings are numbered.
+   *
+   * Changing it does not renumber anything already issued — a reference the
+   * bank has filed does not move — so this only decides what the next ruling
+   * is called. An empty pattern means the board keeps no series and its
+   * rulings are quoted by their matter id, which is a choice rather than a
+   * misconfiguration.
+   */
+  if (input.rulingSeries !== undefined) {
+    const pattern = input.rulingSeries.trim();
+    if (pattern.length === 0) {
+      next.rulingSeries = undefined;
+    } else {
+      if (pattern.length > MAX_NAME) refuse('too_long', 'That is longer than a reference.');
+      if (!pattern.includes('{n}')) {
+        refuse(
+          'no_reason_given',
+          'A numbering pattern needs {n}, which is where the number goes. Write {year} for the ' +
+            'year; everything else is copied out exactly as typed — SSB/{year}/{n} gives ' +
+            'SSB/2026/1.',
+        );
+      }
+      next.rulingSeries = pattern;
+    }
+  }
+
+  /*
    * What actually moved, as it moved. Fields the caller sent unchanged are not
    * recorded: a history full of "3 → 3" is a history nobody reads.
    */
@@ -130,8 +162,8 @@ export function changeHowItDecides(
     changes.push({
       field,
       called: CALLED[field],
-      from: String(before),
-      to: String(after),
+      from: before === undefined ? NONE : String(before),
+      to: after === undefined ? NONE : String(after),
       by,
       at,
       reason: said,

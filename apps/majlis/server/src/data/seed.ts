@@ -38,6 +38,13 @@ export const boards: Board[] = [
     totalSignatories: 5,
     ratificationWindowHours: 168,
     /*
+     * How this board refers to its own rulings. A board with a series is the
+     * ordinary case — a bank files SSB/2026/1, not an internal matter id — and
+     * the demonstration record should show one, since a reader who never sees
+     * a reference will not know the application can produce them.
+     */
+    rulingSeries: 'SSB/{year}/{n}',
+    /*
      * Five signatories, matching totalSignatories, plus an advisory member and
      * a technical liaison who deliberate without voting.
      *
@@ -1359,7 +1366,33 @@ export function asSignedThen(all: Matter[], board: Board = boards[0]): Matter[] 
   /* A vote that has opened was put under a threshold, and the record should say which. */
   const OPENED = ['voting', 'timelock', 'in_force', 'rejected', 'lapsed'];
 
+  /*
+   * The references the board would have issued, in the order it issued them.
+   *
+   * Taken when a ruling comes into force, so the series runs by `inForceAt`
+   * rather than by the order these entries happen to be written in — a series
+   * where 2 predates 1 is the first thing a reader would disbelieve.
+   */
+  const numbered = new Map<string, string>();
+  if (board.rulingSeries) {
+    const issued = all
+      .filter((m) => m.inForceAt && !m.reference)
+      .sort((a, b) => (a.inForceAt ?? '').localeCompare(b.inForceAt ?? ''));
+
+    const counts = new Map<string, number>();
+    for (const matter of issued) {
+      const year = (matter.inForceAt ?? '').slice(0, 4);
+      const n = (counts.get(year) ?? 0) + 1;
+      counts.set(year, n);
+      numbered.set(
+        matter.id,
+        board.rulingSeries.replace(/\{year\}/g, year).replace(/\{n\}/g, String(n)),
+      );
+    }
+  }
+
   return all.map((matter) => ({
+    ...(numbered.has(matter.id) ? { reference: numbered.get(matter.id) } : {}),
     ...matter,
     ...(OPENED.includes(matter.status) && matter.quorumWhenOpened === undefined
       ? {

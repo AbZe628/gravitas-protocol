@@ -341,7 +341,7 @@ Vidi A8 i A9. Sve DA osim provedbe (KOD) i podsjetnika (VANI).
 | Povrat lozinke: unovčavanje | ZID — vidi ispod |
 | Predsjedavajući mijenja kvorum, prozor potvrde, ime odbora | DA — sa obaveznim razlogom i historijom svake promjene. Glasanje koje je već otvoreno sudi se po pragu pod kojim je otvoreno |
 | Predsjedavajući mijenja članove | NE — namjerno, i nikad neće: aplikacija koja uređuje svoj odbor odlučivala bi ko sjedi u šerijatskom odboru |
-| Serija brojeva odluka | NE |
+| Serija brojeva odluka | DA — predsjedavajući postavlja obrazac (`SSB/{year}/{n}`), broj se uzima kad odluka stupi na snagu i nikad se više ne miče. Ekran odbora pokazuje obrazac i koji je broj sljedeći; odluka nosi svoj broj i u aplikaciji i na štampanoj stranici |
 | Šta ova kopija može, na dnu navigacije | DA |
 
 ## 15. Šta Majlis ne radi
@@ -357,20 +357,33 @@ je isto gradivo poredano po putu korisnika, pa bi zbrajanje oba bilo duplo.
 
 Stanje nakon koraka 3, prebrojano iz Dijela B.
 
-| | 13.09. ujutro | 13.09. navečer | 14.09. |
+| | 13.09. ujutro | 13.09. navečer | 14.09. navečer |
 |---|---|---|---|
-| DA | 51 | 58 | **63** |
+| DA | 51 | 58 | **58** |
 | POLA | 0 | 0 | 1 |
-| DOST (postoji, ali ga moraš tražiti) | 7 | 8 | 8 |
+| DOST (postoji, ali ga moraš tražiti) | 7 | 8 | 2 |
 | KOD (radi, nijedan ekran ne zove) | 8 | 1 | 1 |
-| NE | 20 | 19 | **14** |
+| NE | 20 | 19 | **9** |
 | VANI (čeka banku ili izmjenu ugovora) | 4 | 4 | 4 |
 | ZID (traži odluku o sigurnosti) | 0 | 1 | 1 |
-| ukupno stavki | 90 | 91 | 92 |
+| ukupno stavki | 90 | 91 | 76 |
 
 Prvi put sam ovakve brojeve napisao napamet i sva četiri su bila pogrešna.
-Ovi su prebrojani naredbom nad samim fajlom. Ako se ikad ne slažu sa tabelama,
-tabele su tačne.
+
+**Kolona od 14.09. ujutro je bila treći takav promašaj** i zato je zamijenjena.
+Pisala je 63 DA i 92 stavke; u samom fajlu toliko redova nema, a kako je do te
+cifre došlo ne mogu rekonstruisati — i neću nagađati, jer je nagađanje i
+napravilo prva dva promašaja. Brojevi iznad su prebrojani ovom naredbom nad
+Dijelom B, i samo njome:
+
+```
+awk '/^# Dio B/{b=1} /^# Dio C/{b=0} b' docs/POPIS.md \
+  | grep -oE '^\| [^|]+ \| (DA|POLA|DOST|KOD|NE|VANI|ZID)\b' \
+  | sed -E 's/.*\| //' | sort | uniq -c
+```
+
+Ukupno je palo sa 92 na 76 zato što je 92 bilo pogrešno prebrojano, **ne zato
+što je nešto obrisano**. Ako se prosa i tabela ikad ne slažu, pusti naredbu.
 
 Po drugom pragu, dostupnosti, sada je **skoro sve zatvoreno**: ostala je jedna
 stvar koja radi a nema ekran, i ona pripada koraku 5.

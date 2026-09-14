@@ -1133,9 +1133,10 @@ export function governanceRoutes(
       const board = await boardFor(store, res, req.params.id);
       if (!board) return;
 
+      const held = await store.matters(board.id);
       let outcome = '';
       const updated = await store.updateMatter(req.params.id, (matter) => {
-        const closed = closeVoting(board, matter, now());
+        const closed = closeVoting(board, matter, now(), held);
         outcome = closed.outcome;
         return closed.matter;
       });
@@ -1170,7 +1171,12 @@ export function governanceRoutes(
     handle(async (req, res) => {
       const who = identityOf(req);
       if (!requireRole(res, mayVote(who.role), 'bring a change into force', who.role)) return;
-      res.json(await store.updateMatter(req.params.id, (m) => bringIntoForce(m, now())));
+
+      const board = await boardFor(store, res, req.params.id);
+      if (!board) return;
+      const held = await store.matters(board.id);
+
+      res.json(await store.updateMatter(req.params.id, (m) => bringIntoForce(m, now(), board, held)));
     }),
   );
 
