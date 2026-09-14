@@ -249,7 +249,7 @@ describe('forgetting a device', () => {
     await request(app)
       .delete(`/api/devices/${encodeURIComponent(kept.body.id)}`)
       .set('Authorization', as('member-a'))
-      .expect(204);
+      .expect(200);
 
     const mine = await request(app).get('/api/devices').set('Authorization', as('member-a'));
     expect(mine.body.devices).toHaveLength(0);

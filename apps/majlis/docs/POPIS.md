@@ -130,7 +130,7 @@ račun.
 |---|---|
 | Brojanje glasova naspram praga | DA |
 | Prigovor u periodu čekanja zaustavlja odluku | DA |
-| **Potpis otiskom, licem ili PIN-om** | NE — nula rezultata za passkey u cijelom kodu |
+| **Potpis otiskom, licem ili PIN-om** | DA — uređaj se upiše na /settings, potpisuje se sa stranice predmeta, i odluka nosi kojim je uređajem potpisana |
 | Broj sakupljenih potpisa | DA |
 | Obavijest potpisnicima da je glasanje otvoreno | VANI — email |
 
@@ -294,8 +294,8 @@ Vidi A8 i A9. Sve DA osim provedbe (KOD) i podsjetnika (VANI).
 
 | stavka | stanje |
 |---|---|
-| Passkey potpis | NE |
-| Upis uređaja | NE |
+| Passkey potpis | DA — WebAuthn, bez ijedne nove biblioteke. Izazov je 32 slučajna bajta izdana za jednog člana, jedan predmet i jedan hash dokumenta, i troši se prvom upotrebom. Nacrt koji se pomjerio između pitanja i odgovora se odbija. Ključ nikad nije bio na serveru |
+| Upis uređaja | DA — `/settings`, članovim vlastitim riječima za uređaj ("moj radni laptop"), i to ime se štampa uz potpis. Gdje browser ne može (nesigurna veza, stari browser, mašina bez otiska i PIN-a), dugmeta nema nego piše koja je od te tri stvari |
 | Bez novčanika i naknade | DA po dizajnu |
 
 ## 11. Sa lancem i bez
@@ -359,11 +359,11 @@ Stanje nakon koraka 3, prebrojano iz Dijela B.
 
 | | 13.09. ujutro | 13.09. navečer | 14.09. navečer |
 |---|---|---|---|
-| DA | 51 | 58 | **58** |
+| DA | 51 | 58 | **60** |
 | POLA | 0 | 0 | 1 |
 | DOST (postoji, ali ga moraš tražiti) | 7 | 8 | 2 |
 | KOD (radi, nijedan ekran ne zove) | 8 | 1 | 1 |
-| NE | 20 | 19 | **9** |
+| NE | 20 | 19 | **7** |
 | VANI (čeka banku ili izmjenu ugovora) | 4 | 4 | 4 |
 | ZID (traži odluku o sigurnosti) | 0 | 1 | 1 |
 | ukupno stavki | 90 | 91 | 76 |

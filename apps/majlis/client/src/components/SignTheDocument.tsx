@@ -3,6 +3,7 @@ import { oversight, type Matter, type SignedDocument } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { useIdentity, mayVote } from '../lib/identity.js';
 import { Field } from './field.js';
+import { asRefusal, available, signWithDevice } from '../lib/devices.js';
 
 /**
  * Signing the written decision.
@@ -55,6 +56,15 @@ export default function SignTheDocument({ matter }: { matter: Matter }) {
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState<string | null>(null);
 
+  /**
+   * Whether signing with a device can be offered here.
+   *
+   * Two answers are needed and both are asked for: whether this browser can
+   * do it at all, and whether this member has enrolled anything. Either being
+   * no means the control is absent rather than offered and refused.
+   */
+  const [withDevice, setWithDevice] = useState(false);
+
   const decided = SETTLED.includes(matter.status);
 
   useEffect(() => {
@@ -70,6 +80,33 @@ export default function SignTheDocument({ matter }: { matter: Matter }) {
       live = false;
     };
   }, [matter.id, decided]);
+
+  /*
+   * Whether this browser and this member can sign with a device.
+   *
+   * Asked once, when the panel appears. The device list is a cheap call and
+   * the answer decides whether a control exists at all — a member with nothing
+   * enrolled is shown the ordinary button and no mention of devices, rather
+   * than a second button that would refuse them.
+   */
+  useEffect(() => {
+    if (!decided) return;
+    let live = true;
+
+    void (async () => {
+      if (!(await available())) return;
+      try {
+        const held = await oversight.devices();
+        if (live) setWithDevice(held.devices.length > 0);
+      } catch {
+        // No answer means no offer. The ordinary signature is still there.
+      }
+    })();
+
+    return () => {
+      live = false;
+    };
+  }, [decided]);
 
   if (!decided || !doc) return null;
 
@@ -100,6 +137,39 @@ export default function SignTheDocument({ matter }: { matter: Matter }) {
       setDoc(await oversight.document(matter.id));
     } catch (e) {
       setFailed(e instanceof Error ? e.message : t('sign.failed'));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  /**
+   * Sign with an enrolled device.
+   *
+   * Three steps and they have to be in this order: ask the server for a
+   * challenge issued against the document as it stands, let the device sign
+   * it, hand the answer back. Nothing about the document is sent — the server
+   * computes the hash from the record at both ends, so what is signed is the
+   * decision rather than whatever a page had in it.
+   */
+  async function putWithDevice() {
+    setBusy(true);
+    setFailed(null);
+    try {
+      const request = await oversight.askToSign(matter.id);
+      const answer = await signWithDevice(request);
+
+      await oversight.sign(
+        matter.id,
+        'a device they enrolled, unlocked by its owner',
+        note.trim() || undefined,
+        answer,
+      );
+      setNote('');
+      setDoc(await oversight.document(matter.id));
+    } catch (e) {
+      const refused = asRefusal(e);
+      // Walking away from the fingerprint prompt is not a failure.
+      setFailed(refused.code === 'cancelled' ? null : refused.message);
     } finally {
       setBusy(false);
     }
@@ -144,6 +214,8 @@ export default function SignTheDocument({ matter }: { matter: Matter }) {
               <span className="ms-auto font-mono text-[11.5px] text-muted">{day(s.at)}</span>
               <div className="w-full text-[12px] leading-[1.55] text-muted">
                 {t('sign.provedBy')} {s.provedBy}
+                {/* Which device, in the member's own words for it. */}
+                {s.signedWith && <span className="text-sand"> ({s.signedWith})</span>}
                 {stale && (
                   <span className="text-breach">
                     {' · '}
@@ -178,14 +250,45 @@ export default function SignTheDocument({ matter }: { matter: Matter }) {
               />
             )}
           </Field>
-          <button
-            type="button"
-            onClick={put}
-            disabled={busy}
-            className="mt-3 rounded-card bg-lapis px-6 py-3 text-[14px] font-bold text-white shadow-act disabled:opacity-60"
-          >
-            {busy ? t('sign.signing') : t('sign.doIt')}
-          </button>
+          {/*
+            Two ways to sign, and the stronger one leads where it is available.
+            A member with a device enrolled still sees the other: a phone left
+            at home is not a reason to be unable to sign at all, and the
+            document says which way each signature was made.
+          */}
+          <div className="mt-3 flex flex-wrap items-center gap-3">
+            {withDevice && (
+              <button
+                type="button"
+                onClick={putWithDevice}
+                disabled={busy}
+                className="rounded-card bg-lapis px-6 py-3 text-[14px] font-bold text-white shadow-act disabled:opacity-60"
+              >
+                {busy ? t('sign.waiting') : t('sign.withDevice')}
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={put}
+              disabled={busy}
+              className={
+                withDevice
+                  ? 'text-[12.5px] text-muted underline decoration-line underline-offset-4'
+                  : 'rounded-card bg-lapis px-6 py-3 text-[14px] font-bold text-white shadow-act disabled:opacity-60'
+              }
+            >
+              {withDevice
+                ? t('sign.withoutDevice')
+                : busy
+                  ? t('sign.signing')
+                  : t('sign.doIt')}
+            </button>
+          </div>
+          {withDevice && (
+            <p className="mt-2 max-w-[62ch] text-[12px] leading-[1.6] text-muted">
+              {t('sign.deviceMeans')}
+            </p>
+          )}
           {failed && <p className="mt-2 text-[12.5px] text-breach">{failed}</p>}
         </div>
       )}

@@ -4,6 +4,7 @@ import { useI18n } from '../lib/i18n.js';
 import { PageHead } from '../components/page.js';
 import YourAccount from '../components/YourAccount.js';
 import WhoYouAreOnPaper from '../components/WhoYouAreOnPaper.js';
+import YourDevices from '../components/YourDevices.js';
 import HowItDecides from '../components/HowItDecides.js';
 import { Card, DateText, ErrorText, Loading, Tag } from '../components/ui.js';
 import TheCommittees from '../components/TheCommittees.js';
@@ -61,6 +62,13 @@ export default function Settings() {
       <WhoYouAreOnPaper />
 
       <YourAccount />
+
+      {/*
+        The devices you sign with, under the password rather than beside it.
+        A member who has just set a password is the one most likely to be
+        thinking about how they prove who they are.
+      */}
+      <YourDevices />
 
       {/*
         No credentials at all used to be said twice on this page, once here and

@@ -1503,10 +1503,14 @@ export type CalculationKind =
  * weaker thing than one given behind a one-time code, and the page should read
  * that way to whoever relies on it.
  */
+import type { Device, DeviceAnswer } from './devices.js';
+
 export type SigningProof =
   | 'their own sign-in'
   | 'their own sign-in and a one-time code'
-  | 'in person at a sitting, entered by the secretary';
+  | 'in person at a sitting, entered by the secretary'
+  /** A device the member enrolled, unlocked by fingerprint, face or PIN. */
+  | 'a device they enrolled, unlocked by its owner';
 
 export interface Signing {
   scholarId: string;
@@ -1517,6 +1521,8 @@ export interface Signing {
   /** The hash of the document this member actually signed. */
   documentHash: string;
   note?: string;
+  /** Which device, in the member's own words for it. Only on a device signature. */
+  signedWith?: string;
 }
 
 export interface DocumentSeal {
@@ -2017,8 +2023,50 @@ export const oversight = {
    * of signing, so what a member signs is the document as it stands and not
    * whatever a client chose to put in the request.
    */
-  sign: (id: string, provedBy: SigningProof, note?: string) =>
-    send<Signing>(`/api/matters/${id}/sign`, { provedBy, ...(note ? { note } : {}) }),
+  sign: (id: string, provedBy: SigningProof, note?: string, device?: DeviceAnswer) =>
+    send<Signing>(`/api/matters/${id}/sign`, {
+      provedBy,
+      ...(note ? { note } : {}),
+      ...(device ? { device } : {}),
+    }),
+
+  /**
+   * The devices this member signs with.
+   *
+   * Yours only, on every one of these. There is no parameter for another
+   * member: not a check that could be got round, an absence.
+   */
+  devices: () => get<{ devices: Device[]; rpId: string; origin: string }>('/api/devices'),
+
+  askToEnrol: () =>
+    send<{
+      challenge: string;
+      rpId: string;
+      boardName: string;
+      user: { id: string; name: string; displayName: string };
+      already: string[];
+    }>('/api/devices/request', {}),
+
+  enrolDevice: (answer: { label: string; clientDataJSON: string; attestationObject: string }) =>
+    send<Device>('/api/devices', answer),
+
+  forgetDevice: (id: string) =>
+    send<{ id: string }>(`/api/devices/${encodeURIComponent(id)}`, undefined, 'DELETE'),
+
+  /**
+   * Ask for a request to sign this document with a device.
+   *
+   * The hash comes back so the screen can show that what was asked for is the
+   * document in front of the member, and the server checks it again on the way
+   * in — the answer here is not what it trusts.
+   */
+  askToSign: (id: string) =>
+    send<{
+      challenge: string;
+      rpId: string;
+      documentHash: string;
+      devices: { id: string; label: string }[];
+    }>(`/api/matters/${id}/sign/request`, {}),
 
   /**
    * Read a contract against the conditions this board holds.

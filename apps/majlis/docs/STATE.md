@@ -18,9 +18,9 @@ tool calls instead of re-reading the codebase.
 ### Measured now, not remembered
 
 ```
-server   75 test files   1679 tests   passed
-client   31 test files    336 tests   passed
-POPIS.md Dio B: 76 items — 58 DA, 9 NE, 4 VANI, 2 DOST, 1 POLA, 1 KOD, 1 ZID
+server   77 test files   1725 tests   passed
+client   32 test files    342 tests   passed
+POPIS.md Dio B: 76 items — 60 DA, 7 NE, 4 VANI, 2 DOST, 1 POLA, 1 KOD, 1 ZID
 git: 23 commits on main unpushed. The owner is asked before every push.
 ```
 
@@ -41,7 +41,15 @@ Names on `Reasoning`/`ConditionFinding`, `Matter.quorumWhenOpened`, and now
 `Matter.reference`. If a fourth such field is ever added, stamp the seed in
 `store/index.ts` as well — `memory.ts` is bypassed by the demo.
 
-### Where to pick up: passkey signing (handbook §10)
+### Where to pick up: the web2/web3 marker (item 5 below)
+
+Passkey signing was finished on the evening of 14 September — everything from
+here to the end of this subsection is what was established before it was
+written, and is kept because it explains the shape of what is there. Item 5 is
+the next open one: today enforcement is a property of the installation rather
+than of a holding.
+
+#### What was established before writing it
 
 Nothing of it is written yet. Everything below was measured this evening, so
 it does not need measuring again.
@@ -382,8 +390,44 @@ From `docs/POPIS.md`, in the order they are worth doing:
    answers yes and then no on the same string, and the board's second ruling
    of the day would have lost its number in silence.
 
-4. **Passkey signing** — zero results for `passkey` or `webauthn` in the
-   whole repository.
+4. ~~**Passkey signing**~~ — done 14 September. `auth/passkeys.ts`,
+   `auth/cbor.ts`, `routes/devices.ts`, `components/YourDevices.tsx`, and the
+   second button on `SignTheDocument.tsx`. Handbook §10 is closed except for
+   what it says about sending, which stays VANI.
+
+   **No dependency.** The COSE key becomes a JWK and `node:crypto` verifies
+   with it directly; `cbor.ts` is the hundred lines that read the only two
+   structures WebAuthn encodes, refusing by name everything a passkey never
+   contains.
+
+   **What holds it shut**, and all of it is in the file's own header: the
+   challenge is 32 random bytes issued for one member, one matter and one
+   document hash, spent by its first use whether or not that use succeeded; a
+   draft that moved between the request and the answer is refused; the device
+   proof requires a device answer and an answer is refused under any weaker
+   proof; user verification is required at both ends; a counter that goes
+   backwards is refused and zero-forever is accepted; and the origin comes
+   from `MAJLIS_ORIGIN` rather than from the request.
+
+   **The paragraph that changed.** `services/signature.ts` used to say that no
+   member's own key ever touches a document. For a device signature that is no
+   longer true, and the screen now says what it does and does not prove: that
+   someone held the device and unlocked it, not who that person was.
+
+   **Attestation is deliberately not examined** and should stay that way. It
+   would tell a board which make of laptop a member owns.
+
+   **The secure-context constraint is built for, not discovered.** Over plain
+   HTTP the API is absent, and `YourDevices` says which of three things is in
+   the way — the connection, the browser, or a machine with no fingerprint
+   reader and no PIN. Walked headless with a CDP virtual authenticator:
+   enrolled, signed, and the ruling prints `a device they enrolled, unlocked
+   by its owner (A virtual laptop)`.
+
+   **`MAJLIS_ORIGIN` has to be set on any real deployment.** Unset it falls
+   back to `http://localhost:<port>`, which is right for the demonstration and
+   wrong everywhere else — and a mismatch fails every signature rather than
+   accepting anything.
 5. **The per-holding and per-ruling web2/web3 marker** — today enforcement is
    a property of the installation, not of a holding.
 6. **The handbook rewrite**, which the owner called a catastrophe.

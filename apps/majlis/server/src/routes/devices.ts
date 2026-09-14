@@ -231,7 +231,9 @@ export function deviceRoutes(
       }
 
       await store.forgetDevice(req.params.id);
-      res.status(204).end();
+      // A body rather than 204: everything else here answers with JSON, and
+      // one route that does not is one the client has to special-case.
+      res.json({ id: req.params.id, forgotten: true });
     }),
   );
 
