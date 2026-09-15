@@ -1,8 +1,16 @@
 # Algoritam Majlisa
 
-Ovo je specifikacija toka, ne popis gumbi. Svaki čvor ima **ime, ekran,
-uslove, činove, i gdje svaki čin vodi**. Uz svaki čvor piše i **kako izgleda
-kroz aplikaciju** — koji prozor, koja okna, koja traka, koji alat.
+Ovo je specifikacija toka, ne popis gumbi. Čita se u tri sloja:
+
+| sloj | šta je | gdje |
+|---|---|---|
+| **Algoritam** | petlje, uslovi, grananja — šta se vrti i dok se šta ne desi | §A–§J |
+| **Čvorovi** | 36 ekrana: prozor, ulaz, alat, činovi, izlaz | §1–§25 |
+| **Provjera** | svih 74 čina, svaki na svoj čvor, brojano iz koda | §26–§27 |
+
+Svaki čvor ima **ime, ekran, uslove, činove, i gdje svaki čin vodi**. Uz svaki
+čvor piše i **kako izgleda kroz aplikaciju** — koji prozor, koja okna, koja
+traka, koji alat.
 
 Sve granice su čitane iz koda: prelazi iz `services/lifecycle.ts`, uloge iz
 `lib/identity.ts`, faze prekršaja i vrste računa iz `server/src/types.ts`.
@@ -35,6 +43,523 @@ N-xx  IME
 
 Nijedan čvor nije „stranica sa klikanjem". Ako neki jeste, to je greška u
 ovom dokumentu ili u kodu.
+
+---
+
+# A · Šta je ovaj dokument bio, a šta mu je falilo
+
+Do §12 ovdje je bio **katalog čvorova**: koji ekran postoji i šta je na njemu.
+To nije algoritam. Algoritam su **petlje, uslovi i grananja** — šta se vrti,
+dok se šta ne desi, i šta tačno uradi svaki pritisak u svakom stanju.
+
+Ovaj sloj (§A–§J) je to. Redoslijed je namjeran:
+
+| | | |
+|---|---|---|
+| **§B** | Petlje | šta se vrti, u pseudokodu |
+| **§C** | Predmet je *slučaj*, ne cjevovod | zašto je raniji model bio pogrešan |
+| **§D** | Tablica odluke: koji alat | kako sistem sam zna koji toolkit |
+| **§E** | Matrica gumba | svaki gumb × svako stanje × svaka uloga |
+| **§F** | Pet stanja svakog ekrana | prazno, učitava, djelimično, greška, idealno |
+| **§G** | Brojke iz PDF-a | prag pouzdanosti, citat, potvrdi-ili-ispravi |
+| **§H** | Dva para očiju | ko sprema, ko potvrđuje |
+| **§I** | Dupli klik, dva člana odjednom | šta se desi i šta danas nema |
+| **§J** | Tastatura i obavijesti | kako se ovo vozi bez miša |
+
+---
+
+# B · Petlje — šta se stvarno vrti
+
+## B.1 · Glavna petlja: od pitanja do fatwe
+
+```
+PETLJA ODBORA (vrti se dok postoji posao)
+
+  za svako PITANJE u redu:
+
+     # ── TRIJEŽENJE ──────────────────────────────────
+     prikaži: šta su poslali, šta traže, prepoznati oblik
+     ako odbor NE uzima:
+        traži razlog; pošalji banci; sljedeće pitanje
+     inače:
+        PREDMET ← otvori(pitanje)
+        OBLIK   ← član potvrdi prepoznati oblik (aplikacija predlaže)
+
+     # ── PRIPREMA ────────────────────────────────────
+     ALATI ← tablica_odluke(OBLIK)          # §D — bez AI
+     POLJA ← izvuci_iz_pdf(PITANJE.prilog)  # §G — sa AI, sa citatima
+     prikaži briefing: šta traže · po čemu se sudi · koji alati dolaze
+
+     # ── PETLJA KORAKA ───────────────────────────────
+     dok postoji uslov bez nalaza:
+        U ← prvi uslov bez nalaza
+        otvori RADNI PROZOR na U
+        ako U traži brojku:
+           otvori kalkulator koji OBLIK imenuje
+           popuni iz POLJA, svako polje sa citatom
+           čekaj da čovjek potvrdi svako polje         # §G
+        ako U traži dokument:
+           otvori čitač; označi rečenicu koja odgovara
+        čekaj čin:
+           [Ispunjen]        → traži razlog → zapiši → dalje
+           [Nije ispunjen]   → traži razlog → zapiši
+                             → klauzula u ugovor banci
+                             → ponudi: pitaj banku / dalje
+           [Ne primjenjuje]  → traži razlog → zapiši (bez klauzule)
+           [Pitaj banku]     → pošalji zahtjev; U ostaje bez nalaza;
+                               sat predmeta se ODVAJA; idi na sljedeći U
+           [Nazad]           → prethodni U, nalaz ostaje
+     # izlaz iz petlje: svaki uslov ima nalaz ILI je pitanje kod banke
+
+     # ── PETLJA ČEKANJA NA BANKU ─────────────────────
+     dok ima otvorenih zahtjeva prema banci:
+        predmet stoji u „Čeka banku"
+        kad odgovor stigne → vrati se u PETLJU KORAKA na taj U
+
+     # ── GLASANJE ────────────────────────────────────
+     ako niko nije govorio:
+        gumb za glasanje je MRTAV, i piše zašto        # danas ne piše
+     zamrzni PRAG ← odbor.kvorum                       # §I.4
+     dok je glasanje otvoreno:
+        svaki potpisnik: za / protiv / suzdržan + razlog
+        prikaz „X od N" se mijenja UŽIVO
+        ako predsjedavajući [Zatvori]:
+           ako glasova_za < PRAG → ODBIJEN, kraj
+           inače ako smjer == dozvola → ČEKANJE (48h)
+           inače                      → NA SNAZI
+
+     # ── PETLJA ČEKANJA (samo dozvola) ───────────────
+     dok nije isteklo 48h:
+        ako neki potpisnik [Prigovori] sa razlogom → ODBIJEN, kraj
+     → NA SNAZI
+
+     # ── IZDAVANJE, automatski ───────────────────────
+     čim stanje postane NA SNAZI:
+        sastavi ODLUKU (PDF) iz zapisa
+        sastavi KLAUZULE iz svih „nije ispunjen"
+        dodijeli BROJ iz serije odbora
+        ako je pitanje web3 I holding je tokeniziran:
+           upiši termine u policy registry
+        obavijesti banku
+        otvori potpisivanje
+
+     # ── ŽIVOT POSLIJE ───────────────────────────────
+     predmet prelazi u nadzor: drift · pregled · prekršaj
+```
+
+## B.2 · Petlja nadzora (vrti se stalno, u pozadini)
+
+```
+za svaku ODLUKU NA SNAZI:
+   za svaki HOLDING koji imenuje:
+      ako sastav(holding) ≠ termini(odluka):
+         DRIFT → crveni red u „Šta te treba"
+         ponudi: otvori predmet o pomjeranju
+
+   ako odluka ima rok ratifikacije I rok je prošao:
+      → ISTEKLA
+```
+
+**Rupa koju ovo otkriva:** zabrana ima prozor ratifikacije u tipu, ali **čina
+za ratifikaciju nema** — pa zabrana nikad ne istekne. §9.
+
+## B.3 · Petlja prekršaja
+
+```
+PRIJAVLJEN
+   → je li stvarno prekršaj?  ne → NIJE STVARAN, kraj
+                              da ↓
+   → zaustavljeno je?
+   → koliko se očisti          (kalkulator purifikacije)
+   → plaćeno
+   → plan sanacije
+   → petlja odobravanja plana:
+        dok plan nije odobren:
+           odbor [Odobri] → dalje
+           odbor [Vrati]  → institucija popravlja → ponovo
+   → upravi na znanje
+   → ako prag traži: regulatoru
+   → ZATVOREN
+```
+
+**Jedanaest činova, osam faza** — plan ima dva ishoda, čišćenje dva koraka.
+
+## B.4 · Petlja provjere nacrta (bez predmeta)
+
+```
+dok član čita nacrt:
+   ako oblik nije izabran:
+      prepoznaj → ponudi 19 poredanih → ČOVJEK bira
+   za svaki uslov oblika:
+      traži u tekstu → NAĐENO (sa rečenicom) / NEJASNO / ODSUTNO
+   nikad ne izriči presudu
+   ponudi: [Otvori predmet o ovome] → ulazi u GLAVNU PETLJU sa
+           nacrtom i oblikom već u sebi
+```
+
+---
+
+# C · Predmet nije cjevovod — predmet je *slučaj*
+
+Ovo je glavna ispravka ranijeg modela.
+
+Postoje dvije vrste toka. **Cjevovod** (BPMN) je kad se zna unaprijed šta ide
+za čim: prijava kredita, plaćanje. **Slučaj** (CMMN) je kad radi stručnjak
+koji sam odlučuje šta mu treba i kojim redom — i tu se ne propisuje *kako*,
+nego *šta je dozvoljeno i pod kojim uslovom*.
+
+Rad šerijatskog odbora je slučaj, ne cjevovod. Zato je raniji model — niz
+koraka i traka — bio pola istine: **koraci jesu cjevovod, ali predmet nije.**
+
+Iz CMMN-a se uzimaju četiri pojma, i oni rješavaju ono što je falilo:
+
+| pojam | u Majlisu |
+|---|---|
+| **Faza** (stage) | Nacrt · Rasprava · Glasanje · Čekanje · Na snazi |
+| **Ulazni uslov** (sentry) | šta mora biti tačno da faza uopšte počne |
+| **Obavezni zadatak** | bez njega faza ne može završiti |
+| **Diskrecioni zadatak** | dostupan cijelo vrijeme, član ga uzima ako mu treba |
+| **Prekretnica** (milestone) | tačka koja se dostigne, ne posao koji se radi |
+
+## C.1 · Faze predmeta, sa uslovima
+
+| faza | ulazni uslov | obavezno | diskreciono (uvijek dostupno) | prekretnica |
+|---|---|---|---|---|
+| **Nacrt** | predmet otvoren | naslov, prijedlog, smjer | promijeni oblik · povuci | — |
+| **Rasprava** | oblik izabran | nalaz na svakom uslovu · bar jedna riječ rasprave | priloži izvor · pitaj banku · uputi komitetu · bilješka · alat sa strane · promijeni oblik | svi uslovi odgovoreni |
+| **Glasanje** | svi uslovi odgovoreni **I** neko je govorio | glasovi do praga | prigovori · vrati u raspravu | prag dostignut |
+| **Čekanje** | prag met **I** smjer je dozvola | ništa — vrijeme radi | prigovori (obara) | 48h isteklo |
+| **Na snazi** | čekanje isteklo, ili prag met kod zabrane | — | potpiši · papiri · označi holding | odluka izdana |
+
+**Ovo je odgovor na „gdje vodi gumb kad predmet nije otvoren".** Diskrecioni
+zadaci su dostupni u cijeloj fazi, ne samo na jednom koraku. Alat otvoren iz
+koraka veže rezultat za uslov; isti alat otvoren kao diskrecioni zadatak ne
+veže ga ni za šta dok ga član ne zapiše.
+
+## C.2 · Pravilo koje iz ovoga slijedi
+
+> **Obavezni zadatak ide u traku stanica. Diskrecioni ide u bočno okno ili
+> komandnu paletu. Nikad obrnuto.**
+
+Zato su alati skinuti sa glavne stranice: nisu odredište, nego diskrecioni
+zadatak koji se otvara tamo gdje se radi.
+
+---
+
+# D · Koji alat — tablica odluke
+
+Sistem zna koji toolkit ponuditi **bez ikakvog AI**. Oblik ugovora nosi popis
+(`structure.calculations`), i to je tablica odluke sa politikom **Collect**:
+pogodi može više pravila, svi se skupe, redoslijed je redoslijed u obliku.
+
+| ulaz: oblik nosi | izlaz: alat koji se otvara u koraku | veže se za |
+|---|---|---|
+| `screening` | Screening — dozvoljena djelatnost i omjeri | uslov koji ga je tražio |
+| `purification` | Purifikacija — koliko prihoda se očisti | isto |
+| `zakat` | Zekat — osnovica i stopa | isto |
+| `profit_distribution` | Raspodjela dobiti | isto |
+| `tangibility` | Tangibilnost — udio stvarne imovine | isto |
+| `late_payment` | Zatezna — i gdje ide | isto |
+
+**Zašto ovo, a ne „AI pročita uslov i izabere alat":** alat izabran iz teksta
+je pretpostavka. Alat izabran iz oblika je ono što je odbor usvojio. Prvo se
+ne može odbraniti pred regulatorom, drugo može. Granica iz §11.9.
+
+**Drugi ulaz iste tablice** — prepoznavanje oblika iz priloženog nacrta:
+
+| ulaz | izlaz | politika |
+|---|---|---|
+| tekst nacrta | 19 oblika poredanih po pogocima riječi | **Priority** — ali bira čovjek |
+
+Ekran piše doslovno: *ovo je brojanje riječi, ne čitanje ugovora.*
+
+---
+
+# E · Matrica gumba — svaki gumb, u svakom stanju
+
+Format je iz statecharta: **događaj [uslov] / radnja**. Kolone su uvijek iste:
+
+| gumb | vidljiv u | uloga | uslov (guard) | radnja | vodi na | ako padne |
+|---|---|---|---|---|---|---|
+
+Pravilo za kolonu „uslov": ako uslov nije ispunjen, gumb je **odsutan sa
+razlogom**, ne mrtav bez objašnjenja. Izuzetak je uslov koji član može
+ispuniti odmah na tom ekranu (npr. razlog nije upisan) — tada je **mrtav, a
+traka piše šta fali**, jer bi nestajanje gumba pri kucanju bilo trzanje.
+
+## E.1 · Predmet — 24 čina
+
+| gumb | vidljiv u | uloga | uslov | radnja | vodi na | ako padne |
+|---|---|---|---|---|---|---|
+| Postavi pitanje odboru | /ask | banka, odbor | naslov + tekst | `POST /matters` | N-20 | polja ostaju, greška uz gumb |
+| Otvori raspravu | nacrt | raspravlja | oblik izabran | `/open` | prvi korak | ostaje u nacrtu |
+| Promijeni oblik | nacrt, rasprava | raspravlja | glasanje nije otvoreno | `/structure` | isti ekran | — |
+| Postavi termine | nacrt, rasprava | raspravlja | glasanje nije otvoreno | `/parameters` | isti ekran | — |
+| Ispunjen — dalje | korak | raspravlja | **razlog ≥1 znak** | `/findings` | sljedeći uslov bez nalaza, ili glasanje | razlog ostaje, greška uz traku |
+| Nije ispunjen | korak | raspravlja | razlog ≥1 znak | DIJALOG → `/findings` | N-31 | isto |
+| Ne primjenjuje se | korak | raspravlja | razlog ≥1 znak | DIJALOG → `/findings` | sljedeći uslov | isto |
+| Pročitaj nacrt | korak | raspravlja | nacrt priložen | `/reading` | isti korak, nalazi uz uslove | poruka uz čitač |
+| Reci nešto | rasprava | raspravlja | tekst nije prazan | `/deliberation` | isti ekran | tekst ostaje |
+| Pitaj banku | korak | raspravlja | nije već pitano za taj uslov | `/asked` | N-32 | — |
+| Odgovor banke | predmet | vezni, sekretar | pitanje poslano | `/asked/:q/answer` | korak tog uslova | — |
+| Priloži izvor | dokazi | raspravlja | vrsta + naslov | `/sources` | lista izvora | — |
+| Priloži dokument | dokazi | raspravlja | **volumen postoji** | `/sources/file` | lista izvora | ako nema volumena: gumba nema, piše zašto |
+| Povuci izvor | dokazi | onaj ko je priložio | razlog | `DELETE /sources/:s` | izvor ostaje, označen | — |
+| Prigovori izvoru | dokazi | raspravlja | razlog | `/sources/:s/against` | uz izvor | — |
+| Pročitaj brojke | dokument | raspravlja | **ključ postoji** | `/sources/:s/extract` | §G — potvrdi po polju | bez ključa: gumba nema |
+| Prigovori prijedlogu | rasprava, čekanje | **potpisnik** | pisani razlog | `/object` | u čekanju: obara u ODBIJEN | — |
+| Otvori glasanje | rasprava | **potpisnik** | svi uslovi odgovoreni **I** neko govorio | `/voting` | N-40 | ako uslovi fale: gumba nema, piše koliko |
+| Glasaj | glasanje | **potpisnik**, nije glasao | pozicija + razlog | `/vote` | brojač uživo | — |
+| Zatvori glasanje | glasanje | **potpisnik** | — | DIJALOG: prag met/nije | čekanje · na snazi · odbijen | — |
+| Vrati u raspravu | glasanje | **potpisnik** | — | DIJALOG: **glasovi padaju** | rasprava | — |
+| Stupa na snagu | čekanje | potpisnik | 48h isteklo, bez prigovora | `/force` | N-41 | — |
+| Povuci predmet | sve osim na snazi | raspravlja | razlog | `/withdraw` | POSLIJE | — |
+| Šta banka mora poslije | rasprava, na snazi | raspravlja | bar jedan korak | `/implementation` | isti ekran | — |
+| Traži potpis uređajem | na snazi | potpisnik | upisan uređaj **I** siguran kontekst | `/sign/request` | N-190 | piše koja od tri stvari fali |
+| Potpiši | na snazi | potpisnik | — | `/sign` | POSLIJE: X od N potpisa | — |
+
+**Dva „NEDEFINISANO" iz §9 vide se ovdje kao prazne ćelije:** nalaz dok je
+glasanje otvoreno (kod ne brani), i drugi glas istog člana (nema pravila).
+
+## E.2 · Registar — 3 čina
+
+| gumb | vidljiv u | uloga | uslov | radnja | vodi na | ako padne |
+|---|---|---|---|---|---|---|
+| Unesi holding | registar | raspravlja | ime + bar jedan identifikator | `POST /assets` | POSLIJE: *„u registru je, **nije odobren**"* | — |
+| Označi kako se drži | holding | raspravlja | **lanac prikačen** | `/assets/:id/held-as` | DIJALOG: *mijenja ko izvršava svaku odluku* | bez lanca: gumba nema |
+| Povuci iz registra | holding | raspravlja | razlog | `/assets/:id/retire` | ostaje u zapisu | — |
+
+## E.3 · Pitanja banke — 4 čina
+
+| gumb | vidljiv u | uloga | uslov | radnja | vodi na | ako padne |
+|---|---|---|---|---|---|---|
+| Predaj pitanje | /ask | banka, odbor | naslov + tekst | `POST /submissions` | POSLIJE: „čeka odbor" | prilog ostaje |
+| Uzmi kao predmet | red | raspravlja | — | `/submissions/:id/open` | N-20 | — |
+| Ne uzimaj | red | raspravlja | **razlog obavezan** | `/submissions/:id/decline` | banka vidi razlog | — |
+| Povuci pitanje | moja pitanja | banka | nije već uzeto | `/submissions/:id/withdraw` | POSLIJE | — |
+
+## E.4 · Sjednice — 4 čina
+
+| gumb | vidljiv u | uloga | uslov | radnja | vodi na |
+|---|---|---|---|---|---|
+| Sazovi sjednicu | sjednice | predsjedavajući, sekretar | datum | `POST /meetings` | N-101 |
+| Prisustvo | sjednica | isti | **sjednica otvorena** | `/attendance` | isti ekran |
+| Zapisnik | sjednica | isti | otvorena | `/minute` | isti ekran |
+| Zatvori sjednicu | sjednica | isti | zapisnik upisan | `/close` | DIJALOG: **poslije se ne mijenja** |
+
+Kad je zatvorena: **svi gumbi nestaju**, ekran je čitanje i knjiga sjednice.
+
+## E.5 · Komiteti i upućivanja — 5 činova
+
+| gumb | vidljiv u | uloga | uslov | radnja | napomena |
+|---|---|---|---|---|---|
+| Osnuj komitet | komiteti | predsjedavajući | ime + članovi | `POST /committees` | — |
+| Raspusti | komitet | predsjedavajući | razlog | `/dissolve` | upućivanja u toku **ostaju u zapisu** |
+| Uputi komitetu | predmet | raspravlja | šta se traži | `POST /referrals` | **glasanje se ne blokira** |
+| Izvještaj | upućivanje | član komiteta | tekst | `/report` | nalaz je **građa, ne odluka** |
+| Povuci upućivanje | upućivanje | onaj ko je uputio | razlog | `/withdraw` | — |
+
+## E.6 · Alati — 8 činova
+
+| gumb | vidljiv u | uloga | uslov | radnja | veže se |
+|---|---|---|---|---|---|
+| Izračunaj | korak | raspravlja | polja popunjena | jedan od 6 računa | **za uslov** |
+| Izračunaj | paleta / bočno okno | raspravlja | polja popunjena | isti račun | **ni za šta** |
+| Zapiši račun | rezultat | raspravlja | — | `POST /computations` | POSLIJE: *„zapisano, nije vezano ni za koji predmet"* |
+| Povuci račun | zapisani | autor | razlog | `/computations/:id/withdraw` | ostaje, označen |
+
+## E.7 · Ostalo — 9 činova
+
+| gumb | uloga | uslov | radnja | napomena |
+|---|---|---|---|---|
+| Uzmi oblik | raspravlja | **postoji odluka na snazi** | `POST /adoptions` | bez odluke: gumba nema — *„usvajanje traži odluku, ne dugme"* |
+| Zapiši bilješku | raspravlja | označen tekst | `POST /annotations` | veže se za **tačno te riječi** |
+| Povuci bilješku | autor | — | `/annotations/:id/withdraw` | ostaje, označena |
+| Zapiši obavezu | raspravlja | ko + šta + do kad | `POST /undertakings` | dospjelo → crveni red |
+| Reci šta je bilo | dužnik, sekretar | tekst | `/undertakings/:id/close` | — |
+| Zapiši pregled | **sekretar, vezni** | svih 6 polja | `POST /examinations` | **ne potpisnik** — inače izvještava sam sebi |
+| Ime i titula | ti | — | `/me/details` | izdane odluke zadržavaju staro ime |
+| Lozinka | ti | znaš trenutnu | `/me/password` | — |
+| Izdaj kod za povratak | predsjedavajući, sekretar | — | `/members/password/reset` | tvoje ime ide u zapis |
+
+## E.8 · Prekršaji — 11 činova
+
+| gumb | faza | uloga | uslov |
+|---|---|---|---|
+| Prijavi prekršaj | 1 | **danas samo odbor** — §9 | opis |
+| Je li stvarno prekršaj | 2 | raspravlja | da/ne + razlog |
+| Zaustavljeno | 3 | vezni, sekretar | datum |
+| Koliko se očisti | 4 | raspravlja | kalkulator purifikacije |
+| Plaćeno | 5 | vezni, sekretar | iznos + dokaz |
+| Plan sanacije | 6 | vezni, sekretar | tekst plana |
+| Odobri plan | 7 | raspravlja | — |
+| Vrati plan | 7 | raspravlja | **razlog** → institucija popravlja |
+| Upravi na znanje | 8 | sekretar | — |
+| Regulatoru | 8 | sekretar | prag |
+| Zatvori | 8 | raspravlja | sve prethodno |
+
+---
+
+# F · Pet stanja svakog ekrana
+
+Ekran koji je nacrtan samo u „sve je u redu" stanju izgleda kao stranica čim
+nešto nije u redu. Svaki čvor ima **pet** stanja, i sva se moraju nacrtati:
+
+| stanje | pravilo |
+|---|---|
+| **Prazno** | nikad samo „nema podataka". Kaže *zašto* je prazno i *šta uraditi*. Prazan registar: „Nijedan holding nije unesen. Unesi prvi." |
+| **Učitava** | ekran koji je već tu **ostaje**; sporost se javlja na mjestu gdje je. Ako traje >2s, kaže **šta** čeka |
+| **Djelimično** | jedan dio stigao, drugi nije — svaki dio nosi svoje stanje. Nalazi se vide iako brojke iz PDF-a još stižu |
+| **Greška** | uz kontrolu koja ju je izazvala. Kaže šta uraditi, ne šifru. Ostali činovi i dalje rade |
+| **Idealno** | ono što je do sada bilo jedino nacrtano |
+
+**Šesto stanje, koje ova aplikacija ima a većina nema:** *zid* — čin postoji u
+kodu, ekran ne postoji. Dva takva: unovčavanje koda za povratak pristupa, i
+prijava banke. Piše se kao zid, ne kao greška.
+
+**I sedmo:** *nema pojma* — instalacija nema ključ, lanac, volumen ili relej.
+Tada gumba **nema**, a statusna traka piše koje od tih stvari nema. To je
+pravilo koje već postoji i mora ostati.
+
+---
+
+# G · Brojke iz PDF-a — potvrdi ili ispravi
+
+Ovo je „podaci već upisani iz PDF-a". Radi ovako, i nikako drukčije:
+
+```
+za svako polje kalkulatora:
+   V, CITAT, STRANICA, POUZDANOST ← izvuci(dokument, polje)
+
+   ako CITAT nije doslovno nađen u tekstu:
+      odbaci — nema polja, nema vrijednosti
+   inače ako POUZDANOST ≥ visoko:
+      polje je POPUNJENO i OZNAČENO kao predloženo
+      uz njega: rečenica iz koje je uzeto + stranica
+   inače:
+      polje je PRAZNO, ali uz njega stoji prijedlog i citat
+
+   ništa ne ulazi u račun dok čovjek ne pritisne [Potvrdi]
+   [Nije to] → polje prazno, i **zapisano je da je prijedlog odbijen**
+```
+
+| pravilo | zašto |
+|---|---|
+| Citat se provjerava doslovno u tekstu | model koji izmisli rečenicu ne smije proći dalje |
+| Uz svaku brojku stoji **odakle je** | odbor mora moći pokazati izvor regulatoru |
+| Odbijen prijedlog se **zapisuje** | da se vidi da je čovjek gledao, a ne da nije bilo prijedloga |
+| Račun se ne pokreće sam | rezultat bi izgledao kao nalaz odbora, a nije |
+
+**Prag je stvar odbora, ne softvera.** Gdje je granica „visoko" postavlja se pri
+instalaciji i piše na ekranu.
+
+**KLJUČ** — ovo cijelo traži model. Bez njega: gumba nema, i piše zašto.
+
+---
+
+# H · Dva para očiju
+
+Ovo aplikacija **već ima**, ali nije bilo zapisano kao pravilo:
+
+| ko sprema | ko potvrđuje | gdje |
+|---|---|---|
+| bilo ko ko raspravlja — nalaz po uslovu | **potpisnici** — glasanjem | predmet |
+| sekretar/vezni — šta je institucija uradila | odbor — na pregledu | pregledi |
+| institucija — plan sanacije | odbor — [Odobri] / [Vrati] | prekršaji |
+| komitet — izvještaj | odbor — kao građa, ne kao odluka | upućivanja |
+
+**Pravilo:** niko ne potvrđuje sam sebe. Zato pregled **ne smije** zapisati
+potpisnik, i zato plan sanacije ne odobrava onaj ko ga je podnio.
+
+---
+
+# I · Dupli klik, zastarjela verzija, dva člana odjednom
+
+Ovdje je najveća rupa koju sam našao čitajući kod, i nije UI rupa.
+
+## I.1 · Dupli pritisak
+
+| | |
+|---|---|
+| **Danas** | ništa ne sprječava dva ista nalaza iz dva klika |
+| **Treba** | gumb koji radi piše da radi i ne prima drugi pritisak |
+| **Treba na serveru** | ključ zahtjeva (`Idempotency-Key`) — isti ključ, isti odgovor, bez drugog zapisa |
+
+Bez ovog drugog, prvo je samo ukras: spor mrežni odgovor i F5 daju isti dupli
+zapis. **Ključa zahtjeva u kodu nema nigdje** — provjereno.
+
+## I.2 · Dva člana u isto vrijeme
+
+| | |
+|---|---|
+| **Danas** | `updateMatter` uzima funkciju, pa se ne gubi cijeli predmet, ali **nema verzije** |
+| **Šta se desi** | dva člana zapišu nalaz na isti uslov; drugi tiho pregazi prvog |
+| **Treba** | predmet nosi verziju; čin nosi verziju koju je član vidio; ako se razišlo → **409**, i ekran kaže *„X je u međuvremenu zapisao ovo — pogledaj pa ponovi"* |
+
+Ovo nije sitnica. Odbor od pet ljudi radi isti predmet u isto vrijeme — to je
+cijela poenta.
+
+## I.3 · Zastarjeli ekran
+
+Predmet se promijenio dok si gledao. Ekran **ne smije** izgledati isto.
+Traka: *„promijenjeno prije 12 sekundi — [Osvježi]"*. Ne automatski, jer bi ti
+pobjegao tekst koji kucaš.
+
+## I.4 · Prag zamrznut na predmetu
+
+`openVoting` zamrzava kvorum na predmet pri otvaranju glasanja, da se glasanje
+ne bi iznijelo spuštanjem praga usred glasanja. **Ali rute za mijenjanje
+kvoruma nema** — zaštita za čin koji ne postoji. §9, sedma odluka.
+
+---
+
+# J · Tastatura, paleta, obavijesti
+
+## J.1 · Komandna paleta
+
+Aplikacija se prepoznaje po tome što se može voziti bez miša.
+
+```
+Ctrl+K   →  paleta: kucaj šta hoćeš
+            „zekat"     → otvara kalkulator u bočnom oknu
+            „sjednica"  → sazovi sjednicu
+            „murabaha"  → skoči na oblik u biblioteci
+            ime banke   → njena pitanja
+```
+
+Paleta je **jedini put do diskrecionih zadataka sa bilo kojeg ekrana** — zato
+alati ne moraju stajati u traci.
+
+## J.2 · Tipke
+
+| tipka | gdje | šta |
+|---|---|---|
+| `Ctrl+K` | svuda | paleta |
+| `Esc` | prozor | zatvara **samo najgornji** |
+| `Enter` | polje jednog reda | glavni čin prozora |
+| `Ctrl+Enter` | polje više redova | glavni čin |
+| `←` `→` | traka stanica | prethodna / sljedeća |
+| `/` | svuda | pretraga |
+| `?` | svuda | šta tipke rade ovdje |
+
+Fokus ulazi u novi prozor i **vraća se na gumb koji ga je otvorio**. Dok je
+prozor otvoren, Tab ne izlazi iz njega.
+
+## J.3 · Obavijesti — ko šta vidi i kad
+
+| događaj | ko vidi | gdje |
+|---|---|---|
+| pitanje stiglo | svi koji raspravljaju | **odmah** — zvono + „Šta te treba" |
+| banka odgovorila | ko je pitao | zvono + predmet se vraća u „Radi se" |
+| glasanje otvoreno | svi potpisnici | zvono |
+| neko glasao | svi na predmetu | brojač **uživo**, bez zvona |
+| 48h isteklo | potpisnici | zvono + predmet ide na snagu |
+| drift na holdingu | svi koji raspravljaju | crveni red |
+| obaveza dospjela | dužnik + sekretar | crveni red |
+
+**Danas:** relej (`notifier`) postoji **samo prema banci**. Zvona unutar
+aplikacije nema uopšte — provjereno u kodu. Ovo je prvo što fali da bi
+aplikacija bila aplikacija: *dođe pitanje → odmah iskoči obavijest*.
 
 ---
 
@@ -1099,11 +1624,21 @@ koraka.
 ---
 # 27 · Šta ostaje, po redu
 
-1. **§11 ponašanje** — stanica u adresi, otkucano preživi, tastatura, brojevi
-   koji žive. Ovo se osjeti na svakom ekranu odjednom.
-2. **Prozor + „šta slijedi"** na svim činovima koji ga nemaju
-3. **Sedam odluka iz §9** — traže vlasnika, ne kod
-4. **Automatizam §4** — PDF sam, registry
-5. **Notifikacija · timelock kad istekne · stare adrese**
-6. **Spajanje instrumenata** (N-74) — nema rute
-7. **KLJUČ** — sažetak i brojke · **BANKA** — slanje
+Redoslijed je po tome **šta najviše mijenja osjećaj da je ovo aplikacija**, a
+ne po tome šta je najlakše.
+
+| | šta | zašto prvo | gdje piše |
+|---|---|---|---|
+| 1 | **Obavijesti unutar aplikacije** | „dođe pitanje → odmah iskoči obavijest" je prva rečenica cijelog zahtjeva, a relej danas gađa samo banku | §J.3 |
+| 2 | **Verzija na predmetu + ključ zahtjeva** | odbor od pet ljudi radi isti predmet istovremeno; danas drugi tiho pregazi prvog | §I.1 · §I.2 |
+| 3 | **§11 ponašanje** — stanica u adresi, otkucano preživi, tastatura, brojevi koji žive | osjeti se na svakom ekranu odjednom | §11 |
+| 4 | **Komandna paleta `Ctrl+K`** | jedini put do diskrecionih zadataka sa bilo kojeg ekrana | §J.1 |
+| 5 | **Prozor + „šta slijedi" na svim činovima** | danas ih ima ~8 od 74 | §E |
+| 6 | **Pet stanja svakog ekrana** | ekran nacrtan samo u „sve je u redu" izgleda kao stranica čim nije | §F |
+| 7 | **Automatizam poslije glasanja** — PDF sam, registry | „automatski ispušuje pdf ili upisuje u policy registri" | §4 |
+| 8 | **Sedam odluka iz §9** | traže vlasnika, ne kod | §9 |
+| 9 | **Timelock kad istekne · stare adrese · spajanje instrumenata** | rupe, ne ukras | N-74 |
+| 10 | **KLJUČ** — sažetak i brojke iz PDF-a · **BANKA** — slanje | vani je, ne u kodu | §G |
+
+**Prvih šest su ono zbog čega ovo danas izgleda kao web stranica.** Ni jedna
+od njih nije nov ekran — sve su ponašanje.
