@@ -1,103 +1,44 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { governance, type QueueRow } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
-import { useRevision, whatIsNew } from '../lib/pulse.js';
+import { rowKey, useNews } from '../lib/news.js';
 
 /**
  * What arrived while the member was looking at something else.
  *
- * ── the sentence this exists to make true ─────────────────────────────────
+ * ── the bell and the queue are not the same thing ─────────────────────────
  *
- * > A question comes in from the bank — a notification pops immediately.
+ * The queue answers *what is waiting on me* and is true whether or not anybody
+ * is looking. The bell answers *what appeared since I last looked*, which is
+ * only meaningful to one person in one session. Building them as one thing
+ * would mean either a queue that forgets or a bell that never stops ringing.
  *
- * The first line of the whole specification, and nothing stood behind it. The
- * relay in `services/notice.ts` composes words for the *bank*; inside the
- * application there was no bell at all, so a member found out that a question
- * had arrived by reloading a page.
+ * The derivation is in `lib/news.tsx`, shared with the announcement that
+ * appears by itself — so the two can never disagree about what is new.
  *
- * ── the queue is the state; the bell is the change ────────────────────────
+ * ── looking is the whole of clearing it ───────────────────────────────────
  *
- * They are not the same thing and must not be built as one. The queue answers
- * *what is waiting on me* and is true whether or not anybody is looking. The
- * bell answers *what appeared since I last looked*, which is only meaningful
- * to one person in one session.
- *
- * So nothing is stored. The bell holds the queue it last showed the member,
- * compares it with the queue that arrives when the record moves, and the
- * difference is the news. Something that stops being true stops being news the
- * moment it does, and there is no flag anywhere to go stale — the rule the
- * whole record is built on.
- *
- * ── it does not follow the member around ──────────────────────────────────
- *
- * Opening the panel marks what is in it as seen. There is no badge that has to
- * be cleared and no *mark all read*: the member looked, so it is no longer new.
- * Anything still needing them is still in the queue, where it belongs.
+ * Opening the panel marks what is in it as seen. There is no badge to clear
+ * and no *mark all read*: the member looked, so it is no longer new. Anything
+ * still needing them is still in the queue, where it belongs.
  */
 export default function Bell() {
   const { t } = useI18n();
-  const revision = useRevision();
-
+  const { fresh, looked } = useNews();
   const [open, setOpen] = useState(false);
-  const [fresh, setFresh] = useState<QueueRow[]>([]);
-  /** The queue as it stood when the member last looked. Never rendered. */
-  const seen = useRef<QueueRow[] | null>(null);
-
-  useEffect(() => {
-    let current = true;
-    governance
-      .queue()
-      .then((q) => {
-        if (!current) return;
-        const rows = Array.isArray(q.rows) ? q.rows : [];
-
-        /*
-         * The first read establishes what *was already there*. Without this a
-         * member opening the application would be told that all eleven of
-         * their standing items had just arrived.
-         */
-        if (seen.current === null) {
-          seen.current = rows;
-          return;
-        }
-
-        const arrived = whatIsNew(seen.current, rows, (r) => r.to);
-        if (arrived.length > 0) setFresh((had) => [...arrived, ...had]);
-        seen.current = rows;
-      })
-      .catch(() => {
-        /* No bell is honest. A bell that rings for a failed request is not. */
-      });
-    return () => {
-      current = false;
-    };
-  }, [revision]);
-
-  const look = () => {
-    setOpen((was) => {
-      if (was) return false;
-      return true;
-    });
-  };
 
   const close = () => {
     setOpen(false);
-    /* Looked at it, so it is no longer new. Nothing to clear anywhere else. */
-    setFresh([]);
+    looked();
   };
 
   return (
     <div className="relative">
       <button
         type="button"
-        onClick={look}
+        onClick={() => (open ? close() : setOpen(true))}
         aria-expanded={open}
-        aria-label={
-          fresh.length > 0
-            ? `${t('bell.title')} — ${fresh.length}`
-            : t('bell.title')
-        }
+        aria-label={fresh.length > 0 ? `${t('bell.title')} — ${fresh.length}` : t('bell.title')}
         className="relative grid h-9 w-9 place-items-center rounded-full text-sand transition-colors hover:bg-raised hover:text-paper"
       >
         <Glyph />
@@ -124,18 +65,12 @@ export default function Bell() {
             </p>
 
             {fresh.length === 0 ? (
-              <p className="px-4 py-4 text-ui leading-snug text-muted">
-                {t('bell.nothing')}
-              </p>
+              <p className="px-4 py-4 text-ui leading-snug text-muted">{t('bell.nothing')}</p>
             ) : (
               <ul className="max-h-[50vh] overflow-y-auto py-1">
                 {fresh.map((row) => (
-                  <li key={row.to}>
-                    <Link
-                      to={row.to}
-                      onClick={close}
-                      className="block px-4 py-2.5 hover:bg-ink"
-                    >
+                  <li key={rowKey(row)}>
+                    <Link to={row.to} onClick={close} className="block px-4 py-2.5 hover:bg-ink">
                       <span
                         className={
                           'text-label font-bold uppercase tracking-caps ' +
@@ -148,9 +83,7 @@ export default function Bell() {
                         {row.title}
                       </span>
                       {row.next && (
-                        <span className="mt-0.5 block text-note text-muted">
-                          {row.next}
-                        </span>
+                        <span className="mt-0.5 block text-note text-muted">{row.next}</span>
                       )}
                     </Link>
                   </li>
@@ -178,7 +111,12 @@ function Glyph() {
         strokeWidth="1.4"
         strokeLinejoin="round"
       />
-      <path d="M8.2 15.2a1.9 1.9 0 0 0 3.6 0" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+      <path
+        d="M8.2 15.2a1.9 1.9 0 0 0 3.6 0"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinecap="round"
+      />
     </svg>
   );
 }

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useI18n } from '../lib/i18n.js';
 import { RAIL } from '../lib/spine.js';
+import { governance } from '../lib/api.js';
 import { KINDS, LABEL, type Kind } from './Tools.js';
 
 /**
@@ -32,7 +33,8 @@ import { KINDS, LABEL, type Kind } from './Tools.js';
 
 type Row =
   | { sort: 'tool'; key: Kind; label: string }
-  | { sort: 'place'; key: string; label: string; to: string };
+  | { sort: 'place'; key: string; label: string; to: string }
+  | { sort: 'record'; key: string; label: string; note?: string; to: string };
 
 export default function Palette({
   open,
@@ -64,11 +66,58 @@ export default function Palette({
     return [...tools, ...places];
   }, [t]);
 
+  /*
+   * ── the record itself, by name ──────────────────────────────────────────
+   *
+   * Tools and places are known before anybody types; matters, rulings and
+   * shapes are not, and there can be hundreds of them. So they are asked for
+   * only once the member has typed enough to mean something, and the server's
+   * own search does the finding — the same search the search screen uses, so
+   * the palette can never disagree with it about what exists.
+   *
+   * Two characters, because one is every matter in the record.
+   */
+  const [found, setFound] = useState<Row[]>([]);
+  useEffect(() => {
+    const q = typed.trim();
+    if (q.length < 2) {
+      setFound([]);
+      return;
+    }
+    let current = true;
+    const id = window.setTimeout(() => {
+      governance
+        .search({ q })
+        .then((results) => {
+          if (!current) return;
+          const rows = Array.isArray(results?.hits) ? results.hits : [];
+          setFound(
+            rows.slice(0, 8).map((hit) => ({
+              sort: 'record' as const,
+              key: hit.matterId,
+              label: hit.title,
+              note: hit.status,
+              to: `/matters/${hit.matterId}`,
+            })),
+          );
+        })
+        .catch(() => {
+          /* The palette still reaches everything it knew without asking. */
+          if (current) setFound([]);
+        });
+      /* Long enough that typing a word is one request, not six. */
+    }, 180);
+    return () => {
+      current = false;
+      window.clearTimeout(id);
+    };
+  }, [typed]);
+
   const hits = useMemo(() => {
     const q = typed.trim().toLowerCase();
     if (!q) return all;
-    return all.filter((r) => r.label.toLowerCase().includes(q));
-  }, [all, typed]);
+    return [...all.filter((r) => r.label.toLowerCase().includes(q)), ...found];
+  }, [all, typed, found]);
 
   /* A fresh opening starts empty, at the top, with the cursor in the box. */
   useEffect(() => {
@@ -116,6 +165,7 @@ export default function Palette({
 
   const tools = hits.filter((r) => r.sort === 'tool');
   const places = hits.filter((r) => r.sort === 'place');
+  const records = hits.filter((r) => r.sort === 'record');
   const indexOf = (row: Row) => hits.indexOf(row);
 
   return (
@@ -156,6 +206,11 @@ export default function Palette({
           {places.map((row) => (
             <Line key={'p' + row.key} row={row} on={indexOf(row) === cursor} take={take} />
           ))}
+
+          {records.length > 0 && <Heading>{t('palette.record')}</Heading>}
+          {records.map((row) => (
+            <Line key={'r' + row.key} row={row} on={indexOf(row) === cursor} take={take} />
+          ))}
         </div>
 
         <footer className="flex flex-wrap gap-4 border-t border-line px-5 py-2 text-label text-faint">
@@ -193,7 +248,11 @@ function Line({ row, on, take }: { row: Row; on: boolean; take: (r: Row) => void
     >
       <span className="truncate">{row.label}</span>
       <span className="ms-auto shrink-0 text-label uppercase tracking-caps text-faint">
-        {row.sort === 'tool' ? t('palette.opensHere') : t('palette.goes')}
+        {row.sort === 'tool'
+          ? t('palette.opensHere')
+          : row.sort === 'record'
+            ? (row.note ?? t('palette.goes'))
+            : t('palette.goes')}
       </span>
     </button>
   );

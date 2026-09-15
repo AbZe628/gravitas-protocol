@@ -83,9 +83,15 @@ i piše u pravilu — ne izmišljaju se:
 `#F7F0E2` ×3 · `#A67A28` · `#133A5F` · `#F2DFB5` · `#FBF1DF` · `#235A49` ·
 `#FCF6EA` · `#FCF6EC`
 
-**Ostaje iz ove faze:** `tokens.css` još nije generator za `tailwind.config.js`
-— dva fajla se i dalje drže ručno u koraku. Ljestvica je sada u Tailwindu, pa
-drift više ne može pogoditi tipografiju, ali može boje.
+**Dva fajla više ne mogu razići boju.** `tailwind.config.js` je na vrhu pisao
+da je duplikacija **već jednom napravila drift** — a upozorenje u komentaru je
+nešto što se pročita jednom. Sada `scripts/tokens.mjs` uporedi obje palete i
+odbije ih pustiti da se ne slažu, i to se vrti u testovima, ne u nečijem
+sjećanju. Prvo pokretanje je našlo pet stvarnih razilaženja; sva su zatvorena u
+`tokens.css`. **22 boje provjerene, nula razilaženja.**
+
+Nije generator nego provjera, namjerno: generisan fajl je fajl koji će neko
+ipak jednom urediti rukom, a problem nikad nije bila duplikacija nego **tišina**.
 
 **Posao**
 
@@ -159,9 +165,21 @@ Uz to pet testova koji čuvaju klasifikaciju: lista čitača se provjerava proti
 **stvarne** površine `Store`-a, pa metoda dodana sutra ne može proći
 neklasifikovana. 1748 server testova, 360 client testova.
 
-**Ostaje iz ove faze:** zvono radi na osnovu reda, pa hvata sve što ulazi u red.
-Ne hvata ono što nije u redu — tuđi glas na predmetu koji već pratiš, na
-primjer. I nema zvuka ni iskakanja preko ekrana; tačka je u traci.
+**Obavijest koja iskoči sama** — jer tačka na zvonu nije ono što je traženo.
+Tačka je nešto što član nađe ako slučajno pogleda u traku, a cijela poenta je
+da ne mora gledati. Iskače bez pitanja, kaže šta je stiglo i od koga, i nudi
+jedan pritisak koji to otvara. Bez tajmera: obavijest koja nestane za pet
+sekundi je obećanje da je član gledao u ekran baš tada, a učenjak koji čita
+ugovor nije. Odlazi kad je pritisne, odbaci, ili otvori zvono.
+
+Najviše dvije odjednom, i samo one vrste koje §N-02 imenuje glasnim. Tri
+naslagane obavijesti se odbace bez čitanja, što je gore nego ne javiti.
+
+**Greška koju je našlo pokretanje, a testovi nisu.** Prva verzija je poredila
+redove po tome **gdje se otvaraju**. Sva pitanja koja čekaju otvaraju se na
+istom mjestu, pa je drugo pitanje izgledalo kao prvo koje je još tu: red je na
+ekranu rastao sa 11 na 12, a zvono ćutalo. Ključ je sada vrsta i broj zajedno.
+Ovo se ne bi vidjelo ni u jednom testu koji sam napisao.
 
 **Posao**
 
@@ -260,9 +278,25 @@ Ctrl+K                otvara, fokus sjeda u polje, 15 redova (7 alata + 8 mjesta
 dokument              i dalje se ne skrola
 ```
 
-**Ostaje iz ove faze:** `?` koje pokazuje tipke tekućeg ekrana, i `/` za
-pretragu. Paleta zna za alate i odredišta — ne još za brojeve odluka, banke i
-oblike.
+**`?` pokazuje tipke tekućeg ekrana**, ne opšti spisak. Jedan list svih kratica
+u aplikaciji je referentni dokument, a referentni dokument se pročita jednom i
+nikad više. Ono što član hoće je *šta mogu odavde gdje stojim* — šest ili sedam
+stvari koje stanu u glavu. List se sastavlja od toga gdje je član: na koraku
+imenuje tri nalaza i dvije strelice, na listi strelice i `Enter`, svuda paletu
+i pretragu. **Ništa se ne navodi što na tom ekranu ne radi** — kratica koja je
+oglašena a ne radi gora je od one koja nikad nije spomenuta.
+
+**`/` vodi na pretragu**, i nikad se ne otima iz polja: član koji kuca datum
+ili oznaku ugovora ima pravo na kosu crtu.
+
+**Paleta zna i za zapis.** Alati i odredišta su poznati prije nego iko išta
+otkuca; predmeta ima na stotine, pa se traže tek kad član otkuca bar dva znaka,
+i to **serverovom vlastitom pretragom** — istom koju koristi ekran pretrage,
+pa se to dvoje ne može razići oko toga šta postoji.
+
+**Provjereno u pregledniku:** `Ctrl K` otvara i fokus sjeda u polje · `?` na
+početnom ekranu pokazuje tačno tri odjeljka — *ova lista*, *svuda*, *pisanje* —
+i nijedan korak, jer koraka tu nema.
 
 ---
 

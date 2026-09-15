@@ -58,10 +58,24 @@
   --g-gold-wash: rgba(176, 132, 48, 0.08);
   --g-lapis-wash: rgba(22, 68, 112, 0.06);
 
-  /* Tinted pill grounds, one per state. */
+  /* Tinted pill grounds, one per state, and the ink that reads on them. */
   --g-settled-tint: #EBF3EF;
   --g-gold-tint: #FBF4E4;
   --g-breach-tint: #FCF0EE;
+  --g-lapis-tint: #EAF1F7;
+  --g-gold-ink: #8A6524;
+  --g-breach-ink: #7A3A33;
+
+  /*
+   * The edge, as a solid colour.
+   *
+   * `--g-line` above is the same edge written with alpha, which is what a
+   * surface wants over the sweep. Tailwind needs a parseable colour to derive
+   * `border-line/40` from, so the solid form is named here too — and
+   * `scripts/tokens.mjs` refuses to let the two files disagree about it or
+   * about anything else in this block.
+   */
+  --g-line-flat: #E8E1D4;
 
   /* Typography */
   --g-font-text: "Newsreader", "Iowan Old Style", "Palatino Linotype", Palatino, serif;

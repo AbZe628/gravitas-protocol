@@ -1,6 +1,6 @@
 
 import { useCallback, useEffect, useState } from 'react';
-import { Link, NavLink, useLocation } from 'react-router-dom';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useI18n } from '../lib/i18n.js';
 import { isInstitution, useIdentity, maySubmit } from '../lib/identity.js';
 import { useHealth } from '../lib/health.js';
@@ -22,6 +22,9 @@ import Tools, { type Kind } from './Tools.js';
 import ToolShelf from './ToolShelf.js';
 import Palette from './Palette.js';
 import Bell from './Bell.js';
+import Keys from './Keys.js';
+import Announcement from './Announcement.js';
+import { NewsProvider } from '../lib/news.js';
 import { Button } from './Button';
 
 /**
@@ -354,7 +357,7 @@ function TabBar() {
   );
 }
 
-export default function Shell({ children }: { children: React.ReactNode }) {
+function Frame({ children }: { children: React.ReactNode }) {
   /**
    * The toolkits, open from anywhere.
    *
@@ -378,16 +381,37 @@ export default function Shell({ children }: { children: React.ReactNode }) {
 
   /** `Ctrl K` from anywhere. A faster way in, never the only one. */
   const [palette, setPalette] = useState(false);
+  /** `?` — what the keyboard does on the screen the member is looking at. */
+  const [keys, setKeys] = useState(false);
+  const navigate = useNavigate();
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      const inABox =
+        e.target instanceof HTMLElement &&
+        (e.target.isContentEditable ||
+          ['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName));
+
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
         setPalette((was) => !was);
+        return;
+      }
+
+      /*
+       * `/` goes to the search. Never taken from a box — a member typing a
+       * date or a contract reference has every right to a slash, and stealing
+       * it would be the application deciding it knows better than the person
+       * typing.
+       */
+      if (e.key === '/' && !inABox && !palette) {
+        e.preventDefault();
+        navigate('/search');
       }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, []);
+  }, [navigate, palette]);
 
   const { t, lang, setLang } = useI18n();
   const { identity } = useIdentity();
@@ -846,6 +870,15 @@ export default function Shell({ children }: { children: React.ReactNode }) {
           onClose={() => setPalette(false)}
           onTool={openTool}
         />
+
+        <Keys open={keys} onOpen={() => setKeys(true)} onClose={() => setKeys(false)} />
+
+        {/*
+          What arrived by itself. Outside the scrolling pane on purpose: it is
+          about the record, not about the screen the member happens to be on,
+          and it must not scroll away from something they have not read.
+        */}
+        {!desk && <Announcement />}
       </div>
 
       <TabBar />
@@ -853,5 +886,20 @@ export default function Shell({ children }: { children: React.ReactNode }) {
       {/* A page change should be felt, not just happen. */}
       <style>{`@keyframes shellFade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}`}</style>
     </div>
+  );
+}
+
+/**
+ * The frame, with one derivation of *what is new* under all of it.
+ *
+ * The bell and the announcement both read it, so the two can never disagree
+ * about what arrived — which they would the moment each held its own copy and
+ * one of them mounted a second later than the other.
+ */
+export default function Shell({ children }: { children: React.ReactNode }) {
+  return (
+    <NewsProvider>
+      <Frame>{children}</Frame>
+    </NewsProvider>
   );
 }

@@ -2089,8 +2089,22 @@ Ne po osjećaju. Šest pitanja, svaki čvor mora proći svih šest:
 | 2 | Je li traka činova na istom pikselu kao na prethodnom čvoru? | ne → stranica |
 | 3 | Ako pritisnem Tab odmah po otvaranju, ide li na sljedeću kontrolu — ili na prvi link u traci? | na traku → fokus nigdje ne sjeda |
 | 4 | Mogu li obaviti cijeli korak bez miša? | ne → stranica |
-| 5 | Koliko riječi u radnom oknu? | >150 → dokument, ne radno okno |
+| 5 | **Koliko riječi u radnom oknu — na radnom prozoru, ne na listi?** | >150 → dokument, ne radno okno |
 | 6 | Koliko je pikselа do prvog stvarnog čina? | >400 → prvo se čita pa radi, a treba obrnuto |
+
+**Peto pitanje je jednom bilo krivo napisano, i mjerenje je to pokazalo.**
+Stajalo je *„koliko riječi u radnom oknu"* bez razlike između radnog prozora i
+liste, pa je na mjerenju palo osam od devet ekrana — red 481 riječ, pitanja
+769. Ali lista od petnaest redova **jeste** svojih 769 riječi; redovi su njen
+sadržaj, ne proza koja stoji pred sadržajem.
+
+Granica važi za **radno okno radnog prozora** — mjesto gdje stoji jedan uslov.
+Tu je 150 riječi mnogo, i tu je pravilo napisano da ujede. Na listi se mjeri
+drugo: **koliko redova stane bez skrola** (osam) i **koliko je do prvog čina**
+(≤400px).
+
+Pravilo koje pada na osam od devet ekrana nije standard nego šum, i standard
+koji se ne može proći prestaje se mjeriti.
 
 `weigh.mjs` u `work/majlis-local/` mjeri 1, 5 i 6 već sada. Za 2 i 3 treba
 dodati dvije linije.
