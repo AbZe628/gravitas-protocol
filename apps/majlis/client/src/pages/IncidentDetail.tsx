@@ -6,6 +6,8 @@ import { DateText, ErrorText, Loading, Tag } from '../components/ui.js';
 import { ClockLine } from './Incidents.js';
 import { mayRecordInstitutionAct, mayVote, useIdentity } from '../lib/identity.js';
 import { Button } from '../components/Button';
+import Act from '../components/Act.js';
+import AfterAct from '../components/AfterAct.js';
 
 /**
  * One reported non-compliance, as the nine steps it actually is.
@@ -115,6 +117,21 @@ export default function IncidentDetail() {
   /** Whether this breach has ever rendered. See the note on `load` below. */
   const shown = useRef(false);
 
+  /** Which act has its window open. Null when none has. */
+  const [acting, setActing] = useState<string | null>(null);
+  /**
+   * What the last act did, held by the screen.
+   *
+   * Not by the step that performed it: most of these change the stage, and a
+   * stage change redraws the whole ladder — the step would be gone before
+   * anybody read the sentence.
+   */
+  const [justDid, setJustDid] = useState<{
+    did: string;
+    means: string;
+    next: readonly { label: string; to?: string; says?: string }[];
+  } | null>(null);
+
   /*
    * A failed refresh must not take away a screen that is already there.
    *
@@ -215,18 +232,13 @@ export default function IncidentDetail() {
         ),
       action:
         i.stage === 'reported' && board ? (
-          <div className="flex flex-col gap-2">
-            <Reason
-              label={t('snc.recordBreach')}
-              tone="warn"
-              placeholder={t('snc.reasonHint')}
-              onSubmit={(text) => act(() => oversight.concur(id, true, text))}
-            />
-            <Reason
-              label={t('snc.recordNoBreach')}
-              placeholder={t('snc.reasonHint')}
-              onSubmit={(text) => act(() => oversight.concur(id, false, text))}
-            />
+          <div className="flex flex-wrap gap-2">
+            <Button tone="grave" size="sm" onClick={() => setActing('concurYes')}>
+              {t('snc.recordBreach')}
+            </Button>
+            <Button tone="quiet" size="sm" onClick={() => setActing('concurNo')}>
+              {t('snc.recordNoBreach')}
+            </Button>
           </div>
         ) : undefined,
     },
@@ -248,14 +260,9 @@ export default function IncidentDetail() {
         ),
       action:
         determined && board ? (
-          <Reason
-            label={t('snc.recordStopped')}
-            tone="warn"
-            placeholder={t('snc.stoppedHint')}
-            onSubmit={(text) =>
-              act(() => oversight.stop(id, text.split('\n').map((x) => x.trim()).filter(Boolean)))
-            }
-          />
+          <Button tone="quiet" size="sm" onClick={() => setActing('stop')}>
+            {t('snc.recordStopped')}
+          </Button>
         ) : undefined,
     },
     {
@@ -308,17 +315,12 @@ export default function IncidentDetail() {
       action:
         i.stage === 'plan_filed' && board ? (
           <div className="flex flex-wrap gap-2">
-            <Button
-              onClick={() => act(() => oversight.endorsePlan(id))}
-              className="rounded-xl bg-raised shadow-ring px-3 py-1.5 text-ui text-lapis font-medium"
-            >
+            <Button tone="act" size="sm" onClick={() => setActing('endorse')}>
               {t('snc.endorse')}
             </Button>
-            <Reason
-              label={t('snc.returnPlan')}
-              placeholder={t('snc.returnHint')}
-              onSubmit={(text) => act(() => oversight.returnPlan(id, text))}
-            />
+            <Button tone="grave" size="sm" onClick={() => setActing('returnPlan')}>
+              {t('snc.returnPlan')}
+            </Button>
           </div>
         ) : undefined,
     },
@@ -331,10 +333,7 @@ export default function IncidentDetail() {
       detail: i.directorsApprovedAt ? <DateText iso={i.directorsApprovedAt} /> : <span className="text-muted">—</span>,
       action:
         i.stage === 'endorsed' && clerk ? (
-          <Button
-            onClick={() => act(() => oversight.directors(id))}
-            className="rounded-xl shadow-ring px-3 py-1.5 text-ui text-muted"
-          >
+          <Button tone="quiet" size="sm" onClick={() => setActing('directors')}>
             {t('snc.recordDirectors')}
           </Button>
         ) : undefined,
@@ -352,10 +351,7 @@ export default function IncidentDetail() {
       ),
       action:
         i.stage === 'approved' && clerk ? (
-          <Button
-            onClick={() => act(() => oversight.submission(id))}
-            className="rounded-xl shadow-ring px-3 py-1.5 text-ui text-muted"
-          >
+          <Button tone="quiet" size="sm" onClick={() => setActing('submission')}>
             {t('snc.recordSubmission')}
           </Button>
         ) : undefined,
@@ -417,11 +413,9 @@ export default function IncidentDetail() {
             <PrescribeForm onSubmit={(p) => act(() => oversight.prescribe(id, p))} />
           )}
           {i.purification && !i.purification.paidAt && clerk && (
-            <Reason
-              label={t('snc.recordPaid')}
-              placeholder={t('snc.paidHint')}
-              onSubmit={(text) => act(() => oversight.purificationPaid(id, text))}
-            />
+            <Button tone="quiet" size="sm" onClick={() => setActing('paid')}>
+              {t('snc.recordPaid')}
+            </Button>
           )}
         </>
       ),
@@ -435,18 +429,217 @@ export default function IncidentDetail() {
       detail: i.closedAt ? <DateText iso={i.closedAt} /> : <span className="text-muted">—</span>,
       action:
         (i.stage === 'submitted' || i.stage === 'not_actual') && board ? (
-          <Button
-            onClick={() => act(() => oversight.closeIncident(id))}
-            className="rounded-xl shadow-ring px-3 py-1.5 text-ui text-muted"
-          >
+          <Button tone="quiet" size="sm" onClick={() => setActing('close')}>
             {t('snc.close')}
           </Button>
         ) : undefined,
     },
   ];
 
+  /**
+   * The ten acts, each with the window that says what it does.
+   *
+   * ── what they were, and why that was wrong ──────────────────────────────
+   *
+   * Four were bare buttons: endorsing a plan, telling the Directors, recording
+   * the submission, closing the whole thing — all four fired on one press with
+   * nothing said before or after. The other six asked for a reason and stopped
+   * there, which is not the same: a box asking *why* does not say what the act
+   * means, who outside this board sees it, or what the member does next.
+   *
+   * Every one of them now carries the clock, because the clock is what makes a
+   * breach different from a matter: from the moment the board finds the event
+   * actual, thirty days run that the institution is judged on.
+   */
+  const windows = (
+    <>
+      <Act
+        open={acting === 'concurYes'}
+        onClose={() => setActing(null)}
+        title={t('snc.recordBreach')}
+        does={t('sw.concurYes.does')}
+        means={t('sw.concurYes.means')}
+        label={t('snc.recordBreach')}
+        grave
+        reason={{ label: t('sw.concurYes.reason'), help: t('sw.concurYes.reasonHelp') }}
+        perform={async ({ reason }) => act(() => oversight.concur(id, true, reason))}
+        onDone={setJustDid}
+        after={{
+          did: t('sw.concurYes.did'),
+          means: t('sw.concurYes.didMeans'),
+          next: [
+            { label: t('sw.next.stopped'), says: t('sw.next.stoppedSays') },
+            { label: t('sw.next.purify'), says: t('sw.next.purifySays') },
+          ],
+        }}
+      />
+
+      <Act
+        open={acting === 'concurNo'}
+        onClose={() => setActing(null)}
+        title={t('snc.recordNoBreach')}
+        does={t('sw.concurNo.does')}
+        means={t('sw.concurNo.means')}
+        label={t('snc.recordNoBreach')}
+        reason={{ label: t('sw.concurNo.reason'), help: t('sw.concurNo.reasonHelp') }}
+        perform={async ({ reason }) => act(() => oversight.concur(id, false, reason))}
+        onDone={setJustDid}
+        after={{
+          did: t('sw.concurNo.did'),
+          means: t('sw.concurNo.didMeans'),
+          next: [{ label: t('sw.next.close'), says: t('sw.next.closeSays') }],
+        }}
+      />
+
+      <Act
+        open={acting === 'stop'}
+        onClose={() => setActing(null)}
+        title={t('snc.recordStopped')}
+        does={t('sw.stop.does')}
+        means={t('sw.stop.means')}
+        label={t('snc.recordStopped')}
+        reason={{ label: t('sw.stop.reason'), help: t('sw.stop.reasonHelp') }}
+        perform={async ({ reason }) =>
+          act(() =>
+            oversight.stop(
+              id,
+              reason.split('\n').map((x) => x.trim()).filter(Boolean),
+            ),
+          )
+        }
+        onDone={setJustDid}
+        after={{
+          did: t('sw.stop.did'),
+          means: t('sw.stop.didMeans'),
+          next: [{ label: t('sw.next.purify'), says: t('sw.next.purifySays') }],
+        }}
+      />
+
+      <Act
+        open={acting === 'endorse'}
+        onClose={() => setActing(null)}
+        title={t('snc.endorse')}
+        does={t('sw.endorse.does')}
+        means={t('sw.endorse.means')}
+        label={t('snc.endorse')}
+        perform={async () => act(() => oversight.endorsePlan(id))}
+        onDone={setJustDid}
+        after={{
+          did: t('sw.endorse.did'),
+          means: t('sw.endorse.didMeans'),
+          next: [{ label: t('sw.next.directors'), says: t('sw.next.directorsSays') }],
+        }}
+      />
+
+      <Act
+        open={acting === 'returnPlan'}
+        onClose={() => setActing(null)}
+        title={t('snc.returnPlan')}
+        does={t('sw.returnPlan.does')}
+        means={t('sw.returnPlan.means')}
+        label={t('snc.returnPlan')}
+        grave
+        reason={{ label: t('sw.returnPlan.reason'), help: t('sw.returnPlan.reasonHelp') }}
+        perform={async ({ reason }) => act(() => oversight.returnPlan(id, reason))}
+        onDone={setJustDid}
+        after={{
+          did: t('sw.returnPlan.did'),
+          means: t('sw.returnPlan.didMeans'),
+          next: [{ label: t('sw.next.plan'), says: t('sw.next.planSays') }],
+        }}
+      />
+
+      <Act
+        open={acting === 'directors'}
+        onClose={() => setActing(null)}
+        title={t('snc.recordDirectors')}
+        does={t('sw.directors.does')}
+        means={t('sw.directors.means')}
+        label={t('snc.recordDirectors')}
+        perform={async () => act(() => oversight.directors(id))}
+        onDone={setJustDid}
+        after={{
+          did: t('sw.directors.did'),
+          means: t('sw.directors.didMeans'),
+          next: [{ label: t('sw.next.close'), says: t('sw.next.closeSays') }],
+        }}
+      />
+
+      <Act
+        open={acting === 'submission'}
+        onClose={() => setActing(null)}
+        title={t('snc.recordSubmission')}
+        does={t('sw.submission.does')}
+        means={t('sw.submission.means')}
+        label={t('snc.recordSubmission')}
+        perform={async () => act(() => oversight.submission(id))}
+        onDone={setJustDid}
+        after={{
+          did: t('sw.submission.did'),
+          means: t('sw.submission.didMeans'),
+          next: [{ label: t('sw.next.close'), says: t('sw.next.closeSays') }],
+        }}
+      />
+
+      <Act
+        open={acting === 'paid'}
+        onClose={() => setActing(null)}
+        title={t('snc.recordPaid')}
+        does={t('sw.paid.does')}
+        means={t('sw.paid.means')}
+        label={t('snc.recordPaid')}
+        reason={{ label: t('sw.paid.reason'), help: t('sw.paid.reasonHelp') }}
+        perform={async ({ reason }) => act(() => oversight.purificationPaid(id, reason))}
+        onDone={setJustDid}
+        after={{
+          did: t('sw.paid.did'),
+          means: t('sw.paid.didMeans'),
+          next: [{ label: t('sw.next.close'), says: t('sw.next.closeSays') }],
+        }}
+      />
+
+      <Act
+        open={acting === 'close'}
+        onClose={() => setActing(null)}
+        title={t('snc.close')}
+        does={t('sw.close.does')}
+        means={t('sw.close.means')}
+        label={t('snc.close')}
+        perform={async () => act(() => oversight.closeIncident(id))}
+        onDone={setJustDid}
+        after={{
+          did: t('sw.close.did'),
+          means: t('sw.close.didMeans'),
+          next: [
+            {
+              label: t('sw.next.backToBreaches'),
+              to: '/incidents',
+              says: t('sw.next.backToBreachesSays'),
+            },
+          ],
+        }}
+      />
+    </>
+  );
+
   return (
     <div>
+      {/*
+        What the last act did, above the ladder.
+
+        Above it on purpose: an act changes the stage, the stage redraws the
+        ladder, and a sentence rendered inside a step would go with it.
+      */}
+      {justDid && (
+        <AfterAct
+          did={justDid.did}
+          means={justDid.means}
+          next={justDid.next}
+          onClose={() => setJustDid(null)}
+        />
+      )}
+      {windows}
+
       <div className="mb-1 font-mono text-note text-muted">{i.reference}</div>
       <h1 className="mb-2 font-display font-normal leading-tight tracking-display text-head sm:text-display">{i.title}</h1>
 
