@@ -6,7 +6,12 @@ Ovo je specifikacija toka, ne popis gumbi. Čita se u tri sloja:
 |---|---|---|
 | **Algoritam** | petlje, uslovi, grananja — šta se vrti i dok se šta ne desi | §A–§J |
 | **Čvorovi** | 50 ekrana: prozor, ulaz, alat, činovi, izlaz | §1–§25 · §28–§33 |
+| **Ljuska** | deset zakona koji se **mjere**, i test od šest pitanja po čvoru | **§35** |
 | **Provjera** | svih 74 čina, svaki na svoj čvor, brojano iz koda | §26–§27 · §34 |
+
+**Ako čitaš samo jedno:** §35. Algoritam govori šta se dešava; §35 je razlog
+zašto to neće ispasti web stranica, i jedini dio koji se može oboriti
+mjerenjem umjesto raspravom.
 
 Svaki čvor ima **ime, ekran, uslove, činove, i gdje svaki čin vodi**. Uz svaki
 čvor piše i **kako izgleda kroz aplikaciju** — koji prozor, koja okna, koja
@@ -1629,6 +1634,7 @@ ne po tome šta je najlakše.
 
 | | šta | zašto prvo | gdje piše |
 |---|---|---|---|
+| **0** | **Primitivi i ljuska** — Button/Field kao komponente, 40 veličina slova na 6 tokena, dokument koji se ne skrola | **bez ovoga svaki sljedeći ekran nasljeđuje istu grešku**; ovo je razlog zašto se dosad svaka popravka osjetila kao minimalna | **§35** |
 | 1 | **Obavijesti unutar aplikacije** | „dođe pitanje → odmah iskoči obavijest" je prva rečenica cijelog zahtjeva, a relej danas gađa samo banku | §J.3 |
 | 2 | **Verzija na predmetu + ključ zahtjeva** | odbor od pet ljudi radi isti predmet istovremeno; danas drugi tiho pregazi prvog | §I.1 · §I.2 |
 | 3 | **§11 ponašanje** — stanica u adresi, otkucano preživi, tastatura, brojevi koji žive | osjeti se na svakom ekranu odjednom | §11 |
@@ -1640,8 +1646,8 @@ ne po tome šta je najlakše.
 | 9 | **Timelock kad istekne · stare adrese · spajanje instrumenata** | rupe, ne ukras | N-74 |
 | 10 | **KLJUČ** — sažetak i brojke iz PDF-a · **BANKA** — slanje | vani je, ne u kodu | §G |
 
-**Prvih šest su ono zbog čega ovo danas izgleda kao web stranica.** Ni jedna
-od njih nije nov ekran — sve su ponašanje.
+**Stavka 0 i prvih šest su ono zbog čega ovo danas izgleda kao web stranica.**
+Ni jedna od njih nije nov ekran — nula su primitivi, ostalo je ponašanje.
 
 ---
 
@@ -1983,3 +1989,137 @@ PROZOR   RADNI · rad: šta je tehnički tim promijenio
 
 **Algoritam je gotov.** Ono što ostaje nije više pisanje nego građenje, i
 poredano je u §27.
+
+---
+
+# 35 · Zašto ovo neće izgledati kao web stranica
+
+Do sada je ovaj dokument opisao **šta se dešava** (§B), **šta koji gumb radi**
+(§E) i **kako se ponaša** (§11). Ni jedno od toga ne sprječava da rezultat
+ispadne stranica. Može svaki gumb voditi tačno gdje treba, a da cijela stvar i
+dalje bude stubac teksta sa gumbima — jer razlika između stranice i aplikacije
+nije u tome *šta radi*, nego u tome **kako je složena na ekranu**.
+
+Ovo je taj sloj, i on je mjerljiv.
+
+## 35.1 · Jedan zakon iznad svih: **aplikacija ne skrola**
+
+| stranica | aplikacija |
+|---|---|
+| dokument je duži od ekrana, cijela stvar se pomjera | ljuska je **tačno visoka koliko ekran** i nikad se ne pomjera |
+| zaglavlje odlazi gore kad čitaš | zaglavlje, traka stanica i traka činova **stoje** |
+| jedan skrol | svako okno skrola **svoje**, nezavisno |
+
+```
+┌──────────────────────────────────────────────┐  100vh, fiksno
+│  traka: logo · odredišta · Šta te treba · 🔔 │  ne skrola
+├───────────────┬──────────────────────────────┤
+│  traka        │  naslov predmeta             │  ne skrola
+│  stanica      ├──────────────────────────────┤
+│  i 01..N V    │                              │
+│               │  RAD                    ▲    │  skrola SAM
+│  ne skrola    │  (jedan uslov)          │    │
+│               │                         ▼    │
+│               ├──────────────────────────────┤
+│               │  traka činova                │  ne skrola,
+└───────────────┴──────────────────────────────┘  UVIJEK isto mjesto
+```
+
+**Provjera:** `document.body.scrollHeight === window.innerHeight` na svakom
+čvoru. Ako je veće — to je stranica, i to je greška, ne stvar ukusa.
+
+**Danas:** mjereno je 4.849px, 3.920px, 4.062px na tri ekrana. Poslije prvog
+prolaza 2.708px, 1.447px, 1.554px. **Cilj nije manji broj — cilj je da broj
+bude jednak visini ekrana.**
+
+## 35.2 · Deset zakona ljuske
+
+| | zakon | provjera |
+|---|---|---|
+| 1 | **Dokument se ne skrola.** Skrolaju okna. | `scrollHeight === innerHeight` |
+| 2 | **Traka činova je uvijek na istom pikselu.** Ista visina, isti redoslijed: opasno lijevo, glavno desno *(obrnuto u RTL)*. | isti `offsetTop` na svim čvorovima |
+| 3 | **Fokus je uvijek negdje.** Kad se prozor otvori, fokus sjeda na ono što ćeš raditi — ne na `<body>`. | `document.activeElement !== body` |
+| 4 | **Nikad puni ekran vrtuljka.** Ekran koji je tu ostaje; sporost se javlja gdje je. | nema elementa preko cijelog ekrana za čekanje |
+| 5 | **Radno okno nema proze.** Najviše **tri reda** teksta u komadu; duže objašnjenje ide u sklopku ili bočno okno. | nijedan `<p>` u radnom oknu preko 3 reda |
+| 6 | **Jedan ekran, jedan posao.** Ako ekran odgovara na dva pitanja, to su dva čvora. | — |
+| 7 | **Liste se voze strelicama.** ↑↓ kroz redove, Enter otvara, bez miša. | — |
+| 8 | **Kretanje pokazuje odakle.** Slajd dolazi sa strane na koju se vraća; dijalog raste iz gumba koji ga je otvorio. Trajanje 120–180ms, nikad duže. | — |
+| 9 | **Ništa se ne otvara kao nova stranica.** Prozor se slaže preko, ono ispod ostaje živo i vidljivo. | §11.6 |
+| 10 | **Adresa nosi stanje.** F5 vraća isti čvor, istu stanicu, isto otvoreno okno. | `/matters/x?step=03` |
+
+## 35.3 · Gustoća — koliko stane na ekran
+
+Aplikacija je gušća od stranice, ali ne zato što je sitnija — nego zato što
+**ne ponavlja**. Stranica ponavlja da bi se mogla čitati odozgo nadolje;
+aplikacija ne mora, jer kontekst stoji sa strane i ne odlazi.
+
+| | pravilo |
+|---|---|
+| Radni prozor | **cijeli jedan uslov** staje na 1280×800 bez skrola |
+| Red na početnoj | **osam redova** vidljivo bez skrola |
+| Bočno okno | pitanje predmeta stoji cijelim putem, nikad se ne ponavlja u radu |
+| Naslov | jednom po ekranu. Nikad naslov pa isti tekst opet ispod |
+
+## 35.4 · Primitivi — bez njih zakoni ne mogu držati
+
+Ovdje je mjerenje iz koda, ne mišljenje:
+
+| | danas | zašto to obara sve gore |
+|---|---|---|
+| Button komponenta | **ne postoji** — 197 golih `<button>` | *mrtav*, *radi*, *greška* — tri od pet stanja iz §F ne mogu biti dosljedna ni u principu |
+| Zajednički helper za klase | **nema nijednog** | svaki gumb izmišlja svoj razmak i visinu → traka činova nije na istom pikselu → zakon 2 pada |
+| Veličine slova | **40 različitih**, sa polupikselima *(12.5px, 11.5px, 13.5px…)* | nema ritma; dva ekrana se nikad ne poklope. **Ovo je glavni razlog zašto izgleda kao stranica** |
+| Tvrdo upisanih boja | **119**, od kojih neke nisu ni u paleti | — |
+| Ljestvica u `tokens.css` | napisana, **korištena 0 puta** | postoje dva sistema, a koristi se onaj koji niko nije osmislio |
+
+**Šta iz ovoga slijedi kao posao, prije bilo kojeg ekrana:**
+
+```
+1. Button · Field · Select · Textarea      kao komponente, sa pet stanja
+2. 40 veličina  →  6 tokena                 jedan mehanički prolaz
+3. tokens.css   →  tailwind.config.js       generisano, da drift ne bude moguć
+4. Shell            100vh, fiksna okna      zakon 1
+```
+
+**Bez ovih četiri, svaki sljedeći ekran nasljeđuje istu grešku.** Ovo nisu
+ekrani i ne vide se na slici — ali su razlog zašto se dosad svaka popravka
+osjetila kao minimalna.
+
+## 35.5 · Test: je li ovo aplikacija
+
+Ne po osjećaju. Šest pitanja, svaki čvor mora proći svih šest:
+
+| | pitanje | pada ako |
+|---|---|---|
+| 1 | Skrola li se dokument? | da → stranica |
+| 2 | Je li traka činova na istom pikselu kao na prethodnom čvoru? | ne → stranica |
+| 3 | Ako pritisnem Tab odmah po otvaranju, ide li na sljedeću kontrolu — ili na prvi link u traci? | na traku → fokus nigdje ne sjeda |
+| 4 | Mogu li obaviti cijeli korak bez miša? | ne → stranica |
+| 5 | Koliko riječi u radnom oknu? | >150 → dokument, ne radno okno |
+| 6 | Koliko je pikselа do prvog stvarnog čina? | >400 → prvo se čita pa radi, a treba obrnuto |
+
+`weigh.mjs` u `work/majlis-local/` mjeri 1, 5 i 6 već sada. Za 2 i 3 treba
+dodati dvije linije.
+
+## 35.6 · Šta ovo znači za red gradnje
+
+§27 je imao šest stavki ponašanja. **Ispred njih ide ljuska**, jer sve ostalo
+sjeda u nju:
+
+| | | |
+|---|---|---|
+| **0** | **Primitivi + ljuska 100vh** | §35.4 — bez ovoga sve ostalo nasljeđuje grešku |
+| 1 | Obavijesti | §J.3 |
+| 2 | Verzija + ključ zahtjeva | §I |
+| 3 | §11 ponašanje | §11 |
+| 4 | Komandna paleta | §J.1 |
+| 5 | Prozor + „šta slijedi" na svih 74 čina | §E |
+| 6 | Pet stanja svakog ekrana | §F |
+
+---
+
+**Odgovor na pitanje „hoće li ovo izgledati kao aplikacija":** algoritam sam
+po sebi to ne garantuje i nikad nije ni mogao. Garantuje ga §35 — deset
+zakona koji se **mjere**, a ne procjenjuju, i četiri primitiva bez kojih
+zakoni ne mogu držati. Ako neki čvor padne na testu iz §35.5, greška je u
+kodu, a ne u ukusu onoga ko gleda.
