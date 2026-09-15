@@ -5,8 +5,8 @@ Ovo je specifikacija toka, ne popis gumbi. Čita se u tri sloja:
 | sloj | šta je | gdje |
 |---|---|---|
 | **Algoritam** | petlje, uslovi, grananja — šta se vrti i dok se šta ne desi | §A–§J |
-| **Čvorovi** | 36 ekrana: prozor, ulaz, alat, činovi, izlaz | §1–§25 |
-| **Provjera** | svih 74 čina, svaki na svoj čvor, brojano iz koda | §26–§27 |
+| **Čvorovi** | 50 ekrana: prozor, ulaz, alat, činovi, izlaz | §1–§25 · §28–§33 |
+| **Provjera** | svih 74 čina, svaki na svoj čvor, brojano iz koda | §26–§27 · §34 |
 
 Svaki čvor ima **ime, ekran, uslove, činove, i gdje svaki čin vodi**. Uz svaki
 čvor piše i **kako izgleda kroz aplikaciju** — koji prozor, koja okna, koja
@@ -1642,3 +1642,344 @@ ne po tome šta je najlakše.
 
 **Prvih šest su ono zbog čega ovo danas izgleda kao web stranica.** Ni jedna
 od njih nije nov ekran — sve su ponašanje.
+
+---
+
+# 28 · Čvorovi koji su falili
+
+Provjera §26 je brojala **činove** i svaki je imao čvor. Ali nije brojala
+**ekrane bez čina** — a njih je jedanaest, i među njima je onaj koji učenjak
+vidi svaki dan prvi. Ovo je ta rupa, zatvorena.
+
+## N-01 · ŠTA TE TREBA — prvi ekran
+
+```
+PROZOR   RADNI · jedan stubac reda, ništa drugo
+ULAZ     /  ·  logo  ·  Esc sa bilo kojeg ekrana dvaput
+ALAT     nijedan
+```
+
+**Ovo je najvažniji ekran u aplikaciji** i do sada nije bio opisan. Odgovara na
+jedno pitanje — *ima li išta za mene* — i staje.
+
+`/` se grana po ulozi: banka dobija svoja vrata (N-220), odbor dobija red.
+
+Red je **izveden, nikad zapisan**. Računa se svaki put iz zapisa:
+
+```
+RED ← prazan
+
+# ── najhitnije gore ─────────────────────────────
+za svaki PREDMET u glasanju gdje ja nisam glasao:
+   dodaj crveno: „glasanje otvoreno, X od N, ti nisi"
+
+za svaki PREKRŠAJ gdje sat od 30 dana ističe < 7 dana:
+   dodaj crveno: „ističe za N dana"
+
+za svaku OBAVEZU koja je dospjela:
+   dodaj crveno: „dospjelo prije N dana"
+
+za svaki HOLDING sa driftom:
+   dodaj crveno: „sastav se pomjerio od termina odluke"
+
+# ── posao ───────────────────────────────────────
+za svaki PREDMET u raspravi gdje ja raspravljam:
+   ako ima uslova bez nalaza:
+      dodaj: „korak K od N — nastavi"     → N-30 na stanici gdje sam stao
+   inače ako niko nije govorio:
+      dodaj: „svi koraci odgovoreni, niko nije rekao ništa"
+   inače:
+      dodaj: „spremno za glasanje"        → N-40
+
+za svako PITANJE u redu neotvoreno:
+   dodaj: „banka pita — otvoriti ili vratiti"   → N-11
+
+za svaki ZAHTJEV BANCI na koji je stigao odgovor:
+   dodaj: „banka je odgovorila"          → N-30 tog uslova
+
+# ── ništa ───────────────────────────────────────
+ako je RED prazan:
+   ne piši „nema podataka"
+   piši šta je zadnje zatvoreno i kad, pa: „ništa ne čeka na tebe"
+   i ponudi tri diskreciona: postavi pitanje · provjeri nacrt · alati
+```
+
+```
+ČIN      [red]              →  tačno tamo gdje se radi, ne na pregled
+         [Postavi pitanje]  raspravlja  →  N-10
+         [Provjeri nacrt]   raspravlja  →  N-80
+IZLAZ    svuda
+```
+
+**Pravilo:** red pokazuje **samo ono što traži mene**. Predmet na kojem sam
+posmatrač ne stoji ovdje. Brojka u traci je dužina ovog reda i mijenja se
+**uživo** — §11.7.
+
+## N-02 · ZVONO — obavijesti
+
+```
+PROZOR   SLAJD iz zvona u traci
+ULAZ     zvono  ·  ili samo iskoči kad stigne nešto novo
+```
+
+Zvono i red (N-01) nisu isto: **red je stanje, zvono je promjena.**
+
+```
+ČIN      [obavijest]   →  tamo gdje se desila
+         [Pročitano]   →  nestaje iz zvona, ostaje u redu ako je posao
+         [Sve pročitano]  →  zvono prazno
+```
+
+| dolazi | kad | kako |
+|---|---|---|
+| pitanje od banke | odmah | **iskoči samo** — ovo je prva rečenica cijelog zahtjeva |
+| banka odgovorila | odmah | iskoči |
+| glasanje otvoreno | odmah | iskoči, potpisnicima |
+| neko glasao | — | **bez zvona**, samo brojač uživo |
+| 48h isteklo | odmah | iskoči |
+| drift, dospjelo | jednom dnevno | tiho, u red |
+
+**NEMA danas ništa od ovoga.** `notifier` gađa samo banku, unutar aplikacije
+zvona nema uopšte. §27, stavka 1.
+
+## N-03 · KOMANDNA PALETA
+
+```
+PROZOR   DIJALOG preko svega, `Ctrl+K`
+ULAZ     bilo koji ekran, uključujući otvoren prozor
+```
+
+Paleta je **jedini put do diskrecionih zadataka** (§C) sa bilo kojeg ekrana —
+zato alati ne moraju stajati u traci.
+
+```
+kucaš           dobijaš
+────────────────────────────────────────────────
+„zekat"         alat u bočnom oknu, ne mijenja ekran
+„murabaha"      oblik u biblioteci
+ime banke       njena pitanja
+broj odluke     ta odluka
+„sjednica"      sazovi sjednicu
+„nacrt"         provjera nacrta
+
+ČIN      Enter    →  prvi rezultat
+         ↑ ↓      →  kroz rezultate
+         Esc      →  zatvara paletu, ekran ostaje netaknut
+```
+
+**Pravilo:** paleta **nikad** ne mijenja glavni ekran ako je otvoren radni
+prozor. Alat se otvara sa strane, iznad njega.
+
+## N-04 · SUDAR — neko je pisao u međuvremenu
+
+```
+PROZOR   DIJALOG, sam iskoči kad server vrati 409
+```
+
+```
+„Dok si pisao, {ime} je zapisao nalaz na ovaj uslov.
+
+ Njihov:  {tekst}
+ Tvoj:    {tekst}     ← ostaje u polju, ništa se ne gubi
+
+ČIN      [Pogledaj njihov pa odluči]  →  zatvara, oba se vide jedan uz drugi
+         [Ipak zapiši moj]            →  ispravka koja zamjenjuje, u historiji
+                                          se vidi oba
+```
+
+**NEMA danas.** Predmet nema verziju, pa drugi tiho pregazi prvog. §I.2.
+
+---
+
+# 29 · Prekršaji — ekrani
+
+§5 je imao dijagram i §E.8 matricu gumba, ali **ekrana nije bilo**.
+
+## N-200 · PREKRŠAJI, LISTA
+
+```
+PROZOR   RADNI · red po tome **šta se zatvara**, nikad po težini
+ULAZ     traka → Prekršaji
+```
+
+**Zašto ne po težini:** poredati po težini značilo bi da softver ima stav o
+prekršaju koji nije pročitao. Rok je činjenica, težina je mišljenje.
+
+```
+ČIN      [red]               →  N-201
+         [Prijavi prekršaj]  **danas samo odbor** — §9  →  DIJALOG
+```
+
+## N-201 · JEDAN PREKRŠAJ
+
+```
+PROZOR   RADNI · traka faza:  [1][2][3][4][5][6][7][8]
+         rad: tekuća faza
+         okno: **sat od 30 dana** — od kad odbor kaže da je stvaran
+         act bar: čin te faze
+```
+
+Sat je ono što ovo razlikuje od predmeta: od trenutka kad odbor nađe da je
+događaj stvaran, teče trideset dana po kojima se institucija sudi.
+
+| faza | ko | čin | prozor |
+|---|---|---|---|
+| 1 prijavljen | odbor | opis | DIJALOG |
+| 2 je li stvaran | raspravlja | da/ne + razlog | DIJALOG — **ne → NIJE STVARAN, kraj**, sat ne kreće |
+| 3 zaustavljeno | vezni, sekretar | datum | DIJALOG |
+| 4 koliko se očisti | raspravlja | **kalkulator purifikacije otvoren u koraku** | RADNI |
+| 5 plaćeno | vezni, sekretar | iznos + dokaz | DIJALOG |
+| 6 plan sanacije | vezni, sekretar | tekst | RADNI |
+| 7 odobri / vrati | raspravlja | [Odobri] ili [Vrati] + razlog | DIJALOG — **petlja dok nije odobren** |
+| 8 uprava · regulator · zatvori | sekretar, raspravlja | tri čina | DIJALOG svaki |
+
+```
+ČIN      [Nazad]   →  ranija faza, samo čitanje, ništa se ne mijenja
+IZLAZ    POSLIJE: koliko dana ostalo · šta je sljedeća faza · ko je na redu
+```
+
+---
+
+# 30 · Uređaji za potpis
+
+## N-210 · TVOJI UREĐAJI
+
+```
+PROZOR   SLAJD iz N-160
+ULAZ     nalog → Uređaji
+```
+
+```
+ČIN      [Upiši ovaj uređaj]   siguran kontekst **I** preglednik zna
+                               →  otisak / lice / PIN  →  POSLIJE
+                               nema →  GUMBA NEMA, piše **koja** od tri
+                               stvari fali, poimence
+         [Zaboravi uređaj]     ti  →  DIJALOG: **potpisi ostaju**, ključ se
+                               briše — jedino pravo brisanje u sistemu
+IZLAZ    N-160
+```
+
+**Tri stvari koje moraju stajati:** sigurna veza (https), preglednik koji zna
+za uređaje, i postavljeno porijeklo na serveru. Ekran ih imenuje pojedinačno,
+nikad zbirno „nije podržano".
+
+---
+
+# 31 · Banka — troja vrata
+
+Banka je korisnik ove aplikacije, a do sada je bila opisana samo kao neko ko
+pošalje pitanje. Ima tri ekrana i ništa više.
+
+## N-220 · BANKA: POČETNA
+
+```
+ULAZ     /  kad je uloga institucija
+```
+
+`/` se grana: odbor dobija red (N-01), banka dobija **odmah ekran za pitanje**
+— jer to je jedino zbog čega banka ulazi.
+
+## N-221 · POSTAVI PITANJE
+
+```
+PROZOR   RADNI · jedna stanica
+ČIN      [Izaberi fajl]      →  prilog
+         [Postavi odboru]    naslov + tekst  →  POSLIJE: „čeka odbor"
+IZLAZ    N-222
+```
+
+## N-222 · ŠTA ME OBAVEZUJE
+
+```
+PROZOR   RADNI · dvije liste
+         gore: **šta odbor traži od mene** — zahtjevi iz koraka (N-32)
+         dolje: moja pitanja i gdje su
+ULAZ     /i-owe
+ČIN      [Odgovori]    →  DIJALOG: tekst + prilog  →  ide na uslov
+         [Povuci pitanje]  nije uzeto  →  DIJALOG
+IZLAZ    POSLIJE
+```
+
+**NEMA:** banka se ne može prijaviti — uloga institucije postoji, a
+vjerodajnice za nju ne postoje. Plaćanja nema. Oboje su zid, ne greška.
+
+---
+
+# 32 · Tri ekrana zapisa
+
+## N-230 · DOLAZI — kalendar
+
+```
+PROZOR   RADNI · grupisano **po blizini**, ne po vrsti
+         prošlo · ove sedmice · ovaj mjesec · kasnije
+ULAZ     traka → Dolazi
+ČIN      [stavka]       →  taj zapis
+         [U moj kalendar]  →  .ics
+```
+
+**Rupa se piše na ekranu, ne u fusnoti:** kadenca sjednica od šest mjeseci —
+jedina obaveza sa regulatornim podom iza sebe — **ne zapisuje se nigdje**.
+Kalendar koji je preskoči bio bi gori od nikakvog, jer bi mu se vjerovalo.
+
+## N-240 · ŠTA STOJI
+
+```
+PROZOR   RADNI · dva pogleda na isto pitanje
+         „šta smo odlučili"  i  „šta je na snazi danas"
+ULAZ     traka → Pravila
+ČIN      [pravilo]        →  N-50
+         [Godina]         →  godišnji izvještaj te godine
+         [Izvoz zapisa]   →  cijeli zapis sa otiskom, jedan čin
+```
+
+Pravila **bez intervala preispitivanja** stoje izdvojena i piše da ih ništa
+nikada neće podići samo.
+
+## N-250 · SAŽECI
+
+```
+PROZOR   RADNI · lista: ko je podigao, kad, šta pita
+ULAZ     traka → Zapis → Sažeci
+ČIN      [sažetak]         →  N-251 na svojoj stranici
+```
+
+## N-251 · JEDAN SAŽETAK
+
+```
+PROZOR   RADNI · rad: šta je tehnički tim promijenio
+         okno: pravila koja to dodiruje
+         act bar: pitanje odboru u zlatnoj kutiji
+ČIN      [Otvori predmet o ovome]  raspravlja  →  N-20, sažetak već u sebi
+```
+
+---
+
+# 33 · Dopuna matrice gumba — šest činova koji su falili
+
+| gumb | vidljiv u | uloga | uslov | radnja | vodi na | ako padne |
+|---|---|---|---|---|---|---|
+| Počni upis uređaja | N-210 | ti | siguran kontekst | `/devices/request` | izazov pregledniku | piše koja od tri stvari fali |
+| Upiši uređaj | N-210 | ti | preglednik potvrdio | `POST /devices` | POSLIJE: uređaj upisan | izazov istekao → ponovi |
+| Zaboravi uređaj | N-210 | ti | — | `DELETE /devices/:id` | DIJALOG: **potpisi ostaju** | — |
+| Unovči kod | — | — | — | `/members/reset` | **ZID** — ekrana nema | — |
+| Pročitaj nacrt | N-80 | raspravlja | tekst + oblik | `POST /reading` | nalazi uz uslove | poruka uz čitač |
+| Koji je ovo oblik | N-81 | raspravlja | tekst | `POST /recognise` | 19 poredanih, **čovjek bira** | — |
+
+**Sada je svih 74 čina u matrici**, i svih 50 čvorova ima ekran.
+
+---
+
+# 34 · Zadnja provjera — šta je specificirano
+
+| | broj |
+|---|---|
+| čvorova sa ekranom | **50** |
+| činova u matrici §E i §33 | **74 od 74** |
+| odredišta u traci sa čvorom | **8 od 8** |
+| petlji u pseudokodu | 4 (glavna, nadzor, prekršaj, nacrt) |
+| ekrana bez čina koji su bili nespecificirani | **0** *(bilo 11)* |
+| zidova — čin postoji, ekran ne | 2 *(unovči kod, prijava banke)* |
+| otvorenih odluka za vlasnika | 7 |
+
+**Algoritam je gotov.** Ono što ostaje nije više pisanje nego građenje, i
+poredano je u §27.
