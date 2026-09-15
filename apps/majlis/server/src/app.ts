@@ -48,6 +48,9 @@ import { meetingRoutes } from './routes/meetings.js';
 import { submissionRoutes } from './routes/submissions.js';
 import { examinationRoutes } from './routes/examinations.js';
 import { notifierFromEnv, type Notifier } from './services/notice.js';
+import { createPulse } from './services/pulse.js';
+import { pulsing } from './store/pulsing.js';
+import { pulseRoutes } from './routes/pulse.js';
 import { incidentRoutes } from './routes/incidents.js';
 
 
@@ -73,7 +76,7 @@ const limiter = new Limiter();
  * refuses to fall back to memory when NODE_ENV is production.
  */
 export function createApp(
-  store: Store = storeFromEnv(),
+  rawStore: Store = storeFromEnv(),
   /*
    * Chosen once, at construction. Everything an institution might refuse,
    * forbid or already own arrives here rather than being reached for inside a
@@ -106,6 +109,18 @@ export function createApp(
   notifier: Notifier = notifierFromEnv(),
 ): Express {
   const app = express();
+
+  /*
+   * ── the bell hears every act, because it sits under all of them ─────────
+   *
+   * Wrapped here rather than at each of the seventy-four acts. An act cannot
+   * change the record without going through this store, so it cannot change
+   * the record without the bell hearing — including acts written after today.
+   * See `store/pulsing.ts` for why classification is inverted, and
+   * `services/pulse.ts` for why a count travels instead of a list.
+   */
+  const pulse = createPulse();
+  const store = pulsing(rawStore, pulse);
 
   /*
    * The interface is served by this same process, so nothing legitimate calls
@@ -692,6 +707,7 @@ export function createApp(
   };
 
   // ---- governance ------------------------------------------------------
+  app.use('/api', pulseRoutes(pulse));
   app.use('/api', governanceRoutes(store, undefined, vault, reading, passkeys));
   app.use('/api', deviceRoutes(store, passkeys.challenges, passkeys.expected));
   app.use('/api', incidentRoutes(store));

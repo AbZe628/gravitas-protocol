@@ -21,6 +21,7 @@ import NotYourScreen from './NotYourScreen.js';
 import Tools, { type Kind } from './Tools.js';
 import ToolShelf from './ToolShelf.js';
 import Palette from './Palette.js';
+import Bell from './Bell.js';
 import { Button } from './Button';
 
 /**
@@ -656,17 +657,31 @@ export default function Shell({ children }: { children: React.ReactNode }) {
             )}
 
             {/*
-              The toolkits. Not a destination and never was one: the six
-              calculators open in a panel beside whatever the member is
-              reading, and close back to it.
+              What arrived while the member was looking at something else.
+
+              The first line of the whole specification — *a question comes in,
+              a notification pops immediately* — and until now nothing stood
+              behind it. See `Bell.tsx` for why it holds no stored list.
+            */}
+            {!desk && <Bell />}
+
+            {/*
+              The palette. A faster way to the same seven tools and eight
+              places the shelf and the rail already reach, for whoever would
+              rather type than aim. Written out with its key rather than left
+              for a member to discover: a shortcut nobody knows about is not a
+              shortcut.
             */}
             {!desk && (
               <Button
                 type="button"
-                onClick={() => setTools(true)}
-                className="rounded-xl bg-raised px-3.5 py-2 text-ui font-semibold text-lapis shadow-ring"
+                onClick={() => setPalette(true)}
+                className="flex items-center gap-2 rounded-xl bg-raised px-3 py-2 text-ui font-semibold text-sand shadow-ring hover:text-paper"
               >
-                {t('tools.open')}
+                {t('palette.title')}
+                <kbd className="rounded border border-line px-1 font-mono text-label font-medium text-faint">
+                  Ctrl K
+                </kbd>
               </Button>
             )}
 

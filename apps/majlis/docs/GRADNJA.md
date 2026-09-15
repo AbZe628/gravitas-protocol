@@ -126,10 +126,42 @@ minimalna promjena — tačno kao dosad.
 
 ---
 
-### FAZA 1 · Obavijesti
+### FAZA 1 · Obavijesti — **URAĐENO 15.09.2026.**
 
 > *„Dođe pitanje → odmah iskoči obavijest"* je prva rečenica cijelog zahtjeva.
-> Iza nje danas ne stoji ništa: `notifier` gađa **samo banku**.
+> Iza nje nije stajalo ništa: `notifier` je gađao **samo banku**.
+
+**Kako je riješeno — brojka putuje, nikad lista**
+
+Očigledna gradnja je tablica obavijesti: glasa se, upiše se red po članu, zvono
+čita redove. Cijela aplikacija odbija taj oblik i `attention.ts` kaže zašto:
+*zapisana lista je druga kopija istine, a druga kopija se razilazi.* Predmet se
+povuče a obavijest ostane. Član glasa a obavijest ostane.
+
+Zato se ne pamti **šta** se desilo, nego samo **koliko puta** se zapis pomjerio.
+Ekran koji drži svoju kopiju čuje da je brojka porasla, zatraži listu ponovo, i
+sam uporedi. Istina ostaje na jednom mjestu i zvono se ne može s njom razići.
+
+**Gdje zvono stoji:** ispod svih 74 čina, ne uz njih. `Store` je omotan, pa čin
+ne može promijeniti zapis a da zvono ne čuje — uključujući činove pisane
+poslije danas. Da je bilo uz svaki čin, bilo bi 74 prilike da se jedan zaboravi,
+a zaboravljeni bi bio nevidljiv: zapis tačan, samo zvono krivo.
+
+**Provjereno na živom serveru, ne samo u testu**
+
+```
+tri zapisa koja su sjela (201)   →  linija javila 1, 2, 3
+jedno čitanje (200)              →  ništa
+jedan odbijen zapis (400)        →  ništa
+```
+
+Uz to pet testova koji čuvaju klasifikaciju: lista čitača se provjerava protiv
+**stvarne** površine `Store`-a, pa metoda dodana sutra ne može proći
+neklasifikovana. 1748 server testova, 360 client testova.
+
+**Ostaje iz ove faze:** zvono radi na osnovu reda, pa hvata sve što ulazi u red.
+Ne hvata ono što nije u redu — tuđi glas na predmetu koji već pratiš, na
+primjer. I nema zvuka ni iskakanja preko ekrana; tačka je u traci.
 
 **Posao**
 

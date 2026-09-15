@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useRevision } from '../lib/pulse.js';
 import { Link } from 'react-router-dom';
 import { governance, type Attention as AttentionData, type AttentionItem } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
@@ -39,12 +40,31 @@ export default function Attention() {
   const [data, setData] = useState<AttentionData | null>(null);
   const [failed, setFailed] = useState(false);
 
+  /*
+   * Re-read whenever the record moves, not only when the page loads.
+   *
+   * This list is the whole of *what needs you*, and until now it was frozen at
+   * whatever it had been at load: a question could arrive, a colleague could
+   * open a vote, a deadline could pass, and the member looking straight at it
+   * would see none of it. The revision is a count, so this costs one request
+   * when something actually happened and nothing at all while nothing does.
+   */
+  const revision = useRevision();
+
   useEffect(() => {
+    let current = true;
     governance
       .attention()
-      .then(setData)
-      .catch(() => setFailed(true));
-  }, []);
+      .then((fresh) => {
+        if (current) setData(fresh);
+      })
+      .catch(() => {
+        if (current) setFailed(true);
+      });
+    return () => {
+      current = false;
+    };
+  }, [revision]);
 
   // Say nothing rather than imply there is nothing. A response that is not the
   // shape this expects is treated the same way: a panel is not worth taking the

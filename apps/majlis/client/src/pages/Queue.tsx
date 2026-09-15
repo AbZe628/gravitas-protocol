@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useRevision } from '../lib/pulse.js';
 import { Link } from 'react-router-dom';
 import { governance, type QueueRow } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
@@ -138,16 +139,36 @@ export default function Queue() {
   /** A failed refresh keeps a screen that is already there. */
   const there = useStillThere();
 
+  /*
+   * The queue re-reads itself whenever the record moves.
+   *
+   * This is the first screen a member sees and the whole of what is waiting on
+   * them, and until now it was whatever it had been at the moment the page
+   * loaded. `useStillThere` already keeps the screen that is there when a
+   * refresh fails, so a re-read that goes wrong costs nothing: the member
+   * keeps the rows they had rather than being shown an empty list.
+   */
+  const revision = useRevision();
+
   useEffect(() => {
+    let current = true;
     governance
       .queue()
       .then((q) => {
+        if (!current) return;
         there.arrived();
         setRows(Array.isArray(q.rows) ? q.rows : []);
         setOverdue(q.overdue ?? 0);
       })
-      .catch(() => there.lost(setFailed));
-  }, []);
+      .catch(() => {
+        if (current) there.lost(setFailed);
+      });
+    return () => {
+      current = false;
+    };
+    /* `there` is a stable handle; re-reading is driven by the count alone. */
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [revision]);
 
   if (failed) return <ErrorText />;
   if (!rows) return <Loading />;
