@@ -60,7 +60,7 @@ ali da i dalje nije aplikacija, pa je tražio algoritam prije daljeg rada.
 
 ```
 server   1743 testa   ·   client   360 testova   ·   sve prolazi
-36 ruta (~29 radnih ekrana)  ·  76 mutirajućih činova
+36 ruta (~29 radnih ekrana)  ·  74 mutirajuća čina
 sve gurnuto na origin/main  ·  zadnji commit: algoritam kao specifikacija
 ```
 
@@ -68,6 +68,12 @@ sve gurnuto na origin/main  ·  zadnji commit: algoritam kao specifikacija
 
 ```
 grep -oE "'[A-Z]+ /api/[^']*'" server/test/majlis.test.ts | sort -u | wc -l
+```
+
+Mutirajući činovi, iz izvora a ne iz testova — ovo daje **74**:
+
+```
+cd server/src && grep -rhA1 "router\.\(post\|put\|patch\|delete\)(" routes/ | grep -o "'/[^']*'" | sort -u | wc -l
 ```
 
 ---
