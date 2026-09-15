@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useI18n } from '../lib/i18n.js';
 import type { AnyPhase } from '../lib/spine.js';
 import { PageHead } from './page.js';
+import { Button } from './Button';
 
 /**
  * The two shapes every screen is.
@@ -68,7 +69,7 @@ export function ListPage({
       {filters && <div className="mb-5 flex flex-wrap gap-2">{filters}</div>}
       {children}
       {limits && (
-        <p className="mt-6 max-w-[62ch] text-[12px] leading-[1.6] text-muted">{limits}</p>
+        <p className="mt-6 max-w-[62ch] text-note leading-relaxed text-muted">{limits}</p>
       )}
     </div>
   );
@@ -87,12 +88,12 @@ export function Chip({
   count?: number;
 }) {
   return (
-    <button
+    <Button
       type="button"
       onClick={onPick}
       aria-pressed={on}
       className={
-        'rounded-full px-3.5 py-1.5 text-[12px] transition-all ' +
+        'rounded-full px-3.5 py-1.5 text-note transition-all ' +
         (on
           ? 'bg-lapis font-semibold text-white'
           : 'bg-raised text-sand shadow-ring hover:text-paper')
@@ -102,7 +103,7 @@ export function Chip({
       {count !== undefined && (
         <span className="ms-1.5 font-mono tabular-nums opacity-60">{count}</span>
       )}
-    </button>
+    </Button>
   );
 }
 
@@ -112,7 +113,7 @@ export function Rows({ children }: { children: ReactNode }) {
 
 const PHASE_TONE: Record<string, string> = {
   asked: 'text-lapis',
-  deciding: 'text-[#8A6524]',
+  deciding: 'text-goldink',
   inforce: 'text-settled',
   checked: 'text-breach',
   iasked: 'text-lapis',
@@ -193,7 +194,7 @@ export function Row({
       className={
         'flex items-center gap-4 rounded-card px-5 py-3.5 ' +
         (overdue
-          ? 'border-s-[3px] border-breach bg-[#FCF0EE] shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)]'
+          ? 'border-s-[3px] border-breach bg-breachtint shadow-ringbreach'
           : 'bg-raised shadow-ring')
       }
     >
@@ -208,54 +209,54 @@ export function Row({
         <div className="w-[3.75rem] shrink-0 text-end">
           <div
             className={
-              'font-mono text-[17px] leading-none tabular-nums ' +
+              'font-mono text-sub leading-none tabular-nums ' +
               (overdue ? 'text-breach' : 'text-paper')
             }
           >
             {days}
           </div>
-          <div className="mt-1 text-[9px] uppercase tracking-[0.1em] text-muted">{daysLabel}</div>
+          <div className="mt-1 text-label uppercase tracking-label text-muted">{daysLabel}</div>
         </div>
       )}
 
       <div className="min-w-0 flex-1">
         <div
           className={
-            'mb-0.5 text-[9.5px] font-bold uppercase tracking-[0.13em] ' +
+            'mb-0.5 text-label font-bold uppercase tracking-caps ' +
             (PHASE_TONE[phase] ?? 'text-muted')
           }
         >
           {kind}
         </div>
         {onPress ? (
-          <button
+          <Button
             type="button"
             onClick={onPress}
-            className="text-start font-display text-[15px] leading-snug text-paper hover:underline hover:underline-offset-[3px]"
+            className="text-start font-display text-lead leading-snug text-paper hover:underline hover:underline-offset-[3px]"
           >
             {title}
-          </button>
+          </Button>
         ) : (
           <Link
             to={to ?? '#'}
-            className="font-display text-[15px] leading-snug text-paper hover:underline hover:underline-offset-[3px]"
+            className="font-display text-lead leading-snug text-paper hover:underline hover:underline-offset-[3px]"
           >
             {title}
           </Link>
         )}
-        {note && <div className="mt-1 text-[12.5px] leading-[1.5] text-muted">{note}</div>}
+        {note && <div className="mt-1 text-ui leading-snug text-muted">{note}</div>}
       </div>
 
       {act && onAct ? (
-        <button
+        <Button
           type="button"
           onClick={onAct}
-          className="shrink-0 whitespace-nowrap rounded-xl border border-lapis px-3.5 py-1.5 text-[12.5px] font-semibold text-lapis transition-colors hover:bg-lapis hover:text-white"
+          className="shrink-0 whitespace-nowrap rounded-xl border border-lapis px-3.5 py-1.5 text-ui font-semibold text-lapis transition-colors hover:bg-lapis hover:text-white"
         >
           {act}
-        </button>
+        </Button>
       ) : heldBy ? (
-        <span className="shrink-0 whitespace-nowrap text-[12.5px] text-muted">{heldBy}</span>
+        <span className="shrink-0 whitespace-nowrap text-ui text-muted">{heldBy}</span>
       ) : standing ? (
         <span className="shrink-0">{standing}</span>
       ) : null}
@@ -299,7 +300,7 @@ export function StageBar({ stages }: { stages: readonly Stage[] }) {
         >
           <div
             className={
-              'text-[9.5px] uppercase tracking-[0.1em] ' +
+              'text-label uppercase tracking-label ' +
               (s.state === 'here'
                 ? 'font-bold text-lapis'
                 : s.state === 'done'
@@ -309,7 +310,7 @@ export function StageBar({ stages }: { stages: readonly Stage[] }) {
           >
             {s.name}
           </div>
-          <div className="mt-0.5 font-mono text-[11px] text-muted">{s.at ?? '—'}</div>
+          <div className="mt-0.5 font-mono text-note text-muted">{s.at ?? '—'}</div>
         </li>
       ))}
     </ol>
@@ -340,13 +341,13 @@ export function ActionPanel({
   const { t } = useI18n();
   return (
     <div className="rounded-card bg-raised p-4 shadow-ring">
-      <div className="mb-2.5 text-[9.5px] font-bold uppercase tracking-[0.13em] text-muted">
+      <div className="mb-2.5 text-label font-bold uppercase tracking-caps text-muted">
         {t('shape.next')}
       </div>
-      <p className="text-[15px] leading-snug text-paper">{next}</p>
-      {whose && <p className="mt-1 text-[12.5px] text-muted">{whose}</p>}
+      <p className="text-lead leading-snug text-paper">{next}</p>
+      {whose && <p className="mt-1 text-ui text-muted">{whose}</p>}
       {children && <div className="mt-3.5">{children}</div>}
-      {more && <details className="mt-3 text-[12.5px]">
+      {more && <details className="mt-3 text-ui">
         <summary className="cursor-pointer text-lapis">{t('shape.more')}</summary>
         <div className="mt-2.5 flex flex-col gap-2">{more}</div>
       </details>}
@@ -359,10 +360,10 @@ export function Facts({ rows }: { rows: readonly { label: string; value: ReactNo
   const { t } = useI18n();
   return (
     <div className="mt-3.5 rounded-card bg-raised p-4 shadow-ring">
-      <div className="mb-2.5 text-[9.5px] font-bold uppercase tracking-[0.13em] text-muted">
+      <div className="mb-2.5 text-label font-bold uppercase tracking-caps text-muted">
         {t('shape.facts')}
       </div>
-      <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 text-[12.5px]">
+      <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 text-ui">
         {rows.map((r) => (
           <div key={r.label} className="contents">
             <dt className="text-muted">{r.label}</dt>
@@ -390,16 +391,16 @@ export function Activity({
 
   return (
     <section className="mt-10 border-t border-line pt-6">
-      <h2 className="mb-3 text-[9.5px] font-bold uppercase tracking-[0.13em] text-muted">
+      <h2 className="mb-3 text-label font-bold uppercase tracking-caps text-muted">
         {t('shape.history')}
       </h2>
       <ul className="space-y-0">
         {entries.map((e, i) => (
           <li
             key={i}
-            className="grid grid-cols-[5.5rem_1fr] gap-3.5 border-b border-line/60 py-2 text-[13px] last:border-b-0"
+            className="grid grid-cols-[5.5rem_1fr] gap-3.5 border-b border-line/60 py-2 text-ui last:border-b-0"
           >
-            <time className="font-mono text-[12px] text-muted">{e.at}</time>
+            <time className="font-mono text-note text-muted">{e.at}</time>
             <span className="text-sand">{e.said}</span>
           </li>
         ))}

@@ -46,18 +46,18 @@ export default function HowItChanged({ structureId }: { structureId: string }) {
 
   return (
     <section className="mt-8 border-t border-line pt-6">
-      <h2 className="mb-1 text-[10px] font-bold uppercase tracking-[0.14em] text-muted">
+      <h2 className="mb-1 text-label font-bold uppercase tracking-caps text-muted">
         {t('adopt.howItChanged')}
       </h2>
-      <p className="mb-4 max-w-[62ch] text-[12.5px] leading-[1.6] text-muted">
+      <p className="mb-4 max-w-[62ch] text-ui leading-relaxed text-muted">
         {t('adopt.howItChangedLead')}
       </p>
 
       <ol className="space-y-3">
         {earlier.map(({ adoption }) => (
           <li key={adoption.id} className="rounded-card bg-raised px-5 py-4 shadow-ring">
-            <div className="mb-1.5 flex flex-wrap items-baseline gap-x-3 gap-y-1 text-[12px] text-muted">
-              <span className="text-[10px] font-bold uppercase tracking-[0.13em]">
+            <div className="mb-1.5 flex flex-wrap items-baseline gap-x-3 gap-y-1 text-note text-muted">
+              <span className="text-label font-bold uppercase tracking-caps">
                 {t(`adopt.${adoption.standing}`)}
               </span>
               <DateText iso={adoption.decidedAt} />
@@ -68,14 +68,14 @@ export default function HowItChanged({ structureId }: { structureId: string }) {
             {adoption.amendments.length > 0 && (
               <ul className="space-y-1.5 border-s-2 border-gold/50 ps-4">
                 {adoption.amendments.map((a, i) => (
-                  <li key={i} className="font-display text-[14.5px] leading-[1.55] text-paper">
+                  <li key={i} className="font-display text-lead leading-relaxed text-paper">
                     {a}
                   </li>
                 ))}
               </ul>
             )}
 
-            <p className="mt-2 text-[11.5px] text-muted">
+            <p className="mt-2 text-note text-muted">
               {t('adopt.under')}{' '}
               <Link
                 to={`/matters/${adoption.matterId}`}

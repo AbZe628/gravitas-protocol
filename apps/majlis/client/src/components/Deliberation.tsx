@@ -3,6 +3,7 @@ import { Refused, governance, type Deliberation as Entry, type Matter } from '..
 import { useIdentity } from '../lib/identity.js';
 import { useI18n } from '../lib/i18n.js';
 import { DateText, Tag } from './ui.js';
+import { Button } from './Button';
 
 /**
  * The deliberation, as a thread.
@@ -68,7 +69,7 @@ function Composer({
         placeholder={t('say.placeholder')}
             aria-label={t('say.placeholder')}
         rows={replyTo ? 2 : 3}
-        className="w-full resize-y rounded bg-transparent text-[14px] leading-relaxed outline-none placeholder:text-muted"
+        className="w-full resize-y rounded bg-transparent text-body leading-relaxed outline-none placeholder:text-muted"
       />
       {/*
         The board, offered by name and inserted as an id. Names are ambiguous
@@ -77,39 +78,39 @@ function Composer({
       */}
       {mentionable.length > 0 && (
         <div className="mt-1 flex flex-wrap items-center gap-1.5">
-          <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted">{t('say.ask')}</span>
+          <span className="text-label font-bold uppercase tracking-caps text-muted">{t('say.ask')}</span>
           {mentionable.map((m) => (
-            <button
+            <Button
               key={m.id}
               type="button"
               title={m.title}
               onClick={() => setBody((was) => (was.endsWith(' ') || was === '' ? was : was + ' ') + '@' + m.id + ' ')}
-              className="rounded-xl shadow-ring px-2 py-0.5 text-[11.5px] text-muted hover:text-paper"
+              className="rounded-xl shadow-ring px-2 py-0.5 text-note text-muted hover:text-paper"
             >
               {m.name}
-            </button>
+            </Button>
           ))}
         </div>
       )}
 
-      {refusal && <p className="mt-2 text-[12px] leading-relaxed text-breach">{refusal}</p>}
+      {refusal && <p className="mt-2 text-note leading-relaxed text-breach">{refusal}</p>}
       <div className="mt-2 flex items-center gap-2">
-        <button
+        <Button
           type="button"
           onClick={submit}
           disabled={!body.trim() || busy}
-          className="rounded-xl shadow-ring px-3 py-1.5 text-[12px] hover:bg-raised disabled:opacity-40"
+          className="rounded-xl shadow-ring px-3 py-1.5 text-note hover:bg-raised disabled:opacity-40"
         >
           {t('say.submit')}
-        </button>
+        </Button>
         {onCancel && (
-          <button
+          <Button
             type="button"
             onClick={onCancel}
-            className="text-[12px] text-muted hover:text-paper"
+            className="text-note text-muted hover:text-paper"
           >
             {t('say.cancel')}
-          </button>
+          </Button>
         )}
       </div>
     </div>
@@ -178,30 +179,30 @@ function Entry({
         (entry.liaisonAnswer ? 'bg-raised/60 shadow-ring' : 'bg-raised shadow-card')
       }
     >
-      <div className="mb-2.5 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[12px]">
+      <div className="mb-2.5 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-note">
         <span className="font-semibold text-lapis">{entry.scholarId}</span>
         {entry.liaisonAnswer && <Tag>{t('matter.liaison')}</Tag>}
         <span className="text-muted">
           <DateText iso={entry.at} />
         </span>
       </div>
-      <p className="max-w-[62ch] font-display text-[15.5px] leading-[1.6]">
+      <p className="max-w-[62ch] font-display text-lead leading-relaxed">
         <Body entry={entry} />
       </p>
 
       {canSpeak && !replying && (
-        <button
+        <Button
           type="button"
           onClick={() => setReplying(true)}
-          className="mt-3 text-[12.5px] text-muted underline decoration-line underline-offset-4 transition-colors hover:text-paper"
+          className="mt-3 text-ui text-muted underline decoration-line underline-offset-4 transition-colors hover:text-paper"
         >
           {t('say.reply')}
-        </button>
+        </Button>
       )}
 
       {replying && (
         <div className="mt-3">
-          <p className="mb-2 text-[11.5px] text-muted">
+          <p className="mb-2 text-note text-muted">
             {t('say.replyingTo')} {entry.scholarId}
           </p>
           <Composer
@@ -218,14 +219,14 @@ function Entry({
         <ul className="mt-4 space-y-4 border-s-2 border-line ps-5">
           {replies.map((reply) => (
             <li key={reply.id}>
-              <div className="mb-2 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[12px]">
+              <div className="mb-2 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-note">
                 <span className="font-semibold text-lapis">{reply.scholarId}</span>
                 {reply.liaisonAnswer && <Tag>{t('matter.liaison')}</Tag>}
                 <span className="text-muted">
                   <DateText iso={reply.at} />
                 </span>
               </div>
-              <p className="max-w-[62ch] font-display text-[15px] leading-[1.6]">{reply.body}</p>
+              <p className="max-w-[62ch] font-display text-lead leading-relaxed">{reply.body}</p>
             </li>
           ))}
         </ul>
@@ -274,7 +275,7 @@ export default function Deliberation({ matter, canSpeak, onChanged }: Props) {
         />
       )}
       {entries.length === 0 && !canSpeak && (
-        <p className="text-[13px] text-muted">{t('matter.noDeliberation')}</p>
+        <p className="text-ui text-muted">{t('matter.noDeliberation')}</p>
       )}
     </div>
   );

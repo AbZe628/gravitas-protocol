@@ -67,16 +67,16 @@ export default function Carrying({ matterId }: { matterId: string }) {
   return (
     <div className="mb-6 rounded-sheet bg-raised/75 px-6 py-5 shadow-ring">
       <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-2">
-        <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted">{t('carry.title')}</span>
+        <span className="text-label font-bold uppercase tracking-caps text-muted">{t('carry.title')}</span>
         {/*
           The distinction, as a badge, because it is the one thing on this panel
           a scholar should carry away even if they read nothing else.
         */}
         <span
           className={
-            'rounded-full px-2.5 py-0.5 text-[10.5px] font-bold uppercase tracking-[0.1em] ' +
+            'rounded-full px-2.5 py-0.5 text-label font-bold uppercase tracking-label ' +
             (carrying.attached
-              ? 'bg-[#EBF3EF] text-settled shadow-[0_0_0_0.5px_rgba(44,107,87,0.18)]'
+              ? 'bg-settledtint text-settled shadow-ringsettled'
               : 'bg-black/[0.045] text-sand')
           }
         >
@@ -85,9 +85,9 @@ export default function Carrying({ matterId }: { matterId: string }) {
       </div>
 
       {/* The sentence itself, at reading size rather than as a caption. */}
-      <p className="max-w-[62ch] text-[13.5px] leading-[1.68] text-sand">{carrying.whenChecked}</p>
+      <p className="max-w-[62ch] text-body leading-loose text-sand">{carrying.whenChecked}</p>
 
-      <p className="mt-3 max-w-[62ch] border-s-2 border-line ps-4 text-[12.5px] leading-[1.6] text-muted">
+      <p className="mt-3 max-w-[62ch] border-s-2 border-line ps-4 text-ui leading-relaxed text-muted">
         {carrying.drift}
       </p>
 
@@ -106,7 +106,7 @@ export default function Carrying({ matterId }: { matterId: string }) {
       */}
       {carrying.carriedOut?.attached && !carrying.carriedOut.namesNoHolding && (
         <div className="mt-4 rounded-card bg-ink px-5 py-4">
-          <p className="max-w-[62ch] text-[13px] leading-[1.6] text-paper">
+          <p className="max-w-[62ch] text-ui leading-relaxed text-paper">
             {carrying.carriedInAWord}
           </p>
 
@@ -118,12 +118,12 @@ export default function Carrying({ matterId }: { matterId: string }) {
               .filter((group) => group.held.length > 0)
               .map((group) => (
                 <div key={group.how}>
-                  <div className="mb-1 text-[10px] font-bold uppercase tracking-[0.14em] text-muted">
+                  <div className="mb-1 text-label font-bold uppercase tracking-caps text-muted">
                     {t(group.how)}
                   </div>
                   <ul className="space-y-1">
                     {group.held.map((h) => (
-                      <li key={h.assetId} className="text-[12.5px] leading-[1.5] text-sand">
+                      <li key={h.assetId} className="text-ui leading-snug text-sand">
                         {h.name}
                         {/*
                           Where the answer came from. "The board said so" and
@@ -131,7 +131,7 @@ export default function Carrying({ matterId }: { matterId: string }) {
                           are different answers, and a board that was never
                           asked should be able to see that it was never asked.
                         */}
-                        <span className="ms-2 text-[11.5px] text-muted">{t(`carry.basis.${h.basis}`)}</span>
+                        <span className="ms-2 text-note text-muted">{t(`carry.basis.${h.basis}`)}</span>
                       </li>
                     ))}
                   </ul>
@@ -143,7 +143,7 @@ export default function Carrying({ matterId }: { matterId: string }) {
 
       {carrying.terms.length > 0 && (
         <div className="mt-4">
-          <div className="mb-2.5 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+          <div className="mb-2.5 text-label font-bold uppercase tracking-caps text-muted">
             {t('carry.terms')}
           </div>
           <ul className="space-y-2.5">
@@ -157,19 +157,19 @@ export default function Carrying({ matterId }: { matterId: string }) {
                     finding: the software's name for a thing set above the
                     sentence the board actually wrote.
                   */}
-                  <p className="text-[13.5px] leading-[1.5] text-paper">{term.meaning}</p>
-                  <div className="mt-1 font-mono text-[10.5px] text-muted opacity-70">{term.key}</div>
+                  <p className="text-body leading-snug text-paper">{term.meaning}</p>
+                  <div className="mt-1 font-mono text-label text-muted opacity-70">{term.key}</div>
                   {term.onBreach && (
-                    <p className="mt-1.5 text-[12px] leading-[1.5] text-gold">
+                    <p className="mt-1.5 text-note leading-snug text-gold">
                       {t('carry.onBreach')} {term.onBreach}
                     </p>
                   )}
                 </div>
                 <div className="shrink-0 text-end">
-                  <div className="font-mono text-[18px] font-medium tabular-nums tracking-[-0.01em] text-lapis">
+                  <div className="font-mono text-sub font-medium tabular-nums tracking-tight text-lapis">
                     {term.value}
                   </div>
-                  {term.unit && <div className="mt-0.5 text-[11px] text-muted">{term.unit}</div>}
+                  {term.unit && <div className="mt-0.5 text-note text-muted">{term.unit}</div>}
                 </div>
               </li>
             ))}
@@ -183,12 +183,12 @@ export default function Carrying({ matterId }: { matterId: string }) {
         and the less honest of the two.
       */}
       <div className="mt-5 border-t border-line pt-4">
-        <div className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+        <div className="mb-1.5 text-label font-bold uppercase tracking-caps text-muted">
           {t('carry.limits')}
         </div>
         <ul className="space-y-1.5">
           {carrying.limits.map((limit, i) => (
-            <li key={i} className="flex items-baseline gap-3 text-[12.5px] leading-[1.55] text-muted">
+            <li key={i} className="flex items-baseline gap-3 text-ui leading-relaxed text-muted">
               <span className="relative top-[-5px] h-px w-3.5 shrink-0 bg-line" />
               <span>{limit}</span>
             </li>

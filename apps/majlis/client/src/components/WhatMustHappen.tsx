@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { oversight, Refused, type Matter } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
+import { Button } from './Button';
 
 /**
  * What the institution has to do once this carries.
@@ -72,34 +73,34 @@ export default function WhatMustHappen({ matter, canEdit, onChanged }: Props) {
     return (
       <div>
         {steps.length === 0 ? (
-          <p className="max-w-[62ch] text-[13px] leading-[1.6] text-muted">
+          <p className="max-w-[62ch] text-ui leading-relaxed text-muted">
             {mayEdit ? t('doing.noneYet') : t('doing.noneEver')}
           </p>
         ) : (
           <ol className="space-y-2">
             {steps.map((s, i) => (
               <li key={i} className="flex gap-3 rounded-card bg-raised px-4 py-3 shadow-ring">
-                <span className="mt-[2px] font-mono text-[11px] tabular-nums text-muted">
+                <span className="mt-[2px] font-mono text-note tabular-nums text-muted">
                   {i + 1}
                 </span>
-                <span className="max-w-[58ch] text-[13.5px] leading-[1.6] text-sand">{s}</span>
+                <span className="max-w-[58ch] text-body leading-relaxed text-sand">{s}</span>
               </li>
             ))}
           </ol>
         )}
 
         {mayEdit && (
-          <button
+          <Button
             type="button"
             onClick={start}
-            className="mt-3 text-[12.5px] font-semibold text-lapis underline decoration-line underline-offset-4"
+            className="mt-3 text-ui font-semibold text-lapis underline decoration-line underline-offset-4"
           >
             {steps.length === 0 ? t('doing.write') : t('doing.change')}
-          </button>
+          </Button>
         )}
 
         {!drafting && steps.length > 0 && (
-          <p className="mt-2.5 text-[11.5px] leading-[1.6] text-muted">{t('doing.frozen')}</p>
+          <p className="mt-2.5 text-note leading-relaxed text-muted">{t('doing.frozen')}</p>
         )}
       </div>
     );
@@ -107,12 +108,12 @@ export default function WhatMustHappen({ matter, canEdit, onChanged }: Props) {
 
   return (
     <div className="rounded-card bg-ink/70 px-4 py-4 shadow-ring">
-      <p className="mb-3 max-w-[58ch] text-[12.5px] leading-[1.6] text-muted">{t('doing.lead')}</p>
+      <p className="mb-3 max-w-[58ch] text-ui leading-relaxed text-muted">{t('doing.lead')}</p>
 
       <ol className="space-y-2">
         {rows.map((row, i) => (
           <li key={i} className="flex items-start gap-2.5">
-            <span className="mt-3 font-mono text-[11px] tabular-nums text-muted">{i + 1}</span>
+            <span className="mt-3 font-mono text-note tabular-nums text-muted">{i + 1}</span>
             <textarea
               value={row}
               onChange={(e) =>
@@ -120,49 +121,49 @@ export default function WhatMustHappen({ matter, canEdit, onChanged }: Props) {
               }
               rows={2}
               aria-label={`${t('doing.step')} ${i + 1}`}
-              className="w-full rounded-xl bg-raised px-3 py-2 text-[13px] leading-[1.5] shadow-ring outline-none"
+              className="w-full rounded-xl bg-raised px-3 py-2 text-ui leading-snug shadow-ring outline-none"
             />
-            <button
+            <Button
               type="button"
               onClick={() => setRows((r) => r.filter((_, n) => n !== i))}
               aria-label={`${t('common.remove')} ${i + 1}`}
-              className="mt-2.5 px-1 text-[14px] text-muted hover:text-breach"
+              className="mt-2.5 px-1 text-body text-muted hover:text-breach"
             >
               ×
-            </button>
+            </Button>
           </li>
         ))}
       </ol>
 
-      <button
+      <Button
         type="button"
         onClick={() => setRows((r) => [...r, ''])}
-        className="mt-2.5 text-[12.5px] text-lapis underline decoration-line underline-offset-4"
+        className="mt-2.5 text-ui text-lapis underline decoration-line underline-offset-4"
       >
         {t('doing.addStep')}
-      </button>
+      </Button>
 
-      {refusal && <p className="mt-3 text-[12.5px] text-breach">{refusal}</p>}
+      {refusal && <p className="mt-3 text-ui text-breach">{refusal}</p>}
 
       <div className="mt-4 flex flex-wrap items-center gap-3">
-        <button
+        <Button
           type="button"
           onClick={save}
           disabled={busy}
-          className="rounded-xl bg-lapis px-5 py-2.5 text-[13px] font-semibold text-white shadow-act disabled:opacity-40"
+          className="rounded-xl bg-lapis px-5 py-2.5 text-ui font-semibold text-white shadow-act disabled:opacity-40"
         >
           {busy ? t('common.loading') : t('doing.save')}
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
           onClick={() => setEditing(false)}
-          className="text-[12.5px] text-muted underline decoration-line underline-offset-4"
+          className="text-ui text-muted underline decoration-line underline-offset-4"
         >
           {t('common.cancel')}
-        </button>
+        </Button>
       </div>
 
-      <p className="mt-3 max-w-[58ch] text-[11.5px] leading-[1.6] text-muted">
+      <p className="mt-3 max-w-[58ch] text-note leading-relaxed text-muted">
         {t('doing.freezeWarning')}
       </p>
     </div>

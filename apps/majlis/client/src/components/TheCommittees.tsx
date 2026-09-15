@@ -62,7 +62,7 @@ export default function TheCommittees() {
   }, []);
 
   if (failed) return <Nothing>{t('cttee.unavailable')}</Nothing>;
-  if (!held) return <p className="text-[13px] text-muted">{t('common.loading')}</p>;
+  if (!held) return <p className="text-ui text-muted">{t('common.loading')}</p>;
   if (keepsNone) return <Nothing>{t('set.keepsNoCommittees')}</Nothing>;
 
   return (
@@ -70,31 +70,31 @@ export default function TheCommittees() {
       {held.map(({ committee: c, memberNames, convenorName, summary }) => (
         <li key={c.id} className="rounded-sheet bg-raised/75 px-6 py-5 shadow-ring">
           <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-            <span className="font-display text-[19px] leading-snug tracking-[-0.014em]">
+            <span className="font-display text-sub leading-snug tracking-title">
               {c.name}
             </span>
             {summary.waiting > 0 && (
-              <span className="text-[12px] text-gold">
+              <span className="text-note text-gold">
                 <span className="font-mono tabular-nums">{summary.waiting}</span>{' '}
                 {t('set.carrying')}
               </span>
             )}
           </div>
 
-          <p className="mt-2 max-w-[62ch] text-[13px] leading-[1.6] text-sand">{c.remit}</p>
+          <p className="mt-2 max-w-[62ch] text-ui leading-relaxed text-sand">{c.remit}</p>
 
-          <p className="mt-3 text-[12.5px] leading-[1.6] text-muted">{memberNames.join(', ')}</p>
+          <p className="mt-3 text-ui leading-relaxed text-muted">{memberNames.join(', ')}</p>
           {convenorName && (
-            <p className="mt-1 text-[12px] text-muted">
+            <p className="mt-1 text-note text-muted">
               {t('set.convenor')}: {convenorName}
             </p>
           )}
 
           {/* Where its authority comes from, which is a decision and not a setting. */}
-          <p className="mt-2.5 font-mono text-[11.5px] text-muted">{c.formedIn}</p>
+          <p className="mt-2.5 font-mono text-note text-muted">{c.formedIn}</p>
 
           {c.dissolvedAt && (
-            <p className="mt-2 text-[12px] text-muted">
+            <p className="mt-2 text-note text-muted">
               {t('cttee.state.withdrawn')}
               <span className="mx-1.5 opacity-40">·</span>
               <span className="font-mono">{c.dissolvedAt.slice(0, 10)}</span>

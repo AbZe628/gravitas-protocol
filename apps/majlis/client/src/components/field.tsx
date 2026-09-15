@@ -34,7 +34,7 @@ import { useId, type ReactNode } from 'react';
  * with the box rather than lost above it.
  */
 /** The heading a box carries on the ordinary screens. */
-export const HEADING = 'mb-1.5 block text-[12px] text-muted';
+export const HEADING = 'mb-1.5 block text-note text-muted';
 
 export function Field({
   label,
@@ -70,13 +70,13 @@ export function Field({
    */
   return (
     <div className={'flex h-full flex-col ' + (className ?? '')}>
-      <label htmlFor={id} className={headingClass ?? 'mb-1 block text-[12px] text-muted'}>
+      <label htmlFor={id} className={headingClass ?? 'mb-1 block text-note text-muted'}>
         {label}
       </label>
       {help && (
         <p
           id={helpId}
-          className={helpClass ?? 'mb-2 max-w-[62ch] text-[11.5px] leading-[1.6] text-muted'}
+          className={helpClass ?? 'mb-2 max-w-[62ch] text-note leading-relaxed text-muted'}
         >
           {help}
         </p>
@@ -112,7 +112,7 @@ export function Tick({
         onChange={(e) => onChange(e.target.checked)}
         className="h-3.5 w-3.5 accent-lapis"
       />
-      <span className="text-[12.5px] text-sand">{children}</span>
+      <span className="text-ui text-sand">{children}</span>
     </label>
   );
 }

@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import type { Matter, SignedDocument } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { mayVote, type Identity } from '../lib/identity.js';
+import { Button } from './Button';
 
 /**
  * What you do now, and the one act that does it.
@@ -164,7 +165,7 @@ export default function NextAct({ doing, children }: { doing: Doing; children?: 
     >
       <div
         className={
-          'mb-2 text-[10px] font-bold uppercase tracking-[0.15em] ' +
+          'mb-2 text-label font-bold uppercase tracking-caps ' +
           (doing.tone === 'act' ? 'text-white/70' : 'text-muted')
         }
       >
@@ -173,7 +174,7 @@ export default function NextAct({ doing, children }: { doing: Doing; children?: 
 
       <p
         className={
-          'max-w-[52ch] text-[15px] leading-[1.5] ' +
+          'max-w-[52ch] text-lead leading-snug ' +
           (doing.tone === 'act' ? 'text-white' : 'text-paper')
         }
       >
@@ -181,16 +182,16 @@ export default function NextAct({ doing, children }: { doing: Doing; children?: 
       </p>
 
       {doing.act && (
-        <button
+        <Button
           type="button"
           onClick={doing.act.onPress}
           className={
-            'mt-4 rounded-card px-6 py-3 text-[14px] font-bold shadow-act ' +
+            'mt-4 rounded-card px-6 py-3 text-body font-bold shadow-act ' +
             (doing.tone === 'act' ? 'bg-white text-lapis' : 'bg-lapis text-white')
           }
         >
           {doing.act.label}
-        </button>
+        </Button>
       )}
 
       {children}

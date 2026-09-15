@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { oversight, type Passage as Passage_, type PassageStep } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
+import { Button } from './Button';
 
 /**
  * Where this matter stands, and what the next act is.
@@ -59,26 +60,26 @@ function Step({ step, ordinal }: { step: PassageStep; ordinal?: number }) {
       <div className="min-w-0 flex-1 pb-3">
         <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
           {ordinal !== undefined && (
-            <span className="font-mono text-[11px] tabular-nums text-muted">{ordinal}</span>
+            <span className="font-mono text-note tabular-nums text-muted">{ordinal}</span>
           )}
-          <span className={'text-[13px] ' + (dim ? 'text-muted' : 'text-paper')}>{step.act}</span>
+          <span className={'text-ui ' + (dim ? 'text-muted' : 'text-paper')}>{step.act}</span>
           {/* Whose it is, on every step. The commonest way a matter stalls is
               that everyone believes it is with somebody else. */}
-          <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+          <span className="text-label font-bold uppercase tracking-caps text-muted">
             {t(`passage.whose.${step.whose}`)}
           </span>
           {step.state === 'done' && (
-            <span className="text-[11px] text-gold/70">{t('passage.done')}</span>
+            <span className="text-note text-gold/70">{t('passage.done')}</span>
           )}
           {step.enforced && step.state === 'open' && (
-            <span className="rounded-full px-2.5 py-0.5 text-[10.5px] font-bold uppercase tracking-[0.1em] bg-[#FBF4E4] text-gold shadow-[0_0_0_0.5px_rgba(176,132,48,0.22)]">
+            <span className="rounded-full px-2.5 py-0.5 text-label font-bold uppercase tracking-label bg-goldtint text-gold shadow-ringgold">
               {t('passage.enforced')}
             </span>
           )}
         </div>
 
         {step.standing && (
-          <p className="mt-1 text-[12px] leading-relaxed text-muted">{step.standing}</p>
+          <p className="mt-1 text-note leading-relaxed text-muted">{step.standing}</p>
         )}
       </div>
     </li>
@@ -121,21 +122,21 @@ export default function Passage({ matterId }: { matterId: string }) {
       {passage.next ? (
         <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
           <div className="min-w-0">
-            <div className="mb-2.5 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+            <div className="mb-2.5 text-label font-bold uppercase tracking-caps text-muted">
               {t('passage.next')}
             </div>
             <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-              <span className="font-display text-[22px] leading-snug tracking-[-0.016em]">
+              <span className="font-display text-title leading-snug tracking-title">
                 {passage.next.act}
               </span>
               {/* Whose act it is, as a state rather than as a caption stuck
                   to the end of the sentence. */}
-              <span className="rounded-full bg-black/[0.045] px-2.5 py-0.5 text-[10.5px] font-bold uppercase tracking-[0.1em] text-sand">
+              <span className="rounded-full bg-black/[0.045] px-2.5 py-0.5 text-label font-bold uppercase tracking-label text-sand">
                 {t(`passage.whose.${passage.next.whose}`)}
               </span>
             </div>
             {passage.next.standing && (
-              <p className="mt-2.5 max-w-[62ch] text-[13px] leading-[1.6] text-muted">
+              <p className="mt-2.5 max-w-[62ch] text-ui leading-relaxed text-muted">
                 {passage.next.standing}
               </p>
             )}
@@ -149,37 +150,37 @@ export default function Passage({ matterId }: { matterId: string }) {
           */}
           {passage.waiting && (
             <div className="shrink-0 text-end">
-              <div className="font-display text-[40px] leading-[0.92] tabular-nums tracking-[-0.028em] text-gold">
+              <div className="font-display text-display leading-none tabular-nums tracking-display text-gold">
                 {passage.waiting.days}
               </div>
-              <div className="mt-1.5 text-[11.5px] text-muted">{t('passage.days')}</div>
+              <div className="mt-1.5 text-note text-muted">{t('passage.days')}</div>
             </div>
           )}
         </div>
       ) : (
-        <p className="max-w-[62ch] font-display text-[18px] leading-[1.55]">{passage.settled}</p>
+        <p className="max-w-[62ch] font-display text-sub leading-relaxed">{passage.settled}</p>
       )}
 
       {passage.waiting && (
-        <p className="mt-3 max-w-[62ch] text-[12px] leading-[1.55] text-muted">{passage.waiting.note}</p>
+        <p className="mt-3 max-w-[62ch] text-note leading-relaxed text-muted">{passage.waiting.note}</p>
       )}
 
-      <button
+      <Button
         type="button"
         onClick={() => setOpen((was) => !was)}
-        className="mt-4 rounded-xl bg-ink px-3.5 py-2 text-[12.5px] text-sand shadow-ring transition-colors hover:text-paper"
+        className="mt-4 rounded-xl bg-ink px-3.5 py-2 text-ui text-sand shadow-ring transition-colors hover:text-paper"
       >
         {open ? t('passage.hide') : t('passage.show')}
-      </button>
+      </Button>
 
       {open && (
         <div className="mt-5 grid gap-7 border-t border-line pt-5 sm:grid-cols-2">
           <div>
-            <div className="mb-1 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+            <div className="mb-1 text-label font-bold uppercase tracking-caps text-muted">
               {t('passage.shaping')}
             </div>
             {/* Unnumbered on purpose: the order is the work's, not ours. */}
-            <p className="mb-2.5 text-[11.5px] leading-relaxed text-muted">
+            <p className="mb-2.5 text-note leading-relaxed text-muted">
               {t('passage.shaping.hint')}
             </p>
             <ul>
@@ -190,10 +191,10 @@ export default function Passage({ matterId }: { matterId: string }) {
           </div>
 
           <div>
-            <div className="mb-1 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+            <div className="mb-1 text-label font-bold uppercase tracking-caps text-muted">
               {t('passage.deciding')}
             </div>
-            <p className="mb-2.5 text-[11.5px] leading-relaxed text-muted">
+            <p className="mb-2.5 text-note leading-relaxed text-muted">
               {t('passage.deciding.hint')}
             </p>
             <ul>

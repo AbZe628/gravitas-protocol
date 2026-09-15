@@ -8,6 +8,7 @@ import {
 import { useHealth } from '../lib/health.js';
 import { useI18n } from '../lib/i18n.js';
 import { useIdentity } from '../lib/identity.js';
+import { Button } from './Button';
 
 /**
  * Reading figures out of a document the bank supplied.
@@ -70,9 +71,9 @@ function Candidate({
   if (candidate.notFound) {
     return (
       <li className="rounded-xl shadow-ring px-3 py-2.5">
-        <div className="text-[12.5px] font-medium">{label}</div>
+        <div className="text-ui font-medium">{label}</div>
         {/* A gap a scholar looks at, rather than a plausible zero. */}
-        <p className="mt-0.5 text-[12px] leading-relaxed text-muted">{t('read.notFound')}</p>
+        <p className="mt-0.5 text-note leading-relaxed text-muted">{t('read.notFound')}</p>
       </li>
     );
   }
@@ -92,8 +93,8 @@ function Candidate({
   return (
     <li className="rounded-xl shadow-ring px-3 py-2.5">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <span className="text-[12.5px] font-medium">{label}</span>
-        <span className="font-mono text-[14px] tabular-nums text-lapis">{candidate.value}</span>
+        <span className="text-ui font-medium">{label}</span>
+        <span className="font-mono text-body tabular-nums text-lapis">{candidate.value}</span>
       </div>
 
       {/*
@@ -101,29 +102,29 @@ function Candidate({
         checking one against the other on this screen, which is the difference
         between confirming and rubber-stamping.
       */}
-      <p className="mt-1.5 border-s-2 border-line ps-2.5 text-[12px] leading-relaxed text-muted">
+      <p className="mt-1.5 border-s-2 border-line ps-2.5 text-note leading-relaxed text-muted">
         “{candidate.quote}”
         {candidate.locator && (
-          <span className="ms-1.5 font-mono text-[11.5px]">
+          <span className="ms-1.5 font-mono text-note">
             {t('read.page')} {candidate.locator.page}
           </span>
         )}
       </p>
 
       {!candidate.quoteVerified && (
-        <p className="mt-1.5 text-[11.5px] leading-relaxed text-breach">{t('read.unverified')}</p>
+        <p className="mt-1.5 text-note leading-relaxed text-breach">{t('read.unverified')}</p>
       )}
 
       {taken ? (
-        <p className="mt-2 text-[12px] text-muted">{t('read.taken')}</p>
+        <p className="mt-2 text-note text-muted">{t('read.taken')}</p>
       ) : (
-        <button
+        <Button
           type="button"
           onClick={confirm}
-          className="mt-2 rounded-xl shadow-ring px-3 py-1 text-[12px] text-muted transition-colors hover:text-paper"
+          className="mt-2 rounded-xl shadow-ring px-3 py-1 text-note text-muted transition-colors hover:text-paper"
         >
           {t('read.confirm')}
-        </button>
+        </Button>
       )}
     </li>
   );
@@ -177,13 +178,13 @@ export default function ReadDocument({ fields, onConfirm }: ReadDocumentProps) {
 
   if (!open) {
     return (
-      <button
+      <Button
         type="button"
         onClick={() => setOpen(true)}
-        className="mb-3 rounded-xl shadow-ring px-3 py-1.5 text-[12.5px] text-muted transition-colors hover:text-paper"
+        className="mb-3 rounded-xl shadow-ring px-3 py-1.5 text-ui text-muted transition-colors hover:text-paper"
       >
         {t('read.open')}
-      </button>
+      </Button>
     );
   }
 
@@ -191,21 +192,21 @@ export default function ReadDocument({ fields, onConfirm }: ReadDocumentProps) {
 
   return (
     <div className="mb-4 rounded-card shadow-ring px-4 py-3.5">
-      <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">{t('read.title')}</div>
-      <p className="mb-3 text-[12.5px] leading-relaxed text-muted">{t('read.intro')}</p>
+      <div className="mb-2 text-label font-bold uppercase tracking-caps text-muted">{t('read.title')}</div>
+      <p className="mb-3 text-ui leading-relaxed text-muted">{t('read.intro')}</p>
 
       {documents.length === 0 ? (
-        <p className="text-[12.5px] leading-relaxed text-muted">{t('read.noDocuments')}</p>
+        <p className="text-ui leading-relaxed text-muted">{t('read.noDocuments')}</p>
       ) : (
         <div className="flex flex-wrap items-end gap-2">
           <label className="min-w-[220px] flex-1">
-            <span className="mb-1 block text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+            <span className="mb-1 block text-label font-bold uppercase tracking-caps text-muted">
               {t('read.document')}
             </span>
             <select
               value={chosen}
               onChange={(e) => setChosen(e.target.value)}
-              className="w-full rounded-xl shadow-ring bg-raised px-3 py-2 text-[13px]"
+              className="w-full rounded-xl shadow-ring bg-raised px-3 py-2 text-ui"
             >
               <option value="">{t('read.pickDocument')}</option>
               {documents.map((d) => (
@@ -216,20 +217,20 @@ export default function ReadDocument({ fields, onConfirm }: ReadDocumentProps) {
               ))}
             </select>
           </label>
-          <button
+          <Button
             type="button"
             disabled={busy || !chosen}
             onClick={read}
-            className="rounded-xl bg-raised shadow-ring px-3.5 py-2 text-[13px] text-lapis font-medium disabled:opacity-40"
+            className="rounded-xl bg-raised shadow-ring px-3.5 py-2 text-ui text-lapis font-medium disabled:opacity-40"
           >
             {t('read.read')}
-          </button>
+          </Button>
         </div>
       )}
 
       {/* The refusal in the server's words: off is a setting, not a fault. */}
       {error && (
-        <p className="mt-3 rounded-xl shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)] px-3 py-2 text-[12.5px] leading-relaxed text-breach">
+        <p className="mt-3 rounded-xl shadow-ringbreach px-3 py-2 text-ui leading-relaxed text-breach">
           {error}
         </p>
       )}
@@ -255,13 +256,13 @@ export default function ReadDocument({ fields, onConfirm }: ReadDocumentProps) {
             thin one.
           */}
           {result.discarded.length > 0 && (
-            <div className="mt-3 rounded-xl shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)] px-3 py-2.5">
-              <div className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.15em] text-gold">
+            <div className="mt-3 rounded-xl shadow-ringbreach px-3 py-2.5">
+              <div className="mb-1.5 text-label font-bold uppercase tracking-caps text-gold">
                 {t('read.discarded')}
               </div>
               <ul className="space-y-1">
                 {result.discarded.map((d, i) => (
-                  <li key={i} className="text-[12px] leading-relaxed text-muted">
+                  <li key={i} className="text-note leading-relaxed text-muted">
                     <span className="font-mono">{labelOf(d.field)}</span> — {d.reason}
                   </li>
                 ))}
@@ -270,7 +271,7 @@ export default function ReadDocument({ fields, onConfirm }: ReadDocumentProps) {
           )}
 
           {/* Carried from the server, so nothing here can soften it. */}
-          <p className="mt-3 text-[12px] leading-relaxed text-muted">{result.note}</p>
+          <p className="mt-3 text-note leading-relaxed text-muted">{result.note}</p>
         </div>
       )}
     </div>

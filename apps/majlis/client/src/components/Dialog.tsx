@@ -1,5 +1,6 @@
 import { useEffect, useRef, type ReactNode } from 'react';
 import { useI18n } from '../lib/i18n.js';
+import { Button } from './Button';
 
 /**
  * A window that opens over the work, says what an act will do, and does it.
@@ -73,11 +74,11 @@ export default function Dialog({
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center p-4 sm:items-center">
       {/* The ground behind it, which also closes it. */}
-      <button
+      <Button
         type="button"
         aria-label={t('common.cancel')}
         onClick={onClose}
-        className="absolute inset-0 cursor-default bg-[#191713]/35 backdrop-blur-[2px]"
+        className="absolute inset-0 cursor-default bg-paper/35 backdrop-blur-[2px]"
       />
 
       <div
@@ -89,7 +90,7 @@ export default function Dialog({
         className="relative flex max-h-[88vh] w-full max-w-[560px] flex-col overflow-hidden rounded-sheet bg-raised shadow-card outline-none"
       >
         <div className="border-b border-line px-5 py-3.5 sm:px-6">
-          <h2 className="font-display text-[17px] leading-tight tracking-[-0.014em] text-paper">
+          <h2 className="font-display text-sub leading-tight tracking-title text-paper">
             {title}
           </h2>
         </div>

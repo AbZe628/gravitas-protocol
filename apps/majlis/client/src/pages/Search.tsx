@@ -5,6 +5,7 @@ import { useIdentity } from '../lib/identity.js';
 import { useI18n } from '../lib/i18n.js';
 import { Nothing, PageHead } from '../components/page.js';
 import { DateText, Tag } from '../components/ui.js';
+import { Button } from '../components/Button';
 
 /**
  * Finding what the board decided before.
@@ -65,7 +66,7 @@ export default function Search() {
     setFailed(false);
   }
 
-  const select = 'rounded-xl bg-raised shadow-ring px-2 py-1.5 text-[13px] outline-none';
+  const select = 'rounded-xl bg-raised shadow-ring px-2 py-1.5 text-ui outline-none';
 
   return (
     <div>
@@ -87,24 +88,24 @@ export default function Search() {
             onChange={(e) => setQ(e.target.value)}
             placeholder={t('search.placeholder')}
             aria-label={t('search.title')}
-            className="min-w-[14rem] flex-1 rounded-xl shadow-ring bg-raised p-2 text-[14px] outline-none"
+            className="min-w-[14rem] flex-1 rounded-xl shadow-ring bg-raised p-2 text-body outline-none"
           />
-          <button
+          <Button
             type="submit"
             disabled={busy || empty}
-            className="rounded-xl shadow-ring px-4 py-2 text-[13px] hover:bg-raised disabled:opacity-40"
+            className="rounded-xl shadow-ring px-4 py-2 text-ui hover:bg-raised disabled:opacity-40"
           >
             {t('search.go')}
-          </button>
+          </Button>
           {(result || q || status || direction || mine) && (
-            <button type="button" onClick={clear} className="px-2 text-[13px] text-muted hover:text-paper">
+            <Button type="button" onClick={clear} className="px-2 text-ui text-muted hover:text-paper">
               {t('search.clear')}
-            </button>
+            </Button>
           )}
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-[11.5px] uppercase tracking-wide text-muted">{t('search.filters')}</span>
+          <span className="text-note uppercase tracking-wide text-muted">{t('search.filters')}</span>
 
           <select value={status} onChange={(e) => setStatus(e.target.value)} className={select} aria-label={t('search.anyStatus')}>
             <option value="">{t('search.anyStatus')}</option>
@@ -122,7 +123,7 @@ export default function Search() {
           </select>
 
           {identity && identity.role !== 'observer' && (
-            <label className="flex items-center gap-1.5 text-[13px] text-muted">
+            <label className="flex items-center gap-1.5 text-ui text-muted">
               <input type="checkbox" checked={mine} onChange={(e) => setMine(e.target.checked)} />
               {t('search.mine')}
             </label>
@@ -131,19 +132,19 @@ export default function Search() {
       </form>
 
       {!result && !failed && (
-        <p className="text-[13px] leading-relaxed text-muted">{t('search.emptyQuery')}</p>
+        <p className="text-ui leading-relaxed text-muted">{t('search.emptyQuery')}</p>
       )}
 
       {/* It said "Loading…" in the colour of a failure. */}
-      {failed && <p className="text-[13px] text-breach">{t('common.error')}</p>}
+      {failed && <p className="text-ui text-breach">{t('common.error')}</p>}
 
       {result && (
         <>
           <div className="mb-5 flex items-baseline gap-2.5">
-            <span className="font-display text-[28px] leading-none tabular-nums tracking-[-0.024em]">
+            <span className="font-display text-head leading-none tabular-nums tracking-display">
               {result.count}
             </span>
-            <span className="text-[13px] text-muted">{t('search.count')}</span>
+            <span className="text-ui text-muted">{t('search.count')}</span>
           </div>
           {result.hits.length === 0 ? (
             <Nothing>{t('search.none')}</Nothing>
@@ -164,7 +165,7 @@ function Hit({ hit }: { hit: SearchHit }) {
   const { t } = useI18n();
   return (
     <li className="rounded-sheet bg-raised/75 px-6 py-5 shadow-ring transition-all hover:shadow-card">
-      <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-2 text-[11.5px]">
+      <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-2 text-note">
         <Tag tone={hit.direction === 'restrict' ? 'warn' : 'ok'}>
           {t(`matter.direction.${hit.direction}`)}
         </Tag>
@@ -176,7 +177,7 @@ function Hit({ hit }: { hit: SearchHit }) {
 
       <Link
         to={`/matters/${hit.matterId}`}
-        className="block max-w-[46ch] font-display text-[20px] leading-snug tracking-[-0.014em] text-paper transition-colors hover:text-lapis"
+        className="block max-w-[46ch] font-display text-sub leading-snug tracking-title text-paper transition-colors hover:text-lapis"
       >
         {hit.title}
       </Link>
@@ -185,12 +186,12 @@ function Hit({ hit }: { hit: SearchHit }) {
         <ul className="mt-4 space-y-3.5 border-t border-line pt-4">
           {hit.matches.map((m, i) => (
             <li key={i}>
-              <div className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+              <div className="mb-1.5 text-label font-bold uppercase tracking-caps text-muted">
                 {t(`search.field.${m.field}`)}
                 {m.by && <span className="ms-2 normal-case tracking-normal">{m.by}</span>}
               </div>
               {/* What matched, in the face the board wrote it in. */}
-              <p className="max-w-[62ch] border-s-2 border-gold/50 ps-4 font-display text-[15px] leading-[1.55] text-sand">
+              <p className="max-w-[62ch] border-s-2 border-gold/50 ps-4 font-display text-lead leading-relaxed text-sand">
                 {m.snippet}
               </p>
             </li>

@@ -10,6 +10,7 @@ import {
 import { useI18n } from '../lib/i18n.js';
 import { DateText } from './ui.js';
 import { Field, HEADING } from './field.js';
+import { Button } from './Button';
 
 /**
  * The devices this member signs with.
@@ -110,14 +111,14 @@ export default function YourDevices() {
     }
   }
 
-  const BOX = 'w-full rounded-xl bg-raised px-3 py-2.5 text-[13.5px] shadow-ring outline-none';
+  const BOX = 'w-full rounded-xl bg-raised px-3 py-2.5 text-body shadow-ring outline-none';
 
   return (
     <div className="mt-5 border-t border-line pt-4">
-      <div className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-muted">
+      <div className="mb-1.5 text-label font-bold uppercase tracking-caps text-muted">
         {t('devices.heading')}
       </div>
-      <p className="mb-3 max-w-[62ch] text-[12.5px] leading-[1.65] text-sand">
+      <p className="mb-3 max-w-[62ch] text-ui leading-relaxed text-sand">
         {t('devices.what')}
       </p>
 
@@ -128,8 +129,8 @@ export default function YourDevices() {
               key={d.id}
               className="flex flex-wrap items-baseline gap-x-3 gap-y-1 rounded-card bg-raised px-4 py-3 shadow-ring"
             >
-              <span className="text-[13.5px] text-paper">{d.label}</span>
-              <span className="text-[11.5px] text-muted">
+              <span className="text-body text-paper">{d.label}</span>
+              <span className="text-note text-muted">
                 {t('devices.since')} <DateText iso={d.enrolledAt} />
                 {d.lastUsedAt && (
                   <>
@@ -138,36 +139,36 @@ export default function YourDevices() {
                   </>
                 )}
               </span>
-              <button
+              <Button
                 type="button"
                 onClick={() => void forget(d.id)}
-                className="ms-auto text-[12px] text-muted underline decoration-line underline-offset-4"
+                className="ms-auto text-note text-muted underline decoration-line underline-offset-4"
               >
                 {t('devices.forget')}
-              </button>
+              </Button>
             </li>
           ))}
         </ul>
       )}
 
       {devices && devices.length === 0 && can === 'yes' && (
-        <p className="mb-3 max-w-[62ch] text-[12.5px] leading-[1.65] text-muted">
+        <p className="mb-3 max-w-[62ch] text-ui leading-relaxed text-muted">
           {t('devices.none')}
         </p>
       )}
 
       {/* The act, where the browser can honour it. */}
       {can === 'yes' && !naming && (
-        <button
+        <Button
           type="button"
           onClick={() => {
             setRefusal(null);
             setNaming(true);
           }}
-          className="rounded-xl bg-raised px-4 py-2 text-[12.5px] font-semibold text-lapis shadow-ring"
+          className="rounded-xl bg-raised px-4 py-2 text-ui font-semibold text-lapis shadow-ring"
         >
           {t('devices.enrol')}
-        </button>
+        </Button>
       )}
 
       {can === 'yes' && naming && (
@@ -186,20 +187,20 @@ export default function YourDevices() {
           </Field>
 
           <div className="mt-4 flex flex-wrap items-center gap-3">
-            <button
+            <Button
               type="submit"
               disabled={busy || label.trim().length === 0}
-              className="rounded-xl bg-lapis px-5 py-2.5 text-[13px] font-semibold text-white shadow-act disabled:opacity-40"
+              className="rounded-xl bg-lapis px-5 py-2.5 text-ui font-semibold text-white shadow-act disabled:opacity-40"
             >
               {busy ? t('devices.waiting') : t('devices.enrolThis')}
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
               onClick={() => setNaming(false)}
-              className="text-[12.5px] text-muted underline decoration-line underline-offset-4"
+              className="text-ui text-muted underline decoration-line underline-offset-4"
             >
               {t('common.cancel')}
-            </button>
+            </Button>
           </div>
         </form>
       )}
@@ -209,7 +210,7 @@ export default function YourDevices() {
         than a button that opens a dialog the browser cannot answer.
       */}
       {can !== 'yes' && can !== 'asking' && (
-        <p className="max-w-[62ch] text-[12.5px] leading-[1.65] text-muted">
+        <p className="max-w-[62ch] text-ui leading-relaxed text-muted">
           {t(
             can === 'insecure'
               ? 'devices.insecure'
@@ -220,9 +221,9 @@ export default function YourDevices() {
         </p>
       )}
 
-      {refusal && <p className="mt-3 text-[12.5px] leading-[1.6] text-breach">{refusal}</p>}
+      {refusal && <p className="mt-3 text-ui leading-relaxed text-breach">{refusal}</p>}
 
-      <p className="mt-3 max-w-[62ch] text-[12px] leading-[1.6] text-muted">
+      <p className="mt-3 max-w-[62ch] text-note leading-relaxed text-muted">
         {t('devices.proves')}
       </p>
     </div>

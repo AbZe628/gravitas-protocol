@@ -6,6 +6,7 @@ import { Nothing } from '../components/page.js';
 import { ErrorText, Loading } from '../components/ui.js';
 import { useStillThere } from '../lib/stillThere.js';
 import type { QueuePhase } from '../lib/api.js';
+import { Button } from '../components/Button';
 
 /**
  * Everything waiting on somebody, in one list.
@@ -48,7 +49,7 @@ const PHASES: readonly QueuePhase[] = ['asked', 'deciding', 'inforce', 'checked'
 /** The stage's own colour, from the vocabulary the doors already use. */
 const TONE: Record<QueuePhase, string> = {
   asked: 'text-lapis',
-  deciding: 'text-[#8A6524]',
+  deciding: 'text-goldink',
   inforce: 'text-settled',
   checked: 'text-breach',
 };
@@ -63,7 +64,7 @@ function Row({ row }: { row: QueueRow }) {
         className={
           'flex gap-5 rounded-card px-5 py-4 transition-all hover:-translate-y-px hover:shadow-card ' +
           (row.overdue
-            ? 'bg-[#FCF0EE] shadow-[0_0_0_0.5px_rgba(154,56,48,0.22)]'
+            ? 'bg-breachtint shadow-ringbreach'
             : 'bg-raised shadow-ring')
         }
       >
@@ -75,13 +76,13 @@ function Row({ row }: { row: QueueRow }) {
         <div className="w-[4.5rem] shrink-0 text-end">
           <div
             className={
-              'font-mono text-[22px] leading-none tabular-nums ' +
+              'font-mono text-title leading-none tabular-nums ' +
               (row.overdue ? 'text-breach' : '')
             }
           >
             {row.days}
           </div>
-          <div className="mt-1 text-[10.5px] uppercase tracking-[0.12em] text-muted">
+          <div className="mt-1 text-label uppercase tracking-label text-muted">
             {t('needs.daysHere')}
           </div>
         </div>
@@ -90,26 +91,26 @@ function Row({ row }: { row: QueueRow }) {
           <div className="mb-1 flex flex-wrap items-center gap-x-2.5 gap-y-1">
             <span
               className={
-                'text-[10px] font-bold uppercase tracking-[0.14em] ' + TONE[row.phase]
+                'text-label font-bold uppercase tracking-caps ' + TONE[row.phase]
               }
             >
               {t(`needs.kind.${row.kind}`)}
             </span>
             {row.overdue && (
-              <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-breach">
+              <span className="text-label font-bold uppercase tracking-caps text-breach">
                 {t('needs.overdue')}
               </span>
             )}
           </div>
 
-          <div className="font-display text-[16.5px] leading-snug">{row.title}</div>
+          <div className="font-display text-lead leading-snug">{row.title}</div>
 
           {/*
             The act and whose it is, on one line. The commonest way anything
             here stalls is that every side believes it is with the other, so
             the owner is never left to be inferred.
           */}
-          <div className="mt-1.5 flex flex-wrap items-baseline gap-x-2 text-[12.5px]">
+          <div className="mt-1.5 flex flex-wrap items-baseline gap-x-2 text-ui">
             {row.next ? (
               <>
                 <span className="text-paper">{row.next}</span>
@@ -161,10 +162,10 @@ export default function Queue() {
         replaces had no <h1> at all: a person arrived somewhere with no name.
       */}
       <div className="mb-5 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
-        <h1 className="font-display text-[30px] leading-[1.1] tracking-[-0.024em] text-paper">
+        <h1 className="font-display text-head leading-tight tracking-display text-paper">
           {t('needs.title')}
         </h1>
-        <div className="text-[13px] text-muted">
+        <div className="text-ui text-muted">
           <span className="font-mono tabular-nums text-paper">{rows.length}</span>{' '}
           {t('needs.waiting')}
           {overdue > 0 && (
@@ -178,30 +179,30 @@ export default function Queue() {
       </div>
 
       <div className="mb-5 flex flex-wrap gap-2">
-        <button
+        <Button
           type="button"
           onClick={() => setOnly(null)}
           className={
-            'rounded-full px-3.5 py-1.5 text-[12px] transition-all ' +
+            'rounded-full px-3.5 py-1.5 text-note transition-all ' +
             (only === null
               ? 'bg-lapis font-semibold text-white'
               : 'bg-raised text-sand shadow-ring hover:text-paper')
           }
         >
           {t('needs.everything')}
-        </button>
+        </Button>
         {/*
           A stage with nothing in it is not offered. A chip that filters to an
           empty list is a control that cannot be honoured, and this
           application's rule is that those are absent rather than disabled.
         */}
         {PHASES.filter((p) => countOf(p) > 0).map((p) => (
-          <button
+          <Button
             key={p}
             type="button"
             onClick={() => setOnly(p)}
             className={
-              'rounded-full px-3.5 py-1.5 text-[12px] transition-all ' +
+              'rounded-full px-3.5 py-1.5 text-note transition-all ' +
               (only === p
                 ? 'bg-lapis font-semibold text-white'
                 : 'bg-raised text-sand shadow-ring hover:text-paper')
@@ -209,7 +210,7 @@ export default function Queue() {
           >
             {t(`door.${p}`)}
             <span className="ms-1.5 font-mono tabular-nums opacity-60">{countOf(p)}</span>
-          </button>
+          </Button>
         ))}
       </div>
 
@@ -230,7 +231,7 @@ export default function Queue() {
           <Link
             key={to}
             to={to}
-            className="text-[12.5px] text-muted underline decoration-line underline-offset-4 hover:text-paper"
+            className="text-ui text-muted underline decoration-line underline-offset-4 hover:text-paper"
           >
             {t(key)}
           </Link>
@@ -253,7 +254,7 @@ export default function Queue() {
         here is not waiting as far as this screen is concerned, and a member
         who believes the list is complete will stop looking.
       */}
-      <p className="mt-6 max-w-[62ch] text-[12px] leading-[1.6] text-muted">
+      <p className="mt-6 max-w-[62ch] text-note leading-relaxed text-muted">
         {t('needs.limits')}
       </p>
     </div>

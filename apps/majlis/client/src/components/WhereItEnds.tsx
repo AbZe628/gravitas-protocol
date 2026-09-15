@@ -61,14 +61,14 @@ export default function WhereItEnds({ matter }: { matter: Matter }) {
   return (
     <div className="mb-7 rounded-sheet bg-raised px-6 py-5 shadow-card">
       <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-2">
-        <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+        <span className="text-label font-bold uppercase tracking-caps text-muted">
           {t('ends.title')}
         </span>
         <span
           className={
-            'rounded-full px-2.5 py-0.5 text-[10.5px] font-bold uppercase tracking-[0.1em] ' +
+            'rounded-full px-2.5 py-0.5 text-label font-bold uppercase tracking-label ' +
             (onChain
-              ? 'bg-[#EBF3EF] text-settled shadow-[0_0_0_0.5px_rgba(44,107,87,0.18)]'
+              ? 'bg-settledtint text-settled shadow-ringsettled'
               : 'bg-black/[0.045] text-sand')
           }
         >
@@ -76,11 +76,11 @@ export default function WhereItEnds({ matter }: { matter: Matter }) {
         </span>
       </div>
 
-      <p className="max-w-[62ch] font-display text-[17px] leading-[1.55]">
+      <p className="max-w-[62ch] font-display text-sub leading-relaxed">
         {t(onChain ? 'ends.enforcedWhat' : 'ends.documentWhat')}
       </p>
 
-      <p className="mt-3 max-w-[62ch] text-[12.5px] leading-[1.6] text-muted">
+      <p className="mt-3 max-w-[62ch] text-ui leading-relaxed text-muted">
         {t(onChain ? 'ends.enforcedNote' : 'ends.documentNote')}
       </p>
 
@@ -91,12 +91,12 @@ export default function WhereItEnds({ matter }: { matter: Matter }) {
       */}
       {onChain && enforcement.address && (
         <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-card bg-ink px-4 py-3">
-          <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+          <span className="text-label font-bold uppercase tracking-caps text-muted">
             {t('ends.readAt')}
           </span>
-          <span className="break-all font-mono text-[11.5px] text-lapis">{enforcement.address}</span>
+          <span className="break-all font-mono text-note text-lapis">{enforcement.address}</span>
           {enforcement.reachable === false && (
-            <span className="text-[11.5px] text-breach">{t('ends.unreachable')}</span>
+            <span className="text-note text-breach">{t('ends.unreachable')}</span>
           )}
         </div>
       )}

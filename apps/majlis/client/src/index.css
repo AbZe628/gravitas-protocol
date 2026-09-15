@@ -19,6 +19,43 @@
     font-size: var(--g-text-base);
     line-height: var(--g-leading-body);
   }
+
+  /*
+   * ── where the keyboard is ─────────────────────────────────────────────
+   *
+   * Measured before this: `outline-none` appeared 49 times in the markup and
+   * `focus-visible` did not appear once. Every one of those 49 was somebody
+   * removing the browser's focus ring because it looked wrong, and nobody put
+   * anything back. The result is an application that can be driven from the
+   * keyboard and gives the person driving it no way to see where they are —
+   * which is not a rough edge, it is the keyboard not working.
+   *
+   * This is the floor, not the finish. `Button` carries its own ring and any
+   * control may carry a better one; this catches everything that does not,
+   * including the 49, because it is written against the element rather than
+   * against a class somebody has to remember.
+   *
+   * `:focus-visible` rather than `:focus`, so the ring appears for the
+   * keyboard and never after a mouse press.
+   */
+  :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+    outline: 2px solid theme('colors.lapis');
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /*
+   * Movement is a convenience, never the way something is said. A member who
+   * has asked their machine for less of it loses nothing here.
+   */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
   /*
    * Display type is set tight. A serif tracked at zero reads loose at 30px on
    * a light ground in a way it did not on the old dark one.

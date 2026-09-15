@@ -6,6 +6,7 @@ import { Card, DateText, ErrorText, Loading, Tag } from '../components/ui.js';
 import { DocumentLink, YearPicker } from '../components/Documents.js';
 import { Row, Rows } from '../components/shapes.js';
 import { State } from '../components/kit.js';
+import { Button } from '../components/Button';
 
 /** Everything this board has settled, newest first. */
 const SETTLED = ['in_force', 'rejected', 'lapsed', 'withdrawn'];
@@ -13,7 +14,7 @@ const SETTLED = ['in_force', 'rejected', 'lapsed', 'withdrawn'];
 function Decided({ matters }: { matters: MatterSummary[] | null }) {
   const { t } = useI18n();
 
-  if (matters === null) return <p className="mb-6 text-[13px] text-muted">{t('common.loading')}</p>;
+  if (matters === null) return <p className="mb-6 text-ui text-muted">{t('common.loading')}</p>;
 
   const settled = matters
     .filter((m) => SETTLED.includes(m.status))
@@ -21,12 +22,12 @@ function Decided({ matters }: { matters: MatterSummary[] | null }) {
 
   return (
     <div className="mb-8">
-      <h2 className="mb-3 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+      <h2 className="mb-3 text-label font-bold uppercase tracking-caps text-muted">
         {t('decided.heading')}
       </h2>
 
       {settled.length === 0 ? (
-        <p className="rounded-card bg-raised/60 px-5 py-4 text-[13px] leading-[1.6] text-muted shadow-ring">
+        <p className="rounded-card bg-raised/60 px-5 py-4 text-ui leading-relaxed text-muted shadow-ring">
           {t('decided.none')}
         </p>
       ) : (
@@ -43,7 +44,7 @@ function Decided({ matters }: { matters: MatterSummary[] | null }) {
               phase="inforce"
               kind={t(`matter.direction.${m.direction}`)}
               title={m.title}
-              note={<span className="font-mono text-[11.5px]">{m.openedAt.slice(0, 10)}</span>}
+              note={<span className="font-mono text-note">{m.openedAt.slice(0, 10)}</span>}
               standing={
                 <State tone={m.status === 'in_force' ? 'settled' : 'plain'}>
                   {t(`matter.status.${m.status}`)}
@@ -98,7 +99,7 @@ export default function Record({ embedded = false }: { embedded?: boolean }) {
 
   return (
     <div>
-      {!embedded && (<h1 className="mb-5 font-display font-normal leading-[1.12] tracking-[-0.024em] text-[30px] sm:text-[34px]">{t('record.title')}</h1>)}
+      {!embedded && (<h1 className="mb-5 font-display font-normal leading-tight tracking-display text-head sm:text-display">{t('record.title')}</h1>)}
 
       {/*
         What the board decided, which is what this page is named after and
@@ -114,17 +115,17 @@ export default function Record({ embedded = false }: { embedded?: boolean }) {
       */}
       <Link
         to="/briefings"
-        className="mb-5 inline-block rounded-xl bg-raised px-4 py-2 text-[12.5px] font-semibold text-lapis shadow-ring"
+        className="mb-5 inline-block rounded-xl bg-raised px-4 py-2 text-ui font-semibold text-lapis shadow-ring"
       >
         {t('record.toPapers')}
       </Link>
 
       {health?.recordSince && (
         <div className="mb-5 rounded-card shadow-ring bg-raised px-4 py-3">
-          <div className="text-[13px] text-paper">
+          <div className="text-ui text-paper">
             {t('record.since')} <DateText iso={health.recordSince} />
           </div>
-          <p className="mt-1 text-[12.5px] leading-relaxed text-muted">{t('record.notDurable')}</p>
+          <p className="mt-1 text-ui leading-relaxed text-muted">{t('record.notDurable')}</p>
         </div>
       )}
 
@@ -135,7 +136,7 @@ export default function Record({ embedded = false }: { embedded?: boolean }) {
         the wrong way round.
       */}
       <div className="mb-4">
-        <div className="mb-2 flex items-center gap-2 text-[13px] text-muted">
+        <div className="mb-2 flex items-center gap-2 text-ui text-muted">
           <span>{t('doc.year')}</span>
           <YearPicker year={year} onChange={setYear} />
         </div>
@@ -147,40 +148,40 @@ export default function Record({ embedded = false }: { embedded?: boolean }) {
       </div>
 
       <Card>
-        <div className="text-[15px] font-medium">{t('record.export')}</div>
-        <p className="mt-1.5 text-[13px] leading-relaxed text-muted">{t('record.exportNote')}</p>
-        <button
+        <div className="text-lead font-medium">{t('record.export')}</div>
+        <p className="mt-1.5 text-ui leading-relaxed text-muted">{t('record.exportNote')}</p>
+        <Button
           type="button"
           onClick={exportAudit}
           disabled={exporting}
-          className="mt-3 rounded bg-lapis px-4 py-2 text-[13px] text-white font-semibold shadow-act transition-colors hover:bg-lapis disabled:opacity-40"
+          className="mt-3 rounded bg-lapis px-4 py-2 text-ui text-white font-semibold shadow-act transition-colors hover:bg-lapis disabled:opacity-40"
         >
           {exporting ? t('common.loading') : t('record.export')}
-        </button>
+        </Button>
       </Card>
 
-      <h2 className="mb-2 mt-8 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+      <h2 className="mb-2 mt-8 text-label font-bold uppercase tracking-caps text-muted">
         {t('record.assistantLog')}
       </h2>
-      <p className="mb-4 text-[13px] leading-relaxed text-muted">{t('record.assistantLogNote')}</p>
+      <p className="mb-4 text-ui leading-relaxed text-muted">{t('record.assistantLogNote')}</p>
 
       {failed ? (
         <ErrorText />
       ) : !log ? (
         <Loading />
       ) : log.length === 0 ? (
-        <p className="text-[13px] text-muted">{t('common.none')}</p>
+        <p className="text-ui text-muted">{t('common.none')}</p>
       ) : (
         <ul className="space-y-3">
           {log.map((x) => (
             <li key={x.id} className="rounded-card shadow-ring p-3.5">
-              <div className="mb-1.5 flex flex-wrap items-center gap-2 text-[12px] text-muted">
+              <div className="mb-1.5 flex flex-wrap items-center gap-2 text-note text-muted">
                 <DateText iso={x.at} />
                 {x.declinedAsRuling && <Tag tone="warn">{t('asst.declined')}</Tag>}
                 {x.escalated && <Tag tone="gold">{t('asst.escalated')}</Tag>}
               </div>
-              <div className="text-[14px]">{x.question}</div>
-              <div className="mt-1.5 text-[13px] text-sand line-clamp-3">{x.answer}</div>
+              <div className="text-body">{x.question}</div>
+              <div className="mt-1.5 text-ui text-sand line-clamp-3">{x.answer}</div>
             </li>
           ))}
         </ul>

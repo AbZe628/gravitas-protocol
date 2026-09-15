@@ -15,6 +15,7 @@ import { ActionPanel, Facts, RecordPage } from '../components/shapes.js';
 import HowItChanged from '../components/HowItChanged.js';
 import { ErrorText, Loading, Section } from '../components/ui.js';
 import { State, type Tone } from '../components/kit.js';
+import { Button } from '../components/Button';
 
 /**
  * One contract shape, as this board holds it.
@@ -172,29 +173,29 @@ export default function StructureDetail({ structureId }: { structureId?: string 
           {after ? (
             after
           ) : !open ? (
-            <button
+            <Button
               type="button"
               onClick={() => setOpen(true)}
-              className="w-full rounded-xl bg-lapis px-4 py-2.5 text-[13px] font-semibold text-white shadow-act"
+              className="w-full rounded-xl bg-lapis px-4 py-2.5 text-ui font-semibold text-white shadow-act"
             >
               {untouched ? t('adopt.take') : t('adopt.reconsider')}
-            </button>
+            </Button>
           ) : carried.length === 0 ? (
             /*
               No ruling in force, so no adoption. Said here rather than as a
               disabled button: a control that cannot be honoured is absent.
             */
-            <p className="text-[12.5px] leading-relaxed text-muted">{t('adopt.noDecision')}</p>
+            <p className="text-ui leading-relaxed text-muted">{t('adopt.noDecision')}</p>
           ) : (
             <>
               <label className="mb-3 block">
-                <span className="mb-1.5 block text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+                <span className="mb-1.5 block text-label font-bold uppercase tracking-caps text-muted">
                   {t('adopt.decidedIn')}
                 </span>
                 <select
                   value={matterId}
                   onChange={(e) => setMatterId(e.target.value)}
-                  className="w-full rounded-xl bg-raised px-3 py-2.5 text-[13px] shadow-ring"
+                  className="w-full rounded-xl bg-raised px-3 py-2.5 text-ui shadow-ring"
                 >
                   <option value="">{t('adopt.pickDecision')}</option>
                   {carried.map((m) => (
@@ -206,7 +207,7 @@ export default function StructureDetail({ structureId }: { structureId?: string 
               </label>
 
               <label className="mb-3 block">
-                <span className="mb-1.5 block text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+                <span className="mb-1.5 block text-label font-bold uppercase tracking-caps text-muted">
                   {t('adopt.reason')}
                 </span>
                 <textarea
@@ -214,43 +215,43 @@ export default function StructureDetail({ structureId }: { structureId?: string 
                   onChange={(e) => setReason(e.target.value)}
                   rows={3}
                   placeholder={t('adopt.reasonHint')}
-                  className="w-full rounded-xl bg-raised px-3 py-2.5 text-[13px] shadow-ring"
+                  className="w-full rounded-xl bg-raised px-3 py-2.5 text-ui shadow-ring"
                 />
               </label>
 
               {error && (
-                <p className="mb-3 rounded-xl bg-[#FCF0EE] px-3.5 py-2.5 text-[12.5px] leading-relaxed text-breach shadow-[0_0_0_0.5px_rgba(154,56,48,0.18)]">
+                <p className="mb-3 rounded-xl bg-breachtint px-3.5 py-2.5 text-ui leading-relaxed text-breach shadow-ringbreach">
                   {error}
                 </p>
               )}
 
               <div className="flex flex-col gap-2">
-                <button
+                <Button
                   type="button"
                   disabled={busy || !matterId}
                   onClick={() => take('adopted')}
-                  className="rounded-xl bg-lapis px-4 py-2 text-[12.5px] font-semibold text-white shadow-act disabled:opacity-40"
+                  className="rounded-xl bg-lapis px-4 py-2 text-ui font-semibold text-white shadow-act disabled:opacity-40"
                 >
                   {t('adopt.confirm')}
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
                   disabled={busy || !matterId}
                   onClick={() => take('declined')}
-                  className="rounded-xl bg-raised px-4 py-2 text-[12.5px] font-medium text-breach shadow-[0_0_0_0.5px_rgba(154,56,48,0.25)] disabled:opacity-40"
+                  className="rounded-xl bg-raised px-4 py-2 text-ui font-medium text-breach shadow-ringbreach disabled:opacity-40"
                 >
                   {t('adopt.decline')}
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
                   onClick={() => {
                     setOpen(false);
                     setError(null);
                   }}
-                  className="px-4 py-1 text-[12.5px] text-muted"
+                  className="px-4 py-1 text-ui text-muted"
                 >
                   {t('common.cancel')}
-                </button>
+                </Button>
               </div>
 
               {/*
@@ -258,7 +259,7 @@ export default function StructureDetail({ structureId }: { structureId?: string 
                 condition in a textarea is drafting, and it belongs beside the
                 condition it changes.
               */}
-              <p className="mt-3 text-[11.5px] leading-relaxed text-muted">
+              <p className="mt-3 text-note leading-relaxed text-muted">
                 {t('adopt.amendElsewhere')}
               </p>
             </>
@@ -284,7 +285,7 @@ export default function StructureDetail({ structureId }: { structureId?: string 
       */}
       <Link
         to={`/check?shape=${encodeURIComponent(s.id)}`}
-        className="mt-3.5 block rounded-card bg-raised p-4 text-[12.5px] font-semibold text-lapis shadow-ring"
+        className="mt-3.5 block rounded-card bg-raised p-4 text-ui font-semibold text-lapis shadow-ring"
       >
         {t('adopt.checkADraft')}
       </Link>
@@ -303,8 +304,8 @@ export default function StructureDetail({ structureId }: { structureId?: string 
       aside={aside}
     >
       {/* What this standing means, in the words the library uses for it. */}
-      <p className="max-w-[62ch] text-[13.5px] leading-[1.65] text-muted">{held.note}</p>
-      <p className="mb-7 mt-2 text-[12.5px] text-muted">
+      <p className="max-w-[62ch] text-body leading-relaxed text-muted">{held.note}</p>
+      <p className="mb-7 mt-2 text-ui text-muted">
         {held.adoption?.basis ?? t('adopt.noBasis')}
       </p>
 
@@ -317,9 +318,9 @@ export default function StructureDetail({ structureId }: { structureId?: string 
         <ol className="space-y-3">
           {s.conditions.map((c) => (
             <li key={c.id} className="rounded-card bg-raised px-4 py-3 shadow-ring">
-              <p className="font-display text-[15px] leading-[1.55] text-paper">{c.requirement}</p>
-              <p className="mt-1.5 text-[12.5px] leading-[1.6] text-muted">{c.why}</p>
-              <p className="mt-1.5 text-[11.5px] text-muted">{t(`chk.evidence.${c.evidence}`)}</p>
+              <p className="font-display text-lead leading-relaxed text-paper">{c.requirement}</p>
+              <p className="mt-1.5 text-ui leading-relaxed text-muted">{c.why}</p>
+              <p className="mt-1.5 text-note text-muted">{t(`chk.evidence.${c.evidence}`)}</p>
             </li>
           ))}
         </ol>
@@ -334,12 +335,12 @@ export default function StructureDetail({ structureId }: { structureId?: string 
         <Section title={t('adopt.reason')}>
           <ul className="space-y-2 border-s-2 border-gold/50 ps-4">
             {held.adoption.amendments.map((a, i) => (
-              <li key={i} className="font-display text-[15px] leading-[1.55] text-paper">
+              <li key={i} className="font-display text-lead leading-relaxed text-paper">
                 {a}
               </li>
             ))}
           </ul>
-          <p className="mt-3 text-[12px] text-muted">
+          <p className="mt-3 text-note text-muted">
             {t('adopt.under')}{' '}
             <Link
               to={`/matters/${held.adoption.matterId}`}
@@ -362,24 +363,24 @@ export default function StructureDetail({ structureId }: { structureId?: string 
 
       <Section title={t('adopt.usedIn')}>
         {(held.usedBy ?? []).length === 0 ? (
-          <p className="max-w-[62ch] text-[12.5px] leading-[1.6] text-muted">
+          <p className="max-w-[62ch] text-ui leading-relaxed text-muted">
             {t('adopt.neverUsed')}
           </p>
         ) : (
           <ul className="space-y-1.5">
             {(held.usedBy ?? []).map((u) => (
               <li key={u.matterId} className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                <Link to={`/matters/${u.matterId}`} className="text-[13px] text-lapis hover:underline">
+                <Link to={`/matters/${u.matterId}`} className="text-ui text-lapis hover:underline">
                   {u.title}
                 </Link>
-                <span className="text-[11.5px] text-muted">{t(`matter.status.${u.status}`)}</span>
+                <span className="text-note text-muted">{t(`matter.status.${u.status}`)}</span>
                 {/* Offered only where the route will honour it. */}
                 {u.hasDraft && (
                   <a
                     href={oversight.hrefs.contract(u.matterId)}
                     target="_blank"
                     rel="noreferrer"
-                    className="text-[12.5px] font-semibold text-lapis underline decoration-line underline-offset-4"
+                    className="text-ui font-semibold text-lapis underline decoration-line underline-offset-4"
                   >
                     {t('adopt.theDraft')}
                   </a>

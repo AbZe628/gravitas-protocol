@@ -68,7 +68,7 @@ function entryRow(entry: CalendarEntry, t: (k: string) => string) {
         <>
           {entry.note}
           {entry.waitingOn.length > 0 && (
-            <span className="mt-0.5 block text-[11.5px]">
+            <span className="mt-0.5 block text-note">
               {t('cal.notYetFrom')} {entry.waitingOn.join(', ')}
             </span>
           )}
@@ -77,7 +77,7 @@ function entryRow(entry: CalendarEntry, t: (k: string) => string) {
       standing={
         <span
           className={
-            entry.overdue ? 'text-[12.5px] font-semibold text-breach' : 'text-[12.5px] text-muted'
+            entry.overdue ? 'text-ui font-semibold text-breach' : 'text-ui text-muted'
           }
         >
           <DateText iso={entry.at} />
@@ -109,13 +109,13 @@ function Rhythm({ cadence, nextConvened }: { cadence: Cadence | null; nextConven
       className={
         'mb-7 rounded-card px-5 py-4 ' +
         (cadence.overdue
-          ? 'bg-[#FCF0EE] shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)]'
+          ? 'bg-breachtint shadow-ringbreach'
           : 'bg-raised shadow-ring')
       }
     >
       <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-3">
         <div className="min-w-0">
-          <div className="flex flex-wrap items-baseline gap-x-5 gap-y-1.5 text-[13px]">
+          <div className="flex flex-wrap items-baseline gap-x-5 gap-y-1.5 text-ui">
             {cadence.lastHeldAt && (
               <span className="text-muted">
                 {t('meet.lastHeld')}{' '}
@@ -132,7 +132,7 @@ function Rhythm({ cadence, nextConvened }: { cadence: Cadence | null; nextConven
             </span>
           </div>
 
-          <p className="mt-2 max-w-[62ch] text-[12.5px] leading-[1.6] text-muted">{cadence.note}</p>
+          <p className="mt-2 max-w-[62ch] text-ui leading-relaxed text-muted">{cadence.note}</p>
         </div>
 
         {/*
@@ -143,13 +143,13 @@ function Rhythm({ cadence, nextConvened }: { cadence: Cadence | null; nextConven
         */}
         <div className="shrink-0">
           {nextConvened ? (
-            <Link to="/meetings" className="block text-[13px] text-lapis">
+            <Link to="/meetings" className="block text-ui text-lapis">
               {t('meet.nextConvened')} <DateText iso={nextConvened} />
             </Link>
           ) : (
             <Link
               to="/meetings"
-              className="inline-block rounded-xl bg-lapis px-4 py-2 text-[13px] font-semibold text-white shadow-act"
+              className="inline-block rounded-xl bg-lapis px-4 py-2 text-ui font-semibold text-white shadow-act"
             >
               {t('meet.convene')}
             </Link>
@@ -203,7 +203,7 @@ export default function Calendar() {
       says={t('cal.intro')}
       live={
         entries.length > 0 ? (
-          <span className="text-[13px] text-muted">
+          <span className="text-ui text-muted">
             <span className="font-mono tabular-nums text-paper">{entries.length}</span>{' '}
             <span>{t('cal.entries')}</span>
           </span>
@@ -228,7 +228,7 @@ export default function Calendar() {
           <Link
             key={to}
             to={to}
-            className="rounded-xl bg-raised px-4 py-2 text-[12.5px] font-semibold text-lapis shadow-ring"
+            className="rounded-xl bg-raised px-4 py-2 text-ui font-semibold text-lapis shadow-ring"
           >
             {t(key)}
           </Link>
@@ -268,12 +268,12 @@ export default function Calendar() {
         className="mt-7 block rounded-card shadow-ring bg-raised px-4 py-3 transition-colors hover:text-paper"
       >
         <div className="flex items-baseline justify-between gap-3">
-          <span className="text-[14px] font-medium">{t('cal.feed')}</span>
-          <span className="shrink-0 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+          <span className="text-body font-medium">{t('cal.feed')}</span>
+          <span className="shrink-0 text-label font-bold uppercase tracking-caps text-muted">
             {t('cal.download')}
           </span>
         </div>
-        <p className="mt-1 text-[12.5px] leading-relaxed text-muted">{t('cal.feedNote')}</p>
+        <p className="mt-1 text-ui leading-relaxed text-muted">{t('cal.feedNote')}</p>
       </a>
     </ListPage>
   );

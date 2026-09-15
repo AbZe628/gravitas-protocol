@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useHealth } from '../lib/health.js';
 import { useI18n } from '../lib/i18n.js';
+import { Button } from './Button';
 
 /**
  * Speaking a reason instead of typing it.
@@ -85,7 +86,7 @@ export default function Dictate({ onText }: { onText: (text: string) => void }) 
 
   if (health?.dictation !== 'browser') {
     return (
-      <p className="mt-2.5 text-[11.5px] leading-[1.55] text-muted">
+      <p className="mt-2.5 text-note leading-relaxed text-muted">
         {t('dictate.notOn')}
       </p>
     );
@@ -95,7 +96,7 @@ export default function Dictate({ onText }: { onText: (text: string) => void }) 
   // and not one the institution can do anything about.
   if (!Recognition) {
     return (
-      <p className="mt-2.5 text-[11.5px] leading-[1.55] text-muted">
+      <p className="mt-2.5 text-note leading-relaxed text-muted">
         {t('dictate.noBrowser')}
       </p>
     );
@@ -155,24 +156,24 @@ export default function Dictate({ onText }: { onText: (text: string) => void }) 
 
   return (
     <div className="mt-2">
-      <button
+      <Button
         type="button"
         onClick={press}
         aria-pressed={listening}
         className={
-          'rounded-xl px-3.5 py-2 text-[12.5px] transition-all ' +
-          (listening ? 'bg-[#EAF1F7] font-semibold text-lapis shadow-[0_0_0_1.5px_#164470]' : 'bg-raised text-sand shadow-ring hover:text-paper')
+          'rounded-xl px-3.5 py-2 text-ui transition-all ' +
+          (listening ? 'bg-lapistint font-semibold text-lapis shadow-pick' : 'bg-raised text-sand shadow-ring hover:text-paper')
         }
       >
         {listening ? t('dictate.stop') : t('dictate.start')}
-      </button>
+      </Button>
 
       {listening && (
-        <span className="ms-2 text-[11.5px] text-muted">{t('dictate.listening')}</span>
+        <span className="ms-2 text-note text-muted">{t('dictate.listening')}</span>
       )}
 
       {refusal && (
-        <p className="mt-1.5 text-[11.5px] leading-relaxed text-breach">{refusal}</p>
+        <p className="mt-1.5 text-note leading-relaxed text-breach">{refusal}</p>
       )}
 
       {/*
@@ -182,9 +183,9 @@ export default function Dictate({ onText }: { onText: (text: string) => void }) 
       */}
       {asking && (
         <div className="mt-2 rounded-xl shadow-ring px-3 py-2.5">
-          <p className="text-[12px] leading-relaxed text-muted">{health.dictationNote}</p>
+          <p className="text-note leading-relaxed text-muted">{health.dictationNote}</p>
           <div className="mt-2 flex flex-wrap gap-2">
-            <button
+            <Button
               type="button"
               onClick={() => {
                 try {
@@ -195,17 +196,17 @@ export default function Dictate({ onText }: { onText: (text: string) => void }) 
                 setAsking(false);
                 start();
               }}
-              className="rounded-xl bg-raised shadow-ring px-3 py-1 text-[12px] text-lapis font-medium"
+              className="rounded-xl bg-raised shadow-ring px-3 py-1 text-note text-lapis font-medium"
             >
               {t('dictate.understood')}
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
               onClick={() => setAsking(false)}
-              className="rounded-xl shadow-ring px-3 py-1 text-[12px] text-muted"
+              className="rounded-xl shadow-ring px-3 py-1 text-note text-muted"
             >
               {t('dictate.typeInstead')}
-            </button>
+            </Button>
           </div>
         </div>
       )}

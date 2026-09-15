@@ -54,7 +54,7 @@ export default function Attention() {
   if (failed || !data || !items) return null;
   if (items.length === 0) {
     return (
-      <div className="mb-5 rounded-card shadow-ring bg-raised px-4 py-3 text-[13px] text-muted">
+      <div className="mb-5 rounded-card shadow-ring bg-raised px-4 py-3 text-ui text-muted">
         {t('attention.none')}
       </div>
     );
@@ -62,9 +62,9 @@ export default function Attention() {
 
   return (
     <section className="mb-6">
-      <h2 className="mb-3 flex items-baseline gap-2 text-[15px] font-semibold">
+      <h2 className="mb-3 flex items-baseline gap-2 text-lead font-semibold">
         {t('attention.title')}
-        <span className="text-[12px] font-normal text-muted">
+        <span className="text-note font-normal text-muted">
           {items.length}
           {items.filter((i) => i.overdue).length > 0
             ? ` · ${items.filter((i) => i.overdue).length} ${t('attention.overdue').toLowerCase()}`
@@ -87,16 +87,16 @@ export default function Attention() {
                       <span
                         className={
                           item.overdue
-                            ? 'text-[12px] font-semibold text-breach'
-                            : 'text-[12px] text-muted'
+                            ? 'text-note font-semibold text-breach'
+                            : 'text-note text-muted'
                         }
                       >
                         {left}
                       </span>
                     )}
                   </div>
-                  <div className="text-[14px] font-medium leading-snug">{item.title}</div>
-                  <p className="mt-1 text-[12px] leading-relaxed text-muted">{item.note}</p>
+                  <div className="text-body font-medium leading-snug">{item.title}</div>
+                  <p className="mt-1 text-note leading-relaxed text-muted">{item.note}</p>
                 </Card>
               </Link>
             </li>

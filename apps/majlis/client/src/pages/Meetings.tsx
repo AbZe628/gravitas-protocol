@@ -13,6 +13,7 @@ import { Division, Nothing, PageHead } from '../components/page.js';
 import { useIdentity } from '../lib/identity.js';
 import { Card, DateText, ErrorText, Loading, Tag } from '../components/ui.js';
 import { useStillThere } from '../lib/stillThere.js';
+import { Button } from '../components/Button';
 
 /**
  * Meetings, as a record rather than a room.
@@ -106,7 +107,7 @@ function MeetingCard({
     <Card>
       <div className="mb-1.5 flex flex-wrap items-center gap-2">
         <Tag tone={tone(row.state)}>{t(`meet.${row.state}`)}</Tag>
-        <span className="font-mono text-[12.5px] tabular-nums">
+        <span className="font-mono text-ui tabular-nums">
           <DateText iso={m.at} />
         </span>
         {m.joinUrl && (
@@ -114,7 +115,7 @@ function MeetingCard({
             href={m.joinUrl}
             target="_blank"
             rel="noreferrer"
-            className="text-[12px] text-muted underline underline-offset-2 hover:text-paper"
+            className="text-note text-muted underline underline-offset-2 hover:text-paper"
           >
             {t('meet.join')}
           </a>
@@ -124,7 +125,7 @@ function MeetingCard({
       {/* The agenda, with each item that is a matter linking to it. */}
       <ul className="mb-2 space-y-1">
         {m.agenda.map((item, i) => (
-          <li key={i} className="text-[13px] leading-snug">
+          <li key={i} className="text-ui leading-snug">
             {item.matterId ? (
               <Link to={`/matters/${item.matterId}`} className="underline underline-offset-2 hover:text-fg">
                 {item.item}
@@ -144,24 +145,24 @@ function MeetingCard({
         */}
         <Link
           to={`/meetings/${row.meeting.id}/book`}
-          className="text-[12.5px] font-semibold text-lapis underline decoration-line underline-offset-4"
+          className="text-ui font-semibold text-lapis underline decoration-line underline-offset-4"
         >
           {t('book.open')}
         </Link>
-        <button
+        <Button
           type="button"
           onClick={() => setOpen(!open)}
-          className="text-[12px] text-muted underline underline-offset-2 hover:text-paper"
+          className="text-note text-muted underline underline-offset-2 hover:text-paper"
         >
           {open ? t('meet.hide') : t('meet.show')}
-        </button>
+        </Button>
       </div>
 
       {open && (
         <div className="mt-3 space-y-3">
           {/* ── who was there ───────────────────────────────────────────── */}
           <div>
-            <div className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+            <div className="mb-1.5 text-label font-bold uppercase tracking-caps text-muted">
               {t('meet.attendance')}
             </div>
 
@@ -169,7 +170,7 @@ function MeetingCard({
               <div className="space-y-1.5">
                 {board.members.map((member) => (
                   <div key={member.id} className="flex flex-wrap items-center gap-2">
-                    <label className="flex min-w-[180px] cursor-pointer items-center gap-2 text-[13px]">
+                    <label className="flex min-w-[180px] cursor-pointer items-center gap-2 text-ui">
                       <input
                         type="checkbox"
                         checked={present[member.id] ?? false}
@@ -191,22 +192,22 @@ function MeetingCard({
                         onChange={(e) => setNotes({ ...notes, [member.id]: e.target.value })}
                         placeholder={t('meet.absenceNote')}
             aria-label={t('meet.absenceNote')}
-                        className="flex-1 rounded-xl shadow-ring bg-raised px-2 py-1 text-[12.5px]"
+                        className="flex-1 rounded-xl shadow-ring bg-raised px-2 py-1 text-ui"
                       />
                     )}
                   </div>
                 ))}
-                <button
+                <Button
                   type="button"
                   disabled={busy}
                   onClick={saveAttendance}
-                  className="rounded-xl shadow-ring px-3 py-1.5 text-[12.5px] text-muted hover:text-paper disabled:opacity-40"
+                  className="rounded-xl shadow-ring px-3 py-1.5 text-ui text-muted hover:text-paper disabled:opacity-40"
                 >
                   {t('meet.saveAttendance')}
-                </button>
+                </Button>
               </div>
             ) : (
-              <ul className="space-y-1 text-[12.5px]">
+              <ul className="space-y-1 text-ui">
                 {m.attendance.map((a) => (
                   <li key={a.scholarId}>
                     <span className={a.present ? '' : 'text-muted'}>
@@ -226,7 +227,7 @@ function MeetingCard({
               would assert an absence nobody recorded.
             */}
             {row.unaccountedFor.length > 0 && (
-              <p className="mt-1.5 text-[12px] leading-relaxed text-muted">
+              <p className="mt-1.5 text-note leading-relaxed text-muted">
                 {t('meet.unaccounted')}: {row.unaccountedFor.join(', ')}
               </p>
             )}
@@ -234,7 +235,7 @@ function MeetingCard({
 
           {/* ── the minute ──────────────────────────────────────────────── */}
           <div>
-            <div className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+            <div className="mb-1.5 text-label font-bold uppercase tracking-caps text-muted">
               {t('meet.minute')}
             </div>
 
@@ -246,26 +247,26 @@ function MeetingCard({
                   rows={4}
                   placeholder={t('meet.minuteHint')}
             aria-label={t('meet.minuteHint')}
-                  className="w-full rounded-xl shadow-ring bg-raised px-3 py-2 text-[13px] leading-relaxed"
+                  className="w-full rounded-xl shadow-ring bg-raised px-3 py-2 text-ui leading-relaxed"
                 />
-                <button
+                <Button
                   type="button"
                   disabled={busy}
                   onClick={() => run(() => oversight.writeMinute(m.id, minute))}
-                  className="mt-1.5 rounded-xl shadow-ring px-3 py-1.5 text-[12.5px] text-muted hover:text-paper disabled:opacity-40"
+                  className="mt-1.5 rounded-xl shadow-ring px-3 py-1.5 text-ui text-muted hover:text-paper disabled:opacity-40"
                 >
                   {t('meet.saveMinute')}
-                </button>
+                </Button>
               </>
             ) : (
-              <p className="whitespace-pre-wrap text-[13px] leading-relaxed">
+              <p className="whitespace-pre-wrap text-ui leading-relaxed">
                 {m.minute || <span className="text-muted">{t('meet.noMinute')}</span>}
               </p>
             )}
           </div>
 
           {error && (
-            <p className="rounded-xl shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)] px-3 py-2 text-[12.5px] leading-relaxed text-breach">
+            <p className="rounded-xl shadow-ringbreach px-3 py-2 text-ui leading-relaxed text-breach">
               {error}
             </p>
           )}
@@ -276,15 +277,15 @@ function MeetingCard({
           */}
           {canClose && row.state !== 'closed' && (
             <div>
-              <button
+              <Button
                 type="button"
                 disabled={busy}
                 onClick={() => run(() => oversight.closeMeeting(m.id))}
-                className="rounded-xl bg-gradient-to-br from-lapissoft to-[#143E67] px-4 py-2 text-[13px] font-semibold text-white shadow-act hover:bg-lapis disabled:opacity-40"
+                className="rounded-xl bg-gradient-to-br from-lapissoft to-lapis px-4 py-2 text-ui font-semibold text-white shadow-act hover:bg-lapis disabled:opacity-40"
               >
                 {t('meet.close')}
-              </button>
-              <p className="mt-1.5 text-[11.5px] leading-relaxed text-muted">
+              </Button>
+              <p className="mt-1.5 text-note leading-relaxed text-muted">
                 {t('meet.closeMeans')}
               </p>
             </div>
@@ -381,13 +382,13 @@ export default function Meetings() {
         className={
           'mb-5 rounded-card px-5 py-4 ' +
           (data.cadence.overdue
-            ? 'bg-[#FCF0EE] text-breach shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)]'
+            ? 'bg-breachtint text-breach shadow-ringbreach'
             : 'bg-raised shadow-ring')
         }
       >
         {data.cadence.dueBy ? (
           <>
-            <div className="flex flex-wrap items-baseline gap-x-5 gap-y-1 text-[13px]">
+            <div className="flex flex-wrap items-baseline gap-x-5 gap-y-1 text-ui">
               <span>
                 <span className="text-muted">{t('meet.lastHeld')} </span>
                 <DateText iso={data.cadence.lastHeldAt} />
@@ -403,23 +404,23 @@ export default function Meetings() {
                 </span>
               )}
             </div>
-            <p className="mt-1.5 text-[12px] leading-relaxed text-muted">{data.cadence.note}</p>
+            <p className="mt-1.5 text-note leading-relaxed text-muted">{data.cadence.note}</p>
           </>
         ) : (
           // The server's own sentence: an absence in this record rather than a
           // finding about a board that may have met for years without it.
-          <p className="text-[12.5px] leading-relaxed text-muted">{data.cadence.note}</p>
+          <p className="text-ui leading-relaxed text-muted">{data.cadence.note}</p>
         )}
       </div>
 
       {canConvene && !convening && (
-        <button
+        <Button
           type="button"
           onClick={() => setConvening(true)}
-          className="mb-5 rounded-xl bg-lapis px-5 py-2.5 text-[13px] font-semibold text-white shadow-act transition-all hover:bg-lapissoft"
+          className="mb-5 rounded-xl bg-lapis px-5 py-2.5 text-ui font-semibold text-white shadow-act transition-all hover:bg-lapissoft"
         >
           {t('meet.convene')}
-        </button>
+        </Button>
       )}
 
       {canConvene && convening && (
@@ -430,19 +431,19 @@ export default function Meetings() {
             people have.
           */}
           <label className="mb-2.5 block">
-            <span className="mb-1 block text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+            <span className="mb-1 block text-label font-bold uppercase tracking-caps text-muted">
               {t('meet.when')}
             </span>
             <input
               type="datetime-local"
               value={at}
               onChange={(e) => setAt(e.target.value)}
-              className="w-full rounded-xl shadow-ring bg-raised px-3 py-2 text-[13px]"
+              className="w-full rounded-xl shadow-ring bg-raised px-3 py-2 text-ui"
             />
           </label>
 
           <label className="mb-2.5 block">
-            <span className="mb-1 block text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+            <span className="mb-1 block text-label font-bold uppercase tracking-caps text-muted">
               {t('meet.agenda')}
             </span>
             <textarea
@@ -450,46 +451,46 @@ export default function Meetings() {
               onChange={(e) => setAgenda(e.target.value)}
               rows={3}
               placeholder={t('meet.agendaHint')}
-              className="w-full rounded-xl shadow-ring bg-raised px-3 py-2 text-[13px]"
+              className="w-full rounded-xl shadow-ring bg-raised px-3 py-2 text-ui"
             />
           </label>
 
           <label className="mb-3 block">
-            <span className="mb-1 block text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+            <span className="mb-1 block text-label font-bold uppercase tracking-caps text-muted">
               {t('meet.joinUrl')}
             </span>
             <input
               value={joinUrl}
               onChange={(e) => setJoinUrl(e.target.value)}
               placeholder={t('meet.joinUrlHint')}
-              className="w-full rounded-xl shadow-ring bg-raised px-3 py-2 text-[13px]"
+              className="w-full rounded-xl shadow-ring bg-raised px-3 py-2 text-ui"
             />
           </label>
 
           {error && (
-            <p className="mb-2.5 rounded-xl shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)] px-3 py-2 text-[12.5px] leading-relaxed text-breach">
+            <p className="mb-2.5 rounded-xl shadow-ringbreach px-3 py-2 text-ui leading-relaxed text-breach">
               {error}
             </p>
           )}
 
           <div className="flex gap-2">
-            <button
+            <Button
               type="submit"
               disabled={busy || !at}
-              className="rounded-xl bg-raised shadow-ring px-3.5 py-1.5 text-[13px] text-lapis font-medium disabled:opacity-40"
+              className="rounded-xl bg-raised shadow-ring px-3.5 py-1.5 text-ui text-lapis font-medium disabled:opacity-40"
             >
               {t('meet.conveneIt')}
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
               onClick={() => {
                 setConvening(false);
                 setError(null);
               }}
-              className="rounded-xl shadow-ring px-3 py-1.5 text-[13px] text-muted"
+              className="rounded-xl shadow-ring px-3 py-1.5 text-ui text-muted"
             >
               {t('common.cancel')}
-            </button>
+            </Button>
           </div>
         </form>
       )}
@@ -524,8 +525,8 @@ export default function Meetings() {
           <ul className="space-y-1.5">
             {data.attendance.map((a) => (
               <li key={a.scholarId} className="flex flex-wrap items-baseline justify-between gap-2">
-                <span className="text-[13px]">{a.name}</span>
-                <span className="font-mono text-[12.5px] tabular-nums text-muted">
+                <span className="text-ui">{a.name}</span>
+                <span className="font-mono text-ui tabular-nums text-muted">
                   {a.attended} {t('reg.of')} {a.of}
                   {a.notes.length > 0 && <span> · {a.notes.join('; ')}</span>}
                 </span>

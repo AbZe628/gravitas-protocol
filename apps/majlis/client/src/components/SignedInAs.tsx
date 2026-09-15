@@ -29,12 +29,12 @@ export default function SignedInAs() {
     <div className="text-end leading-tight">
       <div
         className={
-          'text-[11px] font-medium ' + (observer ? 'text-muted' : 'text-lapis')
+          'text-note font-medium ' + (observer ? 'text-muted' : 'text-lapis')
         }
       >
         {t(`who.role.${identity.role}`)}
       </div>
-      <div className="text-[10px] text-muted">{identity.scholarId}</div>
+      <div className="text-label text-muted">{identity.scholarId}</div>
     </div>
   );
 }

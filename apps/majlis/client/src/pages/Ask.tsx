@@ -27,9 +27,9 @@ import { Field } from '../components/field.js';
  * board will polish writes a different sentence.
  */
 
-const field = 'w-full rounded-xl bg-raised shadow-ring p-2.5 text-[14px] leading-relaxed outline-none';
-const label = 'mb-1 block text-[12px] text-muted';
-const help = 'mb-2 max-w-[62ch] text-[11.5px] leading-[1.6] text-muted';
+const field = 'w-full rounded-xl bg-raised shadow-ring p-2.5 text-body leading-relaxed outline-none';
+const label = 'mb-1 block text-note text-muted';
+const help = 'mb-2 max-w-[62ch] text-note leading-relaxed text-muted';
 
 function Standing({ s }: { s: Submission }) {
   const { t } = useI18n();
@@ -51,20 +51,20 @@ function Mine({ s, onWithdraw }: { s: Submission; onWithdraw: (id: string, why: 
     <Card>
       <div className="mb-2 flex flex-wrap items-center gap-x-3 gap-y-2">
         <Standing s={s} />
-        <span className="text-[11.5px] text-muted">
+        <span className="text-note text-muted">
           {t('queue.asked')} {s.arrivedAt.slice(0, 10)}
         </span>
       </div>
 
-      <div className="font-display text-[17px] leading-snug">{s.subject}</div>
-      <p className="mt-2 max-w-[62ch] text-[12.5px] leading-[1.6] text-muted">{s.question}</p>
+      <div className="font-display text-sub leading-snug">{s.subject}</div>
+      <p className="mt-2 max-w-[62ch] text-ui leading-relaxed text-muted">{s.question}</p>
 
       {/*
         What the board said back, in the board's words. A decline is the only
         thing a desk gets, so it is shown in full rather than summarised.
       */}
       {last?.reason && (
-        <p className="mt-3 max-w-[62ch] rounded-xl bg-raised px-3.5 py-2.5 text-[12.5px] leading-[1.6] shadow-ring">
+        <p className="mt-3 max-w-[62ch] rounded-xl bg-raised px-3.5 py-2.5 text-ui leading-relaxed shadow-ring">
           {last.reason}
         </p>
       )}
@@ -170,8 +170,8 @@ export default function Ask({ boardId }: { boardId: string }) {
 
   return (
     <div className="mx-auto max-w-reading px-5 pb-16 pt-6">
-      <h1 className="font-display text-[27px] leading-tight tracking-[-0.018em]">{t('ask.title')}</h1>
-      <p className="mt-2 max-w-[62ch] text-[13px] leading-[1.65] text-muted">{t('ask.lead')}</p>
+      <h1 className="font-display text-head leading-tight tracking-title">{t('ask.title')}</h1>
+      <p className="mt-2 max-w-[62ch] text-ui leading-relaxed text-muted">{t('ask.lead')}</p>
 
       <Edge />
 
@@ -291,7 +291,7 @@ export default function Ask({ boardId }: { boardId: string }) {
           <AttachTheContract draft={draft} onDraft={setDraft} />
 
           {error && (
-            <p className="mb-3 rounded-xl bg-[#FCF0EE] px-3.5 py-2.5 text-[12.5px] leading-[1.55] text-breach shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)]">
+            <p className="mb-3 rounded-xl bg-breachtint px-3.5 py-2.5 text-ui leading-relaxed text-breach shadow-ringbreach">
               {error}
             </p>
           )}
@@ -304,21 +304,21 @@ export default function Ask({ boardId }: { boardId: string }) {
 
       {notice && (
         <div className="mt-6">
-          <p className="mb-3 font-display text-[17px]">{t('ask.sent')}</p>
+          <p className="mb-3 font-display text-sub">{t('ask.sent')}</p>
           <TheNotice notice={notice.notice} delivery={notice.delivery} />
         </div>
       )}
 
       <div className="mt-10">
-        <h2 className="mb-3 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+        <h2 className="mb-3 text-label font-bold uppercase tracking-caps text-muted">
           {t('ask.mine')}
         </h2>
         {mineFailed ? (
           <ErrorText />
         ) : !mine ? (
-          <p className="text-[13px] text-muted">{t('common.loading')}</p>
+          <p className="text-ui text-muted">{t('common.loading')}</p>
         ) : mine.length === 0 ? (
-          <p className="text-[13px] text-muted">{t('ask.mineNone')}</p>
+          <p className="text-ui text-muted">{t('ask.mineNone')}</p>
         ) : (
           <div className="space-y-3">
             {mine.map((s) => (

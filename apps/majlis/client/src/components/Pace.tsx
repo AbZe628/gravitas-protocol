@@ -71,7 +71,7 @@ export default function Pace() {
     <section className="mb-5 rounded-card shadow-ring bg-raised px-4 py-3">
       <div className="flex flex-wrap items-baseline gap-x-5 gap-y-1.5">
         {board.medianDays !== null && (
-          <span className="text-[13px]">
+          <span className="text-ui">
             <span className="text-muted">{t('pace.median')} </span>
             <span className="font-medium tabular-nums">
               {isSubDay(board.medianDays) ? t('pace.underADay') : `${days(board.medianDays)} ${t('attention.days')}`}
@@ -80,7 +80,7 @@ export default function Pace() {
         )}
 
         {board.open > 0 && (
-          <span className="text-[13px]">
+          <span className="text-ui">
             <span className="text-muted">{t('pace.waitingNow')} </span>
             <span className="font-medium tabular-nums">{board.open}</span>
           </span>
@@ -89,7 +89,7 @@ export default function Pace() {
         {/* A range is only information when the ends differ. One settled matter
             produces "76–76", which reads as a figure and carries none. */}
         {board.settled > 1 && board.fastestDays !== board.slowestDays && (
-          <span className="text-[12px] text-muted tabular-nums">
+          <span className="text-note text-muted tabular-nums">
             {t('pace.range')} {days(board.fastestDays ?? 0)}–{days(board.slowestDays ?? 0)}{' '}
             {t('attention.days')}
           </span>
@@ -97,7 +97,7 @@ export default function Pace() {
       </div>
 
       {longest && (
-        <p className="mt-2 text-[12px] leading-relaxed text-muted">
+        <p className="mt-2 text-note leading-relaxed text-muted">
           {t('pace.longest')}{' '}
           <Link to={`/matters/${longest.matterId}`} className="underline underline-offset-2 hover:text-fg">
             {longest.title}
@@ -110,7 +110,7 @@ export default function Pace() {
       )}
 
       {board.approximate && (
-        <p className="mt-1.5 text-[11px] leading-relaxed text-muted opacity-80">{t('pace.partial')}</p>
+        <p className="mt-1.5 text-note leading-relaxed text-muted opacity-80">{t('pace.partial')}</p>
       )}
     </section>
   );
@@ -127,11 +127,11 @@ export function WaitingFor({ wait }: { wait: Wait | undefined }) {
   if (!wait || wait.phase === 'settled') return null;
 
   if (wait.onTheClock) {
-    return <span className="text-[12px] text-muted">{t('pace.onTheClock')}</span>;
+    return <span className="text-note text-muted">{t('pace.onTheClock')}</span>;
   }
 
   return (
-    <span className="text-[12px] text-muted tabular-nums">
+    <span className="text-note text-muted tabular-nums">
       {t('pace.waiting')}{' '}
       {isSubDay(wait.days) ? t('pace.underADay') : `${days(wait.days)} ${t('attention.days')}`}
       {wait.partial ? '*' : ''}

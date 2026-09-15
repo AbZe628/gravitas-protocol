@@ -123,7 +123,7 @@ export default function MayDeal() {
         note={
           <>
             {s.asset.identifiers.map((id, i) => (
-              <span key={i} className="me-3 break-all font-mono text-[11.5px]">
+              <span key={i} className="me-3 break-all font-mono text-note">
                 {id.value}
                 {id.network ? <span className="opacity-60"> · {id.network}</span> : null}
               </span>
@@ -136,11 +136,11 @@ export default function MayDeal() {
             */}
             {terms.length > 0 && (
               <span className="mt-1 block">
-                <span className="text-[10px] font-bold uppercase tracking-[0.13em] text-muted">
+                <span className="text-label font-bold uppercase tracking-caps text-muted">
                   {t('deal.onConditionThat')}
                 </span>
                 {terms.map((p) => (
-                  <span key={p.key} className="mt-0.5 block text-[12px] leading-[1.55]">
+                  <span key={p.key} className="mt-0.5 block text-note leading-relaxed">
                     {p.meaning}
                   </span>
                 ))}
@@ -150,7 +150,7 @@ export default function MayDeal() {
             {s.governedBy && (
               <Link
                 to={`/matters/${s.governedBy}`}
-                className="mt-1 inline-block font-mono text-[11.5px] text-lapis underline decoration-line underline-offset-4"
+                className="mt-1 inline-block font-mono text-note text-lapis underline decoration-line underline-offset-4"
               >
                 {t('deal.under')} {s.governedBy}
               </Link>
@@ -169,7 +169,7 @@ export default function MayDeal() {
       says={t('deal.says')}
       live={
         assets.length > 0 ? (
-          <span className="text-[13px] text-muted">
+          <span className="text-ui text-muted">
             <span className="font-mono tabular-nums text-paper">{permitted}</span>{' '}
             <span>{t('deal.permittedCount')}</span>
             {unasked > 0 && (

@@ -74,19 +74,19 @@ export default function BriefingDetail() {
         to be separate paragraphs under separate headings, which read as two
         documents when it is one account.
       */}
-      <div className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+      <div className="text-label font-bold uppercase tracking-caps text-muted">
         {t('brief.account')}
       </div>
       <div className="mt-2">
         <InTheMargin on="briefing" subjectId={b.id} />
       </div>
 
-      <div className="mt-6 rounded-card bg-[#FBF4E4] px-5 py-4 shadow-[0_0_0_0.5px_rgba(176,132,48,0.24)]">
-        <div className="text-[10px] font-bold uppercase tracking-[0.15em] text-gold">
+      <div className="mt-6 rounded-card bg-goldtint px-5 py-4 shadow-ringgold">
+        <div className="text-label font-bold uppercase tracking-caps text-gold">
           {t('brief.question')}
         </div>
         {/* The one part addressed to the board, in the board's face. */}
-        <p className="mt-2 max-w-[62ch] font-display text-[16px] leading-[1.55]">
+        <p className="mt-2 max-w-[62ch] font-display text-lead leading-relaxed">
           {b.questionForBoard}
         </p>
 

@@ -123,7 +123,7 @@ export default function RuleDetail() {
     >
       {/* The board's own words, set the way the board's words are set. */}
       <Section title={t('rule.statement')}>
-        <p className="max-w-[62ch] font-display text-[17px] leading-[1.6] text-paper">
+        <p className="max-w-[62ch] font-display text-sub leading-relaxed text-paper">
           {rule.statement}
         </p>
       </Section>
@@ -149,7 +149,7 @@ export default function RuleDetail() {
         follows them rather than leading. Named, not left as a bare line of
         characters.
       */}
-      <p className="mt-4 text-[11.5px] text-muted">
+      <p className="mt-4 text-note text-muted">
         {t('rule.hashLabel')} <span className="break-all font-mono">{rule.parameterHash}</span>
       </p>
 

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { oversight, type Examination } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { Field, HEADING } from './field.js';
+import { Button } from './Button';
 
 /**
  * From a review that found something, to the board.
@@ -89,19 +90,19 @@ export default function ReportWhatWasFound({
 
   if (!open) {
     return (
-      <button
+      <Button
         type="button"
         onClick={begin}
-        className="mt-4 rounded-card bg-raised px-5 py-2.5 text-[13.5px] font-semibold text-breach shadow-ring"
+        className="mt-4 rounded-card bg-raised px-5 py-2.5 text-body font-semibold text-breach shadow-ring"
       >
         {t('found.putToBoard')}
-      </button>
+      </Button>
     );
   }
 
   return (
     <div className="mt-4 rounded-card bg-ink px-4 py-4 shadow-ring">
-      <p className="mb-3 max-w-[58ch] text-[12.5px] leading-[1.6] text-muted">{t('found.lead')}</p>
+      <p className="mb-3 max-w-[58ch] text-ui leading-relaxed text-muted">{t('found.lead')}</p>
 
       <Field label={t('found.title')} className="mb-3" headingClass={HEADING}>
         {(attrs) => (
@@ -109,7 +110,7 @@ export default function ReportWhatWasFound({
             {...attrs}
             value={title}
             onChange={(ev) => setTitle(ev.target.value)}
-            className="w-full rounded-card bg-raised px-4 py-2.5 text-[13.5px] text-paper shadow-ring outline-none"
+            className="w-full rounded-card bg-raised px-4 py-2.5 text-body text-paper shadow-ring outline-none"
           />
         )}
       </Field>
@@ -121,32 +122,32 @@ export default function ReportWhatWasFound({
             value={report}
             onChange={(ev) => setReport(ev.target.value)}
             rows={8}
-            className="w-full rounded-card bg-raised px-4 py-3 font-mono text-[12.5px] leading-[1.6] text-paper shadow-ring outline-none"
+            className="w-full rounded-card bg-raised px-4 py-3 font-mono text-ui leading-relaxed text-paper shadow-ring outline-none"
           />
         )}
       </Field>
 
-      {error && <p className="mt-2 text-[12.5px] text-breach">{error}</p>}
+      {error && <p className="mt-2 text-ui text-breach">{error}</p>}
 
       <div className="mt-3 flex flex-wrap items-center gap-4">
-        <button
+        <Button
           type="button"
           onClick={send}
           disabled={busy || !title.trim() || !report.trim()}
-          className="rounded-card bg-breach px-6 py-3 text-[14px] font-bold text-white shadow-act disabled:opacity-50"
+          className="rounded-card bg-breach px-6 py-3 text-body font-bold text-white shadow-act disabled:opacity-50"
         >
           {busy ? t('found.reporting') : t('found.report')}
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
           onClick={() => setOpen(false)}
-          className="text-[12.5px] text-muted underline decoration-line underline-offset-4"
+          className="text-ui text-muted underline decoration-line underline-offset-4"
         >
           {t('common.back')}
-        </button>
+        </Button>
       </div>
 
-      <p className="mt-3 max-w-[58ch] text-[12px] leading-[1.6] text-muted">{t('found.clockStarts')}</p>
+      <p className="mt-3 max-w-[58ch] text-note leading-relaxed text-muted">{t('found.clockStarts')}</p>
     </div>
   );
 }

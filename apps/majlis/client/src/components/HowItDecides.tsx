@@ -4,6 +4,7 @@ import { useI18n } from '../lib/i18n.js';
 import { useIdentity } from '../lib/identity.js';
 import { DateText } from './ui.js';
 import { Field, HEADING } from './field.js';
+import { Button } from './Button';
 
 /**
  * The quorum, the confirmation window, and the name the board issues under.
@@ -90,27 +91,27 @@ export default function HowItDecides({
     }
   }
 
-  const BOX = 'w-full rounded-xl bg-raised px-3 py-2.5 text-[13.5px] shadow-ring outline-none';
+  const BOX = 'w-full rounded-xl bg-raised px-3 py-2.5 text-body shadow-ring outline-none';
 
   return (
     <div>
       {mayChange && !open && (
-        <button
+        <Button
           type="button"
           onClick={() => {
             setRefusal(null);
             setOpen(true);
           }}
-          className="mb-4 rounded-xl bg-raised px-4 py-2 text-[12.5px] font-semibold text-lapis shadow-ring"
+          className="mb-4 rounded-xl bg-raised px-4 py-2 text-ui font-semibold text-lapis shadow-ring"
         >
           {t('decides.change')}
-        </button>
+        </Button>
       )}
 
       {mayChange && open && (
         <form onSubmit={keep} className="mb-5 rounded-card bg-ink/70 px-4 py-4 shadow-ring">
           {/* The one sentence a chair pressing this mid-vote has to read. */}
-          <p className="mb-4 max-w-[58ch] text-[12px] leading-[1.6] text-muted">
+          <p className="mb-4 max-w-[58ch] text-note leading-relaxed text-muted">
             {t('decides.lead')}
           </p>
 
@@ -206,23 +207,23 @@ export default function HowItDecides({
             </Field>
           </div>
 
-          {refusal && <p className="mt-3 text-[12.5px] leading-[1.6] text-breach">{refusal}</p>}
+          {refusal && <p className="mt-3 text-ui leading-relaxed text-breach">{refusal}</p>}
 
           <div className="mt-4 flex flex-wrap items-center gap-3">
-            <button
+            <Button
               type="submit"
               disabled={busy || reason.trim().length < 20}
-              className="rounded-xl bg-lapis px-5 py-2.5 text-[13px] font-semibold text-white shadow-act disabled:opacity-40"
+              className="rounded-xl bg-lapis px-5 py-2.5 text-ui font-semibold text-white shadow-act disabled:opacity-40"
             >
               {busy ? t('common.loading') : t('decides.keep')}
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
               onClick={() => setOpen(false)}
-              className="text-[12.5px] text-muted underline decoration-line underline-offset-4"
+              className="text-ui text-muted underline decoration-line underline-offset-4"
             >
               {t('common.cancel')}
-            </button>
+            </Button>
           </div>
         </form>
       )}
@@ -234,11 +235,11 @@ export default function HowItDecides({
         the pattern alone is a form field, the example is the answer.
       */}
       <div className="mt-5 border-t border-line pt-4">
-        <div className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-muted">
+        <div className="mb-1.5 text-label font-bold uppercase tracking-caps text-muted">
           {t('decides.series')}
         </div>
         {settings.decides.rulingSeries ? (
-          <p className="max-w-[62ch] text-[12.5px] leading-[1.65] text-sand">
+          <p className="max-w-[62ch] text-ui leading-relaxed text-sand">
             <span className="font-mono text-paper">{settings.decides.rulingSeries}</span>
             {settings.decides.nextReference && (
               <>
@@ -249,7 +250,7 @@ export default function HowItDecides({
             )}
           </p>
         ) : (
-          <p className="max-w-[62ch] text-[12.5px] leading-[1.65] text-muted">
+          <p className="max-w-[62ch] text-ui leading-relaxed text-muted">
             {t('decides.noSeries')}
           </p>
         )}
@@ -262,20 +263,20 @@ export default function HowItDecides({
       */}
       {changes.length > 0 && (
         <div className="mt-5 border-t border-line pt-4">
-          <div className="mb-2.5 text-[10px] font-bold uppercase tracking-[0.14em] text-muted">
+          <div className="mb-2.5 text-label font-bold uppercase tracking-caps text-muted">
             {t('decides.history')}
           </div>
           <ul className="space-y-2.5">
             {[...changes].reverse().map((c, i) => (
               <li key={i} className="rounded-card bg-raised px-4 py-3 shadow-ring">
-                <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-[12.5px]">
+                <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-ui">
                   <span className="text-paper">{c.called}</span>
                   <span className="font-mono tabular-nums text-muted">
                     {c.from} → <span className="text-paper">{c.to}</span>
                   </span>
                 </div>
-                <p className="mt-1 max-w-[62ch] text-[12.5px] leading-[1.6] text-sand">{c.reason}</p>
-                <p className="mt-1 text-[11.5px] text-muted">
+                <p className="mt-1 max-w-[62ch] text-ui leading-relaxed text-sand">{c.reason}</p>
+                <p className="mt-1 text-note text-muted">
                   {c.by}
                   <span className="mx-1.5 opacity-40">·</span>
                   <DateText iso={c.at} />

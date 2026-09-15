@@ -8,6 +8,7 @@ import Tradability from './Tradability.js';
 import LatePayment from './LatePayment.js';
 import Recorded from './Recorded.js';
 import { useI18n } from '../lib/i18n.js';
+import { Button } from './Button';
 
 /**
  * The toolkits, in a slide, reachable from anywhere.
@@ -79,20 +80,20 @@ export default function Tools({ open, onClose }: { open: boolean; onClose: () =>
       {/* Which one. A row of real tabs, not a menu to read. */}
       <div className="mb-5 flex flex-wrap gap-1.5 border-b border-line pb-3">
         {KINDS.map((k) => (
-          <button
+          <Button
             key={k}
             type="button"
             onClick={() => setKind(k)}
             aria-current={kind === k ? 'true' : undefined}
             className={
-              'rounded-lg px-3 py-1.5 text-[12.5px] transition-colors ' +
+              'rounded-lg px-3 py-1.5 text-ui transition-colors ' +
               (kind === k
                 ? 'bg-lapis font-semibold text-white'
                 : 'bg-ink text-sand shadow-ring hover:text-paper')
             }
           >
             {t(LABEL[k])}
-          </button>
+          </Button>
         ))}
       </div>
 
@@ -109,7 +110,7 @@ export default function Tools({ open, onClose }: { open: boolean; onClose: () =>
         recording it are two acts, and this panel does only the first.
       */}
       {kind !== 'recorded' && (
-        <p className="mt-5 rounded-card bg-ink px-4 py-3 text-[12.5px] leading-[1.6] text-muted">
+        <p className="mt-5 rounded-card bg-ink px-4 py-3 text-ui leading-relaxed text-muted">
           {t('calc.recordingIsSeparate')}
         </p>
       )}

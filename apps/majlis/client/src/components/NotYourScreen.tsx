@@ -42,7 +42,7 @@ export default function NotYourScreen() {
       <PageHead title={t('notyours.title')} says={t('notyours.says')} />
 
       <section className="border-t border-line py-6">
-        <div className="mb-3 text-[10px] font-bold uppercase tracking-[0.14em] text-muted">
+        <div className="mb-3 text-label font-bold uppercase tracking-caps text-muted">
           {t('notyours.yours')}
         </div>
         <ul className="space-y-2.5">
@@ -53,10 +53,10 @@ export default function NotYourScreen() {
                 className="block rounded-card bg-raised px-5 py-4 shadow-ring transition-all hover:shadow-card"
               >
                 <div className="flex flex-wrap items-baseline gap-x-3">
-                  <span className="font-mono text-[11px] text-muted">{door.ordinal}</span>
-                  <span className="font-display text-[17px] leading-snug">{t(door.label)}</span>
+                  <span className="font-mono text-note text-muted">{door.ordinal}</span>
+                  <span className="font-display text-sub leading-snug">{t(door.label)}</span>
                 </div>
-                <p className="mt-1 max-w-[58ch] text-[12.5px] leading-[1.6] text-muted">
+                <p className="mt-1 max-w-[58ch] text-ui leading-relaxed text-muted">
                   {t(door.meaning)}
                 </p>
               </Link>

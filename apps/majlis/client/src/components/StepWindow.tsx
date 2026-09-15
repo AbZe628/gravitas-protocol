@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { useI18n } from '../lib/i18n.js';
+import { Button } from './Button';
 
 /**
  * A window, not a page.
@@ -81,7 +82,7 @@ export default function StepWindow({
     <div className="flex h-[calc(100vh-7.5rem)] min-h-[560px] flex-col overflow-hidden rounded-sheet bg-raised shadow-card lg:h-[calc(100vh-6rem)]">
       {/* ── the title bar ─────────────────────────────────────────────── */}
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-line px-5 py-3.5 sm:px-6">
-        <h1 className="min-w-0 flex-1 truncate font-display text-[17px] leading-tight tracking-[-0.014em] text-paper">
+        <h1 className="min-w-0 flex-1 truncate font-display text-sub leading-tight tracking-title text-paper">
           {title}
         </h1>
         {chips}
@@ -91,25 +92,25 @@ export default function StepWindow({
       {steps.length > 0 && (
         <div className="flex items-center gap-1 overflow-x-auto border-b border-line bg-ink/40 px-5 py-2.5 sm:px-6">
           {steps.map((s) => (
-            <button
+            <Button
               key={s.id}
               type="button"
               onClick={s.onOpen}
               aria-current={s.state === 'here' ? 'step' : undefined}
               title={`${t('win.step')} ${s.ordinal}`}
               className={
-                'grid h-7 w-7 shrink-0 place-items-center rounded-lg font-mono text-[11px] transition-colors ' +
+                'grid h-7 w-7 shrink-0 place-items-center rounded-lg font-mono text-note transition-colors ' +
                 (s.state === 'here'
                   ? 'bg-lapis font-semibold text-white'
                   : s.state === 'done'
-                    ? 'bg-[#EBF3EF] text-settled'
+                    ? 'bg-settledtint text-settled'
                     : s.state === 'contested'
                       ? 'bg-[#FBF1DF] text-gold'
                       : 'bg-raised text-muted shadow-ring')
               }
             >
               {s.ordinal}
-            </button>
+            </Button>
           ))}
         </div>
       )}
@@ -117,7 +118,7 @@ export default function StepWindow({
       {/* ── the work, and the pane beside it ──────────────────────────── */}
       <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
         <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5 sm:px-6">
-          <div className="mb-3 text-[10px] font-bold uppercase tracking-[0.14em] text-muted">
+          <div className="mb-3 text-label font-bold uppercase tracking-caps text-muted">
             {heading}
           </div>
           {children}

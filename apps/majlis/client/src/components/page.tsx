@@ -65,7 +65,7 @@ function Breadcrumb({ phase, tail }: { phase?: AnyPhase; tail?: string }) {
   if (!door) return null;
 
   return (
-    <div className="mb-4 flex flex-wrap items-center gap-2.5 text-[12.5px] text-muted">
+    <div className="mb-4 flex flex-wrap items-center gap-2.5 text-ui text-muted">
       <Link to={door.destinations[0].to} className="transition-colors hover:text-paper">
         {t(door.label)}
       </Link>
@@ -115,14 +115,14 @@ export function PageHead({
         <div className="min-w-0">
           {live && <div className="mb-3 flex flex-wrap items-center gap-2.5">{live}</div>}
           <h1
-            className="max-w-[24ch] font-display text-[32px] font-normal leading-[1.1] tracking-[-0.026em] text-paper sm:text-[38px]"
+            className="max-w-[24ch] font-display text-head font-normal leading-tight tracking-display text-paper sm:text-display"
             style={{ textWrap: 'balance' }}
           >
             {title}
           </h1>
           {/* A record has no standing sentence: its title and its state say what it is. */}
           {says && (
-            <p className="mt-3 max-w-[62ch] text-[13.5px] leading-[1.65] text-muted">{says}</p>
+            <p className="mt-3 max-w-[62ch] text-body leading-relaxed text-muted">{says}</p>
           )}
         </div>
         {act && <div className="shrink-0">{act}</div>}
@@ -150,9 +150,9 @@ export function Part({
   return (
     <section className="border-t border-line py-6 first:border-t-0 first:pt-0">
       <div className="flex gap-5">
-        <span className="w-5 shrink-0 pt-1 font-mono text-[11px] text-muted">{n}</span>
+        <span className="w-5 shrink-0 pt-1 font-mono text-note text-muted">{n}</span>
         <div className="min-w-0 flex-1">
-          <div className="mb-2.5 text-[10px] font-bold uppercase tracking-[0.14em] text-muted">
+          <div className="mb-2.5 text-label font-bold uppercase tracking-caps text-muted">
             {heading}
           </div>
           {children}
@@ -179,10 +179,10 @@ export function Division({
 }) {
   return (
     <section className="border-t border-line py-6 first:border-t-0 first:pt-0">
-      <div className="mb-2.5 text-[10px] font-bold uppercase tracking-[0.14em] text-muted">
+      <div className="mb-2.5 text-label font-bold uppercase tracking-caps text-muted">
         {heading}
       </div>
-      {note && <p className="mb-4 max-w-[62ch] text-[12.5px] leading-[1.6] text-muted">{note}</p>}
+      {note && <p className="mb-4 max-w-[62ch] text-ui leading-relaxed text-muted">{note}</p>}
       {children}
     </section>
   );
@@ -205,14 +205,14 @@ export function Gaps({ items }: { items: readonly string[] }) {
 
   return (
     <section className="border-t border-line py-6">
-      <div className="mb-3 text-[10px] font-bold uppercase tracking-[0.14em] text-muted">
+      <div className="mb-3 text-label font-bold uppercase tracking-caps text-muted">
         {t('pack.gaps')}
       </div>
       <ul className="space-y-2.5">
         {items.map((gap, i) => (
           <li key={i} className="flex gap-3">
             <span className="mt-[7px] h-[7px] w-[7px] shrink-0 rounded-full bg-gold/70" />
-            <span className="max-w-[62ch] text-[13.5px] leading-[1.65] text-sand">{gap}</span>
+            <span className="max-w-[62ch] text-body leading-relaxed text-sand">{gap}</span>
           </li>
         ))}
       </ul>
@@ -229,7 +229,7 @@ export function Gaps({ items }: { items: readonly string[] }) {
  */
 export function Nothing({ children }: { children: ReactNode }) {
   return (
-    <p className="rounded-card bg-raised/60 px-5 py-4 text-[13px] leading-[1.65] text-muted shadow-ring">
+    <p className="rounded-card bg-raised/60 px-5 py-4 text-ui leading-relaxed text-muted shadow-ring">
       {children}
     </p>
   );

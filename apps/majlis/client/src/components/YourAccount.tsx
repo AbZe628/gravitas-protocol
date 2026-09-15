@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { account, type Me } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { Division, Nothing } from './page.js';
+import { Button } from './Button';
 
 /**
  * Your own account: your password, and letting somebody back in.
@@ -30,7 +31,7 @@ import { Division, Nothing } from './page.js';
  */
 
 const field =
-  'w-full rounded-card bg-ink px-4 py-3 text-[13.5px] leading-[1.6] text-paper shadow-ring outline-none placeholder:text-muted focus:shadow-lift';
+  'w-full rounded-card bg-ink px-4 py-3 text-body leading-relaxed text-paper shadow-ring outline-none placeholder:text-muted focus:shadow-lift';
 
 export default function YourAccount() {
   const { t } = useI18n();
@@ -98,7 +99,7 @@ export default function YourAccount() {
     <>
       <Division heading={t('acct.yours')}>
         {me.stillOnTheSeed && (
-          <p className="mb-5 max-w-[62ch] text-[13px] leading-[1.65] text-sand">
+          <p className="mb-5 max-w-[62ch] text-ui leading-relaxed text-sand">
             {t('acct.onTheSeed')}
           </p>
         )}
@@ -108,7 +109,7 @@ export default function YourAccount() {
         ) : (
           <form onSubmit={change} className="max-w-[46ch] space-y-3">
             <label className="block">
-              <span className="mb-1.5 block text-[12px] text-muted">{t('acct.current')}</span>
+              <span className="mb-1.5 block text-note text-muted">{t('acct.current')}</span>
               <input
                 type="password"
                 autoComplete="current-password"
@@ -119,7 +120,7 @@ export default function YourAccount() {
             </label>
 
             <label className="block">
-              <span className="mb-1.5 block text-[12px] text-muted">{t('acct.new')}</span>
+              <span className="mb-1.5 block text-note text-muted">{t('acct.new')}</span>
               <input
                 type="password"
                 autoComplete="new-password"
@@ -128,21 +129,21 @@ export default function YourAccount() {
                 className={field}
               />
               {/* The floor, and why it is the only rule. */}
-              <span className="mt-1.5 block text-[11.5px] leading-[1.55] text-muted">
+              <span className="mt-1.5 block text-note leading-relaxed text-muted">
                 {t('acct.howLong').replace('{n}', String(me.passwordMinimum))}
               </span>
             </label>
 
-            {failed && <p className="text-[12.5px] text-breach">{failed}</p>}
-            {changed && <p className="text-[12.5px] text-settled">{t('acct.changed')}</p>}
+            {failed && <p className="text-ui text-breach">{failed}</p>}
+            {changed && <p className="text-ui text-settled">{t('acct.changed')}</p>}
 
-            <button
+            <Button
               type="submit"
               disabled={changing || !current || next.length < me.passwordMinimum}
-              className="rounded-card bg-lapis px-6 py-3 text-[14px] font-bold text-white shadow-act disabled:opacity-50"
+              className="rounded-card bg-lapis px-6 py-3 text-body font-bold text-white shadow-act disabled:opacity-50"
             >
               {changing ? t('acct.changing') : t('acct.change')}
-            </button>
+            </Button>
           </form>
         )}
       </Division>
@@ -156,7 +157,7 @@ export default function YourAccount() {
         <Division heading={t('acct.letBackIn')} note={t('acct.letBackInNote')}>
           <form onSubmit={issue} className="max-w-[46ch] space-y-3">
             <label className="block">
-              <span className="mb-1.5 block text-[12px] text-muted">{t('acct.whoForgot')}</span>
+              <span className="mb-1.5 block text-note text-muted">{t('acct.whoForgot')}</span>
               <input
                 value={who}
                 onChange={(e) => setWho(e.target.value)}
@@ -165,31 +166,31 @@ export default function YourAccount() {
               />
             </label>
 
-            {issueFailed && <p className="text-[12.5px] text-breach">{issueFailed}</p>}
+            {issueFailed && <p className="text-ui text-breach">{issueFailed}</p>}
 
-            <button
+            <Button
               type="submit"
               disabled={issuing || !who.trim()}
-              className="rounded-card bg-raised px-5 py-2.5 text-[13.5px] font-semibold text-lapis shadow-ring disabled:opacity-50"
+              className="rounded-card bg-raised px-5 py-2.5 text-body font-semibold text-lapis shadow-ring disabled:opacity-50"
             >
               {issuing ? t('acct.issuing') : t('acct.issue')}
-            </button>
+            </Button>
           </form>
 
           {code !== null &&
             (code === '' ? (
               // Said the same way as a success, on purpose: the difference is
               // how a board's membership gets read off the door.
-              <p className="mt-4 max-w-[62ch] text-[13px] leading-[1.65] text-muted">
+              <p className="mt-4 max-w-[62ch] text-ui leading-relaxed text-muted">
                 {t('acct.ifTheyHold')}
               </p>
             ) : (
               <div className="mt-4 max-w-[46ch] rounded-card bg-ink px-5 py-4 shadow-ring">
-                <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-muted">
+                <div className="text-label font-bold uppercase tracking-caps text-muted">
                   {t('acct.readThis')}
                 </div>
-                <div className="mt-2 font-mono text-[22px] tracking-[0.08em] text-lapis">{code}</div>
-                <p className="mt-3 text-[12px] leading-[1.6] text-muted">{t('acct.shownOnce')}</p>
+                <div className="mt-2 font-mono text-title tracking-label text-lapis">{code}</div>
+                <p className="mt-3 text-note leading-relaxed text-muted">{t('acct.shownOnce')}</p>
               </div>
             ))}
         </Division>

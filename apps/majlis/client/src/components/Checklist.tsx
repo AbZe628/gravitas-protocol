@@ -14,6 +14,7 @@ import { useI18n } from '../lib/i18n.js';
 import { Tag } from './ui.js';
 import TheCalculator from './TheCalculator.js';
 import AskTheBank from './AskTheBank.js';
+import { Button } from './Button';
 
 /**
  * The conditions of a contract shape, ruled on one at a time.
@@ -76,15 +77,15 @@ function Carried({
   return (
     <div className="mt-3 rounded-card bg-ink px-4 py-3">
       <div className="mb-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-1.5">
-        <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+        <span className="text-label font-bold uppercase tracking-caps text-muted">
           {t('inherit.lastTime')}
         </span>
         {proposal.holds && (
           <span
             className={
-              'rounded-full px-2.5 py-0.5 text-[10.5px] font-bold uppercase tracking-[0.1em] ' +
+              'rounded-full px-2.5 py-0.5 text-label font-bold uppercase tracking-label ' +
               (proposal.holds === 'met'
-                ? 'bg-[#EBF3EF] text-settled shadow-[0_0_0_0.5px_rgba(44,107,87,0.18)]'
+                ? 'bg-settledtint text-settled shadow-ringsettled'
                 : 'bg-black/[0.045] text-sand')
             }
           >
@@ -94,19 +95,19 @@ function Carried({
       </div>
 
       {/* The board's own words from its own past ruling. Never rewritten. */}
-      <p className="max-w-[62ch] text-[13px] leading-[1.6]">{proposal.value}</p>
+      <p className="max-w-[62ch] text-ui leading-relaxed">{proposal.value}</p>
 
       {taken ? (
-        <p className="mt-2 text-[12px] text-settled">{t('inherit.taken')}</p>
+        <p className="mt-2 text-note text-settled">{t('inherit.taken')}</p>
       ) : (
-        <button
+        <Button
           type="button"
           onClick={onTake}
           disabled={busy}
-          className="mt-2.5 rounded-xl bg-gradient-to-br from-lapissoft to-[#143E67] px-3.5 py-1.5 text-[12px] font-semibold text-white shadow-act transition-all hover:brightness-110 disabled:opacity-40"
+          className="mt-2.5 rounded-xl bg-gradient-to-br from-lapissoft to-lapis px-3.5 py-1.5 text-note font-semibold text-white shadow-act transition-all hover:brightness-110 disabled:opacity-40"
         >
           {t('inherit.take')}
-        </button>
+        </Button>
       )}
     </div>
   );
@@ -202,12 +203,12 @@ function Condition({
   if (!here && !contested) {
     return (
       <li>
-        <button
+        <Button
           type="button"
           onClick={onHere}
           className="flex w-full items-center gap-3 rounded-card bg-raised/40 px-5 py-2.5 text-start shadow-ring transition-colors hover:bg-raised/70"
         >
-          <span className="font-mono text-[11px] tabular-nums text-muted">
+          <span className="font-mono text-note tabular-nums text-muted">
             {String(n).padStart(2, '0')}
           </span>
           {mine ? (
@@ -216,8 +217,8 @@ function Condition({
             <Tag>{t('chk.unanswered')}</Tag>
           )}
           {contested && <Tag tone="gold">{t('chk.contested')}</Tag>}
-          <span className="min-w-0 flex-1 truncate text-[13px] text-sand">{c.requirement}</span>
-        </button>
+          <span className="min-w-0 flex-1 truncate text-ui text-sand">{c.requirement}</span>
+        </Button>
       </li>
     );
   }
@@ -227,7 +228,7 @@ function Condition({
       className={
         'rounded-card px-5 py-4 ' +
         (contested
-          ? 'bg-raised shadow-[0_0_0_1px_rgba(176,132,48,0.3),0_1px_2px_rgba(25,23,19,0.045),0_12px_24px_-14px_rgba(25,23,19,0.16)]'
+          ? 'bg-raised shadow-pickgold'
           : mine
             ? 'bg-raised shadow-card'
             : 'bg-raised/60 shadow-ring')
@@ -235,7 +236,7 @@ function Condition({
     >
       <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-2">
         {/* The step's number. The list is the work, and the work is in order. */}
-        <span className="font-mono text-[11px] tabular-nums text-muted">
+        <span className="font-mono text-note tabular-nums text-muted">
           {String(n).padStart(2, '0')}
         </span>
         {mine ? (
@@ -244,12 +245,12 @@ function Condition({
           <Tag>{t('chk.unanswered')}</Tag>
         )}
         {contested && <Tag tone="gold">{t('chk.contested')}</Tag>}
-        <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+        <span className="text-label font-bold uppercase tracking-caps text-muted">
           {t(`chk.evidence.${c.evidence}`)}
         </span>
       </div>
 
-      <p className="max-w-[62ch] font-display text-[16px] leading-[1.55]">{c.requirement}</p>
+      <p className="max-w-[62ch] font-display text-lead leading-relaxed">{c.requirement}</p>
 
       {/*
         A step that needs a figure carries the calculator, and what has already
@@ -270,21 +271,21 @@ function Condition({
                   key={w.id}
                   className={
                     'rounded-xl px-4 py-2.5 shadow-ring ' +
-                    (w.withdrawnAt ? 'bg-raised/50 opacity-60' : 'bg-[#EBF3EF]')
+                    (w.withdrawnAt ? 'bg-raised/50 opacity-60' : 'bg-settledtint')
                   }
                 >
                   <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                    <span className="text-[13px] text-paper">
+                    <span className="text-ui text-paper">
                       {w.headline} <span className="font-semibold">{w.amount}</span>
                     </span>
                     <Link
                       to={`/figures/${w.id}`}
-                      className="text-[12px] text-lapis underline decoration-line underline-offset-4"
+                      className="text-note text-lapis underline decoration-line underline-offset-4"
                     >
                       {t('step.theWorking')}
                     </Link>
                   </div>
-                  <p className="mt-0.5 text-[11.5px] text-muted">
+                  <p className="mt-0.5 text-note text-muted">
                     {t(`calc.tab.${w.kind}`)}
                     <span className="mx-1.5 opacity-40">·</span>
                     {w.periodFrom} — {w.periodTo}
@@ -340,15 +341,15 @@ function Condition({
         Nothing here is ever collapsed unless it can be opened where it sits.
       */}
       <details className="group mt-2">
-        <summary className="cursor-pointer list-none text-[12px] text-muted underline decoration-line underline-offset-4 hover:text-paper">
+        <summary className="cursor-pointer list-none text-note text-muted underline decoration-line underline-offset-4 hover:text-paper">
           {t('chk.why')}
         </summary>
-        <p className="mt-2 max-w-[62ch] text-[12.5px] leading-[1.6] text-muted">{c.why}</p>
+        <p className="mt-2 max-w-[62ch] text-ui leading-relaxed text-muted">{c.why}</p>
       </details>
 
       {state.history.length > 0 && (
         <details className="mt-2.5">
-          <summary className="cursor-pointer text-[12px] text-muted hover:text-paper">
+          <summary className="cursor-pointer text-note text-muted hover:text-paper">
             {state.answeredBy.length} {t('chk.answeredBy')}
           </summary>
           <ul className="mt-2 space-y-2">
@@ -357,7 +358,7 @@ function Condition({
                 key={i}
                 className={'border-s-2 border-line ps-4 ' + (f.supersededAt ? 'opacity-60' : '')}
               >
-                <div className="text-[12px]">
+                <div className="text-note">
                   <span className={f.holds === 'not_met' ? 'font-semibold text-breach' : 'font-semibold text-settled'}>
                     {t(`chk.${f.holds}`)}
                   </span>
@@ -370,7 +371,7 @@ function Condition({
                     </>
                   )}
                 </div>
-                <p className="mt-1.5 max-w-[62ch] font-display text-[14.5px] leading-[1.55] text-sand">
+                <p className="mt-1.5 max-w-[62ch] font-display text-lead leading-relaxed text-sand">
                   {f.reason}
                 </p>
               </li>
@@ -400,19 +401,19 @@ function Condition({
             <div>
               <div className="mb-2 flex flex-wrap gap-2">
                 {HOLDS.map((h) => (
-                  <button
+                  <Button
                     key={h}
                     type="button"
                     onClick={() => setHolds(h)}
                     className={
-                      'rounded-xl px-4 py-2 text-[12.5px] transition-all ' +
+                      'rounded-xl px-4 py-2 text-ui transition-all ' +
                       (holds === h
-                        ? 'bg-[#EAF1F7] font-bold text-lapis shadow-[0_0_0_1.5px_#164470]'
+                        ? 'bg-lapistint font-bold text-lapis shadow-pick'
                         : 'bg-raised text-sand shadow-ring hover:text-paper')
                     }
                   >
                     {t(`chk.${h}`)}
-                  </button>
+                  </Button>
                 ))}
               </div>
 
@@ -421,37 +422,37 @@ function Condition({
                 onChange={(e) => setReason(e.target.value)}
                 placeholder={t('chk.reasonHint')}
             aria-label={t('chk.reasonHint')}
-                className="mb-2 h-20 w-full rounded-xl shadow-ring bg-raised px-3 py-2 text-[13.5px]"
+                className="mb-2 h-20 w-full rounded-xl shadow-ring bg-raised px-3 py-2 text-body"
               />
 
-              {refusal && <p className="mb-2 text-[12.5px] leading-relaxed text-breach">{refusal}</p>}
+              {refusal && <p className="mb-2 text-ui leading-relaxed text-breach">{refusal}</p>}
 
               <div className="flex gap-2">
-                <button
+                <Button
                   type="button"
                   onClick={submit}
                   disabled={!holds || busy}
-                  className="rounded-xl bg-raised shadow-ring px-3 py-1.5 text-[12.5px] text-lapis font-medium disabled:opacity-40"
+                  className="rounded-xl bg-raised shadow-ring px-3 py-1.5 text-ui text-lapis font-medium disabled:opacity-40"
                 >
                   {t('chk.record')}
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
                   onClick={() => setOpen(false)}
-                  className="rounded-xl shadow-ring px-3 py-1.5 text-[12.5px] text-muted"
+                  className="rounded-xl shadow-ring px-3 py-1.5 text-ui text-muted"
                 >
                   {t('common.cancel')}
-                </button>
+                </Button>
               </div>
             </div>
           ) : (
-            <button
+            <Button
               type="button"
               onClick={() => setOpen(true)}
-              className="rounded-xl shadow-ring px-3 py-1.5 text-[12.5px] text-muted hover:text-paper"
+              className="rounded-xl shadow-ring px-3 py-1.5 text-ui text-muted hover:text-paper"
             >
               {mine ? t('chk.changeFinding') : t('chk.recordFinding')}
-            </button>
+            </Button>
           )}
         </div>
       )}
@@ -507,19 +508,19 @@ function Picker({
 
         return (
           <div key={family}>
-            <div className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+            <div className="mb-1.5 text-label font-bold uppercase tracking-caps text-muted">
               {t(`family.${family}`)}
             </div>
             <div className="flex flex-wrap gap-2">
               {inFamily.map((s) => (
-                <button
+                <Button
                   key={s.id}
                   type="button"
                   onClick={() => onChoose(s.id)}
-                  className="rounded-xl shadow-ring px-3 py-1.5 text-start text-[12.5px] text-muted transition-colors hover:text-paper"
+                  className="rounded-xl shadow-ring px-3 py-1.5 text-start text-ui text-muted transition-colors hover:text-paper"
                 >
                   {s.name}
-                </button>
+                </Button>
               ))}
             </div>
           </div>
@@ -690,7 +691,7 @@ export default function Checklist({
   if (none) {
     return (
       <div>
-        <p className="mb-3 text-[13px] leading-relaxed text-muted">{t('chk.noShape')}</p>
+        <p className="mb-3 text-ui leading-relaxed text-muted">{t('chk.noShape')}</p>
         {canRule && structures && <Picker structures={structures} onChoose={choose} />}
       </div>
     );
@@ -730,7 +731,7 @@ export default function Checklist({
   return (
     <div>
       <div className="mb-1 flex flex-wrap items-center gap-2">
-        <span className="text-[14px] font-medium">{data.structure.name}</span>
+        <span className="text-body font-medium">{data.structure.name}</span>
         {/*
           Whose conditions these are, on the face of the checklist.
           A board judging a matter beside somebody else's reading and a board
@@ -747,16 +748,16 @@ export default function Checklist({
         standard of ours: the shipped library names none, so a board that has
         not said reads as not having said.
       */}
-      <p className="mb-2 text-[12px] text-muted">
+      <p className="mb-2 text-note text-muted">
         {data.basis ?? t('adopt.noBasis')}
       </p>
 
       {/* The server's own sentence about what that means. Not restated here. */}
       <p
         className={
-          'mb-4 rounded-xl px-4 py-2.5 text-[12.5px] leading-[1.55] ' +
+          'mb-4 rounded-xl px-4 py-2.5 text-ui leading-relaxed ' +
           (data.declined
-            ? 'bg-[#FCF0EE] text-breach shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)]'
+            ? 'bg-breachtint text-breach shadow-ringbreach'
             : 'bg-raised/60 text-muted shadow-ring')
         }
       >
@@ -767,7 +768,7 @@ export default function Checklist({
         A count, not a score. No bar and no percentage: a figure that filled up
         toward approval would be the interface forming a view.
       */}
-      <p className="mb-4 text-[13px]">
+      <p className="mb-4 text-ui">
         <span className="tabular-nums font-medium">
           {data.answered} {t('reg.of')} {data.total}
         </span>{' '}
@@ -790,7 +791,7 @@ export default function Checklist({
         instead, because "nothing left" is the fact a chair is looking for
         before they open the vote.
       */}
-      <p className="mb-3 text-[12.5px] text-muted">
+      <p className="mb-3 text-ui text-muted">
         {firstUnanswered
           ? `${t('chk.onStep')} ${String(
               data.conditions.findIndex((c) => c.condition.id === (pinned ?? firstUnanswered)) + 1,
@@ -799,7 +800,7 @@ export default function Checklist({
       </p>
 
       {carryRefusal && (
-        <p className="mb-3 rounded-xl bg-[#FCF0EE] px-4 py-2.5 text-[12.5px] leading-[1.55] text-breach shadow-[0_0_0_0.5px_rgba(154,56,48,0.18)]">
+        <p className="mb-3 rounded-xl bg-breachtint px-4 py-2.5 text-ui leading-relaxed text-breach shadow-ringbreach">
           {carryRefusal}
         </p>
       )}
@@ -838,7 +839,7 @@ export default function Checklist({
         ))}
       </ul>
 
-      <p className="mt-4 rounded-xl shadow-ring bg-raised px-3 py-2.5 text-[12.5px] leading-relaxed text-muted">
+      <p className="mt-4 rounded-xl shadow-ring bg-raised px-3 py-2.5 text-ui leading-relaxed text-muted">
         {data.note}
       </p>
     </div>

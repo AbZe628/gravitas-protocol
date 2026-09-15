@@ -65,11 +65,11 @@ function Event({ e }: { e: Disclosure['events'][number] }) {
         ) : (
           <State tone="attention">{t('owe.stepsOpen')}</State>
         )}
-        <span className="font-mono text-[11.5px] text-muted">{e.reference}</span>
+        <span className="font-mono text-note text-muted">{e.reference}</span>
       </div>
 
       {/* What happened, in the board's words. */}
-      <div className="font-display text-[17px] leading-snug">{e.nature}</div>
+      <div className="font-display text-sub leading-snug">{e.nature}</div>
 
       {/*
         The money. Three states and they are not interchangeable: an amount
@@ -77,21 +77,21 @@ function Event({ e }: { e: Disclosure['events'][number] }) {
       */}
       <div className="mt-3 rounded-xl bg-raised px-3.5 py-3 shadow-ring">
         {e.amount === null ? (
-          <p className="max-w-[62ch] text-[12.5px] leading-[1.6] text-muted">
+          <p className="max-w-[62ch] text-ui leading-relaxed text-muted">
             {t('owe.noneDirected')}
           </p>
         ) : (
           <>
             <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-              <span className="text-[13px] font-semibold">
+              <span className="text-ui font-semibold">
                 {e.paid ? t('owe.paid') : t('owe.owed')}
               </span>
-              <span className={e.paid ? 'text-[15px] text-settled' : 'text-[15px] text-breach'}>
+              <span className={e.paid ? 'text-lead text-settled' : 'text-lead text-breach'}>
                 <Amount amount={e.amount} currency={e.currency ?? ''} />
               </span>
             </div>
             {e.destination && (
-              <p className="mt-1.5 max-w-[62ch] text-[12px] leading-[1.6] text-muted">
+              <p className="mt-1.5 max-w-[62ch] text-note leading-relaxed text-muted">
                 <span className="font-semibold">{t('owe.to')}</span> {e.destination}
               </p>
             )}
@@ -105,7 +105,7 @@ function Event({ e }: { e: Disclosure['events'][number] }) {
       */}
       {e.rectification.length > 0 && (
         <div className="mt-3">
-          <div className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+          <div className="mb-1.5 text-label font-bold uppercase tracking-caps text-muted">
             {e.rectified ? t('owe.stepsDone') : t('owe.steps')}
             <span className="ms-2 font-mono tabular-nums opacity-70">
               {e.rectification.length}
@@ -114,12 +114,12 @@ function Event({ e }: { e: Disclosure['events'][number] }) {
           <ol className="space-y-1.5">
             {e.rectification.map((step, i) => (
               <li key={i} className="flex gap-2.5">
-                <span className="mt-[3px] shrink-0 font-mono text-[11px] text-muted tabular-nums">
+                <span className="mt-[3px] shrink-0 font-mono text-note text-muted tabular-nums">
                   {String(i + 1).padStart(2, '0')}
                 </span>
                 <span
                   className={
-                    'max-w-[58ch] text-[12.5px] leading-[1.6] ' +
+                    'max-w-[58ch] text-ui leading-relaxed ' +
                     (e.rectified ? 'text-muted' : '')
                   }
                 >
@@ -135,14 +135,14 @@ function Event({ e }: { e: Disclosure['events'][number] }) {
         Where the board's own record of this event is. A desk reading its
         obligation has to be able to reach what the board actually wrote.
       */}
-      <p className="mt-3 text-[12.5px]">
+      <p className="mt-3 text-ui">
         <Link to="/incidents" className="text-lapis underline underline-offset-2">
           {t('owe.seeTheRecord')}
         </Link>
       </p>
 
       {stepsLeft && (
-        <p className="mt-2 max-w-[62ch] text-[11.5px] leading-[1.55] text-muted">
+        <p className="mt-2 max-w-[62ch] text-note leading-relaxed text-muted">
           {t('owe.stepsAreYours')}
         </p>
       )}
@@ -202,13 +202,13 @@ export default function IOwe({ boardId }: { boardId: string }) {
         would invent an exchange rate nobody recorded.
       */}
       {totals.length > 0 && (
-        <div className="mb-6 rounded-sheet bg-[#FCF0EE] px-6 py-5 shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)]">
-          <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.15em] text-breach">
+        <div className="mb-6 rounded-sheet bg-breachtint px-6 py-5 shadow-ringbreach">
+          <div className="mb-2 text-label font-bold uppercase tracking-caps text-breach">
             {t('owe.stillOwed')}
           </div>
           <ul className="space-y-1">
             {totals.map((row) => (
-              <li key={row.currency} className="text-[15px] text-breach">
+              <li key={row.currency} className="text-lead text-breach">
                 {row.amounts.map((a, i) => (
                   <span key={i}>
                     {i > 0 && <span className="mx-2 opacity-40">+</span>}
@@ -218,7 +218,7 @@ export default function IOwe({ boardId }: { boardId: string }) {
               </li>
             ))}
           </ul>
-          <p className="mt-2.5 max-w-[62ch] text-[12px] leading-[1.6] text-[#7a3a33]">
+          <p className="mt-2.5 max-w-[62ch] text-note leading-relaxed text-breachink">
             {t('owe.totalsNote')}
           </p>
         </div>

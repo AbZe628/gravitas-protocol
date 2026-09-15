@@ -35,7 +35,7 @@ export function Display({ children, className = '' }: { children: ReactNode; cla
   return (
     <h1
       className={
-        'font-display text-[30px] leading-[1.15] tracking-[-0.01em] text-paper sm:text-[36px] ' +
+        'font-display text-head leading-tight tracking-tight text-paper sm:text-display ' +
         className
       }
       style={{ textWrap: 'balance' }}
@@ -47,7 +47,7 @@ export function Display({ children, className = '' }: { children: ReactNode; cla
 
 export function Title({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
-    <h2 className={'font-display text-[20px] leading-snug text-paper ' + className}>{children}</h2>
+    <h2 className={'font-display text-sub leading-snug text-paper ' + className}>{children}</h2>
   );
 }
 
@@ -60,7 +60,7 @@ export function Title({ children, className = '' }: { children: ReactNode; class
  */
 export function Body({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
-    <p className={'max-w-[62ch] text-[15px] leading-[1.6] text-sand ' + className}>{children}</p>
+    <p className={'max-w-[62ch] text-lead leading-relaxed text-sand ' + className}>{children}</p>
   );
 }
 
@@ -69,7 +69,7 @@ export function Label({ children, className = '' }: { children: ReactNode; class
   return (
     <div
       className={
-        'text-[11px] font-medium uppercase tracking-[0.12em] text-muted ' + className
+        'text-note font-medium uppercase tracking-label text-muted ' + className
       }
     >
       {children}
@@ -79,7 +79,7 @@ export function Label({ children, className = '' }: { children: ReactNode; class
 
 export function Note({ children, className = '' }: { children: ReactNode; className?: string }) {
   return (
-    <p className={'max-w-[62ch] text-[13px] leading-[1.55] text-muted ' + className}>{children}</p>
+    <p className={'max-w-[62ch] text-ui leading-relaxed text-muted ' + className}>{children}</p>
   );
 }
 
@@ -92,7 +92,7 @@ export function Note({ children, className = '' }: { children: ReactNode; classN
  */
 export function Quoted({ children }: { children: ReactNode }) {
   return (
-    <blockquote className="border-s-2 border-gold/50 ps-4 font-display text-[17px] leading-[1.55] text-paper">
+    <blockquote className="border-s-2 border-gold/50 ps-4 font-display text-sub leading-relaxed text-paper">
       {children}
     </blockquote>
   );
@@ -112,7 +112,7 @@ export function Quoted({ children }: { children: ReactNode }) {
 export function Why({ children, label }: { children: ReactNode; label: string }) {
   return (
     <details className="group mt-2">
-      <summary className="cursor-pointer list-none text-[12.5px] text-muted underline decoration-line underline-offset-4 transition-colors hover:text-sand">
+      <summary className="cursor-pointer list-none text-ui text-muted underline decoration-line underline-offset-4 transition-colors hover:text-sand">
         {label}
       </summary>
       <div className="mt-2 border-s border-line ps-3">

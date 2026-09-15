@@ -35,17 +35,17 @@ export default function Precedent({ matterId }: { matterId: string }) {
   if (related === null) return null;
 
   if (related.length === 0) {
-    return <p className="text-[13px] text-muted">{t('related.none')}</p>;
+    return <p className="text-ui text-muted">{t('related.none')}</p>;
   }
 
   return (
     <div className="space-y-3">
-      <p className="text-[12.5px] leading-relaxed text-muted">{t('related.help')}</p>
+      <p className="text-ui leading-relaxed text-muted">{t('related.help')}</p>
 
       <ul className="space-y-2">
         {related.map((r) => (
           <li key={r.matterId} className="rounded-card shadow-ring p-3">
-            <div className="mb-1.5 flex flex-wrap items-center gap-2 text-[11.5px]">
+            <div className="mb-1.5 flex flex-wrap items-center gap-2 text-note">
               <Tag tone={r.direction === 'restrict' ? 'warn' : 'gold'}>
                 {t(`matter.direction.${r.direction}`)}
               </Tag>
@@ -57,7 +57,7 @@ export default function Precedent({ matterId }: { matterId: string }) {
 
             <Link
               to={`/matters/${r.matterId}`}
-              className="text-[14px] font-medium leading-snug text-paper hover:text-lapis"
+              className="text-body font-medium leading-snug text-paper hover:text-lapis"
             >
               {r.title}
             </Link>
@@ -65,10 +65,10 @@ export default function Precedent({ matterId }: { matterId: string }) {
             {/* The specific thing shared, shown rather than summarised. */}
             <ul className="mt-2 space-y-1">
               {r.relations.map((rel, i) => (
-                <li key={i} className="text-[12px] leading-relaxed text-muted">
+                <li key={i} className="text-note leading-relaxed text-muted">
                   <span className="text-lapis">{t(`related.${rel.kind}`)}</span>
                   <span className="mx-1.5 opacity-40">·</span>
-                  <span className="font-mono text-[11.5px]">{rel.shared}</span>
+                  <span className="font-mono text-note">{rel.shared}</span>
                 </li>
               ))}
             </ul>

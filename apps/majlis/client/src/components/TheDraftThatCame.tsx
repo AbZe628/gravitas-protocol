@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { oversight, type Recognition, type SubmittedDraft } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
+import { Button } from './Button';
 
 /**
  * The contract that came with the question, and what to do with it.
@@ -67,15 +68,15 @@ export default function TheDraftThatCame({
   return (
     <section className="mt-3.5 rounded-card bg-raised px-4 py-3.5 shadow-ring">
       <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-        <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-muted">
+        <span className="text-label font-bold uppercase tracking-caps text-muted">
           {t('camewith.title')}
         </span>
-        <span className="font-mono text-[11.5px] text-muted">
+        <span className="font-mono text-note text-muted">
           {draft.text.length} {t('draftfrom.characters')}
         </span>
       </div>
 
-      <div className="mt-1.5 text-[13.5px] text-paper">{draft.name}</div>
+      <div className="mt-1.5 text-body text-paper">{draft.name}</div>
 
       {/*
         The shapes whose conditions use words that are in this draft. Pressing
@@ -84,16 +85,16 @@ export default function TheDraftThatCame({
       */}
       {guessed && guessed.guesses.length > 0 && (
         <div className="mt-3">
-          <div className="mb-2 text-[12px] text-muted">{t('camewith.looksLike')}</div>
+          <div className="mb-2 text-note text-muted">{t('camewith.looksLike')}</div>
           <ul className="flex flex-wrap gap-2">
             {guessed.guesses.map((g) => (
               <li key={g.structureId}>
                 <Link
                   to={`/check?shape=${encodeURIComponent(g.structureId)}&from=${encodeURIComponent(submissionId)}`}
-                  className="block max-w-[34ch] rounded-xl bg-ink/60 px-3.5 py-2 text-[12.5px] text-sand shadow-ring transition-colors hover:text-paper"
+                  className="block max-w-[34ch] rounded-xl bg-ink/60 px-3.5 py-2 text-ui text-sand shadow-ring transition-colors hover:text-paper"
                 >
                   <span className="block truncate">{g.name}</span>
-                  <span className="mt-0.5 block text-[11px] text-muted">
+                  <span className="mt-0.5 block text-note text-muted">
                     {g.namedInTheDraft
                       ? `${t('camewith.namesItself')} “${g.namedInTheDraft}”`
                       : `${g.found + g.partly} ${t('camewith.ofConditions')} ${g.of}`}
@@ -102,22 +103,22 @@ export default function TheDraftThatCame({
               </li>
             ))}
           </ul>
-          <p className="mt-2.5 max-w-[62ch] text-[11.5px] leading-[1.6] text-muted">
+          <p className="mt-2.5 max-w-[62ch] text-note leading-relaxed text-muted">
             {guessed.note}
           </p>
         </div>
       )}
 
-      <button
+      <Button
         type="button"
         onClick={() => setShowing((was) => !was)}
-        className="mt-3 text-[12.5px] font-semibold text-lapis underline decoration-line underline-offset-4"
+        className="mt-3 text-ui font-semibold text-lapis underline decoration-line underline-offset-4"
       >
         {t(showing ? 'camewith.hide' : 'camewith.show')}
-      </button>
+      </Button>
 
       {showing && (
-        <pre className="mt-2.5 max-h-[22rem] overflow-auto whitespace-pre-wrap rounded-xl bg-ink px-3.5 py-3 font-mono text-[12px] leading-[1.6] text-sand">
+        <pre className="mt-2.5 max-h-[22rem] overflow-auto whitespace-pre-wrap rounded-xl bg-ink px-3.5 py-3 font-mono text-note leading-relaxed text-sand">
           {draft.text}
         </pre>
       )}

@@ -48,7 +48,7 @@ export default function MatterDetail() {
 
   return (
     <article>
-      <Link to="/" className="mb-4 inline-block text-[13px] text-muted hover:text-paper">
+      <Link to="/" className="mb-4 inline-block text-ui text-muted hover:text-paper">
         ← {t('common.back')}
       </Link>
 
@@ -57,7 +57,7 @@ export default function MatterDetail() {
           {t(`matter.direction.${matter.direction}`)}
         </State>
         <State tone={toneForStatus(matter.status)}>{t(`matter.status.${matter.status}`)}</State>
-        <span className="text-[12px] text-muted">
+        <span className="text-note text-muted">
           {t(`matter.origin.${matter.origin}`)}
           <span className="mx-1.5 opacity-40">·</span>
           <DateText iso={matter.openedAt} />
@@ -65,13 +65,13 @@ export default function MatterDetail() {
       </div>
 
       <h1
-        className="mb-4 max-w-[21ch] font-display text-[32px] font-normal leading-[1.12] tracking-[-0.024em] sm:text-[38px]"
+        className="mb-4 max-w-[21ch] font-display text-head font-normal leading-tight tracking-display sm:text-display"
         style={{ textWrap: 'balance' }}
       >
         {matter.title}
       </h1>
 
-      <p className="mb-7 max-w-[62ch] text-[13px] leading-[1.65] text-muted">
+      <p className="mb-7 max-w-[62ch] text-ui leading-relaxed text-muted">
         {t(`matter.direction.${matter.direction}Note`)}
       </p>
 
@@ -126,7 +126,7 @@ export default function MatterDetail() {
             </div>
           </>
         ) : (
-          <p className="rounded-card bg-raised/60 px-5 py-4 text-[12.5px] leading-[1.6] text-muted shadow-ring">
+          <p className="rounded-card bg-raised/60 px-5 py-4 text-ui leading-relaxed text-muted shadow-ring">
             {t('doc.fatwaNotYet')}
           </p>
         )}
@@ -160,10 +160,10 @@ export default function MatterDetail() {
 
       <Section title={t('matter.parameters')}>
         <Card>
-          <div className="mb-3 font-display text-[20px] leading-snug tracking-[-0.014em]">
+          <div className="mb-3 font-display text-sub leading-snug tracking-title">
             {rule.title}
           </div>
-          <p className="mb-5 border-s-2 border-gold/50 ps-4 font-display text-[16px] leading-[1.55] text-paper">
+          <p className="mb-5 border-s-2 border-gold/50 ps-4 font-display text-lead leading-relaxed text-paper">
             {rule.statement}
           </p>
 
@@ -182,7 +182,7 @@ export default function MatterDetail() {
               ) : (
                 <Tag tone="warn">{t('rule.hashBad')}</Tag>
               )}
-              <p className="mt-2 text-[12px] leading-relaxed text-muted">{t('rule.hashExplain')}</p>
+              <p className="mt-2 text-note leading-relaxed text-muted">{t('rule.hashExplain')}</p>
             </div>
           )}
         </Card>
@@ -205,8 +205,8 @@ export default function MatterDetail() {
       {matter.simulation && (
         <Section title={t('matter.simulation')}>
           <Card>
-            <div className="mb-3 text-[14px]">
-              <span className="font-display text-[30px] leading-none tracking-[-0.026em] text-lapis tabular-nums">
+            <div className="mb-3 text-body">
+              <span className="font-display text-head leading-none tracking-display text-lapis tabular-nums">
                 {matter.simulation.transactionsAffected}
               </span>{' '}
               <span className="text-muted">
@@ -214,23 +214,23 @@ export default function MatterDetail() {
                 {t('sim.transactions')} {t('sim.affected')}
               </span>
             </div>
-            <div className="mb-4 text-[12px] text-muted">
+            <div className="mb-4 text-note text-muted">
               {t('sim.window')} <DateText iso={matter.simulation.windowFrom} /> —{' '}
               <DateText iso={matter.simulation.windowTo} />
             </div>
-            <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+            <div className="mb-2 text-label font-bold uppercase tracking-caps text-muted">
               {t('sim.sample')}
             </div>
             <ul className="space-y-2.5">
               {matter.simulation.affectedSample.map((s) => (
                 <li key={s.hash} className="border-t border-line pt-2.5 first:border-0 first:pt-0">
-                  <div className="font-mono text-[11px] text-muted">{s.hash}</div>
-                  <div className="text-[13px]">{s.asset}</div>
-                  <div className="text-[12px] text-sand">{s.reason}</div>
+                  <div className="font-mono text-note text-muted">{s.hash}</div>
+                  <div className="text-ui">{s.asset}</div>
+                  <div className="text-note text-sand">{s.reason}</div>
                 </li>
               ))}
             </ul>
-            <p className="mt-4 border-t border-line pt-3 text-[13px] text-sand">
+            <p className="mt-4 border-t border-line pt-3 text-ui text-sand">
               {matter.simulation.note}
             </p>
           </Card>
@@ -289,7 +289,7 @@ export default function MatterDetail() {
         no record of what was computed or from whose figures.
       */}
       <Section title={t('screen.title')}>
-        <p className="mb-3 text-[13px] leading-relaxed text-muted">{t('screen.intro')}</p>
+        <p className="mb-3 text-ui leading-relaxed text-muted">{t('screen.intro')}</p>
         <Screening />
       </Section>
 
@@ -308,7 +308,7 @@ export default function MatterDetail() {
                   (r.releasedAt ? 'bg-raised/50 shadow-ring' : 'bg-raised shadow-card')
                 }
               >
-                <div className="mb-1.5 flex flex-wrap items-center gap-2 text-[12px]">
+                <div className="mb-1.5 flex flex-wrap items-center gap-2 text-note">
                   <span className={r.releasedAt ? 'text-muted' : 'font-semibold text-lapis'}>{r.scholarId}</span>
                   <Tag tone={r.releasedAt ? 'neutral' : r.position === 'against' ? 'warn' : 'neutral'}>
                     {r.position}
@@ -317,16 +317,16 @@ export default function MatterDetail() {
                     <DateText iso={r.at} />
                   </span>
                   {r.releasedAt && (
-                    <span className="rounded-full bg-black/[0.045] px-2.5 py-0.5 text-[10.5px] font-bold uppercase tracking-[0.1em] text-muted">
+                    <span className="rounded-full bg-black/[0.045] px-2.5 py-0.5 text-label font-bold uppercase tracking-label text-muted">
                       {t('vote.released')}
                     </span>
                   )}
                 </div>
-                <p className={'text-[14px] leading-relaxed ' + (r.releasedAt ? 'text-muted' : '')}>
+                <p className={'text-body leading-relaxed ' + (r.releasedAt ? 'text-muted' : '')}>
                   {r.reason}
                 </p>
                 {r.releasedAt && (
-                  <p className="mt-1.5 text-[11.5px] leading-relaxed text-muted">
+                  <p className="mt-1.5 text-note leading-relaxed text-muted">
                     {t('vote.releasedNote')}
                   </p>
                 )}

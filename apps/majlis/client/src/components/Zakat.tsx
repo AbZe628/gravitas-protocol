@@ -170,8 +170,8 @@ export default function Zakat() {
           amount={`${result.due} ${result.currency}`}
           steps={result.steps}
         >
-          <p className="mb-2 text-[12.5px] leading-relaxed text-muted">{result.methodStated}</p>
-          <p className="mb-2 text-[12.5px] leading-relaxed text-muted">
+          <p className="mb-2 text-ui leading-relaxed text-muted">{result.methodStated}</p>
+          <p className="mb-2 text-ui leading-relaxed text-muted">
             <span className="font-mono">{result.rateStated}</span> — {result.rateWhy}
           </p>
           {/*
@@ -180,7 +180,7 @@ export default function Zakat() {
             discharges nothing by doing so" is the sentence that stops a
             computed number being mistaken for a paid one.
           */}
-          <p className="mb-3 rounded-xl shadow-ring px-3 py-2 text-[12.5px] leading-relaxed">
+          <p className="mb-3 rounded-xl shadow-ring px-3 py-2 text-ui leading-relaxed">
             {result.borneByStated}
           </p>
         </Result>

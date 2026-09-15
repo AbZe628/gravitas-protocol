@@ -40,17 +40,17 @@ function ReserveRow({ r, currency }: { r: Reserve; currency: string }) {
   return (
     <li className="rounded-xl shadow-ring px-3 py-2.5">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <span className="text-[13px] font-medium">{r.name}</span>
-        <span className="font-mono text-[13px] tabular-nums">
+        <span className="text-ui font-medium">{r.name}</span>
+        <span className="font-mono text-ui tabular-nums">
           {r.closingBalance} {currency}
         </span>
       </div>
-      <p className="mt-0.5 font-mono text-[11.5px] text-muted">
+      <p className="mt-0.5 font-mono text-note text-muted">
         {r.openingBalance} {r.movement.startsWith('-') ? '−' : '+'}{' '}
         {r.movement.replace('-', '')} · {t('dist.headroom')} {r.headroom}
       </p>
       {/* A capped deduction is not the deduction the board approved. */}
-      {r.cappedAt && <p className="mt-1 text-[11.5px] text-warn">{t('dist.capped')}</p>}
+      {r.cappedAt && <p className="mt-1 text-note text-warn">{t('dist.capped')}</p>}
     </li>
   );
 }
@@ -150,8 +150,8 @@ export default function Distribution() {
 
       {/* Before the split. Both parties bear it. */}
       <div className="mb-3 rounded-xl shadow-ring px-3 py-3">
-        <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">{t('dist.perTitle')}</div>
-        <p className="mb-2.5 text-[11.5px] leading-relaxed text-muted">{t('dist.per.meaning')}</p>
+        <div className="mb-2 text-label font-bold uppercase tracking-caps text-muted">{t('dist.perTitle')}</div>
+        <p className="mb-2.5 text-note leading-relaxed text-muted">{t('dist.per.meaning')}</p>
         <Rate label={t('dist.deduction')} bps={per} onChange={setPer} />
         <div className="flex gap-2">
           <div className="flex-1">
@@ -165,8 +165,8 @@ export default function Distribution() {
 
       {/* After the split. The depositors alone bear it. */}
       <div className="mb-3 rounded-xl shadow-ring px-3 py-3">
-        <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">{t('dist.irrTitle')}</div>
-        <p className="mb-2.5 text-[11.5px] leading-relaxed text-muted">{t('dist.irr.meaning')}</p>
+        <div className="mb-2 text-label font-bold uppercase tracking-caps text-muted">{t('dist.irrTitle')}</div>
+        <p className="mb-2.5 text-note leading-relaxed text-muted">{t('dist.irr.meaning')}</p>
         <Rate label={t('dist.deduction')} bps={irr} onChange={setIrr} />
         <div className="flex gap-2">
           <div className="flex-1">
@@ -196,7 +196,7 @@ export default function Distribution() {
           amount={`${result.paidToDepositors} ${result.currency}`}
           steps={result.steps}
         >
-          <p className="mb-3 text-[12.5px] leading-relaxed text-muted">{result.method}</p>
+          <p className="mb-3 text-ui leading-relaxed text-muted">{result.method}</p>
 
           {/*
             What smoothing did, printed rather than absorbed into the rate. A
@@ -204,10 +204,10 @@ export default function Distribution() {
             reserves exist to raise.
           */}
           <div className="mb-3 rounded-xl shadow-ring px-3 py-2.5">
-            <div className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+            <div className="mb-1.5 text-label font-bold uppercase tracking-caps text-muted">
               {t('dist.smoothing')}
             </div>
-            <div className="flex flex-wrap items-baseline justify-between gap-2 font-mono text-[12.5px] tabular-nums">
+            <div className="flex flex-wrap items-baseline justify-between gap-2 font-mono text-ui tabular-nums">
               <span className="text-muted">
                 {t('dist.withoutSmoothing')} {result.smoothing.withoutSmoothing}
               </span>
@@ -221,7 +221,7 @@ export default function Distribution() {
                 {result.smoothing.difference.replace(/^-/, '')}
               </span>
             </div>
-            <p className="mt-1.5 text-[12px] leading-relaxed text-muted">{result.smoothing.note}</p>
+            <p className="mt-1.5 text-note leading-relaxed text-muted">{result.smoothing.note}</p>
           </div>
 
           <ul className="mb-3 space-y-1.5">

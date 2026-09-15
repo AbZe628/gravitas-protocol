@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { governance, Refused, type Matter, type RuleParameter } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
+import { Button } from './Button';
 
 /**
  * The operative terms of the rule being proposed.
@@ -60,14 +61,14 @@ export default function Terms({ matter, canEdit, onChanged }: Props) {
     }
   }
 
-  const field = 'w-full rounded-xl bg-raised shadow-ring p-1.5 text-[13px] outline-none';
+  const field = 'w-full rounded-xl bg-raised shadow-ring p-1.5 text-ui outline-none';
 
   // ── reading ─────────────────────────────────────────────────────────────
   if (!editing) {
     return (
       <div className="space-y-3">
         {rule.parameters.length === 0 ? (
-          <p className="text-[13px] text-muted">{t('terms.none')}</p>
+          <p className="text-ui text-muted">{t('terms.none')}</p>
         ) : (
           <ul className="space-y-2.5">
             {rule.parameters.map((p) => (
@@ -89,14 +90,14 @@ export default function Terms({ matter, canEdit, onChanged }: Props) {
                   both need it — the same reason the examination keeps it.
                 */}
                 <div className="min-w-0">
-                  <p className="text-[13.5px] leading-[1.5] text-paper">{p.meaning}</p>
-                  <div className="mt-1 font-mono text-[10.5px] text-muted opacity-70">{p.key}</div>
+                  <p className="text-body leading-snug text-paper">{p.meaning}</p>
+                  <div className="mt-1 font-mono text-label text-muted opacity-70">{p.key}</div>
                 </div>
                 <div className="shrink-0 text-end">
-                  <div className="font-mono text-[18px] font-medium tabular-nums tracking-[-0.01em] text-lapis">
+                  <div className="font-mono text-sub font-medium tabular-nums tracking-tight text-lapis">
                     {p.value}
                   </div>
-                  {p.unit ? <div className="mt-0.5 text-[11px] text-muted">{p.unit}</div> : null}
+                  {p.unit ? <div className="mt-0.5 text-note text-muted">{p.unit}</div> : null}
                 </div>
               </li>
             ))}
@@ -110,29 +111,29 @@ export default function Terms({ matter, canEdit, onChanged }: Props) {
         <div className="rounded-card bg-raised px-5 py-4 shadow-ring">
           {rule.parameterHash ? (
             <>
-              <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+              <div className="mb-2 text-label font-bold uppercase tracking-caps text-muted">
                 {t('terms.fixed')}
               </div>
-              <div className="break-all font-mono text-[11.5px] text-lapis">
+              <div className="break-all font-mono text-note text-lapis">
                 {rule.parameterHash}
               </div>
-              <p className="mt-1.5 text-[12px] leading-relaxed text-muted">{t('terms.fixedNote')}</p>
+              <p className="mt-1.5 text-note leading-relaxed text-muted">{t('terms.fixedNote')}</p>
             </>
           ) : (
-            <p className="text-[12.5px] leading-relaxed text-muted">{t('terms.notFixed')}</p>
+            <p className="text-ui leading-relaxed text-muted">{t('terms.notFixed')}</p>
           )}
         </div>
 
-        {refusal && <p className="text-[12.5px] text-breach">{refusal}</p>}
+        {refusal && <p className="text-ui text-breach">{refusal}</p>}
 
         {mayEdit && (
-          <button
+          <Button
             type="button"
             onClick={start}
-            className="rounded-xl bg-raised px-4 py-2 text-[12.5px] text-sand shadow-ring transition-colors hover:text-paper"
+            className="rounded-xl bg-raised px-4 py-2 text-ui text-sand shadow-ring transition-colors hover:text-paper"
           >
             {rule.parameters.length ? t('terms.edit') : t('terms.set')}
-          </button>
+          </Button>
         )}
       </div>
     );
@@ -141,7 +142,7 @@ export default function Terms({ matter, canEdit, onChanged }: Props) {
   // ── drafting ────────────────────────────────────────────────────────────
   return (
     <div className="space-y-3 rounded-card shadow-ring p-3">
-      <p className="text-[12px] leading-relaxed text-muted">{t('terms.help')}</p>
+      <p className="text-note leading-relaxed text-muted">{t('terms.help')}</p>
 
       <ul className="space-y-3">
         {rows.map((row, i) => (
@@ -178,44 +179,44 @@ export default function Terms({ matter, canEdit, onChanged }: Props) {
               className={field + ' resize-y leading-relaxed'}
             />
             {rows.length > 1 && (
-              <button
+              <Button
                 type="button"
                 onClick={() => setRows((r) => r.filter((_, n) => n !== i))}
-                className="text-[12px] text-muted hover:text-paper"
+                className="text-note text-muted hover:text-paper"
               >
                 {t('terms.removeRow')}
-              </button>
+              </Button>
             )}
           </li>
         ))}
       </ul>
 
-      <button
+      <Button
         type="button"
         onClick={() => setRows((r) => [...r, blank()])}
-        className="text-[12px] text-muted hover:text-paper"
+        className="text-note text-muted hover:text-paper"
       >
         {t('terms.addRow')}
-      </button>
+      </Button>
 
-      {refusal && <p className="text-[12.5px] text-breach">{refusal}</p>}
+      {refusal && <p className="text-ui text-breach">{refusal}</p>}
 
       <div className="flex gap-2 border-t border-line pt-3">
-        <button
+        <Button
           type="button"
           disabled={busy}
           onClick={save}
-          className="rounded-xl shadow-ring px-3 py-1.5 text-[12px] hover:bg-raised disabled:opacity-40"
+          className="rounded-xl shadow-ring px-3 py-1.5 text-note hover:bg-raised disabled:opacity-40"
         >
           {t('terms.save')}
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
           onClick={() => setEditing(false)}
-          className="text-[12px] text-muted hover:text-paper"
+          className="text-note text-muted hover:text-paper"
         >
           {t('say.cancel')}
-        </button>
+        </Button>
       </div>
     </div>
   );

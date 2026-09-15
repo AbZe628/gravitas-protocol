@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import { useI18n } from '../lib/i18n.js';
+import { Button } from './Button';
 
 /**
  * The bank attaches the contract its question is about.
@@ -59,36 +60,36 @@ export default function AttachTheContract({
 
   return (
     <div className="mb-4 rounded-card bg-raised px-4 py-3.5 shadow-ring">
-      <div className="mb-1 text-[10px] font-bold uppercase tracking-[0.14em] text-muted">
+      <div className="mb-1 text-label font-bold uppercase tracking-caps text-muted">
         {t('attach.title')}
       </div>
-      <p className="mb-3 max-w-[62ch] text-[12.5px] leading-[1.6] text-muted">{t('attach.note')}</p>
+      <p className="mb-3 max-w-[62ch] text-ui leading-relaxed text-muted">{t('attach.note')}</p>
 
       {draft ? (
         <div className="flex flex-wrap items-center gap-3">
-          <span className="text-[13px] text-paper">{draft.name}</span>
-          <span className="font-mono text-[11.5px] text-muted">
+          <span className="text-ui text-paper">{draft.name}</span>
+          <span className="font-mono text-note text-muted">
             {draft.text.length} {t('draftfrom.characters')}
           </span>
-          <button
+          <Button
             type="button"
             onClick={() => {
               onDraft(null);
               setRefused(null);
             }}
-            className="text-[12.5px] text-muted underline decoration-line underline-offset-4 hover:text-paper"
+            className="text-ui text-muted underline decoration-line underline-offset-4 hover:text-paper"
           >
             {t('attach.remove')}
-          </button>
+          </Button>
         </div>
       ) : (
-        <button
+        <Button
           type="button"
           onClick={() => chooser.current?.click()}
-          className="rounded-xl bg-ink/60 px-3.5 py-2 text-[12.5px] text-sand shadow-ring transition-colors hover:text-paper"
+          className="rounded-xl bg-ink/60 px-3.5 py-2 text-ui text-sand shadow-ring transition-colors hover:text-paper"
         >
           {t('attach.choose')}
-        </button>
+        </Button>
       )}
 
       <input
@@ -104,7 +105,7 @@ export default function AttachTheContract({
       />
 
       {refused && (
-        <p className="mt-2.5 max-w-[62ch] text-[12.5px] leading-[1.6] text-breach">{refused}</p>
+        <p className="mt-2.5 max-w-[62ch] text-ui leading-relaxed text-breach">{refused}</p>
       )}
     </div>
   );

@@ -4,6 +4,7 @@ import { useI18n } from '../lib/i18n.js';
 import ReadDocument from './ReadDocument.js';
 import FromTheLastTime from './FromTheLastTime.js';
 import RecordCalculation from './RecordCalculation.js';
+import { Button } from './Button';
 
 /**
  * The three screening ratios, against limits this board set.
@@ -65,19 +66,19 @@ function Ratio({ ratio }: { ratio: RatioResult }) {
     ratio.withinThreshold === null
       ? 'shadow-ring text-muted'
       : ratio.withinThreshold
-        ? 'shadow-[0_0_0_0.5px_rgba(44,107,87,0.22)]'
-        : 'shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)]';
+        ? 'shadow-ringsettled'
+        : 'shadow-ringbreach';
 
   return (
     <li className={'rounded-xl bg-raised px-4 py-3 ' + tone}>
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <span className="text-[13px] font-medium">{ratio.label}</span>
-        <span className="font-mono text-[13px] tabular-nums">
+        <span className="text-ui font-medium">{ratio.label}</span>
+        <span className="font-mono text-ui tabular-nums">
           {ratio.percent === null ? '—' : ratio.percent + '%'}
         </span>
       </div>
       {/* The sum, not the verdict. */}
-      <p className="mt-1 font-mono text-[11.5px] leading-relaxed text-muted break-words">
+      <p className="mt-1 font-mono text-note leading-relaxed text-muted break-words">
         {ratio.workings}
       </p>
 
@@ -87,7 +88,7 @@ function Ratio({ ratio }: { ratio: RatioResult }) {
         the line under it has to say that rather than sit empty — an empty line
         where a citation used to be reads as a citation that failed to load.
       */}
-      <p className="mt-1 text-[11px] text-muted opacity-80">
+      <p className="mt-1 text-note text-muted opacity-80">
         {ratio.thresholdBps === null ? t('calc.screening.noLimit') : (ratio.basis ?? t('calc.screening.boardsLimit'))}
       </p>
     </li>
@@ -104,12 +105,12 @@ export default function Screening() {
 
   if (!open) {
     return (
-      <button
+      <Button
         onClick={() => setOpen(true)}
-        className="rounded-xl shadow-ring px-3 py-2 text-[13px] text-muted hover:text-paper"
+        className="rounded-xl shadow-ring px-3 py-2 text-ui text-muted hover:text-paper"
       >
         {t('screen.open')}
-      </button>
+      </Button>
     );
   }
 
@@ -182,76 +183,76 @@ export default function Screening() {
       <form onSubmit={compute}>
         <div className="mb-3 flex gap-2">
           <label className="flex-1">
-            <span className="mb-1 block text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+            <span className="mb-1 block text-label font-bold uppercase tracking-caps text-muted">
               {t('screen.asOf')}
             </span>
             <input
               type="date"
               value={figures.asOf}
               onChange={(e) => setFigures({ ...figures, asOf: e.target.value })}
-              className="w-full rounded-xl shadow-ring bg-raised px-2 py-1.5 text-[13px]"
+              className="w-full rounded-xl shadow-ring bg-raised px-2 py-1.5 text-ui"
             />
           </label>
           <label className="w-24">
-            <span className="mb-1 block text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+            <span className="mb-1 block text-label font-bold uppercase tracking-caps text-muted">
               {t('screen.currency')}
             </span>
             <input
               value={figures.currency}
               onChange={(e) => setFigures({ ...figures, currency: e.target.value })}
-              className="w-full rounded-xl shadow-ring bg-raised px-2 py-1.5 text-[13px]"
+              className="w-full rounded-xl shadow-ring bg-raised px-2 py-1.5 text-ui"
             />
           </label>
         </div>
 
         {FIELDS.map((f) => (
           <label key={f.key} className="mb-2.5 block">
-            <span className="mb-1 block text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+            <span className="mb-1 block text-label font-bold uppercase tracking-caps text-muted">
               {t(f.label)}
             </span>
             <input
               inputMode="decimal"
               value={figures[f.key] as string}
               onChange={(e) => setFigures({ ...figures, [f.key]: e.target.value })}
-              className="w-full rounded-xl shadow-ring bg-raised px-3 py-2 text-[14px] font-mono tabular-nums"
+              className="w-full rounded-xl shadow-ring bg-raised px-3 py-2 text-body font-mono tabular-nums"
               placeholder="0"
             />
           </label>
         ))}
 
         <label className="mb-3 block">
-          <span className="mb-1 block text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+          <span className="mb-1 block text-label font-bold uppercase tracking-caps text-muted">
             {t('screen.source')}
           </span>
           <input
             value={figures.source}
             onChange={(e) => setFigures({ ...figures, source: e.target.value })}
             placeholder={t('screen.sourceHint')}
-            className="w-full rounded-xl shadow-ring bg-raised px-3 py-2 text-[13px]"
+            className="w-full rounded-xl shadow-ring bg-raised px-3 py-2 text-ui"
           />
         </label>
 
-        {error && <p className="mb-3 text-[13px] leading-relaxed text-breach">{error}</p>}
+        {error && <p className="mb-3 text-ui leading-relaxed text-breach">{error}</p>}
 
         <div className="flex gap-2">
-          <button
+          <Button
             type="submit"
             disabled={busy}
-            className="rounded-xl bg-raised shadow-ring px-3 py-1.5 text-[13px] text-lapis font-medium disabled:opacity-50"
+            className="rounded-xl bg-raised shadow-ring px-3 py-1.5 text-ui text-lapis font-medium disabled:opacity-50"
           >
             {t('screen.compute')}
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
             onClick={() => {
               setOpen(false);
               setResult(null);
               setError(null);
             }}
-            className="rounded-xl shadow-ring px-3 py-1.5 text-[13px] text-muted"
+            className="rounded-xl shadow-ring px-3 py-1.5 text-ui text-muted"
           >
             {t('common.cancel')}
-          </button>
+          </Button>
         </div>
       </form>
 
@@ -268,7 +269,7 @@ export default function Screening() {
             cannot soften it and the same sentence travels with the figures
             wherever they go.
           */}
-          <p className="mt-3 rounded-xl shadow-ring bg-raised px-3 py-2.5 text-[12.5px] leading-relaxed text-muted">
+          <p className="mt-3 rounded-xl shadow-ring bg-raised px-3 py-2.5 text-ui leading-relaxed text-muted">
             {result.note}
           </p>
 

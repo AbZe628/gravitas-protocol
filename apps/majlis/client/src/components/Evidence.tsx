@@ -3,6 +3,7 @@ import { governance, Refused, SOURCE_KINDS, type Matter, type SourceKind } from 
 import { useI18n } from '../lib/i18n.js';
 import { useHealth } from '../lib/health.js';
 import { DateText } from './ui.js';
+import { Button } from './Button';
 
 /**
  * What the board is arguing from.
@@ -102,12 +103,12 @@ export default function Evidence({ matter, scholarId, canAttach, onChanged }: Pr
       },
     );
 
-  const field = 'w-full rounded-xl bg-raised shadow-ring p-2 text-[14px] outline-none';
+  const field = 'w-full rounded-xl bg-raised shadow-ring p-2 text-body outline-none';
 
   return (
     <div className="space-y-3">
       {sources.length === 0 && !adding && (
-        <p className="text-[13px] text-muted">{t('evidence.none')}</p>
+        <p className="text-ui text-muted">{t('evidence.none')}</p>
       )}
 
       {sources.length > 0 && (
@@ -123,8 +124,8 @@ export default function Evidence({ matter, scholarId, canAttach, onChanged }: Pr
                   (withdrawn ? 'bg-raised/50 shadow-ring' : 'bg-raised shadow-card')
                 }
               >
-                <div className="mb-2.5 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[11.5px]">
-                  <span className="rounded-full bg-black/[0.045] px-2.5 py-0.5 text-[10.5px] font-bold uppercase tracking-[0.1em] text-sand">
+                <div className="mb-2.5 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-note">
+                  <span className="rounded-full bg-black/[0.045] px-2.5 py-0.5 text-label font-bold uppercase tracking-label text-sand">
                     {t(`evidence.kind.${s.kind}`)}
                   </span>
                   {s.addedBy && (
@@ -136,13 +137,13 @@ export default function Evidence({ matter, scholarId, canAttach, onChanged }: Pr
                     </span>
                   )}
                   {withdrawn && (
-                    <span className="rounded-full bg-black/[0.045] px-2.5 py-0.5 text-[10.5px] font-bold uppercase tracking-[0.1em] text-sand">
+                    <span className="rounded-full bg-black/[0.045] px-2.5 py-0.5 text-label font-bold uppercase tracking-label text-sand">
                       {t('evidence.withdrawn')}
                     </span>
                   )}
                 </div>
 
-                <div className={'text-[14px] ' + (withdrawn ? 'text-muted' : 'text-paper')}>
+                <div className={'text-body ' + (withdrawn ? 'text-muted' : 'text-paper')}>
                   {s.label}
                 </div>
                 {/*
@@ -154,35 +155,35 @@ export default function Evidence({ matter, scholarId, canAttach, onChanged }: Pr
                 {s.file ? (
                   <a
                     href={governance.documentHref(matter.id, s.id ?? '')}
-                    className="mt-0.5 inline-block break-words text-[12.5px] underline underline-offset-2 hover:text-fg"
+                    className="mt-0.5 inline-block break-words text-ui underline underline-offset-2 hover:text-fg"
                   >
                     {s.file.name}{' '}
-                    <span className="font-mono text-[11.5px] text-muted">
+                    <span className="font-mono text-note text-muted">
                       {(s.file.bytes / 1024).toFixed(0)} kB
                     </span>
                   </a>
                 ) : (
-                  <div className="mt-0.5 break-words font-mono text-[12px] text-muted">{s.ref}</div>
+                  <div className="mt-0.5 break-words font-mono text-note text-muted">{s.ref}</div>
                 )}
                 {s.note && (
-                  <p className="mt-1.5 text-[13px] leading-relaxed text-muted">{s.note}</p>
+                  <p className="mt-1.5 text-ui leading-relaxed text-muted">{s.note}</p>
                 )}
 
                 {withdrawn && (
-                  <p className="mt-1.5 text-[11.5px] leading-relaxed text-muted">
+                  <p className="mt-1.5 text-note leading-relaxed text-muted">
                     {t('evidence.withdrawnNote')}
                   </p>
                 )}
 
                 {!withdrawn && mine && stillOpen && s.id && (
-                  <button
+                  <Button
                     type="button"
                     disabled={busy}
                     onClick={() => run(() => governance.withdrawSource(matter.id, s.id!))}
-                    className="mt-2 text-[12px] text-muted hover:text-paper disabled:opacity-40"
+                    className="mt-2 text-note text-muted hover:text-paper disabled:opacity-40"
                   >
                     {t('evidence.withdraw')}
-                  </button>
+                  </Button>
                 )}
               </li>
             );
@@ -191,37 +192,37 @@ export default function Evidence({ matter, scholarId, canAttach, onChanged }: Pr
       )}
 
       {refusal && !adding && (
-        <p className="rounded-xl bg-[#FCF0EE] px-4 py-2.5 text-[12.5px] leading-[1.55] text-breach shadow-[0_0_0_0.5px_rgba(154,56,48,0.18)]">
+        <p className="rounded-xl bg-breachtint px-4 py-2.5 text-ui leading-relaxed text-breach shadow-ringbreach">
           {refusal}
         </p>
       )}
 
       {mayAdd && !adding && (
         <div className="flex flex-wrap gap-2">
-          <button
+          <Button
             type="button"
             onClick={() => {
               setRefusal(null);
               setAdding(true);
             }}
-            className="rounded-xl shadow-ring px-3 py-1.5 text-[12px] hover:bg-raised"
+            className="rounded-xl shadow-ring px-3 py-1.5 text-note hover:bg-raised"
           >
             {t('evidence.add')}
-          </button>
+          </Button>
 
           {mayAttachDocument && (
             <>
-              <button
+              <Button
                 type="button"
                 disabled={busy}
                 onClick={() => {
                   setRefusal(null);
                   chooser.current?.click();
                 }}
-                className="rounded-xl shadow-ring px-3 py-1.5 text-[12px] hover:bg-raised disabled:opacity-40"
+                className="rounded-xl shadow-ring px-3 py-1.5 text-note hover:bg-raised disabled:opacity-40"
               >
                 {t('evidence.attachDocument')}
-              </button>
+              </Button>
               <input
                 ref={chooser}
                 type="file"
@@ -242,27 +243,27 @@ export default function Evidence({ matter, scholarId, canAttach, onChanged }: Pr
 
       {mayAdd && adding && (
         <div className="space-y-2 rounded-card shadow-ring p-3">
-          <p className="text-[12px] leading-relaxed text-muted">{t('evidence.help')}</p>
+          <p className="text-note leading-relaxed text-muted">{t('evidence.help')}</p>
 
           <div className="flex flex-wrap gap-1.5">
             {SOURCE_KINDS.map((k) => (
-              <button
+              <Button
                 key={k}
                 type="button"
                 onClick={() => setKind(k)}
                 className={
-                  'rounded-full px-3 py-1 text-[10.5px] font-bold uppercase tracking-[0.1em] transition-all ' +
+                  'rounded-full px-3 py-1 text-label font-bold uppercase tracking-label transition-all ' +
                   (kind === k
-                    ? 'bg-[#EAF1F7] text-lapis shadow-[0_0_0_1.5px_#164470]'
+                    ? 'bg-lapistint text-lapis shadow-pick'
                     : 'bg-black/[0.045] text-sand hover:text-paper')
                 }
               >
                 {t(`evidence.kind.${k}`)}
-              </button>
+              </Button>
             ))}
           </div>
 
-          <label className="block text-[12px] text-muted" htmlFor="ev-label">
+          <label className="block text-note text-muted" htmlFor="ev-label">
             {t('evidence.label')}
           </label>
           <input
@@ -273,7 +274,7 @@ export default function Evidence({ matter, scholarId, canAttach, onChanged }: Pr
             className={field}
           />
 
-          <label className="block text-[12px] text-muted" htmlFor="ev-ref">
+          <label className="block text-note text-muted" htmlFor="ev-ref">
             {t('evidence.ref')}
           </label>
           <input
@@ -281,10 +282,10 @@ export default function Evidence({ matter, scholarId, canAttach, onChanged }: Pr
             value={ref}
             onChange={(e) => setRef(e.target.value)}
             placeholder={t('evidence.refHint')}
-            className={field + ' font-mono text-[13px]'}
+            className={field + ' font-mono text-ui'}
           />
 
-          <label className="block text-[12px] text-muted" htmlFor="ev-note">
+          <label className="block text-note text-muted" htmlFor="ev-note">
             {t('evidence.note')}
           </label>
           <textarea
@@ -296,30 +297,30 @@ export default function Evidence({ matter, scholarId, canAttach, onChanged }: Pr
             className={field + ' resize-y leading-relaxed'}
           />
 
-          {refusal && <p className="text-[12.5px] text-breach">{refusal}</p>}
+          {refusal && <p className="text-ui text-breach">{refusal}</p>}
 
           <div className="flex gap-2 pt-1">
-            <button
+            <Button
               type="button"
               disabled={busy || label.trim().length < 3 || ref.trim().length < 1}
               onClick={submit}
-              className="rounded-xl shadow-ring px-3 py-1.5 text-[12px] hover:bg-raised disabled:opacity-40"
+              className="rounded-xl shadow-ring px-3 py-1.5 text-note hover:bg-raised disabled:opacity-40"
             >
               {t('evidence.attach')}
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
               onClick={() => setAdding(false)}
-              className="text-[12px] text-muted hover:text-paper"
+              className="text-note text-muted hover:text-paper"
             >
               {t('say.cancel')}
-            </button>
+            </Button>
           </div>
         </div>
       )}
 
       {canAttach && !stillOpen && sources.length > 0 && (
-        <p className="text-[11.5px] leading-relaxed text-muted">{t('evidence.closed')}</p>
+        <p className="text-note leading-relaxed text-muted">{t('evidence.closed')}</p>
       )}
     </div>
   );

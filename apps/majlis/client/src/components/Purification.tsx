@@ -202,8 +202,8 @@ export default function Purification() {
               className="mt-0.5"
             />
             <span>
-              <span className="block text-[13px]">{t('purify.apportion')}</span>
-              <span className="mt-0.5 block text-[11.5px] leading-relaxed text-muted">
+              <span className="block text-ui">{t('purify.apportion')}</span>
+              <span className="mt-0.5 block text-note leading-relaxed text-muted">
                 {t('purify.apportion.meaning')}
               </span>
             </span>
@@ -246,9 +246,9 @@ export default function Purification() {
           amount={`${result.amount} ${result.currency}`}
           steps={result.steps}
         >
-          <p className="mb-3 text-[12.5px] leading-relaxed text-muted">{result.methodStated}</p>
+          <p className="mb-3 text-ui leading-relaxed text-muted">{result.methodStated}</p>
           {result.perUnit && (
-            <p className="mb-3 font-mono text-[12px] tabular-nums text-muted">
+            <p className="mb-3 font-mono text-note tabular-nums text-muted">
               {t('purify.perUnit')}: {result.perUnit} {result.currency}
             </p>
           )}

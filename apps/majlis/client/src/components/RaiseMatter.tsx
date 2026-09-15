@@ -4,10 +4,11 @@ import { Refused, governance } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { Card } from './ui.js';
 import { Field } from './field.js';
+import { Button } from './Button';
 
 /** This form sets its headings and help tighter than the ordinary screens. */
-const TIGHT = 'mb-1 block text-[12px] text-muted';
-const HELP = 'mb-1.5 text-[11.5px] leading-relaxed text-muted';
+const TIGHT = 'mb-1 block text-note text-muted';
+const HELP = 'mb-1.5 text-note leading-relaxed text-muted';
 
 /**
  * Raising a matter.
@@ -82,21 +83,21 @@ export default function RaiseMatter({ boardId }: { boardId: string }) {
 
   if (!open) {
     return (
-      <button
+      <Button
         type="button"
         onClick={() => setOpen(true)}
-        className="mb-5 rounded-xl shadow-ring px-3 py-1.5 text-[12px] hover:bg-raised"
+        className="mb-5 rounded-xl shadow-ring px-3 py-1.5 text-note hover:bg-raised"
       >
         {t('raise.open')}
-      </button>
+      </Button>
     );
   }
 
-  const field = 'w-full rounded-xl bg-raised shadow-ring p-2 text-[14px] leading-relaxed outline-none';
+  const field = 'w-full rounded-xl bg-raised shadow-ring p-2 text-body leading-relaxed outline-none';
 
   return (
     <Card>
-      <div className="mb-3 text-[13px] font-medium">{t('raise.title')}</div>
+      <div className="mb-3 text-ui font-medium">{t('raise.title')}</div>
 
       <Field label={t('raise.subject')} className="mb-3" headingClass={TIGHT}>
         {(attrs) => (
@@ -125,10 +126,10 @@ export default function RaiseMatter({ boardId }: { boardId: string }) {
         A choice between two buttons, not a box to fill in, so the words above
         it head a group rather than pointing at one control.
       */}
-      <div className="mb-1 block text-[12px] text-muted" id="raise-direction">
+      <div className="mb-1 block text-note text-muted" id="raise-direction">
         {t('raise.direction')}
       </div>
-      <p id="raise-direction-help" className="mb-2 text-[11.5px] leading-relaxed text-muted">
+      <p id="raise-direction-help" className="mb-2 text-note leading-relaxed text-muted">
         {t('raise.directionHelp')}
       </p>
       <div
@@ -138,17 +139,17 @@ export default function RaiseMatter({ boardId }: { boardId: string }) {
         className="mb-3 flex flex-wrap gap-2"
       >
         {(['permit', 'restrict'] as const).map((d) => (
-          <button
+          <Button
             key={d}
             type="button"
             onClick={() => setDirection(d)}
             className={
-              'rounded-xl px-4 py-2 text-[12.5px] transition-all ' +
-              (direction === d ? 'bg-[#EAF1F7] font-semibold text-lapis shadow-[0_0_0_1.5px_#164470]' : 'bg-raised text-sand shadow-ring hover:text-paper')
+              'rounded-xl px-4 py-2 text-ui transition-all ' +
+              (direction === d ? 'bg-lapistint font-semibold text-lapis shadow-pick' : 'bg-raised text-sand shadow-ring hover:text-paper')
             }
           >
             {t(`raise.direction.${d}`)}
-          </button>
+          </Button>
         ))}
       </div>
 
@@ -210,22 +211,22 @@ export default function RaiseMatter({ boardId }: { boardId: string }) {
         )}
       </Field>
 
-      {refusal && <p className="mt-2 text-[12px] leading-relaxed text-breach">{refusal}</p>}
+      {refusal && <p className="mt-2 text-note leading-relaxed text-breach">{refusal}</p>}
 
       <div className="mt-3 flex items-center gap-2">
-        <button
+        <Button
           type="button"
           onClick={submit}
           disabled={!ready || busy}
-          className="rounded-xl shadow-ring px-3 py-1.5 text-[12px] hover:bg-raised disabled:opacity-40"
+          className="rounded-xl shadow-ring px-3 py-1.5 text-note hover:bg-raised disabled:opacity-40"
         >
           {t('raise.submit')}
-        </button>
-        <button type="button" onClick={() => setOpen(false)} className="text-[12px] text-muted hover:text-paper">
+        </Button>
+        <Button type="button" onClick={() => setOpen(false)} className="text-note text-muted hover:text-paper">
           {t('say.cancel')}
-        </button>
+        </Button>
       </div>
-      <p className="mt-2 text-[11.5px] text-muted">{t('raise.draftNote')}</p>
+      <p className="mt-2 text-note text-muted">{t('raise.draftNote')}</p>
     </Card>
   );
 }

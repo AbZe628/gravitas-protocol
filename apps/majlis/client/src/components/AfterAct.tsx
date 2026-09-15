@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { useI18n } from '../lib/i18n.js';
+import { Button } from './Button';
 
 /**
  * What just happened, and the one or two things that follow from it.
@@ -62,19 +63,19 @@ export default function AfterAct({
 
   return (
     <div>
-      <div className="mb-4 rounded-card bg-[#EBF3EF] px-5 py-4 shadow-[0_0_0_0.5px_rgba(44,107,87,0.18)]">
-        <div className="mb-1 text-[10px] font-bold uppercase tracking-[0.14em] text-settled">
+      <div className="mb-4 rounded-card bg-settledtint px-5 py-4 shadow-ringsettled">
+        <div className="mb-1 text-label font-bold uppercase tracking-caps text-settled">
           {t('after.done')}
         </div>
-        <p className="max-w-[58ch] text-[13.5px] leading-[1.6] text-paper">{did}</p>
+        <p className="max-w-[58ch] text-body leading-relaxed text-paper">{did}</p>
         {means && (
-          <p className="mt-2 max-w-[58ch] text-[12.5px] leading-[1.6] text-sand">{means}</p>
+          <p className="mt-2 max-w-[58ch] text-ui leading-relaxed text-sand">{means}</p>
         )}
       </div>
 
       {children}
 
-      <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.14em] text-muted">
+      <div className="mb-2 text-label font-bold uppercase tracking-caps text-muted">
         {t('after.next')}
       </div>
 
@@ -86,22 +87,22 @@ export default function AfterAct({
                 to={n.to}
                 className="block rounded-card bg-ink px-4 py-3 shadow-ring transition-shadow hover:shadow-card"
               >
-                <span className="text-[13.5px] font-semibold text-lapis">{n.label}</span>
+                <span className="text-body font-semibold text-lapis">{n.label}</span>
                 {n.says && (
-                  <span className="mt-0.5 block text-[12px] leading-[1.5] text-muted">{n.says}</span>
+                  <span className="mt-0.5 block text-note leading-snug text-muted">{n.says}</span>
                 )}
               </Link>
             ) : (
-              <button
+              <Button
                 type="button"
                 onClick={n.onPress}
                 className="block w-full rounded-card bg-ink px-4 py-3 text-start shadow-ring transition-shadow hover:shadow-card"
               >
-                <span className="text-[13.5px] font-semibold text-lapis">{n.label}</span>
+                <span className="text-body font-semibold text-lapis">{n.label}</span>
                 {n.says && (
-                  <span className="mt-0.5 block text-[12px] leading-[1.5] text-muted">{n.says}</span>
+                  <span className="mt-0.5 block text-note leading-snug text-muted">{n.says}</span>
                 )}
-              </button>
+              </Button>
             )}
           </li>
         ))}
@@ -111,13 +112,13 @@ export default function AfterAct({
           than left as an X in a corner.
         */}
         <li>
-          <button
+          <Button
             type="button"
             onClick={onClose}
-            className="text-[12.5px] text-muted underline decoration-line underline-offset-4"
+            className="text-ui text-muted underline decoration-line underline-offset-4"
           >
             {t('after.nothingMore')}
-          </button>
+          </Button>
         </li>
       </ul>
     </div>

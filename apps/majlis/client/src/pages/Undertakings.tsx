@@ -7,6 +7,7 @@ import { Loading, ErrorText } from '../components/ui.js';
 import { State } from '../components/kit.js';
 import { Division, Gaps, Nothing, PageHead } from '../components/page.js';
 import { useStillThere } from '../lib/stillThere.js';
+import { Button } from '../components/Button';
 
 /**
  * What was undertaken, and what became of it.
@@ -82,53 +83,53 @@ function One({
         <State tone={u.state === 'open' ? (row.overdue ? 'breach' : 'attention') : 'plain'}>
           {t(row.overdue ? 'und.overdue' : `book.state.${u.state}`)}
         </State>
-        <span className="text-[13.5px] font-semibold">{row.whoName}</span>
+        <span className="text-body font-semibold">{row.whoName}</span>
         {u.dueAt ? (
-          <span className="font-mono text-[12px] text-muted">{day(u.dueAt)}</span>
+          <span className="font-mono text-note text-muted">{day(u.dueAt)}</span>
         ) : (
-          <span className="text-[12px] text-muted">{t('book.noDate')}</span>
+          <span className="text-note text-muted">{t('book.noDate')}</span>
         )}
         <Link
           to={`/meetings/${u.meetingId}/book`}
-          className="ms-auto text-[12px] text-muted hover:text-paper"
+          className="ms-auto text-note text-muted hover:text-paper"
         >
           {t('und.fromSitting')}
         </Link>
       </div>
 
-      <p className="mt-2 max-w-[62ch] text-[13.5px] leading-[1.6]">{u.what}</p>
+      <p className="mt-2 max-w-[62ch] text-body leading-relaxed">{u.what}</p>
 
       {u.outcome && (
-        <p className="mt-2 max-w-[62ch] border-s-2 border-line ps-3 text-[12.5px] leading-[1.6] text-muted">
+        <p className="mt-2 max-w-[62ch] border-s-2 border-line ps-3 text-ui leading-relaxed text-muted">
           {u.outcome.said}
         </p>
       )}
 
       {mayClose && !open && (
-        <button
+        <Button
           type="button"
           onClick={() => setOpen(true)}
-          className="mt-3 text-[12.5px] font-semibold text-lapis underline decoration-line underline-offset-4"
+          className="mt-3 text-ui font-semibold text-lapis underline decoration-line underline-offset-4"
         >
           {t('und.closeIt')}
-        </button>
+        </Button>
       )}
 
       {open && (
         <div className="mt-3">
           <div className="mb-2 flex gap-2">
             {(['done', 'dropped'] as const).map((s) => (
-              <button
+              <Button
                 key={s}
                 type="button"
                 onClick={() => setState(s)}
                 className={
-                  'rounded-card px-4 py-2 text-[13px] shadow-ring ' +
+                  'rounded-card px-4 py-2 text-ui shadow-ring ' +
                   (state === s ? 'bg-raised font-semibold text-paper' : 'text-muted')
                 }
               >
                 {t(`book.state.${s}`)}
-              </button>
+              </Button>
             ))}
           </div>
 
@@ -138,26 +139,26 @@ function One({
             rows={3}
             placeholder={t('und.whatHappened')}
             aria-label={t('und.whatHappened')}
-            className="w-full rounded-card bg-ink px-4 py-3 text-[13.5px] leading-[1.6] text-paper shadow-ring outline-none placeholder:text-muted"
+            className="w-full rounded-card bg-ink px-4 py-3 text-body leading-relaxed text-paper shadow-ring outline-none placeholder:text-muted"
           />
-          {error && <p className="mt-2 text-[12.5px] text-breach">{error}</p>}
+          {error && <p className="mt-2 text-ui text-breach">{error}</p>}
 
           <div className="mt-2.5 flex flex-wrap items-center gap-4">
-            <button
+            <Button
               type="button"
               onClick={close}
               disabled={busy || said.trim().length < 3}
-              className="rounded-card bg-lapis px-5 py-2.5 text-[13.5px] font-bold text-white shadow-act disabled:opacity-50"
+              className="rounded-card bg-lapis px-5 py-2.5 text-body font-bold text-white shadow-act disabled:opacity-50"
             >
               {busy ? t('und.closing') : t('und.record')}
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
               onClick={() => setOpen(false)}
-              className="text-[12.5px] text-muted underline decoration-line underline-offset-4"
+              className="text-ui text-muted underline decoration-line underline-offset-4"
             >
               {t('common.back')}
-            </button>
+            </Button>
           </div>
         </div>
       )}
@@ -216,7 +217,7 @@ export default function Undertakings() {
                 {open.length} {t('und.stillOpen')}
               </State>
               {data.summary?.overdue ? (
-                <span className="text-[12.5px] text-breach">
+                <span className="text-ui text-breach">
                   {data.summary.overdue} {t('und.pastTheDate')}
                 </span>
               ) : null}

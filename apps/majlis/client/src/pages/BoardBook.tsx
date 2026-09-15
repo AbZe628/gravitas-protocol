@@ -79,7 +79,7 @@ export default function BoardBook() {
         live={
           <>
             <State tone="plain">{day(book.at)}</State>
-            <span className="text-[12.5px] text-muted">
+            <span className="text-ui text-muted">
               {items.length} {t('book.items')}
             </span>
           </>
@@ -102,7 +102,7 @@ export default function BoardBook() {
           >
             {entry.pack ? (
               <>
-                <p className="max-w-[58ch] font-display text-[16px] leading-[1.6]">
+                <p className="max-w-[58ch] font-display text-lead leading-relaxed">
                   {entry.pack.question.text}
                 </p>
 
@@ -110,11 +110,11 @@ export default function BoardBook() {
                   <ul className="mt-4 space-y-1.5">
                     {entry.pack.figures.terms.map((term) => (
                       <li key={term.key} className="flex flex-wrap items-baseline gap-x-3">
-                        <span className="font-mono text-[13px] text-lapis">
+                        <span className="font-mono text-ui text-lapis">
                           {term.value}
                           {term.unit ? ` ${term.unit}` : ''}
                         </span>
-                        <span className="text-[12.5px] text-muted">{term.meaning}</span>
+                        <span className="text-ui text-muted">{term.meaning}</span>
                       </li>
                     ))}
                   </ul>
@@ -126,7 +126,7 @@ export default function BoardBook() {
                     {entry.pack.gaps.map((gap, i) => (
                       <li key={i} className="flex gap-2.5">
                         <span className="mt-[7px] h-[6px] w-[6px] shrink-0 rounded-full bg-gold/70" />
-                        <span className="max-w-[58ch] text-[12.5px] leading-[1.6] text-sand">
+                        <span className="max-w-[58ch] text-ui leading-relaxed text-sand">
                           {gap}
                         </span>
                       </li>
@@ -136,17 +136,17 @@ export default function BoardBook() {
 
                 <Link
                   to={`/matters/${entry.matterId}`}
-                  className="mt-4 inline-block text-[13px] font-semibold text-lapis underline decoration-line underline-offset-4"
+                  className="mt-4 inline-block text-ui font-semibold text-lapis underline decoration-line underline-offset-4"
                 >
                   {t('book.openMatter')}
                 </Link>
               </>
             ) : entry.missing ? (
-              <p className="max-w-[58ch] text-[13px] leading-[1.65] text-breach">
+              <p className="max-w-[58ch] text-ui leading-relaxed text-breach">
                 {t('book.itemMissing')}
               </p>
             ) : (
-              <p className="max-w-[58ch] text-[13px] leading-[1.65] text-muted">
+              <p className="max-w-[58ch] text-ui leading-relaxed text-muted">
                 {t('book.itemNotAMatter')}
               </p>
             )}
@@ -167,9 +167,9 @@ export default function BoardBook() {
               <li key={i} className="rounded-card bg-ink px-4 py-3">
                 <div className="flex flex-wrap items-center gap-2.5">
                   <State tone={STANDING_TONE[s.kind] ?? 'plain'}>{t(`book.kind.${s.kind}`)}</State>
-                  <span className="text-[13.5px] font-semibold">{s.what}</span>
+                  <span className="text-body font-semibold">{s.what}</span>
                 </div>
-                <p className="mt-1.5 max-w-[58ch] text-[12.5px] leading-[1.6] text-muted">
+                <p className="mt-1.5 max-w-[58ch] text-ui leading-relaxed text-muted">
                   {s.note}
                 </p>
               </li>
@@ -194,16 +194,16 @@ export default function BoardBook() {
                   <State tone={u.state === 'open' ? 'attention' : 'plain'}>
                     {t(`book.state.${u.state}`)}
                   </State>
-                  <span className="text-[13px] font-semibold">{u.who}</span>
+                  <span className="text-ui font-semibold">{u.who}</span>
                   {u.dueAt ? (
-                    <span className="font-mono text-[12px] text-muted">{day(u.dueAt)}</span>
+                    <span className="font-mono text-note text-muted">{day(u.dueAt)}</span>
                   ) : (
-                    <span className="text-[12px] text-muted">{t('book.noDate')}</span>
+                    <span className="text-note text-muted">{t('book.noDate')}</span>
                   )}
                 </div>
-                <p className="mt-1.5 max-w-[58ch] text-[13px] leading-[1.6] text-sand">{u.what}</p>
+                <p className="mt-1.5 max-w-[58ch] text-ui leading-relaxed text-sand">{u.what}</p>
                 {u.outcome && (
-                  <p className="mt-1.5 max-w-[58ch] text-[12.5px] leading-[1.6] text-muted">
+                  <p className="mt-1.5 max-w-[58ch] text-ui leading-relaxed text-muted">
                     {u.outcome.said}
                   </p>
                 )}
@@ -223,8 +223,8 @@ export default function BoardBook() {
                   (e.present === true ? 'bg-settled' : e.present === false ? 'bg-breach' : 'bg-line')
                 }
               />
-              <span className="min-w-0 flex-1 truncate text-[13px]">{e.name}</span>
-              <span className="shrink-0 text-[12px] text-muted">
+              <span className="min-w-0 flex-1 truncate text-ui">{e.name}</span>
+              <span className="shrink-0 text-note text-muted">
                 {/* Unrecorded, never absent by default. */}
                 {e.present === true
                   ? t('meet.present')
@@ -240,7 +240,7 @@ export default function BoardBook() {
 
       <Gaps items={book.gaps ?? []} />
 
-      <p className="mt-8 max-w-[62ch] text-[12px] leading-[1.6] text-muted">{t('book.print')}</p>
+      <p className="mt-8 max-w-[62ch] text-note leading-relaxed text-muted">{t('book.print')}</p>
     </article>
   );
 }

@@ -89,20 +89,20 @@ export default function Settings() {
         it untrue in a way the page cannot otherwise show.
       */}
       {mismatches.length > 0 && (
-        <div className="mb-7 rounded-card shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)] bg-[#FCF0EE] px-4 py-3.5">
-          <div className="mb-2 text-[13px] font-semibold text-breach">
+        <div className="mb-7 rounded-card shadow-ringbreach bg-breachtint px-4 py-3.5">
+          <div className="mb-2 text-ui font-semibold text-breach">
             {mismatches.length === 1 ? t('set.oneMismatch') : `${mismatches.length} ${t('set.mismatches')}`}
           </div>
           <ul className="space-y-2.5">
             {mismatches.map((m, i) => (
-              <li key={i} className="text-[12.5px] leading-relaxed">
-                <span className="font-mono text-[11.5px] text-breach">{m.scholarId}</span>
+              <li key={i} className="text-ui leading-relaxed">
+                <span className="font-mono text-note text-breach">{m.scholarId}</span>
                 <p className="mt-0.5 text-muted">{m.consequence}</p>
               </li>
             ))}
           </ul>
-          <p className="mt-3 border-t border-warn/30 pt-2.5 text-[12px] leading-relaxed text-muted">
-            {t('set.fixIn')} <span className="font-mono text-[11.5px]">{data.fixIn}</span>
+          <p className="mt-3 border-t border-warn/30 pt-2.5 text-note leading-relaxed text-muted">
+            {t('set.fixIn')} <span className="font-mono text-note">{data.fixIn}</span>
           </p>
         </div>
       )}
@@ -116,12 +116,12 @@ export default function Settings() {
           <li key={m.scholarId} className="rounded-sheet bg-raised/75 px-6 py-5 shadow-ring">
             <div>
               <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                <span className="font-display text-[19px] leading-snug tracking-[-0.014em]">
+                <span className="font-display text-sub leading-snug tracking-title">
                   {m.name}
                 </span>
-                <span className="font-mono text-[11.5px] text-muted">{m.scholarId}</span>
+                <span className="font-mono text-note text-muted">{m.scholarId}</span>
               </div>
-              {m.title && <div className="mt-1.5 text-[12.5px] text-muted">{m.title}</div>}
+              {m.title && <div className="mt-1.5 text-ui text-muted">{m.title}</div>}
 
               <div className="mt-3 flex flex-wrap items-center gap-2">
                 <Tag tone={m.signatory ? 'ok' : undefined}>
@@ -134,7 +134,7 @@ export default function Settings() {
                   seeing on their row.
                 */}
                 {m.role !== null ? (
-                  <span className="text-[11.5px] text-muted">{t(`role.${m.role}`)}</span>
+                  <span className="text-note text-muted">{t(`role.${m.role}`)}</span>
                 ) : data.credentialsConfigured ? (
                   // Missing one while others have them is a real fault, and the
                   // panel above already says what it costs.
@@ -156,7 +156,7 @@ export default function Settings() {
         summary={`${data.decides.quorumPermit} ${t('set.foldQuorum')}`}
       >
       <Card>
-        <dl className="space-y-2.5 text-[13px]">
+        <dl className="space-y-2.5 text-ui">
           <Row label={t('set.quorumPermit')} value={String(data.decides.quorumPermit)} />
           <Row label={t('set.quorumRestrict')} value={String(data.decides.quorumRestrict)} />
           <Row
@@ -170,7 +170,7 @@ export default function Settings() {
           <Row label={t('set.timelock')} value={`${data.decides.timelockHours} h`} />
           <Row label={t('set.ratification')} value={`${data.decides.ratificationWindowHours} h`} />
         </dl>
-        <p className="mt-3 border-t border-line pt-3 text-[12.5px] leading-relaxed text-muted">
+        <p className="mt-3 border-t border-line pt-3 text-ui leading-relaxed text-muted">
           {t('set.asymmetry')}
         </p>
 
@@ -189,7 +189,7 @@ export default function Settings() {
 
       <Fold heading={t('set.whatIsAttached')}>
       <Card>
-        <dl className="space-y-2.5 text-[13px]">
+        <dl className="space-y-2.5 text-ui">
           <Row
             label={t('set.assistant')}
             value={health?.assistantKind === 'off' ? t('set.assistantOff') : (health?.assistantKind ?? '—')}
@@ -197,7 +197,7 @@ export default function Settings() {
           <Row label={t('set.enforcement')} value={health?.enforcement ?? '—'} />
         </dl>
         {health?.recordSince && (
-          <p className="mt-3 border-t border-line pt-3 text-[12.5px] leading-relaxed text-muted">
+          <p className="mt-3 border-t border-line pt-3 text-ui leading-relaxed text-muted">
             {t('record.since')} <DateText iso={health.recordSince} />
           </p>
         )}

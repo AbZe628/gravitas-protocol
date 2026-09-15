@@ -10,6 +10,7 @@ import Recorded from '../components/Recorded.js';
 import { ActionPanel, Facts, RecordPage } from '../components/shapes.js';
 import HowThisIsHeld from '../components/HowThisIsHeld.js';
 import { Field, HEADING } from '../components/field.js';
+import { Button } from '../components/Button';
 
 /**
  * One holding: where it stands, what the board has said about it, what it is
@@ -137,16 +138,16 @@ export default function AssetDetail() {
           more={
             <div>
               {!retiring ? (
-                <button
+                <Button
                   type="button"
                   onClick={() => setRetiring(true)}
-                  className="text-start text-[12.5px] text-breach underline decoration-line underline-offset-4"
+                  className="text-start text-ui text-breach underline decoration-line underline-offset-4"
                 >
                   {t('reg.retire')}
-                </button>
+                </Button>
               ) : (
                 <form onSubmit={retire}>
-                  <p className="mb-2 text-[11.5px] leading-[1.6] text-muted">
+                  <p className="mb-2 text-note leading-relaxed text-muted">
                     {t('reg.retireLead')}
                   </p>
                   <Field label={t('reg.retireWhy')} headingClass={HEADING}>
@@ -156,40 +157,40 @@ export default function AssetDetail() {
                         value={reason}
                         onChange={(e) => setReason(e.target.value)}
                         rows={3}
-                        className="w-full rounded-xl bg-raised px-3 py-2 text-[12.5px] shadow-ring outline-none"
+                        className="w-full rounded-xl bg-raised px-3 py-2 text-ui shadow-ring outline-none"
                         required
                       />
                     )}
                   </Field>
                   <div className="mt-2 flex flex-wrap items-center gap-3">
-                    <button
+                    <Button
                       type="submit"
                       disabled={busy || reason.trim().length === 0}
-                      className="rounded-xl bg-raised px-3.5 py-2 text-[12.5px] font-medium text-breach shadow-[0_0_0_0.5px_rgba(154,56,48,0.25)] disabled:opacity-40"
+                      className="rounded-xl bg-raised px-3.5 py-2 text-ui font-medium text-breach shadow-ringbreach disabled:opacity-40"
                     >
                       {t('reg.retireIt')}
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       type="button"
                       onClick={() => setRetiring(false)}
-                      className="text-[12px] text-muted"
+                      className="text-note text-muted"
                     >
                       {t('common.cancel')}
-                    </button>
+                    </Button>
                   </div>
                 </form>
               )}
             </div>
           }
         >
-          <button
+          <Button
             onClick={putToTheBoard}
             disabled={busy}
-            className="w-full rounded-xl bg-lapis px-4 py-2.5 text-[13px] font-semibold text-white shadow-act disabled:opacity-50"
+            className="w-full rounded-xl bg-lapis px-4 py-2.5 text-ui font-semibold text-white shadow-act disabled:opacity-50"
           >
             {t('reg.putToTheBoard')}
-          </button>
-          {refusal && <p className="mt-2.5 text-[12.5px] text-breach">{refusal}</p>}
+          </Button>
+          {refusal && <p className="mt-2.5 text-ui text-breach">{refusal}</p>}
         </ActionPanel>
       ) : null}
 
@@ -234,14 +235,14 @@ export default function AssetDetail() {
           >
             {t(`reg.status.${data.status}`)}
           </Tag>
-          <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+          <span className="text-label font-bold uppercase tracking-caps text-muted">
             {t(`reg.kind.${a.kind}`)}
           </span>
         </>
       }
       aside={aside}
     >
-      <p className="mb-7 max-w-[62ch] text-[13.5px] leading-[1.65] text-muted">{data.note}</p>
+      <p className="mb-7 max-w-[62ch] text-body leading-relaxed text-muted">{data.note}</p>
 
       {/*
         Above the composition it concerns, so a reader looking at 50.00% sees at
@@ -259,14 +260,14 @@ export default function AssetDetail() {
       <Section title={t('reg.identifiers')}>
         <ul className="space-y-1.5">
           {a.identifiers.map((i, n) => (
-            <li key={n} className="text-[13px]">
-              <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted">{i.scheme}</span>
+            <li key={n} className="text-ui">
+              <span className="text-label font-bold uppercase tracking-caps text-muted">{i.scheme}</span>
               <span className="mx-2 font-mono break-all">{i.value}</span>
-              {i.network && <span className="text-[12px] text-muted">{i.network}</span>}
+              {i.network && <span className="text-note text-muted">{i.network}</span>}
             </li>
           ))}
         </ul>
-        <p className="mt-2.5 text-[12px] leading-relaxed text-muted">
+        <p className="mt-2.5 text-note leading-relaxed text-muted">
           {t(`reg.source.${a.source}`)}
           <span className="mx-1.5 opacity-40">·</span>
           <DateText iso={a.addedAt} />
@@ -283,7 +284,7 @@ export default function AssetDetail() {
           <>
             <ul className="mb-3 space-y-1.5">
               {data.composition.byKind.map((k) => (
-                <li key={k.kind} className="flex items-baseline justify-between gap-3 text-[13.5px]">
+                <li key={k.kind} className="flex items-baseline justify-between gap-3 text-body">
                   <span>{t(`reg.part.${k.kind}`)}</span>
                   <span className="font-mono tabular-nums">{k.percent}%</span>
                 </li>
@@ -291,12 +292,12 @@ export default function AssetDetail() {
             </ul>
 
             <details className="mb-3">
-              <summary className="cursor-pointer text-[12px] text-muted hover:text-paper">
+              <summary className="cursor-pointer text-note text-muted hover:text-paper">
                 {t('reg.everyPart')}
               </summary>
               <ul className="mt-2 space-y-1">
                 {data.composition.parts.map((p, n) => (
-                  <li key={n} className="flex items-baseline justify-between gap-3 text-[12.5px] text-muted">
+                  <li key={n} className="flex items-baseline justify-between gap-3 text-ui text-muted">
                     <span>{p.label}</span>
                     <span className="font-mono tabular-nums">{p.percent}%</span>
                   </li>
@@ -306,7 +307,7 @@ export default function AssetDetail() {
 
             <p
               className={
-                'text-[12px] leading-relaxed ' +
+                'text-note leading-relaxed ' +
                 (data.composition.incomplete ? 'text-breach' : 'text-muted')
               }
             >
@@ -314,23 +315,23 @@ export default function AssetDetail() {
             </p>
           </>
         ) : (
-          <p className="text-[13px] text-muted">{t('reg.noComposition')}</p>
+          <p className="text-ui text-muted">{t('reg.noComposition')}</p>
         )}
       </Section>
 
       <Section title={t('reg.whatTheBoardSaid')}>
         {data.openMatters.length === 0 && data.history.length === 0 ? (
-          <p className="text-[13px] text-muted">{t('reg.nothingSaid')}</p>
+          <p className="text-ui text-muted">{t('reg.nothingSaid')}</p>
         ) : (
           <ul className="space-y-2">
             {data.openMatters.map((m) => (
               <li key={m}>
                 <Link
                   to={`/matters/${m}`}
-                  className="flex items-baseline gap-2 rounded-card shadow-[0_0_0_0.5px_rgba(176,132,48,0.24)] px-3 py-2 text-[13px]"
+                  className="flex items-baseline gap-2 rounded-card shadow-ringgold px-3 py-2 text-ui"
                 >
                   <Tag tone="gold">{t('reg.open')}</Tag>
-                  <span className="font-mono text-[12px] break-all">{m}</span>
+                  <span className="font-mono text-note break-all">{m}</span>
                 </Link>
               </li>
             ))}
@@ -338,10 +339,10 @@ export default function AssetDetail() {
               <li key={m}>
                 <Link
                   to={`/matters/${m}`}
-                  className="flex items-baseline gap-2 rounded-card shadow-ring px-3 py-2 text-[13px] hover:text-paper"
+                  className="flex items-baseline gap-2 rounded-card shadow-ring px-3 py-2 text-ui hover:text-paper"
                 >
                   {m === data.governedBy && <Tag>{t('reg.governs')}</Tag>}
-                  <span className="font-mono text-[12px] break-all">{m}</span>
+                  <span className="font-mono text-note break-all">{m}</span>
                 </Link>
               </li>
             ))}
@@ -361,12 +362,12 @@ export default function AssetDetail() {
 
       {a.retiredAt && (
         <div className="mt-6 rounded-card shadow-ring px-4 py-3">
-          <div className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted">{t('reg.retired')}</div>
-          <p className="mt-1.5 text-[13px] leading-relaxed text-muted">
+          <div className="text-label font-bold uppercase tracking-caps text-muted">{t('reg.retired')}</div>
+          <p className="mt-1.5 text-ui leading-relaxed text-muted">
             <DateText iso={a.retiredAt} />
             {a.retiredReason ? <> — {a.retiredReason}</> : null}
           </p>
-          <p className="mt-2 text-[12px] leading-relaxed text-muted">{t('reg.retiredNote')}</p>
+          <p className="mt-2 text-note leading-relaxed text-muted">{t('reg.retiredNote')}</p>
         </div>
       )}
     </RecordPage>

@@ -4,6 +4,7 @@ import { useI18n } from '../lib/i18n.js';
 import { useIdentity, mayVote } from '../lib/identity.js';
 import { Field } from './field.js';
 import { asRefusal, available, signWithDevice } from '../lib/devices.js';
+import { Button } from './Button';
 
 /**
  * Signing the written decision.
@@ -177,10 +178,10 @@ export default function SignTheDocument({ matter }: { matter: Matter }) {
 
   return (
     <div className="rounded-sheet bg-raised p-6 shadow-card sm:p-7">
-      <h2 className="font-display text-[21px] font-normal leading-[1.16] tracking-[-0.02em]">
+      <h2 className="font-display text-title font-normal leading-tight tracking-title">
         {t('sign.title')}
       </h2>
-      <p className="mt-2.5 max-w-[62ch] text-[13.5px] leading-[1.65] text-sand">
+      <p className="mt-2.5 max-w-[62ch] text-body leading-relaxed text-sand">
         {t('sign.what')}
       </p>
 
@@ -192,7 +193,7 @@ export default function SignTheDocument({ matter }: { matter: Matter }) {
         is already in the address bar and would be said twice.
       */}
       {doc.reference !== matter.id && (
-        <p className="mt-3 text-[12.5px] text-muted">
+        <p className="mt-3 text-ui text-muted">
           {t('sign.calledIt')} <span className="font-mono text-paper">{doc.reference}</span>
         </p>
       )}
@@ -200,7 +201,7 @@ export default function SignTheDocument({ matter }: { matter: Matter }) {
       {/* Who has signed. Names, dates, and how each proved who they were. */}
       <div className="mt-5 space-y-2.5">
         {signings.length === 0 && (
-          <p className="text-[13px] leading-[1.6] text-muted">{t('sign.nobodyYet')}</p>
+          <p className="text-ui leading-relaxed text-muted">{t('sign.nobodyYet')}</p>
         )}
         {signings.map((s, i) => {
           const stale = s.documentHash !== doc.documentHash;
@@ -209,10 +210,10 @@ export default function SignTheDocument({ matter }: { matter: Matter }) {
               key={`${s.scholarId}-${s.at}-${i}`}
               className="flex flex-wrap items-baseline gap-x-3 gap-y-1 rounded-card bg-ink px-4 py-3"
             >
-              <span className="text-[13.5px] font-semibold">{s.name}</span>
-              {s.title && <span className="text-[12px] text-muted">{s.title}</span>}
-              <span className="ms-auto font-mono text-[11.5px] text-muted">{day(s.at)}</span>
-              <div className="w-full text-[12px] leading-[1.55] text-muted">
+              <span className="text-body font-semibold">{s.name}</span>
+              {s.title && <span className="text-note text-muted">{s.title}</span>}
+              <span className="ms-auto font-mono text-note text-muted">{day(s.at)}</span>
+              <div className="w-full text-note leading-relaxed text-muted">
                 {t('sign.provedBy')} {s.provedBy}
                 {/* Which device, in the member's own words for it. */}
                 {s.signedWith && <span className="text-sand"> ({s.signedWith})</span>}
@@ -224,7 +225,7 @@ export default function SignTheDocument({ matter }: { matter: Matter }) {
                 )}
               </div>
               {s.note && (
-                <p className="w-full text-[12.5px] leading-[1.6] text-sand">“{s.note}”</p>
+                <p className="w-full text-ui leading-relaxed text-sand">“{s.note}”</p>
               )}
             </div>
           );
@@ -236,7 +237,7 @@ export default function SignTheDocument({ matter }: { matter: Matter }) {
         <div className="mt-5">
           <Field
             label={t('sign.noteLabel')}
-            headingClass="block text-[10px] font-bold uppercase tracking-[0.15em] text-muted"
+            headingClass="block text-label font-bold uppercase tracking-caps text-muted"
           >
             {(attrs) => (
               <textarea
@@ -246,7 +247,7 @@ export default function SignTheDocument({ matter }: { matter: Matter }) {
                 rows={2}
                 maxLength={600}
                 placeholder={t('sign.notePlaceholder')}
-                className="mt-2 w-full rounded-card bg-ink px-4 py-3 text-[13.5px] leading-[1.6] text-paper shadow-ring outline-none placeholder:text-muted focus:shadow-lift"
+                className="mt-2 w-full rounded-card bg-ink px-4 py-3 text-body leading-relaxed text-paper shadow-ring outline-none placeholder:text-muted focus:shadow-lift"
               />
             )}
           </Field>
@@ -258,23 +259,23 @@ export default function SignTheDocument({ matter }: { matter: Matter }) {
           */}
           <div className="mt-3 flex flex-wrap items-center gap-3">
             {withDevice && (
-              <button
+              <Button
                 type="button"
                 onClick={putWithDevice}
                 disabled={busy}
-                className="rounded-card bg-lapis px-6 py-3 text-[14px] font-bold text-white shadow-act disabled:opacity-60"
+                className="rounded-card bg-lapis px-6 py-3 text-body font-bold text-white shadow-act disabled:opacity-60"
               >
                 {busy ? t('sign.waiting') : t('sign.withDevice')}
-              </button>
+              </Button>
             )}
-            <button
+            <Button
               type="button"
               onClick={put}
               disabled={busy}
               className={
                 withDevice
-                  ? 'text-[12.5px] text-muted underline decoration-line underline-offset-4'
-                  : 'rounded-card bg-lapis px-6 py-3 text-[14px] font-bold text-white shadow-act disabled:opacity-60'
+                  ? 'text-ui text-muted underline decoration-line underline-offset-4'
+                  : 'rounded-card bg-lapis px-6 py-3 text-body font-bold text-white shadow-act disabled:opacity-60'
               }
             >
               {withDevice
@@ -282,55 +283,55 @@ export default function SignTheDocument({ matter }: { matter: Matter }) {
                 : busy
                   ? t('sign.signing')
                   : t('sign.doIt')}
-            </button>
+            </Button>
           </div>
           {withDevice && (
-            <p className="mt-2 max-w-[62ch] text-[12px] leading-[1.6] text-muted">
+            <p className="mt-2 max-w-[62ch] text-note leading-relaxed text-muted">
               {t('sign.deviceMeans')}
             </p>
           )}
-          {failed && <p className="mt-2 text-[12.5px] text-breach">{failed}</p>}
+          {failed && <p className="mt-2 text-ui text-breach">{failed}</p>}
         </div>
       )}
 
       {canSign && current && (
-        <p className="mt-5 text-[13px] text-settled">{t('sign.youHave')}</p>
+        <p className="mt-5 text-ui text-settled">{t('sign.youHave')}</p>
       )}
 
       {/* The seal, or the absence of one, always in the same place. */}
       <div className="mt-6 border-t border-line pt-5">
         {doc.seal ? (
           <>
-            <p className="text-[12.5px] leading-[1.65] text-sand">
+            <p className="text-ui leading-relaxed text-sand">
               {t('sign.sealedBy')} {doc.seal.issuer} · {day(doc.seal.at)}
             </p>
-            <p className="mt-2 max-w-[62ch] text-[12.5px] leading-[1.65] text-muted">
+            <p className="mt-2 max-w-[62ch] text-ui leading-relaxed text-muted">
               {t('sign.sealProves')}
             </p>
-            <p className="mt-2 max-w-[62ch] text-[12.5px] leading-[1.65] text-muted">
+            <p className="mt-2 max-w-[62ch] text-ui leading-relaxed text-muted">
               {t('sign.sealDoesNotProve')}
             </p>
           </>
         ) : (
-          <p className="max-w-[62ch] text-[12.5px] leading-[1.65] text-muted">
+          <p className="max-w-[62ch] text-ui leading-relaxed text-muted">
             {t('sign.unsealed')}
           </p>
         )}
 
         <div className="mt-3 rounded-card bg-ink px-4 py-3">
-          <div className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+          <div className="text-label font-bold uppercase tracking-caps text-muted">
             {t('sign.reference')}
           </div>
-          <div className="mt-1.5 break-all font-mono text-[12px] text-lapis">
+          <div className="mt-1.5 break-all font-mono text-note text-lapis">
             {readable(doc.documentHash)}
           </div>
         </div>
-        <p className="mt-2 max-w-[62ch] text-[12px] leading-[1.6] text-muted">
+        <p className="mt-2 max-w-[62ch] text-note leading-relaxed text-muted">
           {t('sign.compare')}
         </p>
       </div>
 
-      <p className="mt-5 max-w-[62ch] text-[12px] leading-[1.6] text-muted">{t('sign.pdf')}</p>
+      <p className="mt-5 max-w-[62ch] text-note leading-relaxed text-muted">{t('sign.pdf')}</p>
     </div>
   );
 }

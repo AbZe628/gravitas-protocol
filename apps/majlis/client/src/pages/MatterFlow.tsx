@@ -21,6 +21,7 @@ import Dialog from '../components/Dialog.js';
 import VotePanel from '../components/VotePanel.js';
 import SignTheDocument from '../components/SignTheDocument.js';
 import { useStillThere } from '../lib/stillThere.js';
+import { Button } from '../components/Button';
 
 /**
  * A question, worked one step at a time, inside a window.
@@ -217,19 +218,19 @@ export default function MatterFlow() {
 
   const aside = (
     <>
-      <div className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-muted">
+      <div className="mb-1.5 text-label font-bold uppercase tracking-caps text-muted">
         {t('flow.theQuestion')}
       </div>
-      <p className="mb-5 font-display text-[14px] leading-[1.55] text-paper">{matter.proposal}</p>
+      <p className="mb-5 font-display text-body leading-relaxed text-paper">{matter.proposal}</p>
 
       {matter.notDecided.length > 0 && (
         <>
-          <div className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-muted">
+          <div className="mb-1.5 text-label font-bold uppercase tracking-caps text-muted">
             {t('matter.notDecided')}
           </div>
           <ul className="mb-5 space-y-1.5">
             {matter.notDecided.map((n, i) => (
-              <li key={i} className="flex gap-2 text-[12.5px] leading-[1.5] text-sand">
+              <li key={i} className="flex gap-2 text-ui leading-snug text-sand">
                 <span className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-muted" />
                 <span>{n}</span>
               </li>
@@ -240,16 +241,16 @@ export default function MatterFlow() {
 
       {list?.structure && (
         <>
-          <div className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-muted">
+          <div className="mb-1.5 text-label font-bold uppercase tracking-caps text-muted">
             {t('sent.judgedAs')}
           </div>
-          <p className="mb-5 text-[12.5px] leading-[1.5] text-sand">{list.structure.name}</p>
+          <p className="mb-5 text-ui leading-snug text-sand">{list.structure.name}</p>
         </>
       )}
 
       <Link
         to={`/dossier/matters/${matter.id}`}
-        className="text-[12px] text-lapis underline decoration-line underline-offset-4"
+        className="text-note text-lapis underline decoration-line underline-offset-4"
       >
         {t('flow.everythingElse')}
       </Link>
@@ -278,7 +279,7 @@ export default function MatterFlow() {
         acts={
           <Link
             to={`/dossier/matters/${matter.id}`}
-            className="rounded-xl bg-raised px-4 py-2 text-[12.5px] font-semibold text-lapis shadow-ring"
+            className="rounded-xl bg-raised px-4 py-2 text-ui font-semibold text-lapis shadow-ring"
           >
             {t('flow.everythingElse')}
           </Link>
@@ -300,13 +301,13 @@ export default function MatterFlow() {
         heading={t('sent.title')}
         aside={aside}
         acts={
-          <button
+          <Button
             type="button"
             onClick={() => setAt(firstOpen?.condition.id ?? VOTE)}
-            className="rounded-xl bg-lapis px-5 py-2.5 text-[13px] font-semibold text-white shadow-act"
+            className="rounded-xl bg-lapis px-5 py-2.5 text-ui font-semibold text-white shadow-act"
           >
             {t('sent.understood')}
-          </button>
+          </Button>
         }
       >
         <WhatTheySent
@@ -331,13 +332,13 @@ export default function MatterFlow() {
         aside={aside}
         acts={
           outstanding > 0 ? (
-            <button
+            <Button
               type="button"
               onClick={() => setAt(firstOpen?.condition.id ?? null)}
-              className="rounded-xl bg-lapis px-5 py-2.5 text-[13px] font-semibold text-white shadow-act"
+              className="rounded-xl bg-lapis px-5 py-2.5 text-ui font-semibold text-white shadow-act"
             >
               {t('win.backToSteps')}
-            </button>
+            </Button>
           ) : null
         }
       >
@@ -379,7 +380,7 @@ export default function MatterFlow() {
        */
       consequences={
         canRule ? (
-          <p className="max-w-[76ch] text-[11.5px] leading-[1.6] text-muted">
+          <p className="max-w-[76ch] text-note leading-relaxed text-muted">
             {t('win.whatTheseDo')}
             {why.trim().length === 0 ? ' ' + t('win.needAReason') : ''}
           </p>
@@ -388,26 +389,26 @@ export default function MatterFlow() {
       acts={
         <>
           {refusal && (
-            <span className="me-auto text-[12.5px] leading-[1.5] text-breach">{refusal}</span>
+            <span className="me-auto text-ui leading-snug text-breach">{refusal}</span>
           )}
           {canRule && (
             <>
-              <button
+              <Button
                 type="button"
                 onClick={() => setConfirming('not_applicable')}
                 disabled={busy}
-                className="rounded-xl bg-raised px-4 py-2.5 text-[12.5px] font-semibold text-sand shadow-ring disabled:opacity-50"
+                className="rounded-xl bg-raised px-4 py-2.5 text-ui font-semibold text-sand shadow-ring disabled:opacity-50"
               >
                 {t('win.setAside')}
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
                 onClick={() => setConfirming('not_met')}
                 disabled={busy}
-                className="rounded-xl bg-raised px-4 py-2.5 text-[12.5px] font-semibold text-breach shadow-ring disabled:opacity-50"
+                className="rounded-xl bg-raised px-4 py-2.5 text-ui font-semibold text-breach shadow-ring disabled:opacity-50"
               >
                 {t('win.notMet')}
-              </button>
+              </Button>
               {/*
                 Dead until there is a reason, because the server requires one
                 and refuses without it.
@@ -417,14 +418,14 @@ export default function MatterFlow() {
                 as the button doing nothing. A control that cannot be honoured
                 is absent or dead, never live and then sorry.
               */}
-              <button
+              <Button
                 type="button"
                 onClick={() => void record('met')}
                 disabled={busy || why.trim().length === 0}
-                className="rounded-xl bg-lapis px-5 py-2.5 text-[13px] font-semibold text-white shadow-act disabled:opacity-50"
+                className="rounded-xl bg-lapis px-5 py-2.5 text-ui font-semibold text-white shadow-act disabled:opacity-50"
               >
                 {busy ? t('common.loading') : t('win.metAndOn')}
-              </button>
+              </Button>
             </>
           )}
         </>
@@ -432,11 +433,11 @@ export default function MatterFlow() {
     >
       {step && (
         <>
-          <p className="mb-4 max-w-[62ch] font-display text-[17px] leading-[1.5] text-paper">
+          <p className="mb-4 max-w-[62ch] font-display text-sub leading-snug text-paper">
             {step.condition.requirement}
           </p>
 
-          <p className="mb-5 max-w-[62ch] text-[12.5px] leading-[1.6] text-muted">
+          <p className="mb-5 max-w-[62ch] text-ui leading-relaxed text-muted">
             {step.condition.why}
           </p>
 
@@ -470,10 +471,10 @@ export default function MatterFlow() {
           */}
           {already?.holds === 'not_met' && (
             <div className="mb-5 rounded-card bg-[#FCF6EC] px-4 py-3.5 shadow-ring">
-              <div className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-gold">
+              <div className="mb-1.5 text-label font-bold uppercase tracking-caps text-gold">
                 {t('win.notMetNext')}
               </div>
-              <p className="mb-3 max-w-[62ch] text-[12.5px] leading-[1.6] text-sand">
+              <p className="mb-3 max-w-[62ch] text-ui leading-relaxed text-sand">
                 {t('win.notMetMeans')}
               </p>
               <AskTheBank
@@ -489,7 +490,7 @@ export default function MatterFlow() {
 
           {/* What this member already said, if anything. */}
           {already && (
-            <p className="mb-4 rounded-card bg-ink px-4 py-3 text-[12.5px] leading-[1.6] text-sand">
+            <p className="mb-4 rounded-card bg-ink px-4 py-3 text-ui leading-relaxed text-sand">
               {t(`chk.${already.holds}`)}
               {already.reason ? ` — ${already.reason}` : ''}
             </p>
@@ -498,12 +499,12 @@ export default function MatterFlow() {
           {/* And what colleagues said, because a step they disagree on matters. */}
           {said.length > 0 && (
             <div className="mb-5">
-              <div className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-muted">
+              <div className="mb-1.5 text-label font-bold uppercase tracking-caps text-muted">
                 {t('win.othersSaid')}
               </div>
               <ul className="space-y-1.5">
                 {said.slice(0, 4).map((f, i) => (
-                  <li key={i} className="text-[12.5px] leading-[1.5] text-sand">
+                  <li key={i} className="text-ui leading-snug text-sand">
                     <span className="font-semibold">{f.scholarId}</span> —{' '}
                     {t(`chk.${f.holds}`)}
                     {f.reason ? `: ${f.reason}` : ''}
@@ -515,7 +516,7 @@ export default function MatterFlow() {
 
           {canRule && (
             <label className="block">
-              <span className="mb-1.5 block text-[10px] font-bold uppercase tracking-[0.14em] text-muted">
+              <span className="mb-1.5 block text-label font-bold uppercase tracking-caps text-muted">
                 {t('win.why')}
               </span>
               <textarea
@@ -523,7 +524,7 @@ export default function MatterFlow() {
                 onChange={(e) => setWhy(e.target.value)}
                 rows={3}
                 placeholder={t('win.whyHint')}
-                className="w-full rounded-xl bg-ink px-4 py-3 text-[13.5px] leading-[1.6] text-paper shadow-ring outline-none placeholder:text-muted focus:shadow-lift"
+                className="w-full rounded-xl bg-ink px-4 py-3 text-body leading-relaxed text-paper shadow-ring outline-none placeholder:text-muted focus:shadow-lift"
               />
             </label>
           )}
@@ -543,14 +544,14 @@ export default function MatterFlow() {
         onClose={() => setConfirming(null)}
         acts={
           <>
-            <button
+            <Button
               type="button"
               onClick={() => setConfirming(null)}
-              className="text-[12.5px] text-muted underline decoration-line underline-offset-4"
+              className="text-ui text-muted underline decoration-line underline-offset-4"
             >
               {t('common.cancel')}
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
               disabled={busy || why.trim().length === 0}
               onClick={() => {
@@ -559,25 +560,25 @@ export default function MatterFlow() {
                 setConfirming(null);
                 void record(holds);
               }}
-              className="rounded-xl bg-lapis px-5 py-2.5 text-[13px] font-semibold text-white shadow-act disabled:opacity-40"
+              className="rounded-xl bg-lapis px-5 py-2.5 text-ui font-semibold text-white shadow-act disabled:opacity-40"
             >
               {t(confirming === 'not_met' ? 'ask.notMetDo' : 'ask.notApplyDo')}
-            </button>
+            </Button>
           </>
         }
       >
-        <p className="mb-4 max-w-[58ch] text-[13.5px] leading-[1.65] text-sand">
+        <p className="mb-4 max-w-[58ch] text-body leading-relaxed text-sand">
           {t(confirming === 'not_met' ? 'ask.notMetMeans' : 'ask.notApplyMeans')}
         </p>
 
         {step && (
-          <p className="mb-4 rounded-card bg-ink px-4 py-3 font-display text-[14px] leading-[1.5] text-paper">
+          <p className="mb-4 rounded-card bg-ink px-4 py-3 font-display text-body leading-snug text-paper">
             {step.condition.requirement}
           </p>
         )}
 
         <label className="block">
-          <span className="mb-1.5 block text-[10px] font-bold uppercase tracking-[0.14em] text-muted">
+          <span className="mb-1.5 block text-label font-bold uppercase tracking-caps text-muted">
             {t(confirming === 'not_met' ? 'ask.notMetWhy' : 'ask.notApplyWhy')}
           </span>
           <textarea
@@ -585,11 +586,11 @@ export default function MatterFlow() {
             onChange={(e) => setWhy(e.target.value)}
             rows={4}
             placeholder={t('win.whyHint')}
-            className="w-full rounded-xl bg-ink px-4 py-3 text-[13.5px] leading-[1.6] text-paper shadow-ring outline-none placeholder:text-muted focus:shadow-lift"
+            className="w-full rounded-xl bg-ink px-4 py-3 text-body leading-relaxed text-paper shadow-ring outline-none placeholder:text-muted focus:shadow-lift"
           />
         </label>
 
-        <p className="mt-3 max-w-[58ch] text-[12px] leading-[1.6] text-muted">
+        <p className="mt-3 max-w-[58ch] text-note leading-relaxed text-muted">
           {t('ask.reasonIsRequired')}
         </p>
       </Dialog>

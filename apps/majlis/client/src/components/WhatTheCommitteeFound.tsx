@@ -5,6 +5,7 @@ import { mayDeliberate, useIdentity } from '../lib/identity.js';
 import { Nothing } from './page.js';
 import ReportBack from './ReportBack.js';
 import { useStillThere } from '../lib/stillThere.js';
+import { Button } from './Button';
 
 /**
  * What the board asked a committee to look at, and what came back.
@@ -38,13 +39,13 @@ function Standing({ r }: { r: ReferralOnMatter }) {
   return (
     <div className="mt-4 border-t border-line pt-3.5">
       {r.stood.unanimous ? (
-        <p className="text-[12.5px] text-settled">{t('cttee.ofOneMind')}</p>
+        <p className="text-ui text-settled">{t('cttee.ofOneMind')}</p>
       ) : (
-        <p className="text-[12.5px] text-gold">{t('cttee.notOfOneMind')}</p>
+        <p className="text-ui text-gold">{t('cttee.notOfOneMind')}</p>
       )}
 
       {r.stood.agreedNames.length > 0 && (
-        <p className="mt-2 text-[12.5px] leading-[1.6] text-muted">
+        <p className="mt-2 text-ui leading-relaxed text-muted">
           <span className="font-semibold text-sand">{t('cttee.stoodBehind')}</span>{' '}
           {r.stood.agreedNames.join(', ')}
         </p>
@@ -56,15 +57,15 @@ function Standing({ r }: { r: ReferralOnMatter }) {
       */}
       {r.stood.dissentedNames.map((d) => (
         <div key={d.scholarId} className="mt-3 rounded-card bg-[#FCF6EA] px-4 py-3 shadow-ring">
-          <div className="mb-1.5 text-[12px] font-semibold text-gold">
+          <div className="mb-1.5 text-note font-semibold text-gold">
             {d.name} {t('cttee.didNot')}
           </div>
-          <p className="max-w-[58ch] text-[13.5px] leading-[1.65] text-paper">{d.said}</p>
+          <p className="max-w-[58ch] text-body leading-relaxed text-paper">{d.said}</p>
         </div>
       ))}
 
       {r.stood.silentNames.length > 0 && (
-        <p className="mt-2.5 text-[12.5px] leading-[1.6] text-muted">
+        <p className="mt-2.5 text-ui leading-relaxed text-muted">
           <span className="font-semibold">{t('cttee.recordedNothing')}</span>{' '}
           {r.stood.silentNames.join(', ')}
         </p>
@@ -88,23 +89,23 @@ function One({
   return (
     <li className="rounded-card bg-ink px-5 py-4 shadow-ring">
       <div className="mb-2 flex flex-wrap items-center gap-x-3 gap-y-1.5">
-        <span className="text-[13.5px] font-semibold text-paper">
+        <span className="text-body font-semibold text-paper">
           {r.committee?.name ?? t('cttee.unknown')}
         </span>
-        <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-muted">
+        <span className="text-note font-bold uppercase tracking-caps text-muted">
           {t(`cttee.state.${r.state}`)}
         </span>
       </div>
 
       {r.committee && (
-        <p className="mb-3 max-w-[58ch] text-[12px] leading-[1.6] text-muted">{r.committee.remit}</p>
+        <p className="mb-3 max-w-[58ch] text-note leading-relaxed text-muted">{r.committee.remit}</p>
       )}
 
-      <div className="mb-1 text-[10px] font-bold uppercase tracking-[0.14em] text-muted">
+      <div className="mb-1 text-label font-bold uppercase tracking-caps text-muted">
         {t('cttee.asked')}
       </div>
-      <p className="max-w-[58ch] text-[13.5px] leading-[1.65] text-sand">{r.referral.asking}</p>
-      <p className="mt-1.5 text-[11.5px] text-muted">
+      <p className="max-w-[58ch] text-body leading-relaxed text-sand">{r.referral.asking}</p>
+      <p className="mt-1.5 text-note text-muted">
         {r.referredByName}
         <span className="mx-1.5 opacity-40">·</span>
         <span className="font-mono">{r.referral.referredAt.slice(0, 10)}</span>
@@ -112,27 +113,27 @@ function One({
 
       {r.referral.report && (
         <div className="mt-4">
-          <div className="mb-1 text-[10px] font-bold uppercase tracking-[0.14em] text-muted">
+          <div className="mb-1 text-label font-bold uppercase tracking-caps text-muted">
             {t('cttee.found')}
           </div>
-          <p className="max-w-[58ch] font-display text-[15.5px] leading-[1.6] text-paper">
+          <p className="max-w-[58ch] font-display text-lead leading-relaxed text-paper">
             {r.referral.report.found}
           </p>
-          <p className="mt-1.5 text-[11.5px] font-mono text-muted">
+          <p className="mt-1.5 text-note font-mono text-muted">
             {r.referral.report.at.slice(0, 10)}
           </p>
         </div>
       )}
 
       {r.referral.withdrawn && (
-        <p className="mt-3 max-w-[58ch] text-[12.5px] leading-[1.6] text-muted">
+        <p className="mt-3 max-w-[58ch] text-ui leading-relaxed text-muted">
           <span className="font-semibold">{t('cttee.takenBack')}</span> {r.referral.withdrawn.why}
         </p>
       )}
 
       {/* Waiting, and nothing has come back. Said, rather than left blank. */}
       {r.state === 'waiting' && (
-        <p className="mt-3 text-[12.5px] leading-[1.6] text-muted">{t('cttee.stillWaiting')}</p>
+        <p className="mt-3 text-ui leading-relaxed text-muted">{t('cttee.stillWaiting')}</p>
       )}
 
       {/*
@@ -217,7 +218,7 @@ export default function WhatTheCommitteeFound({ matterId }: { matterId: string }
   }
 
   if (failed) return <Nothing>{t('cttee.unavailable')}</Nothing>;
-  if (!data) return <p className="text-[13px] text-muted">{t('common.loading')}</p>;
+  if (!data) return <p className="text-ui text-muted">{t('common.loading')}</p>;
 
   /*
    * A control that cannot be honoured is absent. A board that keeps no
@@ -245,33 +246,33 @@ export default function WhatTheCommitteeFound({ matterId }: { matterId: string }
             ))}
           </ul>
           {/* The server's own sentence, so no screen can soften it. */}
-          <p className="mt-3.5 max-w-[58ch] text-[12px] leading-[1.6] text-muted">{data.note}</p>
+          <p className="mt-3.5 max-w-[58ch] text-note leading-relaxed text-muted">{data.note}</p>
         </>
       )}
 
       {canRefer && !open && (
-        <button
+        <Button
           type="button"
           onClick={() => {
             setOpen(true);
             setPick(committees?.[0]?.id ?? '');
           }}
-          className="mt-3 text-[12.5px] font-semibold text-lapis underline decoration-line underline-offset-4"
+          className="mt-3 text-ui font-semibold text-lapis underline decoration-line underline-offset-4"
         >
           {t('cttee.refer')}
-        </button>
+        </Button>
       )}
 
       {canRefer && open && (
         <div className="mt-3 rounded-card bg-ink px-4 py-4 shadow-ring">
-          <label className="mb-1.5 block text-[12px] text-muted" htmlFor="refer-committee">
+          <label className="mb-1.5 block text-note text-muted" htmlFor="refer-committee">
             {t('cttee.whichCommittee')}
           </label>
           <select
             id="refer-committee"
             value={pick}
             onChange={(e) => setPick(e.target.value)}
-            className="mb-3 w-full rounded-card bg-raised px-4 py-2.5 text-[13.5px] text-paper shadow-ring outline-none"
+            className="mb-3 w-full rounded-card bg-raised px-4 py-2.5 text-body text-paper shadow-ring outline-none"
           >
             {(committees ?? []).map((c) => (
               <option key={c.id} value={c.id}>
@@ -280,7 +281,7 @@ export default function WhatTheCommitteeFound({ matterId }: { matterId: string }
             ))}
           </select>
 
-          <label className="mb-1.5 block text-[12px] text-muted" htmlFor="refer-asking">
+          <label className="mb-1.5 block text-note text-muted" htmlFor="refer-asking">
             {t('cttee.whatToAsk')}
           </label>
           <textarea
@@ -288,30 +289,30 @@ export default function WhatTheCommitteeFound({ matterId }: { matterId: string }
             value={asking}
             onChange={(e) => setAsking(e.target.value)}
             rows={4}
-            className="w-full rounded-card bg-raised px-4 py-3 text-[13.5px] leading-[1.6] text-paper shadow-ring outline-none"
+            className="w-full rounded-card bg-raised px-4 py-3 text-body leading-relaxed text-paper shadow-ring outline-none"
           />
 
-          {refused && <p className="mt-2 text-[12.5px] text-breach">{refused}</p>}
+          {refused && <p className="mt-2 text-ui text-breach">{refused}</p>}
 
           <div className="mt-3 flex flex-wrap items-center gap-4">
-            <button
+            <Button
               type="button"
               onClick={send}
               disabled={busy || !pick || asking.trim().length < 5}
-              className="rounded-card bg-lapis px-5 py-2.5 text-[13.5px] font-bold text-white shadow-act disabled:opacity-50"
+              className="rounded-card bg-lapis px-5 py-2.5 text-body font-bold text-white shadow-act disabled:opacity-50"
             >
               {t('cttee.sendIt')}
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
               onClick={() => setOpen(false)}
-              className="text-[12.5px] text-muted underline decoration-line underline-offset-4"
+              className="text-ui text-muted underline decoration-line underline-offset-4"
             >
               {t('common.back')}
-            </button>
+            </Button>
           </div>
 
-          <p className="mt-3 max-w-[58ch] text-[12px] leading-[1.6] text-muted">
+          <p className="mt-3 max-w-[58ch] text-note leading-relaxed text-muted">
             {t('cttee.stillTheBoards')}
           </p>
         </div>

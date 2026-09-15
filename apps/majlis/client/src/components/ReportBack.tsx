@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { oversight, Refused, type Committee } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { Field, HEADING } from './field.js';
+import { Button } from './Button';
 
 /**
  * The committee's account, going back to the board.
@@ -56,13 +57,13 @@ export default function ReportBack({
 
   if (!open) {
     return (
-      <button
+      <Button
         type="button"
         onClick={() => setOpen(true)}
-        className="mt-3 rounded-xl bg-lapis px-4 py-2 text-[12.5px] font-semibold text-white shadow-act"
+        className="mt-3 rounded-xl bg-lapis px-4 py-2 text-ui font-semibold text-white shadow-act"
       >
         {t('cttee.report')}
-      </button>
+      </Button>
     );
   }
 
@@ -94,7 +95,7 @@ export default function ReportBack({
 
   return (
     <form onSubmit={send} className="mt-4 rounded-card bg-ink/70 px-4 py-4 shadow-ring">
-      <p className="mb-3 max-w-[58ch] text-[12.5px] leading-[1.6] text-muted">
+      <p className="mb-3 max-w-[58ch] text-ui leading-relaxed text-muted">
         {t('cttee.reportLead')}
       </p>
 
@@ -105,13 +106,13 @@ export default function ReportBack({
             rows={5}
             value={found}
             onChange={(e) => setFound(e.target.value)}
-            className="w-full rounded-xl bg-raised px-3 py-2.5 text-[13.5px] leading-[1.6] shadow-ring outline-none"
+            className="w-full rounded-xl bg-raised px-3 py-2.5 text-body leading-relaxed shadow-ring outline-none"
             required
           />
         )}
       </Field>
 
-      <div className="mt-4 mb-2 text-[10px] font-bold uppercase tracking-[0.14em] text-muted">
+      <div className="mt-4 mb-2 text-label font-bold uppercase tracking-caps text-muted">
         {t('cttee.whoStoodWhere')}
       </div>
 
@@ -119,10 +120,10 @@ export default function ReportBack({
         {committee.members.map((m) => (
           <li key={m} className="rounded-xl bg-raised px-3.5 py-3 shadow-ring">
             <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-              <span className="text-[13px] text-paper">{m}</span>
+              <span className="text-ui text-paper">{m}</span>
               <div className="flex gap-1.5">
                 {(['silent', 'agrees', 'dissents'] as Position[]).map((at) => (
-                  <button
+                  <Button
                     key={at}
                     type="button"
                     aria-pressed={positions[m].at === at}
@@ -130,7 +131,7 @@ export default function ReportBack({
                       setPositions((p) => ({ ...p, [m]: { ...p[m], at } }))
                     }
                     className={
-                      'rounded-full px-3 py-1 text-[11.5px] transition-all ' +
+                      'rounded-full px-3 py-1 text-note transition-all ' +
                       (positions[m].at === at
                         ? at === 'dissents'
                           ? 'bg-breach font-semibold text-white'
@@ -141,7 +142,7 @@ export default function ReportBack({
                     }
                   >
                     {t(`cttee.stood.${at}`)}
-                  </button>
+                  </Button>
                 ))}
               </div>
             </div>
@@ -156,36 +157,36 @@ export default function ReportBack({
                   setPositions((p) => ({ ...p, [m]: { ...p[m], said: e.target.value } }))
                 }
                 placeholder={t('cttee.whatTheySaid')}
-                className="mt-2.5 w-full rounded-xl bg-ink px-3 py-2 text-[12.5px] leading-[1.5] shadow-ring outline-none"
+                className="mt-2.5 w-full rounded-xl bg-ink px-3 py-2 text-ui leading-snug shadow-ring outline-none"
               />
             )}
           </li>
         ))}
       </ul>
 
-      {refusal && <p className="mt-3 text-[12.5px] text-breach">{refusal}</p>}
+      {refusal && <p className="mt-3 text-ui text-breach">{refusal}</p>}
       {incomplete && (
-        <p className="mt-3 text-[12px] leading-[1.6] text-gold">{t('cttee.dissentNeedsWords')}</p>
+        <p className="mt-3 text-note leading-relaxed text-gold">{t('cttee.dissentNeedsWords')}</p>
       )}
 
       <div className="mt-4 flex flex-wrap items-center gap-3">
-        <button
+        <Button
           type="submit"
           disabled={busy || found.trim().length === 0 || incomplete}
-          className="rounded-xl bg-lapis px-5 py-2.5 text-[13px] font-semibold text-white shadow-act disabled:opacity-40"
+          className="rounded-xl bg-lapis px-5 py-2.5 text-ui font-semibold text-white shadow-act disabled:opacity-40"
         >
           {busy ? t('common.loading') : t('cttee.sendReport')}
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
           onClick={() => setOpen(false)}
-          className="text-[12.5px] text-muted underline decoration-line underline-offset-4"
+          className="text-ui text-muted underline decoration-line underline-offset-4"
         >
           {t('common.cancel')}
-        </button>
+        </Button>
       </div>
 
-      <p className="mt-3 max-w-[58ch] text-[11.5px] leading-[1.6] text-muted">
+      <p className="mt-3 max-w-[58ch] text-note leading-relaxed text-muted">
         {t('cttee.noVerdict')}
       </p>
     </form>

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { oversight, type Inheritance, type Proposal } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
+import { Button } from './Button';
 
 /**
  * What this board already decided about a question of this shape.
@@ -56,15 +57,15 @@ function Item({
   return (
     <li className="rounded-card bg-ink px-5 py-4">
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-        <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+        <span className="text-label font-bold uppercase tracking-caps text-muted">
           {t(`inherit.kind.${proposal.kind}`)}
         </span>
-        {proposal.key && <span className="font-mono text-[12px]">{proposal.key}</span>}
+        {proposal.key && <span className="font-mono text-note">{proposal.key}</span>}
         {proposal.holds && (
           <span
             className={
-              'rounded-full px-2.5 py-0.5 text-[10.5px] font-bold uppercase tracking-[0.1em] ' +
-              (proposal.holds === 'met' ? 'bg-[#EBF3EF] text-settled shadow-[0_0_0_0.5px_rgba(44,107,87,0.18)]' : 'bg-black/[0.045] text-sand')
+              'rounded-full px-2.5 py-0.5 text-label font-bold uppercase tracking-label ' +
+              (proposal.holds === 'met' ? 'bg-settledtint text-settled shadow-ringsettled' : 'bg-black/[0.045] text-sand')
             }
           >
             {t(`inherit.holds.${proposal.holds}`)}
@@ -73,22 +74,22 @@ function Item({
       </div>
 
       {/* The board's own words from its own past ruling. Never rewritten. */}
-      <p className="mt-2.5 max-w-[62ch] font-display text-[15.5px] leading-[1.55]">
+      <p className="mt-2.5 max-w-[62ch] font-display text-lead leading-relaxed">
         {proposal.value}
-        {proposal.unit && <span className="ms-1.5 font-body text-[11.5px] text-muted">{proposal.unit}</span>}
+        {proposal.unit && <span className="ms-1.5 font-body text-note text-muted">{proposal.unit}</span>}
       </p>
 
       {taken ? (
-        <p className="mt-3 text-[12px] text-settled">{t('inherit.taken')}</p>
+        <p className="mt-3 text-note text-settled">{t('inherit.taken')}</p>
       ) : (
-        <button
+        <Button
           type="button"
           onClick={onTake}
           disabled={busy}
-          className="mt-3 rounded-xl bg-raised px-3.5 py-2 text-[12.5px] text-sand shadow-ring transition-colors hover:text-paper disabled:opacity-40"
+          className="mt-3 rounded-xl bg-raised px-3.5 py-2 text-ui text-sand shadow-ring transition-colors hover:text-paper disabled:opacity-40"
         >
           {t('inherit.take')}
-        </button>
+        </Button>
       )}
     </li>
   );
@@ -170,7 +171,7 @@ export default function Inherited({
 
   return (
     <div className="mb-6 rounded-sheet bg-raised/75 px-6 py-5 shadow-ring">
-      <div className="mb-3 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+      <div className="mb-3 text-label font-bold uppercase tracking-caps text-muted">
         {t('inherit.title')}
       </div>
 
@@ -186,12 +187,12 @@ export default function Inherited({
             'the 2th question' was wrong in English and an ordinal does not
             survive translation into Arabic or Urdu at all.
           */}
-          <p className="max-w-[62ch] font-display text-[19px] leading-[1.45] tracking-[-0.008em]">
+          <p className="max-w-[62ch] font-display text-sub leading-snug tracking-tight">
             {inheritance.timesRuled > 2
               ? t('inherit.timesMany').replace('{n}', String(inheritance.timesRuled - 1))
               : t('inherit.timesOnce')}
           </p>
-          <p className="mt-2.5 max-w-[62ch] text-[12.5px] leading-[1.6] text-muted">
+          <p className="mt-2.5 max-w-[62ch] text-ui leading-relaxed text-muted">
             <Link to={`/matters/${inheritance.from.id}`} className="text-lapis underline decoration-lapis/30 underline-offset-4">
               {inheritance.from.title}
             </Link>
@@ -202,23 +203,23 @@ export default function Inherited({
           </p>
         </>
       ) : (
-        <p className="max-w-[62ch] text-[13px] leading-[1.6] text-muted">{inheritance.note}</p>
+        <p className="max-w-[62ch] text-ui leading-relaxed text-muted">{inheritance.note}</p>
       )}
 
       {inheritance.proposals.length > 0 && (
         <>
-          <p className="mt-4 max-w-[62ch] text-[12.5px] leading-[1.6] text-muted">
+          <p className="mt-4 max-w-[62ch] text-ui leading-relaxed text-muted">
             {inheritance.note}
           </p>
 
           {refusal && (
-            <p className="mt-3 rounded-xl bg-[#FCF0EE] px-4 py-2.5 text-[12.5px] leading-[1.55] text-breach shadow-[0_0_0_0.5px_rgba(154,56,48,0.18)]">
+            <p className="mt-3 rounded-xl bg-breachtint px-4 py-2.5 text-ui leading-relaxed text-breach shadow-ringbreach">
               {refusal}
             </p>
           )}
 
           {conditions.length > 0 && conditionsBelow && (
-            <p className="mt-3 max-w-[62ch] text-[12.5px] leading-[1.6] text-muted">
+            <p className="mt-3 max-w-[62ch] text-ui leading-relaxed text-muted">
               {t('inherit.underEach')}
             </p>
           )}
@@ -248,19 +249,19 @@ export default function Inherited({
           */}
           {rest.length > 0 && (
             <div className="mt-5 border-t border-line pt-4">
-              <div className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+              <div className="mb-1.5 text-label font-bold uppercase tracking-caps text-muted">
                 {t('inherit.alsoSaid')}
               </div>
               <ul className="space-y-2.5">
                 {rest.map((p, i) => (
                   <li key={idOf(p, i)} className="rounded-card bg-ink px-5 py-4">
-                    <div className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+                    <div className="text-label font-bold uppercase tracking-caps text-muted">
                       {t(`inherit.kind.${p.kind}`)}
                       {p.key && <span className="ms-2 font-mono normal-case tracking-normal">{p.key}</span>}
                     </div>
-                    <p className="mt-2.5 max-w-[62ch] font-display text-[15.5px] leading-[1.55]">
+                    <p className="mt-2.5 max-w-[62ch] font-display text-lead leading-relaxed">
                       {p.value}
-                      {p.unit && <span className="ms-1.5 font-body text-[11.5px] text-muted">{p.unit}</span>}
+                      {p.unit && <span className="ms-1.5 font-body text-note text-muted">{p.unit}</span>}
                     </p>
                   </li>
                 ))}

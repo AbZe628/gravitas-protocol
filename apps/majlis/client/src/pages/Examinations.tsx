@@ -15,6 +15,7 @@ import { ErrorText, Loading } from '../components/ui.js';
 import { useIdentity, mayRecordInstitutionAct, mayDeliberate } from '../lib/identity.js';
 import { Act, Card, Quiet, State } from '../components/kit.js';
 import { Field } from '../components/field.js';
+import { Button } from '../components/Button';
 
 /**
  * What was executed, against what the board approved.
@@ -30,9 +31,9 @@ import { Field } from '../components/field.js';
  * silence about a condition reads as a pass.
  */
 
-const field = 'w-full rounded-xl bg-raised shadow-ring p-2.5 text-[14px] leading-relaxed outline-none';
-const label = 'mb-1 block text-[12px] text-muted';
-const help = 'mb-2 max-w-[62ch] text-[11.5px] leading-[1.6] text-muted';
+const field = 'w-full rounded-xl bg-raised shadow-ring p-2.5 text-body leading-relaxed outline-none';
+const label = 'mb-1 block text-note text-muted';
+const help = 'mb-2 max-w-[62ch] text-note leading-relaxed text-muted';
 
 function One({ e, canReport }: { e: Examination; canReport: boolean }) {
   const { t } = useI18n();
@@ -47,13 +48,13 @@ function One({ e, canReport }: { e: Examination; canReport: boolean }) {
             {e.exceptions} {t('exam.exceptions')}
           </State>
         )}
-        <span className="text-[11.5px] text-muted">
+        <span className="text-note text-muted">
           {e.from.slice(0, 10)} — {e.to.slice(0, 10)}
         </span>
       </div>
 
       {e.matterTitle && (
-        <div className="font-display text-[17px] leading-snug">
+        <div className="font-display text-sub leading-snug">
           <Link to={`/matters/${e.matterId}`} className="hover:text-lapis">
             {e.matterTitle}
           </Link>
@@ -65,7 +66,7 @@ function One({ e, canReport }: { e: Examination; canReport: boolean }) {
         missing value to hide — it is the institution not having said how many
         transactions there were, which the reader has to be told.
       */}
-      <p className="mt-2 text-[13px]">
+      <p className="mt-2 text-ui">
         <span className="font-mono tabular-nums">{e.coverage.examined}</span> {t('exam.examined')}
         {e.coverage.population !== null && (
           <>
@@ -77,16 +78,16 @@ function One({ e, canReport }: { e: Examination; canReport: boolean }) {
         )}
       </p>
       {e.coverage.population === null && (
-        <p className="mt-1 max-w-[62ch] text-[11.5px] leading-[1.55] text-muted">
+        <p className="mt-1 max-w-[62ch] text-note leading-relaxed text-muted">
           {t('exam.coverageUnknown')}
         </p>
       )}
 
       <div className="mt-3">
-        <div className="mb-1 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+        <div className="mb-1 text-label font-bold uppercase tracking-caps text-muted">
           {t('exam.howChosen')}
         </div>
-        <p className="max-w-[62ch] text-[12.5px] leading-[1.6]">{e.howChosen}</p>
+        <p className="max-w-[62ch] text-ui leading-relaxed">{e.howChosen}</p>
       </div>
 
       {e.findings.filter((f) => f.held === 'exceptions').length > 0 && (
@@ -94,7 +95,7 @@ function One({ e, canReport }: { e: Examination; canReport: boolean }) {
           {e.findings
             .filter((f) => f.held === 'exceptions')
             .map((f, i) => (
-              <li key={i} className="rounded-xl bg-[#FCF0EE] px-3.5 py-2.5 shadow-[0_0_0_0.5px_rgba(154,56,48,0.18)]">
+              <li key={i} className="rounded-xl bg-breachtint px-3.5 py-2.5 shadow-ringbreach">
                 {/*
                   What the board wrote, not what the parameter is called.
 
@@ -107,38 +108,38 @@ function One({ e, canReport }: { e: Examination; canReport: boolean }) {
                   the examination does not.
                 */}
                 <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                  <span className="max-w-[54ch] text-[13px] font-semibold leading-snug text-breach">
+                  <span className="max-w-[54ch] text-ui font-semibold leading-snug text-breach">
                     {f.inWords ?? f.against.replace(/^term:/, '')}
                   </span>
-                  <span className="shrink-0 text-[11.5px] text-breach">
+                  <span className="shrink-0 text-note text-breach">
                     <span className="font-mono tabular-nums">{f.exceptions}</span>{' '}
                     {t('exam.exceptions')}
                   </span>
                 </div>
                 {f.inWords && (
-                  <div className="mt-1 font-mono text-[10.5px] text-muted opacity-70">
+                  <div className="mt-1 font-mono text-label text-muted opacity-70">
                     {f.against.replace(/^term:/, '')}
                   </div>
                 )}
-                <p className="mt-1.5 max-w-[62ch] text-[12.5px] leading-[1.6] text-muted">{f.note}</p>
+                <p className="mt-1.5 max-w-[62ch] text-ui leading-relaxed text-muted">{f.note}</p>
               </li>
             ))}
         </ul>
       )}
 
       {e.notExamined.length > 0 && (
-        <div className="mt-3 rounded-xl bg-[#F7F0E2] px-3.5 py-2.5 shadow-[0_0_0_0.5px_rgba(176,132,48,0.28)]">
-          <div className="mb-1 text-[10px] font-bold uppercase tracking-[0.15em] text-[#8A6524]">
+        <div className="mt-3 rounded-xl bg-[#F7F0E2] px-3.5 py-2.5 shadow-ringgold">
+          <div className="mb-1 text-label font-bold uppercase tracking-caps text-goldink">
             {t('exam.notExamined')} · {e.notExamined.length}
           </div>
-          <p className="max-w-[62ch] text-[11.5px] leading-[1.55] text-[#6b5326]">
+          <p className="max-w-[62ch] text-note leading-relaxed text-goldink">
             {t('exam.notExaminedNote')}
           </p>
         </div>
       )}
 
       {e.againstCurrentTerms === false && (
-        <p className="mt-3 max-w-[62ch] text-[12px] leading-[1.55] text-muted">
+        <p className="mt-3 max-w-[62ch] text-note leading-relaxed text-muted">
           {t('exam.termsMoved')}
         </p>
       )}
@@ -275,7 +276,7 @@ export default function Examinations({ boardId }: { boardId: string }) {
               {settled.length === 0 ? (
                 <>
                   <div className={label}>{t('exam.whichRuling')}</div>
-                  <p className="mb-3 text-[12.5px] text-muted">{t('exam.noSettled')}</p>
+                  <p className="mb-3 text-ui text-muted">{t('exam.noSettled')}</p>
                 </>
               ) : (
                 <Field label={t('exam.whichRuling')} className="mb-4" headingClass={label}>
@@ -360,22 +361,22 @@ export default function Examinations({ boardId }: { boardId: string }) {
                       const v = held[r.against] ?? { held: '', exceptions: '', note: '' };
                       return (
                         <div key={r.against} className="rounded-card bg-raised/60 px-4 py-3 shadow-ring">
-                          <p className="mb-2 max-w-[62ch] text-[13px] leading-[1.5]">{r.requirement}</p>
+                          <p className="mb-2 max-w-[62ch] text-ui leading-snug">{r.requirement}</p>
                           <div className="mb-2 flex flex-wrap gap-2">
                             {(['held', 'exceptions', 'not_examined'] as const).map((h) => (
-                              <button
+                              <Button
                                 key={h}
                                 type="button"
                                 onClick={() => setHeld({ ...held, [r.against]: { ...v, held: h } })}
                                 className={
-                                  'rounded-xl px-3 py-1.5 text-[12px] transition-all ' +
+                                  'rounded-xl px-3 py-1.5 text-note transition-all ' +
                                   (v.held === h
-                                    ? 'bg-[#EAF1F7] font-semibold text-lapis shadow-[0_0_0_1.5px_#164470]'
+                                    ? 'bg-lapistint font-semibold text-lapis shadow-pick'
                                     : 'bg-raised text-sand shadow-ring hover:text-paper')
                                 }
                               >
                                 {t(`exam.finding.${h}`)}
-                              </button>
+                              </Button>
                             ))}
                           </div>
 
@@ -399,7 +400,7 @@ export default function Examinations({ boardId }: { boardId: string }) {
                                 rows={2}
                                 className={field + ' resize-y'}
                               />
-                              <p className="mt-1 text-[11px] leading-[1.5] text-muted">
+                              <p className="mt-1 text-note leading-snug text-muted">
                                 {t('exam.findingNoteHelp')}
                               </p>
                             </>
@@ -410,7 +411,7 @@ export default function Examinations({ boardId }: { boardId: string }) {
                   </div>
 
                   {error && (
-                    <p className="mt-4 rounded-xl bg-[#FCF0EE] px-3.5 py-2.5 text-[12.5px] text-breach shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)]">
+                    <p className="mt-4 rounded-xl bg-breachtint px-3.5 py-2.5 text-ui text-breach shadow-ringbreach">
                       {error}
                     </p>
                   )}
@@ -427,7 +428,7 @@ export default function Examinations({ boardId }: { boardId: string }) {
           )}
         </div>
       ) : (
-        <p className="mt-5 max-w-[62ch] rounded-card bg-raised/60 px-4 py-3 text-[12.5px] leading-[1.6] text-muted shadow-ring">
+        <p className="mt-5 max-w-[62ch] rounded-card bg-raised/60 px-4 py-3 text-ui leading-relaxed text-muted shadow-ring">
           {t('exam.onlyInstitution')}
         </p>
       )}
@@ -444,7 +445,7 @@ export default function Examinations({ boardId }: { boardId: string }) {
         )}
       </Division>
 
-      <p className="mt-8 max-w-[62ch] text-[12px] leading-[1.6] text-muted">
+      <p className="mt-8 max-w-[62ch] text-note leading-relaxed text-muted">
         {t('exam.notAVerdict')}
       </p>
     </div>

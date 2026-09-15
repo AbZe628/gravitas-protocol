@@ -5,6 +5,7 @@ import { useI18n } from '../lib/i18n.js';
 import TellTheBank from './TellTheBank.js';
 import { Steps } from './calc.js';
 import { Tag } from './ui.js';
+import { Button } from './Button';
 
 /**
  * What the board has noted, and what happened to each.
@@ -48,20 +49,20 @@ function Entry({ entry }: { entry: HistoryEntry }) {
     >
       <div className="mb-1.5 flex flex-wrap items-center gap-2">
         <Tag tone={tone(entry.state)}>{t(`recorded.${entry.state}`)}</Tag>
-        <span className="text-[13px] font-medium">{t(`calc.tab.${c.kind}`)}</span>
-        <span className="font-mono text-[12px] tabular-nums text-muted">
+        <span className="text-ui font-medium">{t(`calc.tab.${c.kind}`)}</span>
+        <span className="font-mono text-note tabular-nums text-muted">
           {c.periodFrom} – {c.periodTo}
         </span>
       </div>
 
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <span className="text-[12.5px] text-muted">{c.headline}</span>
-        <span className="font-mono text-[15px] tabular-nums">
+        <span className="text-ui text-muted">{c.headline}</span>
+        <span className="font-mono text-lead tabular-nums">
           {c.amount} {c.currency}
         </span>
       </div>
 
-      <p className="mt-1 text-[12px] leading-relaxed text-muted">
+      <p className="mt-1 text-note leading-relaxed text-muted">
         {t('recorded.by')} {c.recordedBy} · {c.recordedAt.slice(0, 10)} · {c.source}
       </p>
 
@@ -70,12 +71,12 @@ function Entry({ entry }: { entry: HistoryEntry }) {
         that vanished, so both are shown rather than filed behind a click.
       */}
       {entry.state === 'withdrawn' && (
-        <p className="mt-1.5 rounded-xl shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)] px-2.5 py-1.5 text-[12px] leading-relaxed text-breach">
+        <p className="mt-1.5 rounded-xl shadow-ringbreach px-2.5 py-1.5 text-note leading-relaxed text-breach">
           {t('recorded.withdrawnBy')} {c.withdrawnBy} — {c.withdrawalReason}
         </p>
       )}
       {entry.state === 'superseded' && entry.replacedBy && (
-        <p className="mt-1.5 text-[12px] text-muted">
+        <p className="mt-1.5 text-note text-muted">
           {t('recorded.replacedBy')} <span className="font-mono">{entry.replacedBy.slice(0, 8)}</span>
         </p>
       )}
@@ -88,16 +89,16 @@ function Entry({ entry }: { entry: HistoryEntry }) {
         they mention a figure.
       */}
       <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1.5">
-        <button
+        <Button
           type="button"
           onClick={() => setOpen(!open)}
-          className="text-[12px] text-muted underline underline-offset-2 hover:text-paper"
+          className="text-note text-muted underline underline-offset-2 hover:text-paper"
         >
           {open ? t('recorded.hideWorking') : t('recorded.showWorking')}
-        </button>
+        </Button>
         <Link
           to={`/figures/${c.id}`}
-          className="text-[12px] font-semibold text-lapis underline underline-offset-2"
+          className="text-note font-semibold text-lapis underline underline-offset-2"
         >
           {t('recorded.openIt')}
         </Link>
@@ -105,10 +106,10 @@ function Entry({ entry }: { entry: HistoryEntry }) {
 
       {open && (
         <div className="mt-2">
-          <p className="mb-2 text-[12.5px] leading-relaxed text-muted">{c.methodStated}</p>
+          <p className="mb-2 text-ui leading-relaxed text-muted">{c.methodStated}</p>
           <Steps steps={c.steps} />
           {/* Carried from the server, so nothing here can soften it. */}
-          <p className="mt-2 text-[12px] leading-relaxed text-muted">{c.note}</p>
+          <p className="mt-2 text-note leading-relaxed text-muted">{c.note}</p>
 
           {/*
             And then you tell the bank. A figure recorded and never sent is a
@@ -141,7 +142,7 @@ export default function Recorded({ kind, assetId }: { kind?: string; assetId?: s
   if (!data) return null;
 
   if (data.history.length === 0) {
-    return <p className="text-[12.5px] leading-relaxed text-muted">{t('recorded.none')}</p>;
+    return <p className="text-ui leading-relaxed text-muted">{t('recorded.none')}</p>;
   }
 
   // Newest first: a reader opening this wants the current figure, and the
@@ -155,7 +156,7 @@ export default function Recorded({ kind, assetId }: { kind?: string; assetId?: s
           <Entry key={e.computation.id} entry={e} />
         ))}
       </ul>
-      <p className="mt-3 rounded-xl shadow-ring bg-raised px-3 py-2.5 text-[12.5px] leading-relaxed text-muted">
+      <p className="mt-3 rounded-xl shadow-ring bg-raised px-3 py-2.5 text-ui leading-relaxed text-muted">
         {data.whatRecordingMeans}
       </p>
     </div>

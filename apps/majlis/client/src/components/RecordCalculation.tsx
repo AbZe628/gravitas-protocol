@@ -3,6 +3,7 @@ import { api, oversight, type Asset, type RecordInput } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { Refusal, Text } from './calc.js';
 import { useWorkedOutFor } from '../lib/workedOutFor.js';
+import { Button } from './Button';
 
 /**
  * Noting a calculation against a period.
@@ -115,7 +116,7 @@ export default function RecordCalculation({
   // twice by somebody pressing the button again.
   if (done) {
     return (
-      <p className="mt-3 rounded-xl bg-[#EBF3EF] px-4 py-2.5 text-[12.5px] leading-[1.55] text-settled shadow-[0_0_0_0.5px_rgba(44,107,87,0.18)]">
+      <p className="mt-3 rounded-xl bg-settledtint px-4 py-2.5 text-ui leading-relaxed text-settled shadow-ringsettled">
         {t('noteCalc.done')}
       </p>
     );
@@ -123,22 +124,22 @@ export default function RecordCalculation({
 
   if (!open) {
     return (
-      <button
+      <Button
         type="button"
         onClick={() => setOpen(true)}
-        className="mt-3 rounded-xl shadow-ring px-3 py-1.5 text-[13px] text-muted transition-colors hover:text-paper"
+        className="mt-3 rounded-xl shadow-ring px-3 py-1.5 text-ui text-muted transition-colors hover:text-paper"
       >
         {t('noteCalc.open')}
-      </button>
+      </Button>
     );
   }
 
   return (
     <div className="mt-3 rounded-card shadow-ring px-4 py-3.5">
-      <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">{t('noteCalc.title')}</div>
+      <div className="mb-2 text-label font-bold uppercase tracking-caps text-muted">{t('noteCalc.title')}</div>
 
       {/* The server's own words. Shown before the panel offers to act. */}
-      {meaning && <p className="mb-3 text-[12.5px] leading-relaxed text-muted">{meaning}</p>}
+      {meaning && <p className="mb-3 text-ui leading-relaxed text-muted">{meaning}</p>}
 
       <div className="flex gap-2">
         <div className="flex-1">
@@ -151,13 +152,13 @@ export default function RecordCalculation({
 
       {wantsHolding && (
         <label className="mb-2.5 block">
-          <span className="mb-1 block text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+          <span className="mb-1 block text-label font-bold uppercase tracking-caps text-muted">
             {t('noteCalc.holding')}
           </span>
           <select
             value={assetId}
             onChange={(e) => setAssetId(e.target.value)}
-            className="w-full rounded-xl shadow-ring bg-raised px-3 py-2 text-[13px]"
+            className="w-full rounded-xl shadow-ring bg-raised px-3 py-2 text-ui"
           >
             <option value="">{t('noteCalc.noHolding')}</option>
             {assets.map((a) => (
@@ -173,24 +174,24 @@ export default function RecordCalculation({
       {error && <Refusal>{error}</Refusal>}
 
       <div className="flex gap-2">
-        <button
+        <Button
           type="button"
           disabled={busy}
           onClick={save}
-          className="rounded-xl bg-gradient-to-br from-lapissoft to-[#143E67] px-4 py-2 text-[13px] font-semibold text-white shadow-act transition-colors hover:bg-lapis disabled:opacity-50"
+          className="rounded-xl bg-gradient-to-br from-lapissoft to-lapis px-4 py-2 text-ui font-semibold text-white shadow-act transition-colors hover:bg-lapis disabled:opacity-50"
         >
           {t('noteCalc.save')}
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
           onClick={() => {
             setOpen(false);
             setError(null);
           }}
-          className="rounded-xl shadow-ring px-3 py-1.5 text-[13px] text-muted"
+          className="rounded-xl shadow-ring px-3 py-1.5 text-ui text-muted"
         >
           {t('common.cancel')}
-        </button>
+        </Button>
       </div>
     </div>
   );

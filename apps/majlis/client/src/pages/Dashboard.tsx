@@ -85,7 +85,7 @@ export default function Dashboard() {
         illogically" is largely this: nothing at the top ever said where you
         had landed.
       */}
-      <h1 className="mb-5 font-display text-[30px] font-normal leading-[1.12] tracking-[-0.024em] sm:text-[34px]">
+      <h1 className="mb-5 font-display text-head font-normal leading-tight tracking-display sm:text-display">
         {t('dash.title')}
       </h1>
 
@@ -114,7 +114,7 @@ export default function Dashboard() {
       */}
       <DriftPanel />
 
-      <div className="mb-5 rounded-card shadow-ring bg-raised px-4 py-3 text-[13px] text-muted">
+      <div className="mb-5 rounded-card shadow-ring bg-raised px-4 py-3 text-ui text-muted">
         {t('dash.stageNotice')}
       </div>
 
@@ -136,10 +136,10 @@ export default function Dashboard() {
                     </Tag>
                     <Tag>{t(`matter.status.${m.status}`)}</Tag>
                 </div>
-                  <div className="max-w-[46ch] font-display text-[19px] leading-snug tracking-[-0.014em]">
+                  <div className="max-w-[46ch] font-display text-sub leading-snug tracking-title">
                     {m.title}
                   </div>
-                  <div className="mt-2.5 text-[12px] text-muted">
+                  <div className="mt-2.5 text-note text-muted">
                     {t(`matter.origin.${m.origin}`)}
                     <span className="mx-1.5 opacity-40">·</span>
                     {t('common.opened')} <DateText iso={m.openedAt} />
@@ -166,7 +166,7 @@ export default function Dashboard() {
 
       {settled.length > 0 && (
         <>
-          <h2 className="mb-3 mt-8 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+          <h2 className="mb-3 mt-8 text-label font-bold uppercase tracking-caps text-muted">
             {t('matter.status.in_force')}
           </h2>
           <ul className="space-y-2">
@@ -176,8 +176,8 @@ export default function Dashboard() {
                   to={`/matters/${m.id}`}
                   className="block rounded-card shadow-ring px-4 py-3 hover:text-paper"
                 >
-                  <div className="text-[14px] leading-snug">{m.title}</div>
-                  <div className="mt-1 text-[12px] text-muted">
+                  <div className="text-body leading-snug">{m.title}</div>
+                  <div className="mt-1 text-note text-muted">
                     <DateText iso={m.openedAt} />
                   </div>
                 </Link>
@@ -194,20 +194,20 @@ export default function Dashboard() {
       */}
       {enforcement && !enforcement.configured && (
         <div className="mt-9 rounded-card shadow-ring px-4 py-3">
-          <div className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+          <div className="text-label font-bold uppercase tracking-caps text-muted">
             {t('dash.enforcement')}
           </div>
-          <p className="mt-1.5 text-[13px] leading-relaxed text-muted">{t('dash.enforcementNone')}</p>
+          <p className="mt-1.5 text-ui leading-relaxed text-muted">{t('dash.enforcementNone')}</p>
         </div>
       )}
 
       {enforcement?.configured && (
         <div className="mt-9 rounded-card shadow-ring px-4 py-3">
-          <div className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+          <div className="text-label font-bold uppercase tracking-caps text-muted">
             {enforcement.label ?? t('dash.registry')}
           </div>
           {enforcement.address && (
-            <div className="mt-1 font-mono text-[11px] break-all text-muted">{enforcement.address}</div>
+            <div className="mt-1 font-mono text-note break-all text-muted">{enforcement.address}</div>
           )}
           <div className="mt-2">
             {enforcement.reachable ? (

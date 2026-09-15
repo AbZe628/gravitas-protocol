@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import type { ReactNode } from 'react';
+import { Button } from './Button';
 
 /**
  * The parts screens are built from.
@@ -62,9 +63,9 @@ export function Card({
   const edge: Record<string, string> = {
     plain: '',
     quiet: '',
-    settled: 'shadow-[0_0_0_0.5px_rgba(44,107,87,0.22)]',
-    attention: 'shadow-[0_0_0_0.5px_rgba(176,132,48,0.24)]',
-    breach: 'shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)]',
+    settled: 'shadow-ringsettled',
+    attention: 'shadow-ringgold',
+    breach: 'shadow-ringbreach',
   };
 
   // A quiet card is translucent, so the sweep behind the page shows through it.
@@ -153,16 +154,16 @@ export type Tone = 'settled' | 'attention' | 'breach' | 'lapis' | 'plain';
  */
 export function State({ tone = 'plain', children }: { tone?: Tone; children: ReactNode }) {
   const paint: Record<Tone, string> = {
-    settled: 'bg-[#EBF3EF] text-settled shadow-[0_0_0_0.5px_rgba(44,107,87,0.18)]',
-    attention: 'bg-[#FBF4E4] text-gold shadow-[0_0_0_0.5px_rgba(176,132,48,0.22)]',
-    breach: 'bg-[#FCF0EE] text-breach shadow-[0_0_0_0.5px_rgba(154,56,48,0.18)]',
-    lapis: 'bg-[#EAF1F7] text-lapis shadow-[0_0_0_0.5px_rgba(22,68,112,0.18)]',
+    settled: 'bg-settledtint text-settled shadow-ringsettled',
+    attention: 'bg-goldtint text-gold shadow-ringgold',
+    breach: 'bg-breachtint text-breach shadow-ringbreach',
+    lapis: 'bg-lapistint text-lapis shadow-ringlapis',
     plain: 'bg-black/[0.045] text-sand',
   };
   return (
     <span
       className={
-        'inline-flex items-center rounded-full px-3 py-1 text-[10.5px] font-bold uppercase tracking-[0.1em] ' +
+        'inline-flex items-center rounded-full px-3 py-1 text-label font-bold uppercase tracking-label ' +
         paint[tone]
       }
     >
@@ -211,10 +212,10 @@ export function Act({
   const paint =
     tone === 'gold'
       ? 'bg-gradient-to-br from-goldsoft to-[#A67A28] shadow-actgold'
-      : 'bg-gradient-to-br from-lapissoft to-[#143E67] shadow-act';
+      : 'bg-gradient-to-br from-lapissoft to-lapis shadow-act';
 
   const shape =
-    'inline-flex items-center gap-2 rounded-xl px-5 py-3 text-[14px] font-semibold text-white transition-all hover:brightness-110 active:scale-[0.98] disabled:opacity-40 ' +
+    'inline-flex items-center gap-2 rounded-xl px-5 py-3 text-body font-semibold text-white transition-all hover:brightness-110 active:scale-[0.98] disabled:opacity-40 ' +
     paint;
 
   if (to) {
@@ -225,9 +226,9 @@ export function Act({
     );
   }
   return (
-    <button type="button" onClick={onClick} disabled={disabled} className={shape}>
+    <Button type="button" onClick={onClick} disabled={disabled} className={shape}>
       {children}
-    </button>
+    </Button>
   );
 }
 
@@ -242,7 +243,7 @@ export function Quiet({
   to?: string;
 }) {
   const shape =
-    'text-[13px] text-muted underline decoration-line underline-offset-4 transition-colors hover:text-paper';
+    'text-ui text-muted underline decoration-line underline-offset-4 transition-colors hover:text-paper';
 
   if (to) {
     return (
@@ -252,9 +253,9 @@ export function Quiet({
     );
   }
   return (
-    <button type="button" onClick={onClick} className={shape}>
+    <Button type="button" onClick={onClick} className={shape}>
       {children}
-    </button>
+    </Button>
   );
 }
 
@@ -287,12 +288,12 @@ export function Figure({
     <>
       <div
         className={
-          'font-display text-[40px] leading-[0.92] tabular-nums tracking-[-0.028em] ' + paint[tone]
+          'font-display text-display leading-none tabular-nums tracking-display ' + paint[tone]
         }
       >
         {n}
       </div>
-      <div className="mt-3 max-w-[24ch] text-[13px] leading-[1.5] text-muted">{of}</div>
+      <div className="mt-3 max-w-[24ch] text-ui leading-snug text-muted">{of}</div>
     </>
   );
 

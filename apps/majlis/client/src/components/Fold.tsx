@@ -1,3 +1,4 @@
+import { Button } from './Button';
 import { useId, useState, type ReactNode } from 'react';
 
 /**
@@ -47,7 +48,7 @@ export default function Fold({
   if (alwaysOpen) {
     return (
       <section className="border-t border-line py-5 first:border-t-0 first:pt-0">
-        <h2 className="mb-2.5 text-[10px] font-bold uppercase tracking-[0.14em] text-muted">
+        <h2 className="mb-2.5 text-label font-bold uppercase tracking-caps text-muted">
           {heading}
         </h2>
         {children}
@@ -58,7 +59,7 @@ export default function Fold({
   return (
     <section className="border-t border-line first:border-t-0">
       <h2>
-        <button
+        <Button
           type="button"
           onClick={() => setOpen((was) => !was)}
           aria-expanded={open}
@@ -68,19 +69,19 @@ export default function Fold({
           <span
             aria-hidden="true"
             className={
-              'mt-[3px] shrink-0 text-[10px] text-muted transition-transform ' +
+              'mt-[3px] shrink-0 text-label text-muted transition-transform ' +
               (open ? 'rotate-90' : '')
             }
           >
             ▶
           </span>
           <span className="min-w-0 flex-1">
-            <span className="block text-[13.5px] leading-[1.4] text-paper">{heading}</span>
+            <span className="block text-body leading-snug text-paper">{heading}</span>
             {summary && !open && (
-              <span className="mt-0.5 block text-[12.5px] leading-[1.5] text-muted">{summary}</span>
+              <span className="mt-0.5 block text-ui leading-snug text-muted">{summary}</span>
             )}
           </span>
-        </button>
+        </Button>
       </h2>
 
       {open && (

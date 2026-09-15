@@ -9,6 +9,7 @@ import Recorded from '../components/Recorded.js';
 import Screening from '../components/Screening.js';
 import Tradability from '../components/Tradability.js';
 import Zakat from '../components/Zakat.js';
+import { Button } from '../components/Button';
 
 /**
  * The arithmetic a board does on its own figures.
@@ -95,30 +96,30 @@ export default function Calculations() {
         className="flex w-full shrink-0 flex-row flex-wrap gap-1 lg:w-[244px] lg:flex-col lg:flex-nowrap"
       >
         {TABS.map((k) => (
-          <button
+          <Button
             key={k}
             role="tab"
             type="button"
             aria-selected={tab === k}
             onClick={() => setTab(k)}
             className={
-              'rounded-xl px-4 py-3 text-start text-[13.5px] transition-all ' +
+              'rounded-xl px-4 py-3 text-start text-body transition-all ' +
               (tab === k
                 ? 'bg-raised font-semibold text-paper shadow-card'
                 : 'text-sand hover:bg-raised/60 hover:text-paper')
             }
           >
             {t(`calc.tab.${k}`)}
-          </button>
+          </Button>
         ))}
       </div>
 
       <div className="min-w-0 flex-1">
         <div className="g-panel-raised px-7 py-6">
-          <h2 className="font-display text-[24px] leading-snug tracking-[-0.018em]">
+          <h2 className="font-display text-title leading-snug tracking-title">
             {t(`calc.tab.${tab}`)}
           </h2>
-          <p className="mb-6 mt-2.5 max-w-[62ch] text-[13px] leading-[1.65] text-muted">
+          <p className="mb-6 mt-2.5 max-w-[62ch] text-ui leading-relaxed text-muted">
             {t(`calc.${tab}.about`)}
           </p>
 
@@ -136,7 +137,7 @@ export default function Calculations() {
         something out and assumes it was filed has been misled by the interface
         rather than by the record.
       */}
-          <p className="mt-4 rounded-card bg-raised/60 px-5 py-4 text-[12.5px] leading-[1.6] text-muted shadow-ring">
+          <p className="mt-4 rounded-card bg-raised/60 px-5 py-4 text-ui leading-relaxed text-muted shadow-ring">
             {t('calc.recordingIsSeparate')}
           </p>
         </div>

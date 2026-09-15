@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { oversight, type Delivery, type Notice } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import TheNotice from './TheNotice.js';
+import { Button } from './Button';
 
 /**
  * Telling the bank, from wherever the thing happened.
@@ -62,15 +63,15 @@ export default function TellTheBank({
 
   return (
     <div className="mt-5">
-      <button
+      <Button
         type="button"
         onClick={compose}
         disabled={busy}
-        className="rounded-card bg-raised px-5 py-2.5 text-[13.5px] font-semibold text-lapis shadow-ring disabled:opacity-50"
+        className="rounded-card bg-raised px-5 py-2.5 text-body font-semibold text-lapis shadow-ring disabled:opacity-50"
       >
         {busy ? t('tell.composing') : (label ?? t('tell.doIt'))}
-      </button>
-      {failed && <p className="mt-2 text-[12.5px] text-breach">{failed}</p>}
+      </Button>
+      {failed && <p className="mt-2 text-ui text-breach">{failed}</p>}
     </div>
   );
 }

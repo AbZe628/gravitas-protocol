@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { oversight, type AssetIdentifier, type AssetKind } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { Field, HEADING } from './field.js';
+import { Button } from './Button';
 
 /**
  * Put a holding into the register by hand.
@@ -33,7 +34,7 @@ import { Field, HEADING } from './field.js';
 const KINDS: AssetKind[] = ['token', 'pool', 'security', 'instrument', 'product'];
 const SCHEMES: AssetIdentifier['scheme'][] = ['chain', 'isin', 'ticker', 'internal'];
 
-const BOX = 'w-full rounded-xl bg-raised px-3 py-2.5 text-[13.5px] shadow-ring outline-none';
+const BOX = 'w-full rounded-xl bg-raised px-3 py-2.5 text-body shadow-ring outline-none';
 
 export default function EnterAHolding({ onEntered }: { onEntered: () => void }) {
   const { t } = useI18n();
@@ -49,13 +50,13 @@ export default function EnterAHolding({ onEntered }: { onEntered: () => void }) 
 
   if (!open) {
     return (
-      <button
+      <Button
         type="button"
         onClick={() => setOpen(true)}
-        className="rounded-xl bg-lapis px-5 py-2.5 text-[13px] font-semibold text-white shadow-act transition-all hover:bg-lapissoft"
+        className="rounded-xl bg-lapis px-5 py-2.5 text-ui font-semibold text-white shadow-act transition-all hover:bg-lapissoft"
       >
         {t('reg.enter')}
-      </button>
+      </Button>
     );
   }
 
@@ -90,7 +91,7 @@ export default function EnterAHolding({ onEntered }: { onEntered: () => void }) 
 
   return (
     <form onSubmit={enter} className="mb-6 rounded-sheet bg-raised px-6 py-5 shadow-card">
-      <p className="mb-4 max-w-[62ch] text-[12.5px] leading-[1.6] text-muted">{t('reg.enterLead')}</p>
+      <p className="mb-4 max-w-[62ch] text-ui leading-relaxed text-muted">{t('reg.enterLead')}</p>
 
       <div className="grid gap-3 sm:grid-cols-[10rem_1fr]">
         <Field label={t('reg.kindLabel')} headingClass={HEADING}>
@@ -148,7 +149,7 @@ export default function EnterAHolding({ onEntered }: { onEntered: () => void }) 
               {...attrs}
               value={value}
               onChange={(e) => setValue(e.target.value)}
-              className={BOX + ' font-mono text-[12.5px]'}
+              className={BOX + ' font-mono text-ui'}
               required
             />
           )}
@@ -168,29 +169,29 @@ export default function EnterAHolding({ onEntered }: { onEntered: () => void }) 
         </Field>
       </div>
 
-      {refusal && <p className="mt-3 text-[12.5px] text-breach">{refusal}</p>}
+      {refusal && <p className="mt-3 text-ui text-breach">{refusal}</p>}
 
       <div className="mt-4 flex flex-wrap items-center gap-3">
-        <button
+        <Button
           type="submit"
           disabled={busy || name.trim().length < 2 || value.trim().length === 0}
-          className="rounded-xl bg-lapis px-5 py-2.5 text-[13px] font-semibold text-white shadow-act disabled:opacity-40"
+          className="rounded-xl bg-lapis px-5 py-2.5 text-ui font-semibold text-white shadow-act disabled:opacity-40"
         >
           {busy ? t('common.loading') : t('reg.enterIt')}
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
           onClick={() => {
             setOpen(false);
             setRefusal(null);
           }}
-          className="text-[12.5px] text-muted underline decoration-line underline-offset-4"
+          className="text-ui text-muted underline decoration-line underline-offset-4"
         >
           {t('common.cancel')}
-        </button>
+        </Button>
       </div>
 
-      <p className="mt-3 max-w-[62ch] text-[11.5px] leading-[1.6] text-muted">
+      <p className="mt-3 max-w-[62ch] text-note leading-relaxed text-muted">
         {t('reg.enterNote')}
       </p>
     </form>

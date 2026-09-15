@@ -101,13 +101,13 @@ export default function Library() {
       act={(
         <Link
           to="/check"
-          className="rounded-xl bg-lapis px-4 py-2 text-[12.5px] font-semibold text-white shadow-act"
+          className="rounded-xl bg-lapis px-4 py-2 text-ui font-semibold text-white shadow-act"
         >
           {t('adopt.toCheck')}
         </Link>
       )}
       live={
-        <span className="text-[13px] text-muted">
+        <span className="text-ui text-muted">
           <span className="font-mono tabular-nums text-paper">{untouched}</span>{' '}
           <span>{t('adopt.untouched')}</span>
           <span className="mx-2 opacity-40">·</span>

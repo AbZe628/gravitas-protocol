@@ -18,10 +18,10 @@ import { useI18n } from '../lib/i18n.js';
 export function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="mb-7">
-      <h2 className="mb-2.5 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+      <h2 className="mb-2.5 text-label font-bold uppercase tracking-caps text-muted">
         {title}
       </h2>
-      <div className="text-[15px] leading-[1.65] text-sand">{children}</div>
+      <div className="text-lead leading-relaxed text-sand">{children}</div>
     </section>
   );
 }
@@ -31,7 +31,7 @@ export function Card({ children, accent }: { children: ReactNode; accent?: boole
     <div
       className={
         'rounded-card p-4 ' +
-        (accent ? 'bg-raised shadow-[0_0_0_1px_rgba(176,132,48,0.3),0_1px_2px_rgba(25,23,19,0.045),0_12px_24px_-14px_rgba(25,23,19,0.16)]' : 'bg-raised shadow-card')
+        (accent ? 'bg-raised shadow-pickgold' : 'bg-raised shadow-card')
       }
     >
       {children}
@@ -52,18 +52,18 @@ export function Tag({
    */
   const tones = {
     neutral: 'bg-black/[0.045] text-sand',
-    gold: 'bg-[#FBF4E4] text-gold shadow-[0_0_0_0.5px_rgba(176,132,48,0.22)]',
-    warn: 'bg-[#FBF4E4] text-gold shadow-[0_0_0_0.5px_rgba(176,132,48,0.22)]',
-    ok: 'bg-[#EBF3EF] text-settled shadow-[0_0_0_0.5px_rgba(44,107,87,0.18)]',
+    gold: 'bg-goldtint text-gold shadow-ringgold',
+    warn: 'bg-goldtint text-gold shadow-ringgold',
+    ok: 'bg-settledtint text-settled shadow-ringsettled',
     // The fourth state the palette has and this had no name for: overdue,
     // refused, a threshold crossed. Callers were reaching for 'warn', which
     // is gold, which is a clock that is still running.
-    breach: 'bg-[#FCF0EE] text-breach shadow-[0_0_0_0.5px_rgba(154,56,48,0.18)]',
+    breach: 'bg-breachtint text-breach shadow-ringbreach',
   } as const;
   return (
     <span
       className={
-        'inline-block rounded-full px-2.5 py-0.5 text-[10.5px] font-bold uppercase tracking-[0.1em] ' +
+        'inline-block rounded-full px-2.5 py-0.5 text-label font-bold uppercase tracking-label ' +
         tones[tone]
       }
     >
@@ -77,15 +77,15 @@ export function Sources({ sources }: { sources: SourceRef[] }) {
   if (!sources.length) return null;
   return (
     <div className="mt-3 border-t border-line pt-3">
-      <div className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+      <div className="mb-1.5 text-label font-bold uppercase tracking-caps text-muted">
         {t('matter.sources')}
       </div>
       <ul className="space-y-1">
         {sources.map((s, i) => (
-          <li key={`${s.ref}-${i}`} className="text-[13px] text-muted">
+          <li key={`${s.ref}-${i}`} className="text-ui text-muted">
             <span className="text-lapis">{s.kind}</span>
             <span className="mx-1.5 opacity-40">·</span>
-            <span className="break-all font-mono text-[12px]">{s.ref}</span>
+            <span className="break-all font-mono text-note">{s.ref}</span>
           </li>
         ))}
       </ul>

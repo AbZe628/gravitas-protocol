@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { oversight, type AssetStanding, type Composition } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
+import { Button } from './Button';
 
 /**
  * Take the figures from what the board already holds.
@@ -64,15 +65,15 @@ export default function FromTheRegister({
 
   return (
     <section className="mb-6 rounded-card bg-raised px-4 py-4 shadow-ring">
-      <div className="mb-1 text-[10px] font-bold uppercase tracking-[0.14em] text-muted">
+      <div className="mb-1 text-label font-bold uppercase tracking-caps text-muted">
         {t('fromreg.title')}
       </div>
-      <p className="mb-3 max-w-[62ch] text-[12.5px] leading-[1.6] text-muted">
+      <p className="mb-3 max-w-[62ch] text-ui leading-relaxed text-muted">
         {t('fromreg.note')}
       </p>
 
       {withFigures.length === 0 ? (
-        <p className="text-[12.5px] leading-[1.6] text-muted">{t('fromreg.noneHaveFigures')}</p>
+        <p className="text-ui leading-relaxed text-muted">{t('fromreg.noneHaveFigures')}</p>
       ) : (
         <ul className="flex flex-wrap gap-2">
           {withFigures.map((a) => {
@@ -80,23 +81,23 @@ export default function FromTheRegister({
             const on = chosenId === a.asset.id;
             return (
               <li key={a.asset.id}>
-                <button
+                <Button
                   type="button"
                   onClick={() => onTake({ assetId: a.asset.id, name: a.asset.name, composition: c })}
                   className={
-                    'rounded-xl px-3.5 py-2.5 text-start text-[13px] leading-snug transition-all ' +
+                    'rounded-xl px-3.5 py-2.5 text-start text-ui leading-snug transition-all ' +
                     (on
                       ? 'bg-ink font-semibold text-paper shadow-card'
                       : 'bg-ink/60 text-sand shadow-ring hover:text-paper')
                   }
                 >
                   {a.asset.name}
-                  <span className="mt-0.5 block text-[11px] font-normal text-muted">
+                  <span className="mt-0.5 block text-note font-normal text-muted">
                     {c.parts.length} {t('fromreg.parts')}
                     <span className="mx-1.5 opacity-40">·</span>
                     {(c.asOf ?? '').slice(0, 10)}
                   </span>
-                </button>
+                </Button>
               </li>
             );
           })}
@@ -109,7 +110,7 @@ export default function FromTheRegister({
         thing to go and get rather than a thing the screen forgot.
       */}
       {without.length > 0 && (
-        <p className="mt-3.5 border-t border-line pt-3 text-[12px] leading-[1.6] text-muted">
+        <p className="mt-3.5 border-t border-line pt-3 text-note leading-relaxed text-muted">
           {t('fromreg.withoutFigures')}{' '}
           {without.map((a, i) => (
             <span key={a.asset.id}>

@@ -10,6 +10,7 @@ import { Field, HEADING } from '../components/field.js';
 import { mayDeliberate, useIdentity } from '../lib/identity.js';
 import { ErrorText, Loading } from '../components/ui.js';
 import { useStillThere } from '../lib/stillThere.js';
+import { Button } from '../components/Button';
 
 /**
  * One recorded calculation, at an address of its own.
@@ -124,7 +125,7 @@ export default function Figure() {
       <div>
         <PageHead phase="inforce" title={t('figure.noneTitle')} says={t('figure.noneSays')} />
         <Nothing>{t('figure.none')}</Nothing>
-        <p className="mt-4 text-[12.5px]">
+        <p className="mt-4 text-ui">
           <Link to="/calculations" className="text-lapis underline underline-offset-2">
             {t('figure.allOfThem')}
           </Link>
@@ -166,11 +167,11 @@ export default function Figure() {
         bottom of the page is a figure somebody acts on.
       */}
       {withdrawn && (
-        <div className="mb-6 rounded-sheet bg-[#FCF0EE] px-6 py-5 shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)]">
-          <div className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.15em] text-breach">
+        <div className="mb-6 rounded-sheet bg-breachtint px-6 py-5 shadow-ringbreach">
+          <div className="mb-1.5 text-label font-bold uppercase tracking-caps text-breach">
             {t('recorded.withdrawn')}
           </div>
-          <p className="max-w-[62ch] text-[13px] leading-[1.65] text-[#7a3a33]">
+          <p className="max-w-[62ch] text-ui leading-relaxed text-breachink">
             {t('recorded.withdrawnBy')} {c.withdrawnBy} — {c.withdrawalReason}
           </p>
         </div>
@@ -179,7 +180,7 @@ export default function Figure() {
       <Division heading={t('figure.theFigure')}>
         <div className="rounded-sheet bg-raised px-6 py-5 shadow-card">
           <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
-            <span className="text-[13px] text-muted">
+            <span className="text-ui text-muted">
               {day(c.periodFrom)} — {day(c.periodTo)}
             </span>
             {/*
@@ -190,9 +191,9 @@ export default function Figure() {
               there is not. A screen that adds a currency to it is guessing
               about a figure it did not compute.
             */}
-            <span className="font-mono text-[26px] tabular-nums">{c.amount}</span>
+            <span className="font-mono text-head tabular-nums">{c.amount}</span>
           </div>
-          <p className="mt-3 max-w-[62ch] text-[12.5px] leading-[1.6] text-muted">
+          <p className="mt-3 max-w-[62ch] text-ui leading-relaxed text-muted">
             {t('recorded.by')} {c.recordedBy} · {day(c.recordedAt)} · {c.source}
           </p>
         </div>
@@ -204,7 +205,7 @@ export default function Figure() {
         idea which of two bases produced them.
       */}
       <Division heading={t('figure.method')}>
-        <p className="max-w-[62ch] text-[13.5px] leading-[1.65]">{c.methodStated}</p>
+        <p className="max-w-[62ch] text-body leading-relaxed">{c.methodStated}</p>
       </Division>
 
       <Division heading={t('figure.working')} note={t('figure.working.note')}>
@@ -216,13 +217,13 @@ export default function Figure() {
         nothing on this page can soften it.
       */}
       <Division heading={t('figure.doesNotSay')}>
-        <p className="max-w-[62ch] text-[13px] leading-[1.65] text-sand">{c.note}</p>
+        <p className="max-w-[62ch] text-ui leading-relaxed text-sand">{c.note}</p>
       </Division>
 
       {/* Where it came from and what it replaced, as links rather than ids. */}
       {(c.supersedes || c.assetId) && (
         <Division heading={t('figure.related')}>
-          <ul className="space-y-2 text-[12.5px]">
+          <ul className="space-y-2 text-ui">
             {c.supersedes && (
               <li>
                 <Link
@@ -275,11 +276,11 @@ export default function Figure() {
       */}
       {!withdrawn && mayDeliberate(identity?.role) && (
         <details className="mt-6">
-          <summary className="cursor-pointer text-[12.5px] text-muted hover:text-paper">
+          <summary className="cursor-pointer text-ui text-muted hover:text-paper">
             {t('figure.withdraw')}
           </summary>
           <form onSubmit={withdraw} className="mt-3 rounded-card bg-raised px-5 py-4 shadow-ring">
-            <p className="mb-3 max-w-[62ch] text-[12.5px] leading-[1.6] text-muted">
+            <p className="mb-3 max-w-[62ch] text-ui leading-relaxed text-muted">
               {t('figure.withdrawLead')}
             </p>
             <Field label={t('figure.withdrawWhy')} headingClass={HEADING}>
@@ -289,24 +290,24 @@ export default function Figure() {
                   rows={3}
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
-                  className="w-full rounded-xl bg-raised px-3 py-2 text-[13px] shadow-ring outline-none"
+                  className="w-full rounded-xl bg-raised px-3 py-2 text-ui shadow-ring outline-none"
                   required
                 />
               )}
             </Field>
-            {refusal && <p className="mt-2.5 text-[12.5px] text-breach">{refusal}</p>}
-            <button
+            {refusal && <p className="mt-2.5 text-ui text-breach">{refusal}</p>}
+            <Button
               type="submit"
               disabled={busy || reason.trim().length === 0}
-              className="mt-3 rounded-xl bg-raised px-4 py-2 text-[12.5px] font-medium text-breach shadow-[0_0_0_0.5px_rgba(154,56,48,0.25)] disabled:opacity-40"
+              className="mt-3 rounded-xl bg-raised px-4 py-2 text-ui font-medium text-breach shadow-ringbreach disabled:opacity-40"
             >
               {t('figure.withdrawIt')}
-            </button>
+            </Button>
           </form>
         </details>
       )}
 
-      <div className="mt-6 rounded-card bg-raised px-5 py-4 text-[12.5px] leading-[1.65] text-muted shadow-ring">
+      <div className="mt-6 rounded-card bg-raised px-5 py-4 text-ui leading-relaxed text-muted shadow-ring">
         {means}
       </div>
 

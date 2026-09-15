@@ -46,12 +46,12 @@ function Question({
   return (
     <li className="border-t border-line py-4 first:border-t-0 first:pt-0">
       <div className="mb-1.5 flex items-baseline gap-2.5">
-        <span className="font-mono text-[11px] tabular-nums text-muted">{n}</span>
-        <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-muted">
+        <span className="font-mono text-note tabular-nums text-muted">{n}</span>
+        <span className="text-label font-bold uppercase tracking-caps text-muted">
           {heading}
         </span>
       </div>
-      <div className="max-w-[62ch] text-[13.5px] leading-[1.68] text-sand">{children}</div>
+      <div className="max-w-[62ch] text-body leading-loose text-sand">{children}</div>
     </li>
   );
 }
@@ -59,7 +59,7 @@ function Question({
 /** The board's own words, set the way the board's words are set everywhere. */
 function Said({ children }: { children: React.ReactNode }) {
   return (
-    <p className="font-display text-[15px] leading-[1.6] text-paper">{children}</p>
+    <p className="font-display text-lead leading-relaxed text-paper">{children}</p>
   );
 }
 
@@ -68,7 +68,7 @@ function Term({ term }: { term: TermCarried }) {
   return (
     <li>
       <Said>{term.meaning}</Said>
-      <p className="mt-0.5 break-all font-mono text-[11.5px] text-muted">
+      <p className="mt-0.5 break-all font-mono text-note text-muted">
         {term.key} = {term.value}
         {term.unit ? ` ${term.unit}` : ''}
       </p>
@@ -101,16 +101,16 @@ export default function WhatItMeans({ ruleId }: { ruleId: string }) {
   return (
     <section className="mt-8">
       <div className="mb-1 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-        <h2 className="font-display text-[19px] leading-snug tracking-[-0.012em] text-paper">
+        <h2 className="font-display text-sub leading-snug tracking-tight text-paper">
           {t('six.title')}
         </h2>
         {d.attached && d.carrier && (
-          <span className="text-[12px] text-muted">
+          <span className="text-note text-muted">
             {t('six.readBy')} {d.carrier}
           </span>
         )}
       </div>
-      <p className="mb-4 max-w-[62ch] text-[12.5px] leading-[1.6] text-muted">{t('six.lead')}</p>
+      <p className="mb-4 max-w-[62ch] text-ui leading-relaxed text-muted">{t('six.lead')}</p>
 
       <ol className="rounded-sheet bg-raised px-6 py-5 shadow-ring">
         <Question n={1} heading={t('six.q1')}>

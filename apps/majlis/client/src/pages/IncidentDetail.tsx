@@ -5,6 +5,7 @@ import { useI18n } from '../lib/i18n.js';
 import { DateText, ErrorText, Loading, Tag } from '../components/ui.js';
 import { ClockLine } from './Incidents.js';
 import { mayRecordInstitutionAct, mayVote, useIdentity } from '../lib/identity.js';
+import { Button } from '../components/Button';
 
 /**
  * One reported non-compliance, as the nine steps it actually is.
@@ -57,16 +58,16 @@ function Reason({
 
   const skin =
     tone === 'warn'
-      ? 'bg-raised text-breach shadow-[0_0_0_0.5px_rgba(154,56,48,0.25)]'
+      ? 'bg-raised text-breach shadow-ringbreach'
       : tone === 'gold'
-        ? 'bg-raised font-medium text-lapis shadow-[0_0_0_0.5px_rgba(22,68,112,0.25)]'
+        ? 'bg-raised font-medium text-lapis shadow-ringlapis'
         : 'bg-raised text-sand shadow-ring';
 
   if (!open) {
     return (
-      <button onClick={() => setOpen(true)} className={`rounded-xl px-4 py-2 text-[13px] ${skin}`}>
+      <Button onClick={() => setOpen(true)} className={`rounded-xl px-4 py-2 text-ui ${skin}`}>
         {label}
-      </button>
+      </Button>
     );
   }
 
@@ -77,10 +78,10 @@ function Reason({
         value={text}
         onChange={(e) => setText(e.target.value)}
         placeholder={placeholder}
-        className="mb-2 h-20 w-full rounded-xl shadow-ring bg-raised px-3 py-2 text-[14px]"
+        className="mb-2 h-20 w-full rounded-xl shadow-ring bg-raised px-3 py-2 text-body"
       />
       <div className="flex gap-2">
-        <button
+        <Button
           disabled={busy}
           onClick={async () => {
             setBusy(true);
@@ -92,13 +93,13 @@ function Reason({
               setBusy(false);
             }
           }}
-          className={`rounded-xl px-4 py-2 text-[13px] disabled:opacity-50 ${skin}`}
+          className={`rounded-xl px-4 py-2 text-ui disabled:opacity-50 ${skin}`}
         >
           {label}
-        </button>
-        <button onClick={() => setOpen(false)} className="rounded-xl shadow-ring px-3 py-1.5 text-[13px] text-muted">
+        </Button>
+        <Button onClick={() => setOpen(false)} className="rounded-xl shadow-ring px-3 py-1.5 text-ui text-muted">
           {t('common.cancel')}
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -307,12 +308,12 @@ export default function IncidentDetail() {
       action:
         i.stage === 'plan_filed' && board ? (
           <div className="flex flex-wrap gap-2">
-            <button
+            <Button
               onClick={() => act(() => oversight.endorsePlan(id))}
-              className="rounded-xl bg-raised shadow-ring px-3 py-1.5 text-[13px] text-lapis font-medium"
+              className="rounded-xl bg-raised shadow-ring px-3 py-1.5 text-ui text-lapis font-medium"
             >
               {t('snc.endorse')}
-            </button>
+            </Button>
             <Reason
               label={t('snc.returnPlan')}
               placeholder={t('snc.returnHint')}
@@ -330,12 +331,12 @@ export default function IncidentDetail() {
       detail: i.directorsApprovedAt ? <DateText iso={i.directorsApprovedAt} /> : <span className="text-muted">—</span>,
       action:
         i.stage === 'endorsed' && clerk ? (
-          <button
+          <Button
             onClick={() => act(() => oversight.directors(id))}
-            className="rounded-xl shadow-ring px-3 py-1.5 text-[13px] text-muted"
+            className="rounded-xl shadow-ring px-3 py-1.5 text-ui text-muted"
           >
             {t('snc.recordDirectors')}
-          </button>
+          </Button>
         ) : undefined,
     },
     {
@@ -351,12 +352,12 @@ export default function IncidentDetail() {
       ),
       action:
         i.stage === 'approved' && clerk ? (
-          <button
+          <Button
             onClick={() => act(() => oversight.submission(id))}
-            className="rounded-xl shadow-ring px-3 py-1.5 text-[13px] text-muted"
+            className="rounded-xl shadow-ring px-3 py-1.5 text-ui text-muted"
           >
             {t('snc.recordSubmission')}
-          </button>
+          </Button>
         ) : undefined,
     },
     {
@@ -398,7 +399,7 @@ export default function IncidentDetail() {
             being waited for and when it was promised.
           */}
           {plan && (
-            <p className="mt-1.5 max-w-[58ch] text-[12.5px] leading-[1.6] text-muted">
+            <p className="mt-1.5 max-w-[58ch] text-ui leading-relaxed text-muted">
               {t('snc.amountComesFrom')}
               {plan.completeBy && (
                 <>
@@ -434,20 +435,20 @@ export default function IncidentDetail() {
       detail: i.closedAt ? <DateText iso={i.closedAt} /> : <span className="text-muted">—</span>,
       action:
         (i.stage === 'submitted' || i.stage === 'not_actual') && board ? (
-          <button
+          <Button
             onClick={() => act(() => oversight.closeIncident(id))}
-            className="rounded-xl shadow-ring px-3 py-1.5 text-[13px] text-muted"
+            className="rounded-xl shadow-ring px-3 py-1.5 text-ui text-muted"
           >
             {t('snc.close')}
-          </button>
+          </Button>
         ) : undefined,
     },
   ];
 
   return (
     <div>
-      <div className="mb-1 font-mono text-[12px] text-muted">{i.reference}</div>
-      <h1 className="mb-2 font-display font-normal leading-[1.12] tracking-[-0.024em] text-[30px] sm:text-[34px]">{i.title}</h1>
+      <div className="mb-1 font-mono text-note text-muted">{i.reference}</div>
+      <h1 className="mb-2 font-display font-normal leading-tight tracking-display text-head sm:text-display">{i.title}</h1>
 
       <div className="mb-4 flex flex-wrap items-center gap-2">
         <Tag tone={i.clock?.overdue ? 'warn' : i.stage === 'closed' ? 'ok' : undefined}>
@@ -459,9 +460,9 @@ export default function IncidentDetail() {
       {i.clock && (
         <p
           className={
-            'mb-5 rounded-card px-5 py-4 text-[13px] leading-[1.6] ' +
+            'mb-5 rounded-card px-5 py-4 text-ui leading-relaxed ' +
             (i.clock.overdue
-              ? 'bg-[#FCF0EE] text-breach shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)]'
+              ? 'bg-breachtint text-breach shadow-ringbreach'
               : 'bg-raised/60 text-muted shadow-ring')
           }
         >
@@ -469,15 +470,15 @@ export default function IncidentDetail() {
         </p>
       )}
 
-      <p className="mb-6 text-[15px] leading-relaxed">{i.report}</p>
+      <p className="mb-6 text-lead leading-relaxed">{i.report}</p>
 
       {refusal && (
-        <div className="mb-5 rounded-card shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)] bg-[#FCF0EE] px-4 py-3 text-[13px] leading-relaxed text-breach">
+        <div className="mb-5 rounded-card shadow-ringbreach bg-breachtint px-4 py-3 text-ui leading-relaxed text-breach">
           {refusal}
         </div>
       )}
 
-      <h2 className="mb-3 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+      <h2 className="mb-3 text-label font-bold uppercase tracking-caps text-muted">
         {t('snc.sequence')}
       </h2>
 
@@ -488,21 +489,21 @@ export default function IncidentDetail() {
             className={
               'grid grid-cols-[28px_1fr] gap-3 rounded-card px-5 py-4 ' +
               (s.current
-                ? 'bg-[#EAF1F7] shadow-[0_0_0_1.5px_#164470]'
+                ? 'bg-lapistint shadow-pick'
                 : s.done
                   ? 'bg-raised shadow-card'
                   : 'bg-raised/60 opacity-70 shadow-ring')
             }
           >
-            <div className="pt-0.5 font-mono text-[12px] text-muted tabular-nums">
+            <div className="pt-0.5 font-mono text-note text-muted tabular-nums">
               {s.done ? '✓' : String(s.n).padStart(2, '0')}
             </div>
             <div>
               <div className="mb-1 flex flex-wrap items-baseline gap-2">
-                <span className="text-[14px] font-medium">{s.label}</span>
-                <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted">{mine(s.owner)}</span>
+                <span className="text-body font-medium">{s.label}</span>
+                <span className="text-label font-bold uppercase tracking-caps text-muted">{mine(s.owner)}</span>
               </div>
-              <div className="text-[13px] leading-relaxed">{s.detail}</div>
+              <div className="text-ui leading-relaxed">{s.detail}</div>
               {s.action && <div className="mt-2.5">{s.action}</div>}
             </div>
           </li>
@@ -523,9 +524,9 @@ function PrescribeForm({
 
   if (!open) {
     return (
-      <button onClick={() => setOpen(true)} className="rounded-xl bg-raised shadow-ring px-3 py-1.5 text-[13px] text-lapis font-medium">
+      <Button onClick={() => setOpen(true)} className="rounded-xl bg-raised shadow-ring px-3 py-1.5 text-ui text-lapis font-medium">
         {t('snc.prescribe')}
-      </button>
+      </Button>
     );
   }
 
@@ -538,24 +539,24 @@ function PrescribeForm({
       */}
       <div className="flex gap-2">
         <label className="block">
-          <span className="mb-1 block text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+          <span className="mb-1 block text-label font-bold uppercase tracking-caps text-muted">
             {t('common.amount')}
           </span>
           <input
             value={p.amount}
             onChange={(e) => setP({ ...p, amount: e.target.value })}
             placeholder="12480.55"
-            className="w-32 rounded-xl shadow-ring bg-raised px-3 py-2 text-[14px] tabular-nums"
+            className="w-32 rounded-xl shadow-ring bg-raised px-3 py-2 text-body tabular-nums"
           />
         </label>
         <label className="block">
-          <span className="mb-1 block text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+          <span className="mb-1 block text-label font-bold uppercase tracking-caps text-muted">
             {t('common.currency')}
           </span>
           <input
             value={p.currency}
             onChange={(e) => setP({ ...p, currency: e.target.value })}
-            className="w-20 rounded-xl shadow-ring bg-raised px-3 py-2 text-[14px]"
+            className="w-20 rounded-xl shadow-ring bg-raised px-3 py-2 text-body"
           />
         </label>
       </div>
@@ -564,22 +565,22 @@ function PrescribeForm({
         onChange={(e) => setP({ ...p, destination: e.target.value })}
         placeholder={t('snc.destinationHint')}
             aria-label={t('snc.destinationHint')}
-        className="w-full rounded-xl shadow-ring bg-raised px-3 py-2 text-[14px]"
+        className="w-full rounded-xl shadow-ring bg-raised px-3 py-2 text-body"
       />
-      <p className="text-[11px] leading-relaxed text-muted">{t('snc.destinationNote')}</p>
+      <p className="text-note leading-relaxed text-muted">{t('snc.destinationNote')}</p>
       <div className="flex gap-2">
-        <button
+        <Button
           onClick={async () => {
             await onSubmit(p);
             setOpen(false);
           }}
-          className="rounded-xl bg-raised shadow-ring px-3 py-1.5 text-[13px] text-lapis font-medium"
+          className="rounded-xl bg-raised shadow-ring px-3 py-1.5 text-ui text-lapis font-medium"
         >
           {t('snc.prescribe')}
-        </button>
-        <button onClick={() => setOpen(false)} className="rounded-xl shadow-ring px-3 py-1.5 text-[13px] text-muted">
+        </Button>
+        <Button onClick={() => setOpen(false)} className="rounded-xl shadow-ring px-3 py-1.5 text-ui text-muted">
           {t('common.cancel')}
-        </button>
+        </Button>
       </div>
     </div>
   );

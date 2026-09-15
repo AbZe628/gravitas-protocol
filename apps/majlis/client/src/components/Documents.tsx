@@ -39,12 +39,12 @@ export function DocumentLink({
       }
     >
       <div className="flex items-baseline justify-between gap-3">
-        <span className={'text-[14px] font-medium ' + (emphasis ? 'text-lapis' : '')}>{label}</span>
-        <span className="shrink-0 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+        <span className={'text-body font-medium ' + (emphasis ? 'text-lapis' : '')}>{label}</span>
+        <span className="shrink-0 text-label font-bold uppercase tracking-caps text-muted">
           {t('doc.opens')}
         </span>
       </div>
-      <p className="mt-1 text-[12.5px] leading-relaxed text-muted">{note}</p>
+      <p className="mt-1 text-ui leading-relaxed text-muted">{note}</p>
     </a>
   );
 }
@@ -72,7 +72,7 @@ export function YearPicker({
       aria-label={t('doc.year')}
       value={year}
       onChange={(e) => onChange(Number(e.target.value))}
-      className="rounded-xl shadow-ring bg-raised px-2 py-1 text-[13px] tabular-nums"
+      className="rounded-xl shadow-ring bg-raised px-2 py-1 text-ui tabular-nums"
     >
       {years.map((y) => (
         <option key={y} value={y}>

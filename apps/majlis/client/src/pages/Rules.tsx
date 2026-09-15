@@ -89,7 +89,7 @@ export default function Rules({ embedded = false }: { embedded?: boolean }) {
                 <>
                   <span className="line-clamp-2">{r.statement}</span>
                   {r.inForceFrom && (
-                    <span className="mt-0.5 block text-[11.5px]">
+                    <span className="mt-0.5 block text-note">
                       {t('rule.inForceFrom')} <DateText iso={r.inForceFrom} />
                     </span>
                   )}
@@ -103,7 +103,7 @@ export default function Rules({ embedded = false }: { embedded?: boolean }) {
     );
 
   const live = (
-    <span className="text-[13px] text-muted">
+    <span className="text-ui text-muted">
       <span className="font-mono tabular-nums text-paper">{rules.length}</span>{' '}
       <span>{t('rule.inForce')}</span>
       {dueCount > 0 && (

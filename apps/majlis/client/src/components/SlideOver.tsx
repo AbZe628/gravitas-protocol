@@ -1,5 +1,6 @@
 import { useEffect, useRef, type ReactNode } from 'react';
 import { useI18n } from '../lib/i18n.js';
+import { Button } from './Button';
 
 /**
  * A panel that slides in from the side and is worked in.
@@ -74,11 +75,11 @@ export default function SlideOver({
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
-      <button
+      <Button
         type="button"
         aria-label={t('common.cancel')}
         onClick={onClose}
-        className="absolute inset-0 cursor-default bg-[#191713]/35 backdrop-blur-[2px]"
+        className="absolute inset-0 cursor-default bg-paper/35 backdrop-blur-[2px]"
       />
 
       <div
@@ -91,19 +92,19 @@ export default function SlideOver({
       >
         <div className="flex items-start gap-4 border-b border-line px-5 py-3.5 sm:px-6">
           <div className="min-w-0 flex-1">
-            <h2 className="font-display text-[17px] leading-tight tracking-[-0.014em] text-paper">
+            <h2 className="font-display text-sub leading-tight tracking-title text-paper">
               {title}
             </h2>
-            {says && <p className="mt-1 text-[12px] leading-[1.5] text-muted">{says}</p>}
+            {says && <p className="mt-1 text-note leading-snug text-muted">{says}</p>}
           </div>
-          <button
+          <Button
             type="button"
             onClick={onClose}
             aria-label={t('common.cancel')}
-            className="shrink-0 rounded-lg px-2 py-1 text-[16px] leading-none text-muted hover:bg-ink hover:text-paper"
+            className="shrink-0 rounded-lg px-2 py-1 text-lead leading-none text-muted hover:bg-ink hover:text-paper"
           >
             ×
-          </button>
+          </Button>
         </div>
 
         <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5 sm:px-6">{children}</div>

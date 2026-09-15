@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { api, oversight, type MatterSummary } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
+import { Button } from './Button';
 
 /**
  * Three ways to get a contract into the reader, only one of which existed.
@@ -126,19 +127,19 @@ export default function WhereTheDraftComesFrom({
 
   return (
     <div className="mb-4 rounded-card bg-raised px-4 py-3.5 shadow-ring">
-      <div className="mb-2.5 text-[10px] font-bold uppercase tracking-[0.14em] text-muted">
+      <div className="mb-2.5 text-label font-bold uppercase tracking-caps text-muted">
         {t('draftfrom.title')}
       </div>
 
       <div className="flex flex-wrap gap-2">
-        <button
+        <Button
           type="button"
           disabled={busy}
           onClick={() => chooser.current?.click()}
-          className="rounded-xl bg-ink/60 px-3.5 py-2 text-[12.5px] text-sand shadow-ring transition-colors hover:text-paper disabled:opacity-50"
+          className="rounded-xl bg-ink/60 px-3.5 py-2 text-ui text-sand shadow-ring transition-colors hover:text-paper disabled:opacity-50"
         >
           {t('draftfrom.file')}
-        </button>
+        </Button>
         <input
           ref={chooser}
           type="file"
@@ -152,20 +153,20 @@ export default function WhereTheDraftComesFrom({
         />
 
         {drafts.map((d) => (
-          <button
+          <Button
             key={d.id}
             type="button"
             disabled={busy}
             onClick={() => void takeDraft(d.id, d.title)}
-            className="max-w-[30ch] truncate rounded-xl bg-ink/60 px-3.5 py-2 text-[12.5px] text-sand shadow-ring transition-colors hover:text-paper disabled:opacity-50"
+            className="max-w-[30ch] truncate rounded-xl bg-ink/60 px-3.5 py-2 text-ui text-sand shadow-ring transition-colors hover:text-paper disabled:opacity-50"
           >
             {t('draftfrom.ours')} {d.title}
-          </button>
+          </Button>
         ))}
       </div>
 
-      <p className="mt-2.5 text-[11.5px] leading-[1.6] text-muted">{t('draftfrom.note')}</p>
-      {note && <p className="mt-2 text-[12.5px] leading-[1.6] text-breach">{note}</p>}
+      <p className="mt-2.5 text-note leading-relaxed text-muted">{t('draftfrom.note')}</p>
+      {note && <p className="mt-2 text-ui leading-relaxed text-breach">{note}</p>}
     </div>
   );
 }

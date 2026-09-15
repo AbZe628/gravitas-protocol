@@ -108,18 +108,18 @@ export default function FourDoors({ counts }: { counts: DoorCounts }) {
               <div className="min-w-0 flex-1 sm:flex sm:items-baseline sm:gap-5">
                 <div className="sm:w-[186px] sm:shrink-0">
                   <div className="flex items-baseline gap-2.5">
-                    <span className="font-mono text-[11px] text-muted">{door.ordinal}</span>
-                    <span className="font-display text-[19px] leading-none tracking-[-0.018em] text-paper sm:text-[21px]">
+                    <span className="font-mono text-note text-muted">{door.ordinal}</span>
+                    <span className="font-display text-sub leading-none tracking-title text-paper sm:text-title">
                       {t(door.label)}
                     </span>
                   </div>
-                  <div className="mt-1.5 text-[12.5px] leading-[1.5] text-muted">
+                  <div className="mt-1.5 text-ui leading-snug text-muted">
                     {t(door.meaning)}
                   </div>
                 </div>
 
                 {/* What is true right now, in one line. */}
-                <div className="mt-2 min-w-0 text-[13px] leading-[1.5] text-sand sm:mt-0 sm:flex-1">
+                <div className="mt-2 min-w-0 text-ui leading-snug text-sand sm:mt-0 sm:flex-1">
                   {moved ? (
                     <span className="text-gold">
                       {counts.moved} · {t('spine.moved')}
@@ -140,13 +140,13 @@ export default function FourDoors({ counts }: { counts: DoorCounts }) {
                 <div className="shrink-0 text-end">
                   <div
                     className={
-                      'font-display text-[28px] leading-none tabular-nums tracking-[-0.03em] sm:text-[32px] ' +
+                      'font-display text-head leading-none tabular-nums tracking-display sm:text-head ' +
                       FIGURE[door.tone]
                     }
                   >
                     {n}
                   </div>
-                  <div className="mt-1.5 text-[11px] leading-tight text-muted">
+                  <div className="mt-1.5 text-note leading-tight text-muted">
                     {t(COUNT_KEY[door.phase])}
                   </div>
                 </div>
@@ -186,8 +186,8 @@ export default function FourDoors({ counts }: { counts: DoorCounts }) {
                         to={d.to}
                         className="block rounded-card bg-ink px-4 py-2.5 shadow-ring transition-shadow hover:shadow-card"
                       >
-                        <span className="text-[13px] font-semibold text-paper">{t(d.label)}</span>
-                        <span className="mt-0.5 block text-[11.5px] leading-[1.5] text-muted">
+                        <span className="text-ui font-semibold text-paper">{t(d.label)}</span>
+                        <span className="mt-0.5 block text-note leading-snug text-muted">
                           {t(d.note)}
                         </span>
                       </Link>

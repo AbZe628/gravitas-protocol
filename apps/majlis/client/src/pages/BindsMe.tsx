@@ -45,7 +45,7 @@ function Terms({ rule }: { rule: Rule }) {
 
   return (
     <div className="mt-3.5">
-      <div className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+      <div className="mb-1.5 text-label font-bold uppercase tracking-caps text-muted">
         {t('binds.terms')}
       </div>
       <ul className="space-y-2">
@@ -57,13 +57,13 @@ function Terms({ rule }: { rule: Rule }) {
               tracing a term back to the record needs the key.
             */}
             <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-              <span className="max-w-[54ch] text-[12.5px] leading-[1.55]">{p.meaning}</span>
-              <span className="shrink-0 font-mono text-[13px] tabular-nums">
+              <span className="max-w-[54ch] text-ui leading-relaxed">{p.meaning}</span>
+              <span className="shrink-0 font-mono text-ui tabular-nums">
                 {p.value}
-                {p.unit && <span className="ms-1.5 text-[11px] text-muted">{p.unit}</span>}
+                {p.unit && <span className="ms-1.5 text-note text-muted">{p.unit}</span>}
               </span>
             </div>
-            <div className="mt-1 font-mono text-[10.5px] text-muted opacity-70">{p.key}</div>
+            <div className="mt-1 font-mono text-label text-muted opacity-70">{p.key}</div>
           </li>
         ))}
       </ul>
@@ -83,17 +83,17 @@ function One({ rule, pending }: { rule: Rule; pending: boolean }) {
           <State tone="settled">{t('binds.inForce')}</State>
         )}
         {rule.inForceFrom && (
-          <span className="text-[11.5px] text-muted">
+          <span className="text-note text-muted">
             {pending ? t('binds.from') : t('binds.since')}{' '}
             <span className="font-mono">{rule.inForceFrom.slice(0, 10)}</span>
           </span>
         )}
       </div>
 
-      <div className="font-display text-[17px] leading-snug">{rule.title}</div>
+      <div className="font-display text-sub leading-snug">{rule.title}</div>
 
       {/* The condition itself, in the board's words and at reading size. */}
-      <p className="mt-2.5 max-w-[62ch] font-display text-[15.5px] leading-[1.55]">
+      <p className="mt-2.5 max-w-[62ch] font-display text-lead leading-relaxed">
         {rule.statement}
       </p>
 
@@ -103,14 +103,14 @@ function One({ rule, pending }: { rule: Rule; pending: boolean }) {
         Two onward steps, and they are the two a desk actually takes: read a
         contract against this, or ask the board about it.
       */}
-      <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-[12.5px]">
+      <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-ui">
         <Link to="/check" className="font-semibold text-lapis underline underline-offset-2">
           {t('binds.checkAgainst')}
         </Link>
         <Link to="/ask" className="text-lapis underline underline-offset-2">
           {t('binds.askAboutIt')}
         </Link>
-        <span className="font-mono text-[10.5px] text-muted opacity-70">{rule.id}</span>
+        <span className="font-mono text-label text-muted opacity-70">{rule.id}</span>
       </div>
     </Card>
   );

@@ -43,7 +43,7 @@ export default function Briefings() {
       says={t('brief.lead')}
       live={
         items.length > 0 ? (
-          <span className="text-[13px] text-muted">
+          <span className="text-ui text-muted">
             <span className="font-mono tabular-nums text-paper">{items.length}</span>{' '}
             <span>{t('nav.briefings')}</span>
           </span>

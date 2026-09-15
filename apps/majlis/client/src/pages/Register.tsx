@@ -73,7 +73,7 @@ function holdingRow(s: AssetStanding, t: (k: string) => string) {
       note={
         <>
           {s.asset.identifiers.map((id, i) => (
-            <span key={i} className="me-3 break-all font-mono text-[11.5px]">
+            <span key={i} className="me-3 break-all font-mono text-note">
               {id.value}
               {id.network ? <span className="opacity-60"> · {id.network}</span> : null}
             </span>
@@ -154,7 +154,7 @@ export default function Register() {
               {data.neverExamined > 0 && (
                 <Link
                   to="/examinations"
-                  className="text-[12.5px] text-gold underline decoration-gold/30 underline-offset-4 transition-colors hover:text-paper"
+                  className="text-ui text-gold underline decoration-gold/30 underline-offset-4 transition-colors hover:text-paper"
                 >
                   {data.neverExamined} {t('spine.checked.count')}
                 </Link>

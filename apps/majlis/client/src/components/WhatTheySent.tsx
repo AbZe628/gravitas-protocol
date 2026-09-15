@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { Checklist as ChecklistData, Matter } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
+import { Button } from './Button';
 
 /**
  * What arrived, what is being asked, and what you will need to answer it.
@@ -69,17 +70,17 @@ export default function WhatTheySent({
 
   return (
     <section className="mb-7 rounded-sheet bg-raised p-6 shadow-card sm:p-7">
-      <h2 className="mb-4 font-display text-[21px] font-normal leading-[1.16] tracking-[-0.02em]">
+      <h2 className="mb-4 font-display text-title font-normal leading-tight tracking-title">
         {t('sent.title')}
       </h2>
 
       <dl className="space-y-4">
         {/* What arrived. */}
         <div>
-          <dt className="mb-1 text-[10px] font-bold uppercase tracking-[0.14em] text-muted">
+          <dt className="mb-1 text-label font-bold uppercase tracking-caps text-muted">
             {t('sent.whatArrived')}
           </dt>
-          <dd className="text-[13.5px] leading-[1.55] text-paper">
+          <dd className="text-body leading-relaxed text-paper">
             {documents.length === 0 ? (
               <span className="text-muted">{t('sent.nothingAttached')}</span>
             ) : (
@@ -94,10 +95,10 @@ export default function WhatTheySent({
 
         {/* What they are asking, in their words. */}
         <div>
-          <dt className="mb-1 text-[10px] font-bold uppercase tracking-[0.14em] text-muted">
+          <dt className="mb-1 text-label font-bold uppercase tracking-caps text-muted">
             {t('sent.whatTheyAsk')}
           </dt>
-          <dd className="max-w-[62ch] font-display text-[15px] leading-[1.55] text-paper">
+          <dd className="max-w-[62ch] font-display text-lead leading-relaxed text-paper">
             {matter.proposal}
           </dd>
         </div>
@@ -105,10 +106,10 @@ export default function WhatTheySent({
         {/* What it is being held against. */}
         {shape && (
           <div>
-            <dt className="mb-1 text-[10px] font-bold uppercase tracking-[0.14em] text-muted">
+            <dt className="mb-1 text-label font-bold uppercase tracking-caps text-muted">
               {t('sent.judgedAs')}
             </dt>
-            <dd className="text-[13.5px] leading-[1.55] text-paper">{shape.name}</dd>
+            <dd className="text-body leading-relaxed text-paper">{shape.name}</dd>
           </div>
         )}
 
@@ -120,10 +121,10 @@ export default function WhatTheySent({
           three steps into doing it.
         */}
         <div>
-          <dt className="mb-1 text-[10px] font-bold uppercase tracking-[0.14em] text-muted">
+          <dt className="mb-1 text-label font-bold uppercase tracking-caps text-muted">
             {t('sent.youWillNeed')}
           </dt>
-          <dd className="text-[13.5px] leading-[1.55] text-paper">
+          <dd className="text-body leading-relaxed text-paper">
             <div>
               <span className="font-mono tabular-nums">{conditions}</span> {t('sent.conditions')}
             </div>
@@ -132,14 +133,14 @@ export default function WhatTheySent({
                 {tools.map((kind) => (
                   <span
                     key={kind}
-                    className="rounded-full bg-ink px-3 py-1 text-[12px] text-sand shadow-ring"
+                    className="rounded-full bg-ink px-3 py-1 text-note text-sand shadow-ring"
                   >
                     {t(TOOL_KEYS[kind] ?? kind)}
                   </span>
                 ))}
               </div>
             )}
-            <p className="mt-2 max-w-[58ch] text-[12px] leading-[1.6] text-muted">
+            <p className="mt-2 max-w-[58ch] text-note leading-relaxed text-muted">
               {t(tools.length > 0 ? 'sent.toolsNote' : 'sent.noToolsNote')}
             </p>
           </dd>
@@ -150,20 +151,20 @@ export default function WhatTheySent({
         Whether the figures arrive filled in, said before the member meets an
         empty calculator and wonders why.
       */}
-      <p className="mt-5 max-w-[60ch] border-t border-line pt-4 text-[12.5px] leading-[1.6] text-muted">
+      <p className="mt-5 max-w-[60ch] border-t border-line pt-4 text-ui leading-relaxed text-muted">
         {t(assistantOn ? 'sent.willFill' : 'sent.willNotFill')}
       </p>
 
-      <button
+      <Button
         type="button"
         onClick={() => {
           setRead(true);
           onStart();
         }}
-        className="mt-4 rounded-card bg-lapis px-6 py-3 text-[14px] font-bold text-white shadow-act"
+        className="mt-4 rounded-card bg-lapis px-6 py-3 text-body font-bold text-white shadow-act"
       >
         {t('sent.understood')}
-      </button>
+      </Button>
     </section>
   );
 }

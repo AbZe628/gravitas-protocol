@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useI18n } from '../lib/i18n.js';
+import { Button } from './Button';
 
 /**
  * The guide, present on every screen.
@@ -96,39 +97,39 @@ export default function Guide() {
 
   if (!open) {
     return (
-      <button
+      <Button
         type="button"
         onClick={() => setOpen(true)}
-        className="fixed bottom-5 end-5 z-40 hidden items-center gap-2 rounded-full bg-raised lg:flex px-4 py-2.5 text-[13px] font-medium text-sand shadow-[0_0_0_0.5px_rgba(25,23,19,0.08),0_2px_6px_rgba(25,23,19,0.09),0_14px_30px_-10px_rgba(25,23,19,0.3)] transition-all hover:-translate-y-px hover:text-paper"
+        className="fixed bottom-5 end-5 z-40 hidden items-center gap-2 rounded-full bg-raised lg:flex px-4 py-2.5 text-ui font-medium text-sand shadow-[0_0_0_0.5px_rgba(25,23,19,0.08),0_2px_6px_rgba(25,23,19,0.09),0_14px_30px_-10px_rgba(25,23,19,0.3)] transition-all hover:-translate-y-px hover:text-paper"
       >
         <svg aria-hidden width="14" height="14" viewBox="0 0 16 16" fill="none">
           <path d="M8 1 L9.6 6.4 L15 8 L9.6 9.6 L8 15 L6.4 9.6 L1 8 L6.4 6.4 Z" fill="#B08430" />
         </svg>
         {t('guide.open')}
-      </button>
+      </Button>
     );
   }
 
   return (
     <div className="fixed bottom-[calc(4.75rem+env(safe-area-inset-bottom))] end-5 z-40 w-[min(26rem,calc(100vw-2.5rem))] lg:bottom-5">
-      <div className="rounded-sheet bg-raised shadow-[0_0_0_0.5px_rgba(25,23,19,0.08),0_2px_6px_rgba(25,23,19,0.09),0_24px_48px_-16px_rgba(25,23,19,0.35)]">
+      <div className="rounded-sheet bg-raised shadow-sheeted">
         {/* `items-start` and a `shrink-0` close: on a phone the scope line
             wraps to two, and centred with a flexible close the × sat on top
             of the second line. */}
         <div className="flex items-start justify-between gap-3 border-b border-line px-4 py-3">
           <div className="min-w-0">
-            <div className="text-[13px] font-medium text-paper">{t('guide.title')}</div>
+            <div className="text-ui font-medium text-paper">{t('guide.title')}</div>
             {/* What it is for, and what it is not, in one line. */}
-            <div className="mt-0.5 text-[11.5px] leading-snug text-muted">{t('guide.scope')}</div>
+            <div className="mt-0.5 text-note leading-snug text-muted">{t('guide.scope')}</div>
           </div>
-          <button
+          <Button
             type="button"
             onClick={() => setOpen(false)}
             aria-label={t('guide.close')}
-            className="-me-1 shrink-0 rounded-lg px-1.5 text-[18px] leading-none text-muted transition-colors hover:text-paper"
+            className="-me-1 shrink-0 rounded-lg px-1.5 text-sub leading-none text-muted transition-colors hover:text-paper"
           >
             ×
-          </button>
+          </Button>
         </div>
 
         <div className="max-h-[22rem] overflow-y-auto px-4 py-3.5">
@@ -136,7 +137,7 @@ export default function Guide() {
             <>
               <p
                 className={
-                  'text-[13.5px] leading-[1.6] ' + (answer.refused ? 'text-attention' : 'text-sand')
+                  'text-body leading-relaxed ' + (answer.refused ? 'text-attention' : 'text-sand')
                 }
               >
                 {answer.answer}
@@ -146,7 +147,7 @@ export default function Guide() {
                 <Link
                   to={answer.goTo.path}
                   onClick={() => setOpen(false)}
-                  className="mt-3 inline-block text-[13px] text-gold underline decoration-gold/40 underline-offset-4"
+                  className="mt-3 inline-block text-ui text-gold underline decoration-gold/40 underline-offset-4"
                 >
                   {answer.goTo.label} →
                 </Link>
@@ -156,37 +157,37 @@ export default function Guide() {
               {answer.seeAlso.length > 0 && (
                 <div className="mt-4 flex flex-wrap gap-1.5">
                   {answer.seeAlso.map((next) => (
-                    <button
+                    <Button
                       key={next}
                       type="button"
                       onClick={() => {
                         setQuestion(t(`guide.ask.${next}`));
                         void ask(t(`guide.ask.${next}`));
                       }}
-                      className="rounded-full shadow-ring px-2.5 py-1 text-[12px] text-muted transition-colors hover:text-paper"
+                      className="rounded-full shadow-ring px-2.5 py-1 text-note text-muted transition-colors hover:text-paper"
                     >
                       {t(`guide.ask.${next}`)}
-                    </button>
+                    </Button>
                   ))}
                 </div>
               )}
             </>
           ) : (
             <>
-              <p className="text-[13.5px] leading-[1.6] text-sand">{t('guide.intro')}</p>
+              <p className="text-body leading-relaxed text-sand">{t('guide.intro')}</p>
               <div className="mt-3.5 flex flex-wrap gap-1.5">
                 {STARTERS.map((s) => (
-                  <button
+                  <Button
                     key={s}
                     type="button"
                     onClick={() => {
                       setQuestion(t(`guide.ask.${s}`));
                       void ask(t(`guide.ask.${s}`));
                     }}
-                    className="rounded-full shadow-ring px-2.5 py-1 text-[12px] text-muted transition-colors hover:text-paper"
+                    className="rounded-full shadow-ring px-2.5 py-1 text-note text-muted transition-colors hover:text-paper"
                   >
                     {t(`guide.ask.${s}`)}
-                  </button>
+                  </Button>
                 ))}
               </div>
             </>
@@ -206,15 +207,15 @@ export default function Guide() {
             onChange={(e) => setQuestion(e.target.value)}
             placeholder={t('guide.placeholder')}
             aria-label={t('guide.placeholder')}
-            className="w-full rounded-card shadow-ring bg-raised px-3 py-2 text-[13.5px] outline-none transition-colors focus:shadow-[0_0_0_1.5px_rgba(22,68,112,0.35)]"
+            className="w-full rounded-card shadow-ring bg-raised px-3 py-2 text-body outline-none transition-colors focus:shadow-pick"
           />
-          <button
+          <Button
             type="submit"
             disabled={busy || question.trim().length < 2}
-            className="rounded-xl bg-lapis px-3.5 text-[13px] font-semibold text-white shadow-act transition-all hover:bg-lapissoft disabled:opacity-30"
+            className="rounded-xl bg-lapis px-3.5 text-ui font-semibold text-white shadow-act transition-all hover:bg-lapissoft disabled:opacity-30"
           >
             {t('guide.ask')}
-          </button>
+          </Button>
         </form>
       </div>
     </div>

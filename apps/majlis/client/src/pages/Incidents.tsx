@@ -7,6 +7,7 @@ import { ErrorText, Loading } from '../components/ui.js';
 import { mayDeliberate, useIdentity } from '../lib/identity.js';
 import { useStillThere } from '../lib/stillThere.js';
 import { Field, HEADING } from '../components/field.js';
+import { Button } from '../components/Button';
 
 /**
  * Reported non-compliance.
@@ -50,7 +51,7 @@ export function ClockLine({ incident }: { incident: Incident }) {
 
   const days = Math.round(Math.abs(clock.daysRemaining));
   return (
-    <span className={clock.overdue ? 'text-[12px] font-medium text-breach' : 'text-[12px] text-muted'}>
+    <span className={clock.overdue ? 'text-note font-medium text-breach' : 'text-note text-muted'}>
       {clock.overdue
         ? `${t('snc.overdueBy')} ${days} ${t('attention.days')}`
         : `${days} ${t('snc.daysLeftOf30')}`}
@@ -109,7 +110,7 @@ export default function Incidents() {
    * belongs where the count of every other list goes.
    */
   const live = (
-    <span className="text-[13px] text-muted">
+    <span className="text-ui text-muted">
       <span className="font-mono tabular-nums text-paper">{data.awaitingDetermination}</span>{' '}
       {t('snc.awaiting')}
       {data.overdue > 0 && (
@@ -145,7 +146,7 @@ export default function Incidents() {
                     {...attrs}
                     value={form.reference}
                     onChange={(e) => setForm({ ...form, reference: e.target.value })}
-                    className="w-full rounded-xl shadow-ring bg-raised px-3 py-2 text-[14px]"
+                    className="w-full rounded-xl shadow-ring bg-raised px-3 py-2 text-body"
                     placeholder="SNC-2026-001"
                     required
                   />
@@ -158,7 +159,7 @@ export default function Incidents() {
                     {...attrs}
                     value={form.title}
                     onChange={(e) => setForm({ ...form, title: e.target.value })}
-                    className="w-full rounded-xl shadow-ring bg-raised px-3 py-2 text-[14px]"
+                    className="w-full rounded-xl shadow-ring bg-raised px-3 py-2 text-body"
                     required
                     minLength={3}
                   />
@@ -173,7 +174,7 @@ export default function Incidents() {
               <Field
                 label={t('snc.account')}
                 help={t('snc.accountHint')}
-                helpClass="order-last mb-3 text-[11px] leading-relaxed text-muted"
+                helpClass="order-last mb-3 text-note leading-relaxed text-muted"
                 className="mb-0 flex flex-col"
                 headingClass={HEADING}
               >
@@ -182,34 +183,34 @@ export default function Incidents() {
                     {...attrs}
                     value={form.report}
                     onChange={(e) => setForm({ ...form, report: e.target.value })}
-                    className="mb-1 h-24 w-full rounded-xl shadow-ring bg-raised px-3 py-2 text-[14px]"
+                    className="mb-1 h-24 w-full rounded-xl shadow-ring bg-raised px-3 py-2 text-body"
                     required
                   />
                 )}
               </Field>
 
-              {error && <p className="mb-3 text-[13px] text-breach">{error}</p>}
+              {error && <p className="mb-3 text-ui text-breach">{error}</p>}
 
               <div className="flex gap-2">
-                <button type="submit" className="rounded-xl bg-raised shadow-ring px-3 py-1.5 text-[13px] text-lapis font-medium">
+                <Button type="submit" className="rounded-xl bg-raised shadow-ring px-3 py-1.5 text-ui text-lapis font-medium">
                   {t('snc.submitReport')}
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
                   onClick={() => setOpen(false)}
-                  className="rounded-xl shadow-ring px-3 py-1.5 text-[13px] text-muted"
+                  className="rounded-xl shadow-ring px-3 py-1.5 text-ui text-muted"
                 >
                   {t('common.cancel')}
-                </button>
+                </Button>
               </div>
             </form>
           ) : (
-            <button
+            <Button
               onClick={() => setOpen(true)}
-              className="rounded-xl bg-lapis px-5 py-2.5 text-[13px] font-semibold text-white shadow-act transition-all hover:bg-lapissoft"
+              className="rounded-xl bg-lapis px-5 py-2.5 text-ui font-semibold text-white shadow-act transition-all hover:bg-lapissoft"
             >
               {t('snc.report')}
-            </button>
+            </Button>
           )}
         </div>
       )}

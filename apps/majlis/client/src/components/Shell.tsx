@@ -19,6 +19,7 @@ import {
 import { WhatNext } from './Journey.js';
 import NotYourScreen from './NotYourScreen.js';
 import Tools from './Tools.js';
+import { Button } from './Button';
 
 /**
  * The application's frame.
@@ -67,7 +68,7 @@ function Group({ title, items }: { title: string; items: Item[] }) {
   return (
     <div className={title ? 'mb-5' : 'mb-4'}>
       {title && (
-        <div className="mb-1.5 px-3 text-[9.5px] font-bold uppercase tracking-[0.16em] text-muted">
+        <div className="mb-1.5 px-3 text-label font-bold uppercase tracking-caps text-muted">
           {title}
         </div>
       )}
@@ -78,7 +79,7 @@ function Group({ title, items }: { title: string; items: Item[] }) {
               to={item.to}
               end={item.end}
               className={({ isActive }) =>
-                'relative block rounded-lg px-3 py-[7px] text-[13px] transition-all ' +
+                'relative block rounded-lg px-3 py-[7px] text-ui transition-all ' +
                 (isActive
                   ? 'bg-raised font-semibold text-paper shadow-card'
                   : 'text-sand hover:bg-raised/60 hover:text-paper')
@@ -112,7 +113,7 @@ function StatusBar() {
     'h-1.5 w-1.5 shrink-0 rounded-full ' + (on ? 'bg-settled' : 'bg-line');
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-20 hidden items-center gap-x-6 gap-y-1 border-t border-line bg-ink/85 px-4 py-1.5 text-[11px] text-muted backdrop-blur-xl lg:flex lg:ps-[272px]">
+    <div className="fixed inset-x-0 bottom-0 z-20 hidden items-center gap-x-6 gap-y-1 border-t border-line bg-ink/85 px-4 py-1.5 text-note text-muted backdrop-blur-xl lg:flex lg:ps-[272px]">
       <span className="flex items-center gap-2">
         <span className={dot(false)} />
         {t('shell.nothingSigns')}
@@ -189,7 +190,7 @@ function atWorkArea(path: string): boolean {
 /** The member, as a mark. Same in both mastheads, so it is written once. */
 function Avatar({ id }: { id?: string }) {
   return (
-    <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-gradient-to-br from-lapissoft to-[#133A5F] font-display text-[15px] text-[#F2DFB5] shadow-[0_2px_6px_-1px_rgba(19,58,95,0.35)]">
+    <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-gradient-to-br from-lapissoft to-[#133A5F] font-display text-lead text-[#F2DFB5] shadow-[0_2px_6px_-1px_rgba(19,58,95,0.35)]">
       {(id ?? '?').slice(0, 1).toUpperCase()}
     </div>
   );
@@ -327,7 +328,7 @@ function TabBar() {
             {icon(tab.icon, active)}
             <span
               className={
-                'text-[10.5px] leading-none ' + (active ? 'font-bold text-lapis' : 'text-muted')
+                'text-label leading-none ' + (active ? 'font-bold text-lapis' : 'text-muted')
               }
             >
               {tab.label}
@@ -336,7 +337,7 @@ function TabBar() {
         );
       })}
 
-      <button
+      <Button
         type="button"
         onClick={() => window.dispatchEvent(new CustomEvent('majlis:guide'))}
         className="flex flex-1 flex-col items-center gap-1.5 pb-1.5"
@@ -344,8 +345,8 @@ function TabBar() {
         <svg width="21" height="21" viewBox="0 0 16 16" fill="none" aria-hidden="true">
           <path d="M8 1 L9.6 6.4 L15 8 L9.6 9.6 L8 15 L6.4 9.6 L1 8 L6.4 6.4 Z" fill="#B3A896" />
         </svg>
-        <span className="text-[10.5px] leading-none text-muted">{t('guide.open')}</span>
-      </button>
+        <span className="text-label leading-none text-muted">{t('guide.open')}</span>
+      </Button>
     </nav>
   );
 }
@@ -446,10 +447,10 @@ export default function Shell({ children }: { children: React.ReactNode }) {
       <Link to="/" className="mb-8 flex items-center gap-3 px-3">
         <Mark />
         <div>
-          <div className="font-display text-[21px] leading-none tracking-[-0.018em] text-paper">
+          <div className="font-display text-title leading-none tracking-title text-paper">
             {t('app.name')}
           </div>
-          <div className="mt-1.5 text-[11px] leading-snug text-muted">{t('app.stage')}</div>
+          <div className="mt-1.5 text-note leading-snug text-muted">{t('app.stage')}</div>
         </div>
       </Link>
 
@@ -464,7 +465,25 @@ export default function Shell({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <div className="relative min-h-dvh bg-ink text-paper">
+    /*
+     * ── the one law the whole look rests on ───────────────────────────────
+     *
+     * The document does not scroll. The frame is exactly as tall as the screen
+     * and the panes inside it scroll on their own.
+     *
+     * This was the first law in docs/FLOW.md §35 and the application failed it
+     * everywhere: `min-h-dvh` let the page grow to whatever its contents were,
+     * so the rail scrolled away with the work, the act bar sat somewhere down
+     * past the fold, and a member arriving at a matter met a column of text to
+     * read rather than a window to work in. Measured at 4,849px, 3,920px and
+     * 4,062px on three screens. That single property is most of the difference
+     * between an instrument and an article, and nobody could name it while
+     * everybody felt it.
+     *
+     * `h-dvh` rather than `h-screen`: on a phone the browser's own bars come
+     * and go, and `100vh` measures the frame as if they were never there.
+     */
+    <div className="relative flex h-dvh flex-col overflow-hidden bg-ink text-paper">
       {/*
         The sweep: one continuous curve carrying light across the whole frame.
         It sits under everything and is never a line the eye has to read.
@@ -476,7 +495,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
         {rail}
       </aside>
 
-      <div className="relative lg:ps-[260px]">
+      <div className="relative flex min-h-0 flex-1 flex-col lg:ps-[260px]">
         {/*
           ── the phone's masthead ──────────────────────────────────────
 
@@ -495,11 +514,11 @@ export default function Shell({ children }: { children: React.ReactNode }) {
           <Link to="/" className="flex min-w-0 items-center gap-3">
             <Mark />
             <div className="min-w-0">
-              <div className="font-display text-[19px] leading-none tracking-[-0.016em]">
+              <div className="font-display text-sub leading-none tracking-title">
                 {t('app.name')}
               </div>
               {boardName && (
-                <div className="mt-1.5 truncate text-[11.5px] leading-none text-muted">
+                <div className="mt-1.5 truncate text-note leading-none text-muted">
                   {boardName}
                 </div>
               )}
@@ -539,27 +558,27 @@ export default function Shell({ children }: { children: React.ReactNode }) {
         <div className="sticky top-[60px] z-20 flex justify-end bg-ink/80 px-5 pb-2.5 backdrop-blur-xl lg:hidden">
           <div className="flex gap-0.5 rounded-xl bg-paper/[0.045] p-[3px]">
             {LANGS.map((l) => (
-              <button
+              <Button
                 key={l.code}
                 type="button"
                 onClick={() => setLang(l.code)}
                 aria-pressed={lang === l.code}
                 className={
-                  'rounded-lg px-3 py-1 text-[12px] transition-all ' +
+                  'rounded-lg px-3 py-1 text-note transition-all ' +
                   (lang === l.code
-                    ? 'bg-raised font-semibold text-paper shadow-[0_1px_2px_rgba(25,23,19,0.08)]'
+                    ? 'bg-raised font-semibold text-paper shadow-hairline'
                     : 'text-muted')
                 }
               >
                 {l.label}
-              </button>
+              </Button>
             ))}
           </div>
         </div>
 
         {/* ── the wide bar: where you are, who you are ────────────────── */}
         <header className="sticky top-0 z-30 hidden items-center justify-between gap-4 bg-ink/80 px-5 py-3 shadow-[0_1px_0_rgba(25,23,19,0.055)] backdrop-blur-xl lg:flex">
-          <span className="text-[13px] text-muted">{t('shell.where')}</span>
+          <span className="text-ui text-muted">{t('shell.where')}</span>
 
           <div className="flex items-center gap-4">
             {/*
@@ -590,7 +609,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
                 <circle cx="11" cy="11" r="7" />
                 <path d="M20 20l-3.5-3.5" />
               </svg>
-              <span className="text-[12.5px]">{t('besides.search')}</span>
+              <span className="text-ui">{t('besides.search')}</span>
             </Link>
 
             {/*
@@ -602,7 +621,7 @@ export default function Shell({ children }: { children: React.ReactNode }) {
             {maySubmit(identity?.role) && (
               <Link
                 to="/ask"
-                className="rounded-xl bg-lapis px-4 py-2 text-[12.5px] font-semibold text-white shadow-act transition-shadow hover:shadow-lift"
+                className="rounded-xl bg-lapis px-4 py-2 text-ui font-semibold text-white shadow-act transition-shadow hover:shadow-lift"
               >
                 {t('door.asked.put')}
               </Link>
@@ -614,13 +633,13 @@ export default function Shell({ children }: { children: React.ReactNode }) {
               reading, and close back to it.
             */}
             {!desk && (
-              <button
+              <Button
                 type="button"
                 onClick={() => setTools(true)}
-                className="rounded-xl bg-raised px-3.5 py-2 text-[12.5px] font-semibold text-lapis shadow-ring"
+                className="rounded-xl bg-raised px-3.5 py-2 text-ui font-semibold text-lapis shadow-ring"
               >
                 {t('tools.open')}
-              </button>
+              </Button>
             )}
 
             {/*
@@ -633,20 +652,20 @@ export default function Shell({ children }: { children: React.ReactNode }) {
             */}
             <div className="flex gap-0.5 rounded-xl bg-paper/[0.045] p-[3px]">
               {LANGS.map((l) => (
-                <button
+                <Button
                   key={l.code}
                   type="button"
                   onClick={() => setLang(l.code)}
                   aria-pressed={lang === l.code}
                   className={
-                    'rounded-lg px-2.5 py-1 text-[12px] transition-all ' +
+                    'rounded-lg px-2.5 py-1 text-note transition-all ' +
                     (lang === l.code
-                      ? 'bg-raised font-semibold text-paper shadow-[0_1px_2px_rgba(25,23,19,0.08)]'
+                      ? 'bg-raised font-semibold text-paper shadow-hairline'
                       : 'text-muted hover:text-sand')
                   }
                 >
                   {l.label}
-                </button>
+                </Button>
               ))}
             </div>
 
@@ -666,10 +685,10 @@ export default function Shell({ children }: { children: React.ReactNode }) {
               aria-label={t('shell.yourPage')}
             >
               <div className="text-end">
-                <div className="text-[12.5px] font-semibold leading-tight text-paper">
+                <div className="text-ui font-semibold leading-tight text-paper">
                   {identity?.scholarId ?? t('shell.anonymous')}
                 </div>
-                <div className="text-[11px] leading-tight text-muted">
+                <div className="text-note leading-tight text-muted">
                   {t(`role.${identity?.role ?? 'observer'}`)}
                 </div>
               </div>
@@ -686,6 +705,13 @@ export default function Shell({ children }: { children: React.ReactNode }) {
              * centred in a wide field is the shape of an article, and it was
              * making every screen read as one however tight its contents.
              */
+            /*
+             * The pane that scrolls, and the only one on this screen that
+             * does. `min-h-0` is what makes it work: a flex child refuses to
+             * shrink below its content unless it is told it may, and without
+             * it the frame grows and the document scrolls again.
+             */
+            'min-h-0 flex-1 overflow-y-auto overscroll-contain ' +
             'w-full px-4 py-4 pb-[calc(6.5rem+env(safe-area-inset-bottom))] sm:px-6 lg:pb-12 ' +
             (atWorkArea(path) ? '' : 'mx-auto max-w-reading sm:px-8')
           }
@@ -703,8 +729,8 @@ export default function Shell({ children }: { children: React.ReactNode }) {
           */}
           {dirFor(lang) === 'rtl' && (
             <div className="mb-8 rounded-sheet bg-raised/70 px-6 py-5 shadow-ring">
-              <div className="font-display text-[17px] leading-snug">{t('lang.notReady')}</div>
-              <p className="mt-2.5 max-w-[62ch] text-[13px] leading-[1.7] text-muted">
+              <div className="font-display text-sub leading-snug">{t('lang.notReady')}</div>
+              <p className="mt-2.5 max-w-[62ch] text-ui leading-loose text-muted">
                 {t('lang.notReadyBody')}
               </p>
             </div>

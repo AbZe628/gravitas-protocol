@@ -3,10 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { Refused, governance } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { Field } from './field.js';
+import { Button } from './Button';
 
 /** This form sets its headings and help tighter than the ordinary screens. */
-const TIGHT = 'mb-1 block text-[12px] text-muted';
-const HELP = 'mb-1.5 text-[11.5px] leading-relaxed text-muted';
+const TIGHT = 'mb-1 block text-note text-muted';
+const HELP = 'mb-1.5 text-note leading-relaxed text-muted';
 
 /**
  * Putting a question to the board, in the words the person putting it uses.
@@ -100,28 +101,28 @@ export default function SmartRaise({ boardId }: { boardId: string }) {
 
   if (!open) {
     return (
-      <button
+      <Button
         type="button"
         onClick={() => setOpen(true)}
-        className="rounded-xl bg-gradient-to-br from-lapissoft to-[#143E67] px-4 py-2 text-[13px] font-semibold text-white shadow-act transition-colors hover:bg-lapis"
+        className="rounded-xl bg-gradient-to-br from-lapissoft to-lapis px-4 py-2 text-ui font-semibold text-white shadow-act transition-colors hover:bg-lapis"
       >
         {t('smart.open')}
-      </button>
+      </Button>
     );
   }
 
   const field =
-    'w-full rounded-xl bg-raised shadow-ring p-2 text-[14px] leading-relaxed outline-none focus:shadow-[0_0_0_1.5px_rgba(22,68,112,0.35)]';
+    'w-full rounded-xl bg-raised shadow-ring p-2 text-body leading-relaxed outline-none focus:shadow-pick';
 
   return (
     <div className="rounded-card shadow-ring bg-raised px-4 py-4">
-      <div className="mb-3 text-[15px] font-semibold">{t('smart.title')}</div>
+      <div className="mb-3 text-lead font-semibold">{t('smart.title')}</div>
 
       {/* ── one: what kind of decision ─────────────────────────────────── */}
 
       <div
         id="smart-kind"
-        className="mb-1 text-[10px] font-bold uppercase tracking-[0.15em] text-muted"
+        className="mb-1 text-label font-bold uppercase tracking-caps text-muted"
       >
         {t('smart.whatKind')}
       </div>
@@ -131,22 +132,22 @@ export default function SmartRaise({ boardId }: { boardId: string }) {
         className="mb-4 grid gap-2 sm:grid-cols-2"
       >
         {KINDS.map((k) => (
-          <button
+          <Button
             key={k}
             type="button"
             onClick={() => setKind(k)}
             className={
               'rounded-card px-4 py-3.5 text-start transition-all ' +
               (kind === k
-                ? 'bg-[#EAF1F7] shadow-[0_0_0_1.5px_#164470]'
+                ? 'bg-lapistint shadow-pick'
                 : 'bg-raised shadow-ring hover:shadow-card')
             }
           >
-            <div className="text-[13px] font-medium">{t(`smart.kind.${k}`)}</div>
-            <p className="mt-0.5 text-[11.5px] leading-relaxed text-muted">
+            <div className="text-ui font-medium">{t(`smart.kind.${k}`)}</div>
+            <p className="mt-0.5 text-note leading-relaxed text-muted">
               {t(`smart.kind.${k}.means`)}
             </p>
-          </button>
+          </Button>
         ))}
       </div>
 
@@ -159,7 +160,7 @@ export default function SmartRaise({ boardId }: { boardId: string }) {
             the delay and whether it is ratified afterwards, and somebody
             choosing in a hurry should see that rather than discover it.
           */}
-          <p className="mb-4 rounded-xl shadow-ring px-3 py-2 text-[12px] leading-relaxed text-muted">
+          <p className="mb-4 rounded-xl shadow-ring px-3 py-2 text-note leading-relaxed text-muted">
             {t(`matter.direction.${RECORDS[kind].direction}Note`)}
           </p>
 
@@ -211,7 +212,7 @@ export default function SmartRaise({ boardId }: { boardId: string }) {
           </Field>
 
           {refusal && (
-            <p className="mb-3 rounded-xl shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)] px-3 py-2 text-[12.5px] leading-relaxed text-breach">
+            <p className="mb-3 rounded-xl shadow-ringbreach px-3 py-2 text-ui leading-relaxed text-breach">
               {refusal}
             </p>
           )}
@@ -221,24 +222,24 @@ export default function SmartRaise({ boardId }: { boardId: string }) {
             pressing this wants to know whether they have finished or whether
             somebody is now waiting on them for something else.
           */}
-          <p className="mb-3 text-[12px] leading-relaxed text-muted">{t('smart.thenWhat')}</p>
+          <p className="mb-3 text-note leading-relaxed text-muted">{t('smart.thenWhat')}</p>
 
           <div className="flex flex-wrap items-center gap-2">
-            <button
+            <Button
               type="button"
               onClick={submit}
               disabled={!ready || busy}
-              className="rounded-xl bg-gradient-to-br from-lapissoft to-[#143E67] px-4 py-2 text-[13px] font-semibold text-white shadow-act transition-colors hover:bg-lapis disabled:opacity-40"
+              className="rounded-xl bg-gradient-to-br from-lapissoft to-lapis px-4 py-2 text-ui font-semibold text-white shadow-act transition-colors hover:bg-lapis disabled:opacity-40"
             >
               {t('smart.put')}
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
               onClick={() => setOpen(false)}
-              className="text-[12.5px] text-muted underline decoration-line underline-offset-4 hover:text-paper"
+              className="text-ui text-muted underline decoration-line underline-offset-4 hover:text-paper"
             >
               {t('smart.cancel')}
-            </button>
+            </Button>
           </div>
         </>
       )}

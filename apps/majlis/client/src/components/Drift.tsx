@@ -37,14 +37,14 @@ function Row({ drift }: { drift: Drift }) {
   return (
     <li>
       <Link to={`/register/${drift.assetId}`} className="block">
-        <div className="rounded-card shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)] bg-[#FCF0EE] px-4 py-3 transition-colors">
+        <div className="rounded-card shadow-ringbreach bg-breachtint px-4 py-3 transition-colors">
           <div className="mb-1.5 flex flex-wrap items-center gap-2">
             <Tag tone="warn">{t(`drift.${drift.term.bound}`)}</Tag>
             {/*
               What the board set, and what it now reads. Two figures rather than
               one, because one would be an assertion.
             */}
-            <span className="font-mono text-[12.5px] tabular-nums">
+            <span className="font-mono text-ui tabular-nums">
               <span className="text-breach">{drift.observed.percent}%</span>
               <span className="mx-1.5 text-muted">·</span>
               <span className="text-muted">
@@ -53,10 +53,10 @@ function Row({ drift }: { drift: Drift }) {
             </span>
           </div>
 
-          <div className="text-[14px] font-medium leading-snug">{drift.assetName}</div>
+          <div className="text-body font-medium leading-snug">{drift.assetName}</div>
 
           {/* The server's own words. Not reassembled here. */}
-          <p className="mt-1.5 text-[12.5px] leading-relaxed text-muted">{drift.questionForBoard}</p>
+          <p className="mt-1.5 text-ui leading-relaxed text-muted">{drift.questionForBoard}</p>
         </div>
       </Link>
     </li>
@@ -91,7 +91,7 @@ export default function DriftPanel() {
 
   return (
     <section className="mb-6">
-      <h2 className="mb-3 text-[15px] font-semibold">{t('drift.title')}</h2>
+      <h2 className="mb-3 text-lead font-semibold">{t('drift.title')}</h2>
 
       {data.drifting.length > 0 && (
         <ul className="mb-3 space-y-2">
@@ -108,21 +108,21 @@ export default function DriftPanel() {
       */}
       {(data.unwatched.length > 0 || data.unmeasured.length > 0) && (
         <div className="rounded-card shadow-ring px-4 py-3">
-          <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+          <div className="mb-2 text-label font-bold uppercase tracking-caps text-muted">
             {t('drift.notChecked')}
           </div>
           <ul className="space-y-2">
             {data.unwatched.map((u, i) => (
-              <li key={`u${i}`} className="text-[12.5px] leading-relaxed text-muted">
+              <li key={`u${i}`} className="text-ui leading-relaxed text-muted">
                 <Link to={`/register/${u.assetId}`} className="underline underline-offset-2 hover:text-fg">
-                  <span className="font-mono text-[11.5px]">{u.key}</span>
+                  <span className="font-mono text-note">{u.key}</span>
                 </Link>
                 <span className="mx-1.5 opacity-40">·</span>
                 {u.reason}
               </li>
             ))}
             {data.unmeasured.map((u, i) => (
-              <li key={`m${i}`} className="text-[12.5px] leading-relaxed text-muted">
+              <li key={`m${i}`} className="text-ui leading-relaxed text-muted">
                 <Link to={`/register/${u.assetId}`} className="underline underline-offset-2 hover:text-fg">
                   {u.assetName}
                 </Link>
@@ -161,13 +161,13 @@ export function DriftForAsset({ assetId }: { assetId: string }) {
   if (!drifting || drifting.length === 0) return null;
 
   return (
-    <div className="mb-6 rounded-card shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)] bg-[#FCF0EE] px-4 py-3.5">
-      <div className="mb-2 text-[13px] font-semibold text-breach">{t('drift.onThisHolding')}</div>
+    <div className="mb-6 rounded-card shadow-ringbreach bg-breachtint px-4 py-3.5">
+      <div className="mb-2 text-ui font-semibold text-breach">{t('drift.onThisHolding')}</div>
       <ul className="space-y-2.5">
         {drifting.map((d) => (
-          <li key={d.term.key} className="text-[12.5px] leading-relaxed">
+          <li key={d.term.key} className="text-ui leading-relaxed">
             <p className="text-muted">{d.questionForBoard}</p>
-            <p className="mt-1 text-[12px] text-muted">
+            <p className="mt-1 text-note text-muted">
               <Link
                 to={`/matters/${d.matterId}`}
                 className="font-mono underline underline-offset-2 hover:text-fg"

@@ -3,6 +3,7 @@ import { oversight, type ContractReading } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import WhereTheDraftComesFrom from './WhereTheDraftComesFrom.js';
 import { Nothing } from './page.js';
+import { Button } from './Button';
 
 /**
  * Paste a contract, see where each condition is answered.
@@ -121,13 +122,13 @@ export default function ReadTheContract({
    */
   if (!reading && !open && !onItsOwnScreen) {
     return (
-      <button
+      <Button
         type="button"
         onClick={() => setOpen(true)}
-        className="rounded-xl bg-raised px-4 py-2 text-[12.5px] font-semibold text-lapis shadow-ring transition-colors hover:text-paper"
+        className="rounded-xl bg-raised px-4 py-2 text-ui font-semibold text-lapis shadow-ring transition-colors hover:text-paper"
       >
         {t('read.doIt')}
-      </button>
+      </Button>
     );
   }
 
@@ -135,7 +136,7 @@ export default function ReadTheContract({
     <div>
       {!reading && (
         <>
-          <p className="mb-3 max-w-[58ch] text-[13px] leading-[1.65] text-muted">{t('read.lead')}</p>
+          <p className="mb-3 max-w-[58ch] text-ui leading-relaxed text-muted">{t('read.lead')}</p>
 
           {/*
             Three ways in, where there was one. A scholar's contract is a file,
@@ -160,26 +161,26 @@ export default function ReadTheContract({
             rows={6}
             placeholder={t('read.placeholder')}
             aria-label={t('read.placeholder')}
-            className="w-full rounded-card bg-ink px-4 py-3 text-[13.5px] leading-[1.6] text-paper shadow-ring outline-none placeholder:text-muted focus:shadow-lift"
+            className="w-full rounded-card bg-ink px-4 py-3 text-body leading-relaxed text-paper shadow-ring outline-none placeholder:text-muted focus:shadow-lift"
           />
 
           {/* Where the words came from, so a reading is traceable to a source. */}
           {took && (
-            <p className="mt-2 text-[12px] text-muted">
+            <p className="mt-2 text-note text-muted">
               {t('draftfrom.took')} {took}
               <span className="mx-1.5 opacity-40">·</span>
               {text.trim().length} {t('draftfrom.characters')}
             </p>
           )}
-          {failed && <p className="mt-2 text-[12.5px] text-breach">{failed}</p>}
-          <button
+          {failed && <p className="mt-2 text-ui text-breach">{failed}</p>}
+          <Button
             type="button"
             onClick={read}
             disabled={busy || text.trim().length < 40}
-            className="mt-3 rounded-card bg-lapis px-6 py-3 text-[14px] font-bold text-white shadow-act disabled:opacity-50"
+            className="mt-3 rounded-card bg-lapis px-6 py-3 text-body font-bold text-white shadow-act disabled:opacity-50"
           >
             {busy ? t('read.reading') : t('read.doIt')}
-          </button>
+          </Button>
         </>
       )}
 
@@ -191,23 +192,23 @@ export default function ReadTheContract({
               return (
                 <li key={c.conditionId} className="rounded-card bg-ink px-4 py-3">
                   <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                    <span className={'text-[11px] font-bold uppercase tracking-[0.1em] ' + s.tone}>
+                    <span className={'text-note font-bold uppercase tracking-label ' + s.tone}>
                       {t(s.key)}
                     </span>
-                    <span className="text-[13.5px] font-semibold">{c.requirement}</span>
+                    <span className="text-body font-semibold">{c.requirement}</span>
                   </div>
 
                   {/* The sentence it was found in. Without it a reader cannot check. */}
                   {c.passages.map((p, i) => (
                     <p
                       key={i}
-                      className="mt-2 max-w-[58ch] border-s-2 border-line ps-3 font-display text-[13.5px] leading-[1.6] text-sand"
+                      className="mt-2 max-w-[58ch] border-s-2 border-line ps-3 font-display text-body leading-relaxed text-sand"
                     >
                       {p.text}
                     </p>
                   ))}
 
-                  <p className="mt-2 max-w-[58ch] text-[12.5px] leading-[1.6] text-muted">{c.note}</p>
+                  <p className="mt-2 max-w-[58ch] text-ui leading-relaxed text-muted">{c.note}</p>
                 </li>
               );
             })}
@@ -218,31 +219,31 @@ export default function ReadTheContract({
             a list of confident findings with no seams is read as complete.
           */}
           <div className="mt-5 border-t border-line pt-4">
-            <div className="mb-2.5 text-[10px] font-bold uppercase tracking-[0.14em] text-muted">
+            <div className="mb-2.5 text-label font-bold uppercase tracking-caps text-muted">
               {t('read.limits')}
             </div>
             <ul className="space-y-2">
               {reading.limits.map((l, i) => (
                 <li key={i} className="flex gap-2.5">
                   <span className="mt-[7px] h-[6px] w-[6px] shrink-0 rounded-full bg-gold/70" />
-                  <span className="max-w-[58ch] text-[12.5px] leading-[1.6] text-sand">{l}</span>
+                  <span className="max-w-[58ch] text-ui leading-relaxed text-sand">{l}</span>
                 </li>
               ))}
             </ul>
           </div>
 
-          <p className="mt-4 max-w-[58ch] text-[12.5px] leading-[1.6] text-muted">{t('read.thenWhat')}</p>
+          <p className="mt-4 max-w-[58ch] text-ui leading-relaxed text-muted">{t('read.thenWhat')}</p>
 
-          <button
+          <Button
             type="button"
             onClick={() => {
               setReading(null);
               setText('');
             }}
-            className="mt-3 text-[12.5px] text-muted underline decoration-line underline-offset-4 hover:text-paper"
+            className="mt-3 text-ui text-muted underline decoration-line underline-offset-4 hover:text-paper"
           >
             {t('read.again')}
-          </button>
+          </Button>
         </>
       )}
 

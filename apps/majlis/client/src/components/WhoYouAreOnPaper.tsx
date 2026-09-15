@@ -4,6 +4,7 @@ import { useI18n } from '../lib/i18n.js';
 import { useIdentity } from '../lib/identity.js';
 import { Division } from './page.js';
 import { Field, HEADING } from './field.js';
+import { Button } from './Button';
 
 /**
  * Your own name, title and where you can be reached.
@@ -108,7 +109,7 @@ export default function WhoYouAreOnPaper() {
     }
   }
 
-  const BOX = 'w-full rounded-xl bg-raised px-3 py-2.5 text-[13.5px] shadow-ring outline-none';
+  const BOX = 'w-full rounded-xl bg-raised px-3 py-2.5 text-body shadow-ring outline-none';
 
   return (
     <Division heading={t('you.heading')} note={t('you.note')}>
@@ -167,29 +168,29 @@ export default function WhoYouAreOnPaper() {
           expect notices that are not coming.
         */}
         {me.email && (
-          <p className="mt-2.5 text-[11.5px] leading-[1.6] text-muted">
+          <p className="mt-2.5 text-note leading-relaxed text-muted">
             {me.emailConfirmed ? t('you.confirmed') : t('you.notConfirmed')}
           </p>
         )}
 
-        {refusal && <p className="mt-3 text-[12.5px] leading-[1.6] text-breach">{refusal}</p>}
-        {kept && <p className="mt-3 text-[12.5px] text-settled">{t('you.kept')}</p>}
+        {refusal && <p className="mt-3 text-ui leading-relaxed text-breach">{refusal}</p>}
+        {kept && <p className="mt-3 text-ui text-settled">{t('you.kept')}</p>}
 
-        <button
+        <Button
           type="submit"
           disabled={busy || name.trim().length === 0}
-          className="mt-4 rounded-xl bg-lapis px-5 py-2.5 text-[13px] font-semibold text-white shadow-act disabled:opacity-40"
+          className="mt-4 rounded-xl bg-lapis px-5 py-2.5 text-ui font-semibold text-white shadow-act disabled:opacity-40"
         >
           {busy ? t('common.loading') : t('you.keep')}
-        </button>
+        </Button>
       </form>
 
       {/* Named rather than silently missing. */}
       <ul className="mt-5 space-y-2 border-t border-line pt-4">
-        <li className="max-w-[62ch] text-[11.5px] leading-[1.6] text-muted">
+        <li className="max-w-[62ch] text-note leading-relaxed text-muted">
           {t('you.noNotifications')}
         </li>
-        <li className="max-w-[62ch] text-[11.5px] leading-[1.6] text-muted">
+        <li className="max-w-[62ch] text-note leading-relaxed text-muted">
           {t('you.noSignature')}
         </li>
       </ul>

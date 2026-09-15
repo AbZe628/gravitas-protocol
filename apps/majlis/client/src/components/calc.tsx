@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import type { CalcStep } from '../lib/api.js';
 import { Field as Joined } from './field.js';
+import { Button } from './Button';
 
 /**
  * The parts every calculation surface is built from.
@@ -52,8 +53,8 @@ export function Field({
       label={label}
       help={hint}
       className="mb-2.5"
-      helpClass="mb-1.5 block text-[11px] leading-relaxed text-muted opacity-80"
-      headingClass="mb-1 block text-[10px] font-bold uppercase tracking-[0.15em] text-muted"
+      helpClass="mb-1.5 block text-note leading-relaxed text-muted opacity-80"
+      headingClass="mb-1 block text-label font-bold uppercase tracking-caps text-muted"
     >
       {children}
     </Joined>
@@ -61,7 +62,7 @@ export function Field({
 }
 
 const INPUT =
-  'w-full rounded-xl bg-raised shadow-ring px-3 py-2 text-[14px] focus:shadow-[0_0_0_1.5px_rgba(22,68,112,0.35)] focus:outline-none';
+  'w-full rounded-xl bg-raised shadow-ring px-3 py-2 text-body focus:shadow-pick focus:outline-none';
 
 /** A money field. Monospaced and tabular so digits line up down a column. */
 export function Money({
@@ -115,7 +116,7 @@ export function Text({
           value={value}
           placeholder={placeholder}
           onChange={(e) => onChange(e.target.value)}
-          className={INPUT + ' text-[13px]'}
+          className={INPUT + ' text-ui'}
         />
       )}
     </Field>
@@ -162,7 +163,7 @@ export function Rate({
           }}
           className={INPUT + ' font-mono tabular-nums'}
         />
-        <span className="text-[13px] text-muted">%</span>
+        <span className="text-ui text-muted">%</span>
       </div>
       )}
     </Field>
@@ -191,15 +192,15 @@ export function Choice<T extends string>({
 }) {
   return (
     <fieldset className="mb-3">
-      <legend className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">{label}</legend>
-      {hint && <p className="mb-2 text-[11.5px] leading-relaxed text-muted">{hint}</p>}
+      <legend className="mb-1.5 text-label font-bold uppercase tracking-caps text-muted">{label}</legend>
+      {hint && <p className="mb-2 text-note leading-relaxed text-muted">{hint}</p>}
       <div className="space-y-1.5">
         {options.map((o) => (
           <label
             key={o.value}
             className={
               'flex cursor-pointer gap-2.5 rounded-xl px-4 py-3 transition-all ' +
-              (value === o.value ? 'bg-[#EAF1F7] shadow-[0_0_0_1.5px_#164470]' : 'bg-raised shadow-ring hover:shadow-card')
+              (value === o.value ? 'bg-lapistint shadow-pick' : 'bg-raised shadow-ring hover:shadow-card')
             }
           >
             <input
@@ -209,8 +210,8 @@ export function Choice<T extends string>({
               className="mt-0.5 accent-current"
             />
             <span>
-              <span className="block text-[13px] font-medium">{o.label}</span>
-              <span className="mt-0.5 block text-[11.5px] leading-relaxed text-muted">{o.meaning}</span>
+              <span className="block text-ui font-medium">{o.label}</span>
+              <span className="mt-0.5 block text-note leading-relaxed text-muted">{o.meaning}</span>
             </span>
           </label>
         ))}
@@ -226,11 +227,11 @@ export function Steps({ steps }: { steps: CalcStep[] }) {
       {steps.map((s, i) => (
         <li key={i} className="rounded-xl shadow-ring px-3 py-2">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <span className="text-[13px]">{s.label}</span>
-            <span className="font-mono text-[13px] tabular-nums">{s.value}</span>
+            <span className="text-ui">{s.label}</span>
+            <span className="font-mono text-ui tabular-nums">{s.value}</span>
           </div>
           {/* The sum, not the verdict. */}
-          <p className="mt-0.5 font-mono text-[11.5px] leading-relaxed text-muted break-words">
+          <p className="mt-0.5 font-mono text-note leading-relaxed text-muted break-words">
             {s.working}
           </p>
         </li>
@@ -260,8 +261,8 @@ export function Result({
   return (
     <div className="mt-5 border-t border-line pt-4">
       <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
-        <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted">{headline}</span>
-        <span className="font-mono text-[19px] tabular-nums text-lapis">{amount}</span>
+        <span className="text-label font-bold uppercase tracking-caps text-muted">{headline}</span>
+        <span className="font-mono text-sub tabular-nums text-lapis">{amount}</span>
       </div>
       {children}
       <Steps steps={steps} />
@@ -277,7 +278,7 @@ export function Result({
  */
 export function Note({ children }: { children: string }) {
   return (
-    <p className="mt-3 rounded-xl shadow-ring bg-raised px-3 py-2.5 text-[12.5px] leading-relaxed text-muted">
+    <p className="mt-3 rounded-xl shadow-ring bg-raised px-3 py-2.5 text-ui leading-relaxed text-muted">
       {children}
     </p>
   );
@@ -292,7 +293,7 @@ export function Note({ children }: { children: string }) {
  */
 export function Refusal({ children }: { children: string }) {
   return (
-    <p className="mb-3 rounded-xl shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)] bg-[#FCF0EE] px-3 py-2.5 text-[12.5px] leading-relaxed text-breach">
+    <p className="mb-3 rounded-xl shadow-ringbreach bg-breachtint px-3 py-2.5 text-ui leading-relaxed text-breach">
       {children}
     </p>
   );
@@ -300,13 +301,13 @@ export function Refusal({ children }: { children: string }) {
 
 export function Compute({ busy, label }: { busy: boolean; label: string }) {
   return (
-    <button
+    <Button
       type="submit"
       disabled={busy}
-      className="rounded-xl bg-gradient-to-br from-lapissoft to-[#143E67] px-4 py-2 text-[13px] font-semibold text-white shadow-act transition-colors hover:bg-lapis disabled:opacity-50"
+      className="rounded-xl bg-gradient-to-br from-lapissoft to-lapis px-4 py-2 text-ui font-semibold text-white shadow-act transition-colors hover:bg-lapis disabled:opacity-50"
     >
       {label}
-    </button>
+    </Button>
   );
 }
 

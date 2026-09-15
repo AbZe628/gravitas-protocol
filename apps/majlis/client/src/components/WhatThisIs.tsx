@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useI18n } from '../lib/i18n.js';
+import { Button } from './Button';
 
 /**
  * What a scholar reads first.
@@ -61,20 +62,20 @@ export default function WhatThisIs({
 
   if (!open) {
     return (
-      <button
+      <Button
         type="button"
         onClick={onToggle}
-        className="mb-5 text-[12.5px] text-muted underline decoration-line underline-offset-4 transition-colors hover:text-paper"
+        className="mb-5 text-ui text-muted underline decoration-line underline-offset-4 transition-colors hover:text-paper"
       >
         {t('intro.reopen')}
-      </button>
+      </Button>
     );
   }
 
   return (
     <section className="mb-6 rounded-card shadow-ring bg-raised px-4 py-4 sm:px-5">
-      <h2 className="text-[17px] font-semibold tracking-tight">{t('intro.title')}</h2>
-      <p className="mt-1.5 max-w-prose text-[13.5px] leading-relaxed">{t('intro.lede')}</p>
+      <h2 className="text-sub font-semibold tracking-tight">{t('intro.title')}</h2>
+      <p className="mt-1.5 max-w-prose text-body leading-relaxed">{t('intro.lede')}</p>
 
       <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
         {KINDS.map((kind) => (
@@ -83,10 +84,10 @@ export default function WhatThisIs({
             to={WHERE[kind]}
             className="group rounded-xl shadow-ring px-3.5 py-3 transition-colors hover:text-paper"
           >
-            <div className="text-[13px] font-medium">{t(`intro.${kind}`)}</div>
-            <p className="mt-1 text-[12px] leading-relaxed text-muted">{t(`intro.${kind}.body`)}</p>
+            <div className="text-ui font-medium">{t(`intro.${kind}`)}</div>
+            <p className="mt-1 text-note leading-relaxed text-muted">{t(`intro.${kind}.body`)}</p>
             {/* What is running out. It is the thing that differs between them. */}
-            <p className="mt-1.5 text-[11.5px] leading-relaxed text-lapis">
+            <p className="mt-1.5 text-note leading-relaxed text-lapis">
               {t(`intro.${kind}.clock`)}
             </p>
           </Link>
@@ -99,12 +100,12 @@ export default function WhatThisIs({
         spend one.
       */}
       <div className="mt-4 border-t border-line pt-3.5">
-        <div className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+        <div className="mb-1.5 text-label font-bold uppercase tracking-caps text-muted">
           {t('intro.never')}
         </div>
         <ul className="space-y-1.5">
           {['sign', 'rule', 'rerule'].map((k) => (
-            <li key={k} className="flex gap-2 text-[12.5px] leading-relaxed text-muted">
+            <li key={k} className="flex gap-2 text-ui leading-relaxed text-muted">
               <span className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-muted" />
               <span>{t(`intro.never.${k}`)}</span>
             </li>
@@ -112,13 +113,13 @@ export default function WhatThisIs({
         </ul>
       </div>
 
-      <button
+      <Button
         type="button"
         onClick={onToggle}
-        className="mt-3.5 rounded-xl shadow-ring px-3 py-1 text-[12px] text-muted transition-colors hover:text-paper"
+        className="mt-3.5 rounded-xl shadow-ring px-3 py-1 text-note text-muted transition-colors hover:text-paper"
       >
         {t('intro.hide')}
-      </button>
+      </Button>
     </section>
   );
 }

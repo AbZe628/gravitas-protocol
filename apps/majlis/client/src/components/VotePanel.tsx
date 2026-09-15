@@ -4,6 +4,7 @@ import { useI18n } from '../lib/i18n.js';
 import Dictate from './Dictate.js';
 import { Card } from './ui.js';
 import { Field } from './field.js';
+import { Button } from './Button';
 
 /**
  * Where the vote stands, and what this member can still do about it.
@@ -59,7 +60,7 @@ function useCountdown(iso: string | null): { text: string; elapsed: boolean } | 
 
 function Refusal({ message }: { message: string | null }) {
   if (!message) return null;
-  return <p className="mt-2 text-[12px] leading-relaxed text-breach">{message}</p>;
+  return <p className="mt-2 text-note leading-relaxed text-breach">{message}</p>;
 }
 
 export default function VotePanel({
@@ -119,19 +120,19 @@ export default function VotePanel({
   }
 
   const button = (label: string, onClick: () => void, tone: 'plain' | 'warn' = 'plain') => (
-    <button
+    <Button
       type="button"
       onClick={onClick}
       disabled={busy}
       className={
-        'rounded-xl px-4 py-2 text-[12.5px] disabled:opacity-40 ' +
+        'rounded-xl px-4 py-2 text-ui disabled:opacity-40 ' +
         (tone === 'warn'
-          ? 'bg-raised text-breach shadow-[0_0_0_0.5px_rgba(154,56,48,0.25)] hover:brightness-[0.99]'
+          ? 'bg-raised text-breach shadow-ringbreach hover:brightness-[0.99]'
           : 'bg-raised text-sand shadow-ring hover:text-paper')
       }
     >
       {label}
-    </button>
+    </Button>
   );
 
   return (
@@ -141,16 +142,16 @@ export default function VotePanel({
           <div className="mb-4 flex flex-wrap items-baseline gap-x-3 gap-y-1">
             <span
               className={
-                'font-display text-[44px] leading-[0.9] tabular-nums tracking-[-0.03em] ' +
+                'font-display text-hero leading-none tabular-nums tracking-display ' +
                 (tally.met ? 'text-settled' : 'text-paper')
               }
             >
               {tally.for}
             </span>
-            <span className="font-display text-[25px] leading-none tracking-[-0.02em] text-muted">
+            <span className="font-display text-title leading-none tracking-title text-muted">
               {t('vote.ofRequired')} {tally.required}
             </span>
-            <span className="text-[12.5px] text-muted">
+            <span className="text-ui text-muted">
               {t(tally.met ? 'vote.met' : 'vote.notMet')}
             </span>
           </div>
@@ -167,7 +168,7 @@ export default function VotePanel({
             ))}
           </div>
 
-          <div className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-[12.5px] text-muted">
+          <div className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-ui text-muted">
             <span className="tabular-nums">
               {t('vote.against')} {tally.against}
             </span>
@@ -177,7 +178,7 @@ export default function VotePanel({
           </div>
 
           {tally.outstanding.length > 0 && (
-            <p className="mt-3 border-t border-line pt-3 text-[12.5px] leading-[1.55] text-muted">
+            <p className="mt-3 border-t border-line pt-3 text-ui leading-relaxed text-muted">
               {t('vote.outstanding')}: {tally.outstanding.join(', ')}
             </p>
           )}
@@ -186,13 +187,13 @@ export default function VotePanel({
 
       {matter.status === 'timelock' && countdown && (
         <Card accent={countdown.elapsed}>
-          <div className="text-[12px] uppercase tracking-wide text-muted">
+          <div className="text-note uppercase tracking-wide text-muted">
             {t(countdown.elapsed ? 'vote.timelockDone' : 'vote.timelockRunning')}
           </div>
           {!countdown.elapsed && (
-            <div className="mt-1 text-[19px] font-semibold tabular-nums">{countdown.text}</div>
+            <div className="mt-1 text-sub font-semibold tabular-nums">{countdown.text}</div>
           )}
-          <p className="mt-1.5 text-[12px] leading-relaxed text-muted">
+          <p className="mt-1.5 text-note leading-relaxed text-muted">
             {t(countdown.elapsed ? 'vote.timelockDoneNote' : 'vote.timelockNote')}
           </p>
         </Card>
@@ -203,20 +204,20 @@ export default function VotePanel({
         <Card>
           <div className="mb-4 grid grid-cols-3 gap-2">
             {(['for', 'against', 'abstain'] as const).map((p) => (
-              <button
+              <Button
                 key={p}
                 type="button"
                 aria-pressed={position === p}
                 onClick={() => setPosition(p)}
                 className={
-                  'h-12 rounded-xl text-[13px] transition-all ' +
+                  'h-12 rounded-xl text-ui transition-all ' +
                   (position === p
-                    ? 'bg-[#EBF3EF] font-bold text-[#235A49] shadow-[0_0_0_1.5px_#2C6B57]'
+                    ? 'bg-settledtint font-bold text-[#235A49] shadow-picksettled'
                     : 'bg-raised text-sand shadow-ring hover:text-paper')
                 }
               >
                 {t(`vote.${p}`)}
-              </button>
+              </Button>
             ))}
           </div>
 
@@ -229,9 +230,9 @@ export default function VotePanel({
           */}
           <Field
             label={t('vote.reason')}
-            headingClass="mb-2 block text-[12.5px] text-muted"
+            headingClass="mb-2 block text-ui text-muted"
             help={t('vote.reasonHelp')}
-            helpClass="order-last mt-2 text-[11.5px] leading-[1.55] text-muted"
+            helpClass="order-last mt-2 text-note leading-relaxed text-muted"
             className="flex flex-col"
           >
             {(attrs) => (
@@ -240,7 +241,7 @@ export default function VotePanel({
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
                 rows={4}
-                className="w-full resize-y rounded-card bg-raised px-4 py-3 font-display text-[15.5px] leading-[1.55] shadow-ring outline-none focus:shadow-[0_0_0_1.5px_rgba(22,68,112,0.35)]"
+                className="w-full resize-y rounded-card bg-raised px-4 py-3 font-display text-lead leading-relaxed shadow-ring outline-none focus:shadow-pick"
               />
             )}
           </Field>
@@ -259,53 +260,53 @@ export default function VotePanel({
 
           {/* What is missing, while it is missing. */}
           {reason.trim().length < MIN_REASON && (
-            <p className="mt-3 text-[12px] text-muted">
+            <p className="mt-3 text-note text-muted">
               {t('vote.reasonShort').replace('{n}', String(MIN_REASON - reason.trim().length))}
             </p>
           )}
 
           <div className="mt-4">
-            <button
+            <Button
               type="button"
               disabled={busy || reason.trim().length < MIN_REASON}
               onClick={() => run(() => governance.vote(matter.id, position, reason.trim()))}
-              className="h-12 w-full rounded-xl bg-gradient-to-br from-lapissoft to-[#143E67] text-[14px] font-bold text-white shadow-act transition-all hover:brightness-110 active:scale-[0.99] disabled:opacity-40"
+              className="h-12 w-full rounded-xl bg-gradient-to-br from-lapissoft to-lapis text-body font-bold text-white shadow-act transition-all hover:brightness-110 active:scale-[0.99] disabled:opacity-40"
             >
               {t('vote.submit')}
-            </button>
+            </Button>
           </div>
         </Card>
       )}
 
       {matter.status === 'voting' && signatory && alreadyVoted && (
-        <p className="text-[13px] text-muted">{t('vote.recorded')}</p>
+        <p className="text-ui text-muted">{t('vote.recorded')}</p>
       )}
 
       {/* Objecting during a timelock */}
       {matter.status === 'timelock' && signatory && objecting && (
         <Card accent>
-          <div className="mb-1 text-[13px] font-medium">{t('object.title')}</div>
-          <p className="mb-2 text-[12px] leading-relaxed text-muted">{t('object.help')}</p>
+          <div className="mb-1 text-ui font-medium">{t('object.title')}</div>
+          <p className="mb-2 text-note leading-relaxed text-muted">{t('object.help')}</p>
           <textarea
             aria-label={t('object.title')}
             value={reason}
             onChange={(e) => setReason(e.target.value)}
             rows={3}
-            className="w-full resize-y rounded-xl shadow-ring bg-raised p-2 text-[14px] leading-relaxed outline-none"
+            className="w-full resize-y rounded-xl shadow-ring bg-raised p-2 text-body leading-relaxed outline-none"
           />
           <Refusal message={refusal} />
           <div className="mt-2 flex gap-2">
-            <button
+            <Button
               type="button"
               disabled={busy || reason.trim().length < MIN_REASON}
               onClick={() => run(() => governance.object(matter.id, reason.trim()))}
-              className="rounded-xl bg-raised px-4 py-2 text-[12.5px] font-medium text-breach shadow-[0_0_0_0.5px_rgba(154,56,48,0.25)] disabled:opacity-40"
+              className="rounded-xl bg-raised px-4 py-2 text-ui font-medium text-breach shadow-ringbreach disabled:opacity-40"
             >
               {t('object.submit')}
-            </button>
-            <button type="button" onClick={() => setObjecting(false)} className="text-[12px] text-muted hover:text-paper">
+            </Button>
+            <Button type="button" onClick={() => setObjecting(false)} className="text-note text-muted hover:text-paper">
               {t('say.cancel')}
-            </button>
+            </Button>
           </div>
         </Card>
       )}
@@ -313,28 +314,28 @@ export default function VotePanel({
       {/* Returning an open vote to deliberation */}
       {matter.status === 'voting' && signatory && reopening && (
         <Card accent>
-          <div className="mb-1 text-[13px] font-medium">{t('reopen.title')}</div>
-          <p className="mb-2 text-[12px] leading-relaxed text-muted">{t('reopen.help')}</p>
+          <div className="mb-1 text-ui font-medium">{t('reopen.title')}</div>
+          <p className="mb-2 text-note leading-relaxed text-muted">{t('reopen.help')}</p>
           <textarea
             aria-label={t('reopen.title')}
             value={reason}
             onChange={(e) => setReason(e.target.value)}
             rows={3}
-            className="w-full resize-y rounded-xl shadow-ring bg-raised p-2 text-[14px] leading-relaxed outline-none"
+            className="w-full resize-y rounded-xl shadow-ring bg-raised p-2 text-body leading-relaxed outline-none"
           />
           <Refusal message={refusal} />
           <div className="mt-2 flex gap-2">
-            <button
+            <Button
               type="button"
               disabled={busy || reason.trim().length < MIN_REASON}
               onClick={() => run(() => governance.reopen(matter.id, reason.trim()))}
-              className="rounded-xl shadow-ring px-3 py-1.5 text-[12px] hover:bg-raised disabled:opacity-40"
+              className="rounded-xl shadow-ring px-3 py-1.5 text-note hover:bg-raised disabled:opacity-40"
             >
               {t('reopen.submit')}
-            </button>
-            <button type="button" onClick={() => setReopening(false)} className="text-[12px] text-muted hover:text-paper">
+            </Button>
+            <Button type="button" onClick={() => setReopening(false)} className="text-note text-muted hover:text-paper">
               {t('say.cancel')}
-            </button>
+            </Button>
           </div>
         </Card>
       )}
@@ -347,7 +348,7 @@ export default function VotePanel({
         do, which is the whole point of the column.
       */}
       {matter.status === 'deliberation' && signatory && stepsOutstanding > 0 && (
-        <p className="mb-3 rounded-xl bg-[#FBF4E4] px-4 py-3 text-[12.5px] leading-[1.6] text-[#6b5220] shadow-[0_0_0_0.5px_rgba(176,132,48,0.24)]">
+        <p className="mb-3 rounded-xl bg-goldtint px-4 py-3 text-ui leading-relaxed text-goldink shadow-ringgold">
           {stepsOutstanding} {t('vote.stepsFirst')}
         </p>
       )}

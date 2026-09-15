@@ -3,6 +3,7 @@ import { useI18n } from '../lib/i18n.js';
 import { PageHead } from '../components/page.js';
 import Record from './Record.js';
 import Rules from './Rules.js';
+import { Button } from '../components/Button';
 
 /**
  * What we decided, and what stands.
@@ -63,21 +64,21 @@ export default function WhatStands() {
           className="flex shrink-0 gap-0.5 self-start rounded-xl bg-paper/[0.045] p-[3px] sm:self-auto"
         >
           {TABS.map((k) => (
-            <button
+            <Button
               key={k}
               role="tab"
               type="button"
               aria-selected={tab === k}
               onClick={() => setTab(k)}
               className={
-                'rounded-lg px-3.5 py-1.5 text-[12.5px] transition-all ' +
+                'rounded-lg px-3.5 py-1.5 text-ui transition-all ' +
                 (tab === k
-                  ? 'bg-raised font-semibold text-paper shadow-[0_1px_2px_rgba(25,23,19,0.08)]'
+                  ? 'bg-raised font-semibold text-paper shadow-hairline'
                   : 'text-muted hover:text-sand')
               }
             >
               {t(`stands.tab.${k}`)}
-            </button>
+            </Button>
           ))}
         </div>
         }

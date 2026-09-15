@@ -11,6 +11,7 @@ import { Division, Gaps, Nothing, PageHead } from '../components/page.js';
 import { Field } from '../components/field.js';
 import { ErrorText, Loading } from '../components/ui.js';
 import { useStillThere } from '../lib/stillThere.js';
+import { Button } from '../components/Button';
 
 /**
  * What the institution has asked, and what the board did about it.
@@ -29,8 +30,8 @@ import { useStillThere } from '../lib/stillThere.js';
  * anything from is the board refusing to answer and refusing to say why.
  */
 
-const field = 'w-full rounded-xl bg-raised shadow-ring p-2.5 text-[14px] leading-relaxed outline-none';
-const label = 'mb-1 block text-[12px] text-muted';
+const field = 'w-full rounded-xl bg-raised shadow-ring p-2.5 text-body leading-relaxed outline-none';
+const label = 'mb-1 block text-note text-muted';
 
 function span(hours: number, t: (k: string) => string): string {
   if (hours < 48) return `${hours} ${t('attention.hours')}`;
@@ -104,16 +105,16 @@ function One({
         {s.standing === 'declined' && <State tone="breach">{t('queue.declined')}</State>}
         {s.standing === 'withdrawn' && <State tone="plain">{t('queue.withdrawn')}</State>}
 
-        <span className="text-[11.5px] text-muted">
+        <span className="text-note text-muted">
           {t('queue.asked')} {s.arrivedAt.slice(0, 10)}
           <span className="mx-1.5 opacity-40">·</span>
           <span className="tabular-nums">{clock(s, t)}</span>
         </span>
       </div>
 
-      <div className="font-display text-[18px] leading-snug">{s.subject}</div>
+      <div className="font-display text-sub leading-snug">{s.subject}</div>
 
-      <div className="mt-1 text-[11.5px] text-muted">
+      <div className="mt-1 text-note text-muted">
         {s.askedBy}
         {s.onBehalf && (
           <>
@@ -129,10 +130,10 @@ function One({
         wrote and which the board did.
       */}
       <div className="mt-3.5">
-        <div className="mb-1 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+        <div className="mb-1 text-label font-bold uppercase tracking-caps text-muted">
           {t('queue.theirWords')}
         </div>
-        <p className="max-w-[62ch] font-display text-[15.5px] leading-[1.55]">{s.question}</p>
+        <p className="max-w-[62ch] font-display text-lead leading-relaxed">{s.question}</p>
       </div>
 
       {/*
@@ -145,7 +146,7 @@ function One({
         to pick something up, not to read it.
       */}
       {s.awaiting && (
-        <p className="mt-2.5 max-w-[62ch] text-[12.5px] leading-[1.6] text-muted">
+        <p className="mt-2.5 max-w-[62ch] text-ui leading-relaxed text-muted">
           <span className="font-semibold">{t('queue.awaiting')}</span> {s.awaiting}
         </p>
       )}
@@ -154,7 +155,7 @@ function One({
         <div className="mt-3">
           <Fold heading={t('queue.moreOnThis')} summary={s.draft ? t('queue.withDraft') : undefined}>
             {s.background && (
-              <p className="max-w-[62ch] text-[12.5px] leading-[1.6] text-muted">{s.background}</p>
+              <p className="max-w-[62ch] text-ui leading-relaxed text-muted">{s.background}</p>
             )}
 
 
@@ -177,14 +178,14 @@ function One({
           .map((d, i) => (
             <p
               key={i}
-              className="mt-3 max-w-[62ch] rounded-xl bg-raised px-3.5 py-2.5 text-[12.5px] leading-[1.6] shadow-ring"
+              className="mt-3 max-w-[62ch] rounded-xl bg-raised px-3.5 py-2.5 text-ui leading-relaxed shadow-ring"
             >
               {d.reason}
             </p>
           ))}
 
       {s.matterId && (
-        <p className="mt-3 text-[12.5px]">
+        <p className="mt-3 text-ui">
           <Link to={`/matters/${s.matterId}`} className="text-lapis underline underline-offset-2">
             {t('queue.seeMatter')}
           </Link>
@@ -214,7 +215,7 @@ function One({
       {act === 'open' && (
         <div className="mt-4">
           {wasDeclined && (
-            <p className="mb-3 rounded-xl bg-[#F7F0E2] px-3.5 py-2.5 text-[12px] leading-[1.55] text-[#8A6524] shadow-[0_0_0_0.5px_rgba(176,132,48,0.28)]">
+            <p className="mb-3 rounded-xl bg-[#F7F0E2] px-3.5 py-2.5 text-note leading-relaxed text-goldink shadow-ringgold">
               {t('queue.reconsider')}
             </p>
           )}
@@ -255,24 +256,24 @@ function One({
             className="mb-3 flex flex-wrap gap-2"
           >
             {(['permit', 'restrict'] as const).map((d) => (
-              <button
+              <Button
                 key={d}
                 type="button"
                 onClick={() => setDirection(d)}
                 className={
-                  'rounded-xl px-4 py-2 text-[12.5px] transition-all ' +
+                  'rounded-xl px-4 py-2 text-ui transition-all ' +
                   (direction === d
-                    ? 'bg-[#EAF1F7] font-semibold text-lapis shadow-[0_0_0_1.5px_#164470]'
+                    ? 'bg-lapistint font-semibold text-lapis shadow-pick'
                     : 'bg-raised text-sand shadow-ring hover:text-paper')
                 }
               >
                 {t(`raise.direction.${d}`)}
-              </button>
+              </Button>
             ))}
           </div>
 
           {error && (
-            <p className="mb-3 rounded-xl bg-[#FCF0EE] px-3.5 py-2.5 text-[12.5px] text-breach shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)]">
+            <p className="mb-3 rounded-xl bg-breachtint px-3.5 py-2.5 text-ui text-breach shadow-ringbreach">
               {error}
             </p>
           )}
@@ -301,7 +302,7 @@ function One({
           </Field>
 
           {error && (
-            <p className="mb-3 rounded-xl bg-[#FCF0EE] px-3.5 py-2.5 text-[12.5px] text-breach shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)]">
+            <p className="mb-3 rounded-xl bg-breachtint px-3.5 py-2.5 text-ui text-breach shadow-ringbreach">
               {error}
             </p>
           )}
@@ -389,7 +390,7 @@ export default function Questions({ boardId }: { boardId: string }) {
               <State tone={longest >= 24 * 7 ? 'attention' : 'plain'}>
                 {open.length} {t('spine.asked.count')}
               </State>
-              <span className="text-[12.5px] text-muted">
+              <span className="text-ui text-muted">
                 {t('spine.longestWait')}{' '}
                 <span className="font-mono tabular-nums text-gold">{span(longest, t)}</span>
               </span>
@@ -440,7 +441,7 @@ export default function Questions({ boardId }: { boardId: string }) {
 
       {/* Nothing here is a control: the route refuses regardless of what shows. */}
       {!canAct && all.length > 0 && (
-        <p className="mt-6 text-[12px] text-muted">{t('whoami.observerBody')}</p>
+        <p className="mt-6 text-note text-muted">{t('whoami.observerBody')}</p>
       )}
     </div>
   );

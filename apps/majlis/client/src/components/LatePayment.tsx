@@ -11,6 +11,7 @@ import {
 import { useI18n } from '../lib/i18n.js';
 import { Choice, Compute, Money, Note, Rate, Refusal, Result, Text, useCalc } from './calc.js';
 import RecordCalculation from './RecordCalculation.js';
+import { Button } from './Button';
 
 /**
  * An increase taken on a late debt, and the one thing it may not become.
@@ -187,57 +188,57 @@ export default function LatePayment() {
 
           {retention === 'evidenced_costs' && (
             <fieldset className="mb-3 rounded-xl shadow-ring px-3 py-3">
-              <legend className="px-1 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+              <legend className="px-1 text-label font-bold uppercase tracking-caps text-muted">
                 {t('late.costs')}
               </legend>
-              <p className="mb-2.5 text-[11.5px] leading-relaxed text-muted">{t('late.costs.hint')}</p>
+              <p className="mb-2.5 text-note leading-relaxed text-muted">{t('late.costs.hint')}</p>
 
               <div className="space-y-2">
                 {costs.map((cost, i) => (
                   <div key={i} className="flex flex-wrap items-end gap-2">
                     <div className="min-w-[180px] flex-[2]">
                       <label className="block">
-                        <span className="mb-1 block text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+                        <span className="mb-1 block text-label font-bold uppercase tracking-caps text-muted">
                           {t('late.costWhat')}
                         </span>
                         <input
                           value={cost.description}
                           onChange={(e) => setCost(i, { description: e.target.value })}
-                          className="w-full rounded-xl shadow-ring bg-raised px-2.5 py-1.5 text-[13px] focus:shadow-[0_0_0_1.5px_rgba(22,68,112,0.35)] focus:outline-none"
+                          className="w-full rounded-xl shadow-ring bg-raised px-2.5 py-1.5 text-ui focus:shadow-pick focus:outline-none"
                         />
                       </label>
                     </div>
                     <div className="w-36">
                       <label className="block">
-                        <span className="mb-1 block text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+                        <span className="mb-1 block text-label font-bold uppercase tracking-caps text-muted">
                           {t('late.costAmount')}
                         </span>
                         <input
                           inputMode="decimal"
                           value={cost.amount}
                           onChange={(e) => setCost(i, { amount: e.target.value })}
-                          className="w-full rounded-xl shadow-ring bg-raised px-2.5 py-1.5 font-mono text-[13px] tabular-nums focus:shadow-[0_0_0_1.5px_rgba(22,68,112,0.35)] focus:outline-none"
+                          className="w-full rounded-xl shadow-ring bg-raised px-2.5 py-1.5 font-mono text-ui tabular-nums focus:shadow-pick focus:outline-none"
                         />
                       </label>
                     </div>
-                    <button
+                    <Button
                       type="button"
                       onClick={() => setCosts((was) => was.filter((_, j) => j !== i))}
-                      className="rounded-xl shadow-ring px-2.5 py-1.5 text-[12px] text-muted hover:text-paper"
+                      className="rounded-xl shadow-ring px-2.5 py-1.5 text-note text-muted hover:text-paper"
                     >
                       {t('late.removeCost')}
-                    </button>
+                    </Button>
                   </div>
                 ))}
               </div>
 
-              <button
+              <Button
                 type="button"
                 onClick={() => setCosts((was) => [...was, { description: '', amount: '' }])}
-                className="mt-2.5 rounded-xl shadow-ring px-2.5 py-1 text-[12px] text-muted hover:text-paper"
+                className="mt-2.5 rounded-xl shadow-ring px-2.5 py-1 text-note text-muted hover:text-paper"
               >
                 {t('late.addCost')}
-              </button>
+              </Button>
             </fieldset>
           )}
 
@@ -261,7 +262,7 @@ export default function LatePayment() {
             are what the method produces, not a finding that anything is due.
           */}
           {result.solvencyWarning && (
-            <p className="mt-5 rounded-xl shadow-[0_0_0_0.5px_rgba(154,56,48,0.2)] bg-[#FCF0EE] px-3 py-2.5 text-[12.5px] leading-relaxed text-breach">
+            <p className="mt-5 rounded-xl shadow-ringbreach bg-breachtint px-3 py-2.5 text-ui leading-relaxed text-breach">
               {result.solvencyWarning}
             </p>
           )}
@@ -271,17 +272,17 @@ export default function LatePayment() {
             amount={`${result.toBeGivenAway} ${result.currency}`}
             steps={result.steps}
           >
-            <p className="mb-2 text-[12.5px] leading-relaxed text-muted">{result.methodStated}</p>
-            <p className="mb-2 text-[12.5px] leading-relaxed text-muted">{result.solvencyStated}</p>
+            <p className="mb-2 text-ui leading-relaxed text-muted">{result.methodStated}</p>
+            <p className="mb-2 text-ui leading-relaxed text-muted">{result.solvencyStated}</p>
             {/*
               Printed with the figure rather than behind it, like whose zakat
               obligation it is. This sentence is what stops a retained amount
               being read as ordinary revenue.
             */}
-            <p className="mb-3 rounded-xl shadow-ring px-3 py-2 text-[12.5px] leading-relaxed">
+            <p className="mb-3 rounded-xl shadow-ring px-3 py-2 text-ui leading-relaxed">
               {result.retentionStated}
             </p>
-            <div className="mb-3 space-y-1 text-[12.5px]">
+            <div className="mb-3 space-y-1 text-ui">
               <div className="flex items-baseline justify-between gap-2">
                 <span className="text-muted">{t('late.charged')}</span>
                 <span className="font-mono tabular-nums">{result.charged}</span>

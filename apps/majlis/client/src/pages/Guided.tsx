@@ -78,7 +78,7 @@ function TheOneThing({ item }: { item: AttentionItem }) {
         {left && (
           <span
             className={
-              'font-mono text-[12.5px] tabular-nums ' +
+              'font-mono text-ui tabular-nums ' +
               (item.overdue ? 'text-breach' : 'text-gold')
             }
           >
@@ -88,7 +88,7 @@ function TheOneThing({ item }: { item: AttentionItem }) {
       </div>
 
       {/* The one large thing on the page. */}
-      <div className="mt-3.5 max-w-[28ch] font-display text-[26px] leading-[1.18] tracking-[-0.02em] text-paper sm:text-[30px]">
+      <div className="mt-3.5 max-w-[28ch] font-display text-head leading-tight tracking-title text-paper sm:text-head">
         {item.title}
       </div>
 
@@ -161,7 +161,7 @@ function Pressing({
       ) : (
         <Display className="max-w-[20ch] text-sand">{t('pressing.nothingOutstanding')}</Display>
       )}
-      <p className="mt-3 text-[13px] leading-[1.6] text-muted">{t('guided.clearShort')}</p>
+      <p className="mt-3 text-ui leading-relaxed text-muted">{t('guided.clearShort')}</p>
     </>
   );
 }
@@ -292,11 +292,11 @@ export default function Guided() {
                                     : 'bg-line')
                               }
                             />
-                            <span className="font-display text-[18px] leading-snug tracking-[-0.012em] text-paper">
+                            <span className="font-display text-sub leading-snug tracking-tight text-paper">
                               {item.title}
                             </span>
                           </div>
-                          <span className="shrink-0 text-[12.5px] text-muted">
+                          <span className="shrink-0 text-ui text-muted">
                             {t(
                               item.kind === 'overdue'
                                 ? 'attention.overdueKind'
@@ -364,7 +364,7 @@ export default function Guided() {
           out that they were a sequence — and a board member who cannot tell
           what the application is for in one look does not open it twice.
         */}
-        <p className="mb-5 max-w-[62ch] text-[13.5px] leading-[1.7] text-sand">
+        <p className="mb-5 max-w-[62ch] text-body leading-loose text-sand">
           {t('spine.howItWorks')}
         </p>
 

@@ -5,6 +5,7 @@ import { useI18n } from '../lib/i18n.js';
 import { DateText } from './ui.js';
 import { Field, HEADING } from './field.js';
 import { Nothing } from './page.js';
+import { Button } from './Button';
 
 /**
  * What the board has asked this institution, and the box to answer in.
@@ -112,7 +113,7 @@ export default function WhatTheBoardAsked({ boardId }: { boardId: string }) {
 
   return (
     <section className="mb-8">
-      <h2 className="mb-1 text-[10px] font-bold uppercase tracking-[0.14em] text-muted">
+      <h2 className="mb-1 text-label font-bold uppercase tracking-caps text-muted">
         {t('toDesk.onCase')}
       </h2>
 
@@ -123,9 +124,9 @@ export default function WhatTheBoardAsked({ boardId }: { boardId: string }) {
           {outstanding.map((row) => (
             <li
               key={row.questionId}
-              className="rounded-card bg-[#FBF4E4] px-5 py-4 shadow-[0_0_0_0.5px_rgba(176,132,48,0.24)]"
+              className="rounded-card bg-goldtint px-5 py-4 shadow-ringgold"
             >
-              <div className="mb-1.5 flex flex-wrap items-baseline gap-x-3 gap-y-1 text-[11.5px] text-muted">
+              <div className="mb-1.5 flex flex-wrap items-baseline gap-x-3 gap-y-1 text-note text-muted">
                 <DateText iso={row.askedAt} />
                 <span>{row.askedBy}</span>
                 <Link
@@ -135,7 +136,7 @@ export default function WhatTheBoardAsked({ boardId }: { boardId: string }) {
                   {row.matter.title}
                 </Link>
               </div>
-              <p className="max-w-[62ch] font-display text-[15px] leading-[1.6] text-paper">
+              <p className="max-w-[62ch] font-display text-lead leading-relaxed text-paper">
                 {row.asking}
               </p>
 
@@ -148,41 +149,41 @@ export default function WhatTheBoardAsked({ boardId }: { boardId: string }) {
                         rows={4}
                         value={answer}
                         onChange={(e) => setAnswer(e.target.value)}
-                        className="w-full rounded-xl bg-raised px-3 py-2.5 text-[13px] leading-[1.6] shadow-ring outline-none"
+                        className="w-full rounded-xl bg-raised px-3 py-2.5 text-ui leading-relaxed shadow-ring outline-none"
                         required
                       />
                     )}
                   </Field>
-                  {refusal && <p className="mt-2.5 text-[12.5px] text-breach">{refusal}</p>}
+                  {refusal && <p className="mt-2.5 text-ui text-breach">{refusal}</p>}
                   <div className="mt-3 flex flex-wrap items-center gap-3">
-                    <button
+                    <Button
                       type="submit"
                       disabled={busy || answer.trim().length < 10}
-                      className="rounded-xl bg-lapis px-4 py-2 text-[12.5px] font-semibold text-white shadow-act disabled:opacity-40"
+                      className="rounded-xl bg-lapis px-4 py-2 text-ui font-semibold text-white shadow-act disabled:opacity-40"
                     >
                       {t('toDesk.sendAnswer')}
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       type="button"
                       onClick={() => setAnswering(null)}
-                      className="text-[12px] text-muted underline decoration-line underline-offset-4"
+                      className="text-note text-muted underline decoration-line underline-offset-4"
                     >
                       {t('common.cancel')}
-                    </button>
+                    </Button>
                   </div>
                 </form>
               ) : (
-                <button
+                <Button
                   type="button"
                   onClick={() => {
                     setAnswering(row.questionId);
                     setAnswer('');
                     setRefusal(null);
                   }}
-                  className="mt-3 rounded-xl bg-lapis px-4 py-2 text-[12.5px] font-semibold text-white shadow-act"
+                  className="mt-3 rounded-xl bg-lapis px-4 py-2 text-ui font-semibold text-white shadow-act"
                 >
                   {t('toDesk.answerIt')}
-                </button>
+                </Button>
               )}
             </li>
           ))}
@@ -190,19 +191,19 @@ export default function WhatTheBoardAsked({ boardId }: { boardId: string }) {
           {answered.length > 0 && (
             <li>
               <details>
-                <summary className="cursor-pointer text-[12.5px] text-muted hover:text-paper">
+                <summary className="cursor-pointer text-ui text-muted hover:text-paper">
                   {answered.length} {t('toDesk.answered')}
                 </summary>
                 <ul className="mt-2.5 space-y-2.5">
                   {answered.map((row) => (
                     <li key={row.questionId} className="rounded-card bg-raised px-5 py-4 shadow-ring">
-                      <div className="mb-1.5 text-[11.5px] text-muted">
+                      <div className="mb-1.5 text-note text-muted">
                         <DateText iso={row.askedAt} />
                         <span className="mx-1.5 opacity-40">·</span>
                         {row.matter.title}
                       </div>
-                      <p className="max-w-[62ch] text-[13px] leading-[1.6] text-sand">{row.asking}</p>
-                      <p className="mt-2 max-w-[62ch] font-display text-[14.5px] leading-[1.55] text-paper">
+                      <p className="max-w-[62ch] text-ui leading-relaxed text-sand">{row.asking}</p>
+                      <p className="mt-2 max-w-[62ch] font-display text-lead leading-relaxed text-paper">
                         {row.answer}
                       </p>
                     </li>

@@ -6,6 +6,7 @@ import { mayDeliberate, useIdentity } from '../lib/identity.js';
 import { Division, Nothing, PageHead } from '../components/page.js';
 import { ErrorText, Loading } from '../components/ui.js';
 import ReadTheContract from '../components/ReadTheContract.js';
+import { Button } from '../components/Button';
 
 /**
  * Here is a contract. Show me where it answers each condition.
@@ -154,12 +155,12 @@ export default function CheckAContract() {
         ) : (
           <div className="flex flex-wrap gap-2">
             {shapes.map((h) => (
-              <button
+              <Button
                 key={h.structure.id}
                 type="button"
                 onClick={() => setPick(h.structure.id)}
                 className={
-                  'rounded-card px-4 py-2.5 text-start text-[13px] leading-snug transition-all ' +
+                  'rounded-card px-4 py-2.5 text-start text-ui leading-snug transition-all ' +
                   (pick === h.structure.id
                     ? 'bg-raised font-semibold text-paper shadow-card'
                     : 'bg-ink text-sand shadow-ring hover:text-paper')
@@ -172,12 +173,12 @@ export default function CheckAContract() {
                   answers, and the difference has to be visible before the
                   reading rather than explained after it.
                 */}
-                <span className="mt-0.5 block text-[11px] font-normal text-muted">
+                <span className="mt-0.5 block text-note font-normal text-muted">
                   {t(h.source === 'draft' ? 'adopt.draft' : 'adopt.adopted')}
                   <span className="mx-1.5 opacity-40">·</span>
                   {h.structure.conditions.length} {t('check.conditions')}
                 </span>
-              </button>
+              </Button>
             ))}
           </div>
         )}

@@ -7,6 +7,7 @@ import Zakat from './Zakat.js';
 import Distribution from './Distribution.js';
 import Tradability from './Tradability.js';
 import LatePayment from './LatePayment.js';
+import { Button } from './Button';
 
 /**
  * The calculator, inside the step that needs it.
@@ -111,7 +112,7 @@ export default function TheCalculator({
    */
   if (kinds.length === 0) {
     return (
-      <p className="mt-3 rounded-xl bg-raised/60 px-4 py-2.5 text-[12px] leading-[1.6] text-muted shadow-ring">
+      <p className="mt-3 rounded-xl bg-raised/60 px-4 py-2.5 text-note leading-relaxed text-muted shadow-ring">
         {t('step.noCalculator')}
       </p>
     );
@@ -119,40 +120,40 @@ export default function TheCalculator({
 
   if (!open) {
     return (
-      <button
+      <Button
         type="button"
         onClick={() => setOpen(true)}
-        className="mt-3 rounded-xl bg-lapis px-4 py-2 text-[12.5px] font-semibold text-white shadow-act transition-all hover:bg-lapissoft"
+        className="mt-3 rounded-xl bg-lapis px-4 py-2 text-ui font-semibold text-white shadow-act transition-all hover:bg-lapissoft"
       >
         {kinds.length === 1
           ? `${t('step.workItOut')} — ${t(`calc.tab.${kinds[0]}`)}`
           : t('step.workItOut')}
-      </button>
+      </Button>
     );
   }
 
   return (
     <div className="mt-3 rounded-card bg-ink/70 px-4 py-4 shadow-ring">
-      <p className="mb-3 max-w-[58ch] text-[12px] leading-[1.6] text-muted">{t('step.calcLead')}</p>
+      <p className="mb-3 max-w-[58ch] text-note leading-relaxed text-muted">{t('step.calcLead')}</p>
 
       {/* Which one, where the shape names more than a single calculator. */}
       {kinds.length > 1 && (
         <div className="mb-4 flex flex-wrap gap-2">
           {kinds.map((k) => (
-            <button
+            <Button
               key={k}
               type="button"
               aria-pressed={picked === k}
               onClick={() => setPicked(k)}
               className={
-                'rounded-full px-3.5 py-1.5 text-[12px] transition-all ' +
+                'rounded-full px-3.5 py-1.5 text-note transition-all ' +
                 (picked === k
                   ? 'bg-lapis font-semibold text-white'
                   : 'bg-raised text-sand shadow-ring hover:text-paper')
               }
             >
               {t(`calc.tab.${k}`)}
-            </button>
+            </Button>
           ))}
         </div>
       )}
@@ -162,16 +163,16 @@ export default function TheCalculator({
           <One kind={picked} />
         </WorkedOutForProvider>
       ) : (
-        <p className="text-[12.5px] text-muted">{t('step.whichCalculator')}</p>
+        <p className="text-ui text-muted">{t('step.whichCalculator')}</p>
       )}
 
-      <button
+      <Button
         type="button"
         onClick={() => setOpen(false)}
-        className="mt-3 text-[12px] text-muted underline decoration-line underline-offset-4"
+        className="mt-3 text-note text-muted underline decoration-line underline-offset-4"
       >
         {t('step.closeCalculator')}
-      </button>
+      </Button>
     </div>
   );
 }

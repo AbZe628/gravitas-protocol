@@ -7,6 +7,7 @@ import RaiseAMatter from '../components/RaiseAMatter.js';
 import { Nothing } from '../components/page.js';
 import { PageHead } from '../components/page.js';
 import { Sources, Tag } from '../components/ui.js';
+import { Button } from '../components/Button';
 
 export default function Assistant() {
   const { t } = useI18n();
@@ -46,7 +47,7 @@ export default function Assistant() {
         says={t('asst.lead')}
       />
 
-      <div className="mb-6 rounded-card shadow-[0_0_0_0.5px_rgba(176,132,48,0.24)] bg-[#FBF4E4] px-4 py-3 text-[13px] leading-relaxed text-sand">
+      <div className="mb-6 rounded-card shadow-ringgold bg-goldtint px-4 py-3 text-ui leading-relaxed text-sand">
         {t('asst.limits')}
       </div>
 
@@ -56,13 +57,13 @@ export default function Assistant() {
         the sentence at the bottom of the page saying there is nothing to ask.
       */}
       {thread.length === 0 && !busy && !off && (
-        <p className="mb-6 text-[13px] text-muted">{t('asst.empty')}</p>
+        <p className="mb-6 text-ui text-muted">{t('asst.empty')}</p>
       )}
 
       <ul className="mb-6 space-y-5">
         {thread.map((x) => (
           <li key={x.id}>
-            <div className="mb-2.5 rounded-card bg-black/[0.035] px-5 py-3 text-[14px] text-sand">
+            <div className="mb-2.5 rounded-card bg-black/[0.035] px-5 py-3 text-body text-sand">
               {x.question}
             </div>
             <div className="rounded-card bg-raised px-5 py-4 shadow-card">
@@ -72,7 +73,7 @@ export default function Assistant() {
                   {x.escalated && <Tag tone="gold">{t('asst.escalated')}</Tag>}
                 </div>
               )}
-              <p className="whitespace-pre-wrap text-[14px] leading-relaxed">{x.answer}</p>
+              <p className="whitespace-pre-wrap text-body leading-relaxed">{x.answer}</p>
               <Sources sources={x.sources} />
 
               {/*
@@ -95,7 +96,7 @@ export default function Assistant() {
         ))}
       </ul>
 
-      {error && <div className="mb-4 text-[13px] text-breach">{t('asst.error')}</div>}
+      {error && <div className="mb-4 text-ui text-breach">{t('asst.error')}</div>}
 
       {/*
         Absent, not disabled. A question box on an installation with no
@@ -116,16 +117,16 @@ export default function Assistant() {
             rows={2}
             placeholder={t('asst.placeholder')}
             aria-label={t('asst.placeholder')}
-            className="flex-1 resize-none bg-transparent px-2 py-1.5 text-[15px] outline-none placeholder:text-muted"
+            className="flex-1 resize-none bg-transparent px-2 py-1.5 text-lead outline-none placeholder:text-muted"
           />
-          <button
+          <Button
             type="button"
             onClick={submit}
             disabled={busy || question.trim().length < 3}
-            className="self-end rounded bg-lapis px-4 py-2 text-[13px] text-white font-semibold shadow-act transition-colors hover:bg-lapis disabled:opacity-40"
+            className="self-end rounded bg-lapis px-4 py-2 text-ui text-white font-semibold shadow-act transition-colors hover:bg-lapis disabled:opacity-40"
           >
             {busy ? t('asst.thinking') : t('asst.send')}
-          </button>
+          </Button>
         </div>
       </div>
       )}

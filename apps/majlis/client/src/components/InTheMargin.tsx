@@ -4,6 +4,7 @@ import { useI18n } from '../lib/i18n.js';
 import { mayDeliberate, useIdentity } from '../lib/identity.js';
 import { Nothing } from './page.js';
 import { useStillThere } from '../lib/stillThere.js';
+import { Button } from './Button';
 
 /**
  * The papers, with what members wrote in the margin beside them.
@@ -60,7 +61,7 @@ function Marked({ text, threads }: { text: string; threads: AnnotationThread[] }
   if (at < text.length) parts.push({ text: text.slice(at), marked: false });
 
   return (
-    <p className="max-w-[58ch] whitespace-pre-wrap font-display text-[17px] leading-[1.6]">
+    <p className="max-w-[58ch] whitespace-pre-wrap font-display text-sub leading-relaxed">
       {parts.map((p, i) =>
         p.marked ? (
           <mark
@@ -124,24 +125,24 @@ function Note({
 
   return (
     <li className="rounded-card bg-ink px-4 py-3.5 shadow-ring">
-      <p className="mb-2 border-s-2 border-gold/40 ps-3 text-[12.5px] italic leading-[1.55] text-muted">
+      <p className="mb-2 border-s-2 border-gold/40 ps-3 text-ui italic leading-relaxed text-muted">
         {a.quote}
       </p>
 
       {thread.note.adrift && (
-        <p className="mb-2 text-[12px] leading-[1.55] text-gold">{t('margin.adrift')}</p>
+        <p className="mb-2 text-note leading-relaxed text-gold">{t('margin.adrift')}</p>
       )}
 
       <p
         className={
-          'max-w-[58ch] text-[13.5px] leading-[1.65] ' +
+          'max-w-[58ch] text-body leading-relaxed ' +
           (a.withdrawn ? 'text-muted line-through decoration-line' : 'text-paper')
         }
       >
         {a.said}
       </p>
 
-      <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11.5px] text-muted">
+      <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-note text-muted">
         <span>{a.whoName ?? thread.whoName ?? a.by}</span>
         <span className="opacity-40">·</span>
         <span className="font-mono">{a.atTime.slice(0, 10)}</span>
@@ -152,8 +153,8 @@ function Note({
         <ul className="mt-3 space-y-2 border-s border-line ps-3.5">
           {thread.replies.map((r) => (
             <li key={r.id}>
-              <p className="max-w-[56ch] text-[13px] leading-[1.6] text-sand">{r.said}</p>
-              <div className="mt-1 text-[11.5px] text-muted">
+              <p className="max-w-[56ch] text-ui leading-relaxed text-sand">{r.said}</p>
+              <div className="mt-1 text-note text-muted">
                 {r.whoName ?? r.by}
                 <span className="mx-1.5 opacity-40">·</span>
                 <span className="font-mono">{r.atTime.slice(0, 10)}</span>
@@ -163,17 +164,17 @@ function Note({
         </ul>
       )}
 
-      {failed && <p className="mt-2 text-[12.5px] text-breach">{failed}</p>}
+      {failed && <p className="mt-2 text-ui text-breach">{failed}</p>}
 
-      <div className="mt-2.5 flex flex-wrap items-center gap-4 text-[12px]">
+      <div className="mt-2.5 flex flex-wrap items-center gap-4 text-note">
         {!a.withdrawn && !replying && (
-          <button
+          <Button
             type="button"
             onClick={() => setReplying(true)}
             className="font-semibold text-lapis underline decoration-line underline-offset-4"
           >
             {t('margin.reply')}
-          </button>
+          </Button>
         )}
         {/*
           Withdrawing belongs to whoever wrote it. Somebody else removing a
@@ -181,14 +182,14 @@ function Note({
           regardless of what is shown.
         */}
         {!a.withdrawn && a.by === mine && (
-          <button
+          <Button
             type="button"
             onClick={drop}
             disabled={busy}
             className="text-muted underline decoration-line underline-offset-4 disabled:opacity-50"
           >
             {t('margin.withdraw')}
-          </button>
+          </Button>
         )}
       </div>
 
@@ -199,24 +200,24 @@ function Note({
             value={said}
             onChange={(e) => setSaid(e.target.value)}
             rows={3}
-            className="w-full rounded-card bg-raised px-3.5 py-2.5 text-[13px] leading-[1.6] text-paper shadow-ring outline-none"
+            className="w-full rounded-card bg-raised px-3.5 py-2.5 text-ui leading-relaxed text-paper shadow-ring outline-none"
           />
           <div className="mt-2 flex flex-wrap items-center gap-4">
-            <button
+            <Button
               type="button"
               onClick={reply}
               disabled={busy || said.trim().length < 2}
-              className="rounded-card bg-lapis px-4 py-2 text-[12.5px] font-bold text-white shadow-act disabled:opacity-50"
+              className="rounded-card bg-lapis px-4 py-2 text-ui font-bold text-white shadow-act disabled:opacity-50"
             >
               {t('margin.send')}
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
               onClick={() => setReplying(false)}
-              className="text-[12px] text-muted underline decoration-line underline-offset-4"
+              className="text-note text-muted underline decoration-line underline-offset-4"
             >
               {t('common.back')}
-            </button>
+            </Button>
           </div>
         </div>
       )}
@@ -289,7 +290,7 @@ export default function InTheMargin({
   }
 
   if (failed) return <Nothing>{t('margin.unavailable')}</Nothing>;
-  if (!margin) return <p className="text-[13px] text-muted">{t('common.loading')}</p>;
+  if (!margin) return <p className="text-ui text-muted">{t('common.loading')}</p>;
 
   const standing = margin.threads.filter((x) => !x.note.annotation.withdrawn);
 
@@ -303,7 +304,7 @@ export default function InTheMargin({
         <div className="mt-4">
           {selected ? (
             <div className="rounded-card bg-ink px-4 py-4 shadow-ring">
-              <p className="mb-2 border-s-2 border-gold/40 ps-3 text-[12.5px] italic leading-[1.55] text-sand">
+              <p className="mb-2 border-s-2 border-gold/40 ps-3 text-ui italic leading-relaxed text-sand">
                 {selected}
               </p>
               <textarea
@@ -312,39 +313,39 @@ export default function InTheMargin({
                 onChange={(e) => setSaid(e.target.value)}
                 rows={3}
                 placeholder={t('margin.placeholder')}
-                className="w-full rounded-card bg-raised px-3.5 py-2.5 text-[13px] leading-[1.6] text-paper shadow-ring outline-none placeholder:text-muted"
+                className="w-full rounded-card bg-raised px-3.5 py-2.5 text-ui leading-relaxed text-paper shadow-ring outline-none placeholder:text-muted"
               />
-              {refused && <p className="mt-2 text-[12.5px] text-breach">{refused}</p>}
+              {refused && <p className="mt-2 text-ui text-breach">{refused}</p>}
               <div className="mt-2.5 flex flex-wrap items-center gap-4">
-                <button
+                <Button
                   type="button"
                   onClick={write}
                   disabled={busy || said.trim().length < 2}
-                  className="rounded-card bg-lapis px-5 py-2.5 text-[13px] font-bold text-white shadow-act disabled:opacity-50"
+                  className="rounded-card bg-lapis px-5 py-2.5 text-ui font-bold text-white shadow-act disabled:opacity-50"
                 >
                   {t('margin.write')}
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
                   onClick={() => setSelected('')}
-                  className="text-[12px] text-muted underline decoration-line underline-offset-4"
+                  className="text-note text-muted underline decoration-line underline-offset-4"
                 >
                   {t('common.back')}
-                </button>
+                </Button>
               </div>
-              <p className="mt-3 max-w-[58ch] text-[12px] leading-[1.6] text-muted">
+              <p className="mt-3 max-w-[58ch] text-note leading-relaxed text-muted">
                 {t('margin.notDeliberation')}
               </p>
             </div>
           ) : (
-            <p className="text-[12.5px] text-muted">{t('margin.howTo')}</p>
+            <p className="text-ui text-muted">{t('margin.howTo')}</p>
           )}
         </div>
       )}
 
       {margin.threads.length > 0 && (
         <div className="mt-5">
-          <div className="mb-2.5 text-[10px] font-bold uppercase tracking-[0.14em] text-muted">
+          <div className="mb-2.5 text-label font-bold uppercase tracking-caps text-muted">
             {t('margin.heading')}
             <span className="ms-2 font-mono tabular-nums opacity-70">{standing.length}</span>
           </div>

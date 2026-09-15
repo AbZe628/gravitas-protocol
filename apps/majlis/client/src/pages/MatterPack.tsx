@@ -185,7 +185,7 @@ export default function MatterPack() {
     <article className="flex flex-col gap-9 lg:flex-row lg:items-start">
       {/* ── the pack ──────────────────────────────────────────────── */}
       <div className="min-w-0 flex-1">
-        <div className="mb-4 flex flex-wrap items-center gap-2.5 text-[12.5px] text-muted">
+        <div className="mb-4 flex flex-wrap items-center gap-2.5 text-ui text-muted">
           <Link to="/classic" className="hover:text-paper">
             {t('door.deciding')}
           </Link>
@@ -199,7 +199,7 @@ export default function MatterPack() {
           </State>
           <State tone={toneForStatus(matter.status)}>{t(`matter.status.${matter.status}`)}</State>
           {q && q.waitedDays !== null && (
-            <span className="text-[12.5px] text-muted">
+            <span className="text-ui text-muted">
               {t('pack.waiting')}{' '}
               <span className="font-mono tabular-nums text-gold">{q.waitedDays}</span>{' '}
               {t('guided.days')}
@@ -211,7 +211,7 @@ export default function MatterPack() {
         </div>
 
         <h1
-          className="mb-3 max-w-[24ch] font-display text-[32px] font-normal leading-[1.1] tracking-[-0.026em] sm:text-[38px]"
+          className="mb-3 max-w-[24ch] font-display text-head font-normal leading-tight tracking-display sm:text-display"
           style={{ textWrap: 'balance' }}
         >
           {matter.title}
@@ -241,17 +241,17 @@ export default function MatterPack() {
             separate tab makes a reader hold two documents in their head.
           */}
           <InTheMargin on="proposal" subjectId={matter.id} />
-          <p className="mt-3 text-[12.5px] text-muted">
+          <p className="mt-3 text-ui text-muted">
             {q?.arrivedAt ? `${t('pack.asked')} ${day(q.arrivedAt)} · ` : ''}
             {t('pack.opened')} {day(matter.openedAt)}
           </p>
 
           {matter.notDecided.length > 0 && (
             <div className="mt-5">
-              <div className="mb-2 text-[12px] text-muted">{t('matter.notDecided')}</div>
+              <div className="mb-2 text-note text-muted">{t('matter.notDecided')}</div>
               <ul className="space-y-1.5">
                 {matter.notDecided.map((n, i) => (
-                  <li key={i} className="flex gap-2.5 text-[13.5px] leading-[1.6] text-sand">
+                  <li key={i} className="flex gap-2.5 text-body leading-relaxed text-sand">
                     <span className="mt-[9px] h-1 w-1 shrink-0 rounded-full bg-muted" />
                     <span>{n}</span>
                   </li>
@@ -274,7 +274,7 @@ export default function MatterPack() {
           <>
           <Fold heading={t('pack.alreadySaid')} summary={pack.alreadySaid.nothingYet ? t('fold.noPrecedent') : `${pack.alreadySaid.related.length} ${t('fold.precedent')}`}>
             {pack.alreadySaid.nothingYet ? (
-              <p className="max-w-[58ch] text-[13.5px] leading-[1.65] text-sand">
+              <p className="max-w-[58ch] text-body leading-relaxed text-sand">
                 {t('pack.noPrecedent')}
               </p>
             ) : (
@@ -285,8 +285,8 @@ export default function MatterPack() {
                       to={`/matters/${r.matterId}`}
                       className="block rounded-card bg-ink px-4 py-3 shadow-ring transition-shadow hover:shadow-card"
                     >
-                      <div className="text-[13.5px] font-semibold">{r.title}</div>
-                      <div className="mt-1 text-[12px] text-muted">
+                      <div className="text-body font-semibold">{r.title}</div>
+                      <div className="mt-1 text-note text-muted">
                         {t(`matter.status.${r.status}`)}
                         {r.relations[0] ? ` · ${r.relations[0].shared}` : ''}
                       </div>
@@ -299,7 +299,7 @@ export default function MatterPack() {
 
           <Fold heading={t('pack.figures')} summary={`${pack.figures.terms.length} ${t('fold.terms')}`}>
             {pack.figures.terms.length === 0 ? (
-              <p className="max-w-[58ch] text-[13.5px] leading-[1.65] text-sand">
+              <p className="max-w-[58ch] text-body leading-relaxed text-sand">
                 {t('pack.noTerms')}
               </p>
             ) : (
@@ -322,15 +322,15 @@ export default function MatterPack() {
                 {pack.figures.terms.map((term) => (
                   <li key={term.key} className="rounded-card bg-ink px-4 py-3">
                     <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                      <span className="max-w-[52ch] text-[13.5px] leading-[1.5] text-paper">
+                      <span className="max-w-[52ch] text-body leading-snug text-paper">
                         {term.meaning}
                       </span>
-                      <span className="shrink-0 font-mono text-[14px] text-lapis">
+                      <span className="shrink-0 font-mono text-body text-lapis">
                         {term.value}
                         {term.unit ? ` ${term.unit}` : ''}
                       </span>
                     </div>
-                    <div className="mt-1 font-mono text-[10.5px] text-muted opacity-70">
+                    <div className="mt-1 font-mono text-label text-muted opacity-70">
                       {term.key}
                     </div>
                   </li>
@@ -339,7 +339,7 @@ export default function MatterPack() {
             )}
 
             {/* The sentence that must never be separated from a figure. */}
-            <p className="mt-4 max-w-[58ch] text-[12.5px] leading-[1.6] text-muted">
+            <p className="mt-4 max-w-[58ch] text-ui leading-relaxed text-muted">
               {t('pack.whoseMethod')}
             </p>
           </Fold>
@@ -399,11 +399,11 @@ export default function MatterPack() {
           </Fold>
 
           <Fold heading={t('pack.follows')} summary={t('fold.follows')}>
-            <p className="max-w-[58ch] text-[13.5px] leading-[1.65] text-sand">
+            <p className="max-w-[58ch] text-body leading-relaxed text-sand">
               {pack.follows.carrying.whenChecked}
             </p>
             {pack.follows.carrying.drift && (
-              <p className="mt-2.5 max-w-[58ch] text-[12.5px] leading-[1.6] text-muted">
+              <p className="mt-2.5 max-w-[58ch] text-ui leading-relaxed text-muted">
                 {pack.follows.carrying.drift}
               </p>
             )}
@@ -423,7 +423,7 @@ export default function MatterPack() {
             */}
             {pack.follows.carriedOut?.attached && !pack.follows.carriedOut.namesNoHolding && (
               <div className="mt-4 rounded-card bg-ink px-5 py-4">
-                <p className="max-w-[58ch] text-[13px] leading-[1.6] text-paper">
+                <p className="max-w-[58ch] text-ui leading-relaxed text-paper">
                   {pack.follows.carriedInAWord}
                 </p>
 
@@ -435,18 +435,18 @@ export default function MatterPack() {
                     .filter((group) => group.held.length > 0)
                     .map((group) => (
                       <div key={group.how}>
-                        <div className="mb-1 text-[10px] font-bold uppercase tracking-[0.14em] text-muted">
+                        <div className="mb-1 text-label font-bold uppercase tracking-caps text-muted">
                           {t(group.how)}
                         </div>
                         <ul className="space-y-1">
                           {group.held.map((h) => (
-                            <li key={h.assetId} className="text-[12.5px] leading-[1.5] text-sand">
+                            <li key={h.assetId} className="text-ui leading-snug text-sand">
                               {h.name}
                               {/*
                                 Where the answer came from. A board that was
                                 never asked can see that it was never asked.
                               */}
-                              <span className="ms-2 text-[11.5px] text-muted">
+                              <span className="ms-2 text-note text-muted">
                                 {t(`carry.basis.${h.basis}`)}
                               </span>
                             </li>
@@ -469,7 +469,7 @@ export default function MatterPack() {
               empty implementation section.
             */}
             <div className="mt-6 border-t border-line pt-5">
-              <div className="mb-2.5 text-[10px] font-bold uppercase tracking-[0.14em] text-muted">
+              <div className="mb-2.5 text-label font-bold uppercase tracking-caps text-muted">
                 {t('doing.title')}
               </div>
               <WhatMustHappen
@@ -486,13 +486,13 @@ export default function MatterPack() {
           */}
           <Fold heading={t('pack.gaps')} summary={pack.gaps.length === 0 ? t('fold.noGaps') : `${pack.gaps.length} ${t('fold.gaps')}`}>
             {pack.gaps.length === 0 ? (
-              <p className="text-[13.5px] text-settled">{t('pack.noGaps')}</p>
+              <p className="text-body text-settled">{t('pack.noGaps')}</p>
             ) : (
               <ul className="space-y-2.5">
                 {pack.gaps.map((gap, i) => (
                   <li key={i} className="flex gap-3">
                     <span className="mt-[7px] h-[7px] w-[7px] shrink-0 rounded-full bg-gold/70" />
-                    <span className="max-w-[58ch] text-[13.5px] leading-[1.65] text-sand">{gap}</span>
+                    <span className="max-w-[58ch] text-body leading-relaxed text-sand">{gap}</span>
                   </li>
                 ))}
               </ul>
@@ -508,7 +508,7 @@ export default function MatterPack() {
            * true yet, and claiming a failure in it was a lie the screen
            * told every member on the way in.
            */
-          <p className="rounded-card bg-raised/60 px-5 py-4 text-[12.5px] leading-[1.6] text-muted shadow-ring">
+          <p className="rounded-card bg-raised/60 px-5 py-4 text-ui leading-relaxed text-muted shadow-ring">
             {t(packFailed ? 'pack.unavailable' : 'common.loading')}
           </p>
         )}
@@ -532,7 +532,7 @@ export default function MatterPack() {
         {/* Who has voted, and who has not. Naming both is the point. */}
         {pack?.standing && (
         <div className="mt-5 rounded-sheet bg-raised/70 p-5 shadow-ring">
-          <div className="mb-3 text-[10px] font-bold uppercase tracking-[0.14em] text-muted">
+          <div className="mb-3 text-label font-bold uppercase tracking-caps text-muted">
             {t('pack.whereItStands')}
           </div>
           <div className="space-y-2.5">
@@ -548,8 +548,8 @@ export default function MatterPack() {
                         : 'bg-muted')
                   }
                 />
-                <span className="min-w-0 flex-1 truncate text-[13px]">{r.scholarId}</span>
-                <span className="shrink-0 text-[12px] text-muted">
+                <span className="min-w-0 flex-1 truncate text-ui">{r.scholarId}</span>
+                <span className="shrink-0 text-note text-muted">
                   {t(`vote.${r.position}`)}
                 </span>
               </div>
@@ -557,12 +557,12 @@ export default function MatterPack() {
             {pack.standing.yetToSpeak.map((y) => (
               <div key={y.scholarId} className="flex items-center gap-3">
                 <span className="h-[7px] w-[7px] shrink-0 rounded-full bg-line" />
-                <span className="min-w-0 flex-1 truncate text-[13px] text-muted">{y.name}</span>
-                <span className="shrink-0 text-[12px] text-muted">{t('pack.notYet')}</span>
+                <span className="min-w-0 flex-1 truncate text-ui text-muted">{y.name}</span>
+                <span className="shrink-0 text-note text-muted">{t('pack.notYet')}</span>
               </div>
             ))}
           </div>
-          <div className="mt-4 border-t border-line pt-3 text-[12px] text-muted">
+          <div className="mt-4 border-t border-line pt-3 text-note text-muted">
             {t('pack.needed')}{' '}
             <span className="font-mono tabular-nums">{pack.standing.required}</span>
           </div>
@@ -589,11 +589,11 @@ export default function MatterPack() {
             href={oversight.hrefs.fatwa(matter.id)}
             target="_blank"
             rel="noreferrer"
-            className="text-[13px] font-semibold text-lapis underline decoration-line underline-offset-4"
+            className="text-ui font-semibold text-lapis underline decoration-line underline-offset-4"
           >
             {t('pack.takeItWithYou')}
           </a>
-          <p className="mt-1.5 text-[12px] leading-[1.55] text-muted">{t('sign.pdf')}</p>
+          <p className="mt-1.5 text-note leading-relaxed text-muted">{t('sign.pdf')}</p>
         </div>
       </div>
     </article>

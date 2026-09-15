@@ -64,7 +64,7 @@ export function PhaseBar() {
                 to={p.to}
                 aria-current={current ? 'step' : undefined}
                 className={
-                  'flex items-baseline gap-1.5 rounded-full px-3 py-1.5 text-[11.5px] leading-none transition-colors ' +
+                  'flex items-baseline gap-1.5 rounded-full px-3 py-1.5 text-note leading-none transition-colors ' +
                   (current
                     ? 'bg-lapis font-bold text-white'
                     : passed
@@ -72,11 +72,11 @@ export function PhaseBar() {
                       : 'text-muted hover:text-sand')
                 }
               >
-                <span className="font-mono text-[10px] opacity-70">{p.ordinal}</span>
+                <span className="font-mono text-label opacity-70">{p.ordinal}</span>
                 {t(p.label)}
               </Link>
               {i < bar.length - 1 && (
-                <span aria-hidden="true" className="text-[11px] text-muted opacity-30">
+                <span aria-hidden="true" className="text-note text-muted opacity-30">
                   ›
                 </span>
               )}
@@ -102,7 +102,7 @@ export function WhatYouDo() {
   if (!here) return null;
 
   return (
-    <p className="mb-6 flex gap-2.5 text-[13.5px] leading-[1.6] text-paper">
+    <p className="mb-6 flex gap-2.5 text-body leading-relaxed text-paper">
       <span aria-hidden="true" className="mt-[7px] h-[6px] w-[6px] shrink-0 rounded-full bg-lapis" />
       <span className="max-w-[64ch]">{t(here.does)}</span>
     </p>
@@ -128,7 +128,7 @@ export function WhatNext() {
 
   return (
     <section className="mt-12 border-t border-line pt-6">
-      <h2 className="mb-3.5 text-[10px] font-bold uppercase tracking-[0.14em] text-muted">
+      <h2 className="mb-3.5 text-label font-bold uppercase tracking-caps text-muted">
         {t('journey.next')}
       </h2>
       <ul className="flex flex-wrap gap-2.5">
@@ -136,7 +136,7 @@ export function WhatNext() {
           <li key={n.to}>
             <Link
               to={n.to}
-              className="inline-flex items-center gap-2 rounded-xl bg-raised px-4 py-2.5 text-[13px] text-paper shadow-ring transition-all hover:-translate-y-px hover:shadow-card"
+              className="inline-flex items-center gap-2 rounded-xl bg-raised px-4 py-2.5 text-ui text-paper shadow-ring transition-all hover:-translate-y-px hover:shadow-card"
             >
               {t(n.label)}
               <span aria-hidden="true" className="text-muted">
