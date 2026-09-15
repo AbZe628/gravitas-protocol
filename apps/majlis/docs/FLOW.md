@@ -13,6 +13,34 @@ Ovo je specifikacija toka, ne popis gumbi. Čita se u tri sloja:
 zašto to neće ispasti web stranica, i jedini dio koji se može oboriti
 mjerenjem umjesto raspravom.
 
+---
+
+## Šta je od ovoga izgrađeno — stanje 15.09.2026.
+
+Ovaj dokument je specifikacija, ne izvještaj. Ali specifikacija koja tvrdi ono
+što kod ne radi postaje fikcija iz koje se sljedeći put gradi, pa ovdje stoji
+granica. Red gradnje i mjere su u `docs/GRADNJA.md`.
+
+| | faza iz §27 | stanje |
+|---|---|---|
+| **0** | primitivi i ljuska — jedna ljestvica, `Button`, `100dvh` | **izgrađeno** |
+| **1** | obavijesti — zvono, obavijest koja iskoči, red koji živi | **izgrađeno** |
+| **2** | verzija na predmetu + ključ zahtjeva + N-04 | **izgrađeno** |
+| **3** | §11 ponašanje — stanica u adresi, otkucano preživi, tipke | **izgrađeno** |
+| **4** | polica alata, `Ctrl+K`, `?`, `/` | **izgrađeno** |
+| 5 | prozor + „šta slijedi" na svih 74 čina | ~8 od 74 |
+| 6 | pet stanja svakog ekrana | nije |
+| 7 | automatizam izdavanja — PDF sam, registry | nije |
+| 8 | rupe: timelock, stare adrese, spajanje instrumenata | nije |
+| 9 | sedam odluka iz §9 | čeka vlasnika |
+| 10 | KLJUČ i BANKA | vani je, ne u kodu |
+
+**Dva mjesta gdje je ovaj dokument već jednom zaostao za kodom** — oba
+ispravljena, oba zapisana zašto: N-60 je opisivao meni sa sedam kartica, a
+N-03 je tvrdio da je paleta *jedini* put do alata. Kad se opis i kod raziđu,
+**kod nije taj koji je pogriješio ako je promjena bila tražena** — ispravlja se
+dokument, i piše se ko je i zašto tražio.
+
 Svaki čvor ima **ime, ekran, uslove, činove, i gdje svaki čin vodi**. Uz svaki
 čvor piše i **kako izgleda kroz aplikaciju** — koji prozor, koja okna, koja
 traka, koji alat.
@@ -828,21 +856,34 @@ flowchart LR
   K --> R[POSLIJE: zapiši ili odbaci]
 ```
 
-### N-60 · ALATI
+### N-60 · ALATI — **IZGRAĐENO**
 
 ```
-PROZOR   SLAJD · sedam kartica
-ULAZ     [Alati] u gornjoj traci — sa BILO KOJEG ekrana
+PROZOR   POLICA na desnoj ivici okvira · sedam imena, stalno vidljivih
+         + SLAJD koji se otvara NA imenovanom alatu
+ULAZ     polica — na svakom ekranu, dio okvira a ne nešto što se otvara
+         `Ctrl+K` — isti alat imenom, za onoga ko kuca brže nego što cilja
+         korak — aplikacija ga otvori sama, iz oblika
 ALAT     screening · purifikacija · zekat · raspodjela · tangibilnost ·
          zatezna · zapisani računi
-ČIN      [Izračunaj]     →  rezultat i da li prelazi prag
+ČIN      [ime alata]     →  taj alat, jednim pritiskom
+         [Izračunaj]     →  rezultat i da li prelazi prag
          [Zapiši]        →  POSLIJE: „zapisano, nije vezano ni za koji predmet"
 IZLAZ    zatvori — vraća tačno gdje si bio
 ```
 
+**Ispravka koja je došla od vlasnika.** Ovdje je stajalo *`[Alati]` u gornjoj
+traci → SLAJD sa sedam kartica*. To je meni čiji je jedini sadržaj drugi meni:
+pritisneš Alati, dobiješ sedam imena, biraš drugi put. Drugi pokušaj je bio
+gori — sakrio je alat iza `Ctrl+K`, što radi samo za onoga ko **već zna** da
+tipka postoji, a to nije niko prvog dana.
+
+> **Kratica je brži put za onoga ko zna. Nikad nije put.**
+
 **Razlika koja se mora razumjeti:** u koraku alat bira **aplikacija** (iz
-oblika) i rezultat se **veže za uslov**. Iz trake bira **član** i rezultat se
-**ne veže ni za šta** dok ga ne zapiše.
+oblika) i rezultat se **veže za uslov**. Sa police ili iz palete bira **član**
+i rezultat se **ne veže ni za šta** dok ga ne zapiše. To piše na vrhu panela,
+ne samo ovdje.
 
 ---
 
@@ -1749,8 +1790,13 @@ PROZOR   DIJALOG preko svega, `Ctrl+K`
 ULAZ     bilo koji ekran, uključujući otvoren prozor
 ```
 
-Paleta je **jedini put do diskrecionih zadataka** (§C) sa bilo kojeg ekrana —
-zato alati ne moraju stajati u traci.
+Paleta je **brži put** do diskrecionih zadataka (§C), za onoga ko kuca brže
+nego što cilja. **Nikad jedini** — polica na desnoj ivici (N-60) dohvaća istih
+sedam alata bez ikakvog znanja da paleta postoji, a to je stanje u kojem je
+svaki član prvog dana.
+
+*(Ovdje je pisalo „jedini put". To je bilo pogrešno i vlasnik je to ispravio:
+kratica koja je jedini ulaz nije kratica nego brava.)*
 
 ```
 kucaš           dobijaš

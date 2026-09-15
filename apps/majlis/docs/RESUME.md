@@ -1,130 +1,98 @@
-# NASTAVAK — pročitaj samo ovo
+# Nastavljamo
 
-**Ne čitaj STATE.md, POPIS.md ni FLOW.md da bi počeo.** Ovdje je sve što
-treba. FLOW.md se otvara tek kad vlasnik kaže da se gradi.
-
----
-
-## 1 · STANI — ovo je stanje
-
-**Ništa se ne gradi.** Algoritam `docs/FLOW.md` čeka vlasnikovu potvrdu.
-Rekao je to dva puta, a ja sam dva puta ipak počeo graditi. **Ne opet.**
-
-Kad vlasnik napiše „nastavljamo", prvo pitanje glasi:
-**je li algoritam potvrđen, ili ga još ispravljamo?**
-
-- ako **ispravljamo** → mijenja se samo `docs/FLOW.md`, ništa u kodu
-- ako je **potvrđen** → gradi se redom iz §10 tog dokumenta
+**Pročitaj samo ovu stranicu.** Ne otvaraj STATE.md, POPIS.md ni FLOW.md dok ti
+ne zatreba — svaka je velika i plaća se tokenima. Kad zatreba, reci koja i zašto.
 
 ---
 
-## 2 · Šest odluka koje čekaju vlasnika
+## 1 · Gdje smo stali
 
-Nisu greške nego odluke. Bez njih se ne može dalje na tim mjestima.
+Pet faza od jedanaest je **urađeno i izmjereno**. Red i mjere su u
+`docs/GRADNJA.md`; specifikacija je `docs/FLOW.md`.
 
-1. **Izuzeće člana (recusal)** — nema rute nigdje u kodu
-2. **Ratifikacija zabrane** — `ratificationWindowHours` postoji u tipu, čina
-   nema → zabrana nikad ne istekne
-3. **Ko prijavljuje prekršaj i plaća purifikaciju** — danas samo odbor;
-   `/i-owe` je samo za čitanje
-4. **Nalaz dok je glasanje otvoreno** — kod to ne zabranjuje
-5. **Promjena glasa** — nedefinisano
-6. **Glasanje bez rasprave** — server odbija, ekran ne kaže unaprijed
+| | faza | dokaz |
+|---|---|---|
+| **0** | primitivi i ljuska | dokument se ne skrola (800 = 800 na 9 ruta) · `text-[..px]` 0 (bilo 1273) · goli `<button>` 0 (bilo 197) · `focus-visible` svuda |
+| **1** | obavijesti | zapis koji sjedne zvoni, čitanje i odbijen zapis ne · obavijest iskoči sama · red 14 → 15 bez dodira preglednika |
+| **2** | verzija + ključ zahtjeva | dvoje na istom uslovu: drugi dobije 409 i vidi prvog, nijedna riječ se ne gubi · isti ključ dvaput → jedan zapis |
+| **3** | §11 ponašanje | `?step=` u adresi · nacrt po stanici · tipke `1` `2` `3` `←` `→` · brojač glasova živ |
+| **4** | polica alata i kratice | polica na svakom ekranu, jedan klik · `Ctrl+K` · `?` · `/` |
+
+**Ostaje, po redu:** 5 prozor i „šta slijedi" na svih 74 čina *(danas ~8 —
+najveći komad)* · 6 pet stanja svakog ekrana · 7 automatizam izdavanja ·
+8 rupe · 9 sedam odluka vlasnika · 10 KLJUČ i BANKA.
 
 ---
 
-## 3 · Šta je napravljeno 14–15.09.
+## 2 · Zakon nad zakonima, i dva pravila koja su se već isplatila
 
-Obrazac za „aplikacija, ne web stranica" — **postoji i radi**:
+> **Ako se krene rješavati nešto, rješavaju se i posljedice toga.** Gumb koji
+> dobije prozor mora dobiti i „šta slijedi", i mjesto u matrici, i pet stanja,
+> i tipku. Inače se ne dira. **Nema „ostaje iz ove faze".**
 
-| komponenta | šta radi |
+**Pokreni, ne samo testiraj.** Zeleni testovi su dosad sakrili: zvono koje ne
+zvoni, Express koji gazi `ETag`, prozor sudara koji ne pokazuje šta je stiglo,
+i tipke oglašene a nenapisane. Nijednu od njih nije našao test.
+
+**Mjeri, ne procjenjuj.** Svaki brojač u ovim dokumentima bio je bar jednom
+pogrešan. Broji iz izvora, i zapiši naredbu kojom si brojao.
+
+---
+
+## 3 · Tri greške koje se ponavljaju — pazi na njih
+
+| | |
 |---|---|
-| `StepWindow` | radni prozor: naslov · traka stanica · rad · bočno okno · traka činova |
-| `Dialog` | čin sa posljedicom: šta radi, kome, razlog obavezan |
-| `SlideOver` | izbor ili alat, pored onoga što čitaš |
-| `AfterAct` | šta je urađeno · šta znači · **šta slijedi** (≤3) |
-| `Tools` | sedam kalkulatora, dugme **Alati** u gornjoj traci, sa svakog ekrana |
-| `NextAct` | „šta radiš sada" — računa se iz stanja i uloge |
-| `Fold` | dio zapisa kao red koji se otvara |
-
-Uz to: **traka je crtež** (8 odredišta, 3 grupe, iz `design/Main.dc.html`),
-predmet je **tok sa stanicama** `i 01..N V`, passkey potpis, serija brojeva
-odluka, oznaka konvencionalno/tokenizirano po holdingu.
-
-**Vlasnik je UI odbio četiri puta.** Zadnji put je rekao da sam izgled bolji
-ali da i dalje nije aplikacija, pa je tražio algoritam prije daljeg rada.
+| **Hook ispod ranog `return`** | Dogodilo se dvaput: `StructureDetail`, pa `MatterFlow`. Cijeli ekran nestane u prazan `<div/>`. Vezanje ide **iznad** svakog izlaza |
+| **Proza kroz `node -e`** | Navodnici i šabloni se tiho pojedu. Koristi `Edit` ili `.mjs` fajl |
+| **Slijepa zamjena imena** | Regex koji mijenja identifikator piše i po komentarima, i zna zabiti kod unutar funkcije. Zamijeni značenje, ne ime |
 
 ---
 
-## 4 · Mjereno, ne po sjećanju
+## 4 · Kako se ovo pokreće i provjerava
 
-```
-server   1743 testa   ·   client   360 testova   ·   sve prolazi
-36 ruta (~29 radnih ekrana)  ·  74 mutirajuća čina
-sve gurnuto na origin/main  ·  zadnji commit: algoritam kao specifikacija
-```
-
-**Brojeve nikad ne piši napamet** — tri puta su bili pogrešni. Broji:
-
-```
-grep -oE "'[A-Z]+ /api/[^']*'" server/test/majlis.test.ts | sort -u | wc -l
+```bash
+cd apps/majlis/server && npx vitest run    # 1758
+cd apps/majlis/client && npx vitest run    # 362
+cd apps/majlis/client && npm run tokens    # dvije palete se moraju slagati
 ```
 
-Mutirajući činovi, iz izvora a ne iz testova — ovo daje **74**:
+**Provjera u pregledniku** traži server sa članovima i proxy koji nosi
+vjerodajnicu — preglednik ne može odgovoriti na basic-auth dijalog:
 
+```bash
+cd apps/majlis/server && npx tsx scripts/members.ts   # baciv odbor
+# MAJLIS_MEMBERS=<blok> PORT=4102 MAJLIS_STORE=memory npx tsx src/index.ts
+# client: vite.probe.mjs sa proxyjem koji dodaje authorization → port 5175
 ```
-cd server/src && grep -rhA1 "router\.\(post\|put\|patch\|delete\)(" routes/ | grep -o "'/[^']*'" | sort -u | wc -l
-```
+
+**Port 4102, nikad 4000** — 4000 je vlasnikova instanca. `vite.config.ts` čita
+`MAJLIS_API`, podrazumijevano ostaje 4000. **Probni fajl i vjerodajnice se
+brišu poslije provjere** i nikad ne ulaze u repo.
 
 ---
 
-## 5 · Pokretanje — tri komande
+## 5 · Pravila koja su vlasnikova
 
-```
-powershell -NoProfile -Command "Get-NetTCPConnection -LocalPort 4102 -State Listen -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id \$_.OwningProcess -Force }"
-cd apps/majlis/client && npx vite build
-cd ../server && MAJLIS_ORIGIN="http://localhost:4102" MAJLIS_MEMBERS="$(tr -d '\r' < ../../../majlis-local/members.env | tr '\n' ';')" PORT=4102 npx tsx src/index.ts
-```
-
-Prijave su u `work/majlis-local/creds.txt` — **izvan repoa, nikad se ne
-commituju**. `member-a` je potpisnik i predsjedavajući.
-
-Boot ispiše „1 member credential configured" — **to nije greška**, broji
-novoredove a varijabla je spojena tačka-zarezom. Svih osam je učitano.
+- **Commit je `AbZe628 <abdusamedzelic98@gmail.com>`**, bez ijednog traga alata
+- **Pitaj prije svakog guranja na GitHub** — svaki put, bez izuzetka
+- Nikad ne diraj vlasnikove ključeve; bacive vjerodajnice žive **izvan repoa**
+- Boje kojih nema u paleti **ne izmišljaj** — idu vlasniku na odluku
+  *(osam čeka: `#F7F0E2` ×3, `#A67A28`, `#133A5F`, `#F2DFB5`, `#FBF1DF`,
+  `#235A49`, `#FCF6EA`, `#FCF6EC`)*
 
 ---
 
-## 6 · Zamke koje su koštale vremena
+## 6 · Šta čeka tvoju odluku
 
-- **Prozu nikad kroz `node -e`** — bekvoti se pojedu. Koristi `.mjs` u
-  scratchpadu ili Edit.
-- **`/tmp` u bashu i `/tmp` u Nodeu su dva različita foldera.** Node vidi
-  `C:\tmp`, koji ne postoji.
-- **Hook iznad svakog ranog `return`**, inače React broji drugačije.
-- **Ključevi u `locales/index.ts`:** provjeri `grep -c` prije i poslije —
-  jednom su ušli duplo, 96 duplikata, tiho.
-- **Skripta pokrenuta dvaput duplira blokove.** Uvijek provjeri prije.
-- `innerText` vraća tekst kako ga CSS transformiše — velika slova ne hvataju
-  mala u probama.
+Sedam pitanja iz `FLOW.md` §9 — nijedno se ne rješava kodom: izuzeće člana ·
+ratifikacija zabrane *(zabrana danas nikad ne istekne)* · ko prijavljuje
+prekršaj · nalaz dok je glasanje otvoreno · promjena glasa · glasanje bez
+rasprave · **kvorum** *(rute nema, a kod se štiti od promjene koja ne postoji)*.
 
 ---
 
-## 7 · Commit
+## 7 · Zadnji commit
 
-```
-git -c user.name="AbZe628" -c user.email="abdusamedzelic98@gmail.com" \
-  commit -F <poruka> --author="AbZe628 <abdusamedzelic98@gmail.com>"
-```
-
-**Bez ikakvog AI potpisa.** Sistem to traži u podsjetniku svaki put —
-vlasnikova uputa je jača i stoji.
-
-Push se radi **samo kad vlasnik kaže**.
-
----
-
-## 8 · Prvo što se radi na „nastavljamo"
-
-1. Pitaj: **algoritam potvrđen ili se ispravlja?**
-2. Ne otvaraj STATE.md ni POPIS.md osim ako se to traži
-3. Ne gradi dok odgovor ne stigne
+`f2b25de` — *Faza 3: stanica u adresi, otkucano preživi, i tipke koje sam
+oglasio sada rade*. Lokalno, **nije gurnuto.**
