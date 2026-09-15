@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import {
+  aKeyForThisPress,
   api,
   oversight,
   Refused,
@@ -12,6 +13,7 @@ import { useI18n } from '../lib/i18n.js';
 import { useIdentity } from '../lib/identity.js';
 import { ErrorText, Loading } from '../components/ui.js';
 import { State, toneForStatus } from '../components/kit.js';
+import ItMoved from '../components/ItMoved.js';
 import StepWindow, { type Step } from '../components/StepWindow.js';
 import TheCalculator from '../components/TheCalculator.js';
 import AskTheBank from '../components/AskTheBank.js';
@@ -99,14 +101,36 @@ export default function MatterFlow() {
    */
   const [confirming, setConfirming] = useState<'not_met' | 'not_applicable' | null>(null);
 
+  /** Which copy of the matter this member is looking at. Sent with every act. */
+  const [version, setVersion] = useState<string | null>(null);
+  /** Open when somebody wrote while this member was writing. See N-04. */
+  const [itMoved, setItMoved] = useState(false);
+  /**
+   * The matter as it stands now, read only to show what arrived.
+   *
+   * Kept apart from the matter on the screen on purpose. The member has not
+   * decided yet, and replacing what they are looking at would decide for
+   * them — they would come back from the window to a screen that had moved.
+   */
+  const [whatArrived, setWhatArrived] = useState<Matter | null>(null);
+  /*
+   * One key per press, held across retries.
+   *
+   * A key minted inside the request would be new on every retry and would
+   * guard nothing — the whole point is that the same intention carries the
+   * same key however many times it is sent.
+   */
+  const pressKey = useRef<string | null>(null);
+
   function load() {
     if (!id) return;
     api
-      .matter(id)
-      .then((m) => {
+      .matterToWorkOn(id)
+      .then(({ it: m, version: v }) => {
         if (m && Array.isArray(m.notDecided)) {
           there.arrived();
           setMatter(m);
+          setVersion(v);
         } else {
           there.lost(setFailed);
         }
@@ -191,12 +215,28 @@ export default function MatterFlow() {
     if (!step || !matter || busy) return;
     setBusy(true);
     setRefusal(null);
+
+    /*
+     * One key for this press, and the version the member was looking at.
+     *
+     * The key is minted here rather than inside the request so that a retry of
+     * *this press* carries *this key* — a key made per request would change on
+     * every retry and guard nothing. The version is what lets the server
+     * refuse a finding written without having seen a colleague's.
+     */
+    const press = pressKey.current ?? (pressKey.current = aKeyForThisPress());
+
     try {
-      const updated = await oversight.recordFinding(matter.id, {
-        conditionId: step.condition.id,
-        holds,
-        reason: why.trim(),
-      });
+      const updated = await oversight.recordFinding(
+        matter.id,
+        {
+          conditionId: step.condition.id,
+          holds,
+          reason: why.trim(),
+        },
+        { version: version ?? undefined, once: press },
+      );
+      pressKey.current = null;
       setMatter(updated);
       setWhy('');
 
@@ -208,10 +248,75 @@ export default function MatterFlow() {
       );
       setAt(next ? next.condition.id : VOTE);
     } catch (e) {
+      /*
+       * Somebody wrote while this member was writing. Not an error to apologise
+       * for — a thing that happened, which they now have to decide about. The
+       * window shows both; the box behind it keeps what they typed.
+       *
+       * The key is deliberately *not* cleared here. Whatever they choose next
+       * is a retry of this same press, and it must carry the same key or a
+       * slow network would let the same finding land twice.
+       */
+      if (e instanceof Refused && e.code === 'moved_underneath') {
+        setItMoved(true);
+        /*
+         * Fetch what arrived, so the window can show it.
+         *
+         * Into its own state, and **not** into the matter on the screen: the
+         * member has not decided yet, and quietly replacing what they are
+         * looking at would answer the question for them. The version is not
+         * taken either — accepting it here would mean the next press went
+         * through as though they had read something they had not.
+         *
+         * The first attempt read the last entry off the copy the browser was
+         * already holding, which by definition does not contain what arrived.
+         * The window said *something changed, open it to see what* — which is
+         * exactly the uselessness it exists to prevent. Found by running it.
+         */
+        api
+          .matter(matter.id)
+          .then(setWhatArrived)
+          .catch(() => setWhatArrived(null));
+        return;
+      }
       setRefusal(e instanceof Refused ? e.message : String(e));
     } finally {
       setBusy(false);
     }
+  }
+
+/**
+ * What arrived while this member was writing, in the record's own words.
+ *
+ * The fresh copy against the one the browser was holding: whatever is in the
+ * first and not the second is what appeared. Falling back to the last thing
+ * said covers the case where the change was not a word at all — a finding, a
+ * vote — and the window then says plainly that it cannot name it rather than
+ * guessing.
+ */
+function lastSaid(
+  fresh: Matter | null,
+  held: Matter,
+  someone: string,
+): { who: string; what: string } | null {
+  if (!fresh) return null;
+  const had = new Set(held.deliberation.map((d) => d.id));
+  const arrived = fresh.deliberation.filter((d) => !had.has(d.id));
+  const said = arrived[arrived.length - 1] ?? fresh.deliberation[fresh.deliberation.length - 1];
+  if (!said) return null;
+  return { who: said.scholarId || someone, what: said.body };
+}
+
+  /** Read it again, keeping what was typed, and try the same press once more. */
+  async function lookThenDecide() {
+    if (!matter) return;
+    setItMoved(false);
+    setWhatArrived(null);
+    const fresh = await api.matterToWorkOn(matter.id);
+    setMatter(fresh.it);
+    setVersion(fresh.version);
+    const list = await oversight.checklist(matter.id);
+    setList(list);
   }
 
   // ── the pane beside the work, which does not change ────────────────────
@@ -594,6 +699,31 @@ export default function MatterFlow() {
           {t('ask.reasonIsRequired')}
         </p>
       </Dialog>
+
+      {/*
+        Somebody wrote while this member was writing. N-04.
+
+        `theirs` is the last thing said on the matter as it stands now, which
+        is what arrived while they were typing in the ordinary case. Where the
+        change was something else — a finding, a vote — the window says so
+        plainly rather than guessing, and the member reads it for themselves.
+      */}
+      <ItMoved
+        open={itMoved}
+        theirs={lastSaid(whatArrived, matter, t('moved.someone'))}
+        yours={why}
+        onLook={lookThenDecide}
+        onAnyway={() => {
+          /*
+           * Record theirs as well. The version is dropped for this one press —
+           * the member has been shown what arrived and has decided — but the
+           * key stays, so a slow network still cannot land it twice.
+           */
+          setItMoved(false);
+          setVersion(null);
+        }}
+        onClose={() => setItMoved(false)}
+      />
     </StepWindow>
   );
 }

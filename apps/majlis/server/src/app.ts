@@ -49,6 +49,8 @@ import { submissionRoutes } from './routes/submissions.js';
 import { examinationRoutes } from './routes/examinations.js';
 import { notifierFromEnv, type Notifier } from './services/notice.js';
 import { createPulse } from './services/pulse.js';
+import { versionOf } from './services/version.js';
+import { createOnce, once } from './middleware/once.js';
 import { pulsing } from './store/pulsing.js';
 import { pulseRoutes } from './routes/pulse.js';
 import { incidentRoutes } from './routes/incidents.js';
@@ -152,6 +154,23 @@ export function createApp(
   app.set('trust proxy', 1);
 
   /*
+   * Express's own ETag is turned off, so that the one this application sets
+   * means what it says.
+   *
+   * Express hashes the reply body on its way out and overwrites whatever
+   * `ETag` a route had set. That hash is a **caching** tag — it says *this
+   * reply is byte-identical to the last one*, which is a different question
+   * from *this is the version of the record you are holding*. The two differ
+   * the moment a reply carries anything worked out fresh on each read, and a
+   * write sent back with the caching tag would be refused as stale for no
+   * reason the member could see.
+   *
+   * Caught by running it: the header came back as `W/"6cc-…"` rather than the
+   * version, and every write with `If-Match` would have failed.
+   */
+  app.set('etag', false);
+
+  /*
    * Authentication derives a scrypt hash on every attempt, including for member
    * ids that do not exist — which is what keeps "no such member" and "wrong
    * password" indistinguishable. Nothing counted those attempts, so a loop of
@@ -178,6 +197,20 @@ export function createApp(
   // leaves it.
   const auth = authFromEnv();
   app.use(basicAuth(auth, logins, servingInstitution));
+
+  /*
+   * ── an act sent twice lands once ────────────────────────────────────────
+   *
+   * After authentication, because who is acting is part of what makes an act
+   * that act: two members could pick the same key, and one being handed the
+   * other's answer would be worse than any duplicate.
+   *
+   * Before the routes, and above all of them rather than at each — a button
+   * that disables itself in the browser cannot survive a reload, and is not
+   * there at all for anything driving this API directly. See
+   * `middleware/once.ts`.
+   */
+  app.use(once(createOnce()));
 
   app.get('/api/health', (_req: Request, res: Response) => {
     res.json({
@@ -303,6 +336,21 @@ export function createApp(
   app.get('/api/matters/:id', async (req, res) => {
     const matter = await store.matter(req.params.id);
     if (!matter) return res.status(404).json({ error: 'matter not found' });
+
+    /*
+     * Which version this is, so the reader can send it back when they write.
+     *
+     * In `ETag` because that is the header the web already has for exactly
+     * this — *this is the copy I have* — and it pairs with the `If-Match` the
+     * write carries. Derived from the matter itself, so it cannot disagree
+     * with what is in the reply: see `services/version.ts`.
+     *
+     * Taken before the deliberation is decorated with name segments below. The
+     * decoration is presentation, worked out fresh on every read, and letting
+     * it into the fingerprint would change the version whenever the board's
+     * membership changed rather than whenever the matter did.
+     */
+    res.setHeader('ETag', versionOf(matter));
 
     /*
      * Names in the deliberation are resolved here rather than in the browser.

@@ -11,6 +11,7 @@
 import type { Request, Response } from 'express';
 import type { Identity } from '../auth/members.js';
 import { Refused } from '../services/lifecycle.js';
+import { versionOf } from '../services/version.js';
 import { BadFigure } from '../services/money.js';
 import { NotFound } from '../store/index.js';
 
@@ -58,6 +59,21 @@ export function handle(fn: (req: Request, res: Response) => Promise<void>) {
       }
       if (error instanceof NotFound) {
         res.status(404).json({ error: 'not_found', message: error.message });
+        return;
+      }
+      /*
+       * The record moved under the member who was changing it. Nothing was
+       * written. Answered here, beside the other three kinds of refusal, so
+       * that none of the eighteen acts that edit a matter has to remember.
+       */
+      if (error instanceof MovedUnderneath) {
+        res.status(409).json({
+          error: 'moved_underneath',
+          message:
+            'This changed while you were working on it. Nothing has been recorded. ' +
+            'Look at what moved, then decide whether to record yours.',
+          version: error.current,
+        });
         return;
       }
       console.error('route error:', error);
@@ -134,4 +150,85 @@ export function requireRole(
 
 export function badRequest(res: Response, issues: unknown): void {
   res.status(400).json({ error: 'invalid_request', detail: issues });
+}
+
+/**
+ * Refuse a write whose author was looking at an older version of the record.
+ *
+ * ── what this is for ──────────────────────────────────────────────────────
+ *
+ * A board of five works one matter at once. Two members recording a finding on
+ * the same condition used to mean the second silently replaced the first —
+ * no error, no notice, and the first scholar's reasoning gone from the record
+ * with nobody aware it had been there.
+ *
+ * A caller that read the matter sends back the version it read, in `If-Match`.
+ * If the matter has moved since, nothing is written and the reply carries the
+ * version that is current now **and the names of the parts that moved**, so
+ * the screen can say *Amir recorded a finding* rather than *the record
+ * changed* — and so a member can see whether what moved has anything to do
+ * with what they were about to write. See `N-04` in docs/FLOW.md.
+ *
+ * ── sending no version is allowed, and is not an oversight ────────────────
+ *
+ * A caller that did not read the record first has nothing to be stale about:
+ * opening a matter, putting a question. Requiring the header everywhere would
+ * mean inventing a version for callers who never had one. What it costs is
+ * that a caller which *should* send it and does not gets the old behaviour —
+ * which is why the interface sends it on every act that edits something it
+ * displayed, and `version.test.ts` holds that line.
+ */
+export class MovedUnderneath extends Error {
+  constructor(readonly current: string) {
+    super('This changed while you were working on it.');
+    this.name = 'MovedUnderneath';
+  }
+}
+
+/**
+ * Change a matter, refusing if it moved under the member who is changing it.
+ *
+ * One function rather than the same four lines at each of the twenty-four acts
+ * that edit a matter. Written here for the same reason the bell sits under the
+ * store rather than beside every act: twenty-four places to remember is
+ * twenty-four chances to forget one, and the forgotten one loses somebody's
+ * work in silence.
+ *
+ * Answers `null` when it has refused — the caller has already replied to the
+ * member and must simply stop.
+ */
+export async function changeMatter<M>(
+  store: {
+    matter(id: string): Promise<M | null>;
+    updateMatter(id: string, change: (current: M) => M): Promise<M>;
+  },
+  req: Request,
+  _res: Response,
+  id: string,
+  change: (current: M) => M,
+): Promise<M> {
+  const claimed = req.get('if-match');
+
+  /* Nothing claimed: the caller never read it, so it cannot be stale. */
+  if (!claimed) return store.updateMatter(id, change);
+
+  const before = await store.matter(id);
+  if (!before) return store.updateMatter(id, change);
+
+  const current = versionOf(before);
+  if (claimed !== current) {
+    /*
+     * Thrown rather than returned, and caught in  beside the other
+     * three kinds of refusal.
+     *
+     * The first attempt had this answer  and left each of the eighteen
+     * acts to notice. That is eighteen places to forget one, and the forgotten
+     * one would have replied  to the member as though the act had
+     * landed. Every refusal in this application already travels as an
+     * exception for exactly that reason.
+     */
+    throw new MovedUnderneath(current);
+  }
+
+  return store.updateMatter(id, change);
 }

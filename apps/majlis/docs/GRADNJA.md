@@ -202,7 +202,58 @@ osvježavanja**, i klik vodi na stanicu na kojoj se stalo.
 
 ---
 
-### FAZA 2 · Verzija i ključ zahtjeva
+### FAZA 2 · Verzija i ključ zahtjeva — **URAĐENO 15.09.2026.**
+
+**Verzija je izvedena iz sadržaja, nije zapisana pored njega.** Očigledna
+gradnja je brojač na predmetu koji svaki zapis uveća. Zapisan broj je druga
+kopija istine, a zapis koji zaboravi uvećati ga čini da verzija laže **u smjeru
+koji gubi rad** — opasnom smjeru. Zato verzija **jeste** sadržaj: otisak
+predmeta kakav stoji. Nema se šta zaboraviti ažurirati i nema se od čega
+razići. Ključevi se sortiraju na svakoj dubini, inače bi isti predmet složen
+drugim redom dao drugi otisak i odbio zapis koji je smio proći.
+
+**Odbijanje ide kroz grešku, ne kroz povratnu vrijednost.** Prvi pokušaj je
+vraćao `null` i ostavljao svakom od osamnaest činova da to primijeti — osamnaest
+prilika da se jedan zaboravi, a zaboravljeni bi članu odgovorio `null` kao da
+je čin prošao. Svako odbijanje u ovoj aplikaciji već putuje kao greška.
+
+**Ključ zahtjeva stoji iznad svih 74 čina**, poslije prijave a prije ruta. Ko
+radi je dio otiska: dva člana mogu izabrati isti ključ, a da jedan dobije tuđi
+odgovor bilo bi gore od ijednog duplikata. Odbijanja se ne pamte — 400 je poziv
+da se nešto popravi i pošalje opet.
+
+**Tri greške koje je našlo pokretanje, ne testovi:**
+
+1. **Express je gazio moj `ETag` svojim.** Njegov je keš-oznaka — *ovaj odgovor
+   je bajt-identičan prošlom* — što je drugo pitanje od *ovo je verzija koju
+   držiš*. Vraćalo se `W/"6cc-…"` i **svaki zapis sa `If-Match` bi pao**.
+2. **Dva sata u istom mehanizmu.** Ključ se pamtio sa stvarnim vremenom a
+   istjecao protiv testnog — pa nikad nije istekao. Sada sat ima jedno mjesto.
+3. **Prozor sudara nije pokazivao šta je stiglo.** Čitao je zadnju riječ iz
+   kopije koju preglednik već drži — a ona po definiciji ne sadrži ono što je
+   upravo stiglo. Pisalo je *nešto se promijenilo, otvori da vidiš šta*, što je
+   tačno ona beskorisnost zbog koje prozor postoji.
+
+**Provjereno na živom serveru i u pregledniku:**
+
+```
+Amir pise sa svojom verzijom              201
+Lejla pise sa istom, sad zastarjelom      409 + trenutna verzija, nista upisano
+Lejla procita ponovo pa posalje           201
+u zapisu                                  obje rijeci — nijedna izgubljena
+
+isti kljuc dvaput                         201, 201 · drugi oznacen kao ponavljanje
+u zapisu                                  jedan unos, ne dva
+isti kljuc za DRUGI cin                   409 odbijen
+bez kljuca                                201 — stari put i dalje radi
+```
+
+U pregledniku, sa dva člana: kolega piše dok član kuca, pritisak otvori prozor
+koji pokazuje **stvarne riječi kolege** i **otkucani tekst koji nije nestao**,
+a poslije čitanja isti pritisak prođe i traka ode na sljedeći korak. **Jedan
+nalaz u zapisu, ne dva.**
+
+<details><summary>Šta je faza tražila prije nego je urađena</summary>
 
 > Odbor od pet ljudi radi isti predmet istovremeno. To je cijela poenta
 > proizvoda, i danas drugi tiho pregazi prvog.
@@ -226,6 +277,8 @@ osvježavanja**, i klik vodi na stanicu na kojoj se stalo.
 
 **Gotovo je kad:** dva preglednika zapišu nalaz na isti uslov, drugi dobije
 409 i vidi prvi; dupli klik i F5 naprave **jedan** zapis.
+
+</details>
 
 ---
 

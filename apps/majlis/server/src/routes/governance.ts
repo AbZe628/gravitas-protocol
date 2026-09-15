@@ -21,7 +21,7 @@
  */
 
 import express, { Router, type Response } from 'express';
-import { badRequest, handle, identityOf, requireRole } from './http.js';
+import { badRequest, changeMatter, handle, identityOf, requireRole } from './http.js';
 import {
   PasskeyRefused,
   checkSignature,
@@ -445,7 +445,7 @@ export function governanceRoutes(
       if (!parsed.success) return badRequest(res, parsed.error.issues);
 
       const at = now();
-      const updated = await store.updateMatter(req.params.id, (matter) => {
+      const updated = await changeMatter(store, req, res, req.params.id, (matter) => {
         if (matter.status !== 'draft' && matter.status !== 'deliberation' && matter.status !== 'voting') {
           throw new Refused(
             'wrong_status',
@@ -491,7 +491,7 @@ export function governanceRoutes(
       const parsed = parametersSchema.safeParse(req.body);
       if (!parsed.success) return badRequest(res, parsed.error.issues);
 
-      const updated = await store.updateMatter(req.params.id, (matter) =>
+      const updated = await changeMatter(store, req, res, req.params.id, (matter) =>
         setParameters(matter, parsed.data.parameters),
       );
 
@@ -518,7 +518,7 @@ export function governanceRoutes(
       const at = now();
       const id = `s-${at.replace(/[^0-9]/g, '').slice(0, 14)}-${Math.random().toString(36).slice(2, 8)}`;
 
-      const updated = await store.updateMatter(req.params.id, (matter) =>
+      const updated = await changeMatter(store, req, res, req.params.id, (matter) =>
         attachSource(matter, { scholarId: who.scholarId, source: parsed.data }, at, id),
       );
 
@@ -586,7 +586,7 @@ export function governanceRoutes(
       const at = now();
       const id = `s-${at.replace(/[^0-9]/g, '').slice(0, 14)}-${Math.random().toString(36).slice(2, 8)}`;
 
-      const updated = await store.updateMatter(req.params.id, (matter) =>
+      const updated = await changeMatter(store, req, res, req.params.id, (matter) =>
         attachSource(
           matter,
           {
@@ -963,7 +963,7 @@ export function governanceRoutes(
       if (!requireRole(res, mayDeliberate(who.role), 'withdraw a source', who.role)) return;
 
       const at = now();
-      const updated = await store.updateMatter(req.params.id, (matter) =>
+      const updated = await changeMatter(store, req, res, req.params.id, (matter) =>
         withdrawSource(matter, { scholarId: who.scholarId, sourceId: req.params.sourceId }, at),
       );
 
@@ -989,7 +989,7 @@ export function governanceRoutes(
       if (!board) return;
 
       const at = now();
-      const updated = await store.updateMatter(req.params.id, (matter) => {
+      const updated = await changeMatter(store, req, res, req.params.id, (matter) => {
         const { matter: returned, released } = returnToDeliberation(
           board,
           matter,
@@ -1035,7 +1035,7 @@ export function governanceRoutes(
       if (!parsed.success) return badRequest(res, parsed.error.issues);
 
       res.status(201).json(
-        await store.updateMatter(req.params.id, (m) =>
+        await changeMatter(store, req, res, req.params.id, (m) =>
           askTheInstitution(m, parsed.data, who.scholarId ?? 'unknown', now()),
         ),
       );
@@ -1060,7 +1060,7 @@ export function governanceRoutes(
       if (!parsed.success) return badRequest(res, parsed.error.issues);
 
       res.json(
-        await store.updateMatter(req.params.id, (m) =>
+        await changeMatter(store, req, res, req.params.id, (m) =>
           answerFromTheInstitution(
             m,
             req.params.questionId,
@@ -1079,7 +1079,7 @@ export function governanceRoutes(
     handle(async (req, res) => {
       const who = identityOf(req);
       if (!requireRole(res, mayDeliberate(who.role), 'open deliberation', who.role)) return;
-      res.json(await store.updateMatter(req.params.id, (m) => openDeliberation(m, now())));
+      res.json(await changeMatter(store, req, res, req.params.id, (m) => openDeliberation(m, now())));
     }),
   );
 
@@ -1152,7 +1152,7 @@ export function governanceRoutes(
        * could be carried by lowering it mid-vote.
        */
       const board = await store.board(matter.boardId);
-      res.json(await store.updateMatter(req.params.id, (m) => openVoting(m, board ?? undefined)));
+      res.json(await changeMatter(store, req, res, req.params.id, (m) => openVoting(m, board ?? undefined)));
     }),
   );
 
@@ -1170,7 +1170,7 @@ export function governanceRoutes(
       if (!board) return;
 
       const at = now();
-      const updated = await store.updateMatter(req.params.id, (matter) =>
+      const updated = await changeMatter(store, req, res, req.params.id, (matter) =>
         recordVote(board, matter, { scholarId: who.scholarId, position: parsed.data.position, reason: parsed.data.reason }, at),
       );
       res.status(201).json(updated);
@@ -1189,7 +1189,7 @@ export function governanceRoutes(
 
       const held = await store.matters(board.id);
       let outcome = '';
-      const updated = await store.updateMatter(req.params.id, (matter) => {
+      const updated = await changeMatter(store, req, res, req.params.id, (matter) => {
         const closed = closeVoting(board, matter, now(), held);
         outcome = closed.outcome;
         return closed.matter;
@@ -1212,7 +1212,7 @@ export function governanceRoutes(
       if (!board) return;
 
       const at = now();
-      const updated = await store.updateMatter(req.params.id, (matter) =>
+      const updated = await changeMatter(store, req, res, req.params.id, (matter) =>
         objectDuringTimelock(board, matter, { scholarId: who.scholarId, reason: parsed.data.reason }, at),
       );
       res.json(updated);
@@ -1230,7 +1230,7 @@ export function governanceRoutes(
       if (!board) return;
       const held = await store.matters(board.id);
 
-      res.json(await store.updateMatter(req.params.id, (m) => bringIntoForce(m, now(), board, held)));
+      res.json(await changeMatter(store, req, res, req.params.id, (m) => bringIntoForce(m, now(), board, held)));
     }),
   );
 
@@ -1241,7 +1241,7 @@ export function governanceRoutes(
       const who = identityOf(req);
       if (!requireRole(res, mayDeliberate(who.role), 'withdraw a matter', who.role)) return;
       const at = new Date().toISOString();
-      res.json(await store.updateMatter(req.params.id, (m) => withdraw(m, at)));
+      res.json(await changeMatter(store, req, res, req.params.id, (m) => withdraw(m, at)));
     }),
   );
 
@@ -1568,7 +1568,7 @@ export function governanceRoutes(
       if (!parsed.success) return badRequest(res, parsed.error.issues);
 
       res.json(
-        await store.updateMatter(req.params.id, (current) =>
+        await changeMatter(store, req, res, req.params.id, (current) =>
           setImplementationSteps(current, parsed.data.steps),
         ),
       );
@@ -1856,7 +1856,7 @@ export function governanceRoutes(
       if (!parsed.success) return badRequest(res, parsed.error.issues);
 
       res.json(
-        await store.updateMatter(req.params.id, (current) =>
+        await changeMatter(store, req, res, req.params.id, (current) =>
           setStructure(current, parsed.data.structureId),
         ),
       );
@@ -1884,7 +1884,7 @@ export function governanceRoutes(
 
       const at = now();
       res.status(201).json(
-        await store.updateMatter(req.params.id, (current) =>
+        await changeMatter(store, req, res, req.params.id, (current) =>
           recordFinding(board, current, { scholarId: who.scholarId, ...parsed.data }, at),
         ),
       );

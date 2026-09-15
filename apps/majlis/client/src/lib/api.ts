@@ -224,6 +224,31 @@ export interface AssistantExchange {
   model: string;
 }
 
+/**
+ * A read that also hands back which version of the record this is.
+ *
+ * Separate from `get` rather than folded into it, so the ordinary read stays
+ * the ordinary read and nothing has to unwrap a shape it did not ask for. Only
+ * a screen that is about to change something needs this.
+ */
+export async function withVersion<T>(path: string): Promise<{ it: T; version: string | null }> {
+  const res = await reach(path, {});
+  if (!res.ok) {
+    let payload: { error?: string; message?: string } = {};
+    try {
+      payload = (await res.json()) as typeof payload;
+    } catch {
+      /* No JSON body: the status is all there is. */
+    }
+    throw new Refused(
+      payload.error ?? 'unknown',
+      payload.message ?? `That could not be read (${res.status}).`,
+      res.status,
+    );
+  }
+  return { it: (await res.json()) as T, version: res.headers.get('ETag') };
+}
+
 async function get<T>(path: string): Promise<T> {
   // Through `reach`, so a screen that cannot load says the connection failed
   // rather than printing whatever word the browser chose for it.
@@ -408,6 +433,18 @@ export const api = {
   board: (id: string) => get<Board>(`/api/boards/${id}`),
   matters: () => get<MatterSummary[]>('/api/matters'),
   matter: (id: string) => get<Matter>(`/api/matters/${id}`),
+  /**
+   * The matter, and which version of it this is.
+   *
+   * A screen that is going to *change* a matter needs the version it read, so
+   * it can be told when somebody else got there first. A screen that only
+   * displays one does not, and keeps using `matter` above.
+   *
+   * The version comes from the `ETag` on the reply and is not part of the
+   * body, because it is a fact about *this copy* rather than about the matter
+   * — see `services/version.ts` on the other side.
+   */
+  matterToWorkOn: (id: string) => withVersion<Matter>(`/api/matters/${id}`),
   /**
    * Everything for one matter, in the order it is read.
    *
@@ -632,14 +669,51 @@ async function reach(path: string, init: RequestInit): Promise<Response> {
   }
 }
 
+/**
+ * What an act carries besides its body.
+ *
+ * `version` is the copy of the record the member was looking at. Sent back, it
+ * lets the server refuse a write whose author had not seen somebody else's —
+ * which is the difference between a board of five working together and a board
+ * of five overwriting each other in silence.
+ *
+ * `once` is the key that makes a retry safe. One key per press: repeated on
+ * every retry of that same press, and never reused for a different one.
+ *
+ * Named `Sending` rather than `Carrying` because this file already has a
+ * `Carrying`, and it means something else entirely — what carries a ruling out
+ * in the world. Two meanings for one word in one file is how a reader comes to
+ * distrust both.
+ */
+export interface Sending {
+  version?: string;
+  once?: string;
+}
+
+/**
+ * A key for one press of one button.
+ *
+ * Minted where the act is begun rather than inside the request, because the
+ * whole point is that a retry of the *same intention* carries the *same* key.
+ * A key made per request would change on every retry and guard nothing.
+ */
+export function aKeyForThisPress(): string {
+  return `p-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
 async function send<T>(
   path: string,
   body?: unknown,
   method: 'POST' | 'PUT' | 'DELETE' = 'POST',
+  sending: Sending = {},
 ): Promise<T> {
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (sending.version) headers['If-Match'] = sending.version;
+  if (sending.once) headers['Idempotency-Key'] = sending.once;
+
   const res = await reach(path, {
     method,
-    headers: { 'Content-Type': 'application/json' },
+    headers,
     // A DELETE with a body confuses proxies more often than it helps.
     body: method === 'DELETE' ? undefined : JSON.stringify(body ?? {}),
   });
@@ -1891,10 +1965,19 @@ export const oversight = {
   checklist: (id: string) => get<Checklist>(`/api/matters/${id}/checklist`),
   setStructure: (id: string, structureId: string | null) =>
     send<Matter>(`/api/matters/${id}/structure`, { structureId }, 'PUT'),
+  /**
+   * Record what this condition is, against the matter as the member read it.
+   *
+   * `sending` carries the version they were looking at and the key for this
+   * press. Two members answering the same condition at once is the case this
+   * whole mechanism exists for: without the version the second silently
+   * replaced the first, and nobody was told.
+   */
   recordFinding: (
     id: string,
     finding: { conditionId: string; holds: ConditionFinding['holds']; reason: string },
-  ) => send<Matter>(`/api/matters/${id}/findings`, finding),
+    sending: Sending = {},
+  ) => send<Matter>(`/api/matters/${id}/findings`, finding, 'POST', sending),
   asset: (id: string) => get<AssetDetail>(`/api/assets/${id}`),
   addAsset: (input: { kind: AssetKind; name: string; identifiers: AssetIdentifier[] }) =>
     send<Asset>('/api/assets', input),
