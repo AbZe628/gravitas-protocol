@@ -891,12 +891,12 @@ oblika) i rezultat se **veže za uslov**. Iz trake bira **član** i rezultat se
 
 ## 10 · Šta ostaje da se napravi
 
-1. Prozor + „šta slijedi" na svih 74 čina — danas ~8
-2. Sedam odluka iz §9
-3. Automatizam §4 — PDF i registry
-4. Notifikacija, timelock kad istekne, stare adrese
-5. KLJUČ — sažetak i brojke iz PDF-a
-6. BANKA — slanje
+**Ovdje je nekad stajala lista. Premještena je u §27**, gdje je poredana po
+tome šta najviše mijenja osjećaj da je ovo aplikacija, i gdje ispred svega
+stoji stavka 0 iz §35.
+
+Dvije liste istog posla su dva reda gradnje, a drugi se uvijek zaboravi
+ažurirati. **Jedan red gradnje postoji i to je §27.**
 
 ---
 
@@ -937,17 +937,11 @@ je greška, a ne stvar ukusa.
 
 ## 11.3 · Tastatura
 
-| tipka | gdje | šta radi |
-|---|---|---|
-| `Esc` | dijalog, slajd | zatvara — **radi** |
-| `Tab` | svuda | kroz kontrole redom kako se čitaju |
-| `Enter` | polje jednog reda | glavni čin tog prozora |
-| `Ctrl+Enter` | polje više redova | glavni čin — jer `Enter` tu pravi novi red |
-| `←` `→` | traka stanica | prethodna / sljedeća stanica |
-| `?` | svuda | šta tipke rade ovdje |
-| `/` | svuda | pretraga |
+**Tablica tipki je u §J.2 i samo tamo.** Ovdje je stajala druga, koja nije
+znala za `Ctrl+K` — dvije tablice tipki su dva ugovora sa istim korisnikom.
 
-**NEMA danas:** sve osim `Esc`.
+Mjereno u kodu: `Escape` se obrađuje **3 puta**, `Enter` **1 put**, i to je
+sve. `autoFocus` **0**, `.focus()` **3**. Tastature praktično nema.
 
 ## 11.4 · Čekanje
 
