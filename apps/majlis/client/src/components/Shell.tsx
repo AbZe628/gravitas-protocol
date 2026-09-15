@@ -22,6 +22,7 @@ import Tools, { type Kind } from './Tools.js';
 import ToolShelf from './ToolShelf.js';
 import Palette from './Palette.js';
 import Bell from './Bell.js';
+import Guide from './Guide.js';
 import Keys from './Keys.js';
 import Announcement from './Announcement.js';
 import { NewsProvider } from '../lib/news.js';
@@ -688,6 +689,16 @@ function Frame({ children }: { children: React.ReactNode }) {
               behind it. See `Bell.tsx` for why it holds no stored list.
             */}
             {!desk && <Bell />}
+
+            {/*
+              The guide, which used to float over the work in the corner.
+
+              It lay across the act bar and the aside pane — measured, five
+              overlaps on the matter screen — and the act bar carried empty
+              padding purely to dodge it. A control that hovers over the work
+              is the habit of a website with a support widget bolted on.
+            */}
+            {!desk && <Guide />}
 
             {/*
               The palette. A faster way to the same seven tools and eight

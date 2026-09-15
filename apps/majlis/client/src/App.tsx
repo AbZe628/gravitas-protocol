@@ -34,7 +34,6 @@ import Assistant from './pages/Assistant.js';
 import Record from './pages/Record.js';
 import Search from './pages/Search.js';
 import Shell from './components/Shell.js';
-import Guide from './components/Guide.js';
 import { useIdentity, isInstitution } from './lib/identity.js';
 
 /**
@@ -182,7 +181,7 @@ export default function App() {
         wherever somebody happens to be standing — and an application that keeps
         its explanations on a page of their own has explanations nobody reads.
       */}
-      <Guide />
+      {/* The guide lives in the masthead now — see Guide.tsx on why it stopped floating. */}
     </Shell>
   );
 }

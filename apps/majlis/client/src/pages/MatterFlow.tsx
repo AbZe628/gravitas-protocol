@@ -14,6 +14,7 @@ import { useIdentity } from '../lib/identity.js';
 import { ErrorText, Loading } from '../components/ui.js';
 import { State, toneForStatus } from '../components/kit.js';
 import ItMoved from '../components/ItMoved.js';
+import AfterAct from '../components/AfterAct.js';
 import StepWindow, { type Step } from '../components/StepWindow.js';
 import TheCalculator from '../components/TheCalculator.js';
 import AskTheBank from '../components/AskTheBank.js';
@@ -140,6 +141,20 @@ export default function MatterFlow() {
    * them — they would come back from the window to a screen that had moved.
    */
   const [whatArrived, setWhatArrived] = useState<Matter | null>(null);
+  /**
+   * What the last act did, and what may follow from it.
+   *
+   * Held here rather than inside the panel that performed it. Most acts change
+   * the status, and this screen shows a different panel at a different status
+   * — so the panel is unmounted the moment the act lands, taking the sentence
+   * with it. Proved in the browser: withdrawing a matter worked and said
+   * nothing at all afterwards.
+   */
+  const [justDid, setJustDid] = useState<{
+    did: string;
+    means: string;
+    next: readonly { label: string; to?: string; says?: string }[];
+  } | null>(null);
   /*
    * One key per press, held across retries.
    *
@@ -470,12 +485,15 @@ function lastSaid(
         </>
       )}
 
-      <Link
-        to={`/dossier/matters/${matter.id}`}
-        className="text-note text-lapis underline decoration-line underline-offset-4"
-      >
-        {t('flow.everythingElse')}
-      </Link>
+      {/*
+        Once, not twice.
+
+        This sentence stood here in the aside and again as the act at the foot
+        of the settled window — the same words, a hand's width apart, one of
+        them quiet and one of them the main control. Caught by looking at what
+        the screen actually says rather than at what the code does. The act bar
+        keeps it, because that is where a member looks for something to press.
+      */}
     </>
   );
 
@@ -487,6 +505,21 @@ function lastSaid(
       <State tone={toneForStatus(matter.status)}>{t(`matter.status.${matter.status}`)}</State>
     </>
   );
+
+  /*
+   * What the last act did, above the work and outside every panel.
+   *
+   * Worked out before the branch below, so it survives the screen changing
+   * shape underneath it — which is exactly what the act it reports just did.
+   */
+  const didPanel = justDid ? (
+    <AfterAct
+      did={justDid.did}
+      means={justDid.means}
+      next={justDid.next}
+      onClose={() => setJustDid(null)}
+    />
+  ) : null;
 
   // ── a decided matter is not a run of steps ─────────────────────────────
 
@@ -507,6 +540,7 @@ function lastSaid(
           </Link>
         }
       >
+        {didPanel}
         <SignTheDocument matter={matter} />
       </StepWindow>
     );
@@ -532,6 +566,7 @@ function lastSaid(
           </Button>
         }
       >
+        {didPanel}
         <WhatTheySent
           matter={matter}
           list={list}
@@ -564,6 +599,7 @@ function lastSaid(
           ) : null
         }
       >
+        {didPanel}
         <VotePanel
           stepsOutstanding={outstanding}
           matter={matter}
@@ -573,6 +609,7 @@ function lastSaid(
             setMatter(m);
             load();
           }}
+          onDid={setJustDid}
         />
       </StepWindow>
     );
@@ -653,6 +690,7 @@ function lastSaid(
         </>
       }
     >
+      {didPanel}
       {step && (
         <>
           <p className="mb-4 max-w-[62ch] font-display text-sub leading-snug text-paper">

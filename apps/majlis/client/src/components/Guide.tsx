@@ -95,12 +95,27 @@ export default function Guide() {
     }
   }
 
+  /*
+   * ── it sits in the frame now, not on top of the work ────────────────────
+   *
+   * This was a bubble pinned to the bottom-right corner, floating above
+   * whatever was underneath. Measured on the matter screen: it lay across the
+   * act bar, the aside pane and the title — five overlaps, the largest 3,274
+   * square pixels of the work it was covering. The act bar had grown
+   * `lg:pe-[7.5rem]` of empty padding purely to dodge it, which is the shape
+   * of a workaround rather than a layout.
+   *
+   * A control that hovers over the work is the habit of a website with a
+   * support widget bolted on. In an application it belongs in the frame, with
+   * the bell and the palette, where the member already looks for the things
+   * that are always available.
+   */
   if (!open) {
     return (
       <Button
         type="button"
         onClick={() => setOpen(true)}
-        className="fixed bottom-5 end-5 z-40 hidden items-center gap-2 rounded-full bg-raised lg:flex px-4 py-2.5 text-ui font-medium text-sand shadow-[0_0_0_0.5px_rgba(25,23,19,0.08),0_2px_6px_rgba(25,23,19,0.09),0_14px_30px_-10px_rgba(25,23,19,0.3)] transition-all hover:-translate-y-px hover:text-paper"
+        className="hidden items-center gap-2 rounded-xl bg-raised px-3 py-2 text-ui font-semibold text-sand shadow-ring transition-colors hover:text-paper lg:flex"
       >
         <svg aria-hidden width="14" height="14" viewBox="0 0 16 16" fill="none">
           <path d="M8 1 L9.6 6.4 L15 8 L9.6 9.6 L8 15 L6.4 9.6 L1 8 L6.4 6.4 Z" fill="#B08430" />
@@ -111,7 +126,7 @@ export default function Guide() {
   }
 
   return (
-    <div className="fixed bottom-[calc(4.75rem+env(safe-area-inset-bottom))] end-5 z-40 w-[min(26rem,calc(100vw-2.5rem))] lg:bottom-5">
+    <div className="fixed inset-block-end-auto bottom-4 end-4 z-50 w-[min(26rem,calc(100vw-2rem))] lg:bottom-auto lg:end-[5.5rem] lg:top-[4.25rem]">
       <div className="rounded-sheet bg-raised shadow-sheeted">
         {/* `items-start` and a `shrink-0` close: on a phone the scope line
             wraps to two, and centred with a flexible close the × sat on top

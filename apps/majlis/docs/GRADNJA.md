@@ -541,6 +541,7 @@ Mjeri `weigh.mjs`. **Čvor koji padne nije stvar ukusa — to je greška u kodu.
 |---|---|
 | **Mjeri, ne raspravljaj** | svaki brojač ovdje je bio pogrešan bar jednom; broji iz izvora |
 | **Pokreni, ne samo testiraj** | zeleni testovi su sakrili šest stvarnih grešaka u dva kruga |
+| **Svako gledanje uživo gleda i četvrto** | vlasnikovo pravilo, 16.09. — vidi ispod |
 | **Traži prije nego napraviš** | dvaput sam napravio ono što Majlis već ima; grep za sposobnost **i** za i18n prefiks |
 | **Ništa ne postaje obavezujuće administracijom** | mijenjanje standarda traži odluku na snazi, ne gumb |
 | **Aplikacija predlaže, čovjek odlučuje** | granica §11.9 je granica cijelog proizvoda |
@@ -548,6 +549,33 @@ Mjeri `weigh.mjs`. **Čvor koji padne nije stvar ukusa — to je greška u kodu.
 | **Port 4102**, nikad 4000 | 4000 je vlasnikova instanca |
 | **Commit je AbZe628**, bez ikakvog traga alata | — |
 | **Pitaj prije svakog guranja na GitHub** | svaki put, bez izuzetka |
+
+---
+
+## 5b · Šta se gleda pri svakom gledanju uživo
+
+Vlasnikovo pravilo, 16.09.2026. Pokretanje nije samo *radi li* — nego **i ovo,
+svaki put, kroz sve dijelove aplikacije**:
+
+| | pitanje | pada ako |
+|---|---|---|
+| 1 | **Je li isto kao na slikama?** | ekran odstupa od nacrtanog *(artefakt: osam pa devet radnih prozora)* a promjena nije tražena |
+| 2 | **Je li lijepo ispisano?** | rečenica zvuči kao softver a ne kao čovjek |
+| 3 | **Ima li AI opisa?** | bilo gdje piše da je nešto „generisano", „AI-powered", ili rečenica u tom registru |
+| 4 | **Je li lijepo raspoređeno?** | preklapanje, tekst koji izlazi iz okvira, kolona koja se guši, razmak koji skače |
+
+**Kako se mjeri, ne procjenjuje:**
+
+```js
+// preklapanje — dva elementa koja se vizuelno gaze
+// tekst koji bjezi iz svog okvira — scrollWidth > clientWidth
+// prelomljena rijec — element uzi od svoje najduze rijeci
+// AI registar — pretraga po ispisanom tekstu, ne po kodu
+```
+
+Nalaz se **ne popravlja usput** ako pripada drugoj fazi — zapisuje se, kao i
+svaka druga rupa. Ali **AI registar i preklapanje se popravljaju odmah**: prvo
+je laž o tome šta ovo jeste, drugo je kvar koji se vidi.
 
 ---
 

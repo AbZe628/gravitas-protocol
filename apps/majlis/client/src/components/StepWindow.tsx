@@ -142,7 +142,8 @@ export default function StepWindow({
         {consequences && (
           <div className="px-5 pt-3 sm:px-6">{consequences}</div>
         )}
-        <div className="flex flex-wrap items-center justify-end gap-2 px-5 py-3 sm:px-6 lg:pe-[7.5rem]">
+        {/* The guide no longer floats over this, so the bar keeps its own width. */}
+        <div className="flex flex-wrap items-center justify-end gap-2 px-5 py-3 sm:px-6">
           {acts}
         </div>
       </div>

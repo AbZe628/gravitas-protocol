@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import App from './App.js';
 import { I18nProvider } from './lib/i18n.js';
@@ -272,8 +272,16 @@ describe('when the server refuses', () => {
     });
     renderMatter();
 
-    const open = await screen.findByText('Open the vote');
-    fireEvent.click(open);
+    /*
+     * Two presses now, not one: the act opens a window that says what it does
+     * and what it means before it happens, and the member confirms there. The
+     * assertion is unchanged and is the point of the test — wherever the
+     * refusal surfaces, it surfaces in the server's own words.
+     */
+    fireEvent.click(await screen.findByText('Open the vote'));
+
+    const confirm = await screen.findByRole('dialog');
+    fireEvent.click(within(confirm).getByRole('button', { name: 'Open the vote' }));
 
     // Verbatim. Replacing it with "something went wrong" throws away the only
     // part that helps.

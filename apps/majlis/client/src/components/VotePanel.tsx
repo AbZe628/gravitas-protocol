@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Refused, governance, type Matter, type Tally } from '../lib/api.js';
 import { useRevision } from '../lib/pulse.js';
+import Act from './Act.js';
 import { useI18n } from '../lib/i18n.js';
 import Dictate from './Dictate.js';
 import { Card } from './ui.js';
@@ -34,6 +35,15 @@ interface Props {
    * against no shape, which is the ordinary case and is not held up.
    */
   stepsOutstanding?: number;
+  /**
+   * Where what-follows is shown after an act.
+   *
+   * Handed in rather than shown here, because most of these acts change the
+   * status and the screen shows a different panel at a different status —
+   * this one is unmounted before anybody reads the sentence. Proved in the
+   * browser: withdrawing worked and said nothing.
+   */
+  onDid?: (after: { did: string; means: string; next: readonly { label: string; to?: string; says?: string }[] }) => void;
 }
 
 const MIN_REASON = 20;
@@ -70,6 +80,7 @@ export default function VotePanel({
   scholarId,
   onChanged,
   stepsOutstanding = 0,
+  onDid,
 }: Props) {
   const { t } = useI18n();
   const [tally, setTally] = useState<Tally | null>(null);
@@ -79,6 +90,8 @@ export default function VotePanel({
   const [reason, setReason] = useState('');
   const [objecting, setObjecting] = useState(false);
   const [reopening, setReopening] = useState(false);
+  /** Which of the five acts has its window open. Null when none has. */
+  const [acting, setActing] = useState<string | null>(null);
 
   const signatory = role === 'signatory';
   const deliberator = signatory || role === 'advisory' || role === 'liaison';
@@ -368,7 +381,7 @@ export default function VotePanel({
       {/* Moving the matter along */}
       <div className="flex flex-wrap gap-2">
         {matter.status === 'draft' && deliberator &&
-          button(t('action.openDeliberation'), () => run(() => governance.openDeliberation(matter.id)))}
+          button(t('action.openDeliberation'), () => setActing('openDeliberation'))}
 
         {/*
           The vote opens only when the conditions have been answered.
@@ -381,10 +394,10 @@ export default function VotePanel({
           know what would let them.
         */}
         {matter.status === 'deliberation' && signatory && stepsOutstanding === 0 &&
-          button(t('action.openVoting'), () => run(() => governance.openVoting(matter.id)))}
+          button(t('action.openVoting'), () => setActing('openVoting'))}
 
         {matter.status === 'voting' && signatory &&
-          button(t('action.close'), () => run(() => governance.closeVoting(matter.id)))}
+          button(t('action.close'), () => setActing('closeVoting'))}
 
         {matter.status === 'voting' && signatory && !reopening &&
           button(t('reopen.title'), () => { setReason(''); setReopening(true); })}
@@ -393,13 +406,104 @@ export default function VotePanel({
           button(t('object.title'), () => { setReason(''); setObjecting(true); }, 'warn')}
 
         {matter.status === 'timelock' && signatory && countdown?.elapsed &&
-          button(t('action.force'), () => run(() => governance.bringIntoForce(matter.id)))}
+          button(t('action.force'), () => setActing('force'))}
 
         {['draft', 'deliberation', 'voting', 'timelock'].includes(matter.status) && deliberator &&
-          button(t('action.withdraw'), () => run(() => governance.withdraw(matter.id)))}
+          button(t('action.withdraw'), () => setActing('withdraw'), 'warn')}
       </div>
 
       {!objecting && !reopening && matter.status !== 'voting' && <Refusal message={refusal} />}
+
+      {/*
+        ── the five acts that used to happen in silence ──────────────────────
+        Each says what it does, what it means to whoever is outside this board,
+        and what the member may do next. Before this, a press moved the matter
+        and the screen was quietly different.
+      */}
+      <Act
+        open={acting === 'openDeliberation'}
+        onClose={() => setActing(null)}
+        title={t('action.openDeliberation')}
+        does={t('win.openDeliberation.does')}
+        means={t('win.openDeliberation.means')}
+        label={t('action.openDeliberation')}
+        perform={async () => onChanged(await governance.openDeliberation(matter.id))}
+        onDone={onDid}
+        after={{
+          did: t('win.openDeliberation.did'),
+          means: t('win.openDeliberation.didMeans'),
+          next: [{ label: t('win.next.firstStep'), says: t('win.next.firstStepSays') }],
+        }}
+      />
+
+      <Act
+        open={acting === 'openVoting'}
+        onClose={() => setActing(null)}
+        title={t('action.openVoting')}
+        does={t('win.openVoting.does')}
+        means={t('win.openVoting.means')}
+        label={t('action.openVoting')}
+        perform={async () => onChanged(await governance.openVoting(matter.id))}
+        onDone={onDid}
+        after={{
+          did: t('win.openVoting.did'),
+          means: t('win.openVoting.didMeans'),
+          next: [{ label: t('win.next.castYours'), says: t('win.next.castYoursSays') }],
+        }}
+      />
+
+      <Act
+        open={acting === 'closeVoting'}
+        onClose={() => setActing(null)}
+        title={t('action.close')}
+        does={t('win.closeVoting.does')}
+        means={t('win.closeVoting.means')}
+        label={t('action.close')}
+        perform={async () => onChanged(await governance.closeVoting(matter.id))}
+        onDone={onDid}
+        after={{
+          did: t('win.closeVoting.did'),
+          means: t('win.closeVoting.didMeans'),
+          next: [{ label: t('win.next.readOutcome'), says: t('win.next.readOutcomeSays') }],
+        }}
+      />
+
+      <Act
+        open={acting === 'force'}
+        onClose={() => setActing(null)}
+        title={t('action.force')}
+        does={t('win.force.does')}
+        means={t('win.force.means')}
+        label={t('action.force')}
+        perform={async () => onChanged(await governance.bringIntoForce(matter.id))}
+        onDone={onDid}
+        after={{
+          did: t('win.force.did'),
+          means: t('win.force.didMeans'),
+          next: [
+            { label: t('win.next.sign'), says: t('win.next.signSays') },
+            { label: t('win.next.papers'), says: t('win.next.papersSays') },
+          ],
+        }}
+      />
+
+      <Act
+        open={acting === 'withdraw'}
+        onClose={() => setActing(null)}
+        title={t('action.withdraw')}
+        does={t('win.withdraw.does')}
+        means={t('win.withdraw.means')}
+        label={t('action.withdraw')}
+        grave
+        reason={{ label: t('win.withdraw.reason'), help: t('win.withdraw.reasonHelp') }}
+        perform={async () => onChanged(await governance.withdraw(matter.id))}
+        onDone={onDid}
+        after={{
+          did: t('win.withdraw.did'),
+          means: t('win.withdraw.didMeans'),
+          next: [{ label: t('win.next.backToQueue'), to: '/', says: t('win.next.backToQueueSays') }],
+        }}
+      />
     </div>
   );
 }
