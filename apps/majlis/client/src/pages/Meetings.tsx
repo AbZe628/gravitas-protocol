@@ -14,6 +14,8 @@ import { useIdentity } from '../lib/identity.js';
 import { Card, DateText, ErrorText, Loading, Tag } from '../components/ui.js';
 import { useStillThere } from '../lib/stillThere.js';
 import { Button } from '../components/Button';
+import Act from '../components/Act.js';
+import AfterAct from '../components/AfterAct.js';
 
 /**
  * Meetings, as a record rather than a room.
@@ -78,6 +80,19 @@ function MeetingCard({
   );
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  /** Which act has its window open. Null when none has. */
+  const [acting, setActing] = useState<string | null>(null);
+  /**
+   * What the last act did.
+   *
+   * Held by the row rather than by the control, because closing a sitting
+   * takes every control on it away — and the sentence would go with them.
+   */
+  const [justDid, setJustDid] = useState<{
+    did: string;
+    means: string;
+    next: readonly { label: string; to?: string; says?: string }[];
+  } | null>(null);
 
   const run = async (fn: () => Promise<unknown>) => {
     setBusy(true);
@@ -105,6 +120,59 @@ function MeetingCard({
 
   return (
     <Card>
+      {/*
+        What the last act did, at the head of the row.
+
+        Above the controls rather than beside them: closing a sitting takes
+        every control on it away, and a sentence rendered among them would be
+        gone before it was read.
+      */}
+      {justDid && (
+        <AfterAct
+          did={justDid.did}
+          means={justDid.means}
+          next={justDid.next}
+          onClose={() => setJustDid(null)}
+        />
+      )}
+
+      <Act
+        open={acting === 'minute'}
+        onClose={() => setActing(null)}
+        title={t('meet.saveMinute')}
+        does={t('wm.minute.does')}
+        means={t('wm.minute.means')}
+        label={t('meet.saveMinute')}
+        perform={async () => {
+          await run(() => oversight.writeMinute(m.id, minute));
+        }}
+        onDone={setJustDid}
+        after={{
+          did: t('wm.minute.did'),
+          means: t('wm.minute.didMeans'),
+          next: [{ label: t('wm.next.closeIt'), says: t('wm.next.closeItSays') }],
+        }}
+      />
+
+      <Act
+        open={acting === 'close'}
+        onClose={() => setActing(null)}
+        title={t('meet.close')}
+        does={t('wm.close.does')}
+        means={t('wm.close.means')}
+        label={t('meet.close')}
+        grave
+        perform={async () => {
+          await run(() => oversight.closeMeeting(m.id));
+        }}
+        onDone={setJustDid}
+        after={{
+          did: t('wm.close.did'),
+          means: t('wm.close.didMeans'),
+          next: [{ label: t('wm.next.papers'), says: t('wm.next.papersSays') }],
+        }}
+      />
+
       <div className="mb-1.5 flex flex-wrap items-center gap-2">
         <Tag tone={tone(row.state)}>{t(`meet.${row.state}`)}</Tag>
         <span className="font-mono text-ui tabular-nums">
@@ -250,10 +318,12 @@ function MeetingCard({
                   className="w-full rounded-xl shadow-ring bg-raised px-3 py-2 text-ui leading-relaxed"
                 />
                 <Button
-                  type="button"
-                  disabled={busy}
-                  onClick={() => run(() => oversight.writeMinute(m.id, minute))}
-                  className="mt-1.5 rounded-xl shadow-ring px-3 py-1.5 text-ui text-muted hover:text-paper disabled:opacity-40"
+                  tone="quiet"
+                  size="sm"
+                  className="mt-1.5"
+                  disabled={busy || !minute.trim()}
+                  whyDead={!minute.trim() ? t('meet.minuteHint') : undefined}
+                  onClick={() => setActing('minute')}
                 >
                   {t('meet.saveMinute')}
                 </Button>
@@ -277,12 +347,7 @@ function MeetingCard({
           */}
           {canClose && row.state !== 'closed' && (
             <div>
-              <Button
-                type="button"
-                disabled={busy}
-                onClick={() => run(() => oversight.closeMeeting(m.id))}
-                className="rounded-xl bg-gradient-to-br from-lapissoft to-lapis px-4 py-2 text-ui font-semibold text-white shadow-act hover:bg-lapis disabled:opacity-40"
-              >
+              <Button tone="act" size="md" disabled={busy} onClick={() => setActing('close')}>
                 {t('meet.close')}
               </Button>
               <p className="mt-1.5 text-note leading-relaxed text-muted">

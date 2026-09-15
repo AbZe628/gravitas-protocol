@@ -9,8 +9,9 @@ import { DocumentLink } from '../components/Documents.js';
 import Recorded from '../components/Recorded.js';
 import { ActionPanel, Facts, RecordPage } from '../components/shapes.js';
 import HowThisIsHeld from '../components/HowThisIsHeld.js';
-import { Field, HEADING } from '../components/field.js';
 import { Button } from '../components/Button';
+import Act from '../components/Act.js';
+import AfterAct from '../components/AfterAct.js';
 
 /**
  * One holding: where it stands, what the board has said about it, what it is
@@ -37,7 +38,12 @@ export default function AssetDetail() {
   const [busy, setBusy] = useState(false);
   const [refusal, setRefusal] = useState<string | null>(null);
   const [retiring, setRetiring] = useState(false);
-  const [reason, setReason] = useState('');
+  /** What the last act did. Held here, above anything an act can take away. */
+  const [justDid, setJustDid] = useState<{
+    did: string;
+    means: string;
+    next: readonly { label: string; to?: string; says?: string }[];
+  } | null>(null);
 
   useEffect(() => {
     oversight
@@ -59,31 +65,6 @@ export default function AssetDetail() {
 
   const a = data.asset;
   const canRaise = mayDeliberate(identity?.role) && !a.retiredAt;
-
-  /**
-   * Withdraw it from the universe.
-   *
-   * Retired, never deleted: a holding that is gone still has a history the
-   * board is answerable for. The page reloads rather than patching its own
-   * copy, so what a reader sees afterwards is what the record says.
-   */
-  async function retire(e: React.FormEvent) {
-    e.preventDefault();
-    if (busy) return;
-    setBusy(true);
-    setRefusal(null);
-    try {
-      await oversight.retireAsset(a.id, reason.trim());
-      const fresh = await oversight.asset(a.id);
-      setRetiring(false);
-      setReason('');
-      setData(fresh);
-    } catch (error) {
-      setRefusal(error instanceof Error ? error.message : String(error));
-    } finally {
-      setBusy(false);
-    }
-  }
 
   /**
    * Open a matter that already knows what it is about.
@@ -137,49 +118,36 @@ export default function AssetDetail() {
           */
           more={
             <div>
-              {!retiring ? (
-                <Button
-                  type="button"
-                  onClick={() => setRetiring(true)}
-                  className="text-start text-ui text-breach underline decoration-line underline-offset-4"
-                >
-                  {t('reg.retire')}
-                </Button>
-              ) : (
-                <form onSubmit={retire}>
-                  <p className="mb-2 text-note leading-relaxed text-muted">
-                    {t('reg.retireLead')}
-                  </p>
-                  <Field label={t('reg.retireWhy')} headingClass={HEADING}>
-                    {(attrs) => (
-                      <textarea
-                        {...attrs}
-                        value={reason}
-                        onChange={(e) => setReason(e.target.value)}
-                        rows={3}
-                        className="w-full rounded-xl bg-raised px-3 py-2 text-ui shadow-ring outline-none"
-                        required
-                      />
-                    )}
-                  </Field>
-                  <div className="mt-2 flex flex-wrap items-center gap-3">
-                    <Button
-                      type="submit"
-                      disabled={busy || reason.trim().length === 0}
-                      className="rounded-xl bg-raised px-3.5 py-2 text-ui font-medium text-breach shadow-ringbreach disabled:opacity-40"
-                    >
-                      {t('reg.retireIt')}
-                    </Button>
-                    <Button
-                      type="button"
-                      onClick={() => setRetiring(false)}
-                      className="text-note text-muted"
-                    >
-                      {t('common.cancel')}
-                    </Button>
-                  </div>
-                </form>
-              )}
+              <Button tone="grave" size="sm" onClick={() => setRetiring(true)}>
+                {t('reg.retire')}
+              </Button>
+
+              <Act
+                open={retiring}
+                onClose={() => setRetiring(false)}
+                title={t('reg.retire')}
+                does={t('wm.retire.does')}
+                means={t('wm.retire.means')}
+                label={t('reg.retireIt')}
+                grave
+                reason={{ label: t('wm.retire.reason'), help: t('wm.retire.reasonHelp') }}
+                perform={async ({ reason: said }) => {
+                  await oversight.retireAsset(a.id, said);
+                  setData(await oversight.asset(a.id));
+                }}
+                onDone={setJustDid}
+                after={{
+                  did: t('wm.retire.did'),
+                  means: t('wm.retire.didMeans'),
+                  next: [
+                    {
+                      label: t('wm.next.register'),
+                      to: '/register',
+                      says: t('wm.next.registerSays'),
+                    },
+                  ],
+                }}
+              />
             </div>
           }
         >
@@ -217,7 +185,22 @@ export default function AssetDetail() {
   );
 
   return (
-    <RecordPage
+    <>
+      {/*
+        What the last act did, above the record itself.
+
+        Retiring a holding changes what this page says about it, so the
+        sentence cannot live inside the part that changes.
+      */}
+      {justDid && (
+        <AfterAct
+          did={justDid.did}
+          means={justDid.means}
+          next={justDid.next}
+          onClose={() => setJustDid(null)}
+        />
+      )}
+      <RecordPage
       phase="inforce"
       title={a.name}
       states={
@@ -371,5 +354,6 @@ export default function AssetDetail() {
         </div>
       )}
     </RecordPage>
+    </>
   );
 }

@@ -4,6 +4,8 @@ import { useI18n } from '../lib/i18n.js';
 import { useHealth } from '../lib/health.js';
 import { DateText } from './ui.js';
 import { Button } from './Button';
+import Act from './Act.js';
+import AfterAct from './AfterAct.js';
 
 /**
  * What the board is arguing from.
@@ -40,6 +42,14 @@ const OPEN = ['draft', 'deliberation', 'voting', 'timelock'];
 export default function Evidence({ matter, scholarId, canAttach, onChanged }: Props) {
   const { t } = useI18n();
   const [adding, setAdding] = useState(false);
+  /** Which source is being withdrawn, if any. */
+  const [withdrawing, setWithdrawing] = useState<string | null>(null);
+  /** What the last act did, held above the list it changes. */
+  const [justDid, setJustDid] = useState<{
+    did: string;
+    means: string;
+    next: readonly { label: string; to?: string; says?: string }[];
+  } | null>(null);
   const [busy, setBusy] = useState(false);
   const [refusal, setRefusal] = useState<string | null>(null);
 
@@ -107,6 +117,57 @@ export default function Evidence({ matter, scholarId, canAttach, onChanged }: Pr
 
   return (
     <div className="space-y-3">
+      {/*
+        What the last act did, above the list.
+
+        Withdrawing a source redraws the row it was pressed on, so the sentence
+        cannot be rendered inside that row.
+      */}
+      {justDid && (
+        <AfterAct
+          did={justDid.did}
+          means={justDid.means}
+          next={justDid.next}
+          onClose={() => setJustDid(null)}
+        />
+      )}
+
+      {/*
+        Taking a source back.
+
+        It was a line of small grey text and a press, with nothing said before
+        or after — and what it does is not obvious: the source is not deleted,
+        it stays in the record marked withdrawn, and anything already argued on
+        the strength of it stays exactly as it was said. That is worth a window.
+
+        Attaching one is not here because it already has its own: the composer
+        below asks for the kind, the title and where it is found, which is the
+        dialog `N-90` describes, opened in place rather than over the screen.
+      */}
+      <Act
+        open={withdrawing !== null}
+        onClose={() => setWithdrawing(null)}
+        title={t('evidence.withdraw')}
+        does={t('wm.withdrawSource.does')}
+        means={t('wm.withdrawSource.means')}
+        label={t('evidence.withdraw')}
+        grave
+        reason={{
+          label: t('wm.withdrawSource.reason'),
+          help: t('wm.withdrawSource.reasonHelp'),
+        }}
+        perform={async () => {
+          if (!withdrawing) return;
+          onChanged(await governance.withdrawSource(matter.id, withdrawing));
+        }}
+        onDone={setJustDid}
+        after={{
+          did: t('wm.withdrawSource.did'),
+          means: t('wm.withdrawSource.didMeans'),
+          next: [{ label: t('wm.next.backToMatter'), says: t('wm.next.backToMatterSays') }],
+        }}
+      />
+
       {sources.length === 0 && !adding && (
         <p className="text-ui text-muted">{t('evidence.none')}</p>
       )}
@@ -177,10 +238,11 @@ export default function Evidence({ matter, scholarId, canAttach, onChanged }: Pr
 
                 {!withdrawn && mine && stillOpen && s.id && (
                   <Button
-                    type="button"
+                    tone="grave"
+                    size="sm"
+                    className="mt-2"
                     disabled={busy}
-                    onClick={() => run(() => governance.withdrawSource(matter.id, s.id!))}
-                    className="mt-2 text-note text-muted hover:text-paper disabled:opacity-40"
+                    onClick={() => setWithdrawing(s.id!)}
                   >
                     {t('evidence.withdraw')}
                   </Button>
