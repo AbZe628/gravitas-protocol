@@ -61,10 +61,31 @@ model koji računa a nikad ne zaključuje.
 
 ## 2 · Faze
 
-### FAZA 0 · Primitivi i ljuska
+### FAZA 0 · Primitivi i ljuska — **URAĐENO 15.09.2026.**
 
 > Bez ovoga svaka sljedeća faza nasljeđuje istu grešku. **Ovo je razlog zašto
 > se dosad svaka popravka osjetila kao minimalna.**
+
+**Mjereno poslije, ne procijenjeno:**
+
+```
+dokument se skrola            NE — na svih devet provjerenih ruta, 800 = 800
+text-[..px] u markupu         0    (bilo 1273, na 10 koraka)
+leading-[..] · tracking-[..]  0    (bilo 289 i 195, na 5 i 5)
+shadow-[..]                   7    (bilo 100; preostalih 7 su ivice, ne visina)
+goli <button>                 0    (bilo 197, svi na jednu komponentu)
+focus-visible                 svuda — pisan protiv elementa, hvata i onih 49
+testovi                       360 prolazi · tipovi čisti
+```
+
+**Osam heksova bez imena ostavljeno je netaknuto** i čeka tvoju odluku, kako
+i piše u pravilu — ne izmišljaju se:
+`#F7F0E2` ×3 · `#A67A28` · `#133A5F` · `#F2DFB5` · `#FBF1DF` · `#235A49` ·
+`#FCF6EA` · `#FCF6EC`
+
+**Ostaje iz ove faze:** `tokens.css` još nije generator za `tailwind.config.js`
+— dva fajla se i dalje drže ručno u koraku. Ljestvica je sada u Tailwindu, pa
+drift više ne može pogoditi tipografiju, ali može boje.
 
 **Posao**
 
@@ -180,21 +201,36 @@ miša**; F5 na svakoj stanici vraća istu stanicu.
 
 ---
 
-### FAZA 4 · Komandna paleta
+### FAZA 4 · Do alata — **URAĐENO 15.09.2026.**
 
-**Posao:** `N-03`. `Ctrl+K` sa bilo kojeg ekrana, uključujući otvoren prozor.
-Alati, oblici, banke, brojevi odluka, činovi.
+**Ispravka koja je došla od vlasnika, i bila je tačna.** Prvi pokušaj je alat
+sakrio iza `Ctrl+K`. To radi samo za onoga ko već zna da tipka postoji — a to
+nije niko, prvog dana. **Kratica je brži put za onoga ko zna; nikad nije put.**
 
-**Posljedice u istom prolazu**
+**Posao, kako je urađen**
 
-- paleta **nikad** ne mijenja glavni ekran dok je otvoren radni prozor — alat
-  se otvara sa strane, iznad njega
-- alat otvoren iz palete **ne veže se ni za šta** dok se ne zapiše; alat
-  otvoren iz koraka veže se za uslov. Razlika mora pisati **na ekranu**
-- `?` pokazuje tipke; `/` pretragu
+1. **Polica na desnoj ivici okvira** — sedam alata, imenom, na **svakom**
+   ekranu. Nije nešto što se otvara: dio je okvira. Jedan pritisak otvara
+   **taj alat**, ne panel u kojem ga treba ponovo naći.
+2. Panel prima `at` — ime alata. Prije je imao sedam kartica ali ga ništa nije
+   moglo otvoriti *na* jednoj: pritisneš Alati, dobiješ sedam imena, biraš
+   drugi put. Meni čiji je jedini sadržaj drugi meni.
+3. `Ctrl+K` paleta — sedam alata i osam odredišta, po imenu, sa bilo kojeg
+   ekrana. Strelice, `Enter`, `Esc`. Fokus se vraća na kontrolu koja ju je
+   otvorila.
 
-**Gotovo je kad:** svaki diskrecioni zadatak iz §C dostupan sa svakog čvora,
-bez napuštanja posla.
+**Provjereno u pregledniku, ne pretpostavljeno**
+
+```
+polica                7 gumbi, na svakom ekranu
+pritisak na četvrti   panel se otvara NA četvrtom (aria-current na oba)
+Ctrl+K                otvara, fokus sjeda u polje, 15 redova (7 alata + 8 mjesta)
+dokument              i dalje se ne skrola
+```
+
+**Ostaje iz ove faze:** `?` koje pokazuje tipke tekućeg ekrana, i `/` za
+pretragu. Paleta zna za alate i odredišta — ne još za brojeve odluka, banke i
+oblike.
 
 ---
 

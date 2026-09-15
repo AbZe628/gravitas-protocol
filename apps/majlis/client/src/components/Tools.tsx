@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import SlideOver from './SlideOver.js';
 import Screening from './Screening.js';
 import Purification from './Purification.js';
@@ -41,7 +41,7 @@ import { Button } from './Button';
  * closes back to it.
  */
 
-type Kind =
+export type Kind =
   | 'screening'
   | 'purification'
   | 'zakat'
@@ -50,7 +50,7 @@ type Kind =
   | 'late'
   | 'recorded';
 
-const KINDS: readonly Kind[] = [
+export const KINDS: readonly Kind[] = [
   'screening',
   'purification',
   'zakat',
@@ -61,7 +61,7 @@ const KINDS: readonly Kind[] = [
 ];
 
 /** The dictionary already names all seven for the step that opens them. */
-const LABEL: Record<Kind, string> = {
+export const LABEL: Record<Kind, string> = {
   screening: 'calc.tab.screening',
   purification: 'calc.tab.purification',
   zakat: 'calc.tab.zakat',
@@ -71,9 +71,35 @@ const LABEL: Record<Kind, string> = {
   recorded: 'calc.tab.recorded',
 };
 
-export default function Tools({ open, onClose }: { open: boolean; onClose: () => void }) {
+/**
+ * Opened on a named tool, never on a list of tools.
+ *
+ * `at` is the whole of what changed here. This panel already held seven real
+ * tabs, but nothing could open it *on* one: a member pressed Tools, met a row
+ * of seven, and chose again — a menu whose only contents are another menu.
+ * The shelf down the edge of the frame and the palette both name the tool they
+ * want, so the second choice disappears.
+ *
+ * Kept as internal state rather than driven wholly from outside, because once
+ * the panel is open moving between tabs is the member's business and should
+ * not go back through whatever opened it.
+ */
+export default function Tools({
+  open,
+  at,
+  onClose,
+}: {
+  open: boolean;
+  at?: Kind;
+  onClose: () => void;
+}) {
   const { t } = useI18n();
-  const [kind, setKind] = useState<Kind>('screening');
+  const [kind, setKind] = useState<Kind>(at ?? 'screening');
+
+  /* Each fresh opening honours what it was opened on. */
+  useEffect(() => {
+    if (open && at) setKind(at);
+  }, [open, at]);
 
   return (
     <SlideOver open={open} title={t('tools.title')} says={t('tools.says')} onClose={onClose}>

@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import { useI18n } from '../lib/i18n.js';
 import { isInstitution, useIdentity, maySubmit } from '../lib/identity.js';
@@ -18,7 +18,9 @@ import {
 } from '../lib/spine.js';
 import { WhatNext } from './Journey.js';
 import NotYourScreen from './NotYourScreen.js';
-import Tools from './Tools.js';
+import Tools, { type Kind } from './Tools.js';
+import ToolShelf from './ToolShelf.js';
+import Palette from './Palette.js';
 import { Button } from './Button';
 
 /**
@@ -360,6 +362,32 @@ export default function Shell({ children }: { children: React.ReactNode }) {
    * take them off what they were reading.
    */
   const [tools, setTools] = useState(false);
+  /**
+   * Which tool, not whether a list of tools.
+   *
+   * The shelf and the palette both name the one they want. Holding it here is
+   * what lets a press on the shelf open that tool rather than a panel the
+   * member then has to choose inside again.
+   */
+  const [toolAt, setToolAt] = useState<Kind>('screening');
+  const openTool = useCallback((kind: Kind) => {
+    setToolAt(kind);
+    setTools(true);
+  }, []);
+
+  /** `Ctrl K` from anywhere. A faster way in, never the only one. */
+  const [palette, setPalette] = useState(false);
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setPalette((was) => !was);
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
   const { t, lang, setLang } = useI18n();
   const { identity } = useIdentity();
   const health = useHealth();
@@ -697,6 +725,14 @@ export default function Shell({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
+        {/*
+          The work, and the tools beside it.
+
+          A row rather than a stack, so the shelf is part of the frame and not
+          something that opens over the work. Whatever the member is reading
+          stays exactly where it is when a tool is opened.
+        */}
+        <div className="flex min-h-0 flex-1">
         <main
           key={path}
           className={
@@ -783,9 +819,18 @@ export default function Shell({ children }: { children: React.ReactNode }) {
           )}
         </main>
 
+        {!desk && <ToolShelf at={tools ? toolAt : undefined} onOpen={openTool} />}
+        </div>
+
         <StatusBar />
 
-        <Tools open={tools} onClose={() => setTools(false)} />
+        <Tools open={tools} at={toolAt} onClose={() => setTools(false)} />
+
+        <Palette
+          open={palette}
+          onClose={() => setPalette(false)}
+          onTool={openTool}
+        />
       </div>
 
       <TabBar />
