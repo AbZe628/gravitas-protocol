@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Refused, governance, type Matter, type Tally } from '../lib/api.js';
+import { useRevision } from '../lib/pulse.js';
 import { useI18n } from '../lib/i18n.js';
 import Dictate from './Dictate.js';
 import { Card } from './ui.js';
@@ -87,6 +88,17 @@ export default function VotePanel({
     (r) => r.scholarId === scholarId && !r.releasedAt,
   );
 
+  /**
+   * The count moves when somebody votes, not when the page is loaded again.
+   *
+   * §11.7 — *brojevi koji žive*. `2 of 3` sitting still while a colleague
+   * votes in the next room is the single clearest way this reads as a
+   * document rather than as something several people are using at once. The
+   * revision is a count, so this asks again when the record has actually
+   * moved and never otherwise.
+   */
+  const revision = useRevision();
+
   const showsTally = ['voting', 'timelock', 'in_force', 'rejected'].includes(matter.status);
 
   useEffect(() => {
@@ -102,7 +114,7 @@ export default function VotePanel({
         setTally(r && typeof r.for === 'number' && Array.isArray(r.outstanding) ? r : null),
       )
       .catch(() => setTally(null));
-  }, [matter.id, matter.status, matter.reasoning?.length, showsTally]);
+  }, [matter.id, matter.status, matter.reasoning?.length, showsTally, revision]);
 
   async function run(action: () => Promise<Matter>) {
     if (busy) return;

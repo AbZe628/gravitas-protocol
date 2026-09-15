@@ -282,7 +282,39 @@ nalaz u zapisu, ne dva.**
 
 ---
 
-### FAZA 3 · Ponašanje — §11
+### FAZA 3 · Ponašanje — §11 — **URAĐENO 15.09.2026.**
+
+**Provjera dogovora je prvo našla skretanje, i to moje.** `?` je oglašavao
+tipke `1`, `2`, `3` i strelice na koraku — a **nijedna nije radila**. U samom
+`Keys.tsx` piše: *ništa se ne navodi što na tom ekranu ne radi; kratica koja je
+oglašena a ne radi gora je od one koja nikad nije spomenuta.* Faza 4 nije bila
+gotova nego oglašena. Sada rade, i to je prvo što je ova faza zatvorila.
+
+| §11 | bilo | sada |
+|---|---|---|
+| 11.1 stanica u adresi | nema | `?step=<uslov>` · F5 vraća na istu stanicu · nazad izlazi iz predmeta, ne šeta kroz korake |
+| 11.2 otkucano se ne gubi | brisalo se pri svakoj promjeni stanice | nacrt **po stanici**; odeš pogledati korak 4 i vratiš se — rečenica je tu |
+| 11.3 tastatura | `Escape` 3×, `Enter` 1× | `1` `2` `3` nalazi · `←` `→` stanice · nijedna se ne otima iz polja |
+| 11.7 brojevi koji žive | sve tek na ponovno učitavanje | red, pažnja i **brojač glasova** se mijenjaju čim se zapis pomjeri |
+
+**Dvije greške koje je našlo pokretanje:**
+
+1. **Hook ispod ranog `return`.** Vezao sam tastaturu poslije
+   `if (!matter) return <Loading />`, pa se broj hookova mijenjao između
+   renderâ i **cijeli ekran predmeta je nestao** — prazan `<div/>`. Isti kvar
+   koji je ovaj repozitorij već imao u `StructureDetail`. Vezanje je sada iznad
+   svakog ranog izlaza, a šta tipka radi čita se iz ručke popunjene niže.
+2. **Zaštita je gledala u DOM.** *Je li otvoren prozor* pitalo se pretragom
+   `[role="dialog"]` po stranici. Danas je tačno; prestaje biti tačno čim išta
+   drugo na ekranu uzme tu ulogu — i kvar je nijem: sve tipke tiho prestanu
+   raditi. Sada se čita iz stanja ekrana, koje to ionako zna.
+
+**Provjereno u pregledniku, bez ijednog klika:** otkucan razlog, pritisnuta
+tipka `1`, nalaz zapisan i traka otišla na sljedeći korak. `2` otvara prozor za
+*nije ispunjen*. Tipka otkucana **u polju** ne radi ništa — član koji piše
+*1 od 3 vozila* dobije znak, ne nalaz.
+
+<details><summary>Šta je faza tražila prije nego je urađena</summary>
 
 **Posao**
 
@@ -301,6 +333,8 @@ nalaz u zapisu, ne dva.**
 
 **Gotovo je kad:** cijeli jedan predmet, od otvaranja do glasa, obavljen **bez
 miša**; F5 na svakoj stanici vraća istu stanicu.
+
+</details>
 
 ---
 

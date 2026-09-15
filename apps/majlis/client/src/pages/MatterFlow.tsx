@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
 import {
   aKeyForThisPress,
   api,
@@ -84,10 +84,37 @@ export default function MatterFlow() {
   const [failed, setFailed] = useState(false);
   const there = useStillThere();
 
-  /** Which stop is on the screen. A condition id, or the vote. */
-  const [at, setAt] = useState<string | null>(null);
+  /**
+   * Which stop is on the screen — in the address, not only in memory.
+   *
+   * `?step=<id>` rather than a number nobody outside this component can see.
+   * Three things follow, all three listed in §11.1 as missing: reloading
+   * returns to the step the member was on rather than the first unanswered
+   * one, the browser's own back and forward move between steps, and a member
+   * can send a colleague the step rather than the matter.
+   */
+  const [params, setParams] = useSearchParams();
+  const at = params.get('step');
+  const goTo = (stop: string) => {
+    /*
+     * Replaced rather than pushed, so `back` leaves the matter rather than
+     * walking back through every step the member happened to look at. The
+     * strip is how you move between steps; back is how you leave.
+     */
+    const next = new URLSearchParams(params);
+    next.set('step', stop);
+    setParams(next, { replace: true });
+  };
 
-  const [why, setWhy] = useState('');
+  /**
+   * What the member has typed, kept per step while they are on this matter.
+   *
+   * It was one box, cleared on every move: looking at step 4 to check
+   * something and coming back to step 2 threw away the sentence they were
+   * halfway through. §11.2 — *otkucano se ne gubi*. The reason is the part of
+   * a finding that takes thought, so losing it is losing the work.
+   */
+  const [drafts, setDrafts] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
   const [refusal, setRefusal] = useState<string | null>(null);
 
@@ -148,6 +175,25 @@ export default function MatterFlow() {
       .catch(() => setList(null));
   }
 
+  /**
+   * The keyboard, bound once and above every early return.
+   *
+   * A hook below `if (!matter) return <Loading />` runs on some renders and
+   * not others, and React counts hooks: the screen then throws *rendered more
+   * hooks than during the previous render* and takes the whole matter with it.
+   * This repository has had exactly that fault before, in `StructureDetail`.
+   *
+   * So the listener is attached here, where it is attached on every render,
+   * and what it *does* is read from a handle filled in further down — after
+   * the step, the strip and the draft exist.
+   */
+  const keys = useRef<((e: KeyboardEvent) => void) | null>(null);
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => keys.current?.(e);
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
   useEffect(load, [id]);
 
   if (failed) return <ErrorText />;
@@ -173,13 +219,17 @@ export default function MatterFlow() {
   const step = conditions.find((c) => c.condition.id === here) ?? null;
   const onVote = here === VOTE;
 
+  /* The same two names as before, now holding one draft per step. */
+  const why = drafts[here] ?? '';
+  const setWhy = (said: string) => setDrafts((had) => ({ ...had, [here]: said }));
+
   const strip: Step[] = [
     {
       id: BRIEF,
       ordinal: t('win.briefShort'),
       state: (here === BRIEF ? 'here' : 'done') as Step['state'],
       onOpen: () => {
-        setAt(BRIEF);
+        goTo(BRIEF);
         setRefusal(null);
       },
     },
@@ -194,9 +244,9 @@ export default function MatterFlow() {
             ? 'done'
             : 'todo') as Step['state'],
       onOpen: () => {
-        setAt(c.condition.id);
+        goTo(c.condition.id);
         setRefusal(null);
-        setWhy('');
+        /* The reason stays: moving away and back must not lose it. §11.2 */
       },
     })),
     {
@@ -204,7 +254,7 @@ export default function MatterFlow() {
       ordinal: t('win.voteShort'),
       state: (onVote ? 'here' : 'todo') as Step['state'],
       onOpen: () => {
-        setAt(VOTE);
+        goTo(VOTE);
         setRefusal(null);
       },
     },
@@ -246,7 +296,7 @@ export default function MatterFlow() {
       const next = fresh.conditions.find(
         (c) => c.condition.id !== step.condition.id && (c.answeredBy?.length ?? 0) === 0,
       );
-      setAt(next ? next.condition.id : VOTE);
+      goTo(next ? next.condition.id : VOTE);
     } catch (e) {
       /*
        * Somebody wrote while this member was writing. Not an error to apologise
@@ -320,6 +370,73 @@ function lastSaid(
   }
 
   // ── the pane beside the work, which does not change ────────────────────
+
+  /**
+   * The keys this step advertises, doing what they say.
+   *
+   * ── the fault this closes, and it was mine ────────────────────────────────
+   *
+   * `Keys.tsx` lists `1`, `2`, `3` and the arrows on a step, and says in its
+   * own comment that *nothing is listed that does not work on this screen — a
+   * shortcut that is advertised and does nothing is worse than one never
+   * mentioned.* It listed all five and none of them worked. A sheet that lies
+   * about the keyboard is worse than no sheet, because a member who tries one
+   * and gets nothing stops trusting the rest.
+   *
+   * ── never taken out of a box ──────────────────────────────────────────────
+   *
+   * A member writing *1 of 3 vehicles* in the reason must get the character,
+   * not a recorded finding. Every one of these is refused while the cursor is
+   * in a box, which is why the arrows are here and not on the window: moving
+   * the caret inside a sentence is what arrows are for.
+   */
+  keys.current = (e: KeyboardEvent) => {
+    {
+      const inABox =
+        e.target instanceof HTMLElement &&
+        (e.target.isContentEditable ||
+          ['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName));
+      if (inABox || e.ctrlKey || e.metaKey || e.altKey) return;
+
+      /*
+       * A window is open over this. It owns the keyboard until it closes.
+       *
+       * Read from this screen's own state rather than by looking for a dialog
+       * in the page. A DOM query happens to be right today and stops being
+       * right the moment anything else on the screen uses that role — and the
+       * failure is silent: every key quietly stops working and nobody can say
+       * why. What is on the screen is something this component already knows.
+       */
+      if (confirming !== null || itMoved) return;
+
+      const stops = strip.map((s) => s.id);
+      const mine = stops.indexOf(here);
+
+      if (e.key === 'ArrowLeft' && mine > 0) {
+        e.preventDefault();
+        goTo(stops[mine - 1]);
+        return;
+      }
+      if (e.key === 'ArrowRight' && mine >= 0 && mine < stops.length - 1) {
+        e.preventDefault();
+        goTo(stops[mine + 1]);
+        return;
+      }
+
+      /* The three findings, and only where a finding is what this step takes. */
+      if (!step || !canRule || settled) return;
+      if (e.key === '1') {
+        e.preventDefault();
+        if (why.trim()) void record('met');
+      } else if (e.key === '2') {
+        e.preventDefault();
+        setConfirming('not_met');
+      } else if (e.key === '3') {
+        e.preventDefault();
+        setConfirming('not_applicable');
+      }
+    }
+  };
 
   const aside = (
     <>
@@ -408,7 +525,7 @@ function lastSaid(
         acts={
           <Button
             type="button"
-            onClick={() => setAt(firstOpen?.condition.id ?? VOTE)}
+            onClick={() => goTo(firstOpen?.condition.id ?? VOTE)}
             className="rounded-xl bg-lapis px-5 py-2.5 text-ui font-semibold text-white shadow-act"
           >
             {t('sent.understood')}
@@ -419,7 +536,7 @@ function lastSaid(
           matter={matter}
           list={list}
           assistantOn={health?.assistantKind !== 'off' && health?.assistantKind !== undefined}
-          onStart={() => setAt(firstOpen?.condition.id ?? VOTE)}
+          onStart={() => goTo(firstOpen?.condition.id ?? VOTE)}
         />
       </StepWindow>
     );
@@ -439,7 +556,7 @@ function lastSaid(
           outstanding > 0 ? (
             <Button
               type="button"
-              onClick={() => setAt(firstOpen?.condition.id ?? null)}
+              onClick={() => goTo(firstOpen?.condition.id ?? VOTE)}
               className="rounded-xl bg-lapis px-5 py-2.5 text-ui font-semibold text-white shadow-act"
             >
               {t('win.backToSteps')}
