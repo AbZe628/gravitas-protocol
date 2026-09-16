@@ -3,6 +3,7 @@
 import './env.js';
 import { createApp } from './app.js';
 import { assertConfiguredForProduction } from './middleware/basicAuth.js';
+import { parseMembers } from './auth/members.js';
 import { scopeToInstitution } from './store/index.js';
 import { enforcementFromEnv } from './services/enforcement.js';
 import { comprehensionFromEnv } from './services/comprehension.js';
@@ -65,7 +66,21 @@ const server = app.listen(port, () => {
         'deliberate, vote or object. Generate a board with: npm run members -w server',
     );
   } else {
-    const count = board.split(/\r?\n/).map((l) => l.trim()).filter(Boolean).length;
+    /*
+     * Counted by the thing that reads it, not by a second rule beside it.
+     *
+     * This line used to split on newlines alone. `parseMembers` splits on
+     * newlines *or* semicolons, and a semicolon is how a whole board fits in
+     * one environment variable — which is exactly what `npm run members`
+     * prints and what anybody installing this will paste. So a board of eight
+     * booted and announced **Board: 1 member credential configured**, and the
+     * one line that exists to tell an installer whether the board is
+     * configured told them it was not.
+     *
+     * Two rules for reading one value will disagree eventually. There is one
+     * now, and it is the parser's.
+     */
+    const count = parseMembers(board).size;
     console.log(`Board: ${count} member credential${count === 1 ? '' : 's'} configured.`);
   }
 

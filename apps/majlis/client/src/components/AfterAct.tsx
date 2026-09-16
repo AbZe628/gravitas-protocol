@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useEffect, useRef, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { useI18n } from '../lib/i18n.js';
 import { Button } from './Button';
@@ -61,8 +61,29 @@ export default function AfterAct({
 }) {
   const { t } = useI18n();
 
+  /*
+   * Measured: the question put to the board landed at y=1244 in a 900-pixel
+   * window, below the fold, because the form above it empties on success and
+   * the card shrinks under the press. A confirmation nobody sees is the
+   * silence this component was written to end.
+   */
+  const here = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = here.current;
+    if (!el) return;
+    /*
+     * Asked for, not assumed. `scrollIntoView` is missing under jsdom, and a
+     * component that throws in the commit phase takes the screen down with it
+     * — which is a worse outcome than a confirmation the member has to look
+     * for. The same guard covers any environment that does not offer it.
+     */
+    el.scrollIntoView?.({ behavior: 'smooth', block: 'center' });
+    /* So the keyboard carries on from what just happened, not from the top. */
+    el.focus?.({ preventScroll: true });
+  }, []);
+
   return (
-    <div>
+    <div ref={here} tabIndex={-1} className="scroll-mt-24 focus:outline-none">
       <div className="mb-4 rounded-card bg-settledtint px-5 py-4 shadow-ringsettled">
         <div className="mb-1 text-label font-bold uppercase tracking-caps text-settled">
           {t('after.done')}
