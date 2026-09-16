@@ -3,10 +3,12 @@ import { theWayIn, type Delivery, type Notice, type Submission } from '../lib/ap
 import { useI18n } from '../lib/i18n.js';
 import AttachTheContract from '../components/AttachTheContract.js';
 import { useIdentity, isInstitution } from '../lib/identity.js';
-import { Act, Card, Edge, Quiet, State } from '../components/kit.js';
+import { MainAct, Card, Edge, Quiet, State } from '../components/kit.js';
 import TheNotice from '../components/TheNotice.js';
 import { ErrorText } from '../components/ui.js';
 import { Field } from '../components/field.js';
+import Act from '../components/Act.js';
+import AfterAct from '../components/AfterAct.js';
 
 /**
  * The bank's own screen: put a question, and see what became of it.
@@ -83,9 +85,9 @@ function Mine({ s, onWithdraw }: { s: Submission; onWithdraw: (id: string, why: 
                 />
               )}
             </Field>
-            <Act onClick={() => onWithdraw(s.id, why)} disabled={!why.trim()}>
+            <MainAct onClick={() => onWithdraw(s.id, why)} disabled={!why.trim()}>
               {t('ask.withdraw')}
-            </Act>
+            </MainAct>
           </div>
         ) : (
           <div className="mt-3">
@@ -114,7 +116,13 @@ export default function Ask({ boardId }: { boardId: string }) {
   const [mineFailed, setMineFailed] = useState(false);
   const [notice, setNotice] = useState<{ notice: Notice; delivery: Delivery } | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
+  /** Whether the window that performs the act is open. */
+  const [sending, setSending] = useState(false);
+  const [justDid, setJustDid] = useState<{
+    did: string;
+    means: string;
+    next: readonly { label: string; to?: string; says?: string }[];
+  } | null>(null);
 
   const load = () => {
     theWayIn
@@ -125,38 +133,35 @@ export default function Ask({ boardId }: { boardId: string }) {
 
   useEffect(load, [boardId]);
 
+  /*
+   * No try here. The window that calls this needs the refusal to reach it —
+   * caught here it would return normally, and the window would say the
+   * question was with the board while it was not.
+   */
   async function put() {
-    setBusy(true);
-    setError(null);
-    try {
-      const res = await theWayIn.put({
-        boardId,
-        subject,
-        question,
-        background,
-        awaiting,
-        askedBy,
-        ...(draft ? { draft } : {}),
-        /*
-         * Sent only when somebody actually gave one. A blank date field means
-         * "they are asking now", and turning that into today's date explicitly
-         * would be the same value with a false claim of precision attached.
-         */
-        ...(arrivedAt ? { arrivedAt: new Date(arrivedAt).toISOString() } : {}),
-      });
-      setNotice({ notice: res.notice, delivery: res.delivery });
-      setSubject('');
-      setQuestion('');
-      setBackground('');
-      setAwaiting('');
-      setArrivedAt('');
-      setDraft(null);
-      load();
-    } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
-    } finally {
-      setBusy(false);
-    }
+    const res = await theWayIn.put({
+      boardId,
+      subject,
+      question,
+      background,
+      awaiting,
+      askedBy,
+      ...(draft ? { draft } : {}),
+      /*
+       * Sent only when somebody actually gave one. A blank date field means
+       * "they are asking now", and turning that into today's date explicitly
+       * would be the same value with a false claim of precision attached.
+       */
+      ...(arrivedAt ? { arrivedAt: new Date(arrivedAt).toISOString() } : {}),
+    });
+    setNotice({ notice: res.notice, delivery: res.delivery });
+    setSubject('');
+    setQuestion('');
+    setBackground('');
+    setAwaiting('');
+    setArrivedAt('');
+    setDraft(null);
+    load();
   }
 
   async function withdraw(id: string, reason: string) {
@@ -296,11 +301,43 @@ export default function Ask({ boardId }: { boardId: string }) {
             </p>
           )}
 
-          <Act onClick={put} disabled={busy || !subject.trim() || !question.trim()}>
+          <MainAct
+            onClick={() => setSending(true)}
+            disabled={!subject.trim() || !question.trim()}
+          >
             {t('ask.send')}
-          </Act>
+          </MainAct>
+
+          <Act
+            open={sending}
+            onClose={() => setSending(false)}
+            title={t('ask.send')}
+            does={t('wm.putQ.does')}
+            means={t('wm.putQ.means')}
+            label={t('ask.send')}
+            perform={put}
+            onDone={setJustDid}
+            after={{
+              did: t('wm.putQ.did'),
+              means: t('wm.putQ.didMeans'),
+              next: [
+                { label: t('wm.next.mine'), says: t('wm.next.mineSays') },
+              ],
+            }}
+          />
         </Card>
       </div>
+
+      {justDid && (
+        <div className="mt-6">
+          <AfterAct
+            did={justDid.did}
+            means={justDid.means}
+            next={justDid.next}
+            onClose={() => setJustDid(null)}
+          />
+        </div>
+      )}
 
       {notice && (
         <div className="mt-6">

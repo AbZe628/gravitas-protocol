@@ -196,7 +196,7 @@ export function toneForStatus(status: string): Tone {
  * carries a shadow in its own colour rather than a grey one — a grey shadow
  * under a coloured button is the detail that reads as unfinished.
  */
-export function Act({
+export function MainAct({
   children,
   onClick,
   to,

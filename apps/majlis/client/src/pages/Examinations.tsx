@@ -13,7 +13,9 @@ import ReportWhatWasFound from '../components/ReportWhatWasFound.js';
 import { Division, Nothing, PageHead } from '../components/page.js';
 import { ErrorText, Loading } from '../components/ui.js';
 import { useIdentity, mayRecordInstitutionAct, mayDeliberate } from '../lib/identity.js';
-import { Act, Card, Quiet, State } from '../components/kit.js';
+import { MainAct, Card, Quiet, State } from '../components/kit.js';
+import Act from '../components/Act.js';
+import AfterAct from '../components/AfterAct.js';
 import { Field } from '../components/field.js';
 import { Button } from '../components/Button';
 
@@ -176,7 +178,13 @@ export default function Examinations({ boardId }: { boardId: string }) {
   const [examined, setExamined] = useState('');
   const [held, setHeld] = useState<Record<string, { held: string; exceptions: string; note: string }>>({});
   const [error, setError] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
+  /** Whether the window that performs the act is open. */
+  const [recording, setRecording] = useState(false);
+  const [justDid, setJustDid] = useState<{
+    did: string;
+    means: string;
+    next: readonly { label: string; to?: string; says?: string }[];
+  } | null>(null);
 
   const load = () => {
     examinations
@@ -214,42 +222,39 @@ export default function Examinations({ boardId }: { boardId: string }) {
   }
 
   async function save() {
-    if (!subject) return;
-    setBusy(true);
-    setError(null);
-    try {
-      const findings = Object.entries(held)
-        .filter(([, v]) => v.held)
-        .map(([against, v]) => ({
-          against,
-          held: v.held as 'held' | 'exceptions' | 'not_examined',
-          exceptions: Number(v.exceptions || 0),
-          note: v.note ?? '',
-        }));
+    /*
+     * Nothing to record against, and saying so out loud. Returning quietly
+     * would leave the window announcing an examination that never happened.
+     */
+    if (!subject) throw new Error(t('exam.noSubject'));
 
-      await examinations.record({
-        matterId: subject.matterId,
-        from: new Date(from).toISOString(),
-        to: new Date(to).toISOString(),
-        howChosen,
-        // Empty means the institution did not say. Sent as null rather than 0,
-        // which would claim there were no transactions at all.
-        population: population.trim() === '' ? null : Number(population),
-        examined: Number(examined),
-        findings,
-      });
+    const findings = Object.entries(held)
+      .filter(([, v]) => v.held)
+      .map(([against, v]) => ({
+        against,
+        held: v.held as 'held' | 'exceptions' | 'not_examined',
+        exceptions: Number(v.exceptions || 0),
+        note: v.note ?? '',
+      }));
 
-      setOpen(false);
-      setSubject(null);
-      setHowChosen('');
-      setPopulation('');
-      setExamined('');
-      load();
-    } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
-    } finally {
-      setBusy(false);
-    }
+    await examinations.record({
+      matterId: subject.matterId,
+      from: new Date(from).toISOString(),
+      to: new Date(to).toISOString(),
+      howChosen,
+      // Empty means the institution did not say. Sent as null rather than 0,
+      // which would claim there were no transactions at all.
+      population: population.trim() === '' ? null : Number(population),
+      examined: Number(examined),
+      findings,
+    });
+
+    setOpen(false);
+    setSubject(null);
+    setHowChosen('');
+    setPopulation('');
+    setExamined('');
+    load();
   }
 
   const rows = [...(subject?.conditions ?? []), ...(subject?.terms ?? [])];
@@ -262,10 +267,21 @@ export default function Examinations({ boardId }: { boardId: string }) {
         says={t('exam.lead')}
       />
 
+      {justDid && (
+        <div className="mt-5">
+          <AfterAct
+            did={justDid.did}
+            means={justDid.means}
+            next={justDid.next}
+            onClose={() => setJustDid(null)}
+          />
+        </div>
+      )}
+
       {mayRecord ? (
         <div className="mt-5">
           {!open ? (
-            <Act onClick={() => setOpen(true)}>{t('exam.record')}</Act>
+            <MainAct onClick={() => setOpen(true)}>{t('exam.record')}</MainAct>
           ) : (
             <Card>
               {/*
@@ -417,9 +433,30 @@ export default function Examinations({ boardId }: { boardId: string }) {
                   )}
 
                   <div className="mt-4 flex flex-wrap items-center gap-4">
-                    <Act onClick={save} disabled={busy || !from || !to || !examined}>
+                    <MainAct
+                      onClick={() => setRecording(true)}
+                      disabled={!from || !to || !examined}
+                    >
                       {t('exam.save')}
-                    </Act>
+                    </MainAct>
+
+                    <Act
+                      open={recording}
+                      onClose={() => setRecording(false)}
+                      title={t('exam.record')}
+                      does={t('wm.exam.does')}
+                      means={t('wm.exam.means')}
+                      label={t('exam.save')}
+                      perform={save}
+                      onDone={setJustDid}
+                      after={{
+                        did: t('wm.exam.did'),
+                        means: t('wm.exam.didMeans'),
+                        next: [
+                          { label: t('wm.next.checked'), to: '/check', says: t('wm.next.checkedSays') },
+                        ],
+                      }}
+                    />
                     <Quiet onClick={() => { setOpen(false); setSubject(null); }}>{t('common.back')}</Quiet>
                   </div>
                 </>

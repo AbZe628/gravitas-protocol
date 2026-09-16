@@ -14,7 +14,7 @@ import { mayDeliberate, useIdentity } from '../lib/identity.js';
 import SmartRaise from '../components/SmartRaise.js';
 import FourDoors from '../components/FourDoors.js';
 import { Block, Display, Label, Note, Why } from '../components/type.js';
-import { Act, Card, Edge, State, type Tone } from '../components/kit.js';
+import { MainAct, Card, Edge, State, type Tone } from '../components/kit.js';
 
 /**
  * Arrival.
@@ -95,12 +95,12 @@ function TheOneThing({ item }: { item: AttentionItem }) {
       <Note className="mt-3">{item.note}</Note>
 
       <div className="mt-6">
-        <Act to={`/matters/${item.matterId}`} tone="gold">
+        <MainAct to={`/matters/${item.matterId}`} tone="gold">
           {t('guided.open')}
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden="true">
             <path d="M5 12h13M12 5l7 7-7 7" />
           </svg>
-        </Act>
+        </MainAct>
       </div>
     </Card>
   );

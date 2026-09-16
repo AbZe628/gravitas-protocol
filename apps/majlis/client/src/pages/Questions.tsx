@@ -5,7 +5,9 @@ import { useI18n } from '../lib/i18n.js';
 import TheDraftThatCame from '../components/TheDraftThatCame.js';
 import Fold from '../components/Fold.js';
 import { useIdentity, mayDeliberate, maySubmit } from '../lib/identity.js';
-import { Act, Card, Quiet, State } from '../components/kit.js';
+import { MainAct, Card, Quiet, State } from '../components/kit.js';
+import Act from '../components/Act.js';
+import AfterAct from '../components/AfterAct.js';
 import TheNotice from '../components/TheNotice.js';
 import { Division, Gaps, Nothing, PageHead } from '../components/page.js';
 import { Field } from '../components/field.js';
@@ -64,37 +66,30 @@ function One({
   const [title, setTitle] = useState('');
   const [proposal, setProposal] = useState('');
   const [direction, setDirection] = useState<'permit' | 'restrict'>('permit');
-  const [reason, setReason] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
+  /**
+   * What the last act did, held by the card rather than by the window.
+   *
+   * Opening a question changes its standing, and the card redraws into its
+   * settled shape the moment the list comes back. Anything the window was
+   * about to say would go with it, so the card keeps the answer.
+   */
+  const [justDid, setJustDid] = useState<{
+    did: string;
+    means: string;
+    next: readonly { label: string; to?: string; says?: string }[];
+  } | null>(null);
 
   const settled = s.standing !== 'waiting';
   const wasDeclined = s.dispositions.some((d) => d.kind === 'declined');
 
   async function open() {
-    setBusy(true);
-    setError(null);
-    try {
-      const res = await theWayIn.open(s.id, { title, proposal, direction });
-      onDone({ notice: res.notice, delivery: res.delivery });
-    } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
-    } finally {
-      setBusy(false);
-    }
+    const res = await theWayIn.open(s.id, { title, proposal, direction });
+    onDone({ notice: res.notice, delivery: res.delivery });
   }
 
-  async function decline() {
-    setBusy(true);
-    setError(null);
-    try {
-      await theWayIn.decline(s.id, reason);
-      onDone();
-    } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
-    } finally {
-      setBusy(false);
-    }
+  async function decline(why: string) {
+    await theWayIn.decline(s.id, why);
+    onDone();
   }
 
   return (
@@ -194,7 +189,7 @@ function One({
 
       {!settled && act === 'none' && (
         <div className="mt-4 flex flex-wrap items-center gap-4">
-          <Act onClick={() => setAct('open')}>{t('queue.open')}</Act>
+          <MainAct onClick={() => setAct('open')}>{t('queue.open')}</MainAct>
           <Quiet onClick={() => setAct('decline')}>{t('queue.decline')}</Quiet>
         </div>
       )}
@@ -212,8 +207,24 @@ function One({
         </div>
       )}
 
-      {act === 'open' && (
-        <div className="mt-4">
+      <Act
+        open={act === 'open'}
+        onClose={() => setAct('none')}
+        title={t('queue.open')}
+        does={t('wm.openQ.does')}
+        means={t('wm.openQ.means')}
+        label={t('queue.open')}
+        perform={open}
+        onDone={setJustDid}
+        after={{
+          did: t('wm.openQ.did'),
+          means: t('wm.openQ.didMeans'),
+          next: [
+            { label: t('wm.next.theMatter'), to: '/', says: t('wm.next.theMatterSays') },
+          ],
+        }}
+      >
+        <div>
           {wasDeclined && (
             <p className="mb-3 rounded-xl bg-[#F7F0E2] px-3.5 py-2.5 text-note leading-relaxed text-goldink shadow-ringgold">
               {t('queue.reconsider')}
@@ -272,47 +283,37 @@ function One({
             ))}
           </div>
 
-          {error && (
-            <p className="mb-3 rounded-xl bg-breachtint px-3.5 py-2.5 text-ui text-breach shadow-ringbreach">
-              {error}
-            </p>
-          )}
-
-          <div className="flex flex-wrap items-center gap-4">
-            <Act onClick={open} disabled={busy || title.trim().length < 3 || !proposal.trim()}>
-              {t('queue.open')}
-            </Act>
-            <Quiet onClick={() => setAct('none')}>{t('common.back')}</Quiet>
-          </div>
         </div>
-      )}
+      </Act>
 
-      {act === 'decline' && (
+      <Act
+        open={act === 'decline'}
+        onClose={() => setAct('none')}
+        title={t('queue.decline')}
+        does={t('wm.declineQ.does')}
+        means={t('wm.declineQ.means')}
+        label={t('queue.decline')}
+        grave
+        reason={{ label: t('queue.declineWhy'), help: t('queue.declineHelp') }}
+        perform={({ reason: why }) => decline(why)}
+        onDone={setJustDid}
+        after={{
+          did: t('wm.declineQ.did'),
+          means: t('wm.declineQ.didMeans'),
+          next: [
+            { label: t('wm.next.theQuestions'), to: '/questions', says: t('wm.next.theQuestionsSays') },
+          ],
+        }}
+      />
+
+      {justDid && (
         <div className="mt-4">
-          <Field label={t('queue.declineWhy')} help={t('queue.declineHelp')} className="mb-3">
-            {(attrs) => (
-              <textarea
-                {...attrs}
-                value={reason}
-                onChange={(e) => setReason(e.target.value)}
-                rows={3}
-                className={field + ' resize-y'}
-              />
-            )}
-          </Field>
-
-          {error && (
-            <p className="mb-3 rounded-xl bg-breachtint px-3.5 py-2.5 text-ui text-breach shadow-ringbreach">
-              {error}
-            </p>
-          )}
-
-          <div className="flex flex-wrap items-center gap-4">
-            <Act onClick={decline} disabled={busy || !reason.trim()}>
-              {t('queue.decline')}
-            </Act>
-            <Quiet onClick={() => setAct('none')}>{t('common.back')}</Quiet>
-          </div>
+          <AfterAct
+            did={justDid.did}
+            means={justDid.means}
+            next={justDid.next}
+            onClose={() => setJustDid(null)}
+          />
         </div>
       )}
     </Card>
@@ -398,7 +399,7 @@ export default function Questions({ boardId }: { boardId: string }) {
           ) : undefined
         }
         act={
-          maySubmit(identity?.role) ? <Act to="/ask">{t('door.asked.put')}</Act> : undefined
+          maySubmit(identity?.role) ? <MainAct to="/ask">{t('door.asked.put')}</MainAct> : undefined
         }
       />
 
