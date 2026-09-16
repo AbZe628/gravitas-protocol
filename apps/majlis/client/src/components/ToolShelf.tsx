@@ -64,8 +64,17 @@ export default function ToolShelf({
       aria-label={t('tools.title')}
       className="hidden w-[68px] shrink-0 flex-col items-center gap-0.5 border-s border-line bg-surface/70 py-4 lg:flex"
     >
-      <span className="mb-2 text-label font-bold uppercase tracking-caps text-faint">
-        {t('tools.title')}
+      {/*
+        The short word, not the long one.
+
+        `tools.title` is *the calculations* — 92 pixels of it in a 68-pixel
+        shelf, spilling past the edge onto the pane beside it. Measured, not
+        noticed: the sweep only looked for text that scrolls inside its own box,
+        and this was text wider than the box it sat in, which is a different
+        thing and now checked for too.
+      */}
+      <span className="mb-2 px-1 text-center text-label font-bold uppercase tracking-label text-faint">
+        {t('tools.open')}
       </span>
 
       {KINDS.map((k) => (

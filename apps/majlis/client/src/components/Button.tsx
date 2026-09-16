@@ -95,11 +95,23 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
    * everybody else.
    */
   whyDead?: string;
+  /**
+   * The key that does this, written on the control.
+   *
+   * A shortcut nobody can see is a shortcut nobody uses. The drawings show the
+   * key on the button — `Met — next  1` — because that is how a member learns
+   * it: not by opening a sheet and memorising, but by noticing it while
+   * pressing the thing anyway. `?` is then a reminder rather than a lesson.
+   *
+   * Hidden below the wide breakpoint: a phone has no keyboard to speak of and
+   * the cap would be noise beside the words.
+   */
+  hint?: string;
   children?: ReactNode;
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
-  { tone, size, busy = false, whyDead, disabled, className = '', type, children, ...rest },
+  { tone, size, busy = false, whyDead, hint, disabled, className = '', type, children, ...rest },
   ref,
 ) {
   const dead = disabled || busy;
@@ -117,6 +129,14 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
     >
       {busy ? <Spinner /> : null}
       {children}
+      {hint && (
+        <kbd
+          aria-hidden="true"
+          className="ms-1.5 hidden rounded border border-current/25 px-1 font-mono text-label font-medium opacity-60 lg:inline-block"
+        >
+          {hint}
+        </kbd>
+      )}
     </button>
   );
 });

@@ -19,6 +19,8 @@ import StepWindow, { type Step } from '../components/StepWindow.js';
 import TheCalculator from '../components/TheCalculator.js';
 import AskTheBank from '../components/AskTheBank.js';
 import WhatTheySent from '../components/WhatTheySent.js';
+import Deliberation from '../components/Deliberation.js';
+import Evidence from '../components/Evidence.js';
 import { useHealth } from '../lib/health.js';
 import Dialog from '../components/Dialog.js';
 import VotePanel from '../components/VotePanel.js';
@@ -497,6 +499,50 @@ function lastSaid(
     </>
   );
 
+  /**
+   * The pane beside the work, as three named parts.
+   *
+   * What the step asks, what the board has already said, and the document it
+   * rests on. Stacked they are a column to scroll; named they are a place to
+   * look. The count on *what was said* is how a member knows there is
+   * something there without opening it.
+   */
+  const panes = [
+    { id: 'guidance', label: t('flow.paneGuidance'), body: aside },
+    {
+      id: 'said',
+      label: t('flow.paneSaid'),
+      count: matter.deliberation?.length ?? 0,
+      body: (
+        <Deliberation
+          matter={matter}
+          canSpeak={canRule && !settled}
+          onChanged={(m) => {
+            setMatter(m);
+            load();
+          }}
+        />
+      ),
+    },
+    {
+      id: 'sources',
+      label: t('flow.paneSources'),
+      count: matter.sources?.length ?? 0,
+      body: (
+        <Evidence
+          matter={matter}
+          scholarId={identity?.scholarId}
+          canAttach={canRule && !settled}
+          onChanged={(m) => {
+            setMatter(m);
+            load();
+          }}
+        />
+      ),
+    },
+  ];
+
+
   const chips = (
     <>
       <State tone={matter.direction === 'restrict' ? 'breach' : 'settled'}>
@@ -530,7 +576,7 @@ function lastSaid(
         chips={chips}
         steps={[]}
         heading={t('flow.decided')}
-        aside={aside}
+        asidePanes={panes}
         acts={
           <Link
             to={`/dossier/matters/${matter.id}`}
@@ -555,7 +601,7 @@ function lastSaid(
         chips={chips}
         steps={strip}
         heading={t('sent.title')}
-        aside={aside}
+        asidePanes={panes}
         acts={
           <Button
             type="button"
@@ -586,7 +632,7 @@ function lastSaid(
         chips={chips}
         steps={conditions.length > 0 ? strip : []}
         heading={t('win.theVote')}
-        aside={aside}
+        asidePanes={panes}
         acts={
           outstanding > 0 ? (
             <Button
@@ -627,7 +673,7 @@ function lastSaid(
       chips={chips}
       steps={strip}
       heading={`${t('win.step')} ${n} ${t('win.of')} ${conditions.length}`}
-      aside={aside}
+      asidePanes={panes}
       /*
        * What each button in the bar will cause, before it is pressed.
        *
@@ -653,18 +699,20 @@ function lastSaid(
           {canRule && (
             <>
               <Button
-                type="button"
+                tone="quiet"
+                size="md"
+                hint="3"
                 onClick={() => setConfirming('not_applicable')}
                 disabled={busy}
-                className="rounded-xl bg-raised px-4 py-2.5 text-ui font-semibold text-sand shadow-ring disabled:opacity-50"
               >
                 {t('win.setAside')}
               </Button>
               <Button
-                type="button"
+                tone="grave"
+                size="md"
+                hint="2"
                 onClick={() => setConfirming('not_met')}
                 disabled={busy}
-                className="rounded-xl bg-raised px-4 py-2.5 text-ui font-semibold text-breach shadow-ring disabled:opacity-50"
               >
                 {t('win.notMet')}
               </Button>
@@ -678,12 +726,15 @@ function lastSaid(
                 is absent or dead, never live and then sorry.
               */}
               <Button
-                type="button"
+                tone="act"
+                size="md"
+                hint="1"
                 onClick={() => void record('met')}
-                disabled={busy || why.trim().length === 0}
-                className="rounded-xl bg-lapis px-5 py-2.5 text-ui font-semibold text-white shadow-act disabled:opacity-50"
+                busy={busy}
+                disabled={why.trim().length === 0}
+                whyDead={why.trim().length === 0 ? t('ask.reasonIsRequired') : undefined}
               >
-                {busy ? t('common.loading') : t('win.metAndOn')}
+                {t('win.metAndOn')}
               </Button>
             </>
           )}

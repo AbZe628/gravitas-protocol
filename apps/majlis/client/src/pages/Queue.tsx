@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRevision } from '../lib/pulse.js';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { governance, type QueueRow } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { Nothing } from '../components/page.js';
@@ -55,7 +55,7 @@ const TONE: Record<QueuePhase, string> = {
   checked: 'text-breach',
 };
 
-function Row({ row }: { row: QueueRow }) {
+function Row({ row, n }: { row: QueueRow; n?: number }) {
   const { t } = useI18n();
 
   return (
@@ -69,6 +69,22 @@ function Row({ row }: { row: QueueRow }) {
             : 'bg-raised shadow-ring')
         }
       >
+        {/*
+          The key that opens this row, on the row.
+
+          The first nine only: past that a member is scanning rather than
+          reaching, and a tenth cap would be decoration. Hidden on a phone,
+          where there is no key to press.
+        */}
+        {n !== undefined && n < 10 && (
+          <kbd
+            aria-hidden="true"
+            className="hidden h-5 w-5 shrink-0 place-items-center self-start rounded border border-line font-mono text-label font-medium text-faint lg:grid"
+          >
+            {n}
+          </kbd>
+        )}
+
         {/*
           How long it has stood here, first and largest. It is the one figure
           on the row that is a fact about now rather than about the record,
@@ -149,6 +165,44 @@ export default function Queue() {
    * keeps the rows they had rather than being shown an empty list.
    */
   const revision = useRevision();
+  const navigate = useNavigate();
+
+  /**
+   * The rows as they are on the screen, for the keyboard to reach.
+   *
+   * A ref rather than a dependency: the handler is bound once, and what it
+   * reads has to be what is on the screen at the moment of the press, not
+   * what was there when it was bound.
+   */
+  const onScreen = useRef<QueueRow[]>([]);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const inABox =
+        e.target instanceof HTMLElement &&
+        (e.target.isContentEditable ||
+          ['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName));
+      if (inABox || e.ctrlKey || e.metaKey || e.altKey) return;
+      /*
+       * A window is open somewhere over this. Read from the page rather than
+       * from state, and here that is the honest way round: the window in
+       * question belongs to the frame — the palette, the bell, the key sheet —
+       * and this screen has no way to know about any of them. Where a screen
+       * owns its own windows it reads its own state instead, as the matter
+       * screen does.
+       */
+      if (document.querySelector('[role="dialog"]')) return;
+
+      const n = Number(e.key);
+      if (!Number.isInteger(n) || n < 1 || n > 9) return;
+      const row = onScreen.current[n - 1];
+      if (!row) return;
+      e.preventDefault();
+      navigate(row.to);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [navigate]);
 
   useEffect(() => {
     let current = true;
@@ -174,6 +228,7 @@ export default function Queue() {
   if (!rows) return <Loading />;
 
   const shown = only === null ? rows : rows.filter((r) => r.phase === only);
+  onScreen.current = shown;
   const countOf = (p: QueuePhase) => rows.filter((r) => r.phase === p).length;
 
   return (
@@ -263,8 +318,8 @@ export default function Queue() {
         <Nothing>{t(rows.length === 0 ? 'queue.nothing' : 'queue.noneHere')}</Nothing>
       ) : (
         <ul className="space-y-2">
-          {shown.map((r) => (
-            <Row key={r.kind + r.id} row={r} />
+          {shown.map((r, i) => (
+            <Row key={r.kind + r.id} row={r} n={i + 1} />
           ))}
         </ul>
       )}

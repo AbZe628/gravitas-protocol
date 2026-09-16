@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { useI18n } from '../lib/i18n.js';
 import { Button } from './Button';
 
@@ -54,6 +54,7 @@ export default function StepWindow({
   heading,
   children,
   aside,
+  asidePanes,
   acts,
   consequences,
 }: {
@@ -64,6 +65,22 @@ export default function StepWindow({
   heading: string;
   children: ReactNode;
   aside?: ReactNode;
+  /**
+   * The pane beside the work, as named parts rather than one column.
+   *
+   * ── why tabs and not a stack ────────────────────────────────────────────
+   *
+   * The pane holds three different things: what the step asks of you, what the
+   * board has already said about it, and the document it rests on. Stacked,
+   * they become a column to scroll — which is the shape of a page, and the
+   * reason the drawings show this pane with tabs.
+   *
+   * A count on a tab is how the member knows there is something there without
+   * opening it, which is the whole point of a tab over a fold.
+   *
+   * Passed instead of `aside`, never beside it.
+   */
+  asidePanes?: readonly { id: string; label: string; count?: number; body: ReactNode }[];
   acts: ReactNode;
   /**
    * What the acts in the bar will cause, said before any of them is pressed.
@@ -76,6 +93,14 @@ export default function StepWindow({
    */
   consequences?: ReactNode;
 }) {
+  /**
+   * Which pane is showing.
+   *
+   * The member's own business where they are looking, so it is held here and
+   * not lifted to a screen that has no use for it. It resets when the window
+   * is replaced, which is right: a new matter is a new pane.
+   */
+  const [showing, setShowing] = useState<string | null>(null);
   const { t } = useI18n();
 
   return (
@@ -124,11 +149,45 @@ export default function StepWindow({
           {children}
         </div>
 
-        {aside && (
+        {asidePanes && asidePanes.length > 0 ? (
+          <aside className="grid min-h-0 shrink-0 grid-rows-[auto,1fr] border-line lg:w-[320px] lg:border-s">
+            <div
+              role="tablist"
+              aria-label={heading}
+              className="flex gap-0.5 border-b border-line px-3 pt-2.5"
+            >
+              {asidePanes.map((pane) => (
+                <Button
+                  key={pane.id}
+                  role="tab"
+                  aria-selected={pane.id === (showing ?? asidePanes[0]?.id)}
+                  tone={undefined}
+                  onClick={() => setShowing(pane.id)}
+                  className={
+                    'flex items-center gap-1.5 rounded-t-lg px-2.5 py-1.5 text-note font-bold ' +
+                    (pane.id === (showing ?? asidePanes[0]?.id)
+                      ? 'bg-raised text-paper shadow-ring'
+                      : 'text-muted hover:text-paper')
+                  }
+                >
+                  {pane.label}
+                  {pane.count !== undefined && pane.count > 0 && (
+                    <span className="rounded-full bg-lapistint px-1.5 text-label font-bold text-lapis">
+                      {pane.count}
+                    </span>
+                  )}
+                </Button>
+              ))}
+            </div>
+            <div className="min-h-0 overflow-y-auto px-5 py-5 sm:px-6">
+              {(asidePanes.find((p) => p.id === showing) ?? asidePanes[0]).body}
+            </div>
+          </aside>
+        ) : aside ? (
           <aside className="min-h-0 shrink-0 overflow-y-auto border-line px-5 py-5 sm:px-6 lg:w-[320px] lg:border-s">
             {aside}
           </aside>
-        )}
+        ) : null}
       </div>
 
       {/* ── the act bar, always in the same place ─────────────────────── */}
