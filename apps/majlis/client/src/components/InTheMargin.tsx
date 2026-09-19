@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import Act from './Act.js';
+import AfterAct from './AfterAct.js';
 import { oversight, type Margin, type AnnotationThread } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { mayDeliberate, useIdentity } from '../lib/identity.js';
@@ -89,6 +91,7 @@ function Note({
 }) {
   const { t } = useI18n();
   const [replying, setReplying] = useState(false);
+  const [dropping, setDropping] = useState(false);
   const [said, setSaid] = useState('');
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState<string | null>(null);
@@ -111,16 +114,8 @@ function Note({
   }
 
   async function drop() {
-    setBusy(true);
-    setFailed(null);
-    try {
-      await oversight.withdrawNote(a.id);
-      onChanged();
-    } catch (e) {
-      setFailed(e instanceof Error ? e.message : t('margin.failed'));
-    } finally {
-      setBusy(false);
-    }
+    await oversight.withdrawNote(a.id);
+    onChanged();
   }
 
   return (
@@ -184,14 +179,24 @@ function Note({
         {!a.withdrawn && a.by === mine && (
           <Button
             type="button"
-            onClick={drop}
-            disabled={busy}
-            className="text-muted underline decoration-line underline-offset-4 disabled:opacity-50"
+            onClick={() => setDropping(true)}
+            className="text-muted underline decoration-line underline-offset-4"
           >
             {t('margin.withdraw')}
           </Button>
         )}
       </div>
+
+      <Act
+        open={dropping}
+        onClose={() => setDropping(false)}
+        title={t('margin.withdraw')}
+        does={t('wm.withdrawNote.does')}
+        means={t('wm.withdrawNote.means')}
+        label={t('margin.withdraw')}
+        grave
+        perform={drop}
+      />
 
       {replying && (
         <div className="mt-2.5">
@@ -202,6 +207,16 @@ function Note({
             rows={3}
             className="w-full rounded-card bg-raised px-3.5 py-2.5 text-ui leading-relaxed text-paper shadow-ring outline-none"
           />
+          {/*
+            No window in front of a reply. It means the same thing as the note
+            it hangs under — which the member is reading — and a confirmation
+            before every line would turn a discussion into a queue of presses.
+            The sentence sits here instead: the same telling, one press fewer.
+          */}
+          <p className="mt-2 max-w-[58ch] text-note leading-relaxed text-muted">
+            {t('wm.reply.means')}
+          </p>
+
           <div className="mt-2 flex flex-wrap items-center gap-4">
             <Button
               type="button"
@@ -242,8 +257,14 @@ export default function InTheMargin({
   /** What the reader has selected inside the text, if anything. */
   const [selected, setSelected] = useState('');
   const [said, setSaid] = useState('');
-  const [busy, setBusy] = useState(false);
   const [refused, setRefused] = useState<string | null>(null);
+  /** Whether the window that writes the note is open. */
+  const [writing, setWriting] = useState(false);
+  const [justDid, setJustDid] = useState<{
+    did: string;
+    means: string;
+    next: readonly { label: string; to?: string; says?: string }[];
+  } | null>(null);
 
   function load() {
     setFailed(false);
@@ -275,18 +296,10 @@ export default function InTheMargin({
   }
 
   async function write() {
-    setBusy(true);
-    setRefused(null);
-    try {
-      await oversight.annotate({ on, subjectId, quote: selected, said });
-      setSaid('');
-      setSelected('');
-      load();
-    } catch (e) {
-      setRefused(e instanceof Error ? e.message : t('margin.failed'));
-    } finally {
-      setBusy(false);
-    }
+    await oversight.annotate({ on, subjectId, quote: selected, said });
+    setSaid('');
+    setSelected('');
+    load();
   }
 
   if (failed) return <Nothing>{t('margin.unavailable')}</Nothing>;
@@ -319,8 +332,8 @@ export default function InTheMargin({
               <div className="mt-2.5 flex flex-wrap items-center gap-4">
                 <Button
                   type="button"
-                  onClick={write}
-                  disabled={busy || said.trim().length < 2}
+                  onClick={() => setWriting(true)}
+                  disabled={said.trim().length < 2}
                   className="rounded-card bg-lapis px-5 py-2.5 text-ui font-bold text-white shadow-act disabled:opacity-50"
                 >
                   {t('margin.write')}
@@ -336,9 +349,42 @@ export default function InTheMargin({
               <p className="mt-3 max-w-[58ch] text-note leading-relaxed text-muted">
                 {t('margin.notDeliberation')}
               </p>
+
+              {/*
+                The window is the last press, not a wrapper. The member has
+                just marked a sentence and is writing beside it; pulling the
+                quoted passage into a window would tear the note away from the
+                words it is about.
+              */}
+              <Act
+                open={writing}
+                onClose={() => setWriting(false)}
+                title={t('margin.write')}
+                does={t('wm.note.does')}
+                means={t('wm.note.means')}
+                label={t('margin.write')}
+                perform={write}
+                onDone={setJustDid}
+                after={{
+                  did: t('wm.note.did'),
+                  means: t('wm.note.didMeans'),
+                  next: [{ label: t('wm.next.margin'), says: t('wm.next.marginSays') }],
+                }}
+              />
             </div>
           ) : (
             <p className="text-ui text-muted">{t('margin.howTo')}</p>
+          )}
+
+          {justDid && (
+            <div className="mt-4">
+              <AfterAct
+                did={justDid.did}
+                means={justDid.means}
+                next={justDid.next}
+                onClose={() => setJustDid(null)}
+              />
+            </div>
           )}
         </div>
       )}

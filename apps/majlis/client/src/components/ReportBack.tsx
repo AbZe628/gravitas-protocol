@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import { oversight, Refused, type Committee } from '../lib/api.js';
+import Act from './Act.js';
+import AfterAct from './AfterAct.js';
+import { oversight, type Committee } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { Field, HEADING } from './field.js';
 import { Button } from './Button';
@@ -52,8 +54,13 @@ export default function ReportBack({
   const [positions, setPositions] = useState<Record<string, { at: Position; said: string }>>(
     Object.fromEntries(committee.members.map((m) => [m, { at: 'silent' as Position, said: '' }])),
   );
-  const [busy, setBusy] = useState(false);
-  const [refusal, setRefusal] = useState<string | null>(null);
+  /** Whether the window that files the report is open. */
+  const [filing, setFiling] = useState(false);
+  const [justDid, setJustDid] = useState<{
+    did: string;
+    means: string;
+    next: readonly { label: string; to?: string; says?: string }[];
+  } | null>(null);
 
   if (!open) {
     return (
@@ -69,32 +76,22 @@ export default function ReportBack({
 
   const incomplete = Object.values(positions).some((p) => p.at === 'dissents' && !p.said.trim());
 
-  async function send(e: React.FormEvent) {
-    e.preventDefault();
-    if (busy) return;
-    setBusy(true);
-    setRefusal(null);
-    try {
-      const standing = committee.members
-        .filter((m) => positions[m].at !== 'silent')
-        .map((m) => ({
-          scholarId: m,
-          agrees: positions[m].at === 'agrees',
-          ...(positions[m].said.trim() ? { said: positions[m].said.trim() } : {}),
-        }));
+  async function send() {
+    const standing = committee.members
+      .filter((m) => positions[m].at !== 'silent')
+      .map((m) => ({
+        scholarId: m,
+        agrees: positions[m].at === 'agrees',
+        ...(positions[m].said.trim() ? { said: positions[m].said.trim() } : {}),
+      }));
 
-      await oversight.reportOnReferral(referralId, found.trim(), standing);
-      setOpen(false);
-      onReported();
-    } catch (error) {
-      setRefusal(error instanceof Refused ? error.message : String(error));
-    } finally {
-      setBusy(false);
-    }
+    await oversight.reportOnReferral(referralId, found.trim(), standing);
+    setOpen(false);
+    onReported();
   }
 
   return (
-    <form onSubmit={send} className="mt-4 rounded-card bg-ink/70 px-4 py-4 shadow-ring">
+    <div className="mt-4 rounded-card bg-ink/70 px-4 py-4 shadow-ring">
       <p className="mb-3 max-w-[58ch] text-ui leading-relaxed text-muted">
         {t('cttee.reportLead')}
       </p>
@@ -164,18 +161,45 @@ export default function ReportBack({
         ))}
       </ul>
 
-      {refusal && <p className="mt-3 text-ui text-breach">{refusal}</p>}
       {incomplete && (
         <p className="mt-3 text-note leading-relaxed text-gold">{t('cttee.dissentNeedsWords')}</p>
       )}
 
+      <Act
+        open={filing}
+        onClose={() => setFiling(false)}
+        title={t('cttee.sendReport')}
+        does={t('wm.report.does')}
+        means={t('wm.report.means')}
+        label={t('cttee.sendReport')}
+        perform={send}
+        onDone={setJustDid}
+        after={{
+          did: t('wm.report.did'),
+          means: t('wm.report.didMeans'),
+          next: [{ label: t('wm.next.backToMatter'), says: t('wm.next.backToMatterSays') }],
+        }}
+      />
+
+      {justDid && (
+        <div className="mt-4">
+          <AfterAct
+            did={justDid.did}
+            means={justDid.means}
+            next={justDid.next}
+            onClose={() => setJustDid(null)}
+          />
+        </div>
+      )}
+
       <div className="mt-4 flex flex-wrap items-center gap-3">
         <Button
-          type="submit"
-          disabled={busy || found.trim().length === 0 || incomplete}
+          type="button"
+          onClick={() => setFiling(true)}
+          disabled={found.trim().length === 0 || incomplete}
           className="rounded-xl bg-lapis px-5 py-2.5 text-ui font-semibold text-white shadow-act disabled:opacity-40"
         >
-          {busy ? t('common.loading') : t('cttee.sendReport')}
+          {t('cttee.sendReport')}
         </Button>
         <Button
           type="button"
@@ -189,6 +213,6 @@ export default function ReportBack({
       <p className="mt-3 max-w-[58ch] text-note leading-relaxed text-muted">
         {t('cttee.noVerdict')}
       </p>
-    </form>
+    </div>
   );
 }

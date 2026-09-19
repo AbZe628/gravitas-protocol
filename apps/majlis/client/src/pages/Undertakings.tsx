@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import Act from '../components/Act.js';
+import AfterAct from '../components/AfterAct.js';
 import { Link } from 'react-router-dom';
 import { oversight, type Undertaking } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
@@ -36,16 +38,31 @@ function day(iso: string): string {
   return Number.isNaN(d.getTime()) ? iso : d.toISOString().slice(0, 10);
 }
 
+/** What an act did, as the page holds it. */
+type WhatFollowed = {
+  did: string;
+  means: string;
+  next: readonly { label: string; to?: string; says?: string }[];
+};
+
 function One({
   row,
   mine,
   canKeep,
   onChanged,
+  onDid,
 }: {
   row: { undertaking: Undertaking; whoName: string; overdue: boolean };
   mine: boolean;
   canKeep: boolean;
   onChanged: () => void;
+  /*
+   * Handed up rather than kept here. Closing an undertaking moves it from the
+   * open list to the closed one — two different maps in two different places
+   * in the tree — so React takes this row down and builds a new one. Anything
+   * this row was holding goes with it.
+   */
+  onDid: (what: WhatFollowed) => void;
 }) {
   const { t } = useI18n();
   const u = row.undertaking;
@@ -53,8 +70,6 @@ function One({
   const [open, setOpen] = useState(false);
   const [state, setState] = useState<'done' | 'dropped'>('done');
   const [said, setSaid] = useState('');
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   /*
    * Theirs to close, or the secretary's. Anybody else closing it would be
@@ -63,18 +78,9 @@ function One({
   const mayClose = u.state === 'open' && (mine || canKeep);
 
   async function close() {
-    setBusy(true);
-    setError(null);
-    try {
-      await oversight.closeUndertaking(u.id, state, said);
-      setOpen(false);
-      setSaid('');
-      onChanged();
-    } catch (e) {
-      setError(e instanceof Error ? e.message : t('und.failed'));
-    } finally {
-      setBusy(false);
-    }
+    await oversight.closeUndertaking(u.id, state, said);
+    setSaid('');
+    onChanged();
   }
 
   return (
@@ -115,8 +121,22 @@ function One({
         </Button>
       )}
 
-      {open && (
-        <div className="mt-3">
+      <Act
+        open={open}
+        onClose={() => setOpen(false)}
+        title={t('und.closeIt')}
+        does={t('wm.closeUnd.does')}
+        means={t('wm.closeUnd.means')}
+        label={t('und.record')}
+        perform={close}
+        onDone={onDid}
+        after={{
+          did: t('wm.closeUnd.did'),
+          means: t('wm.closeUnd.didMeans'),
+          next: [{ label: t('wm.next.undertakings'), says: t('wm.next.undertakingsSays') }],
+        }}
+      >
+        <div>
           <div className="mb-2 flex gap-2">
             {(['done', 'dropped'] as const).map((s) => (
               <Button
@@ -141,27 +161,9 @@ function One({
             aria-label={t('und.whatHappened')}
             className="w-full rounded-card bg-ink px-4 py-3 text-body leading-relaxed text-paper shadow-ring outline-none placeholder:text-muted"
           />
-          {error && <p className="mt-2 text-ui text-breach">{error}</p>}
-
-          <div className="mt-2.5 flex flex-wrap items-center gap-4">
-            <Button
-              type="button"
-              onClick={close}
-              disabled={busy || said.trim().length < 3}
-              className="rounded-card bg-lapis px-5 py-2.5 text-body font-bold text-white shadow-act disabled:opacity-50"
-            >
-              {busy ? t('und.closing') : t('und.record')}
-            </Button>
-            <Button
-              type="button"
-              onClick={() => setOpen(false)}
-              className="text-ui text-muted underline decoration-line underline-offset-4"
-            >
-              {t('common.back')}
-            </Button>
-          </div>
         </div>
-      )}
+      </Act>
+
     </li>
   );
 }
@@ -171,6 +173,14 @@ export default function Undertakings() {
   const { identity } = useIdentity();
   const [data, setData] = useState<Awaited<ReturnType<typeof oversight.undertakings>> | null>(null);
   const [failed, setFailed] = useState(false);
+  /**
+   * What the last act did, held here rather than on the row that did it.
+   *
+   * A closed undertaking leaves the open list and appears in the closed one,
+   * which is a different place in the tree: the row that performed the act is
+   * gone by the time there is anything to say about it.
+   */
+  const [justDid, setJustDid] = useState<WhatFollowed | null>(null);
   /** A failed refresh keeps a screen that is already there. */
   const there = useStillThere();
 
@@ -206,6 +216,17 @@ export default function Undertakings() {
 
   return (
     <article>
+      {justDid && (
+        <div className="mb-5">
+          <AfterAct
+            did={justDid.did}
+            means={justDid.means}
+            next={justDid.next}
+            onClose={() => setJustDid(null)}
+          />
+        </div>
+      )}
+
       <PageHead
         phase="deciding"
         title={t('und.title')}
@@ -238,6 +259,7 @@ export default function Undertakings() {
                 mine={r.undertaking.who === identity?.scholarId}
                 canKeep={canKeep}
                 onChanged={load}
+                onDid={setJustDid}
               />
             ))}
           </ul>
@@ -254,6 +276,7 @@ export default function Undertakings() {
                 mine={r.undertaking.who === identity?.scholarId}
                 canKeep={canKeep}
                 onChanged={load}
+                onDid={setJustDid}
               />
             ))}
           </ul>

@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import Act from './Act.js';
+import AfterAct from './AfterAct.js';
 import { oversight, type ReferralOnMatter } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { mayDeliberate, useIdentity } from '../lib/identity.js';
@@ -167,8 +169,13 @@ export default function WhatTheCommitteeFound({ matterId }: { matterId: string }
   const [open, setOpen] = useState(false);
   const [pick, setPick] = useState('');
   const [asking, setAsking] = useState('');
-  const [busy, setBusy] = useState(false);
-  const [refused, setRefused] = useState<string | null>(null);
+  /** Whether the window that sends the referral is open. */
+  const [sending, setSending] = useState(false);
+  const [justDid, setJustDid] = useState<{
+    did: string;
+    means: string;
+    next: readonly { label: string; to?: string; says?: string }[];
+  } | null>(null);
 
   function load() {
     setFailed(false);
@@ -203,18 +210,10 @@ export default function WhatTheCommitteeFound({ matterId }: { matterId: string }
   }, []);
 
   async function send() {
-    setBusy(true);
-    setRefused(null);
-    try {
-      await oversight.referMatter({ committeeId: pick, matterId, asking });
-      setAsking('');
-      setOpen(false);
-      load();
-    } catch (e) {
-      setRefused(e instanceof Error ? e.message : t('cttee.failed'));
-    } finally {
-      setBusy(false);
-    }
+    await oversight.referMatter({ committeeId: pick, matterId, asking });
+    setAsking('');
+    setOpen(false);
+    load();
   }
 
   if (failed) return <Nothing>{t('cttee.unavailable')}</Nothing>;
@@ -292,13 +291,39 @@ export default function WhatTheCommitteeFound({ matterId }: { matterId: string }
             className="w-full rounded-card bg-raised px-4 py-3 text-body leading-relaxed text-paper shadow-ring outline-none"
           />
 
-          {refused && <p className="mt-2 text-ui text-breach">{refused}</p>}
+
+          <Act
+            open={sending}
+            onClose={() => setSending(false)}
+            title={t('cttee.sendIt')}
+            does={t('wm.refer.does')}
+            means={t('wm.refer.means')}
+            label={t('cttee.sendIt')}
+            perform={send}
+            onDone={setJustDid}
+            after={{
+              did: t('wm.refer.did'),
+              means: t('wm.refer.didMeans'),
+              next: [{ label: t('wm.next.backToMatter'), says: t('wm.next.backToMatterSays') }],
+            }}
+          />
+
+          {justDid && (
+            <div className="mt-3">
+              <AfterAct
+                did={justDid.did}
+                means={justDid.means}
+                next={justDid.next}
+                onClose={() => setJustDid(null)}
+              />
+            </div>
+          )}
 
           <div className="mt-3 flex flex-wrap items-center gap-4">
             <Button
               type="button"
-              onClick={send}
-              disabled={busy || !pick || asking.trim().length < 5}
+              onClick={() => setSending(true)}
+              disabled={!pick || asking.trim().length < 5}
               className="rounded-card bg-lapis px-5 py-2.5 text-body font-bold text-white shadow-act disabled:opacity-50"
             >
               {t('cttee.sendIt')}

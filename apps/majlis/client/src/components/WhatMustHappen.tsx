@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import { oversight, Refused, type Matter } from '../lib/api.js';
+import Act from './Act.js';
+import AfterAct from './AfterAct.js';
+import { oversight, type Matter } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { Button } from './Button';
 
@@ -41,32 +43,27 @@ export default function WhatMustHappen({ matter, canEdit, onChanged }: Props) {
 
   const [editing, setEditing] = useState(false);
   const [rows, setRows] = useState<string[]>([]);
-  const [busy, setBusy] = useState(false);
-  const [refusal, setRefusal] = useState<string | null>(null);
+  /** Whether the window that writes the steps is open. */
+  const [saving, setSaving] = useState(false);
+  const [justDid, setJustDid] = useState<{
+    did: string;
+    means: string;
+    next: readonly { label: string; to?: string; says?: string }[];
+  } | null>(null);
 
   function start() {
     setRows(steps.length ? [...steps] : ['']);
-    setRefusal(null);
     setEditing(true);
   }
 
   async function save() {
-    if (busy) return;
-    setBusy(true);
-    setRefusal(null);
-    try {
-      onChanged(
-        await oversight.setImplementation(
-          matter.id,
-          rows.map((r) => r.trim()).filter(Boolean),
-        ),
-      );
-      setEditing(false);
-    } catch (error) {
-      setRefusal(error instanceof Refused ? error.message : String(error));
-    } finally {
-      setBusy(false);
-    }
+    onChanged(
+      await oversight.setImplementation(
+        matter.id,
+        rows.map((r) => r.trim()).filter(Boolean),
+      ),
+    );
+    setEditing(false);
   }
 
   if (!editing) {
@@ -143,16 +140,41 @@ export default function WhatMustHappen({ matter, canEdit, onChanged }: Props) {
         {t('doing.addStep')}
       </Button>
 
-      {refusal && <p className="mt-3 text-ui text-breach">{refusal}</p>}
+
+      <Act
+        open={saving}
+        onClose={() => setSaving(false)}
+        title={t('doing.save')}
+        does={t('wm.steps.does')}
+        means={t('wm.steps.means')}
+        label={t('doing.save')}
+        perform={save}
+        onDone={setJustDid}
+        after={{
+          did: t('wm.steps.did'),
+          means: t('wm.steps.didMeans'),
+          next: [{ label: t('wm.next.backToMatter'), says: t('wm.next.backToMatterSays') }],
+        }}
+      />
+
+      {justDid && (
+        <div className="mt-4">
+          <AfterAct
+            did={justDid.did}
+            means={justDid.means}
+            next={justDid.next}
+            onClose={() => setJustDid(null)}
+          />
+        </div>
+      )}
 
       <div className="mt-4 flex flex-wrap items-center gap-3">
         <Button
           type="button"
-          onClick={save}
-          disabled={busy}
+          onClick={() => setSaving(true)}
           className="rounded-xl bg-lapis px-5 py-2.5 text-ui font-semibold text-white shadow-act disabled:opacity-40"
         >
-          {busy ? t('common.loading') : t('doing.save')}
+          {t('doing.save')}
         </Button>
         <Button
           type="button"

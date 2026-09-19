@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import InTheMargin from './components/InTheMargin.js';
 import { I18nProvider } from './lib/i18n.js';
@@ -149,6 +149,17 @@ describe('the margin', () => {
     const box = await screen.findByLabelText(/Write the note/i);
     fireEvent.change(box, { target: { value: 'Which limit?' } });
     fireEvent.click(screen.getByRole('button', { name: /Write the note/i }));
+
+    /*
+     * The press opens the window that says what a note is before it is one:
+     * that the whole board reads it, that it is not a finding, and that
+     * nothing here is deleted. The act is the press inside it.
+     */
+    const window_ = await screen.findByRole('dialog');
+    expect(window_.textContent).toContain('Everyone on the board sees it');
+    fireEvent.click(
+      within(window_).getByRole('button', { name: /Write the note/i }),
+    );
 
     await waitFor(() => {
       expect(posted).toHaveLength(1);
