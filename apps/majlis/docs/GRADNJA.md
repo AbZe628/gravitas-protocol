@@ -488,6 +488,54 @@ pravilo koje već postoji i ostaje.
 
 ---
 
+### FAZA 11 · Pravi upit banke, kao PDF
+
+Traženo 19.09.2026.
+
+Do sada je svaki dokaz da put od banke do odbora radi bio dokaz na tekstu
+koji sam sâm utipkao. Banka ne šalje utipkan tekst — šalje dopis i uz njega
+nacrt ugovora, u PDF-u, sa zaglavljem, brojem predmeta i potpisom.
+
+| šta | done-uvjet |
+|---|---|
+| Jedan PDF: dopis treasury stola + nacrt murabahe | postoji u `apps/majlis/samples/`, čita se kao papir a ne kao ispis |
+| Prilaže se kroz **Ask** i stiže na predmet | otvoreno pitanje pokazuje priložene riječi, ne ime datoteke |
+| Čitanje protiv oblika radi na njemu | `readAgainstShape` vraća uslove sa navodom, doslovno, iz tog PDF-a |
+| Ono što se ne može pročitati — kaže se | polje bez navoda je prazno i imenovano, nikad pogođeno |
+
+**Posljedica koja se rješava u istom prolazu:** ako PDF uđe a izvlačenje
+pogađa, cijela §7 laž — *citat se provjerava doslovno* — pada na prvom pravom
+papiru. Prag pouzdanosti i potvrdi-ili-ispravi moraju raditi na ovom PDF-u,
+ne na uzorku koji im odgovara.
+
+---
+
+### FAZA 12 · Upute na engleskom, do zadnjeg detalja
+
+Traženo 19.09.2026.
+
+Ovo je jedina isporuka koju ne mogu provjeriti testom: da neko ko nije ja
+otvori aplikaciju i zna šta radi. Sve dosad napisano — FLOW, GRADNJA, RESUME
+— pisano je za mene.
+
+| šta | done-uvjet |
+|---|---|
+| Kako se postavlja i pokreće | banka dobije odbor, ključeve i zapis koji preživi gašenje |
+| Svaka od osam uloga: šta vidi i šta smije | za svaku ulogu jedan prolaz kroz njen posao |
+| Svaki čin: šta radi, šta znači, šta poslije | 59 činova, nijedan ne fali |
+| Svaki ekran: čemu služi i odakle se dolazi | 20 ekrana, sa slikom |
+| Sve kratice tipkovnice | ono što `?` pokazuje, i ništa što ne radi |
+| Šta aplikacija **ne** radi | izrečeno, ne prešućeno |
+
+**Posljedica koja se rješava u istom prolazu:** upute pisane iz koda uvijek
+opisuju ono što je pisac htio. Svaki korak u uputama mora biti prošetan u
+pregledniku dok se piše — ono što se ne da prošetati ne ide u upute nego na
+popis kvarova.
+
+Piše se na engleskom, jer je to jezik u kojem se ovo prodaje.
+
+---
+
 ## 3 · Kontrolna lista — svih 74 čina
 
 Faza 5 je gotova kad je svaki red pun. Nijedan se ne preskače.
