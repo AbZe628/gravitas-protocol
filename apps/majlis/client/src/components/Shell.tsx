@@ -539,6 +539,27 @@ function Frame({ children }: { children: React.ReactNode }) {
      */
     <div className="relative flex h-dvh flex-col overflow-hidden bg-ink text-paper">
       {/*
+        The way past the frame, for whoever is not using a mouse.
+
+        ── what this closes ──────────────────────────────────────────────
+
+        Measured on all twenty screens: the first Tab landed on the name in
+        the masthead. From there to the work is the whole bar and the whole
+        rail, every time, on every screen. FLOW §35.5 asks exactly this as
+        its third question, and the answer was the failing one everywhere.
+
+        First in the order, invisible until it has focus, and gone again
+        when it loses it. A member working from the keyboard presses Tab,
+        then Enter, and is standing in the work.
+      */}
+      <a
+        href="#work"
+        className="sr-only rounded-lg bg-lapis px-4 py-2 text-ui font-semibold text-white focus:not-sr-only focus:absolute focus:start-4 focus:top-4 focus:z-50"
+      >
+        {t('shell.skipToWork')}
+      </a>
+
+      {/*
         The sweep: one continuous curve carrying light across the whole frame.
         It sits under everything and is never a line the eye has to read.
       */}
@@ -784,6 +805,13 @@ function Frame({ children }: { children: React.ReactNode }) {
         */}
         <div className="flex min-h-0 flex-1">
         <main
+          id="work"
+          /*
+           * Fokusabilno programski, ali ne u redu za Tab: preskocna veza
+           * mora moci spustiti fokus ovdje, a sam okvir nije kontrola i ne
+           * smije trositi jedan Tab svakome ko prolazi kroz ekran.
+           */
+          tabIndex={-1}
           key={path}
           className={
             /*

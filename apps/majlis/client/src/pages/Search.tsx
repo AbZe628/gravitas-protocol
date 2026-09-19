@@ -4,6 +4,7 @@ import { governance, type SearchHit, type SearchResult } from '../lib/api.js';
 import { useIdentity } from '../lib/identity.js';
 import { useI18n } from '../lib/i18n.js';
 import { Nothing, PageHead } from '../components/page.js';
+import { ErrorText } from '../components/ui.js';
 import { DateText, Tag } from '../components/ui.js';
 import { Button } from '../components/Button';
 
@@ -136,7 +137,7 @@ export default function Search() {
       )}
 
       {/* It said "Loading…" in the colour of a failure. */}
-      {failed && <p className="text-ui text-breach">{t('common.error')}</p>}
+      {failed && <ErrorText what={t('search.what')} />}
 
       {result && (
         <>
