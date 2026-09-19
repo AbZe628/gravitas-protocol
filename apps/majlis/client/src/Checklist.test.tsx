@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent, within } from '@testing-library/react';
 import Checklist from './components/Checklist.js';
 import { I18nProvider } from './lib/i18n.js';
 
@@ -313,6 +313,15 @@ describe('choosing the shape, out of a library that is no longer short', () => {
 
     await waitFor(() => screen.getByText('Sukuk'));
     fireEvent.click(screen.getByText('Sukuk'));
+
+    /*
+     * Picking the name opens the window that says what has just been chosen:
+     * the whole list of conditions this matter will be judged against, start
+     * to finish. The act is the press inside it.
+     */
+    const window_ = await screen.findByRole('dialog');
+    expect(window_.textContent).toContain('Every step of the work from here');
+    fireEvent.click(within(window_).getByRole('button', { name: /Judge it by this/ }));
 
     await waitFor(() => expect(posted).toHaveLength(1));
     expect(posted[0].url).toContain('/matters/m1/structure');

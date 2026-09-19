@@ -15,6 +15,7 @@ import { Tag } from './ui.js';
 import TheCalculator from './TheCalculator.js';
 import AskTheBank from './AskTheBank.js';
 import { Button } from './Button';
+import Act from './Act.js';
 
 /**
  * The conditions of a contract shape, ruled on one at a time.
@@ -706,16 +707,37 @@ export default function Checklist({
   const firstUnanswered =
     data?.conditions.find((c) => c.answeredBy.length === 0)?.condition.id ?? null;
 
+  /** The shape whose window is open, if the member is choosing one. */
+  const [choosing, setChoosing] = useState<string | null>(null);
+
   async function choose(structureId: string) {
     await oversight.setStructure(matterId, structureId);
     await load();
   }
 
+  /** The shape the window is asking about, held while the window is open. */
+  const picked = choosing ? (structures ?? []).find((x) => x.id === choosing) : undefined;
+
   if (none) {
     return (
       <div>
         <p className="mb-3 text-ui leading-relaxed text-muted">{t('chk.noShape')}</p>
-        {canRule && structures && <Picker structures={structures} onChoose={choose} />}
+        {canRule && structures && <Picker structures={structures} onChoose={setChoosing} />}
+
+        {/*
+          Choosing the shape chooses the whole list of conditions this matter
+          will be judged against, start to finish. It was one press on a name
+          in a row of names, and said nothing about what had just been decided.
+        */}
+        <Act
+          open={choosing !== null}
+          onClose={() => setChoosing(null)}
+          title={picked?.name ?? t('chk.noShape')}
+          does={t('wm.setShape.does')}
+          means={t('wm.setShape.means')}
+          label={t('wm.setShape.label')}
+          perform={() => choose(choosing as string)}
+        />
       </div>
     );
   }
