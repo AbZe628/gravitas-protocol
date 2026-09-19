@@ -2136,7 +2136,7 @@ Ne po osjećaju. Šest pitanja, svaki čvor mora proći svih šest:
 | 3 | Ako pritisnem Tab odmah po otvaranju, ide li na sljedeću kontrolu — ili na prvi link u traci? | na traku → fokus nigdje ne sjeda |
 | 4 | Mogu li obaviti cijeli korak bez miša? | ne → stranica |
 | 5 | **Koliko riječi u radnom oknu — na radnom prozoru, ne na listi?** | >150 → dokument, ne radno okno |
-| 6 | Koliko je pikselа do prvog stvarnog čina? | >400 → prvo se čita pa radi, a treba obrnuto |
+| 6 | Koliko je pikselа do **prvog mjesta gdje se može raditi** — polje ili čin? | >400 → prvo se čita pa radi, a treba obrnuto |
 
 **Peto pitanje je jednom bilo krivo napisano, i mjerenje je to pokazalo.**
 Stajalo je *„koliko riječi u radnom oknu"* bez razlike između radnog prozora i
@@ -2152,8 +2152,40 @@ drugo: **koliko redova stane bez skrola** (osam) i **koliko je do prvog čina**
 Pravilo koje pada na osam od devet ekrana nije standard nego šum, i standard
 koji se ne može proći prestaje se mjeriti.
 
-`weigh.mjs` u `work/majlis-local/` mjeri 1, 5 i 6 već sada. Za 2 i 3 treba
-dodati dvije linije.
+**Šesto pitanje je bilo krivo napisano na isti način, i isto ga je pokazalo
+mjerenje — 19.09.2026.**
+
+Stajalo je *„koliko piksela do prvog stvarnog čina"* bez razlike između
+obrasca i liste, pa je palo na pet ekrana. Najgori je bio **Ask, na 1056
+piksela**. Ali *Ask* je obrazac: njegovo dugme **mora** biti na dnu, jer se
+pitanje prvo napiše pa pošalje. Prvo polje na tom ekranu stoji na **233
+piksela** — posao počinje odmah, a mjera je gledala gdje se posao *završava*.
+
+Isto na *Postavkama*: 567 do dugmeta, 436 do prvog polja.
+
+Granica važi za **mjesto gdje član prvi put može nešto uraditi** — polje u
+koje se piše ili dugme koje nešto radi, šta god dođe prvo. Kucanje jeste rad.
+Dugme koje samo rasklapa okno nije, i ne broji se; prepoznaje se po
+`aria-expanded`, ne po riječima u njemu.
+
+Izmjereno tako, padaju četiri: pitanja 709, pregledi 806, obaveze 436,
+postavke 436.
+
+**I jedna mjera koja je do sada nedostajala.** Za liste §35.5 traži i
+*koliko redova stane bez skrola* — osam. To se nije mjerilo nigdje. Izmjereno
+na dvanaest ekrana: redovi su 22 do 149 piksela, i tamo gdje ih ima osam ili
+više, osam ih i stane. Nijedna lista ne pada. `redovi.mjs` u
+`work/majlis-local/`.
+
+Ono što je izgledalo kao red od 893 piksela na pregledima bio je odjeljak
+koji redove obuhvata, ne red — greška u prvoj verziji te mjere.
+
+**Pravilo koje pada na ekranu koji radi ispravno nije standard nego šum**, i
+to vrijedi jednako za peto i za šesto.
+
+`sest2.mjs` u `work/majlis-local/` mjeri 1, 2, 3, 5 i 6. Četvrto — *može li
+se korak obaviti bez miša* — nije brojka nego prolazak, i ne mjeri se; mjera
+koja bi tvrdila da ga je izmjerila lagala bi.
 
 ## 35.6 · Šta ovo znači za red gradnje
 

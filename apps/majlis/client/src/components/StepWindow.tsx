@@ -197,6 +197,18 @@ export default function StepWindow({
         presses the wrong thing — found by looking at the screen rather than
         by reasoning about it.
       */}
+      {/*
+        The act bar, and the second of the shell laws in docs/FLOW.md §35:
+        it stands on the same pixel on every working window, so a member
+        reaching for the thing they just used finds it where it was.
+
+        Measured on three step screens: top 159px from the bottom of the
+        frame, height 147, identical on all three.
+
+        There was briefly a second bar — `ActBar` in `Button.tsx`, written
+        for this same law and used by nothing. It is gone. Two definitions
+        of one rule drift apart and then there are two to repair.
+      */}
       <div className="border-t border-line bg-ink/40">
         {consequences && (
           <div className="px-5 pt-3 sm:px-6">{consequences}</div>

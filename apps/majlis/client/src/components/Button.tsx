@@ -156,30 +156,3 @@ function Spinner() {
   );
 }
 
-/**
- * The bar the acts sit in, at the foot of a working window.
- *
- * It exists so the bar is in the same place on every screen — the second law
- * of docs/FLOW.md §35, and the one a person feels without being able to name
- * it. `why` is the sentence that says what is missing when the main act is
- * dead; it sits at the far end, where a reason belongs, rather than appearing
- * as a toast after the press.
- */
-export function ActBar({
-  why,
-  children,
-  className = '',
-}: {
-  why?: string;
-  children: ReactNode;
-  className?: string;
-}) {
-  return (
-    <div
-      className={`flex shrink-0 items-center gap-2 border-t border-line bg-raised px-5 py-3 lg:px-8 ${className}`}
-    >
-      {why ? <p className="me-auto max-w-[44ch] text-note leading-snug text-muted">{why}</p> : <span className="me-auto" />}
-      {children}
-    </div>
-  );
-}
