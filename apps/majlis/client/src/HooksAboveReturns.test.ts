@@ -39,6 +39,30 @@ const EARLY_RETURN = /^ {2}(if\s*\(.*\)\s*return\b|return\b)/;
 /** `export default function Name(` or `function Name(` — a component. */
 const COMPONENT = /^(export\s+default\s+)?function\s+[A-Z]/;
 
+/**
+ * What actually ends a component, as against what merely starts at column one.
+ *
+ * ── the fault in this guard ───────────────────────────────────────────────
+ *
+ * This used to be *any* non-space character at column one. Almost every
+ * component here takes destructured props across several lines:
+ *
+ *     export default function HowThisIsHeld({
+ *       asset,
+ *     }: {
+ *       asset: Asset;
+ *     }) {
+ *
+ * The `}: {` sits at column one, so the guard stopped watching on the third
+ * line of nearly every component in the project. It then walked to the end of
+ * the file seeing nothing and reported success — and a hook below an early
+ * return went in under it, which is the fourth time that fault has shipped.
+ *
+ * A continuation of a signature — a brace, a bracket, a colon — ends nothing.
+ * Only a new declaration does.
+ */
+const ENDS_IT = /^(export\b|function\b|const\b|let\b|class\b|type\b|interface\b|enum\b|\/\*|\/\/)/;
+
 function filesUnder(dir: string): string[] {
   const out: string[] = [];
   for (const entry of readdirSync(dir)) {
@@ -68,6 +92,12 @@ describe('hooks sit above every early return', () => {
 
   it('finds no hook after an early return', () => {
     const faults: string[] = [];
+    /*
+     * Which components were actually entered. Asserted below, because this
+     * guard has already once reported success from a walk that stopped on the
+     * third line of nearly every file it opened.
+     */
+    const walked = new Set<string>();
 
     for (const file of files) {
       const lines = readFileSync(file, 'utf8').split('\n');
@@ -80,10 +110,11 @@ describe('hooks sit above every early return', () => {
         if (COMPONENT.test(line)) {
           inComponent = true;
           returned = 0;
+          walked.add(relative(root, file) + ':' + (n + 1));
           continue;
         }
-        /* A function at column zero ends the one before it. */
-        if (/^\S/.test(line) && !COMPONENT.test(line) && line.trim() !== '') {
+        /* Only a new declaration at column one ends the one before it. */
+        if (ENDS_IT.test(line) && !COMPONENT.test(line)) {
           inComponent = false;
         }
         if (!inComponent) continue;
@@ -100,6 +131,13 @@ describe('hooks sit above every early return', () => {
         }
       }
     }
+
+    /*
+     * Counted, not assumed. 160 is below the 166 this walk enters today and above
+     * what a broken walk would find — the version of this guard that stopped
+     * at `}: {` entered a small fraction of them and still passed.
+     */
+    expect(walked.size, 'the walk entered too few components to mean anything').toBeGreaterThan(160);
 
     expect(faults, faults.join('\n')).toEqual([]);
   });

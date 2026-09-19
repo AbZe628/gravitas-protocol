@@ -255,8 +255,18 @@ export default function Queue() {
       </div>
 
       <div className="mb-5 flex flex-wrap gap-2">
+        {/*
+          Which filter is on, said to the machine as well as painted.
+
+          The chips carried their state in colour alone: a member driving this
+          from the keyboard, or reading it aloud, was given four identical
+          controls and no way to tell which one was already chosen. Pressing
+          the one that is on does nothing, correctly — and looked, to anyone
+          not seeing the colour, like a control that does nothing at all.
+        */}
         <Button
           type="button"
+          aria-pressed={only === null}
           onClick={() => setOnly(null)}
           className={
             'rounded-full px-3.5 py-1.5 text-note transition-all ' +
@@ -276,6 +286,7 @@ export default function Queue() {
           <Button
             key={p}
             type="button"
+            aria-pressed={only === p}
             onClick={() => setOnly(p)}
             className={
               'rounded-full px-3.5 py-1.5 text-note transition-all ' +

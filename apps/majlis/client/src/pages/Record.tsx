@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import Act from '../components/Act.js';
+import AfterAct from '../components/AfterAct.js';
 import { Link } from 'react-router-dom';
 import { api, oversight, type AssistantExchange, type Health, type MatterSummary } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
@@ -79,22 +81,33 @@ export default function Record({ embedded = false }: { embedded?: boolean }) {
       .catch(() => setDecided([]));
   }, []);
 
+  /** The name the file lands under, so the screen can say it afterwards. */
+  const [filed, setFiled] = useState<string | null>(null);
+  const [justDid, setJustDid] = useState<{
+    did: string;
+    means: string;
+    next: readonly { label: string; to?: string; says?: string }[];
+  } | null>(null);
+
   async function exportAudit() {
-    setExporting(true);
-    try {
-      const boards = await api.boards();
-      if (!boards.length) return;
-      const data = await api.exportBoard(boards[0].id);
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `majlis-audit-${new Date().toISOString().slice(0, 10)}.json`;
-      a.click();
-      URL.revokeObjectURL(url);
-    } finally {
-      setExporting(false);
-    }
+    const boards = await api.boards();
+    /*
+     * Not a quiet return. With no board there is nothing to export, and a
+     * press that does nothing and says nothing is indistinguishable from a
+     * press that failed.
+     */
+    if (!boards.length) throw new Error(t('record.noBoard'));
+
+    const data = await api.exportBoard(boards[0].id);
+    const name = `majlis-audit-${new Date().toISOString().slice(0, 10)}.json`;
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = name;
+    a.click();
+    URL.revokeObjectURL(url);
+    setFiled(name);
   }
 
   return (
@@ -147,17 +160,53 @@ export default function Record({ embedded = false }: { embedded?: boolean }) {
         />
       </div>
 
+      {justDid && (
+        <div className="mb-4">
+          <AfterAct
+            did={justDid.did}
+            means={justDid.means}
+            next={justDid.next}
+            onClose={() => setJustDid(null)}
+          />
+        </div>
+      )}
+
       <Card>
         <div className="text-lead font-medium">{t('record.export')}</div>
         <p className="mt-1.5 text-ui leading-relaxed text-muted">{t('record.exportNote')}</p>
         <Button
           type="button"
-          onClick={exportAudit}
-          disabled={exporting}
-          className="mt-3 rounded bg-lapis px-4 py-2 text-ui text-white font-semibold shadow-act transition-colors hover:bg-lapis disabled:opacity-40"
+          onClick={() => setExporting(true)}
+          className="mt-3 rounded bg-lapis px-4 py-2 text-ui text-white font-semibold shadow-act transition-colors hover:bg-lapis"
         >
-          {exporting ? t('common.loading') : t('record.export')}
+          {t('record.export')}
         </Button>
+
+        <Act
+          open={exporting}
+          onClose={() => setExporting(false)}
+          title={t('record.export')}
+          does={t('wm.export.does')}
+          means={t('wm.export.means')}
+          label={t('record.export')}
+          perform={exportAudit}
+          onDone={setJustDid}
+          after={{
+            did: t('wm.export.did'),
+            means: t('wm.export.didMeans'),
+            next: [{ label: t('wm.next.theRecord'), says: t('wm.next.theRecordSays') }],
+          }}
+        />
+
+        {/*
+          The name it landed under. A file that falls into the downloads tray
+          changes nothing on the screen, and a member who missed the tray
+          presses again, and again. This is the one thing the press leaves
+          behind here.
+        */}
+        {filed && (
+          <p className="mt-3 font-mono text-note text-muted">{filed}</p>
+        )}
       </Card>
 
       <h2 className="mb-2 mt-8 text-label font-bold uppercase tracking-caps text-muted">

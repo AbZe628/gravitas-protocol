@@ -232,6 +232,19 @@ export default function Screening() {
           />
         </label>
 
+        {/*
+          NO-WINDOW: screen — and why.
+
+          Nothing is stored. Figures go in, the arithmetic comes back with
+          every step shown, and the server keeps none of it: see the note on
+          the three stateless calculators in lib/api.ts. There is nothing to
+          warn a member about before a press that changes nothing, and the
+          panel already says whether a figure was worked here or recorded
+          against a condition — which is the distinction that matters.
+
+          Recording a figure IS an act and has its own window, on the screen
+          that records it.
+        */}
         {error && <p className="mb-3 text-ui leading-relaxed text-breach">{error}</p>}
 
         <div className="flex gap-2">

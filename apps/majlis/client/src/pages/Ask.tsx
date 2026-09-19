@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { theWayIn, type Delivery, type Notice, type Submission } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import AttachTheContract from '../components/AttachTheContract.js';
@@ -68,6 +69,22 @@ function Mine({ s, onWithdraw }: { s: Submission; onWithdraw: (id: string, why: 
       {last?.reason && (
         <p className="mt-3 max-w-[62ch] rounded-xl bg-raised px-3.5 py-2.5 text-ui leading-relaxed shadow-ring">
           {last.reason}
+        </p>
+      )}
+
+      {/*
+        Where the question went. A desk told its question was taken up and
+        given nowhere to go has been informed and then abandoned — and the
+        board's own screen has carried this link all along.
+      */}
+      {s.matterId && (
+        <p className="mt-3 text-ui">
+          <Link
+            to={`/matters/${s.matterId}`}
+            className="text-lapis underline decoration-line underline-offset-4"
+          >
+            {t('ask.seeMatter')}
+          </Link>
         </p>
       )}
 

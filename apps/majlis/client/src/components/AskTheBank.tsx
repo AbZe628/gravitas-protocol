@@ -1,9 +1,11 @@
 import { useState } from 'react';
-import { governance, Refused, type AskedOfTheInstitution } from '../lib/api.js';
+import { governance, type AskedOfTheInstitution } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { DateText } from './ui.js';
 import { Field, HEADING } from './field.js';
 import { Button } from './Button';
+import Act from './Act.js';
+import AfterAct from './AfterAct.js';
 
 /**
  * A question to the desk, from the step that needs it.
@@ -52,24 +54,19 @@ export default function AskTheBank({
   const outstanding = asked.find((q) => q.answeredAt === null);
   const [open, setOpen] = useState(false);
   const [asking, setAsking] = useState('');
-  const [busy, setBusy] = useState(false);
-  const [refusal, setRefusal] = useState<string | null>(null);
+  /** Whether the window that sends the question is open. */
+  const [sending, setSending] = useState(false);
+  const [justDid, setJustDid] = useState<{
+    did: string;
+    means: string;
+    next: readonly { label: string; to?: string; says?: string }[];
+  } | null>(null);
 
-  async function send(e: React.FormEvent) {
-    e.preventDefault();
-    if (busy) return;
-    setBusy(true);
-    setRefusal(null);
-    try {
-      await governance.ask(matterId, asking.trim(), conditionId);
-      setOpen(false);
-      setAsking('');
-      onAsked();
-    } catch (error) {
-      setRefusal(error instanceof Refused ? error.message : String(error));
-    } finally {
-      setBusy(false);
-    }
+  async function send() {
+    await governance.ask(matterId, asking.trim(), conditionId);
+    setOpen(false);
+    setAsking('');
+    onAsked();
   }
 
   return (
@@ -126,11 +123,38 @@ export default function AskTheBank({
                 />
               )}
             </Field>
-            {refusal && <p className="mt-2.5 text-ui text-breach">{refusal}</p>}
+            <Act
+              open={sending}
+              onClose={() => setSending(false)}
+              title={t('toDesk.send')}
+              does={t('wm.toDesk.does')}
+              means={t('wm.toDesk.means')}
+              label={t('toDesk.send')}
+              perform={send}
+              onDone={setJustDid}
+              after={{
+                did: t('wm.toDesk.did'),
+                means: t('wm.toDesk.didMeans'),
+                next: [{ label: t('wm.next.backToMatter'), says: t('wm.next.backToMatterSays') }],
+              }}
+            />
+
+            {justDid && (
+              <div className="mt-3">
+                <AfterAct
+                  did={justDid.did}
+                  means={justDid.means}
+                  next={justDid.next}
+                  onClose={() => setJustDid(null)}
+                />
+              </div>
+            )}
+
             <div className="mt-3 flex flex-wrap items-center gap-3">
               <Button
-                type="submit"
-                disabled={busy || asking.trim().length < 10}
+                type="button"
+                onClick={() => setSending(true)}
+                disabled={asking.trim().length < 10}
                 className="rounded-xl bg-lapis px-4 py-2 text-ui font-semibold text-white shadow-act disabled:opacity-40"
               >
                 {t('toDesk.send')}
@@ -151,7 +175,6 @@ export default function AskTheBank({
               /* The draft opens with the condition in it, because that is what
                  the member standing on this step needs answered. */
               setAsking(`${t('toDesk.draftPrefix')}\n\n${requirement}\n\n${t('toDesk.draftTail')}`);
-              setRefusal(null);
               setOpen(true);
             }}
             className="text-ui font-semibold text-lapis underline decoration-line underline-offset-4"

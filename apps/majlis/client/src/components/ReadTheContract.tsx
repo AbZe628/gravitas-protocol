@@ -4,6 +4,7 @@ import { useI18n } from '../lib/i18n.js';
 import WhereTheDraftComesFrom from './WhereTheDraftComesFrom.js';
 import { Nothing } from './page.js';
 import { Button } from './Button';
+import Act from './Act.js';
 
 /**
  * Paste a contract, see where each condition is answered.
@@ -81,27 +82,19 @@ export default function ReadTheContract({
   const [text, setText] = useState(startWith?.text ?? '');
   const [took, setTook] = useState<string | null>(startWith?.name ?? null);
   const [reading, setReading] = useState<ContractReading | null>(null);
-  const [busy, setBusy] = useState(false);
-  const [failed, setFailed] = useState<string | null>(null);
+  /** Whether the window that performs the reading is open. */
+  const [asking, setAsking] = useState(false);
   /* Opened by a press inside a matter; already open where it is the point. */
   const [open, setOpen] = useState(Boolean(startWith));
 
   if (!canRead) return null;
 
   async function read() {
-    setBusy(true);
-    setFailed(null);
-    try {
-      setReading(
-        matterId
-          ? await oversight.readContract(matterId, text)
-          : await oversight.readAgainstShape(structureId as string, text),
-      );
-    } catch (e) {
-      setFailed(e instanceof Error ? e.message : t('read.failed'));
-    } finally {
-      setBusy(false);
-    }
+    setReading(
+      matterId
+        ? await oversight.readContract(matterId, text)
+        : await oversight.readAgainstShape(structureId as string, text),
+    );
   }
 
   /*
@@ -172,15 +165,38 @@ export default function ReadTheContract({
               {text.trim().length} {t('draftfrom.characters')}
             </p>
           )}
-          {failed && <p className="mt-2 text-ui text-breach">{failed}</p>}
           <Button
             type="button"
-            onClick={read}
-            disabled={busy || text.trim().length < 40}
+            onClick={() => setAsking(true)}
+            disabled={text.trim().length < 40}
             className="mt-3 rounded-card bg-lapis px-6 py-3 text-body font-bold text-white shadow-act disabled:opacity-50"
           >
-            {busy ? t('read.reading') : t('read.doIt')}
+            {t('read.doIt')}
           </Button>
+
+          {/*
+            The one place a machine reads a contract, and so the one place
+            that has to say what it is doing before it does it. What comes
+            back looks like an answer — conditions, verdicts, quotations —
+            and a member who does not know how it was made could take it for
+            one. The window says: words found and lined up, nothing recorded,
+            every quotation checked against the source, and where nothing was
+            found the field stays empty and named rather than guessed.
+          */}
+          <Act
+            open={asking}
+            onClose={() => setAsking(false)}
+            title={t('read.doIt')}
+            does={t('wm.read.does')}
+            means={t('wm.read.means')}
+            label={t('read.doIt')}
+            perform={read}
+            after={{
+              did: t('wm.read.did'),
+              means: t('wm.read.didMeans'),
+              next: [{ label: t('wm.next.theReading'), says: t('wm.next.theReadingSays') }],
+            }}
+          />
         </>
       )}
 

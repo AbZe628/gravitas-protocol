@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { oversight, Refused, type Asset } from '../lib/api.js';
+import Act from './Act.js';
+import { oversight, type Asset } from '../lib/api.js';
 import { useHealth } from '../lib/health.js';
 import { useI18n } from '../lib/i18n.js';
 import { useIdentity, mayDeliberate } from '../lib/identity.js';
@@ -40,9 +41,8 @@ export default function HowThisIsHeld({
   const { t } = useI18n();
   const health = useHealth();
   const { identity } = useIdentity();
-
-  const [busy, setBusy] = useState(false);
-  const [refusal, setRefusal] = useState<string | null>(null);
+  /** Whether the window that changes the mark is open. */
+  const [marking, setMarking] = useState(false);
 
   // The first question, and the reason there is usually nothing here at all.
   if (!health || health.enforcement !== 'gravitas-registry') return null;
@@ -58,17 +58,8 @@ export default function HowThisIsHeld({
   const mayMark = mayDeliberate(identity?.role);
 
   async function mark_as(next: 'conventional' | 'tokenised') {
-    if (busy) return;
-    setBusy(true);
-    setRefusal(null);
-    try {
-      const saved = await oversight.markHolding(asset.id, next);
-      onChanged?.(saved);
-    } catch (e) {
-      setRefusal(e instanceof Refused ? e.message : String(e));
-    } finally {
-      setBusy(false);
-    }
+    const saved = await oversight.markHolding(asset.id, next);
+    onChanged?.(saved);
   }
 
   return (
@@ -95,15 +86,38 @@ export default function HowThisIsHeld({
       {mayMark && (
         <Button
           type="button"
-          onClick={() => void mark_as(mark === 'tokenised' ? 'conventional' : 'tokenised')}
-          disabled={busy}
-          className="mt-3 text-ui text-lapis underline decoration-line underline-offset-4 disabled:opacity-50"
+          onClick={() => setMarking(true)}
+          className="mt-3 text-ui text-lapis underline decoration-line underline-offset-4"
         >
           {t(mark === 'tokenised' ? 'held.markConventional' : 'held.markTokenised')}
         </Button>
       )}
 
-      {refusal && <p className="mt-2 text-ui leading-relaxed text-breach">{refusal}</p>}
+      {/*
+        How a thing is held decides which reading governs it, so this press
+        changes what every later ruling over this holding is measured by. It
+        is one word on the screen and a different body of reasoning behind it.
+      */}
+      <Act
+        open={marking}
+        onClose={() => setMarking(false)}
+        title={t(mark === 'tokenised' ? 'held.markConventional' : 'held.markTokenised')}
+        does={t('wm.held.does')}
+        means={t('wm.held.means')}
+        label={t(mark === 'tokenised' ? 'held.markConventional' : 'held.markTokenised')}
+        perform={() => mark_as(mark === 'tokenised' ? 'conventional' : 'tokenised')}
+      />
+
+      {/*
+        NO-WINDOW: markHolding — the half of it that is missing, and why.
+
+        There is a window before the press. There is no *what follows* after
+        it, because the answer is the screen itself: the line above says how
+        this is held, the line under it says which reasoning governs it, and
+        both change under the member's eyes the moment the mark does. A panel
+        announcing what the two lines already say would be the same sentence
+        twice, and the second one would have to be dismissed.
+      */}
     </div>
   );
 }

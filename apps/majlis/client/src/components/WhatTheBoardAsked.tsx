@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { api, governance, Refused, type Matter } from '../lib/api.js';
+import { api, governance, type Matter } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { DateText } from './ui.js';
 import { Field, HEADING } from './field.js';
 import { Nothing } from './page.js';
 import { Button } from './Button';
+import Act from './Act.js';
+import AfterAct from './AfterAct.js';
 
 /**
  * What the board has asked this institution, and the box to answer in.
@@ -46,8 +48,13 @@ export default function WhatTheBoardAsked({ boardId }: { boardId: string }) {
   const [rows, setRows] = useState<Open[] | null>(null);
   const [answering, setAnswering] = useState<string | null>(null);
   const [answer, setAnswer] = useState('');
-  const [busy, setBusy] = useState(false);
-  const [refusal, setRefusal] = useState<string | null>(null);
+  /** The question whose window is open, if any. */
+  const [sending, setSending] = useState<string | null>(null);
+  const [justDid, setJustDid] = useState<{
+    did: string;
+    means: string;
+    next: readonly { label: string; to?: string; says?: string }[];
+  } | null>(null);
 
   function load() {
     api
@@ -94,25 +101,26 @@ export default function WhatTheBoardAsked({ boardId }: { boardId: string }) {
   const outstanding = rows.filter((r) => r.answeredAt === null);
   const answered = rows.filter((r) => r.answeredAt !== null);
 
-  async function send(row: Open, e: React.FormEvent) {
-    e.preventDefault();
-    if (busy) return;
-    setBusy(true);
-    setRefusal(null);
-    try {
-      await governance.answerAsked(row.matter.id, row.questionId, answer.trim());
-      setAnswering(null);
-      setAnswer('');
-      load();
-    } catch (error) {
-      setRefusal(error instanceof Refused ? error.message : String(error));
-    } finally {
-      setBusy(false);
-    }
+  async function send(row: Open) {
+    await governance.answerAsked(row.matter.id, row.questionId, answer.trim());
+    setAnswering(null);
+    setAnswer('');
+    load();
   }
 
   return (
     <section className="mb-8">
+      {justDid && (
+        <div className="mb-4">
+          <AfterAct
+            did={justDid.did}
+            means={justDid.means}
+            next={justDid.next}
+            onClose={() => setJustDid(null)}
+          />
+        </div>
+      )}
+
       <h2 className="mb-1 text-label font-bold uppercase tracking-caps text-muted">
         {t('toDesk.onCase')}
       </h2>
@@ -141,7 +149,7 @@ export default function WhatTheBoardAsked({ boardId }: { boardId: string }) {
               </p>
 
               {answering === row.questionId ? (
-                <form onSubmit={(e) => send(row, e)} className="mt-3">
+                <div className="mt-3">
                   <Field label={t('toDesk.yourAnswer')} headingClass={HEADING}>
                     {(attrs) => (
                       <textarea
@@ -154,15 +162,31 @@ export default function WhatTheBoardAsked({ boardId }: { boardId: string }) {
                       />
                     )}
                   </Field>
-                  {refusal && <p className="mt-2.5 text-ui text-breach">{refusal}</p>}
                   <div className="mt-3 flex flex-wrap items-center gap-3">
                     <Button
-                      type="submit"
-                      disabled={busy || answer.trim().length < 10}
+                      type="button"
+                      onClick={() => setSending(row.questionId)}
+                      disabled={answer.trim().length < 10}
                       className="rounded-xl bg-lapis px-4 py-2 text-ui font-semibold text-white shadow-act disabled:opacity-40"
                     >
                       {t('toDesk.sendAnswer')}
                     </Button>
+
+                    <Act
+                      open={sending === row.questionId}
+                      onClose={() => setSending(null)}
+                      title={t('toDesk.sendAnswer')}
+                      does={t('wm.answer.does')}
+                      means={t('wm.answer.means')}
+                      label={t('toDesk.sendAnswer')}
+                      perform={() => send(row)}
+                      onDone={setJustDid}
+                      after={{
+                        did: t('wm.answer.did'),
+                        means: t('wm.answer.didMeans'),
+                        next: [{ label: t('wm.next.stayHere'), says: t('wm.next.stayHereSays') }],
+                      }}
+                    />
                     <Button
                       type="button"
                       onClick={() => setAnswering(null)}
@@ -171,14 +195,13 @@ export default function WhatTheBoardAsked({ boardId }: { boardId: string }) {
                       {t('common.cancel')}
                     </Button>
                   </div>
-                </form>
+                </div>
               ) : (
                 <Button
                   type="button"
                   onClick={() => {
                     setAnswering(row.questionId);
                     setAnswer('');
-                    setRefusal(null);
                   }}
                   className="mt-3 rounded-xl bg-lapis px-4 py-2 text-ui font-semibold text-white shadow-act"
                 >
