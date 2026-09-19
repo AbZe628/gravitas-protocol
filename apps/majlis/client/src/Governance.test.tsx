@@ -403,6 +403,15 @@ describe('raising a matter', () => {
     );
     fireEvent.click(screen.getByText('Open as a draft'));
 
+    /*
+     * The press opens the window that says what opening a matter does: it
+     * waits on the board from now, under the name of whoever opened it, and
+     * the title and proposal are not edited afterwards.
+     */
+    const window_ = await screen.findByRole('dialog');
+    expect(window_.textContent).toContain('not edited afterwards');
+    fireEvent.click(within(window_).getByRole('button', { name: /Open as a draft/ }));
+
     await waitFor(() => expect(posted.length).toBeGreaterThan(0));
     const body = posted[0].body as { direction: string; notDecided: string[]; boardId: string };
     expect(body.direction).toBe('permit');

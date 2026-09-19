@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Act from './Act.js';
 import { useNavigate } from 'react-router-dom';
 import { governance } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
@@ -61,28 +62,21 @@ export default function RaiseAMatter({
   const [open, setOpen] = useState(false);
   const [theTitle, setTheTitle] = useState(title);
   const [theProposal, setTheProposal] = useState(proposal);
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+
+  /** Whether the window that opens the matter is showing. */
+  const [opening, setOpening] = useState(false);
 
   if (!canOpen) return null;
 
   async function raise() {
-    setBusy(true);
-    setError(null);
-    try {
-      const made = await governance.openMatter({
-        boardId,
-        title: theTitle,
-        proposal: theProposal,
-        direction,
-        origin,
-      });
-      navigate(`/matters/${made.id}`);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : t('raise.failed'));
-    } finally {
-      setBusy(false);
-    }
+    const made = await governance.openMatter({
+      boardId,
+      title: theTitle,
+      proposal: theProposal,
+      direction,
+      origin,
+    });
+    navigate(`/matters/${made.id}`);
   }
 
   if (!open) {
@@ -124,17 +118,33 @@ export default function RaiseAMatter({
         )}
       </Field>
 
-      {error && <p className="mt-2 text-ui text-breach">{error}</p>}
 
       <div className="mt-3 flex flex-wrap items-center gap-4">
         <Button
           type="button"
-          onClick={raise}
-          disabled={busy || !theTitle.trim() || !theProposal.trim()}
+          onClick={() => setOpening(true)}
+          disabled={!theTitle.trim() || !theProposal.trim()}
           className="rounded-card bg-lapis px-6 py-3 text-body font-bold text-white shadow-act disabled:opacity-50"
         >
-          {busy ? t('raise.opening') : t('raise.openIt')}
+          {t('raise.openIt')}
         </Button>
+
+            {/*
+              NO-AFTER: openMatter — shown, not announced.
+
+              All four ways of opening a matter land the member on the
+              matter itself. The screen becomes what follows, and a panel
+              saying so would stand between them and the work.
+            */}
+            <Act
+              open={opening}
+              onClose={() => setOpening(false)}
+              title={t('raise.openIt')}
+              does={t('wm.openMatter.does')}
+              means={t('wm.openMatter.means')}
+              label={t('raise.openIt')}
+              perform={raise}
+            />
         <Button
           type="button"
           onClick={() => setOpen(false)}

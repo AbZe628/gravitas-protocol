@@ -35,8 +35,6 @@ export default function AssetDetail() {
 
   const [data, setData] = useState<Detail | null>(null);
   const [failed, setFailed] = useState(false);
-  const [busy, setBusy] = useState(false);
-  const [refusal, setRefusal] = useState<string | null>(null);
   const [retiring, setRetiring] = useState(false);
   /** What the last act did. Held here, above anything an act can take away. */
   const [justDid, setJustDid] = useState<{
@@ -60,6 +58,9 @@ export default function AssetDetail() {
       .catch(() => setFailed(true));
   }, [id]);
 
+  /** Whether the window that opens the matter is showing. */
+  const [putting, setPutting] = useState(false);
+
   if (failed) return <ErrorText />;
   if (!data) return <Loading />;
 
@@ -75,23 +76,15 @@ export default function AssetDetail() {
    * the proposer sets it on the matter itself.
    */
   async function putToTheBoard() {
-    if (busy) return;
-    setBusy(true);
-    setRefusal(null);
-    try {
-      const created = await governance.openMatter({
-        boardId: 'demo-board',
-        title: `${t('reg.raiseTitle')} ${a.name}`,
-        proposal: t('reg.raiseProposal'),
-        direction: 'permit',
-        origin: 'institution_request',
-        assetIds: [a.id],
-      });
-      navigate(`/matters/${created.id}`);
-    } catch (error) {
-      setRefusal(error instanceof Error ? error.message : String(error));
-      setBusy(false);
-    }
+    const created = await governance.openMatter({
+      boardId: 'demo-board',
+      title: `${t('reg.raiseTitle')} ${a.name}`,
+      proposal: t('reg.raiseProposal'),
+      direction: 'permit',
+      origin: 'institution_request',
+      assetIds: [a.id],
+    });
+    navigate(`/matters/${created.id}`);
   }
 
   /*
@@ -152,13 +145,26 @@ export default function AssetDetail() {
           }
         >
           <Button
-            onClick={putToTheBoard}
-            disabled={busy}
+            onClick={() => setPutting(true)}
             className="w-full rounded-xl bg-lapis px-4 py-2.5 text-ui font-semibold text-white shadow-act disabled:opacity-50"
           >
             {t('reg.putToTheBoard')}
           </Button>
-          {refusal && <p className="mt-2.5 text-ui text-breach">{refusal}</p>}
+
+          {/*
+            NO-AFTER: openMatter — shown, not announced. The press lands
+            the member on the matter it just opened; a panel saying so
+            would stand between them and the work.
+          */}
+          <Act
+            open={putting}
+            onClose={() => setPutting(false)}
+            title={t('reg.putToTheBoard')}
+            does={t('wm.openMatter.does')}
+            means={t('wm.openMatter.means')}
+            label={t('reg.putToTheBoard')}
+            perform={putToTheBoard}
+          />
         </ActionPanel>
       ) : null}
 

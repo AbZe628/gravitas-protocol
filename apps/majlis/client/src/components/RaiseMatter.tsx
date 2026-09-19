@@ -1,6 +1,7 @@
 import { useState } from 'react';
+import Act from './Act.js';
 import { useNavigate } from 'react-router-dom';
-import { Refused, governance } from '../lib/api.js';
+import { governance } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { Card } from './ui.js';
 import { Field } from './field.js';
@@ -45,17 +46,15 @@ export default function RaiseMatter({ boardId }: { boardId: string }) {
   const [origin, setOrigin] = useState<(typeof ORIGINS)[number]>('protocol_change');
   const [notDecided, setNotDecided] = useState('');
   const [arrivedAt, setArrivedAt] = useState('');
-  const [busy, setBusy] = useState(false);
-  const [refusal, setRefusal] = useState<string | null>(null);
+
+  /** Whether the window that opens the matter is showing. */
+  const [opening, setOpening] = useState(false);
 
   const ready = title.trim().length >= 3 && proposal.trim().length > 0 && direction !== null;
 
   async function submit() {
-    if (!ready || busy || !direction) return;
-    setBusy(true);
-    setRefusal(null);
-    try {
-      const created = await governance.openMatter({
+    if (!direction) throw new Error(t('raise.noDirection'));
+    const created = await governance.openMatter({
         boardId,
         title: title.trim(),
         proposal: proposal.trim(),
@@ -73,12 +72,8 @@ export default function RaiseMatter({ boardId }: { boardId: string }) {
          * rather than overstating it by any.
          */
         ...(arrivedAt ? { arrivedAt: new Date(arrivedAt + 'T00:00:00Z').toISOString() } : {}),
-      });
-      navigate(`/matters/${created.id}`);
-    } catch (error) {
-      setRefusal(error instanceof Refused ? error.message : String(error));
-      setBusy(false);
-    }
+    });
+    navigate(`/matters/${created.id}`);
   }
 
   if (!open) {
@@ -211,17 +206,29 @@ export default function RaiseMatter({ boardId }: { boardId: string }) {
         )}
       </Field>
 
-      {refusal && <p className="mt-2 text-note leading-relaxed text-breach">{refusal}</p>}
-
       <div className="mt-3 flex items-center gap-2">
         <Button
           type="button"
-          onClick={submit}
-          disabled={!ready || busy}
+          onClick={() => setOpening(true)}
+          disabled={!ready}
           className="rounded-xl shadow-ring px-3 py-1.5 text-note hover:bg-raised disabled:opacity-40"
         >
           {t('raise.submit')}
         </Button>
+
+        {/*
+          NO-AFTER: openMatter — shown, not announced. The press lands the
+          member on the matter it just opened.
+        */}
+        <Act
+          open={opening}
+          onClose={() => setOpening(false)}
+          title={t('raise.submit')}
+          does={t('wm.openMatter.does')}
+          means={t('wm.openMatter.means')}
+          label={t('raise.submit')}
+          perform={submit}
+        />
         <Button type="button" onClick={() => setOpen(false)} className="text-note text-muted hover:text-paper">
           {t('say.cancel')}
         </Button>

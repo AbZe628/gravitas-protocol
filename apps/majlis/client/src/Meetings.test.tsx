@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Meetings from './pages/Meetings.js';
 import { I18nProvider } from './lib/i18n.js';
@@ -195,6 +195,17 @@ describe('attendance is recorded, never assumed', () => {
     await waitFor(() => screen.getByRole('button', { name: /Record attendance/ }));
     fireEvent.click(screen.getByRole('button', { name: /Record attendance/ }));
 
+    /*
+     * The press opens the window that says what attendance is: the thing a
+     * quorum is counted from, read by anybody later checking the board was
+     * properly constituted. The act is the press inside it.
+     */
+    {
+      const w = await screen.findByRole('dialog');
+      expect(w.textContent).toContain('quorum is counted from');
+      fireEvent.click(within(w).getByRole('button', { name: /Record attendance/ }));
+    }
+
     await waitFor(() => expect(posted).toHaveLength(1));
     const body = posted[0].body as { attendance: { scholarId: string }[] };
     expect(body.attendance.map((a) => a.scholarId).sort()).toEqual(['member-a', 'member-b']);
@@ -208,6 +219,17 @@ describe('attendance is recorded, never assumed', () => {
 
     await waitFor(() => screen.getByRole('button', { name: /Record attendance/ }));
     fireEvent.click(screen.getByRole('button', { name: /Record attendance/ }));
+
+    /*
+     * The press opens the window that says what attendance is: the thing a
+     * quorum is counted from, read by anybody later checking the board was
+     * properly constituted. The act is the press inside it.
+     */
+    {
+      const w = await screen.findByRole('dialog');
+      expect(w.textContent).toContain('quorum is counted from');
+      fireEvent.click(within(w).getByRole('button', { name: /Record attendance/ }));
+    }
 
     await waitFor(() => expect(posted).toHaveLength(1));
     const body = posted[0].body as { attendance: { scholarId: string; note?: string }[] };

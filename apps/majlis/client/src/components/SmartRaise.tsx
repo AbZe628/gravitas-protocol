@@ -1,6 +1,7 @@
 import { useState } from 'react';
+import Act from './Act.js';
 import { useNavigate } from 'react-router-dom';
-import { Refused, governance } from '../lib/api.js';
+import { governance } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { Field } from './field.js';
 import { Button } from './Button';
@@ -69,17 +70,15 @@ export default function SmartRaise({ boardId }: { boardId: string }) {
   const [title, setTitle] = useState('');
   const [proposal, setProposal] = useState('');
   const [arrivedAt, setArrivedAt] = useState('');
-  const [busy, setBusy] = useState(false);
-  const [refusal, setRefusal] = useState<string | null>(null);
 
   const ready = title.trim().length >= 3 && proposal.trim().length > 0 && kind !== null;
 
+  /** Whether the window that opens the matter is showing. */
+  const [opening, setOpening] = useState(false);
+
   async function submit() {
-    if (!ready || busy || !kind) return;
-    setBusy(true);
-    setRefusal(null);
-    try {
-      const created = await governance.openMatter({
+    if (!kind) throw new Error(t('raise.noKind'));
+    const created = await governance.openMatter({
         boardId,
         title: title.trim(),
         proposal: proposal.trim(),
@@ -91,12 +90,8 @@ export default function SmartRaise({ boardId }: { boardId: string }) {
          * that admits it beats a confident wrong one.
          */
         ...(arrivedAt ? { arrivedAt: new Date(arrivedAt + 'T00:00:00Z').toISOString() } : {}),
-      });
-      navigate(`/matters/${created.id}`);
-    } catch (error) {
-      setRefusal(error instanceof Refused ? error.message : String(error));
-      setBusy(false);
-    }
+    });
+    navigate(`/matters/${created.id}`);
   }
 
   if (!open) {
@@ -211,12 +206,6 @@ export default function SmartRaise({ boardId }: { boardId: string }) {
             )}
           </Field>
 
-          {refusal && (
-            <p className="mb-3 rounded-xl shadow-ringbreach px-3 py-2 text-ui leading-relaxed text-breach">
-              {refusal}
-            </p>
-          )}
-
           {/*
             What the board does next, said before it is sent. A secretary
             pressing this wants to know whether they have finished or whether
@@ -227,12 +216,26 @@ export default function SmartRaise({ boardId }: { boardId: string }) {
           <div className="flex flex-wrap items-center gap-2">
             <Button
               type="button"
-              onClick={submit}
-              disabled={!ready || busy}
+              onClick={() => setOpening(true)}
+              disabled={!ready}
               className="rounded-xl bg-gradient-to-br from-lapissoft to-lapis px-4 py-2 text-ui font-semibold text-white shadow-act transition-colors hover:bg-lapis disabled:opacity-40"
             >
               {t('smart.put')}
             </Button>
+
+            {/*
+              NO-AFTER: openMatter — shown, not announced. The press lands the
+              member on the matter it just opened.
+            */}
+            <Act
+              open={opening}
+              onClose={() => setOpening(false)}
+              title={t('smart.put')}
+              does={t('wm.openMatter.does')}
+              means={t('wm.openMatter.means')}
+              label={t('smart.put')}
+              perform={submit}
+            />
             <Button
               type="button"
               onClick={() => setOpen(false)}

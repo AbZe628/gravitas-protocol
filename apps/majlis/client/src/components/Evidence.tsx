@@ -96,22 +96,23 @@ export default function Evidence({ matter, scholarId, canAttach, onChanged }: Pr
     }
   }
 
-  const submit = () =>
-    run(
-      () =>
-        governance.attachSource(matter.id, {
-          kind,
-          label: label.trim(),
-          ref: ref.trim(),
-          note: note.trim() || undefined,
-        }),
-      () => {
-        setLabel('');
-        setRef('');
-        setNote('');
-        setAdding(false);
-      },
+  /** Whether the window that attaches the source is showing. */
+  const [attaching, setAttaching] = useState(false);
+
+  async function submit() {
+    onChanged(
+      await governance.attachSource(matter.id, {
+        kind,
+        label: label.trim(),
+        ref: ref.trim(),
+        note: note.trim() || undefined,
+      }),
     );
+    setLabel('');
+    setRef('');
+    setNote('');
+    setAdding(false);
+  }
 
   const field = 'w-full rounded-xl bg-raised shadow-ring p-2 text-body outline-none';
 
@@ -144,6 +145,28 @@ export default function Evidence({ matter, scholarId, canAttach, onChanged }: Pr
         below asks for the kind, the title and where it is found, which is the
         dialog `N-90` describes, opened in place rather than over the screen.
       */}
+      {/*
+        A source is what an argument rests on, and putting one on a matter is
+        visible to the whole board at once. The words for this were written
+        when the rest of the acts got theirs; the window was not, and a
+        measure that looked at the file rather than the act did not notice.
+      */}
+      <Act
+        open={attaching}
+        onClose={() => setAttaching(false)}
+        title={t('evidence.add')}
+        does={t('wm.attach.does')}
+        means={t('wm.attach.means')}
+        label={t('evidence.add')}
+        perform={submit}
+        onDone={setJustDid}
+        after={{
+          did: t('wm.attach.did'),
+          means: t('wm.attach.didMeans'),
+          next: [{ label: t('wm.next.backToMatter'), says: t('wm.next.backToMatterSays') }],
+        }}
+      />
+
       <Act
         open={withdrawing !== null}
         onClose={() => setWithdrawing(null)}
@@ -365,7 +388,7 @@ export default function Evidence({ matter, scholarId, canAttach, onChanged }: Pr
             <Button
               type="button"
               disabled={busy || label.trim().length < 3 || ref.trim().length < 1}
-              onClick={submit}
+              onClick={() => setAttaching(true)}
               className="rounded-xl shadow-ring px-3 py-1.5 text-note hover:bg-raised disabled:opacity-40"
             >
               {t('evidence.attach')}

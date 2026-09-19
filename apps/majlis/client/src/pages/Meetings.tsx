@@ -107,7 +107,7 @@ function MeetingCard({
     }
   };
 
-  const saveAttendance = () => {
+  const saveAttendance = async () => {
     // Only members the board actually answered for. Sending an entry for
     // everybody would write down an absence nobody recorded.
     const attendance: Attendance[] = Object.entries(present).map(([scholarId, was]) => ({
@@ -115,7 +115,12 @@ function MeetingCard({
       present: was,
       note: notes[scholarId]?.trim() || undefined,
     }));
-    return run(() => oversight.recordAttendance(m.id, attendance));
+    /*
+     * Ne kroz run(): ona hvata odbijanje u svoje stanje, pa bi se prozor
+     * vratio uredno i javio uspjeh nad neuspjehom.
+     */
+    await oversight.recordAttendance(m.id, attendance);
+    onChanged();
   };
 
   return (
@@ -135,6 +140,27 @@ function MeetingCard({
           onClose={() => setJustDid(null)}
         />
       )}
+
+      {/*
+        Attendance is what a quorum is counted from, so this is read by
+        anybody later checking that the board was properly constituted that
+        day. It was a press that sent at once and said nothing.
+      */}
+      <Act
+        open={acting === 'attend'}
+        onClose={() => setActing(null)}
+        title={t('meet.saveAttendance')}
+        does={t('wm.attend.does')}
+        means={t('wm.attend.means')}
+        label={t('meet.saveAttendance')}
+        perform={saveAttendance}
+        onDone={setJustDid}
+        after={{
+          did: t('wm.attend.did'),
+          means: t('wm.attend.didMeans'),
+          next: [{ label: t('wm.next.minute'), says: t('wm.next.minuteSays') }],
+        }}
+      />
 
       <Act
         open={acting === 'minute'}
@@ -267,9 +293,8 @@ function MeetingCard({
                 ))}
                 <Button
                   type="button"
-                  disabled={busy}
-                  onClick={saveAttendance}
-                  className="rounded-xl shadow-ring px-3 py-1.5 text-ui text-muted hover:text-paper disabled:opacity-40"
+                  onClick={() => setActing('attend')}
+                  className="rounded-xl shadow-ring px-3 py-1.5 text-ui text-muted hover:text-paper"
                 >
                   {t('meet.saveAttendance')}
                 </Button>
