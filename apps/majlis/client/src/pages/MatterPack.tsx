@@ -508,9 +508,12 @@ export default function MatterPack() {
            * true yet, and claiming a failure in it was a lie the screen
            * told every member on the way in.
            */
-          <p className="rounded-card bg-raised/60 px-5 py-4 text-ui leading-relaxed text-muted shadow-ring">
-            {t(packFailed ? 'pack.unavailable' : 'common.loading')}
-          </p>
+          /*
+            Two different things, and they used to share one grey box.
+            Waiting passes by itself; failing to read does not, and the member
+            cannot tell which they are looking at unless the screen says so.
+          */
+          packFailed ? <ErrorText what={t('pack.what')} /> : <Loading />
         )}
       </div>
 

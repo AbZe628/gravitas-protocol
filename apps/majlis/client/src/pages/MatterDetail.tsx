@@ -1,3 +1,4 @@
+import { Nothing } from '../components/page.js';
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { api, type Matter } from '../lib/api.js';
@@ -126,9 +127,7 @@ export default function MatterDetail() {
             </div>
           </>
         ) : (
-          <p className="rounded-card bg-raised/60 px-5 py-4 text-ui leading-relaxed text-muted shadow-ring">
-            {t('doc.fatwaNotYet')}
-          </p>
+          <Nothing>{t('doc.fatwaNotYet')}</Nothing>
         )}
       </div>
 

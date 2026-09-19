@@ -1,3 +1,4 @@
+import { Nothing } from '../components/page.js';
 import { useEffect, useState } from 'react';
 import Act from '../components/Act.js';
 import AfterAct from '../components/AfterAct.js';
@@ -29,9 +30,7 @@ function Decided({ matters }: { matters: MatterSummary[] | null }) {
       </h2>
 
       {settled.length === 0 ? (
-        <p className="rounded-card bg-raised/60 px-5 py-4 text-ui leading-relaxed text-muted shadow-ring">
-          {t('decided.none')}
-        </p>
+        <Nothing>{t('decided.none')}</Nothing>
       ) : (
         <Rows>
           {settled.map((m) => (
