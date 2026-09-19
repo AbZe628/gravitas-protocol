@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
-import { oversight, type Matter, type SignedDocument } from '../lib/api.js';
+import Act from './Act.js';
+import AfterAct from './AfterAct.js';
+import { oversight, Refused, type Matter, type SignedDocument } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { useIdentity, mayVote } from '../lib/identity.js';
 import { Field } from './field.js';
@@ -54,8 +56,7 @@ export default function SignTheDocument({ matter }: { matter: Matter }) {
   const { identity } = useIdentity();
   const [doc, setDoc] = useState<SignedDocument | null>(null);
   const [note, setNote] = useState('');
-  const [busy, setBusy] = useState(false);
-  const [failed, setFailed] = useState<string | null>(null);
+
 
   /**
    * Whether signing with a device can be offered here.
@@ -65,6 +66,13 @@ export default function SignTheDocument({ matter }: { matter: Matter }) {
    * no means the control is absent rather than offered and refused.
    */
   const [withDevice, setWithDevice] = useState(false);
+  /** Which of the two windows is open, if either. */
+  const [signing, setSigning] = useState<'none' | 'own' | 'device'>('none');
+  const [justDid, setJustDid] = useState<{
+    did: string;
+    means: string;
+    next: readonly { label: string; to?: string; says?: string }[];
+  } | null>(null);
 
   const decided = SETTLED.includes(matter.status);
 
@@ -126,21 +134,13 @@ export default function SignTheDocument({ matter }: { matter: Matter }) {
   const canSign = mayVote(identity?.role);
 
   async function put() {
-    setBusy(true);
-    setFailed(null);
-    try {
-      // The proof is what this installation can honestly claim: the member is
-      // signed in under their own credential. A one-time code is offered only
-      // where one was actually sent, which nothing here does yet, so it is not
-      // an option a person can pick.
-      await oversight.sign(matter.id, 'their own sign-in', note.trim() || undefined);
-      setNote('');
-      setDoc(await oversight.document(matter.id));
-    } catch (e) {
-      setFailed(e instanceof Error ? e.message : t('sign.failed'));
-    } finally {
-      setBusy(false);
-    }
+    // The proof is what this installation can honestly claim: the member is
+    // signed in under their own credential. A one-time code is offered only
+    // where one was actually sent, which nothing here does yet, so it is not
+    // an option a person can pick.
+    await oversight.sign(matter.id, 'their own sign-in', note.trim() || undefined);
+    setNote('');
+    setDoc(await oversight.document(matter.id));
   }
 
   /**
@@ -153,27 +153,32 @@ export default function SignTheDocument({ matter }: { matter: Matter }) {
    * decision rather than whatever a page had in it.
    */
   async function putWithDevice() {
-    setBusy(true);
-    setFailed(null);
+    let answer;
     try {
       const request = await oversight.askToSign(matter.id);
-      const answer = await signWithDevice(request);
-
-      await oversight.sign(
-        matter.id,
-        'a device they enrolled, unlocked by its owner',
-        note.trim() || undefined,
-        answer,
-      );
-      setNote('');
-      setDoc(await oversight.document(matter.id));
+      answer = await signWithDevice(request);
     } catch (e) {
+      /*
+       * Walking away from the fingerprint prompt is not a fault and gets no
+       * red line — but nothing was signed, and the window has to say so
+       * rather than report a signature that does not exist.
+       */
       const refused = asRefusal(e);
-      // Walking away from the fingerprint prompt is not a failure.
-      setFailed(refused.code === 'cancelled' ? null : refused.message);
-    } finally {
-      setBusy(false);
+      throw new Refused(
+        refused.code,
+        refused.code === 'cancelled' ? t('wm.signDevice.cancelled') : refused.message,
+        0,
+      );
     }
+
+    await oversight.sign(
+      matter.id,
+      'a device they enrolled, unlocked by its owner',
+      note.trim() || undefined,
+      answer,
+    );
+    setNote('');
+    setDoc(await oversight.document(matter.id));
   }
 
   return (
@@ -261,40 +266,82 @@ export default function SignTheDocument({ matter }: { matter: Matter }) {
             {withDevice && (
               <Button
                 type="button"
-                onClick={putWithDevice}
-                disabled={busy}
+                onClick={() => setSigning('device')}
                 className="rounded-card bg-lapis px-6 py-3 text-body font-bold text-white shadow-act disabled:opacity-60"
               >
-                {busy ? t('sign.waiting') : t('sign.withDevice')}
+                {t('sign.withDevice')}
               </Button>
             )}
             <Button
               type="button"
-              onClick={put}
-              disabled={busy}
+              onClick={() => setSigning('own')}
               className={
                 withDevice
                   ? 'text-ui text-muted underline decoration-line underline-offset-4'
                   : 'rounded-card bg-lapis px-6 py-3 text-body font-bold text-white shadow-act disabled:opacity-60'
               }
             >
-              {withDevice
-                ? t('sign.withoutDevice')
-                : busy
-                  ? t('sign.signing')
-                  : t('sign.doIt')}
+              {withDevice ? t('sign.withoutDevice') : t('sign.doIt')}
             </Button>
           </div>
+
+          {/*
+            Two windows rather than one with a switch in it. What a signature
+            made by device proves is not what a signature made by sign-in
+            proves, and the sentence a member reads before pressing has to be
+            the true one for the press they are about to make.
+          */}
+          <Act
+            open={signing === 'device'}
+            onClose={() => setSigning('none')}
+            title={t('sign.withDevice')}
+            does={t('wm.signDevice.does')}
+            means={t('wm.signDevice.means')}
+            label={t('sign.withDevice')}
+            perform={putWithDevice}
+            onDone={setJustDid}
+            after={{
+              did: t('wm.sign.did'),
+              means: t('wm.signDevice.didMeans'),
+              next: [{ label: t('wm.next.theDocument'), says: t('wm.next.theDocumentSays') }],
+            }}
+          />
+
+          <Act
+            open={signing === 'own'}
+            onClose={() => setSigning('none')}
+            title={t('sign.doIt')}
+            does={t('wm.sign.does')}
+            means={t('wm.sign.means')}
+            label={t('sign.doIt')}
+            perform={put}
+            onDone={setJustDid}
+            after={{
+              did: t('wm.sign.did'),
+              means: t('wm.sign.didMeans'),
+              next: [{ label: t('wm.next.theDocument'), says: t('wm.next.theDocumentSays') }],
+            }}
+          />
           {withDevice && (
             <p className="mt-2 max-w-[62ch] text-note leading-relaxed text-muted">
               {t('sign.deviceMeans')}
             </p>
           )}
-          {failed && <p className="mt-2 text-ui text-breach">{failed}</p>}
         </div>
       )}
 
-      {canSign && current && (
+      {justDid && (
+        <div className="mt-5">
+          <AfterAct
+            did={justDid.did}
+            means={justDid.means}
+            next={justDid.next}
+            onClose={() => setJustDid(null)}
+          />
+        </div>
+      )}
+
+      {canSign && current && !justDid && (
         <p className="mt-5 text-ui text-settled">{t('sign.youHave')}</p>
       )}
 

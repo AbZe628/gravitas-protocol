@@ -11,6 +11,8 @@ import { useI18n } from '../lib/i18n.js';
 import { DateText } from './ui.js';
 import { Field, HEADING } from './field.js';
 import { Button } from './Button';
+import Act from './Act.js';
+import AfterAct from './AfterAct.js';
 
 /**
  * The devices this member signs with.
@@ -49,8 +51,14 @@ export default function YourDevices() {
 
   const [naming, setNaming] = useState(false);
   const [label, setLabel] = useState('');
-  const [busy, setBusy] = useState(false);
   const [refusal, setRefusal] = useState<string | null>(null);
+  /** The device about to be forgotten, and the window asking about it. */
+  const [forgetting, setForgetting] = useState<Device | null>(null);
+  const [justDid, setJustDid] = useState<{
+    did: string;
+    means: string;
+    next: readonly { label: string; to?: string; says?: string }[];
+  } | null>(null);
 
   useEffect(() => {
     let alive = true;
@@ -76,39 +84,34 @@ export default function YourDevices() {
     };
   }, []);
 
-  async function enrol(e: React.FormEvent) {
-    e.preventDefault();
-    if (busy || label.trim().length === 0) return;
-
-    setBusy(true);
-    setRefusal(null);
+  async function enrol() {
+    const named = label.trim();
     try {
       const request = await oversight.askToEnrol();
-      const answer = await enrolThisDevice(request, label.trim());
+      const answer = await enrolThisDevice(request, named);
       const kept = await oversight.enrolDevice(answer);
-
       setDevices((held) => [...(held ?? []), kept]);
       setLabel('');
-      setNaming(false);
     } catch (error) {
+      /*
+       * Closing the browser's own device prompt is not a fault and gets no
+       * red line — but it is not a success either. Thrown rather than
+       * swallowed, so the window says nothing was enrolled instead of saying
+       * something was.
+       */
       const refused = asRefusal(error);
-      // Walking away from the dialog is not a failure and does not get a
-      // red line. Everything else does.
-      setRefusal(refused.code === 'cancelled' ? null : refused.message);
-      if (refused.code === 'cancelled') setNaming(false);
-    } finally {
-      setBusy(false);
+      throw new Refused(
+        refused.code,
+        refused.code === 'cancelled' ? t('wm.enrol.cancelled') : refused.message,
+        /* Nothing HTTP happened: the device prompt is the browser's own. */
+        0,
+      );
     }
   }
 
   async function forget(id: string) {
-    setRefusal(null);
-    try {
-      await oversight.forgetDevice(id);
-      setDevices((held) => (held ?? []).filter((d) => d.id !== id));
-    } catch (error) {
-      setRefusal(error instanceof Refused ? error.message : String(error));
-    }
+    await oversight.forgetDevice(id);
+    setDevices((held) => (held ?? []).filter((d) => d.id !== id));
   }
 
   const BOX = 'w-full rounded-xl bg-raised px-3 py-2.5 text-body shadow-ring outline-none';
@@ -141,7 +144,7 @@ export default function YourDevices() {
               </span>
               <Button
                 type="button"
-                onClick={() => void forget(d.id)}
+                onClick={() => setForgetting(d)}
                 className="ms-auto text-note text-muted underline decoration-line underline-offset-4"
               >
                 {t('devices.forget')}
@@ -171,38 +174,63 @@ export default function YourDevices() {
         </Button>
       )}
 
-      {can === 'yes' && naming && (
-        <form onSubmit={enrol} className="rounded-card bg-ink/70 px-4 py-4 shadow-ring">
-          <Field label={t('devices.label')} help={t('devices.labelHelp')} headingClass={HEADING}>
-            {(attrs) => (
-              <input
-                {...attrs}
-                value={label}
-                onChange={(e) => setLabel(e.target.value)}
-                maxLength={120}
-                className={BOX}
-                required
-              />
-            )}
-          </Field>
+      <Act
+        open={can === 'yes' && naming}
+        onClose={() => setNaming(false)}
+        title={t('devices.enrol')}
+        does={t('wm.enrol.does')}
+        means={t('wm.enrol.means')}
+        label={t('devices.enrolThis')}
+        perform={enrol}
+        onDone={setJustDid}
+        after={{
+          did: t('wm.enrol.did'),
+          means: t('wm.enrol.didMeans'),
+          next: [{ label: t('wm.next.devices'), says: t('wm.next.devicesSays') }],
+        }}
+      >
+        <Field label={t('devices.label')} help={t('devices.labelHelp')} headingClass={HEADING}>
+          {(attrs) => (
+            <input
+              {...attrs}
+              value={label}
+              onChange={(e) => setLabel(e.target.value)}
+              maxLength={120}
+              className={BOX}
+              required
+            />
+          )}
+        </Field>
+      </Act>
 
-          <div className="mt-4 flex flex-wrap items-center gap-3">
-            <Button
-              type="submit"
-              disabled={busy || label.trim().length === 0}
-              className="rounded-xl bg-lapis px-5 py-2.5 text-ui font-semibold text-white shadow-act disabled:opacity-40"
-            >
-              {busy ? t('devices.waiting') : t('devices.enrolThis')}
-            </Button>
-            <Button
-              type="button"
-              onClick={() => setNaming(false)}
-              className="text-ui text-muted underline decoration-line underline-offset-4"
-            >
-              {t('common.cancel')}
-            </Button>
-          </div>
-        </form>
+      <Act
+        open={forgetting !== null}
+        onClose={() => setForgetting(null)}
+        title={t('devices.forget')}
+        does={t('wm.forget.does')}
+        means={t('wm.forget.means')}
+        label={t('devices.forget')}
+        grave
+        perform={() => forget(forgetting!.id)}
+        onDone={setJustDid}
+        after={{
+          did: t('wm.forget.did'),
+          means: t('wm.forget.didMeans'),
+          next: [{ label: t('wm.next.devices'), says: t('wm.next.devicesSays') }],
+        }}
+      >
+        <p className="max-w-[58ch] text-ui leading-relaxed text-sand">{forgetting?.label}</p>
+      </Act>
+
+      {justDid && (
+        <div className="mb-4">
+          <AfterAct
+            did={justDid.did}
+            means={justDid.means}
+            next={justDid.next}
+            onClose={() => setJustDid(null)}
+          />
+        </div>
       )}
 
       {/*
