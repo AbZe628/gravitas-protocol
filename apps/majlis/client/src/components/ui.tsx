@@ -129,17 +129,40 @@ export function Loading() {
 }
 
 /**
- * A failure, said out loud and at once.
+ * A failure, said out loud, and said what it means.
+ *
+ * ── what this replaced ────────────────────────────────────────────────────
+ *
+ * Three words — *Could not load.* — on every screen in the application, in
+ * every kind of failure. Measured across twenty screens with the server
+ * returning 500 to everything: the same three words each time.
+ *
+ * They say what failed and nothing else. A member who sees them on the
+ * register can reasonably read *the register is empty*; on a matter, *this
+ * matter is gone*. The record is untouched and the screen does not say so.
+ *
+ * ── the three things a failure has to say ─────────────────────────────────
+ *
+ * What failed — reading, not writing. What it does not mean — the record
+ * stands, nothing was lost. What to do — try again, and what it means if
+ * trying again does not help.
  *
  * `role="alert"` rather than `status`: a refusal interrupts, because the
- * member may already have moved on believing the thing went through. This is
- * the one announcement on the screen that is allowed to cut across.
+ * member may already have moved on believing the thing went through. It is
+ * the one announcement on a screen allowed to cut across.
  */
-export function ErrorText() {
+export function ErrorText({ what }: { what?: string } = {}) {
   const { t } = useI18n();
   return (
-    <div role="alert" className="py-10 text-center text-sm text-breach">
-      {t('common.error')}
+    <div
+      role="alert"
+      className="mx-auto max-w-[56ch] rounded-card bg-breachtint px-5 py-4 text-ui leading-relaxed text-breach shadow-ringbreach"
+    >
+      <p className="font-semibold">
+        {what ? `${t('common.error.what')} ${what}.` : t('common.error')}
+      </p>
+      <p className="mt-1.5 text-sand">{t('common.error.means')}</p>
+      <p className="mt-1.5 text-muted">{t('common.error.todo')}</p>
     </div>
   );
 }

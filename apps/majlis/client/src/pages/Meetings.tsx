@@ -387,7 +387,18 @@ export default function Meetings() {
         }
         there.arrived();
         setData(d);
-        return api.board(d.boardId).then(setBoard).catch(() => undefined);
+        /*
+         * Prihvati odbor samo ako ima clanove kao niz.
+         *
+         * `board ?` nize u kodu izgleda kao provjera i nije: prazan niz je
+         * istinit, pa prodje, a `board.members` je tada `undefined` i `.map`
+         * skine cijelo stablo. Izmjereno: bijela stranica bez ijedne rijeci
+         * kad server vrati 200 pogresnog oblika.
+         */
+        return api
+          .board(d.boardId)
+          .then((got) => setBoard(got && Array.isArray(got.members) ? got : null))
+          .catch(() => undefined);
       })
       .catch(() => there.lost(setFailed));
 
