@@ -417,11 +417,34 @@ function Condition({
                 ))}
               </div>
 
+              {/*
+                NO-WINDOW: recordFinding — and why.
+
+                Every other act in this application says what it means in a
+                window before it happens. This one says it here instead, and
+                that is a decision rather than an omission.
+
+                A finding is the main loop: a member answers six to twenty
+                conditions in a row. A window in front of each one is six to
+                twenty confirmations for one piece of work, and a person
+                pressing through twenty of them stops reading what they say —
+                which is worse than having none, because then the window is
+                lying about somebody having read it.
+
+                So the telling is here, above the box, where it is visible
+                every time without costing a press. What follows is the next
+                condition, which the step strip already shows, and when the
+                last one is answered the screen says the vote can open.
+              */}
+              <p className="mb-2 max-w-[58ch] text-note leading-relaxed text-muted">
+                {t('wm.finding.means')}
+              </p>
+
               <textarea
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
                 placeholder={t('chk.reasonHint')}
-            aria-label={t('chk.reasonHint')}
+                aria-label={t('chk.reasonHint')}
                 className="mb-2 h-20 w-full rounded-xl shadow-ring bg-raised px-3 py-2 text-body"
               />
 

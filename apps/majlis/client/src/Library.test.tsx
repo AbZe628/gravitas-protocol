@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent, within } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import Library from './pages/Library.js';
 import StructureDetail from './pages/StructureDetail.js';
@@ -220,6 +220,20 @@ describe('it will not adopt without a decision', () => {
 });
 
 describe('taking a shape, and ruling against one', () => {
+  /**
+   * Press it on the page, then press it in the window.
+   *
+   * Taking a shape changes what every matter of this kind is judged against
+   * from that moment on, so it goes through the window that says so. The
+   * window is the act; the button on the page only opens it.
+   */
+  const through = async (name: RegExp, says: RegExp) => {
+    fireEvent.click(screen.getByRole('button', { name }));
+    const window_ = await screen.findByRole('dialog');
+    expect(window_.textContent).toMatch(says);
+    fireEvent.click(within(window_).getByRole('button', { name }));
+  };
+
   const openFirst = async () => {
     matters = [{ id: 'm-live', title: 'A ruling in force', status: 'in_force' }];
     stub(library());
@@ -232,7 +246,7 @@ describe('taking a shape, and ruling against one', () => {
 
   it('sends the shape, the board and the decision it was made under', async () => {
     await openFirst();
-    fireEvent.click(screen.getByRole('button', { name: /Take it as ours/ }));
+    await through(/Take it as ours/, /judged against these conditions/);
 
     await waitFor(() => expect(posted).toHaveLength(1));
     expect(posted[0].url).toContain('/api/adoptions');
@@ -249,7 +263,7 @@ describe('taking a shape, and ruling against one', () => {
     fireEvent.change(screen.getByRole('textbox'), {
       target: { value: 'This institution does not use commodity murabaha.' },
     });
-    fireEvent.click(screen.getByRole('button', { name: /Rule against it/ }));
+    await through(/Rule against it/, /nobody reopens it every few months/);
 
     await waitFor(() => expect(posted).toHaveLength(1));
     expect(posted[0].body).toMatchObject({
@@ -288,9 +302,17 @@ describe('taking a shape, and ruling against one', () => {
     fireEvent.click(screen.getByRole('button', { name: /Take this shape/ }));
     await waitFor(() => screen.getByRole('button', { name: /Rule against it/ }));
     fireEvent.change(screen.getByRole('combobox'), { target: { value: 'm-live' } });
-    fireEvent.click(screen.getByRole('button', { name: /Rule against it/ }));
+    await through(/Rule against it/, /nobody reopens it every few months/);
 
-    await waitFor(() => expect(screen.getByText(/needs the board’s reason/)).toBeInTheDocument());
+    /*
+     * The refusal belongs in the window, where the member is looking, and the
+     * window stays open around it. Drawn behind it, on the page, it would sit
+     * under whatever the member had just been told.
+     */
+    const window_ = await screen.findByRole('dialog');
+    await waitFor(() =>
+      expect(within(window_).getByText(/needs the board’s reason/)).toBeInTheDocument(),
+    );
   });
 
   it('says that rewording a condition belongs elsewhere', async () => {

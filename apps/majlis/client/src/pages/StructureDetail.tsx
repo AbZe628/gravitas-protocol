@@ -16,6 +16,7 @@ import HowItChanged from '../components/HowItChanged.js';
 import { ErrorText, Loading, Section } from '../components/ui.js';
 import { State, type Tone } from '../components/kit.js';
 import { Button } from '../components/Button';
+import Act from '../components/Act.js';
 
 /**
  * One contract shape, as this board holds it.
@@ -67,8 +68,8 @@ export default function StructureDetail({ structureId }: { structureId?: string 
   const [open, setOpen] = useState(false);
   const [matterId, setMatterId] = useState('');
   const [reason, setReason] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
+  /** Which of the two windows is open, if either. */
+  const [taking, setTaking] = useState<'none' | 'adopted' | 'declined'>('none');
   /**
    * What was just done, so the panel can say what follows from it.
    *
@@ -103,26 +104,22 @@ export default function StructureDetail({ structureId }: { structureId?: string 
   const untouched = held.source === 'draft' && !held.declined;
 
   async function take(standing: 'adopted' | 'declined') {
-    if (!held) return;
-    setBusy(true);
-    setError(null);
-    try {
-      await oversight.adopt({
-        structureId: held.structure.id,
-        boardId: data!.boardId,
-        standing,
-        matterId,
-        amendments: reason.trim() ? [reason.trim()] : undefined,
-        supersedes: held.adoption?.id ?? null,
-      });
-      setOpen(false);
-      setJust(standing);
-      await load();
-    } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
-    } finally {
-      setBusy(false);
-    }
+    /*
+     * No guard that returns quietly. The window calling this has already
+     * drawn what the shape is; returning as though it worked would have it
+     * announce a change to what the board judges by that never happened.
+     */
+    await oversight.adopt({
+      structureId: held!.structure.id,
+      boardId: data!.boardId,
+      standing,
+      matterId,
+      amendments: reason.trim() ? [reason.trim()] : undefined,
+      supersedes: held!.adoption?.id ?? null,
+    });
+    setOpen(false);
+    setJust(standing);
+    await load();
   }
 
   /**
@@ -219,35 +216,53 @@ export default function StructureDetail({ structureId }: { structureId?: string 
                 />
               </label>
 
-              {error && (
-                <p className="mb-3 rounded-xl bg-breachtint px-3.5 py-2.5 text-ui leading-relaxed text-breach shadow-ringbreach">
-                  {error}
-                </p>
-              )}
+              {/*
+                Two windows, because the two acts do not mean the same thing.
+                Taking a shape changes what every matter of this kind is
+                judged by from now on; declining it records that the board
+                looked and said no, so nobody reopens it every few months.
+              */}
+              <Act
+                open={taking === 'adopted'}
+                onClose={() => setTaking('none')}
+                title={t('adopt.confirm')}
+                does={t('wm.adopt.does')}
+                means={t('wm.adopt.means')}
+                label={t('adopt.confirm')}
+                perform={() => take('adopted')}
+              />
+
+              <Act
+                open={taking === 'declined'}
+                onClose={() => setTaking('none')}
+                title={t('adopt.decline')}
+                does={t('wm.declineShape.does')}
+                means={t('wm.declineShape.means')}
+                label={t('adopt.decline')}
+                grave
+                perform={() => take('declined')}
+              />
 
               <div className="flex flex-col gap-2">
                 <Button
                   type="button"
-                  disabled={busy || !matterId}
-                  onClick={() => take('adopted')}
+                  disabled={!matterId}
+                  onClick={() => setTaking('adopted')}
                   className="rounded-xl bg-lapis px-4 py-2 text-ui font-semibold text-white shadow-act disabled:opacity-40"
                 >
                   {t('adopt.confirm')}
                 </Button>
                 <Button
                   type="button"
-                  disabled={busy || !matterId}
-                  onClick={() => take('declined')}
+                  disabled={!matterId}
+                  onClick={() => setTaking('declined')}
                   className="rounded-xl bg-raised px-4 py-2 text-ui font-medium text-breach shadow-ringbreach disabled:opacity-40"
                 >
                   {t('adopt.decline')}
                 </Button>
                 <Button
                   type="button"
-                  onClick={() => {
-                    setOpen(false);
-                    setError(null);
-                  }}
+                  onClick={() => setOpen(false)}
                   className="px-4 py-1 text-ui text-muted"
                 >
                   {t('common.cancel')}
