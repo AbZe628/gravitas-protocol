@@ -227,9 +227,21 @@ export function Gaps({ items }: { items: readonly string[] }) {
  * nothing here, when what is true is that nothing has happened yet. The two
  * read identically and only one of them is correct.
  */
+/**
+ * Nothing here, and why — announced, not just drawn.
+ *
+ * `role="status"` and not `alert`: an empty list is news, and worth saying,
+ * but it is not a failure and does not deserve to interrupt. What goes inside
+ * is never the words *no data*; it is why it is empty and what to do, which
+ * is the rule this component exists to carry.
+ */
 export function Nothing({ children }: { children: ReactNode }) {
   return (
-    <p className="rounded-card bg-raised/60 px-5 py-4 text-ui leading-relaxed text-muted shadow-ring">
+    <p
+      role="status"
+      aria-live="polite"
+      className="rounded-card bg-raised/60 px-5 py-4 text-ui leading-relaxed text-muted shadow-ring"
+    >
       {children}
     </p>
   );

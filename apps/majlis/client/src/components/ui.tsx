@@ -103,12 +103,43 @@ export function DateText({ iso }: { iso: string | null }) {
   );
 }
 
+/**
+ * Waiting, said out loud.
+ *
+ * `role="status"` with `aria-live="polite"` means a screen reader announces
+ * this when it arrives, and waits for a gap rather than cutting the member
+ * off mid-sentence. `aria-busy` says the region is not finished, so a reader
+ * that would otherwise read the half-built screen holds off.
+ *
+ * Before this, a member working by ear pressed something and heard nothing at
+ * all: not while it waited, not when it failed, not when it arrived.
+ */
 export function Loading() {
   const { t } = useI18n();
-  return <div className="py-10 text-center text-sm text-muted">{t('common.loading')}</div>;
+  return (
+    <div
+      role="status"
+      aria-live="polite"
+      aria-busy="true"
+      className="py-10 text-center text-sm text-muted"
+    >
+      {t('common.loading')}
+    </div>
+  );
 }
 
+/**
+ * A failure, said out loud and at once.
+ *
+ * `role="alert"` rather than `status`: a refusal interrupts, because the
+ * member may already have moved on believing the thing went through. This is
+ * the one announcement on the screen that is allowed to cut across.
+ */
 export function ErrorText() {
   const { t } = useI18n();
-  return <div className="py-10 text-center text-sm text-breach">{t('common.error')}</div>;
+  return (
+    <div role="alert" className="py-10 text-center text-sm text-breach">
+      {t('common.error')}
+    </div>
+  );
 }

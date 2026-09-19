@@ -172,7 +172,7 @@ export default function MatterPack() {
 
   /** Which part the act points at, so that one is drawn open. */
   const pointingAt = doing.act
-    ? (doing.says === t('doing.readyToVote') || matter.status === 'voting'
+    ? (doing.says === t('now.readyToVote') || matter.status === 'voting'
         ? 'vote'
         : matter.status === 'in_force'
           ? 'sign'
