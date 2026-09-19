@@ -327,6 +327,15 @@ describe('what the interface sends', () => {
     );
     fireEvent.click(screen.getByText('Record my position'));
 
+    /*
+     * The press opens the window that says what a vote is: cast under the
+     * member's name, not edited afterwards, and binding once the threshold
+     * is reached. The act is the press inside it.
+     */
+    const window_ = await screen.findByRole('dialog');
+    expect(window_.textContent).toContain('not edited afterwards');
+    fireEvent.click(within(window_).getByRole('button', { name: /Record my position/ }));
+
     await waitFor(() => expect(posted.length).toBeGreaterThan(0));
     expect(posted[0].body).not.toHaveProperty('scholarId');
   });

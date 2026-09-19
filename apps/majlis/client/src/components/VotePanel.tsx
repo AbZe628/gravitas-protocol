@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Refused, governance, type Matter, type Tally } from '../lib/api.js';
+import { governance, type Matter, type Tally } from '../lib/api.js';
 import { useRevision } from '../lib/pulse.js';
 import Act from './Act.js';
+import AfterAct from './AfterAct.js';
 import { useI18n } from '../lib/i18n.js';
 import Dictate from './Dictate.js';
 import { Card } from './ui.js';
@@ -69,11 +70,6 @@ function useCountdown(iso: string | null): { text: string; elapsed: boolean } | 
   };
 }
 
-function Refusal({ message }: { message: string | null }) {
-  if (!message) return null;
-  return <p className="mt-2 text-note leading-relaxed text-breach">{message}</p>;
-}
-
 export default function VotePanel({
   matter,
   role,
@@ -84,8 +80,15 @@ export default function VotePanel({
 }: Props) {
   const { t } = useI18n();
   const [tally, setTally] = useState<Tally | null>(null);
-  const [busy, setBusy] = useState(false);
-  const [refusal, setRefusal] = useState<string | null>(null);
+  /*
+   * Zauzetost je presla u prozor.
+   *
+   * `Act` sam drzi je li cin u letu, odbija drugi pritisak i pise
+   * `aria-busy`. Ovdje je ostala samo kao uslov na dugmadima koja prozor
+   * otvaraju, a ta se ne smiju gasiti dok se ceka — gase se sama time sto
+   * je prozor preko njih.
+   */
+  const busy = false;
   const [position, setPosition] = useState<'for' | 'against' | 'abstain'>('for');
   const [reason, setReason] = useState('');
   const [objecting, setObjecting] = useState(false);
@@ -129,20 +132,21 @@ export default function VotePanel({
       .catch(() => setTally(null));
   }, [matter.id, matter.status, matter.reasoning?.length, showsTally, revision]);
 
-  async function run(action: () => Promise<Matter>) {
-    if (busy) return;
-    setBusy(true);
-    setRefusal(null);
-    try {
-      onChanged(await action());
-      setReason('');
-      setObjecting(false);
-    } catch (error) {
-      setRefusal(error instanceof Refused ? error.message : String(error));
-    } finally {
-      setBusy(false);
-    }
-  }
+  /** Which of the three windows is open, if any. */
+  const [saying, setSaying] = useState<'none' | 'vote' | 'object' | 'reopen'>('none');
+  /*
+   * What the act did, held above the cards rather than inside one.
+   *
+   * A vote changes the matter's status and this panel draws differently at
+   * every status — the voting card is gone the moment the vote lands. The
+   * answer has to live where the act cannot take it down with it.
+   */
+  const [justDid, setJustDid] = useState<{
+    did: string;
+    means: string;
+    next: readonly { label: string; to?: string; says?: string }[];
+  } | null>(null);
+
 
   const button = (label: string, onClick: () => void, tone: 'plain' | 'warn' = 'plain') => (
     <Button
@@ -162,6 +166,15 @@ export default function VotePanel({
 
   return (
     <div className="space-y-4">
+      {justDid && (
+        <AfterAct
+          did={justDid.did}
+          means={justDid.means}
+          next={justDid.next}
+          onClose={() => setJustDid(null)}
+        />
+      )}
+
       {showsTally && tally && (
         <div className="rounded-sheet bg-raised px-6 py-5 shadow-card">
           <div className="mb-4 flex flex-wrap items-baseline gap-x-3 gap-y-1">
@@ -281,7 +294,6 @@ export default function VotePanel({
             onText={(said) => setReason((was) => (was.trim() ? `${was.trim()} ${said}` : said))}
           />
 
-          <Refusal message={refusal} />
 
           {/* What is missing, while it is missing. */}
           {reason.trim().length < MIN_REASON && (
@@ -294,11 +306,35 @@ export default function VotePanel({
             <Button
               type="button"
               disabled={busy || reason.trim().length < MIN_REASON}
-              onClick={() => run(() => governance.vote(matter.id, position, reason.trim()))}
+              onClick={() => setSaying('vote')}
               className="h-12 w-full rounded-xl bg-gradient-to-br from-lapissoft to-lapis text-body font-bold text-white shadow-act transition-all hover:brightness-110 active:scale-[0.99] disabled:opacity-40"
             >
               {t('vote.submit')}
             </Button>
+
+            {/*
+              The heaviest press in the application, and it had no sentence in
+              front of it. A vote goes into the record under the member's name
+              and is not edited afterwards.
+            */}
+            <Act
+              open={saying === 'vote'}
+              onClose={() => setSaying('none')}
+              title={t('vote.submit')}
+              does={t('wm.vote.does')}
+              means={t('wm.vote.means')}
+              label={t('vote.submit')}
+              perform={async () => {
+                onChanged(await governance.vote(matter.id, position, reason.trim()));
+                setReason('');
+              }}
+              onDone={setJustDid}
+              after={{
+                did: t('wm.vote.did'),
+                means: t('wm.vote.didMeans'),
+                next: [{ label: t('wm.next.backToMatter'), says: t('wm.next.backToMatterSays') }],
+              }}
+            />
           </div>
         </Card>
       )}
@@ -319,16 +355,41 @@ export default function VotePanel({
             rows={3}
             className="w-full resize-y rounded-xl shadow-ring bg-raised p-2 text-body leading-relaxed outline-none"
           />
-          <Refusal message={refusal} />
           <div className="mt-2 flex gap-2">
             <Button
               type="button"
               disabled={busy || reason.trim().length < MIN_REASON}
-              onClick={() => run(() => governance.object(matter.id, reason.trim()))}
+              onClick={() => setSaying('object')}
               className="rounded-xl bg-raised px-4 py-2 text-ui font-medium text-breach shadow-ringbreach disabled:opacity-40"
             >
               {t('object.submit')}
             </Button>
+
+            {/*
+              An objection is not a note of disagreement. It stops the clock:
+              the ratification window halts and the matter waits on the board
+              again, which everyone can see.
+            */}
+            <Act
+              open={saying === 'object'}
+              onClose={() => setSaying('none')}
+              title={t('object.submit')}
+              does={t('wm.object.does')}
+              means={t('wm.object.means')}
+              label={t('object.submit')}
+              grave
+              perform={async () => {
+                onChanged(await governance.object(matter.id, reason.trim()));
+                setReason('');
+                setObjecting(false);
+              }}
+              onDone={setJustDid}
+              after={{
+                did: t('wm.object.did'),
+                means: t('wm.object.didMeans'),
+                next: [{ label: t('wm.next.backToMatter'), says: t('wm.next.backToMatterSays') }],
+              }}
+            />
             <Button type="button" onClick={() => setObjecting(false)} className="text-note text-muted hover:text-paper">
               {t('say.cancel')}
             </Button>
@@ -348,16 +409,40 @@ export default function VotePanel({
             rows={3}
             className="w-full resize-y rounded-xl shadow-ring bg-raised p-2 text-body leading-relaxed outline-none"
           />
-          <Refusal message={refusal} />
           <div className="mt-2 flex gap-2">
             <Button
               type="button"
               disabled={busy || reason.trim().length < MIN_REASON}
-              onClick={() => run(() => governance.reopen(matter.id, reason.trim()))}
+              onClick={() => setSaying('reopen')}
               className="rounded-xl shadow-ring px-3 py-1.5 text-note hover:bg-raised disabled:opacity-40"
             >
               {t('reopen.submit')}
             </Button>
+
+            {/*
+              An open vote going back to discussion. Votes already cast stay
+              in the record and are not deleted; the board is being asked to
+              read further before it decides.
+            */}
+            <Act
+              open={saying === 'reopen'}
+              onClose={() => setSaying('none')}
+              title={t('reopen.submit')}
+              does={t('wm.reopen.does')}
+              means={t('wm.reopen.means')}
+              label={t('reopen.submit')}
+              grave
+              perform={async () => {
+                onChanged(await governance.reopen(matter.id, reason.trim()));
+                setReason('');
+              }}
+              onDone={setJustDid}
+              after={{
+                did: t('wm.reopen.did'),
+                means: t('wm.reopen.didMeans'),
+                next: [{ label: t('wm.next.backToMatter'), says: t('wm.next.backToMatterSays') }],
+              }}
+            />
             <Button type="button" onClick={() => setReopening(false)} className="text-note text-muted hover:text-paper">
               {t('say.cancel')}
             </Button>
@@ -411,8 +496,6 @@ export default function VotePanel({
         {['draft', 'deliberation', 'voting', 'timelock'].includes(matter.status) && deliberator &&
           button(t('action.withdraw'), () => setActing('withdraw'), 'warn')}
       </div>
-
-      {!objecting && !reopening && matter.status !== 'voting' && <Refusal message={refusal} />}
 
       {/*
         ── the five acts that used to happen in silence ──────────────────────
