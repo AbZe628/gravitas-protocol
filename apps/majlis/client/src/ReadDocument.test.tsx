@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent, within } from '@testing-library/react';
 import ReadDocument from './components/ReadDocument.js';
 import { I18nProvider } from './lib/i18n.js';
 
@@ -96,12 +96,24 @@ function show(onConfirm = vi.fn()) {
   return onConfirm;
 }
 
-/** Open the panel, pick the document, read it. */
+/**
+ * Open the panel, pick the document, read it — through the window.
+ *
+ * The press opens the window that says what this is and is not: a list of
+ * fields with numbers in it, which looks like an answer, recorded nowhere
+ * until a member confirms each line. The act is the press inside it, and the
+ * sentence is checked here so these tests cannot pass through a window that
+ * says nothing.
+ */
 async function readIt() {
   fireEvent.click(await screen.findByRole('button', { name: /Read the figures from a document/ }));
   await waitFor(() => expect(screen.getByRole('combobox')).toBeInTheDocument());
   fireEvent.change(screen.getByRole('combobox'), { target: { value: 's1' } });
   fireEvent.click(screen.getByRole('button', { name: /^Read it$/ }));
+
+  const window_ = await screen.findByRole('dialog');
+  expect(window_.textContent).toContain('looks like an answer and is not');
+  fireEvent.click(within(window_).getByRole('button', { name: /^Read it$/ }));
 }
 
 afterEach(() => vi.unstubAllGlobals());

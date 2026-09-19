@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
+import Act from './Act.js';
 import { api, oversight, type Asset, type RecordInput } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
-import { Refusal, Text } from './calc.js';
+import { Text } from './calc.js';
 import { useWorkedOutFor } from '../lib/workedOutFor.js';
 import { Button } from './Button';
 
@@ -59,8 +60,6 @@ export default function RecordCalculation({
   const [assets, setAssets] = useState<Asset[]>([]);
   const [meaning, setMeaning] = useState<string | null>(null);
   const [done, setDone] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     // The sentence about what recording means, from the server, before the
@@ -78,19 +77,19 @@ export default function RecordCalculation({
     }
   }, [wantsHolding]);
 
-  async function save() {
-    setBusy(true);
-    setError(null);
-    try {
-      const boards = await api.boards();
-      if (!boards.length) throw new Error(t('noteCalc.noBoard'));
+  /** Whether the window that records the figure is open. */
+  const [recording, setRecording] = useState(false);
 
-      const saved = await oversight.recordComputation({
-        ...input,
-        boardId: boards[0].id,
-        assetId: wantsHolding ? assetId || null : null,
-        periodFrom: from,
-        periodTo: to,
+  async function save() {
+    const boards = await api.boards();
+    if (!boards.length) throw new Error(t('noteCalc.noBoard'));
+
+    const saved = await oversight.recordComputation({
+      ...input,
+      boardId: boards[0].id,
+      assetId: wantsHolding ? assetId || null : null,
+      periodFrom: from,
+      periodTo: to,
         /*
           Which question this answers, where it was opened from one.
 
@@ -99,17 +98,12 @@ export default function RecordCalculation({
           about, and the step it came from showed no sign of it. Null at the
           workbench, which is honest: that figure is not for anything yet.
         */
-        forMatterId: forStep?.matterId ?? null,
-        forConditionId: forStep?.conditionId ?? null,
-      });
-      setDone(saved.computation.id);
-      onRecorded?.(saved.computation.id);
-      forStep?.onRecorded?.(saved.computation.id);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
-    } finally {
-      setBusy(false);
-    }
+      forMatterId: forStep?.matterId ?? null,
+      forConditionId: forStep?.conditionId ?? null,
+    });
+    setDone(saved.computation.id);
+    onRecorded?.(saved.computation.id);
+    forStep?.onRecorded?.(saved.computation.id);
   }
 
   // Recorded. The offer to record it goes, so the same figure is not noted
@@ -170,24 +164,41 @@ export default function RecordCalculation({
         </label>
       )}
 
-      {/* The refusal in the server's words: it says why, and a border cannot. */}
-      {error && <Refusal>{error}</Refusal>}
+      {/*
+        Worked here, or recorded against the condition — the difference this
+        window exists to make plain. A scholar who works a figure out and
+        assumes it was filed has been misled by the interface; this is the
+        press that files it, and it says so before it happens.
+      */}
+      {/*
+        NO-AFTER: recordComputation — shown, not announced.
+
+        The offer to record it goes, and in its place the screen says it is in
+        the record and links to where it now stands. That is the answer, drawn
+        where the button was, and the same figure cannot be recorded twice by
+        pressing again.
+      */}
+      <Act
+        open={recording}
+        onClose={() => setRecording(false)}
+        title={t('noteCalc.save')}
+        does={t('wm.recordCalc.does')}
+        means={t('wm.recordCalc.means')}
+        label={t('noteCalc.save')}
+        perform={save}
+      />
 
       <div className="flex gap-2">
         <Button
           type="button"
-          disabled={busy}
-          onClick={save}
-          className="rounded-xl bg-gradient-to-br from-lapissoft to-lapis px-4 py-2 text-ui font-semibold text-white shadow-act transition-colors hover:bg-lapis disabled:opacity-50"
+          onClick={() => setRecording(true)}
+          className="rounded-xl bg-gradient-to-br from-lapissoft to-lapis px-4 py-2 text-ui font-semibold text-white shadow-act transition-colors hover:bg-lapis"
         >
           {t('noteCalc.save')}
         </Button>
         <Button
           type="button"
-          onClick={() => {
-            setOpen(false);
-            setError(null);
-          }}
+          onClick={() => setOpen(false)}
           className="rounded-xl shadow-ring px-3 py-1.5 text-ui text-muted"
         >
           {t('common.cancel')}

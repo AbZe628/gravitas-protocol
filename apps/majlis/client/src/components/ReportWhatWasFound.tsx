@@ -1,3 +1,4 @@
+import Act from './Act.js';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { oversight, type Examination } from '../lib/api.js';
@@ -48,8 +49,9 @@ export default function ReportWhatWasFound({
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState('');
   const [report, setReport] = useState('');
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+
+  /** Whether the window that files the breach is open. */
+  const [filing, setFiling] = useState(false);
 
   if (!canReport || failed.length === 0) return null;
 
@@ -69,23 +71,15 @@ export default function ReportWhatWasFound({
   }
 
   async function send() {
-    setBusy(true);
-    setError(null);
-    try {
-      const made = await oversight.report({
-        boardId: e.boardId,
-        // The examination is the reference, so the board can find what this
-        // came from without anybody writing a cross-reference by hand.
-        reference: e.id,
-        title,
-        report,
-      });
-      navigate(`/incidents/${made.id}`);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : t('found.failed'));
-    } finally {
-      setBusy(false);
-    }
+    const made = await oversight.report({
+      boardId: e.boardId,
+      // The examination is the reference, so the board can find what this
+      // came from without anybody writing a cross-reference by hand.
+      reference: e.id,
+      title,
+      report,
+    });
+    navigate(`/incidents/${made.id}`);
   }
 
   if (!open) {
@@ -127,17 +121,41 @@ export default function ReportWhatWasFound({
         )}
       </Field>
 
-      {error && <p className="mt-2 text-ui text-breach">{error}</p>}
 
       <div className="mt-3 flex flex-wrap items-center gap-4">
         <Button
           type="button"
-          onClick={send}
-          disabled={busy || !title.trim() || !report.trim()}
+          onClick={() => setFiling(true)}
+          disabled={!title.trim() || !report.trim()}
           className="rounded-card bg-breach px-6 py-3 text-body font-bold text-white shadow-act disabled:opacity-50"
         >
-          {busy ? t('found.reporting') : t('found.report')}
+          {t('found.report')}
         </Button>
+
+        {/*
+          A breach is the gravest thing anyone enters here. It goes on the
+          record under the reporter's name, the clock starts against the
+          institution, and the whole board sees it — none of which is undone
+          by deciding later that it was not a breach after all.
+        */}
+        {/*
+          NO-AFTER: report — shown, not announced.
+
+          The press lands the member on the breach itself: the title they
+          wrote, the clock already running, and the acts that follow it. A
+          panel saying "it is reported" on top of the report would be a
+          sentence between the member and the work.
+        */}
+        <Act
+          open={filing}
+          onClose={() => setFiling(false)}
+          title={t('found.report')}
+          does={t('wm.reportBreach.does')}
+          means={t('wm.reportBreach.means')}
+          label={t('found.report')}
+          grave
+          perform={send}
+        />
         <Button
           type="button"
           onClick={() => setOpen(false)}

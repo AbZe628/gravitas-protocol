@@ -7,8 +7,8 @@ ne zatreba — svaka je velika i plaća se tokenima. Kad zatreba, reci koja i za
 
 ## 1 · Gdje smo stali
 
-Pet faza od jedanaest je **urađeno i izmjereno**. Red i mjere su u
-`docs/GRADNJA.md`; specifikacija je `docs/FLOW.md`.
+Pet faza od trinaest je **urađeno i izmjereno**, a šesta je pri kraju. Red i
+mjere su u `docs/GRADNJA.md`; specifikacija je `docs/FLOW.md`.
 
 | | faza | dokaz |
 |---|---|---|
@@ -18,9 +18,42 @@ Pet faza od jedanaest je **urađeno i izmjereno**. Red i mjere su u
 | **3** | §11 ponašanje | `?step=` u adresi · nacrt po stanici · tipke `1` `2` `3` `←` `→` · brojač glasova živ |
 | **4** | polica alata i kratice | polica na svakom ekranu, jedan klik · `Ctrl+K` · `?` · `/` |
 
-**Ostaje, po redu:** 5 prozor i „šta slijedi" na svih 74 čina *(danas ~8 —
-najveći komad)* · 6 pet stanja svakog ekrana · 7 automatizam izdavanja ·
-8 rupe · 9 sedam odluka vlasnika · 10 KLJUČ i BANKA.
+### FAZA 5 — **URAĐENA 19.09.2026.**
+
+Mjeri se sa `work/majlis-local/faza5.mjs`, **nikad napamet**:
+
+```bash
+node work/majlis-local/faza5.mjs work/repo/apps/majlis/client/src
+```
+
+**50 sa prozorom i „šta slijedi" · 9 odluka sa razlogom upisanim u kod ·
+0 bez ijednog.**
+
+### Tri vrste ishoda, i zašto mjera broji tri stvari
+
+Mjera **ne smije** biti namještena da odstupanje prođe kao urađeno. Zato
+odstupanje nosi oznaku u kodu, uz razlog, i broji se odvojeno:
+
+- `NO-WINDOW: <čin>` — prozora nema namjerno. Četvero: `recordFinding`
+  *(glavna petlja, 6–20 uslova zaredom; prozor pred svakim bi ga pretvorio u
+  niz potvrda koje niko ne čita)* · `screen` i `recognise` *(ništa se ne
+  upisuje; `recognise` se i ne pritiska — pokreće se dok se red iscrtava)* ·
+  `markHolding` *(prozor postoji, odgovor je ekran)*.
+- `NO-AFTER: <čin>` — prozor postoji, a odgovor se **vidi** umjesto da se
+  izgovori. Petero: `setParameters`, `changeHowItDecides`,
+  `recordComputation`, `withdrawComputation`, `report`.
+
+**Sljedeća je Faza 6** — pet stanja svakog ekrana, na svih 50 čvorova.
+
+---
+### Faze 11 i 12, dodane 19.09.2026.
+
+- **11** — pravi upit banke kao PDF (dopis + nacrt murabahe), koji prolazi
+  kroz *Ask* i na kojem `readAgainstShape` vraća uslove sa doslovnim navodom.
+  Ako izvlačenje na pravom papiru počne pogađati, cijela §7 tvrdnja pada.
+- **12** — upute na engleskom do zadnjeg detalja. Svaki korak mora biti
+  prošetan u pregledniku dok se piše; što se ne da prošetati ide na popis
+  kvarova, ne u upute.
 
 ---
 
@@ -39,13 +72,19 @@ pogrešan. Broji iz izvora, i zapiši naredbu kojom si brojao.
 
 ---
 
-## 3 · Tri greške koje se ponavljaju — pazi na njih
+## 3 · Četiri greške koje se ponavljaju — pazi na njih
 
 | | |
 |---|---|
-| **Hook ispod ranog `return`** | Dogodilo se dvaput: `StructureDetail`, pa `MatterFlow`. Cijeli ekran nestane u prazan `<div/>`. Vezanje ide **iznad** svakog izlaza |
-| **Proza kroz `node -e`** | Navodnici i šabloni se tiho pojedu. Koristi `Edit` ili `.mjs` fajl |
+| **Hook ispod ranog `return`** | Četiri puta: `StructureDetail`, `MatterFlow`, `IncidentDetail`, `HowThisIsHeld`. Cijeli ekran nestane u prazan `<div/>`. Vezanje ide **iznad** svakog izlaza. Čuvar je `src/HooksAboveReturns.test.ts` |
+| **Čuvar koji gleda a ne vidi** | Isti taj čuvar je prošao zeleno na četvrtom slučaju: gasio se na `}: {` u trećem redu skoro svake komponente. Sad broji koliko ih je prošetao — **166**, pada ispod 160. **Svaki čuvar mora tvrditi koliko je pokrio** |
+| **Proza kroz `node -e`** | Navodnici i šabloni se tiho pojedu, a `bash -c` puca na zagradama. Koristi `Edit` ili `.mjs` fajl. Backtick unutar template literala lomi i `.mjs` |
 | **Slijepa zamjena imena** | Regex koji mijenja identifikator piše i po komentarima, i zna zabiti kod unutar funkcije. Zamijeni značenje, ne ime |
+
+**Peta, iz iste porodice:** čin koji sam uhvati grešku i vrati se uredno kaže
+prozoru da je prošlo — pa prozor javi uspjeh nad neuspjehom. Čuvar je
+`src/ActsMustRefuse.test.ts`. Funkcija imenovana u `perform=` ne smije
+uhvatiti vlastiti neuspjeh a ne baciti ga dalje.
 
 ---
 
@@ -53,22 +92,47 @@ pogrešan. Broji iz izvora, i zapiši naredbu kojom si brojao.
 
 ```bash
 cd apps/majlis/server && npx vitest run    # 1758
-cd apps/majlis/client && npx vitest run    # 362
+cd apps/majlis/client && npx vitest run    # 366
 cd apps/majlis/client && npm run tokens    # dvije palete se moraju slagati
 ```
 
 **Provjera u pregledniku** traži server sa članovima i proxy koji nosi
-vjerodajnicu — preglednik ne može odgovoriti na basic-auth dijalog:
+vjerodajnicu — preglednik ne može odgovoriti na basic-auth dijalog. Sve
+pomoćne skripte su u `work/majlis-local/`, van repozitorija:
 
 ```bash
-cd apps/majlis/server && npx tsx scripts/members.ts   # baciv odbor
-# MAJLIS_MEMBERS=<blok> PORT=4102 MAJLIS_STORE=memory npx tsx src/index.ts
-# client: vite.probe.mjs sa proxyjem koji dodaje authorization → port 5175
+cd apps/majlis/server && npx tsx scripts/members.ts   # baciv odbor, ispiše ključeve
+# PORT=4104 MAJLIS_ORIGIN=http://localhost:5177 MAJLIS_MEMBERS=<blok> npx tsx src/index.ts
+# client: kopiraj work/majlis-local/vite.probe3.mjs u client/ i `npx vite --config`
 ```
 
-**Port 4102, nikad 4000** — 4000 je vlasnikova instanca. `vite.config.ts` čita
-`MAJLIS_API`, podrazumijevano ostaje 4000. **Probni fajl i vjerodajnice se
-brišu poslije provjere** i nikad ne ulaze u repo.
+`MAJLIS_ORIGIN` **mora** odgovarati portu na kojem klijent stoji, inače server
+tačno odbije potpis napravljen za drugu adresu. Potpisivanje uređajem u
+pregledniku bez ekrana traži virtuelnog potpisnika kroz CDP
+(`WebAuthn.addVirtualAuthenticator`) — vidi `work/majlis-local/uredjaji.mjs`.
+
+**Port 4104, nikad 4000** — 4000 je vlasnikova instanca. Varijabla je `PORT`,
+**ne** `MAJLIS_PORT`; pogrešno ime je jednom zauzelo 4000. **Probni fajl i
+vjerodajnice se brišu poslije provjere** i nikad ne ulaze u repo.
+
+### Tri žive mjere, sve u `work/majlis-local/`
+
+| skripta | pita |
+|---|---|
+| `radno.mjs` | pritisne **svako** dugme na 20 ekrana: je li se išta pomaklo? Boja se ne računa. Nađe i okna sa mnogo riječi i nijednom kontrolom, i riječi iz mašinskog registra |
+| `prelijeva.mjs` | prelijeva li tekst iz svoje kutije · preklapa li se išta · AI registar · skrola li dokument |
+| `faza5.mjs` | koliko činova ima prozor, koliko je odluka sa razlogom, koliko fali |
+
+Prije nego povjeruješ nuli, **dokaži da mjera hvata**: ubaci pravi kvar i
+gledaj je li prijavljen. Svaka od ove tri je jednom vratila nulu na kvaru koji
+se vidi golim okom.
+
+Preglednik ostavlja tab za sobom pri svakom prolazu i to ga uspori do
+zastoja — zatvori ih prije svakog:
+
+```bash
+for id in $(curl -s http://127.0.0.1:9333/json/list | grep '"id"' | sed 's/.*: "//;s/".*//'); do curl -s "http://127.0.0.1:9333/json/close/$id" > /dev/null; done
+```
 
 ---
 
@@ -94,5 +158,7 @@ rasprave · **kvorum** *(rute nema, a kod se štiti od promjene koja ne postoji)
 
 ## 7 · Zadnji commit
 
-`f2b25de` — *Faza 3: stanica u adresi, otkucano preživi, i tipke koje sam
-oglasio sada rade*. Lokalno, **nije gurnuto.**
+`661be63` — *Izbor oblika kroz prozor, i mjera koja pritisne svako dugme na
+svakom ekranu*.
+
+**Sedamnaest commitova je lokalno i nije gurnuto.** Guranje se pita svaki put.

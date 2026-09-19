@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Recorded from './components/Recorded.js';
 import RecordCalculation from './components/RecordCalculation.js';
@@ -143,6 +143,15 @@ describe('what happens after it is noted', () => {
     fireEvent.click(screen.getByRole('button', { name: /Note this against a period/ }));
     fireEvent.click(screen.getByRole('button', { name: /^Note it$/ }));
 
+    /*
+     * The press opens the window that draws the line this screen exists to
+     * draw: worked out here and bound to nothing, or recorded against the
+     * condition it was worked for. The act is the press inside it.
+     */
+    const window_ = await screen.findByRole('dialog');
+    expect(window_.textContent).toContain('bound to nothing');
+    fireEvent.click(within(window_).getByRole('button', { name: /^Note it$/ }));
+
     await waitFor(() => expect(screen.getByText(/It is in the record/)).toBeInTheDocument());
     // The same figure cannot be noted twice by pressing again.
     expect(screen.queryByRole('button', { name: /^Note it$/ })).toBeNull();
@@ -173,8 +182,16 @@ describe('what happens after it is noted', () => {
     fireEvent.click(screen.getByRole('button', { name: /Note this against a period/ }));
     fireEvent.click(screen.getByRole('button', { name: /^Note it$/ }));
 
+    const window_ = await screen.findByRole('dialog');
+    fireEvent.click(within(window_).getByRole('button', { name: /^Note it$/ }));
+
+    /*
+     * Inside the window, where the member is looking, and the window stays
+     * open around it. Drawn behind it the refusal would sit under the very
+     * sentence the member had just been shown.
+     */
     await waitFor(() =>
-      expect(screen.getByText(/one somebody typed/)).toBeInTheDocument(),
+      expect(within(window_).getByText(/one somebody typed/)).toBeInTheDocument(),
     );
   });
 });

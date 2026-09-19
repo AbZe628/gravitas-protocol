@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import Act from '../components/Act.js';
 import { Link, useParams } from 'react-router-dom';
 import { oversight, Refused, type Computation } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
@@ -58,8 +59,6 @@ export default function Figure() {
   const [missing, setMissing] = useState(false);
   const [failed, setFailed] = useState(false);
   const [reason, setReason] = useState('');
-  const [busy, setBusy] = useState(false);
-  const [refusal, setRefusal] = useState<string | null>(null);
   const { identity } = useIdentity();
 
   /**
@@ -70,20 +69,13 @@ export default function Figure() {
    * what a reader sees is what the record says rather than what this screen
    * believes it did.
    */
-  async function withdraw(e: React.FormEvent) {
-    e.preventDefault();
-    if (busy || !id) return;
-    setBusy(true);
-    setRefusal(null);
-    try {
-      const { computation } = await oversight.withdrawComputation(id, reason.trim());
-      setReason('');
-      setC(computation);
-    } catch (error) {
-      setRefusal(error instanceof Refused ? error.message : String(error));
-    } finally {
-      setBusy(false);
-    }
+  /** Whether the window that withdraws the figure is open. */
+  const [withdrawing, setWithdrawing] = useState(false);
+
+  async function withdraw() {
+    const { computation } = await oversight.withdrawComputation(id as string, reason.trim());
+    setReason('');
+    setC(computation);
   }
   /** A failed refresh keeps a screen that is already there. */
   const there = useStillThere();
@@ -295,10 +287,35 @@ export default function Figure() {
                 />
               )}
             </Field>
-            {refusal && <p className="mt-2.5 text-ui text-breach">{refusal}</p>}
+            {/*
+              Withdrawn, not removed. The figure stays readable with the
+              reason beside it, because anything the board already argued on
+              the strength of it was argued, and a record that quietly loses
+              the number stops agreeing with the reasoning above it.
+            */}
+            {/*
+              NO-AFTER: withdrawComputation — shown, not announced.
+
+              The figure redraws as withdrawn, at the same address, with the
+              reason under it. Nothing moves and nothing is lost, which is the
+              whole point of withdrawing rather than deleting — and it is
+              visible in one glance.
+            */}
+            <Act
+              open={withdrawing}
+              onClose={() => setWithdrawing(false)}
+              title={t('figure.withdrawIt')}
+              does={t('wm.dropFigure.does')}
+              means={t('wm.dropFigure.means')}
+              label={t('figure.withdrawIt')}
+              grave
+              perform={withdraw}
+            />
+
             <Button
-              type="submit"
-              disabled={busy || reason.trim().length === 0}
+              type="button"
+              onClick={() => setWithdrawing(true)}
+              disabled={reason.trim().length === 0}
               className="mt-3 rounded-xl bg-raised px-4 py-2 text-ui font-medium text-breach shadow-ringbreach disabled:opacity-40"
             >
               {t('figure.withdrawIt')}

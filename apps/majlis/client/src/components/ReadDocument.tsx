@@ -1,3 +1,4 @@
+import Act from './Act.js';
 import { useEffect, useState } from 'react';
 import {
   oversight,
@@ -138,8 +139,9 @@ export default function ReadDocument({ fields, onConfirm }: ReadDocumentProps) {
   const [documents, setDocuments] = useState<BoardDocument[]>([]);
   const [chosen, setChosen] = useState('');
   const [result, setResult] = useState<Extraction | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
+
+  /** Whether the window that performs the reading is open. */
+  const [asking, setAsking] = useState(false);
 
   useEffect(() => {
     if (!open) return;
@@ -156,24 +158,21 @@ export default function ReadDocument({ fields, onConfirm }: ReadDocumentProps) {
 
   async function read() {
     const document = documents.find((d) => d.sourceId === chosen);
-    if (!document) return;
+    /*
+     * Not a quiet return. The window has already told the member what is
+     * about to happen; coming back as though it worked would have it
+     * announce a reading of a document nobody chose.
+     */
+    if (!document) throw new Error(t('read.noneChosen'));
 
-    setBusy(true);
-    setError(null);
     setResult(null);
-    try {
-      setResult(
-        await oversight.readDocument(
-          document.matterId,
-          document.sourceId,
-          fields.map((f) => f.key),
-        ),
-      );
-    } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
-    } finally {
-      setBusy(false);
-    }
+    setResult(
+      await oversight.readDocument(
+        document.matterId,
+        document.sourceId,
+        fields.map((f) => f.key),
+      ),
+    );
   }
 
   if (!open) {
@@ -219,21 +218,38 @@ export default function ReadDocument({ fields, onConfirm }: ReadDocumentProps) {
           </label>
           <Button
             type="button"
-            disabled={busy || !chosen}
-            onClick={read}
+            disabled={!chosen}
+            onClick={() => setAsking(true)}
             className="rounded-xl bg-raised shadow-ring px-3.5 py-2 text-ui text-lapis font-medium disabled:opacity-40"
           >
             {t('read.read')}
           </Button>
+
+          {/*
+            A machine reading a document the institution sent. What comes
+            back is a list of fields with figures in them, which is the shape
+            of an answer — so the window says, before the press, that nothing
+            is recorded, that every figure carries the words it was taken
+            from, and that a field it could not find stays empty and named
+            rather than filled with a plausible number.
+          */}
+          <Act
+            open={asking}
+            onClose={() => setAsking(false)}
+            title={t('read.read')}
+            does={t('wm.readDoc.does')}
+            means={t('wm.readDoc.means')}
+            label={t('read.read')}
+            perform={read}
+            after={{
+              did: t('wm.readDoc.did'),
+              means: t('wm.readDoc.didMeans'),
+              next: [{ label: t('wm.next.theFields'), says: t('wm.next.theFieldsSays') }],
+            }}
+          />
         </div>
       )}
 
-      {/* The refusal in the server's words: off is a setting, not a fault. */}
-      {error && (
-        <p className="mt-3 rounded-xl shadow-ringbreach px-3 py-2 text-ui leading-relaxed text-breach">
-          {error}
-        </p>
-      )}
 
       {result && (
         <div className="mt-4">

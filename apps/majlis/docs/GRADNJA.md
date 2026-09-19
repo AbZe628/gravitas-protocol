@@ -387,12 +387,19 @@ i nijedan korak, jer koraka tu nema.
 
 ---
 
-### FAZA 5 · Prozor i „šta slijedi" na svih 74 čina
+### FAZA 5 · Prozor i „šta slijedi" na svakom činu — **URAĐENO 19.09.2026.**
 
-> Danas ih ima oko 8. **Ovdje se ne smije preskočiti nijedan.**
+> **50 sa prozorom i „šta slijedi" · 9 odluka sa razlogom upisanim u kod ·
+> 0 bez ijednog.** Mjeri se sa `work/majlis-local/faza5.mjs`, nikad napamet.
 
 **Posao:** za svaki čin iz matrice §E i §33 — dijalog koji kaže *šta radi i
 kome*, i POSLIJE koje kaže *šta je urađeno · šta to znači · šta slijedi (≤3)*.
+
+**Porodica u kojoj mašina čita papir** — `readContract`, `readAgainstShape`,
+`readDocument` — nosi najvažniju rečenicu u aplikaciji, jer ono što se vrati
+izgleda kao odgovor a nije: nalazi se ne upisuju dok član svaki ne potvrdi
+ili ispravi, navod se provjerava doslovno, a polje bez navoda ostaje prazno
+i imenovano umjesto da se pogodi.
 
 **Posljedice u istom prolazu**
 
@@ -401,8 +408,24 @@ kome*, i POSLIJE koje kaže *šta je urađeno · šta to znači · šta slijedi 
   mrtav, a traka piše šta fali)*
 - svaki čin koji šalje nešto banci mora pokazati **šta banka vidi**
 - „ništa više" je imenovan ishod, ne prazan ekran
+- **čin koji propadne mora odbiti, ne javiti uspjeh** — funkcija imenovana u
+  `perform=` ne smije uhvatiti vlastiti neuspjeh a ne baciti ga dalje. Čuvar:
+  `src/ActsMustRefuse.test.ts`
 
-**Gotovo je kad:** kontrolna lista §3 ovog dokumenta ima **74 od 74**.
+**Tri vrste ishoda, i zašto se broje odvojeno**
+
+Nijedan brojač ne smije biti namješten da odstupanje prođe kao urađeno. Zato
+odstupanje nosi oznaku u kodu, uz razlog:
+
+| oznaka | znači | ko |
+|---|---|---|
+| — | prozor prije, „šta slijedi" poslije | 50 |
+| `NO-WINDOW: <čin>` | prozora nema namjerno | `recordFinding` *(glavna petlja, 6–20 uslova zaredom)* · `screen` i `recognise` *(ne upisuju ništa; `recognise` se i ne pritiska)* · `markHolding` |
+| `NO-AFTER: <čin>` | prozor postoji, odgovor se **vidi** umjesto da se izgovori | `setParameters` · `changeHowItDecides` · `recordComputation` · `withdrawComputation` · `report` *(odvede na sam prekršaj)* |
+
+**Gotovo je kad:** mjera kaže 0 u koloni *bez jednog ili oba*, i svaka oznaka
+u drugoj i trećoj koloni ima razlog napisan iznad sebe u kodu. **Ispunjeno
+19.09.2026.**
 
 ---
 

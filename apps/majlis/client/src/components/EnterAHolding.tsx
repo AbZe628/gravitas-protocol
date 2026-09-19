@@ -1,3 +1,5 @@
+import Act from './Act.js';
+import AfterAct from './AfterAct.js';
 import { useState } from 'react';
 import { oversight, type AssetIdentifier, type AssetKind } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
@@ -45,8 +47,6 @@ export default function EnterAHolding({ onEntered }: { onEntered: () => void }) 
   const [scheme, setScheme] = useState<AssetIdentifier['scheme']>('chain');
   const [value, setValue] = useState('');
   const [network, setNetwork] = useState('');
-  const [busy, setBusy] = useState(false);
-  const [refusal, setRefusal] = useState<string | null>(null);
 
   if (!open) {
     return (
@@ -60,37 +60,51 @@ export default function EnterAHolding({ onEntered }: { onEntered: () => void }) 
     );
   }
 
-  async function enter(e: React.FormEvent) {
-    e.preventDefault();
-    if (busy) return;
-    setBusy(true);
-    setRefusal(null);
-    try {
-      await oversight.addAsset({
-        kind,
-        name: name.trim(),
-        identifiers: [
-          {
-            scheme,
-            value: value.trim(),
-            ...(network.trim() ? { network: network.trim() } : {}),
-          },
-        ],
-      });
-      setName('');
-      setValue('');
-      setNetwork('');
-      setOpen(false);
-      onEntered();
-    } catch (error) {
-      setRefusal(error instanceof Error ? error.message : String(error));
-    } finally {
-      setBusy(false);
-    }
+  /** Whether the window that enters the holding is open. */
+  const [entering, setEntering] = useState(false);
+  /*
+   * What the act did. Unlike the breach, this one does not take the member
+   * anywhere: the form closes and the register refreshes, and the holding
+   * they just entered is somewhere among the others with nothing marking it.
+   */
+  const [justDid, setJustDid] = useState<{
+    did: string;
+    means: string;
+    next: readonly { label: string; to?: string; says?: string }[];
+  } | null>(null);
+
+  async function enter() {
+    await oversight.addAsset({
+      kind,
+      name: name.trim(),
+      identifiers: [
+        {
+          scheme,
+          value: value.trim(),
+          ...(network.trim() ? { network: network.trim() } : {}),
+        },
+      ],
+    });
+    setName('');
+    setValue('');
+    setNetwork('');
+    setOpen(false);
+    onEntered();
   }
 
   return (
-    <form onSubmit={enter} className="mb-6 rounded-sheet bg-raised px-6 py-5 shadow-card">
+    <div className="mb-6 rounded-sheet bg-raised px-6 py-5 shadow-card">
+      {justDid && (
+        <div className="mb-4">
+          <AfterAct
+            did={justDid.did}
+            means={justDid.means}
+            next={justDid.next}
+            onClose={() => setJustDid(null)}
+          />
+        </div>
+      )}
+
       <p className="mb-4 max-w-[62ch] text-ui leading-relaxed text-muted">{t('reg.enterLead')}</p>
 
       <div className="grid gap-3 sm:grid-cols-[10rem_1fr]">
@@ -169,31 +183,50 @@ export default function EnterAHolding({ onEntered }: { onEntered: () => void }) 
         </Field>
       </div>
 
-      {refusal && <p className="mt-3 text-ui text-breach">{refusal}</p>}
 
       <div className="mt-4 flex flex-wrap items-center gap-3">
         <Button
-          type="submit"
-          disabled={busy || name.trim().length < 2 || value.trim().length === 0}
+          type="button"
+          onClick={() => setEntering(true)}
+          disabled={name.trim().length < 2 || value.trim().length === 0}
           className="rounded-xl bg-lapis px-5 py-2.5 text-ui font-semibold text-white shadow-act disabled:opacity-40"
         >
-          {busy ? t('common.loading') : t('reg.enterIt')}
+          {t('reg.enterIt')}
         </Button>
         <Button
           type="button"
-          onClick={() => {
-            setOpen(false);
-            setRefusal(null);
-          }}
+          onClick={() => setOpen(false)}
           className="text-ui text-muted underline decoration-line underline-offset-4"
         >
           {t('common.cancel')}
         </Button>
       </div>
 
+      {/*
+        A holding entered here is what the board is later asked to rule on,
+        and what an examination is later run against. Nothing about it is
+        judged by entering it — that is the point of the register being
+        separate from the ruling.
+      */}
+      <Act
+        open={entering}
+        onClose={() => setEntering(false)}
+        title={t('reg.enterIt')}
+        does={t('wm.addAsset.does')}
+        means={t('wm.addAsset.means')}
+        label={t('reg.enterIt')}
+        perform={enter}
+        onDone={setJustDid}
+        after={{
+          did: t('wm.addAsset.did'),
+          means: t('wm.addAsset.didMeans'),
+          next: [{ label: t('wm.next.theRegister'), says: t('wm.next.theRegisterSays') }],
+        }}
+      />
+
       <p className="mt-3 max-w-[62ch] text-note leading-relaxed text-muted">
         {t('reg.enterNote')}
       </p>
-    </form>
+    </div>
   );
 }

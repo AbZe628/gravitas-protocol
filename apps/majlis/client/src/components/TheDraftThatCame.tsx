@@ -48,6 +48,18 @@ export default function TheDraftThatCame({
   const [showing, setShowing] = useState(false);
 
   /*
+   * NO-WINDOW: recognise — and why.
+   *
+   * There is no press. This runs while the queue draws itself, and the server
+   * stores nothing: figures of speech go in, a list of shapes whose conditions
+   * use the same words comes back. Nothing enters the record, so there is no
+   * act to warn anybody about before it happens.
+   *
+   * What it *could* be mistaken for is handled where it is shown: the line
+   * above the list says these are the kinds of contract whose words turn up
+   * in this draft, and that opening one reads the draft against that kind's
+   * conditions. A suggestion named as a suggestion.
+   *
    * Recognised as the queue renders, not on a press.
    *
    * A scholar opening the queue should already be looking at the answer. It is

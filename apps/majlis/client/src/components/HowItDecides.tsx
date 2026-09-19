@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { oversight, Refused, type Settings } from '../lib/api.js';
+import Act from './Act.js';
+import { oversight, type Settings } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { useIdentity } from '../lib/identity.js';
 import { DateText } from './ui.js';
@@ -62,33 +63,24 @@ export default function HowItDecides({
   const [series, setSeries] = useState(settings.decides.rulingSeries ?? '');
   const [reason, setReason] = useState('');
 
-  const [busy, setBusy] = useState(false);
-  const [refusal, setRefusal] = useState<string | null>(null);
 
   const changes = settings.changes ?? [];
 
-  async function keep(e: React.FormEvent) {
-    e.preventDefault();
-    if (busy) return;
-    setBusy(true);
-    setRefusal(null);
-    try {
-      const next = await oversight.changeHowItDecides({
-        reason: reason.trim(),
-        name: name.trim(),
-        rulingSeries: series.trim(),
-        quorumPermit: Number(permit),
-        quorumRestrict: Number(restrict),
-        ratificationWindowHours: Number(hours),
-      });
-      onChanged(next);
-      setReason('');
-      setOpen(false);
-    } catch (error) {
-      setRefusal(error instanceof Refused ? error.message : String(error));
-    } finally {
-      setBusy(false);
-    }
+  /** Whether the window that changes the board's own rules is open. */
+  const [keeping, setKeeping] = useState(false);
+
+  async function keep() {
+    const next = await oversight.changeHowItDecides({
+      reason: reason.trim(),
+      name: name.trim(),
+      rulingSeries: series.trim(),
+      quorumPermit: Number(permit),
+      quorumRestrict: Number(restrict),
+      ratificationWindowHours: Number(hours),
+    });
+    onChanged(next);
+    setReason('');
+    setOpen(false);
   }
 
   const BOX = 'w-full rounded-xl bg-raised px-3 py-2.5 text-body shadow-ring outline-none';
@@ -98,10 +90,7 @@ export default function HowItDecides({
       {mayChange && !open && (
         <Button
           type="button"
-          onClick={() => {
-            setRefusal(null);
-            setOpen(true);
-          }}
+          onClick={() => setOpen(true)}
           className="mb-4 rounded-xl bg-raised px-4 py-2 text-ui font-semibold text-lapis shadow-ring"
         >
           {t('decides.change')}
@@ -207,15 +196,37 @@ export default function HowItDecides({
             </Field>
           </div>
 
-          {refusal && <p className="mt-3 text-ui leading-relaxed text-breach">{refusal}</p>}
+          {/*
+            The board changing its own rules. Quorum and the ratification
+            window decide what counts as a decision at all, so this is the one
+            act whose effect is on every act after it.
+          */}
+          {/*
+            NO-AFTER: changeHowItDecides — shown, not announced.
+
+            The form closes and the panel above redraws with the new quorum,
+            the new window, and this change at the head of the list of changes
+            with the reason and the date. What follows is that list, and it is
+            already on the screen.
+          */}
+          <Act
+            open={keeping}
+            onClose={() => setKeeping(false)}
+            title={t('decides.keep')}
+            does={t('wm.decides.does')}
+            means={t('wm.decides.means')}
+            label={t('decides.keep')}
+            perform={keep}
+          />
 
           <div className="mt-4 flex flex-wrap items-center gap-3">
             <Button
-              type="submit"
-              disabled={busy || reason.trim().length < 20}
+              type="button"
+              onClick={() => setKeeping(true)}
+              disabled={reason.trim().length < 20}
               className="rounded-xl bg-lapis px-5 py-2.5 text-ui font-semibold text-white shadow-act disabled:opacity-40"
             >
-              {busy ? t('common.loading') : t('decides.keep')}
+              {t('decides.keep')}
             </Button>
             <Button
               type="button"

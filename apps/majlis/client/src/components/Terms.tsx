@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { governance, Refused, type Matter, type RuleParameter } from '../lib/api.js';
+import Act from './Act.js';
+import { governance, type Matter, type RuleParameter } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { Button } from './Button';
 
@@ -33,12 +34,9 @@ export default function Terms({ matter, canEdit, onChanged }: Props) {
 
   const [editing, setEditing] = useState(false);
   const [rows, setRows] = useState<RuleParameter[]>([]);
-  const [busy, setBusy] = useState(false);
-  const [refusal, setRefusal] = useState<string | null>(null);
 
   function start() {
     setRows(rule.parameters.length ? rule.parameters.map((p) => ({ ...p })) : [blank()]);
-    setRefusal(null);
     setEditing(true);
   }
 
@@ -46,19 +44,13 @@ export default function Terms({ matter, canEdit, onChanged }: Props) {
     setRows((r) => r.map((row, n) => (n === i ? { ...row, [field]: value } : row)));
   }
 
+  /** Whether the window that writes the figures is open. */
+  const [saving, setSaving] = useState(false);
+
   async function save() {
-    if (busy) return;
-    setBusy(true);
-    setRefusal(null);
-    try {
-      const kept = rows.filter((r) => r.key.trim() && r.value.trim());
-      onChanged(await governance.setParameters(matter.id, kept));
-      setEditing(false);
-    } catch (error) {
-      setRefusal(error instanceof Refused ? error.message : String(error));
-    } finally {
-      setBusy(false);
-    }
+    const kept = rows.filter((r) => r.key.trim() && r.value.trim());
+    onChanged(await governance.setParameters(matter.id, kept));
+    setEditing(false);
   }
 
   const field = 'w-full rounded-xl bg-raised shadow-ring p-1.5 text-ui outline-none';
@@ -124,9 +116,7 @@ export default function Terms({ matter, canEdit, onChanged }: Props) {
           )}
         </div>
 
-        {refusal && <p className="text-ui text-breach">{refusal}</p>}
-
-        {mayEdit && (
+          {mayEdit && (
           <Button
             type="button"
             onClick={start}
@@ -199,14 +189,36 @@ export default function Terms({ matter, canEdit, onChanged }: Props) {
         {t('terms.addRow')}
       </Button>
 
-      {refusal && <p className="text-ui text-breach">{refusal}</p>}
+      {/*
+        The figures in these rows are what the conditions are measured
+        against. A ratio written here is the number a later examination is
+        checked by, so it is not a note — it is part of what the board is
+        ruling.
+      */}
+      {/*
+        NO-AFTER: setParameters — shown, not announced.
+
+        The rows close and the figures appear in the reading view directly
+        above this button, in the place the ruling will always carry them. A
+        panel saying "the figures are written" over the top of the written
+        figures is the same sentence twice, and the second one has to be
+        dismissed.
+      */}
+      <Act
+        open={saving}
+        onClose={() => setSaving(false)}
+        title={t('terms.save')}
+        does={t('wm.terms.does')}
+        means={t('wm.terms.means')}
+        label={t('terms.save')}
+        perform={save}
+      />
 
       <div className="flex gap-2 border-t border-line pt-3">
         <Button
           type="button"
-          disabled={busy}
-          onClick={save}
-          className="rounded-xl shadow-ring px-3 py-1.5 text-note hover:bg-raised disabled:opacity-40"
+          onClick={() => setSaving(true)}
+          className="rounded-xl shadow-ring px-3 py-1.5 text-note hover:bg-raised"
         >
           {t('terms.save')}
         </Button>

@@ -16,6 +16,7 @@ import TheCalculator from './TheCalculator.js';
 import AskTheBank from './AskTheBank.js';
 import { Button } from './Button';
 import Act from './Act.js';
+import AfterAct from './AfterAct.js';
 
 /**
  * The conditions of a contract shape, ruled on one at a time.
@@ -709,6 +710,16 @@ export default function Checklist({
 
   /** The shape whose window is open, if the member is choosing one. */
   const [choosing, setChoosing] = useState<string | null>(null);
+  /*
+   * What the last act did, held out here rather than inside the branch that
+   * offered the choice. Choosing a shape makes `none` false and that whole
+   * branch disappears, taking anything it was holding with it.
+   */
+  const [justDid, setJustDid] = useState<{
+    did: string;
+    means: string;
+    next: readonly { label: string; to?: string; says?: string }[];
+  } | null>(null);
 
   async function choose(structureId: string) {
     await oversight.setStructure(matterId, structureId);
@@ -737,6 +748,12 @@ export default function Checklist({
           means={t('wm.setShape.means')}
           label={t('wm.setShape.label')}
           perform={() => choose(choosing as string)}
+          onDone={setJustDid}
+          after={{
+            did: t('wm.setShape.did'),
+            means: t('wm.setShape.didMeans'),
+            next: [{ label: t('wm.next.firstStep'), says: t('wm.next.firstStepSays') }],
+          }}
         />
       </div>
     );
@@ -775,6 +792,17 @@ export default function Checklist({
 
   return (
     <div>
+      {justDid && (
+        <div className="mb-4">
+          <AfterAct
+            did={justDid.did}
+            means={justDid.means}
+            next={justDid.next}
+            onClose={() => setJustDid(null)}
+          />
+        </div>
+      )}
+
       <div className="mb-1 flex flex-wrap items-center gap-2">
         <span className="text-body font-medium">{data.structure.name}</span>
         {/*
