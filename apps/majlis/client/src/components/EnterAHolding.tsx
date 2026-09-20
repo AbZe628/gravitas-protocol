@@ -48,18 +48,6 @@ export default function EnterAHolding({ onEntered }: { onEntered: () => void }) 
   const [value, setValue] = useState('');
   const [network, setNetwork] = useState('');
 
-  if (!open) {
-    return (
-      <Button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="rounded-xl bg-lapis px-5 py-2.5 text-ui font-semibold text-white shadow-act transition-all hover:bg-lapissoft"
-      >
-        {t('reg.enter')}
-      </Button>
-    );
-  }
-
   /** Whether the window that enters the holding is open. */
   const [entering, setEntering] = useState(false);
   /*
@@ -72,6 +60,30 @@ export default function EnterAHolding({ onEntered }: { onEntered: () => void }) 
     means: string;
     next: readonly { label: string; to?: string; says?: string }[];
   } | null>(null);
+
+  /*
+   * Every hook is above this return, and that is not a style preference.
+   *
+   * These two sat below it. Closed, the component ran six hooks; opened, it
+   * ran eight, and React counts them — so pressing *Enter a holding* threw
+   * *rendered more hooks than during the previous render* and took the
+   * register down to a blank pane. The button looked like it did nothing.
+   *
+   * Found by the owner pressing it. Not found by the sweep, which counts an
+   * opened form as an effect, and not by `HooksAboveReturns.test.ts`, which
+   * is the thing written to make this impossible.
+   */
+  if (!open) {
+    return (
+      <Button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="rounded-xl bg-lapis px-5 py-2.5 text-ui font-semibold text-white shadow-act transition-all hover:bg-lapissoft"
+      >
+        {t('reg.enter')}
+      </Button>
+    );
+  }
 
   async function enter() {
     await oversight.addAsset({

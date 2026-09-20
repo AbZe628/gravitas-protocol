@@ -33,8 +33,34 @@ import { join, relative } from 'node:path';
 
 const HOOK = /\b(useState|useEffect|useRef|useMemo|useCallback|useReducer|useContext|useLayoutEffect|useSearchParams|useParams|useNavigate|useLocation|useI18n|useIdentity|useHealth|useRevision|useNews|useStillThere|useBoardName)\s*[(<]/;
 
-/** `  if (x) return y;` or `  return z;` at the body's own indentation. */
-const EARLY_RETURN = /^ {2}(if\s*\(.*\)\s*return\b|return\b)/;
+/**
+ * A return that is not the component's last one.
+ *
+ * ── the hole this closes, found the hard way ──────────────────────────────
+ *
+ * This was `/^ {2}(if\s*\(.*\)\s*return\b|return\b)/` — a return on the same
+ * line as its `if`, or a bare return at the body's indentation. It does not
+ * match the commonest form in React by a wide margin:
+ *
+ *     if (!open) {
+ *       return <Button …/>;
+ *     }
+ *
+ * `  if (!open) {` carries no `return`, and `    return` is four spaces deep.
+ * So the guard saw no early return at all in `EnterAHolding`, and two
+ * `useState` below one went in under it. Pressing *Enter a holding* threw
+ * *rendered more hooks than during the previous render* and blanked the
+ * register. The owner found it by pressing the button; this file exists so
+ * that nobody has to.
+ *
+ * Braces are counted instead. Depth 1 is the body, and a `return` there is
+ * the component's own — everything after it is unreachable and cannot hold
+ * a hook anyway. A `return` at depth 2 or deeper is inside a branch, which
+ * is exactly an early return, whichever line the `if` is on.
+ */
+const RETURNS = /^\s*return\b/;
+/** Braces that do not open or close a block: in a string, a regex, a comment. */
+const NOT_STRUCTURE = /(['"`]).*?\1|\/\*.*?\*\/|\/\/.*$/g;
 
 /** `export default function Name(` or `function Name(` — a component. */
 const COMPONENT = /^(export\s+default\s+)?function\s+[A-Z]/;
@@ -103,6 +129,9 @@ describe('hooks sit above every early return', () => {
       const lines = readFileSync(file, 'utf8').split('\n');
       let inComponent = false;
       let returned = 0;
+      let depth = 0;
+      /** Depth at which a body-level branch opened, or null outside one. */
+      let branchAt: number | null = null;
 
       for (let n = 0; n < lines.length; n++) {
         const line = lines[n];
@@ -110,25 +139,78 @@ describe('hooks sit above every early return', () => {
         if (COMPONENT.test(line)) {
           inComponent = true;
           returned = 0;
+          depth = 0;
+          branchAt = null;
           walked.add(relative(root, file) + ':' + (n + 1));
-          continue;
-        }
-        /* Only a new declaration at column one ends the one before it. */
-        if (ENDS_IT.test(line) && !COMPONENT.test(line)) {
+        } else if (ENDS_IT.test(line) && !COMPONENT.test(line) && depth === 0) {
+          /*
+           * Only a new declaration at column one ends the one before it —
+           * and only while no block is open, because a `const` at column one
+           * inside a component body does not exist, while `}: {` on the
+           * third line of a props type most certainly does.
+           */
           inComponent = false;
         }
         if (!inComponent) continue;
 
-        if (EARLY_RETURN.test(line)) {
+        /*
+         * A return inside a branch of the component's own body.
+         *
+         * ── two repairs that did not work, and why ───────────────────────
+         *
+         * Counting brace depth alone over-caught at once:
+         * `useState(() => { … return false; })` puts a return at depth 2
+         * that has nothing to do with the component, and the guard then
+         * reported twenty-odd faults in files that are perfectly correct.
+         * A guard that cries wolf gets turned off and protects nothing.
+         *
+         * Labelling each brace `fn` or `block` failed differently, and the
+         * failure is worth keeping written down. This is a real signature
+         * in this codebase:
+         *
+         *     export default function EnterAHolding({ onEntered }: { onEntered: () => void }) {
+         *
+         * Three braces on one line, and the line contains both `function`
+         * and `=>`. Judged per line, every one of them is labelled a
+         * function scope, so every component looked like it was permanently
+         * inside a nested function and nothing was ever reported. The guard
+         * passed, silently, exactly as before the repair.
+         *
+         * ── what is watched instead ──────────────────────────────────────
+         *
+         * The one shape that actually causes this fault: a branch opened at
+         * the body's own indentation.
+         *
+         *     if (!open) {          ← two spaces, opens a branch
+         *       return …            ← the early return
+         *     }
+         *
+         * Narrow on purpose. It does not try to understand the language; it
+         * recognises the thing that has broken this application four times.
+         */
+        const bare = line.replace(NOT_STRUCTURE, '');
+        const opens = (bare.match(/\{/g) ?? []).length;
+        const closes = (bare.match(/\}/g) ?? []).length;
+
+        /* A branch at the body's indentation, opening a block on this line. */
+        if (branchAt === null && /^ {2}(if|else)\b/.test(line) && opens > closes) {
+          branchAt = depth;
+        }
+
+        if (RETURNS.test(line) && (branchAt !== null || /^ {2}(if\s*\(.*\)\s*)?return\b/.test(line))) {
           returned = returned || n + 1;
-          continue;
         }
 
         if (returned && HOOK.test(line) && !line.trim().startsWith('*')) {
           faults.push(
-            `${relative(root, file)}:${n + 1} — a hook below the return on line ${returned}`,
+            `${relative(root, file)}:${n + 1} — a hook below the early return on line ${returned}`,
           );
         }
+
+        depth += opens - closes;
+        if (depth < 0) depth = 0;
+        /* The branch is over when the body's depth comes back to it. */
+        if (branchAt !== null && depth <= branchAt) branchAt = null;
       }
     }
 
