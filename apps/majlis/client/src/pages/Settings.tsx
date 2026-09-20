@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { api, oversight, type Health, type Settings as SettingsData } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
-import { PageHead } from '../components/page.js';
+import { Gaps, PageHead } from '../components/page.js';
 import YourAccount from '../components/YourAccount.js';
 import WhoYouAreOnPaper from '../components/WhoYouAreOnPaper.js';
 import YourDevices from '../components/YourDevices.js';
@@ -203,6 +203,23 @@ export default function Settings() {
         )}
       </Card>
       </Fold>
+
+      {/*
+        Two walls, written as walls. §FAZA 8.
+
+        The distinction the phase draws is between a thing that is broken, a
+        thing that is missing, and a thing that was never built. These two
+        are the third kind: the act exists in the code and the screen for it
+        does not. `account.redeemReset` is in the client's own api and
+        nothing in the application calls it; the institution role is defined
+        and no credential can ever be issued for one.
+
+        Said here rather than left silent, because a member who forgets
+        their password will otherwise hunt for a control that does not
+        exist and conclude the application is broken. It is not broken. It
+        cannot do this, and that is a different sentence.
+      */}
+      <Gaps items={[t('set.gap.noRecovery'), t('set.gap.noInstitutionSignIn')]} />
     </div>
   );
 }

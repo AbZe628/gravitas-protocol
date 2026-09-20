@@ -129,6 +129,18 @@ export default function Register() {
   }
   if (assets.length > 0) gaps.push(t('reg.gap.asAtLast'));
 
+  /*
+   * A wall, written as a wall. §FAZA 8, N-74.
+   *
+   * Two entries about the same instrument stay two. There is no act for
+   * saying *this is the one we already hold* — not a broken one, not a
+   * hidden one: it was never built. Said here rather than left for a
+   * member to discover by looking for a control that does not exist,
+   * because a register that quietly lists a thing twice is a register
+   * whose totals are wrong and does not know it.
+   */
+  if (assets.length > 1) gaps.push(t('reg.gap.noMerge'));
+
   return (
     <div>
       <PageHead

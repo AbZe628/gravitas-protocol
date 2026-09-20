@@ -698,7 +698,7 @@ srušiti tvrdnju na kojoj cijeli proizvod stoji.
 
 ---
 
-### FAZA 8 · Rupe koje nisu ukras
+### FAZA 8 · Rupe koje nisu ukras — **URAĐENO 20.09.2026.**
 
 | | |
 |---|---|
@@ -710,6 +710,55 @@ srušiti tvrdnju na kojoj cijeli proizvod stoji.
 
 **Posljedica:** svaki zid se **piše kao zid** na ekranu, ne kao greška i ne
 kao tišina.
+
+#### Urađeno 20.09.2026. — dvije popravke i tri zida
+
+**Timelock kad istekne.** Sweep je već hvatao zrcalnu sliku — zabrana koja
+preživi rok za ratifikaciju čitala se kao na snazi iako je istekla — a
+suprotan smjer je bio ostavljen pritisku. Dozvola kojoj rok prođe stajala je
+u `timelock`: zapis kaže *još se čeka* dok je čekanje gotovo. To čini da
+datum stupanja na snagu zavisi od toga kad se neko sljedeći put prijavio.
+
+Sweep sada donosi i te dozvole, kroz `bringIntoForce`, koji već nosi sve
+brave. **Sedam testova**, tri od njih traže da sweep **ne** dira: prigovor u
+roku zaustavlja promjenu · rok koji još teče se ne skraćuje iznutra ·
+predmet koji nije u roku se ne dira. Dvije dozvole u istom prolazu dobiju
+dva broja, ne jedan dvaput.
+
+**Stare adrese ugovora.** Zamijenjen ugovor **nije nestao** — odgovara na
+`paused()` i `owner()` tačno kao i prije, sa stanjem od dana kad je prestao
+biti protokolov. Uperi Majlis u njega i svako čitanje uspije: `reachable`,
+bez greške, zelen ekran, koji prijavljuje stanje izvršenja registra koji
+**ništa ne izvršava**. Odboru bi bilo pokazano da ono što radi odgovara
+odobrenom, na dokazu iz mrtvog ugovora.
+
+Odbija se **po adresi, prije ijednog čitanja**, i odbijanje imenuje koji je
+ugovor i koja je važeća adresa. **Šest testova**, dva od njih čuvaju od
+pretjerivanja: adresa koja nije na popisu prolazi do stvarnog pokušaja veze,
+i važeća adresa nikad ne smije biti na popisu.
+
+*Nađeno uživo i popravljeno:* ekran je iznad odbijanja i dalje tvrdio „ono
+što registar čita jest ono što je odbor odobrio". Sada pada na formulaciju
+koja je istinita, i odbijanje se **ne** piše kao „nedostupno" — inače bi neko
+pokušavao ponovo dok jednog dana ne „proradi".
+
+**Tri zida, napisana kao zidovi**
+
+Razlika koju ova faza povlači: nešto pokvareno, nešto čega nema, i nešto što
+**nikad nije ni napravljeno**. Ova tri su treća vrsta.
+
+| zid | gdje piše |
+|---|---|
+| **unovčavanje koda** — `account.redeemReset` stoji u kodu i **niko ga ne zove** | postavke |
+| **prijava banke** — uloga postoji, vjerodajnica se ne može izdati nijednoj | postavke |
+| **spajanje instrumenata (N-74)** — dva zapisa o istom ostaju dva, i broje se dvaput u svakom zbiru | registar |
+
+Svaki kaže i **šta to košta**, ne samo da nedostaje. Član koji traži
+kontrolu koje nema zaključi da je aplikacija pokvarena; nije pokvarena, ovo
+ne može, a to je druga rečenica.
+
+**Gotovo je kad:** svaki zid stoji napisan na ekranu na kojem bi ga član
+tražio. **Ispunjeno 20.09.2026.**
 
 ---
 
