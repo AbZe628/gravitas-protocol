@@ -51,6 +51,8 @@ export default function Rules({ embedded = false }: { embedded?: boolean }) {
   const [reviews, setReviews] = useState<Map<string, ReviewStatus>>(new Map());
   const [dueCount, setDueCount] = useState(0);
   const [failed, setFailed] = useState(false);
+  /** Which rulings fall due was asked for and did not come. */
+  const [reviewsLost, setReviewsLost] = useState(false);
 
   useEffect(() => {
     api
@@ -65,7 +67,13 @@ export default function Rules({ embedded = false }: { embedded?: boolean }) {
         setReviews(new Map((r.items ?? []).map((x) => [x.ruleId, x])));
         setDueCount(r.due ?? 0);
       })
-      .catch(() => undefined);
+      .then(() => setReviewsLost(false))
+      /*
+       * Not thrown away. Without it the count of what falls due stays at
+       * zero, and a board reads zero as nothing being due rather than as
+       * the screen not having been told.
+       */
+      .catch(() => setReviewsLost(true));
   }, []);
 
   if (failed) return <ErrorText />;
@@ -143,6 +151,8 @@ export default function Rules({ embedded = false }: { embedded?: boolean }) {
       title={t('nav.rules')}
       says={t('rule.lead')}
       live={live}
+      /* ListPage already has the slot for this: what the list cannot see. */
+      limits={reviewsLost ? t('gap.reviewsLost') : undefined}
       act={
         <DocumentLink
           href={oversight.hrefs.manual()}

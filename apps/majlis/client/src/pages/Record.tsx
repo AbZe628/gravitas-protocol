@@ -14,7 +14,7 @@ import { Button } from '../components/Button';
 /** Everything this board has settled, newest first. */
 const SETTLED = ['in_force', 'rejected', 'lapsed', 'withdrawn'];
 
-function Decided({ matters }: { matters: MatterSummary[] | null }) {
+function Decided({ matters, lost }: { matters: MatterSummary[] | null; lost: boolean }) {
   const { t } = useI18n();
 
   if (matters === null) return <p className="mb-6 text-ui text-muted">{t('common.loading')}</p>;
@@ -29,7 +29,23 @@ function Decided({ matters }: { matters: MatterSummary[] | null }) {
         {t('decided.heading')}
       </h2>
 
-      {settled.length === 0 ? (
+      {/*
+        In the list's own place, not under it.
+
+        The gap line was first put at the foot of the page, and the screen
+        went on saying "Nothing has been settled yet" where the list belongs
+        — the false claim still first, the correction below the fold. A
+        member reads the first one. So when the read failed, that sentence
+        is not shown at all: what stands there says the list could not be
+        fetched.
+      */}
+      {lost ? (
+        <div role="alert" className="rounded-card bg-raised px-5 py-4 shadow-ring">
+          <p className="max-w-[62ch] text-body leading-relaxed text-sand">
+            {t('gap.decidedLost')}
+          </p>
+        </div>
+      ) : settled.length === 0 ? (
         <Nothing>{t('decided.none')}</Nothing>
       ) : (
         <Rows>
@@ -64,6 +80,14 @@ export default function Record({ embedded = false }: { embedded?: boolean }) {
   const [log, setLog] = useState<AssistantExchange[] | null>(null);
   const [decided, setDecided] = useState<MatterSummary[] | null>(null);
   const [failed, setFailed] = useState(false);
+  /*
+   * What was decided was asked for and did not come.
+   *
+   * This used to become an empty list, which on this screen of all screens
+   * reads as: the board has decided nothing. Measured by failing that one
+   * request — the page showed its heading and said exactly that.
+   */
+  const [decidedLost, setDecidedLost] = useState(false);
   const [health, setHealth] = useState<Health | null>(null);
   const [exporting, setExporting] = useState(false);
   const [year, setYear] = useState(new Date().getUTCFullYear());
@@ -76,8 +100,15 @@ export default function Record({ embedded = false }: { embedded?: boolean }) {
     api.health().then(setHealth).catch(() => setHealth(null));
     api
       .matters()
-      .then((r) => setDecided(Array.isArray(r) ? r : []))
-      .catch(() => setDecided([]));
+      .then((r) => {
+        const dobar = Array.isArray(r);
+        setDecided(dobar ? r : []);
+        setDecidedLost(!dobar);
+      })
+      .catch(() => {
+        setDecided([]);
+        setDecidedLost(true);
+      });
   }, []);
 
   /** The name the file lands under, so the screen can say it afterwards. */
@@ -118,7 +149,7 @@ export default function Record({ embedded = false }: { embedded?: boolean }) {
         what it did not contain. Settled first and newest first: a decision
         made last week is the one somebody is looking for.
       */}
-      <Decided matters={decided} />
+      <Decided matters={decided} lost={decidedLost} />
 
       {/*
         The briefings, which left the rail with seven others when it was cut

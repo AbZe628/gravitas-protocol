@@ -84,6 +84,8 @@ export default function MatterFlow() {
 
   const [matter, setMatter] = useState<Matter | null>(null);
   const [list, setList] = useState<ChecklistData | null>(null);
+  /** The shape was asked for and did not come — not the same as having none. */
+  const [listLost, setListLost] = useState(false);
   const [failed, setFailed] = useState(false);
   const there = useStillThere();
 
@@ -186,10 +188,24 @@ export default function MatterFlow() {
      * ordinary state rather than an error: the board then argues and votes,
      * which is the whole of what a board did before shapes existed.
      */
+    /*
+     * But a shape that could not be READ is not a matter without a shape.
+     *
+     * Both used to become `null`. Measured with the checklist endpoint
+     * failing: the step strip vanished, the work pane went blank, and the
+     * screen said nothing — indistinguishable from a matter the board
+     * argues and votes on directly. The two are opposite facts.
+     */
     oversight
       .checklist(id)
-      .then(setList)
-      .catch(() => setList(null));
+      .then((l) => {
+        setList(l);
+        setListLost(false);
+      })
+      .catch(() => {
+        setList(null);
+        setListLost(true);
+      });
   }
 
   /**
@@ -558,6 +574,28 @@ function lastSaid(
    * Worked out before the branch below, so it survives the screen changing
    * shape underneath it — which is exactly what the act it reports just did.
    */
+  /*
+   * What this screen could not read, said where the work is.
+   *
+   * Sits beside `didPanel` in every branch, because a member who cannot see
+   * the steps needs to know the difference between *this matter has none*
+   * and *the steps did not come*. The first is a matter argued and voted
+   * directly; the second is an incomplete screen.
+   */
+  const gapPanel = listLost ? (
+    <div
+      role="alert"
+      className="mb-5 rounded-card bg-raised px-5 py-4 shadow-ring"
+    >
+      <div className="text-label font-bold uppercase tracking-caps text-muted">
+        {t('flow.stepsLost')}
+      </div>
+      <p className="mt-2 max-w-[62ch] text-body leading-relaxed text-sand">
+        {t('flow.stepsLostMeans')}
+      </p>
+    </div>
+  ) : null;
+
   const didPanel = justDid ? (
     <AfterAct
       did={justDid.did}
@@ -586,6 +624,7 @@ function lastSaid(
           </Link>
         }
       >
+        {gapPanel}
         {didPanel}
         <SignTheDocument matter={matter} />
       </StepWindow>
@@ -612,6 +651,7 @@ function lastSaid(
           </Button>
         }
       >
+        {gapPanel}
         {didPanel}
         <WhatTheySent
           matter={matter}
@@ -645,6 +685,7 @@ function lastSaid(
           ) : null
         }
       >
+        {gapPanel}
         {didPanel}
         <VotePanel
           stepsOutstanding={outstanding}
@@ -741,7 +782,8 @@ function lastSaid(
         </>
       }
     >
-      {didPanel}
+      {gapPanel}
+        {didPanel}
       {step && (
         <>
           <p className="mb-4 max-w-[62ch] font-display text-sub leading-snug text-paper">

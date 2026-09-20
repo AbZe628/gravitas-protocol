@@ -10,7 +10,7 @@ import {
 import { useI18n } from '../lib/i18n.js';
 import TellTheBank from '../components/TellTheBank.js';
 import ReportWhatWasFound from '../components/ReportWhatWasFound.js';
-import { Division, Nothing, PageHead } from '../components/page.js';
+import { Division, Nothing, PageHead, Gaps } from '../components/page.js';
 import { ErrorText, Loading } from '../components/ui.js';
 import { useIdentity, mayRecordInstitutionAct, mayDeliberate } from '../lib/identity.js';
 import { MainAct, Card, Quiet, State } from '../components/kit.js';
@@ -167,6 +167,8 @@ export default function Examinations({ boardId }: { boardId: string }) {
   const { identity } = useIdentity();
   const [all, setAll] = useState<Examination[] | null>(null);
   const [failed, setFailed] = useState(false);
+  /** Rulings in force were asked for and did not come — not the same as none. */
+  const [settledLost, setSettledLost] = useState(false);
   const [settled, setSettled] = useState<MatterSummary[]>([]);
   const [open, setOpen] = useState(false);
   const [subject, setSubject] = useState<Examinable | null>(null);
@@ -197,7 +199,13 @@ export default function Examinations({ boardId }: { boardId: string }) {
         const list = Array.isArray(m) ? m : [];
         setSettled(list.filter((x) => x.status === 'in_force' || x.status === 'timelock'));
       })
-      .catch(() => undefined);
+      .then(() => setSettledLost(false))
+      /*
+       * Not thrown away. An exception is measured against what the board
+       * put in force, and a screen that quietly holds none of those is
+       * saying the board ruled on nothing.
+       */
+      .catch(() => setSettledLost(true));
   };
 
   useEffect(load, [boardId]);
@@ -289,7 +297,20 @@ export default function Examinations({ boardId }: { boardId: string }) {
                 head: the sentence says why on its own rather than heading an
                 absent control.
               */}
-              {settled.length === 0 ? (
+              {/*
+                And a read that failed does not say "nothing is in force".
+                The gap is also named at the foot of the page, but the
+                sentence a member reads first is this one, where the list
+                of rulings would have been.
+              */}
+              {settledLost ? (
+                <>
+                  <div className={label}>{t('exam.whichRuling')}</div>
+                  <p role="alert" className="mb-3 max-w-[62ch] text-ui leading-relaxed text-sand">
+                    {t('gap.settledLost')}
+                  </p>
+                </>
+              ) : settled.length === 0 ? (
                 <>
                   <div className={label}>{t('exam.whichRuling')}</div>
                   <p className="mb-3 text-ui text-muted">{t('exam.noSettled')}</p>
@@ -481,6 +502,8 @@ export default function Examinations({ boardId }: { boardId: string }) {
           </div>
         )}
       </Division>
+
+      <Gaps items={settledLost ? [t('gap.settledLost')] : []} />
 
       <p className="mt-8 max-w-[62ch] text-note leading-relaxed text-muted">
         {t('exam.notAVerdict')}

@@ -80,6 +80,8 @@ export default function VotePanel({
 }: Props) {
   const { t } = useI18n();
   const [tally, setTally] = useState<Tally | null>(null);
+  /** The tally was asked for and did not come — different from no votes. */
+  const [tallyLost, setTallyLost] = useState(false);
   /*
    * Zauzetost je presla u prozor.
    *
@@ -126,10 +128,24 @@ export default function VotePanel({
        * inside render and took the entire matter screen with it — the
        * vote, the pack and the proposal — over one absent field.
        */
-      .then((r) =>
-        setTally(r && typeof r.for === 'number' && Array.isArray(r.outstanding) ? r : null),
-      )
-      .catch(() => setTally(null));
+      /*
+       * A tally that could not be read is not a tally of nothing.
+       *
+       * Both the wrong shape and a refused request used to become `null`,
+       * and `null` renders no panel at all. Measured: with the tally
+       * endpoint failing, a matter in `voting` showed the heading THE VOTE,
+       * no counts, and the button that closes the vote. A chair reads that
+       * as nobody having voted yet, and closes on it.
+       */
+      .then((r) => {
+        const dobar = !!r && typeof r.for === 'number' && Array.isArray(r.outstanding);
+        setTally(dobar ? r : null);
+        setTallyLost(!dobar);
+      })
+      .catch(() => {
+        setTally(null);
+        setTallyLost(true);
+      });
   }, [matter.id, matter.status, matter.reasoning?.length, showsTally, revision]);
 
   /** Which of the three windows is open, if any. */
@@ -173,6 +189,22 @@ export default function VotePanel({
           next={justDid.next}
           onClose={() => setJustDid(null)}
         />
+      )}
+
+      {/*
+        Said in the tally's own place, so it cannot be mistaken for nobody
+        having voted. `role="alert"` because a member who cannot see the
+        screen needs this more than anybody.
+      */}
+      {showsTally && tallyLost && (
+        <div role="alert" className="rounded-sheet bg-raised px-6 py-5 shadow-card">
+          <div className="text-label font-bold uppercase tracking-caps text-muted">
+            {t('vote.tallyLost')}
+          </div>
+          <p className="mt-2 max-w-[62ch] text-body leading-relaxed text-sand">
+            {t('vote.tallyLostMeans')}
+          </p>
+        </div>
       )}
 
       {showsTally && tally && (
@@ -481,7 +513,13 @@ export default function VotePanel({
         {matter.status === 'deliberation' && signatory && stepsOutstanding === 0 &&
           button(t('action.openVoting'), () => setActing('openVoting'))}
 
-        {matter.status === 'voting' && signatory &&
+        {/*
+          And the same rule when the tally never arrived: closing a vote
+          turns on how many were for it against how many were required, and
+          neither number is on the screen. The control is absent rather than
+          offered over an unknown, and the sentence above says why.
+        */}
+        {matter.status === 'voting' && signatory && !tallyLost &&
           button(t('action.close'), () => setActing('closeVoting'))}
 
         {matter.status === 'voting' && signatory && !reopening &&

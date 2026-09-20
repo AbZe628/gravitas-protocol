@@ -462,7 +462,7 @@ dokazala da hvata — ubačen kvar mora biti prijavljen. **Ispunjeno
 
 ---
 
-### FAZA 6 · Pet stanja svakog ekrana
+### FAZA 6 · Pet stanja svakog ekrana — **URAĐENO 20.09.2026.**
 
 **Posao:** *prazno · učitava · djelimično · greška · idealno* na svih 50
 čvorova. Uz njih dva koja su naša: **zid** *(čin postoji, ekran ne)* i **nema
@@ -568,9 +568,54 @@ prekršaje — a nijedan se ne ponovi kad se pokrene sam. Zato jedna faza po
 pregledniku, nalaz na disk, sažetak od tri fajla; `stanja.sh` to veže. Bez
 toga sam skoro popravljao dva ekrana koja nikad nisu bila pokvarena.
 
+#### Djelimično — **20 od 20, 20.09.2026.**
+
+Najopasnije od pet stanja, jer se jedino ne vidi. Prazno, greška i tišina
+ekran ili nema ili kaže; djelimično znači da je dobio tri od pet stvari,
+iscrtao ta tri uredno, i član čita nepotpun zapis kao potpun — pa na njemu
+odlučuje.
+
+`djelimicno.mjs` prvo popiše šta ekran traži, pa pusti **glavnu** putanju
+čitavu i obori **svaku sljedeću** čitavu. Tako ekran uvijek ima šta pokazati,
+i pita se kaže li i šta mu fali.
+
+| | |
+|---|---|
+| pukli | **0** |
+| dobili dio a ćute | **0** *(bilo 6)* |
+| neprimjenjivo — jedna putanja | 13 |
+
+Trinaest ekrana traži samo jedan izvor: oboriti ga znači napraviti grešku,
+koja je već izmjerena. To nije prolaz nego **neprimjenjivo**, i tako se broji.
+
+**Šest pravih kvarova, svi istog oblika:** neuspjelo čitanje spremano je u
+istu vrijednost kao zakonito odsustvo.
+
+| gdje | šta je značilo |
+|---|---|
+| `MatterFlow` | koraci nisu stigli → isto kao predmet **bez oblika**. Traka koraka nestane, radno okno prazno, ekran ćuti |
+| `VotePanel` | zbir glasova nije stigao → isto kao **nijedan glas**. Ekran piše *THE VOTE*, nijedan broj, i nudi **Close the vote** |
+| `Record` | šta je odlučeno nije stiglo → prazna lista, a ekran napiše **„Nothing has been settled yet"** |
+| `Examinations` | propisi na snazi nisu stigli → **„nema ništa na snazi"**, i izuzetak se ne mjeri ni na šta |
+| `Meetings` | sastav odbora nije stigao → prisustvo i kvorum se ne mogu izvesti, tiho |
+| `Dashboard` | registry i vremena čekanja nisu stigli → oba tiho odbačena |
+
+**Zatvaranje glasanja je uklonjeno kad zbir nije pročitan.** Isto pravilo
+koje već stoji iznad *otvaranja* glasanja: kontrola koja se ne može ispuniti
+je **odsutna, ne onemogućena**, a na njenom mjestu stoji rečenica koja kaže
+zašto.
+
+**I jedna stvar naučena usput:** prvo sam poruku stavio na dno stranice, a
+ekran je i dalje pisao „Nothing has been settled yet" tamo gdje lista treba
+biti — lažna tvrdnja prva, ispravka ispod pregiba. Član čita prvu. Poruka
+sada stoji **umjesto** liste, ne ispod nje.
+
+`SABOTAZA=1` sakrije sve što mjera traži: tada prijavi 6 ćutljivih. Bez nje
+0 — dokaz da poređenje radi.
+
 **Gotovo je kad:** svaki čvor prođe test od šest pitanja iz §35.5.
-*Ispunjeno za šest pitanja i za tri natjerana stanja; ostaje **djelimično**
-— ekran koji je dobio dio odgovora a dio ne.*
+**Ispunjeno 20.09.2026.** — šest pitanja 20/20, tri natjerana stanja 20/20,
+djelimično 20/20.
 
 ---
 

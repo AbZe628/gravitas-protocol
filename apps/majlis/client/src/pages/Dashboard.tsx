@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Gaps } from '../components/page.js';
 import { Link } from 'react-router-dom';
 import { api, oversight, type EnforcementSnapshot, type MatterSummary, type Wait } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
@@ -53,16 +54,37 @@ export default function Dashboard() {
       return !was;
     });
 
+  /*
+   * What could not be read, kept apart from what is legitimately absent.
+   *
+   * Both used to be discarded: enforcement became null, which also means
+   * none is configured, and the waiting times became simply absent.
+   */
+  const [enforcementLost, setEnforcementLost] = useState(false);
+  const [paceLost, setPaceLost] = useState(false);
+
   useEffect(() => {
     api
       .matters()
       .then((r) => (Array.isArray(r) ? setMatters(r) : setFailed(true)))
       .catch(() => setFailed(true));
-    api.enforcement().then(setEnforcement).catch(() => setEnforcement(null));
+    api
+      .enforcement()
+      .then((e) => {
+        setEnforcement(e);
+        setEnforcementLost(false);
+      })
+      .catch(() => {
+        setEnforcement(null);
+        setEnforcementLost(true);
+      });
     oversight
       .pace()
-      .then((p) => setWaits(new Map((p.waiting ?? []).map((w) => [w.matterId, w]))))
-      .catch(() => undefined);
+      .then((p) => {
+        setWaits(new Map((p.waiting ?? []).map((w) => [w.matterId, w])));
+        setPaceLost(false);
+      })
+      .catch(() => setPaceLost(true));
   }, []);
 
   if (failed) return <ErrorText />;
@@ -218,6 +240,13 @@ export default function Dashboard() {
           </div>
         </div>
       )}
+
+      <Gaps
+        items={[
+          enforcementLost ? t('gap.enforcementLost') : null,
+          paceLost ? t('gap.paceLost') : null,
+        ].filter((x): x is string => x !== null)}
+      />
     </div>
   );
 }

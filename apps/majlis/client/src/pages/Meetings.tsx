@@ -9,7 +9,7 @@ import {
   type Meetings as MeetingsData,
 } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
-import { Division, Nothing, PageHead } from '../components/page.js';
+import { Division, Gaps, Nothing, PageHead } from '../components/page.js';
 import { useIdentity } from '../lib/identity.js';
 import { Card, DateText, ErrorText, Loading, Tag } from '../components/ui.js';
 import { useStillThere } from '../lib/stillThere.js';
@@ -395,6 +395,8 @@ export default function Meetings() {
   /** A failed refresh keeps a screen that is already there. */
   const there = useStillThere();
 
+  /** The membership was asked for and did not come. */
+  const [boardLost, setBoardLost] = useState(false);
   const [convening, setConvening] = useState(false);
   /** Whether the window that convenes the sitting is showing. */
   const [convenening, setConvenening] = useState(false);
@@ -432,8 +434,17 @@ export default function Meetings() {
          */
         return api
           .board(d.boardId)
-          .then((got) => setBoard(got && Array.isArray(got.members) ? got : null))
-          .catch(() => undefined);
+          .then((got) => {
+            const dobar = !!got && Array.isArray(got.members);
+            setBoard(dobar ? got : null);
+            setBoardLost(!dobar);
+          })
+          /*
+           * Not thrown away. Attendance and quorum are counted from the
+           * membership, and a screen that holds none of it would let
+           * somebody record a sitting against nobody.
+           */
+          .catch(() => setBoardLost(true));
       })
       .catch(() => there.lost(setFailed));
 
@@ -670,6 +681,8 @@ export default function Meetings() {
           </ul>
         </Division>
       )}
+
+      <Gaps items={boardLost ? [t('gap.boardLost')] : []} />
     </div>
   );
 }
