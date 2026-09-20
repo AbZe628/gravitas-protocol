@@ -1,3 +1,4 @@
+import { forgetIdentity } from './lib/identity.js';
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
@@ -94,6 +95,15 @@ describe('the steps that belong to the institution are not offered to the board'
     const { unmount } = show();
     await waitFor(() => expect(screen.getByRole('button', { name: /this is a breach/ })).toBeInTheDocument());
     unmount();
+
+    /*
+     * A second page load, not a second render. Who is looking is asked once
+     * and shared, because seventy-two components were each asking for it
+     * separately; the application cannot change identity while it is open —
+     * the credential is carried by the browser session — so a test showing
+     * two different members is showing two sessions, and says so.
+     */
+    forgetIdentity();
 
     stub({ role: 'advisory', office: 'secretary' }, incident({ stage: 'reported', actual: null, concurrences: [], clock: null }));
     show();

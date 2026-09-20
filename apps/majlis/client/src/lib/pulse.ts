@@ -27,30 +27,85 @@ import { useEffect, useState } from 'react';
  * as it did before any of this, which is the honest failure: no bell rather
  * than a bell that lies.
  */
-export function useRevision(): number {
-  const [revision, setRevision] = useState(0);
+/*
+ * One line for the whole application, however many screens are watching.
+ *
+ * ── what this was doing ───────────────────────────────────────────────────
+ *
+ * Every component calling `useRevision` opened its own `EventSource`. A
+ * stream never finishes, so each one held a connection for as long as the
+ * screen was up. Measured in the browser: two still open on the home screen
+ * once everything had settled, one on the others — and in development, four
+ * opened before StrictMode's cleanup closed two.
+ *
+ * A browser holds six connections per host on HTTP/1.1. Every stream past
+ * the first takes one of those six away from a request that is actually
+ * waiting for an answer. On a slowed server this was visible: responses
+ * arrived in pairs, and the home screen took fourteen seconds to appear.
+ *
+ * ── one line, shared ──────────────────────────────────────────────────────
+ *
+ * The line carries a count and nothing else, so there is nothing to tell one
+ * subscriber that another one should not hear. It opens when the first
+ * screen asks and closes when the last one stops.
+ */
+let linija: EventSource | null = null;
+let zadnja = 0;
+const slusaoci = new Set<(revision: number) => void>();
 
-  useEffect(() => {
-    if (typeof EventSource === 'undefined') return;
+function prikljuci(slusalac: (revision: number) => void): () => void {
+  slusaoci.add(slusalac);
 
-    const line = new EventSource('/api/pulse', { withCredentials: true });
-
-    line.onmessage = (event) => {
+  if (!linija && typeof EventSource !== 'undefined') {
+    linija = new EventSource('/api/pulse', { withCredentials: true });
+    linija.onmessage = (event) => {
       try {
         const said = JSON.parse(event.data) as { revision?: unknown };
-        if (typeof said.revision === 'number') setRevision(said.revision);
+        if (typeof said.revision !== 'number') return;
+        zadnja = said.revision;
+        for (const s of slusaoci) s(zadnja);
       } catch {
         /* A line that says something unreadable is not a reason to fall over. */
       }
     };
-
     /*
      * No handler for errors on purpose. EventSource reconnects by itself, and
      * a screen that announced every blip would be noisier than the thing it
      * is reporting.
      */
-    return () => line.close();
-  }, []);
+  }
+
+  return () => {
+    slusaoci.delete(slusalac);
+    if (slusaoci.size === 0 && linija) {
+      linija.close();
+      linija = null;
+    }
+  };
+}
+
+/**
+ * Drop the line and the count it carried.
+ *
+ * For a test, where one file runs many screens in one process and the count
+ * from the previous one has nothing to do with the next.
+ */
+export function forgetPulse(): void {
+  if (linija) linija.close();
+  linija = null;
+  zadnja = 0;
+  slusaoci.clear();
+}
+
+export function useRevision(): number {
+  /*
+   * Starts from the last count the line carried, not from zero. A screen
+   * opening second would otherwise see the count jump on the next message
+   * and think the record had moved when it had not.
+   */
+  const [revision, setRevision] = useState(() => zadnja);
+
+  useEffect(() => prikljuci(setRevision), []);
 
   return revision;
 }

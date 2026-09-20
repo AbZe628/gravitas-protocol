@@ -468,6 +468,53 @@ dokazala da hvata — ubačen kvar mora biti prijavljen. **Ispunjeno
 čvorova. Uz njih dva koja su naša: **zid** *(čin postoji, ekran ne)* i **nema
 pojma** *(nema ključa, lanca, volumena, releja)*.
 
+#### Stanje „učitava" — aplikacija je gušila samu sebe · **POPRAVLJENO 20.09.2026.**
+
+Nađeno usput, dok se popravljao uslov smiraja u mjerama: na serveru
+usporenom za 2,2 sekunde početni ekran je stajao na „Loading…" **četrnaest
+sekundi**, i šest od tih četrnaest bez ijednog zahtjeva u letu.
+
+U tragu jednog otvaranja: dvadeset zahtjeva. `/api/attention` **deset do
+dvanaest puta**, `/api/queue` šest, i **četiri odvojene SSE veze** na
+`/api/pulse`.
+
+| šta | zašto |
+|---|---|
+| `useIdentity` se zove na **72 mjesta**, svaki put svoj `/api/attention` | ko gleda se ne mijenja između dvije komponente istog ekrana |
+| `useRevision` otvara **`EventSource` po komponenti**, a tok nikad ne završi | preglednik drži **šest** veza po domaćinu; svaki tok preko prvog oduzme mjesto zahtjevu koji stvarno čeka |
+
+Zato su odgovori stizali u parovima. Na lokalnom serveru se ništa od ovoga
+ne vidi — odgovor dođe za milisekundu, pa dvanaest istih zahtjeva izgleda
+kao jedan.
+
+**Popravka:** pita se jednom i dijeli. Identitet ide kroz jedno obećanje;
+tok je jedan za cijelu aplikaciju, otvori se kad prvi ekran pita i zatvori
+kad zadnji prestane.
+
+**Šta se odmah vidjelo:** dvanaest testova je palo isti čas. Svaki od njih
+se usred testa prijavi kao neko drugi — što je ista zastarjelost koju bi
+imao i pravi član da se odjavi i prijavi kao neko drugi. Odatle
+`forgetIdentity`, i `beforeEach` u `test-setup.ts` koji svaki test počinje
+kao novo učitavanje stranice.
+
+**Mjereno, na proizvodnoj gradnji (bez StrictMode udvostručavanja):**
+
+| | prije | poslije |
+|---|---|---|
+| `/api/attention` po ekranu | 10–12 | **1** |
+| otvorenih tokova, početni ekran | 2 | **1** |
+| zahtjeva, početni ekran | 18 | **7** |
+| zahtjeva, postavke | 24 | **9** |
+| do sadržaja na usporenom serveru | 14,0s | **2,8s** |
+
+Mjere: `work/majlis-local/veze.mjs` *(koliko veza, koliko istih pitanja)* i
+`cekanje.mjs` *(trag svakog zahtjeva sa vremenom)*.
+
+**Ostaje zapisano, nije popravljeno:** `/api/queue` se na početnom ekranu
+traži četiri puta — dva pozivaoca, svaki uz osvježavanje na puls. Ne drži
+prvi prikaz i nije ista vrsta kvara; `lib/news.tsx` poredi staro i novo da
+bi znao *šta je novo*, pa dijeljenje te kopije nije bezopasno.
+
 **Posljedice u istom prolazu**
 
 - prazno nikad ne piše „nema podataka" — piše **zašto** je prazno i **šta

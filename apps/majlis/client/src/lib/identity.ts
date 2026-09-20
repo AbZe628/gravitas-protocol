@@ -27,27 +27,79 @@ export interface Identity {
   office: Office;
 }
 
+/*
+ * Asked once for the whole screen, not once per component.
+ *
+ * ── what this was doing ───────────────────────────────────────────────────
+ *
+ * `useIdentity` is called in seventy-two places, and every one of them ran
+ * its own `/api/attention`. Measured in the browser: ten to twelve requests
+ * for the same answer on a single screen — the home screen 10, settings 12.
+ * Half of that is StrictMode mounting twice in development, so five or six
+ * of them are real and would ship.
+ *
+ * Nothing was wrong on a local server, where the answer comes back in
+ * milliseconds. On a slowed one it showed what it costs: the home screen sat
+ * on "Loading…" for fourteen seconds, because a browser holds six
+ * connections per host and the screen was spending them on the same
+ * question over and over.
+ *
+ * ── one request, and the answer kept ──────────────────────────────────────
+ *
+ * Who is looking does not change between two components of one screen. The
+ * request is made once and every caller waits on that same promise; once it
+ * has answered, a component mounting later starts with the answer already
+ * in hand rather than flashing through a loading state it has no reason to
+ * show.
+ */
+let upit: Promise<Identity | null> | null = null;
+let poznato: Identity | null = null;
+let odgovoreno = false;
+
+function pitaj(): Promise<Identity | null> {
+  upit ??= governance
+    .attention()
+    .then((a) => {
+      if (a && typeof a.scholarId === 'string' && typeof a.role === 'string') {
+        poznato = { scholarId: a.scholarId, role: a.role, office: a.office ?? null };
+      }
+      return poznato;
+    })
+    .catch(() => {
+      // Not knowing is a state the interface handles; it shows nothing that
+      // would need an identity rather than guessing at one.
+      return null;
+    })
+    .finally(() => {
+      odgovoreno = true;
+    });
+  return upit;
+}
+
+/**
+ * Ask again the next time somebody looks.
+ *
+ * Signing out, signing in as somebody else, or anything else that changes
+ * whose credential is being carried. Without this the kept answer would
+ * outlive the person it describes.
+ */
+export function forgetIdentity(): void {
+  upit = null;
+  poznato = null;
+  odgovoreno = false;
+}
+
 export function useIdentity(): { identity: Identity | null; loading: boolean } {
-  const [identity, setIdentity] = useState<Identity | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [identity, setIdentity] = useState<Identity | null>(() => poznato);
+  const [loading, setLoading] = useState(() => !odgovoreno);
 
   useEffect(() => {
     let live = true;
-    governance
-      .attention()
-      .then((a) => {
-        if (!live) return;
-        if (a && typeof a.scholarId === 'string' && typeof a.role === 'string') {
-          setIdentity({ scholarId: a.scholarId, role: a.role, office: a.office ?? null });
-        }
-      })
-      .catch(() => {
-        // Not knowing is a state the interface handles; it shows nothing that
-        // would need an identity rather than guessing at one.
-      })
-      .finally(() => {
-        if (live) setLoading(false);
-      });
+    void pitaj().then((who) => {
+      if (!live) return;
+      setIdentity(who);
+      setLoading(false);
+    });
     return () => {
       live = false;
     };

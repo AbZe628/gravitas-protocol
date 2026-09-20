@@ -1,3 +1,4 @@
+import { forgetIdentity } from './lib/identity.js';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor, fireEvent, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
@@ -361,6 +362,8 @@ describe('raising a matter', () => {
     await waitFor(() => expect(screen.queryByText('Raise a matter')).toBeNull());
 
     vi.unstubAllGlobals();
+    /* A second session: identity is asked once and shared, as in the app. */
+    forgetIdentity();
     stub({ role: 'advisory' });
     renderDashboard();
     await waitFor(() => expect(screen.getAllByText('Raise a matter').length).toBeGreaterThan(0));
