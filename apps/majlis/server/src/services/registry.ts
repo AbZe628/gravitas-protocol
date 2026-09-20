@@ -51,6 +51,39 @@ export function configFromEnv(): RegistryConfig {
   };
 }
 
+/**
+ * Addresses that are no longer the protocol's, and why that is dangerous.
+ *
+ * ── the failure this prevents ─────────────────────────────────────────────
+ *
+ * A superseded contract is not gone. It sits on the chain answering
+ * `paused()` and `owner()` exactly as it always did, with the state it had
+ * the day it was replaced. Point Majlis at one and every read succeeds:
+ * `reachable: true`, no error, a green screen — reporting the enforcement
+ * state of a registry that enforces nothing.
+ *
+ * That is the worst shape a fault can take here. A board would be shown that
+ * what runs matches what it approved, on evidence from a dead contract, and
+ * nothing anywhere would say otherwise.
+ *
+ * So it is refused before a single read, by address, and the refusal names
+ * the replacement. `docs/DEPLOYMENTS.md` is where these come from and is the
+ * only place they are decided.
+ */
+export const SUPERSEDED: Readonly<Record<string, string>> = {
+  /* GravitasPolicyRegistry 0.1.0 → the 0.2.0 registry. */
+  '0xbcae3069362b0f0b80f44139052f159456c84679': 'GravitasPolicyRegistry 0.1.0',
+  /* TeleportV3 0.1.0. Not a registry at all, and it would decode as nonsense. */
+  '0x5d423f8d01539b92d3f3953b91682d9884d1e993': 'TeleportV3 0.1.0',
+};
+
+export const CURRENT_REGISTRY = '0x6f3bfb896DD9964C9c05dA88692bDf1b1b2C3F23';
+
+/** What this address is, if it is one Majlis must not read. */
+export function supersededAs(address: string): string | null {
+  return SUPERSEDED[address.trim().toLowerCase()] ?? null;
+}
+
 export async function readRegistry(cfg: RegistryConfig): Promise<RegistrySnapshot> {
   const base: RegistrySnapshot = {
     address: cfg.address,
@@ -58,6 +91,26 @@ export async function readRegistry(cfg: RegistryConfig): Promise<RegistrySnapsho
     readAt: new Date().toISOString(),
     reachable: false,
   };
+
+  /*
+   * Refused before the read, not after.
+   *
+   * Reading it first and then deciding would mean holding, for a moment, a
+   * successful answer from the wrong contract — and every such moment is one
+   * where somebody adds a line that reports it.
+   */
+  const stale = supersededAs(cfg.address);
+  if (stale) {
+    return {
+      ...base,
+      superseded: true,
+      error:
+        `This is ${stale}, which was replaced and is not the protocol's registry. ` +
+        `It still answers, which is why it is refused here rather than read: ` +
+        `an answer from it would describe a contract that enforces nothing. ` +
+        `The current registry is ${CURRENT_REGISTRY}.`,
+    };
+  }
 
   if (cfg.offline) {
     return { ...base, error: 'offline mode: chain not contacted' };

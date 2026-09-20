@@ -567,6 +567,15 @@ export interface RegistrySnapshot {
   chainId: number;
   readAt: string;
   reachable: boolean;
+  /**
+   * The address given is one that was replaced, and was refused unread.
+   *
+   * Separate from `error` because it is not a failure to reach anything —
+   * the old contract answers perfectly well. It is a refusal to believe it.
+   * A screen that showed this as an ordinary connection problem would invite
+   * somebody to retry until it worked.
+   */
+  superseded?: boolean;
   /** Present only when the chain read succeeded. */
   paused?: boolean;
   owner?: string;

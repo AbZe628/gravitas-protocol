@@ -332,6 +332,8 @@ export interface EnforcementSnapshot {
   readAt: string;
   label?: string;
   reachable?: boolean;
+  /** The address given was replaced and was refused unread. Not a fault to retry. */
+  superseded?: boolean;
   paused?: boolean;
   owner?: string;
   address?: string;

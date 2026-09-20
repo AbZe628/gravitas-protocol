@@ -30,6 +30,14 @@ export interface EnforcementSnapshot {
   /** Everything below is present only when something is attached. */
   label?: string;
   reachable?: boolean;
+  /**
+   * The configured address is one that was replaced, and was refused unread.
+   *
+   * Carried through rather than folded into `reachable: false`, because the
+   * old contract is perfectly reachable. A screen that showed this as a
+   * connection problem would have somebody retrying until it worked.
+   */
+  superseded?: boolean;
   paused?: boolean;
   owner?: string;
   address?: string;
@@ -69,6 +77,7 @@ export class GravitasRegistryEnforcement implements Enforcement {
       label: 'Gravitas Policy Registry',
       readAt: read.readAt,
       reachable: read.reachable,
+      superseded: read.superseded,
       paused: read.paused,
       owner: read.owner,
       address: read.address,

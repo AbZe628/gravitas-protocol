@@ -58,6 +58,21 @@ export default function WhereItEnds({ matter }: { matter: Matter }) {
 
   const onChain = enforcement.kind === 'gravitas-registry' && enforcement.configured;
 
+  /*
+   * A refused address means the assurance above it is not true.
+   *
+   * `ends.enforcedNote` says *what the registry reads is what this board
+   * approved, and the two can be compared*. Pointed at a replaced contract,
+   * nothing is being read and nothing can be compared — so the screen was
+   * giving the assurance and the refusal one above the other. Found by
+   * running the server against a superseded address and reading the page.
+   *
+   * The badge and the two sentences fall back to what a document-only
+   * installation says, which is true here: this is a written ruling, and
+   * nothing is reading it.
+   */
+  const reading = onChain && !enforcement.superseded;
+
   return (
     <div className="mb-7 rounded-sheet bg-raised px-6 py-5 shadow-card">
       <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-2">
@@ -67,21 +82,21 @@ export default function WhereItEnds({ matter }: { matter: Matter }) {
         <span
           className={
             'rounded-full px-2.5 py-0.5 text-label font-bold uppercase tracking-label ' +
-            (onChain
+            (reading
               ? 'bg-settledtint text-settled shadow-ringsettled'
               : 'bg-black/[0.045] text-sand')
           }
         >
-          {t(onChain ? 'ends.enforced' : 'ends.document')}
+          {t(reading ? 'ends.enforced' : 'ends.document')}
         </span>
       </div>
 
       <p className="max-w-[62ch] font-display text-sub leading-relaxed">
-        {t(onChain ? 'ends.enforcedWhat' : 'ends.documentWhat')}
+        {t(reading ? 'ends.enforcedWhat' : 'ends.documentWhat')}
       </p>
 
       <p className="mt-3 max-w-[62ch] text-ui leading-relaxed text-muted">
-        {t(onChain ? 'ends.enforcedNote' : 'ends.documentNote')}
+        {t(reading ? 'ends.enforcedNote' : 'ends.documentNote')}
       </p>
 
       {/*
@@ -95,18 +110,46 @@ export default function WhereItEnds({ matter }: { matter: Matter }) {
             {t('ends.readAt')}
           </span>
           <span className="break-all font-mono text-note text-lapis">{enforcement.address}</span>
-          {enforcement.reachable === false && (
-            <span className="text-note text-breach">{t('ends.unreachable')}</span>
+          {/*
+            A replaced address is not an unreachable one, and must not read
+            as one.
+
+            The old contract answers — that is exactly why the read is
+            refused rather than trusted. Shown as *unreachable* it would
+            look like a network fault, and somebody would retry it until a
+            good day made it "work", which would mean reading enforcement
+            state off a contract that enforces nothing.
+          */}
+          {enforcement.superseded ? (
+            <span className="text-note text-breach">{t('ends.superseded')}</span>
+          ) : (
+            enforcement.reachable === false && (
+              <span className="text-note text-breach">{t('ends.unreachable')}</span>
+            )
           )}
         </div>
       )}
 
+      {/*
+        Said in full below the address, because the one word above cannot
+        carry it: which contract this is, and what the current one is.
+      */}
+      {onChain && enforcement.superseded && enforcement.error && (
+        <p
+          role="alert"
+          className="mt-3 max-w-[62ch] rounded-card bg-raised px-4 py-3 text-ui leading-relaxed text-sand shadow-ringbreach"
+        >
+          {enforcement.error}
+        </p>
+      )}
+
       <div className="mt-5 space-y-2.5">
         <DocumentLink
-          emphasis={!onChain}
+          /* With nothing reading it, the document is the instrument again. */
+          emphasis={!reading}
           href={oversight.hrefs.fatwa(matter.id)}
           label={t('doc.fatwa')}
-          note={t(onChain ? 'ends.documentIsRecord' : 'doc.fatwaNote')}
+          note={t(reading ? 'ends.documentIsRecord' : 'doc.fatwaNote')}
         />
 
         {/*
