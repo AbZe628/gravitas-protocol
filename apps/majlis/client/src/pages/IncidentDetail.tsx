@@ -91,6 +91,13 @@ function Reason({
               await onSubmit(text);
               setOpen(false);
               setText('');
+            } catch {
+              /*
+               * Refused, or called off in the window that asks. What was
+               * typed stays where it is: a plan is several lines of somebody
+               * else's work, and retyping it is not a small thing. The
+               * refusal itself is shown by the act.
+               */
             } finally {
               setBusy(false);
             }
@@ -130,6 +137,31 @@ export default function IncidentDetail() {
     did: string;
     means: string;
     next: readonly { label: string; to?: string; says?: string }[];
+  } | null>(null);
+
+  /**
+   * The one window on this screen that takes its act as a task.
+   *
+   * Two acts here are raised from shared controls — `Reason` and
+   * `PrescribeForm` — which other acts on this screen also use, and those
+   * already have their own windows. Changing the controls would change all
+   * of them. So the screen holds one window, and a control that wants
+   * confirming hands it what to say, what to run and what follows.
+   *
+   * `calledOff` is how the control learns the window was closed without
+   * the act being done, so it can keep what was typed.
+   */
+  const [zadatak, setZadatak] = useState<{
+    title: string;
+    does: string;
+    means: string;
+    run: () => Promise<void>;
+    calledOff: () => void;
+    after: {
+      did: string;
+      means: string;
+      next: readonly { label: string; to?: string; says?: string }[];
+    };
   } | null>(null);
 
   /*
@@ -290,13 +322,29 @@ export default function IncidentDetail() {
             label={t('snc.filePlan')}
             placeholder={t('snc.planHint')}
             onSubmit={(text) =>
-              act(() =>
-                oversight.filePlan(
-                  id,
-                  text.split('\n').map((x) => x.trim()).filter(Boolean),
-                  new Date(Date.now() + 30 * 86_400_000).toISOString().slice(0, 10),
-                ),
-              )
+              new Promise<void>((done, calledOff) => {
+                setZadatak({
+                  title: t('snc.filePlan'),
+                  does: t('wm.filePlan.does'),
+                  means: t('wm.filePlan.means'),
+                  run: async () => {
+                    setIncident(
+                      await oversight.filePlan(
+                        id,
+                        text.split('\n').map((x) => x.trim()).filter(Boolean),
+                        new Date(Date.now() + 30 * 86_400_000).toISOString().slice(0, 10),
+                      ),
+                    );
+                    done();
+                  },
+                  calledOff: () => calledOff(new Error('called off')),
+                  after: {
+                    did: t('wm.filePlan.did'),
+                    means: t('wm.filePlan.didMeans'),
+                    next: [{ label: t('wm.next.checkPlan'), says: t('wm.next.checkPlanSays') }],
+                  },
+                });
+              })
             }
           />
         ) : undefined,
@@ -410,7 +458,32 @@ export default function IncidentDetail() {
       action: (
         <>
           {determined && board && !i.purification && (
-            <PrescribeForm onSubmit={(p) => act(() => oversight.prescribe(id, p))} />
+            <PrescribeForm
+              onSubmit={(p) =>
+                new Promise<void>((done, calledOff) => {
+                  setZadatak({
+                    title: t('snc.prescribe'),
+                    does: t('wm.prescribe.does'),
+                    means: t('wm.prescribe.means'),
+                    run: async () => {
+                      setIncident(await oversight.prescribe(id, p));
+                      done();
+                    },
+                    calledOff: () => calledOff(new Error('called off')),
+                    after: {
+                      did: t('wm.prescribe.did'),
+                      means: t('wm.prescribe.didMeans'),
+                      next: [
+                        {
+                          label: t('wm.next.institutionPlan'),
+                          says: t('wm.next.institutionPlanSays'),
+                        },
+                      ],
+                    },
+                  });
+                })
+              }
+            />
           )}
           {i.purification && !i.purification.paidAt && clerk && (
             <Button tone="quiet" size="sm" onClick={() => setActing('paid')}>
@@ -453,6 +526,33 @@ export default function IncidentDetail() {
    */
   const windows = (
     <>
+      {/*
+        The plan and the prescribed measure are raised from shared controls,
+        so they hand this window what to say and what to run rather than each
+        control carrying a window of its own.
+      */}
+      <Act
+        open={zadatak !== null}
+        onClose={() => {
+          /*
+           * On success the act has already settled its promise, so this
+           * refusal lands on a settled promise and is ignored. Closing
+           * without doing it is what this is for.
+           */
+          zadatak?.calledOff();
+          setZadatak(null);
+        }}
+        title={zadatak?.title ?? ''}
+        does={zadatak?.does ?? ''}
+        means={zadatak?.means}
+        label={zadatak?.title ?? ''}
+        perform={async () => {
+          await zadatak?.run();
+        }}
+        onDone={setJustDid}
+        after={zadatak?.after}
+      />
+
       <Act
         open={acting === 'concurYes'}
         onClose={() => setActing(null)}
@@ -764,8 +864,12 @@ function PrescribeForm({
       <div className="flex gap-2">
         <Button
           onClick={async () => {
-            await onSubmit(p);
-            setOpen(false);
+            try {
+              await onSubmit(p);
+              setOpen(false);
+            } catch {
+              /* Refused, or called off: the amount and destination stay. */
+            }
           }}
           className="rounded-xl bg-raised shadow-ring px-3 py-1.5 text-ui text-lapis font-medium"
         >

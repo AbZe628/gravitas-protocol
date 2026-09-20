@@ -396,11 +396,21 @@ export default function Meetings() {
   const there = useStillThere();
 
   const [convening, setConvening] = useState(false);
+  /** Whether the window that convenes the sitting is showing. */
+  const [convenening, setConvenening] = useState(false);
+  /*
+   * What convening did. The form closes and the list redraws, so the answer
+   * is held by the page rather than by the form that is about to go.
+   */
+  const [convened, setConvened] = useState<{
+    did: string;
+    means: string;
+    next: readonly { label: string; to?: string; says?: string }[];
+  } | null>(null);
   const [at, setAt] = useState('');
   const [joinUrl, setJoinUrl] = useState('');
   const [agenda, setAgenda] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
 
   const load = () =>
     oversight
@@ -438,37 +448,39 @@ export default function Meetings() {
   const canConvene = office === 'chair';
   const canKeep = office === 'chair' || office === 'secretary';
 
-  async function convene(e: React.FormEvent) {
-    e.preventDefault();
-    setBusy(true);
-    setError(null);
-    try {
-      await oversight.convene({
-        boardId: data!.boardId,
-        at: new Date(at).toISOString(),
-        joinUrl: joinUrl.trim() || null,
+  async function convene() {
+    await oversight.convene({
+      boardId: data!.boardId,
+      at: new Date(at).toISOString(),
+      joinUrl: joinUrl.trim() || null,
         // One item per line. A board writing an agenda is writing a list, and
         // a form with an "add item" button for each line is a form nobody
         // finishes.
-        agenda: agenda
-          .split('\n')
-          .map((line) => line.trim())
-          .filter((line) => line !== '')
-          .map((item) => ({ item })),
-      });
-      setConvening(false);
-      setAgenda('');
-      setJoinUrl('');
-      void load();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
-    } finally {
-      setBusy(false);
-    }
+      agenda: agenda
+        .split('\n')
+        .map((line) => line.trim())
+        .filter((line) => line !== '')
+        .map((item) => ({ item })),
+    });
+    setConvening(false);
+    setAgenda('');
+    setJoinUrl('');
+    void load();
   }
 
   return (
     <div>
+      {convened && (
+        <div className="mb-5">
+          <AfterAct
+            did={convened.did}
+            means={convened.means}
+            next={convened.next}
+            onClose={() => setConvened(null)}
+          />
+        </div>
+      )}
+
       <PageHead
         phase="deciding"
         title={t('meet.title')}
@@ -576,12 +588,34 @@ export default function Meetings() {
 
           <div className="flex gap-2">
             <Button
-              type="submit"
-              disabled={busy || !at}
+              type="button"
+              onClick={() => setConvenening(true)}
+              disabled={!at}
               className="rounded-xl bg-raised shadow-ring px-3.5 py-1.5 text-ui text-lapis font-medium disabled:opacity-40"
             >
               {t('meet.conveneIt')}
             </Button>
+
+            {/*
+              The date everything else counts from: the interval to the next
+              sitting is measured from the last one held, and what can be
+              minuted depends on there being a sitting at all.
+            */}
+            <Act
+              open={convenening}
+              onClose={() => setConvenening(false)}
+              title={t('meet.conveneIt')}
+              does={t('wm.convene.does')}
+              means={t('wm.convene.means')}
+              label={t('meet.conveneIt')}
+              perform={convene}
+              onDone={setConvened}
+              after={{
+                did: t('wm.convene.did'),
+                means: t('wm.convene.didMeans'),
+                next: [{ label: t('wm.next.attendance'), says: t('wm.next.attendanceSays') }],
+              }}
+            />
             <Button
               type="button"
               onClick={() => {

@@ -387,10 +387,42 @@ i nijedan korak, jer koraka tu nema.
 
 ---
 
-### FAZA 5 · Prozor i „šta slijedi" na svakom činu — **URAĐENO 19.09.2026.**
+### FAZA 5 · Prozor i „šta slijedi" na svakom činu — **URAĐENO 20.09.2026.**
 
-> **50 sa prozorom i „šta slijedi" · 9 odluka sa razlogom upisanim u kod ·
-> 0 bez ijednog.** Mjeri se sa `work/majlis-local/faza5.mjs`, nikad napamet.
+> **49 sa prozorom i „šta slijedi" · 10 odluka sa razlogom upisanim u kod ·
+> 0 bez ijednog, od 59 činova koji se zovu sa ekrana.** Mjeri se sa
+> `work/majlis-local/faza5b.mjs`, nikad napamet.
+
+**Zašto je datum pomjeren i zašto broj nije isti kao 19.09.**
+
+Ovdje je 19.09. pisalo *50 · 9 · 0*, i to je bilo netačno. Stara mjera
+(`faza5.mjs`) je za svaki čin gledala sadrži li **fajl** u kojem se zove
+ijedan `<Act`. Ekran sa tri čina i jednim prozorom prolazio je kao da ima
+tri. Živa provjera je našla prvi takav — prisustvo na sjednicama slalo je
+odmah, bez ijedne riječi — i ispalo je da ih je šest:
+
+`vote` · `object` · `reopen` · `attachSource` · `recordAttendance` ·
+`convene`, a za njima još `filePlan` i `prescribe`.
+
+`faza5b.mjs` mjeri **po činu**: traži gdje se poziv nalazi i broji ga samo
+ako je unutar nečega što prozor izvršava. Prije nego se povjeruje nuli,
+ubaci se pravi kvar i gleda je li prijavljen — ovdje: prozoru se oduzme
+poziv, i `filePlan` i `prescribe` se odmah vrate u kolonu *bez*.
+
+**Plan popravke i propisana mjera — jedan prozor koji prima zadatak**
+
+Oba se dižu iz kontrola koje dijele i činovi koji prozor već imaju
+(`Reason`, `PrescribeForm`), pa se kontrole ne smiju mijenjati za sve.
+Umjesto toga ekran drži jedan prozor kojem se preda *šta radi, šta znači,
+šta izvršiti i šta slijedi*.
+
+Uz to: **odustajanje u prozoru ostavlja otkucano na mjestu.** Plan je više
+redova nečijeg posla; prozor koji ga pri odustajanju obriše nanio je štetu
+umjesto da je spriječi. Zadatak zato nosi i `calledOff`, a obrazac na
+odbijanje ostaje otvoren.
+
+Provjereno u pregledniku, ne samo u testu: `work/majlis-local/plan-uzivo.mjs`
+— **25 od 25**, oba čina, kao sekretar i kao odbor.
 
 **Posao:** za svaki čin iz matrice §E i §33 — dijalog koji kaže *šta radi i
 kome*, i POSLIJE koje kaže *šta je urađeno · šta to znači · šta slijedi (≤3)*.
@@ -419,13 +451,14 @@ odstupanje nosi oznaku u kodu, uz razlog:
 
 | oznaka | znači | ko |
 |---|---|---|
-| — | prozor prije, „šta slijedi" poslije | 50 |
+| — | prozor prije, „šta slijedi" poslije | 49 |
 | `NO-WINDOW: <čin>` | prozora nema namjerno | `recordFinding` *(glavna petlja, 6–20 uslova zaredom)* · `screen` i `recognise` *(ne upisuju ništa; `recognise` se i ne pritiska)* · `markHolding` |
-| `NO-AFTER: <čin>` | prozor postoji, odgovor se **vidi** umjesto da se izgovori | `setParameters` · `changeHowItDecides` · `recordComputation` · `withdrawComputation` · `report` *(odvede na sam prekršaj)* |
+| `NO-AFTER: <čin>` | prozor postoji, odgovor se **vidi** umjesto da se izgovori | `openMatter` · `setParameters` · `changeHowItDecides` · `recordComputation` · `withdrawComputation` · `report` *(odvede na sam prekršaj)* |
 
-**Gotovo je kad:** mjera kaže 0 u koloni *bez jednog ili oba*, i svaka oznaka
-u drugoj i trećoj koloni ima razlog napisan iznad sebe u kodu. **Ispunjeno
-19.09.2026.**
+**Gotovo je kad:** mjera kaže 0 u koloni *bez jednog ili oba*, svaka oznaka
+u drugoj i trećoj koloni ima razlog napisan iznad sebe u kodu, i mjera je
+dokazala da hvata — ubačen kvar mora biti prijavljen. **Ispunjeno
+20.09.2026.**
 
 ---
 

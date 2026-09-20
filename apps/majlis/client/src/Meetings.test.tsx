@@ -298,6 +298,16 @@ describe('who is offered what', () => {
     });
     fireEvent.click(screen.getByRole('button', { name: /Convene it/ }));
 
+    /*
+     * Convening sets the date everything else counts from, so the press
+     * opens the window that says so. The act is the press inside it.
+     */
+    {
+      const w = await screen.findByRole('dialog');
+      expect(w.textContent).toContain('counted from the last one held');
+      fireEvent.click(within(w).getByRole('button', { name: /Convene it/ }));
+    }
+
     await waitFor(() => expect(posted).toHaveLength(1));
     const body = posted[0].body as { agenda: { item: string }[] };
     // Blank lines are not agenda items.
