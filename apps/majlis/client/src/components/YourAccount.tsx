@@ -97,7 +97,8 @@ export default function YourAccount() {
 
   return (
     <>
-      <Division heading={t('acct.yours')}>
+      {/* No heading: the fold above says "Your password" in these same words. */}
+      <Division>
         {me.stillOnTheSeed && (
           <p className="mb-5 max-w-[62ch] text-ui leading-relaxed text-sand">
             {t('acct.onTheSeed')}

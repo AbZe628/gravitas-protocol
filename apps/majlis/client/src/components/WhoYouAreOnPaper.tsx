@@ -111,8 +111,9 @@ export default function WhoYouAreOnPaper() {
 
   const BOX = 'w-full rounded-xl bg-raised px-3 py-2.5 text-body shadow-ring outline-none';
 
+  /* No heading: the fold above already says who this is about. */
   return (
-    <Division heading={t('you.heading')} note={t('you.note')}>
+    <Division>
       <form onSubmit={keep}>
         <div className="grid gap-3 sm:grid-cols-2">
           <Field label={t('you.name')} headingClass={HEADING}>
@@ -172,6 +173,19 @@ export default function WhoYouAreOnPaper() {
             {me.emailConfirmed ? t('you.confirmed') : t('you.notConfirmed')}
           </p>
         )}
+
+        {/*
+          Which way this cuts, beside the act rather than above the fields.
+
+          It used to stand between the heading and the first box, and it put
+          that box 411 pixels down a screen whose whole job is filling it in.
+          The sentence itself is not in question — a member about to change
+          how they are named on every future ruling should know that what is
+          already signed keeps the name it was signed under. But it is read
+          before pressing, not before typing, so it now sits where the
+          pressing happens.
+        */}
+        <p className="mt-5 max-w-[62ch] text-ui leading-relaxed text-muted">{t('you.note')}</p>
 
         {refusal && <p className="mt-3 text-ui leading-relaxed text-breach">{refusal}</p>}
         {kept && <p className="mt-3 text-ui text-settled">{t('you.kept')}</p>}

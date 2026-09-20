@@ -173,15 +173,26 @@ export function Division({
   children,
   note,
 }: {
-  heading: string;
+  /**
+   * Left out when whatever encloses this has already said it.
+   *
+   * On settings every panel sat inside a fold that named it and then named
+   * itself again directly underneath: "Your password" over "Your password",
+   * and "You, as you appear on a ruling" over "How you appear on a ruling".
+   * Two headings a line apart are not emphasis, they are a stutter, and they
+   * push the first field down the screen for nothing.
+   */
+  heading?: string;
   children: ReactNode;
   note?: string;
 }) {
   return (
     <section className="border-t border-line py-6 first:border-t-0 first:pt-0">
-      <div className="mb-2.5 text-label font-bold uppercase tracking-caps text-muted">
-        {heading}
-      </div>
+      {heading && (
+        <div className="mb-2.5 text-label font-bold uppercase tracking-caps text-muted">
+          {heading}
+        </div>
+      )}
       {note && <p className="mb-4 max-w-[62ch] text-ui leading-relaxed text-muted">{note}</p>}
       {children}
     </section>
