@@ -34,7 +34,28 @@ export type NoticeKind = 'none' | 'smtp';
 export type NoticeEvent =
   | { kind: 'submission_arrived'; submission: Submission }
   | { kind: 'matter_opened'; matterId: string; title: string; openedBy: string }
-  | { kind: 'vote_opened'; matterId: string; title: string; closesAt: string | null };
+  | { kind: 'vote_opened'; matterId: string; title: string; closesAt: string | null }
+  /**
+   * The board has ruled and the ruling is in force.
+   *
+   * The one event of the four that ends something rather than starting it,
+   * and the one that was missing. A question arriving composed a notice; a
+   * question being *answered* composed nothing at all, so the moment the
+   * board's work actually produced its result was the moment nobody was
+   * told.
+   *
+   * `reference` is the board's own series — the thing a bank files under and
+   * a regulator asks for. Null where the board has set no pattern, and the
+   * notice then says so rather than printing an internal id as though it
+   * were a citation.
+   */
+  | {
+      kind: 'ruling_in_force';
+      matterId: string;
+      title: string;
+      reference: string | null;
+      direction: 'permit' | 'restrict';
+    };
 
 /**
  * The notice itself: a subject, a body, and who it concerns.
@@ -117,6 +138,23 @@ export function compose(board: Board, event: NoticeEvent): Notice {
         `${event.openedBy} opened a matter for the board’s deliberation.\n\n` +
         `${event.title}\n\n` +
         `Nothing is decided by opening it. What it needs now is what the board says about it.`,
+      concerns: everyone,
+    };
+  }
+
+  if (event.kind === 'ruling_in_force') {
+    return {
+      subject: `${board.name} has ruled: ${event.title}`,
+      body:
+        `The board has ruled, and the ruling is in force.\n\n` +
+        `${event.title}\n` +
+        `${event.direction === 'permit' ? 'Permitted' : 'Restricted'}\n` +
+        (event.reference
+          ? `Filed as: ${event.reference}\n`
+          : `This board has set no reference series, so it is filed under its own id.\n`) +
+        `\nThe written ruling and the draft clauses are assembled and waiting in ` +
+        `Majlis. Nothing has been sent to the institution by this system — that ` +
+        `is a person's act, and this notice is the prompt for it.`,
       concerns: everyone,
     };
   }

@@ -93,6 +93,7 @@ import { buildPassage } from '../services/passage.js';
 import { buildQueue } from '../services/queue.js';
 import { buildInheritance, checklistStanding } from '../services/inherit.js';
 import type { Store } from '../store/index.js';
+import { compose, NoticeOff, type Notifier } from '../services/notice.js';
 import type { Deliberation, Matter, SourceKind } from '../types.js';
 import { PART_KINDS, SOURCE_KINDS } from '../types.js';
 
@@ -360,6 +361,18 @@ export function governanceRoutes(
    * issued against one document and spent once.
    */
   passkeys?: { challenges: Challenges; expected: Expected },
+  /**
+   * Who is told when the board rules.
+   *
+   * Optional, and its default sends nothing — the same arrangement as
+   * everywhere else here: a channel that is not wired composes the words and
+   * says plainly that they did not go.
+   *
+   * A question arriving already composed a notice. A question being answered
+   * composed nothing, so the one moment the board's work produced its result
+   * was the one moment nobody was told. §FAZA 7.
+   */
+  notifier: Notifier = new NoticeOff(),
 ): Router {
   const router = Router();
 
@@ -1194,7 +1207,35 @@ export function governanceRoutes(
         outcome = closed.outcome;
         return closed.matter;
       });
-      res.json({ ...updated, outcome });
+
+      /*
+       * The board has ruled, so the board is told — without anybody pressing
+       * anything. §FAZA 7: from the vote closing to the finished paper, no
+       * click.
+       *
+       * Composed only where the ruling actually took force. A restriction is
+       * in force the moment the vote closes; a permit has a timelock still to
+       * run and is told about when it ends, not here, because a notice saying
+       * a permit is in force while it is not would be the record lying in an
+       * inbox.
+       *
+       * It travels with the response rather than being fetched afterwards, so
+       * the screen that just closed the vote can say in the same breath what
+       * the words are and whether anything was sent.
+       */
+      const notice =
+        outcome === 'in_force'
+          ? compose(board, {
+              kind: 'ruling_in_force',
+              matterId: updated.id,
+              title: updated.title,
+              reference: updated.reference ?? null,
+              direction: updated.direction,
+            })
+          : null;
+      const delivery = notice ? await notifier.deliver(notice, now()) : null;
+
+      res.json({ ...updated, outcome, notice, delivery });
     }),
   );
 
@@ -1230,7 +1271,27 @@ export function governanceRoutes(
       if (!board) return;
       const held = await store.matters(board.id);
 
-      res.json(await changeMatter(store, req, res, req.params.id, (m) => bringIntoForce(m, now(), board, held)));
+      const updated = await changeMatter(store, req, res, req.params.id, (m) =>
+        bringIntoForce(m, now(), board, held),
+      );
+
+      /*
+       * The other door into force, and it needs the same notice.
+       *
+       * A permit takes effect when its timelock ends rather than when the
+       * vote closes, so telling the board only from `/close` would tell them
+       * about every restriction and no permit at all.
+       */
+      const notice = compose(board, {
+        kind: 'ruling_in_force',
+        matterId: updated.id,
+        title: updated.title,
+        reference: updated.reference ?? null,
+        direction: updated.direction,
+      });
+      const delivery = await notifier.deliver(notice, now());
+
+      res.json({ ...updated, notice, delivery });
     }),
   );
 

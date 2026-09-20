@@ -5,6 +5,8 @@ import {
   api,
   oversight,
   Refused,
+  type Delivery,
+  type Notice,
   type Checklist as ChecklistData,
   type ConditionState,
   type Matter,
@@ -15,6 +17,8 @@ import { ErrorText, Loading } from '../components/ui.js';
 import { State, toneForStatus } from '../components/kit.js';
 import ItMoved from '../components/ItMoved.js';
 import AfterAct from '../components/AfterAct.js';
+import { DocumentLink } from '../components/Documents.js';
+import TheNotice from '../components/TheNotice.js';
 import StepWindow, { type Step } from '../components/StepWindow.js';
 import TheCalculator from '../components/TheCalculator.js';
 import AskTheBank from '../components/AskTheBank.js';
@@ -86,6 +90,14 @@ export default function MatterFlow() {
   const [list, setList] = useState<ChecklistData | null>(null);
   /** The shape was asked for and did not come — not the same as having none. */
   const [listLost, setListLost] = useState(false);
+  /*
+   * The words the board is told when the ruling takes force.
+   *
+   * Held by the page for the same reason as `justDid`: closing the vote
+   * changes the status, the screen takes a different branch, and the panel
+   * that received these would be unmounted before anybody read them.
+   */
+  const [told, setTold] = useState<{ notice: Notice; delivery: Delivery } | null>(null);
   const [failed, setFailed] = useState(false);
   const there = useStillThere();
 
@@ -626,6 +638,64 @@ function lastSaid(
       >
         {gapPanel}
         {didPanel}
+
+        {/*
+          The papers, where the decision landed.
+
+          §FAZA 7: from the vote closing to a finished paper, no click. The
+          papers were finished all along — the routes assemble them on
+          request and both answer 200 the moment a ruling takes force — but
+          they were only reachable through the dossier, so a chair who had
+          just closed a vote had to go looking for the thing the closing
+          produced. Offered here, beside the signing, because this is the
+          screen the act left them on.
+
+          Read rather than sent: §11.9 draws that line, and it holds. The
+          paper assembles itself; a person decides it goes.
+        */}
+        {/*
+          What the board was told, and whether it went anywhere.
+
+          Beside the papers rather than in a mailbox nobody opens. The
+          ordinary installation has no channel, so this says plainly that
+          the words exist and were not sent — which is the prompt for a
+          person to send them. A quiet screen here would let a chair believe
+          the institution had been told.
+        */}
+        {told && (
+          <div className="mb-6">
+            <TheNotice notice={told.notice} delivery={told.delivery} />
+          </div>
+        )}
+
+        {matter.status === 'in_force' && (
+          <section className="mb-6">
+            <div className="mb-3 text-label font-bold uppercase tracking-caps text-muted">
+              {t('flow.papers')}
+            </div>
+            <div className="space-y-2.5">
+              <DocumentLink
+                href={oversight.hrefs.fatwa(matter.id)}
+                label={t('doc.fatwa')}
+                note={t('doc.fatwaNote')}
+                emphasis
+              />
+              {/*
+                Clauses only where the matter was judged against a shape.
+                With no shape there is nothing to draft from, and a link
+                that leads to an empty paper is a link that lied.
+              */}
+              {conditions.length > 0 && (
+                <DocumentLink
+                  href={oversight.hrefs.contract(matter.id)}
+                  label={t('doc.contract')}
+                  note={t('doc.contractNote')}
+                />
+              )}
+            </div>
+          </section>
+        )}
+
         <SignTheDocument matter={matter} />
       </StepWindow>
     );
@@ -697,6 +767,7 @@ function lastSaid(
             load();
           }}
           onDid={setJustDid}
+          onTold={setTold}
         />
       </StepWindow>
     );

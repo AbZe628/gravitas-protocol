@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { governance, type Matter, type Tally } from '../lib/api.js';
+import { governance, type Delivery, type Matter, type Notice, type Tally } from '../lib/api.js';
 import { useRevision } from '../lib/pulse.js';
 import Act from './Act.js';
 import AfterAct from './AfterAct.js';
@@ -45,6 +45,14 @@ interface Props {
    * browser: withdrawing worked and said nothing.
    */
   onDid?: (after: { did: string; means: string; next: readonly { label: string; to?: string; says?: string }[] }) => void;
+  /**
+   * The words the board is told, hoisted for the same reason as onDid.
+   *
+   * Closing a vote can put the ruling in force, which changes the status,
+   * which unmounts this panel — so the notice it just received would go
+   * with it. The page holds it and shows it beside the finished papers.
+   */
+  onTold?: (told: { notice: Notice; delivery: Delivery }) => void;
 }
 
 const MIN_REASON = 20;
@@ -77,6 +85,7 @@ export default function VotePanel({
   onChanged,
   stepsOutstanding = 0,
   onDid,
+  onTold,
 }: Props) {
   const { t } = useI18n();
   const [tally, setTally] = useState<Tally | null>(null);
@@ -580,7 +589,19 @@ export default function VotePanel({
         does={t('win.closeVoting.does')}
         means={t('win.closeVoting.means')}
         label={t('action.close')}
-        perform={async () => onChanged(await governance.closeVoting(matter.id))}
+        perform={async () => {
+          const closed = await governance.closeVoting(matter.id);
+          /*
+           * Kept before the matter is handed on. The status changes, this
+           * panel is unmounted, and the words would go with it — the same
+           * reason `justDid` lives on the page rather than in the panel that
+           * performed the act.
+           */
+          if (closed.notice && closed.delivery) {
+            onTold?.({ notice: closed.notice, delivery: closed.delivery });
+          }
+          onChanged(closed);
+        }}
         onDone={onDid}
         after={{
           did: t('win.closeVoting.did'),
@@ -596,7 +617,13 @@ export default function VotePanel({
         does={t('win.force.does')}
         means={t('win.force.means')}
         label={t('action.force')}
-        perform={async () => onChanged(await governance.bringIntoForce(matter.id))}
+        perform={async () => {
+          const forced = await governance.bringIntoForce(matter.id);
+          if (forced.notice && forced.delivery) {
+            onTold?.({ notice: forced.notice, delivery: forced.delivery });
+          }
+          onChanged(forced);
+        }}
         onDone={onDid}
         after={{
           did: t('win.force.did'),

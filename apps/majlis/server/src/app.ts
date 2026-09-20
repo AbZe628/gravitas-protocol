@@ -756,7 +756,7 @@ export function createApp(
 
   // ---- governance ------------------------------------------------------
   app.use('/api', pulseRoutes(pulse));
-  app.use('/api', governanceRoutes(store, undefined, vault, reading, passkeys));
+  app.use('/api', governanceRoutes(store, undefined, vault, reading, passkeys, notifier));
   app.use('/api', deviceRoutes(store, passkeys.challenges, passkeys.expected));
   app.use('/api', incidentRoutes(store));
   app.use('/api', computationRoutes(store));

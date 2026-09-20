@@ -635,7 +635,66 @@ potpisivanje. Bez ijednog klika.
   prošao i nudi ponovo
 - broj iz serije mora biti jedinstven i kad dvije odluke stupe u istoj sekundi
 
+#### Mjereno, 20.09.2026. — **6 od 6**, `work/majlis-local/izdavanje.mjs`
+
+Mjeri se doslovno: zatvori se glasanje u pregledniku i gleda se šta ekran
+**sam** ponudi. Sve što traži još jedan pritisak da bi *uopšte postojalo* je
+pad; ono što postoji a treba ga samo otvoriti nije — jer papir se sastavlja
+sam, a čovjek ga šalje.
+
+| | |
+|---|---|
+| odluka je na snazi | ✓ |
+| broj iz serije dodijeljen sam | ✓ *(`SSB/2026/4`)* |
+| odluka kao papir ponuđena bez traženja | ✓ *(bilo: samo kroz dosje)* |
+| nacrt klauzula ponuđen bez traženja | ✓ *(bilo: samo kroz dosje)* |
+| potpisivanje otvoreno odmah | ✓ |
+| obavijest odboru sastavljena sama | ✓ *(bilo: nije postojala)* |
+
+**Dvije stvari su nedostajale, obje nađene mjerenjem.**
+
+**Papiri su se sastavljali i prije** — obje rute odgovaraju 200 čim odluka
+sjedne — ali su se dosezali samo kroz dosje. Predsjedavajući koji je tek
+zatvorio glasanje morao je ići tražiti ono što je zatvaranje napravilo.
+Sada stoje na ekranu na kojem ga je čin ostavio, uz potpisivanje.
+
+**Obavijest kad odbor odluči nije postojala.** `notice.ts` zna sastaviti
+tri događaja, a aplikacija je sastavljala **jedan** — *pitanje je stiglo*.
+Pitanje koje dobije **odgovor** nije sastavljalo ništa, pa je jedini
+trenutak u kojem rad odbora proizvede rezultat bio jedini trenutak u kojem
+niko nije obaviješten. Sada se sastavi sama, na oba ulaza u snagu — kad
+glasanje sjedne *(zabrana)* i kad istekne rok *(dozvola)* — i putuje uz
+sam čin, pa ekran u istom dahu kaže riječi i to da **nisu poslane**.
+Šest testova, uključujući dva negativna: odbijen predmet ne sastavlja
+ništa, i dozvola u roku ne sastavlja ništa.
+
+#### Broj iz serije pod istovremenošću — **izmjereno jedinstven, ali garancija nije u konstrukciji**
+
+Šest zatvaranja odjednom, dva puta: šest različitih brojeva oba puta.
+`work/majlis-local/brojevi.mjs`.
+
+Ali to nije dokaz da ne može. Ruta čita **sve** predmete u `held` *prije*
+nego pozove `changeMatter`; upis jeste serijalizovan, a ulaz u račun nije.
+Da se dva zahtjeva poklope između tog čitanja i upisa, oba bi izvela isti
+sljedeći broj. Nije se desilo ni u jednom pokušaju — **ali razlog je
+raspored, ne konstrukcija.** Zapisano ovdje da se zna šta je izmjereno, a
+šta nije dokazano.
+
+#### Dvije stvari koje Faza 7 traži, a arhitektura ih namjerno odbija
+
+Ovo se ne rješava usput — ide vlasniku na odluku.
+
+| traženo | šta kod kaže |
+|---|---|
+| *upis u policy registry* | `enforcement.ts`: **„Nothing here ever performs enforcement. Majlis records a decision; it does not execute it."** Adapter samo **čita** šta izvršni sistem trenutno kaže, da odbor vidi slaže li se to sa odobrenim. Isto piše i u podnožju svakog ekrana: *ništa ovdje ne potpisuje u ime odbora* |
+| *obavijest banci* | `notice.ts`: **„Nothing here holds an address book."** Obavijest ide članovima odbora, a kome i kako se javlja institucija je njena stvar. Uz to, predmet nema vezu na upit iz kojeg je nastao, pa se ni ne zna koji je stol pitao |
+
+Obavijest odboru je zato urađena; obavijest **banci** i upis u registar nisu
+i **neće biti** dok ne kažeš da granica pada. Izmisliti ih usput značilo bi
+srušiti tvrdnju na kojoj cijeli proizvod stoji.
+
 **Gotovo je kad:** od zatvaranja glasanja do gotovog papira — nijedan klik.
+**Ispunjeno 20.09.2026.** za sve što ne traži rušenje te granice.
 
 ---
 

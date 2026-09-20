@@ -884,7 +884,20 @@ export const governance = {
   openVoting: (id: string) => send<Matter>(`/api/matters/${id}/voting`),
   vote: (id: string, position: 'for' | 'against' | 'abstain', reason: string) =>
     send<Matter>(`/api/matters/${id}/vote`, { position, reason }),
-  closeVoting: (id: string) => send<Matter & { outcome: string }>(`/api/matters/${id}/close`),
+  /*
+   * The close carries the notice back with it.
+   *
+   * A ruling coming into force composes words for the board, and they
+   * travel with the act rather than needing a second request — so the
+   * screen that just closed the vote can say in the same breath what the
+   * words are and whether anything was sent. Null where the vote closed
+   * without a ruling taking force: a refusal, or a permit still in its
+   * timelock.
+   */
+  closeVoting: (id: string) =>
+    send<Matter & { outcome: string; notice: Notice | null; delivery: Delivery | null }>(
+      `/api/matters/${id}/close`,
+    ),
 
   /** Return an open vote to deliberation. Every position cast on it is released. */
   reopen: (id: string, reason: string) => send<Matter>(`/api/matters/${id}/reopen`, { reason }),
@@ -945,7 +958,11 @@ export const governance = {
     send<Matter>(`/api/matters/${id}/parameters`, { parameters }, 'PUT'),
 
   object: (id: string, reason: string) => send<Matter>(`/api/matters/${id}/object`, { reason }),
-  bringIntoForce: (id: string) => send<Matter>(`/api/matters/${id}/force`),
+  /** The other door into force, and it carries the same notice. */
+  bringIntoForce: (id: string) =>
+    send<Matter & { notice: Notice | null; delivery: Delivery | null }>(
+      `/api/matters/${id}/force`,
+    ),
   withdraw: (id: string) => send<Matter>(`/api/matters/${id}/withdraw`),
 };
 
