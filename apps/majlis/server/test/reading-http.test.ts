@@ -10,6 +10,11 @@ import { DiskVault } from '../src/store/vault.js';
 import { AnthropicReading, ReadingOff, type Reading } from '../src/services/reading.js';
 import type { ExtractOptions, Extraction } from '../src/services/extraction.js';
 import { extract } from '../src/services/extraction.js';
+import {
+  readContractWithModel,
+  type ModelReadingOptions,
+} from '../src/services/reading-with-a-model.js';
+import type { ContractReading } from '../src/services/reading-a-contract.js';
 import { hashPassword } from '../src/auth/members.js';
 
 /**
@@ -36,14 +41,28 @@ const STATEMENT =
 class StubReading implements Reading {
   readonly kind = 'anthropic' as const;
   readonly available = true;
-  constructor(private readonly reply: string) {}
+  readonly processor = 'a stub';
+  constructor(
+    private readonly reply: string,
+    /** The canned answer for a contract read against conditions. */
+    private readonly passages = JSON.stringify({ passages: [] }),
+  ) {}
+
+  private canned(text: string) {
+    return { messages: { create: async () => ({ content: [{ type: 'text', text }] }) } } as never;
+  }
+
   read(input: ExtractOptions): Promise<Extraction> {
-    return extract({
-      ...input,
-      client: {
-        messages: { create: async () => ({ content: [{ type: 'text', text: this.reply }] }) },
-      } as never,
-    });
+    return extract({ ...input, client: this.canned(this.reply) });
+  }
+
+  /*
+   * Through the real reader, like `read` above: the point of a stub here is
+   * to replace the model, never the screening the model's answer goes
+   * through. Screening it in the test would be testing the test.
+   */
+  readConditions(input: Omit<ModelReadingOptions, 'processor'>): Promise<ContractReading> {
+    return readContractWithModel({ ...input, client: this.canned(this.passages) });
   }
 }
 

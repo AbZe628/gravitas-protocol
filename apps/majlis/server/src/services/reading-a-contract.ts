@@ -48,6 +48,15 @@ export interface Passage {
   text: string;
   /** Where it starts, so an interface can scroll to it rather than search. */
   at: number;
+  /**
+   * The clause the sentence sits in, where whoever read it could name one.
+   *
+   * Absent from a reading that matched words: it knows the character offset
+   * and nothing about the document's own numbering. A model reading the same
+   * draft can say *Clause 3.2 — PAYMENT*, which is how a scholar will look
+   * for it, so it is carried when it is there and never invented when not.
+   */
+  label?: string;
 }
 
 export interface ConditionReading {
@@ -86,6 +95,20 @@ export interface ContractReading {
    * would be the most misleading thing this file could produce.
    */
   limits: string[];
+
+  /**
+   * Which reader produced this, said on the face of the reading.
+   *
+   * There are two, they disagree, and a board must never have to guess which
+   * one it is looking at. `words` matched the conditions against the text and
+   * can be checked by anyone with the document; `model` sent the document to
+   * a reading assistant, which finds clauses the matcher misses and is a
+   * third party the institution chose to involve.
+   */
+  readBy: 'words' | 'model';
+
+  /** Where the document went, where it went anywhere. Absent for `words`. */
+  processor?: string;
 
   readAt: string;
 }
@@ -227,6 +250,7 @@ export function readContract(input: {
     conditions,
     charactersRead: input.text.length,
     limits,
+    readBy: 'words',
     readAt: input.readAt,
   };
 }

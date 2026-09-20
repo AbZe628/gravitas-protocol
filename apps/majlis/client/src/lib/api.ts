@@ -1792,7 +1792,7 @@ export interface ContractReading {
     requirement: string;
     standing: 'found' | 'unclear' | 'absent';
     /** The sentences it was found in, and where each starts. */
-    passages: { text: string; at: number }[];
+    passages: { text: string; at: number; label?: string }[];
     note: string;
     /** True where no reading of words could settle it, whatever was found. */
     needsAPerson: boolean;
@@ -1800,6 +1800,18 @@ export interface ContractReading {
   charactersRead: number;
   /** Never empty. A reading with nothing it could not do would be a lie. */
   limits: string[];
+  /**
+   * Which reader produced this.
+   *
+   * There are two and they disagree. `words` matched the conditions against
+   * the draft and can be checked by anybody holding it; `model` sent the
+   * draft to a reading assistant, which finds clauses the matcher misses and
+   * is a third party the institution chose to involve. A board must never
+   * have to guess which one it is looking at, so it is on the reading.
+   */
+  readBy: 'words' | 'model';
+  /** Where the draft went, where it went anywhere. Absent for `words`. */
+  processor?: string;
   readAt: string;
 }
 

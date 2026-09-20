@@ -20,6 +20,11 @@
  */
 
 import { extract, type ExtractOptions, type Extraction } from './extraction.js';
+import {
+  readContractWithModel,
+  type ModelReadingOptions,
+} from './reading-with-a-model.js';
+import type { ContractReading } from './reading-a-contract.js';
 
 export type ReadingKind = 'off' | 'anthropic';
 
@@ -30,6 +35,20 @@ export interface Reading {
   /** Where the document goes, for the interface to be able to say so. */
   readonly processor?: string;
   read(input: ExtractOptions): Promise<Extraction>;
+  /**
+   * The same document, read against a board's conditions rather than for
+   * figures.
+   *
+   * Behind this switch and not its own, because it is the same act: a
+   * contract the institution has agreed may leave it. An installation that
+   * will not send its accounts will not send its drafts either, and one that
+   * allowed the first has already decided the question the second asks.
+   *
+   * What comes back is a `ContractReading` — the shape the word matcher
+   * returns, so no screen has to know which reader ran, and every one of them
+   * can say which did.
+   */
+  readConditions(input: Omit<ModelReadingOptions, 'processor'>): Promise<ContractReading>;
 }
 
 /** Thrown rather than returned, so a caller cannot mistake it for an answer. */
@@ -52,6 +71,10 @@ export class ReadingOff implements Reading {
   async read(): Promise<Extraction> {
     throw new ReadingUnavailable();
   }
+
+  async readConditions(): Promise<ContractReading> {
+    throw new ReadingUnavailable();
+  }
 }
 
 export class AnthropicReading implements Reading {
@@ -61,6 +84,12 @@ export class AnthropicReading implements Reading {
 
   read(input: ExtractOptions): Promise<Extraction> {
     return extract(input);
+  }
+
+  readConditions(input: Omit<ModelReadingOptions, 'processor'>): Promise<ContractReading> {
+    // Carried down so the reading itself names where the draft went, rather
+    // than a screen assuming it and being wrong after a setting changes.
+    return readContractWithModel({ ...input, processor: this.processor });
   }
 }
 

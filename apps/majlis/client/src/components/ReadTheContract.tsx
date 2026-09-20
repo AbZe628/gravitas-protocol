@@ -202,6 +202,28 @@ export default function ReadTheContract({
 
       {reading && (
         <>
+          {/*
+            Which reader produced this, above the findings rather than under
+            them.
+
+            There are two and they disagree: one matches the condition's words
+            against the draft, the other sends the draft to a reading
+            assistant and finds clauses the first cannot. A board reading
+            "Not there" is entitled to know which of the two said it, and
+            where their draft went to be read, before they read a word of it.
+          */}
+          <div className="mb-3 flex flex-wrap items-baseline gap-x-2 text-note text-muted">
+            <span className="font-semibold text-sand">
+              {reading.readBy === 'model' ? t('read.byModel') : t('read.byWords')}
+            </span>
+            {reading.readBy === 'model' && reading.processor && (
+              <span>
+                <span className="mx-0.5 opacity-40">·</span> {t('read.sentTo')}{' '}
+                {reading.processor}
+              </span>
+            )}
+          </div>
+
           <ul className="space-y-2.5">
             {reading.conditions.map((c) => {
               const s = STANDING[c.standing] ?? STANDING.absent;
@@ -216,12 +238,23 @@ export default function ReadTheContract({
 
                   {/* The sentence it was found in. Without it a reader cannot check. */}
                   {c.passages.map((p, i) => (
-                    <p
-                      key={i}
-                      className="mt-2 max-w-[58ch] border-s-2 border-line ps-3 font-display text-body leading-relaxed text-sand"
-                    >
-                      {p.text}
-                    </p>
+                    <div key={i} className="mt-2 border-s-2 border-line ps-3">
+                      {/*
+                        Where in the contract, where whoever read it could
+                        name a clause. A scholar goes looking by number, not
+                        by character offset, and the matcher has no number to
+                        give — so this appears with one reader and not the
+                        other, rather than being invented for both.
+                      */}
+                      {p.label && (
+                        <div className="mb-1 text-label font-bold uppercase tracking-caps text-muted">
+                          {p.label}
+                        </div>
+                      )}
+                      <p className="max-w-[58ch] font-display text-body leading-relaxed text-sand">
+                        {p.text}
+                      </p>
+                    </div>
                   ))}
 
                   <p className="mt-2 max-w-[58ch] text-ui leading-relaxed text-muted">{c.note}</p>

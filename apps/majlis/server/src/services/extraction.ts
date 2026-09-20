@@ -165,7 +165,7 @@ function normalise(text: string): string {
   return text.replace(/\s+/g, ' ').trim().toLowerCase();
 }
 
-function contains(haystack: string, needle: string): boolean {
+export function contains(haystack: string, needle: string): boolean {
   return normalise(haystack).includes(normalise(needle));
 }
 
@@ -362,11 +362,11 @@ export function provenanceOf(
   );
 }
 
-function textOf(bytes: Buffer, mediaType: string): string | null {
+export function textOf(bytes: Buffer, mediaType: string): string | null {
   return TEXT_TYPES.has(mediaType) ? bytes.toString('utf8') : null;
 }
 
-function blockFor(bytes: Buffer, mediaType: string) {
+export function blockFor(bytes: Buffer, mediaType: string) {
   if (TEXT_TYPES.has(mediaType)) {
     return { type: 'text' as const, text: bytes.toString('utf8').slice(0, 400_000) };
   }

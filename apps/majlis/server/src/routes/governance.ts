@@ -49,7 +49,7 @@ import {
 import { attentionList } from '../services/attention.js';
 import { paceOf, waitingNow } from '../services/clocks.js';
 import { assemble, render } from '../services/fatwa.js';
-import { readContract } from '../services/reading-a-contract.js';
+import { readContract, type ContractReading } from '../services/reading-a-contract.js';
 import { structureById } from '../data/structures.js';
 import { standingAdoptions } from '../services/adoption.js';
 import {
@@ -94,7 +94,7 @@ import { buildQueue } from '../services/queue.js';
 import { buildInheritance, checklistStanding } from '../services/inherit.js';
 import type { Store } from '../store/index.js';
 import { compose, NoticeOff, type Notifier } from '../services/notice.js';
-import type { Deliberation, Matter, SourceKind } from '../types.js';
+import type { Deliberation, Matter, SourceKind, Structure } from '../types.js';
 import { PART_KINDS, SOURCE_KINDS } from '../types.js';
 
 /**
@@ -375,6 +375,103 @@ export function governanceRoutes(
   notifier: Notifier = new NoticeOff(),
 ): Router {
   const router = Router();
+
+  /**
+   * Read a draft against a shape's conditions, by whichever reader this
+   * installation has.
+   *
+   * ── why one place ─────────────────────────────────────────────────────
+   *
+   * Four routes read a contract, and if each chose its own reader they would
+   * sooner or later disagree — a scholar reading a pasted draft would get one
+   * answer and the same draft uploaded to the matter another, with nothing on
+   * either screen to say why. So the choice is made once.
+   *
+   * ── what it chooses ───────────────────────────────────────────────────
+   *
+   * The model where the institution turned reading on, the word matcher where
+   * it did not. The matcher is not a degraded mode: it runs with no key, no
+   * third party and no cost, it can be checked by anybody holding the
+   * document, and for a board that will not send its drafts anywhere it is
+   * the product.
+   *
+   * ── and it never falls back quietly ───────────────────────────────────
+   *
+   * Where the model was asked and refused, the words still read the draft —
+   * but the reading says the assistant refused and why. A silent fallback
+   * would hand a board a thinner reading with nothing to tell them it was
+   * thinner, and thinner here means a clause nobody saw.
+   */
+  async function readADraft(input: {
+    structure: Structure;
+    adopted: boolean;
+    bytes: Buffer;
+    mediaType: string;
+    documentName: string;
+  }): Promise<ContractReading> {
+    const readAt = now();
+    const text = () => Buffer.from(input.bytes).toString('utf8');
+
+    /*
+     * Text is text, whatever the upload called it.
+     *
+     * The model's side holds the document's own text for a couple of media
+     * types and sends the file whole for everything else. A draft stored as
+     * `text/xml` would take the second path — the bytes posted as a document
+     * — and the quotes would come back unverifiable although the words were
+     * here all along. So anything that is plainly text is handed over as
+     * text, which is also what makes its quotes checkable.
+     */
+    const media = input.mediaType.toLowerCase();
+    const plainlyText =
+      media.startsWith('text/') || media.includes('json') || media.includes('xml');
+    const mediaType = plainlyText ? 'text/plain' : input.mediaType;
+
+    if (!reading.available) {
+      return readContract({
+        structure: input.structure,
+        adopted: input.adopted,
+        text: text(),
+        readAt,
+      });
+    }
+
+    try {
+      return await reading.readConditions({
+        structure: input.structure,
+        adopted: input.adopted,
+        bytes: input.bytes,
+        mediaType,
+        documentName: input.documentName,
+        readAt,
+      });
+    } catch (e) {
+      /*
+       * Refused, or unreachable, or slow enough to time out — all one thing
+       * from here: the assistant did not read this draft, and a board still
+       * needs it read. What must not happen is the screen showing an error
+       * where a working reader was available all along.
+       */
+      const why =
+        e instanceof ExtractionRefused
+          ? e.message
+          : 'The reading assistant could not be reached.';
+
+      const fallen = readContract({
+        structure: input.structure,
+        adopted: input.adopted,
+        text: text(),
+        readAt,
+      });
+      fallen.limits.unshift(
+        'The reading assistant was asked first and its answer was not used: ' +
+          why +
+          ' What follows is the draft read by matching the conditions against its words, which ' +
+          'finds a clause only where it uses the condition’s own language.',
+      );
+      return fallen;
+    }
+  }
 
   /** Open a matter. Not a vote, so anyone who deliberates may raise one. */
   router.post(
@@ -807,7 +904,17 @@ export function governanceRoutes(
         (x) => x.structureId === structure.id && x.standing === 'adopted',
       );
 
-      res.json(readContract({ structure, adopted, text: parsed.data.text, readAt: now() }));
+      res.json(
+        await readADraft({
+          structure,
+          adopted,
+          bytes: Buffer.from(parsed.data.text, 'utf8'),
+          mediaType: 'text/plain',
+          // Named rather than left blank: the reading says what it read, and
+          // "a draft pasted in" is the true answer for text nobody stored.
+          documentName: 'a draft pasted in',
+        }),
+      );
     }),
   );
 
@@ -880,7 +987,13 @@ export function governanceRoutes(
       );
 
       res.json(
-        readContract({ structure, adopted, text: parsed.data.text, readAt: now() }),
+        await readADraft({
+          structure,
+          adopted,
+          bytes: Buffer.from(parsed.data.text, 'utf8'),
+          mediaType: 'text/plain',
+          documentName: 'a draft pasted in',
+        }),
       );
     }),
   );
@@ -930,22 +1043,31 @@ export function governanceRoutes(
       }
 
       /*
-       * Text only, and it says so rather than returning nonsense.
+       * A PDF is readable only where the model is on, and it says which.
        *
-       * A PDF's bytes decoded as UTF-8 are not the contract; they are the
-       * container. Reporting every condition absent because the words were
-       * never reachable would be the worst possible answer, so the refusal is
+       * The word matcher takes text. A PDF's bytes decoded as UTF-8 are not
+       * the contract; they are the container, and reporting every condition
+       * absent because the words were never reachable would be the worst
+       * possible answer — so where nothing can read it, the refusal is
        * explicit and names what would fix it.
+       *
+       * Where the institution turned reading on, the file goes to the model
+       * whole and this is no longer a wall. That was the commonest way in:
+       * banks send drafts as PDFs, and until now the board's own reading
+       * screen refused the format the drafts actually arrive in.
        */
       const media = source.file.mediaType.toLowerCase();
       const isText = media.startsWith('text/') || media.includes('json') || media.includes('xml');
-      if (!isText) {
+      if (!isText && !reading.available) {
         res.status(501).json({
           error: 'not_text',
           message:
-            'This reads text, and that document is ' +
+            'This installation reads contracts by matching words, and that needs text. The ' +
+            'document is ' +
             source.file.mediaType +
-            '. Nothing here extracts words from a PDF or a scan, so it would report every condition missing when the words are simply out of reach.',
+            ', so nothing here can reach the words: it would report every condition missing when ' +
+            'they are simply out of reach. A reading assistant would read it as it stands, and ' +
+            'this installation has not turned one on.',
         });
         return;
       }
@@ -956,11 +1078,12 @@ export function governanceRoutes(
       );
 
       res.json(
-        readContract({
+        await readADraft({
           structure,
           adopted,
-          text: Buffer.from(bytes).toString('utf8'),
-          readAt: now(),
+          bytes,
+          mediaType: source.file.mediaType,
+          documentName: source.file.name,
         }),
       );
     }),
