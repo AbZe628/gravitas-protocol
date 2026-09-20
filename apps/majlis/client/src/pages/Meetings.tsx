@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import {
   api,
   oversight,
@@ -398,6 +398,22 @@ export default function Meetings() {
   /** The membership was asked for and did not come. */
   const [boardLost, setBoardLost] = useState(false);
   const [convening, setConvening] = useState(false);
+
+  /*
+   * Arriving here to convene opens the form, rather than leaving it to be
+   * found.
+   *
+   * *What is coming* is the screen that says a sitting is due, and it had
+   * no way to call one — the owner pressed there and nothing happened,
+   * because convening lives on this screen. The act is now offered where
+   * the need is shown, and it carries the intent with it: one press from
+   * there lands on the open form, not on a page to hunt through.
+   */
+  const [params] = useSearchParams();
+  const askedToConvene = params.get('convene') === '1';
+  useEffect(() => {
+    if (askedToConvene) setConvening(true);
+  }, [askedToConvene]);
   /** Whether the window that convenes the sitting is showing. */
   const [convenening, setConvenening] = useState(false);
   /*

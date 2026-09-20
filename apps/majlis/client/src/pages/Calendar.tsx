@@ -2,8 +2,10 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { oversight, type Cadence, type Calendar as CalendarData, type CalendarEntry } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
+import { useIdentity } from '../lib/identity.js';
 import { Division, Gaps, Nothing } from '../components/page.js';
 import { ListPage, Row, Rows } from '../components/shapes.js';
+import { MainAct } from '../components/kit.js';
 import { DateText, ErrorText, Loading } from '../components/ui.js';
 
 /**
@@ -161,6 +163,7 @@ function Rhythm({ cadence, nextConvened }: { cadence: Cadence | null; nextConven
 }
 
 export default function Calendar() {
+  const { identity } = useIdentity();
   const { t } = useI18n();
   const [data, setData] = useState<CalendarData | null>(null);
   const [cadence, setCadence] = useState<Cadence | null>(null);
@@ -201,6 +204,23 @@ export default function Calendar() {
       phase="deciding"
       title={t('cal.title')}
       says={t('cal.intro')}
+      /*
+       * The one thing somebody comes to this screen to do.
+       *
+       * It says a sitting is due and by when, and offered no way to call
+       * one: the owner pressed here expecting to and nothing happened,
+       * because convening lives on *Sittings*. A screen that shows a
+       * deadline and not the act that answers it is a screen that reads
+       * like a report.
+       *
+       * The chair only, mirroring the gate on the form itself — a control
+       * that cannot be honoured is absent, not offered and then refused.
+       */
+      act={
+        identity?.office === 'chair' ? (
+          <MainAct to="/meetings?convene=1">{t('meet.convene')}</MainAct>
+        ) : undefined
+      }
       live={
         entries.length > 0 ? (
           <span className="text-ui text-muted">
