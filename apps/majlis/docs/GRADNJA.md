@@ -762,18 +762,59 @@ tražio. **Ispunjeno 20.09.2026.**
 
 ---
 
-### FAZA 9 · Sedam odluka vlasnika
+### FAZA 9 · Sedam odluka vlasnika — **URAĐENO 20.09.2026.**
 
 Ne rješavaju se kodom. Dok ne odluči, **ostaju napisane na ekranu kao
 nedostatak**, ne prešućene.
 
-1. Izuzeće člana — nema rute nigdje
-2. Ratifikacija zabrane — **zabrana danas nikad ne istekne**
-3. Ko prijavljuje prekršaj i plaća purifikaciju — danas samo odbor
-4. Nalaz dok je glasanje otvoreno — kod ne brani
-5. Promjena glasa — nedefinisano
-6. Glasanje bez rasprave — server odbija, ekran ne kaže unaprijed
-7. Kvorum i serija — **rute nema**, a kod se štiti od promjene koja ne postoji
+#### Izmjereno prije pisanja, 20.09.2026. — dvoje je bilo zastarjelo
+
+Popis je bio napisan ranije i **nije se smio prepisati napamet**. Provjereno
+je svih sedam u kodu:
+
+| | stavka | izmjereno stanje |
+|---|---|---|
+| 1 | **Izuzeće člana** | nema **ničega** nigdje — ni rute, ni polja, ni riječi → **odluka** |
+| 2 | **Ratifikacija zabrane** | gore nego što je pisalo: `ratify()` **postoji** u `lifecycle.ts`, **nema rutu**, i **nigdje se ne bilježi** da se desila → svaka zabrana istekne i to se **ne može spriječiti** → **zid** |
+| 3 | **Ko prijavljuje prekršaj** | dijelom zastarjelo: prijavljuju potpisnik, savjetodavni član **i veza sa institucijom**; stol institucije ne može. Ko **plaća** purifikaciju se ne bilježi uopšte → **odluka** |
+| 4 | **Nalaz dok glasanje traje** | kod **dozvoljava** — `OPEN_TO_FINDINGS` sadrži `voting` → **odluka** |
+| 5 | **Promjena glasa** | pravilo **jeste** napisano, u tekstu odbijanja: „može se povući i zamijeniti". Čina za povlačenje **nema** → **zid** |
+| 6 | **Glasanje bez rasprave** | bio **kvar**, ne odluka — **popravljen** |
+| 7 | **Kvorum i serija** | **zastarjelo** — `changeHowItDecides` postoji i mijenja kvorum, prozor i seriju |
+
+**Šesto je popravljeno, jer nije bila odluka nego kvar.** Pravilo *„kontrola
+koja se ne može ispuniti je odsutna, ne onemogućena"* stoji napisano tačno
+iznad tog gumba — i bilo je primijenjeno samo na uslove, ne i na raspravu.
+Na predmetu na kojem niko ništa nije rekao gumb se nudio, pritiskao, i
+server je odgovarao *glasanje se otvara poslije rasprave, ne umjesto nje*.
+Tačno onaj gumb za koji komentar iznad kaže da ne smije postojati. Sada je
+odsutan, a na njegovom mjestu stoji šta bi ga otvorilo.
+
+Tri testa su pala na tu izmjenu i **sva tri su tvrdila staro ponašanje** —
+uključujući fajl koji se zove `TheVoteIsNotOffered.test.tsx` i koji je tražio
+gumb na predmetu bez ijedne riječi rasprave.
+
+#### Pet koje ostaju — napisane na ekranu, ne prešućene
+
+| gdje | šta stoji |
+|---|---|
+| **predmet**, okno *Limits* uz posao | izuzeće · promjena glasa · nalaz dok se glasa · ratifikacija *(samo na zabrani na snazi)* |
+| **prekršaji**, ispod liste | ko prijavljuje i ko plaća purifikaciju |
+
+Okno *Limits* je četvrto uz *Guidance · What was said · Sources*, a ne u
+radnom oknu — jer §35.5 drži radno okno na 150 riječi i ono stoji na 53.
+Šest odlomaka tamo bi zamijenilo jedan standard drugim. Provjereno poslije:
+**20 od 20, radno okno i dalje 53 riječi.**
+
+*Nađeno i popravljeno usput:* četvrti jezičak nije stao u okno od 320
+piksela — lomio se u tri reda, pa je sa `whitespace-nowrap` ispao van vidika.
+Okno je sada 368 piksela i sva četiri stoje. Jezičak koji član ne vidi je
+gori od prelomljenog.
+
+Najoštrije od svega je **ratifikacija**: kalendar odbrojava do roka za čin
+koji niko ne može izvršiti, i kad rok prođe sweep obori zabranu. Odbor
+donese zabranu na smanjenom kvorumu, namjerava je potvrditi u roku, i **ne
+može** — a zapis to poslije čita kao da nisu ni pokušali.
 
 ---
 

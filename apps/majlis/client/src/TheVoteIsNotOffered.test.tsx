@@ -40,7 +40,25 @@ const matter = (over: Partial<Matter> = {}): Matter =>
     inForceAt: null,
     notDecided: [],
     reasoning: [],
-    deliberation: [],
+    /*
+     * Something has been said, because otherwise the vote cannot open for
+     * that reason instead of the one under test.
+     *
+     * The server refuses with `no_deliberation`, and the screen now mirrors
+     * it: the button is absent until somebody has spoken. These cases are
+     * about the *conditions* holding the vote up, so the deliberation has
+     * to be out of the way or they would pass for the wrong reason.
+     */
+    deliberation: [
+      {
+        id: 'd1',
+        scholarId: 'member-a',
+        body: 'A point about the mechanism, at some length.',
+        at: '2026-08-24T09:00:00.000Z',
+        replyTo: null,
+        liaisonAnswer: false,
+      },
+    ],
     objections: [],
     sources: [],
     interactsWith: [],

@@ -160,11 +160,28 @@ export default function StepWindow({
         </div>
 
         {asidePanes && asidePanes.length > 0 ? (
-          <aside className="grid min-h-0 shrink-0 grid-rows-[auto,1fr] border-line lg:w-[320px] lg:border-s">
+          /*
+            368 rather than 320: four tabs.
+            
+            The width was set when the pane held three and it fitted them
+            exactly. A fourth pushed the last one past the edge, where a
+            member would never find it — worse than wrapping, because a
+            wrapped tab is at least visible.
+          */
+          <aside className="grid min-h-0 shrink-0 grid-rows-[auto,1fr] border-line lg:w-[368px] lg:border-s">
+            {/*
+              The tabs stay on one line and the strip scrolls.
+
+              With three panes they fitted and nothing said otherwise. A
+              fourth was added and they wrapped: "What was said" broke over
+              three lines and the last pane's count was cut off at the edge.
+              A pane strip that reflows every time somebody adds a pane is
+              a strip that only ever looked right by luck.
+            */}
             <div
               role="tablist"
               aria-label={heading}
-              className="flex gap-0.5 border-b border-line px-3 pt-2.5"
+              className="flex gap-0.5 overflow-x-auto border-b border-line px-3 pt-2.5"
             >
               {asidePanes.map((pane) => (
                 <Button
@@ -174,7 +191,7 @@ export default function StepWindow({
                   tone={undefined}
                   onClick={() => setShowing(pane.id)}
                   className={
-                    'flex items-center gap-1.5 rounded-t-lg px-2.5 py-1.5 text-note font-bold ' +
+                    'flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-t-lg px-2.5 py-1.5 text-note font-bold ' +
                     (pane.id === (showing ?? asidePanes[0]?.id)
                       ? 'bg-raised text-paper shadow-ring'
                       : 'text-muted hover:text-paper')

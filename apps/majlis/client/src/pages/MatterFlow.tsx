@@ -535,6 +535,22 @@ function lastSaid(
    * look. The count on *what was said* is how a member knows there is
    * something there without opening it.
    */
+  /*
+   * What this board cannot do to this matter, and what each costs.
+   *
+   * Only the ones that apply here. Ratification is named on a restriction
+   * in force and nowhere else, because on a permit it would be a shortfall
+   * that could never bite.
+   */
+  const cannot = [
+    t('own.recusal'),
+    t('own.changeVote'),
+    ...(matter.structureId ? [t('own.findingWhileVoting')] : []),
+    ...(matter.direction === 'restrict' && matter.status === 'in_force'
+      ? [t('own.ratify')]
+      : []),
+  ];
+
   const panes = [
     { id: 'guidance', label: t('flow.paneGuidance'), body: aside },
     {
@@ -566,6 +582,41 @@ function lastSaid(
             load();
           }}
         />
+      ),
+    },
+    /*
+     * A fourth pane: what cannot be done to this matter. §FAZA 9.
+     *
+     * ── why here and not in the work pane ──────────────────────────────
+     *
+     * These are shortfalls the owner has to rule on, and until he does they
+     * stay written rather than left silent. But the work pane is measured
+     * — §35.5 holds it to 150 words, and it sits at 53 — so putting six
+     * paragraphs there would trade one standard for another.
+     *
+     * The pane beside the work is where reference material already lives
+     * and it scrolls on its own. A member who wonders *can I stand aside
+     * from this one* looks beside the matter, not in the step.
+     *
+     * ── each says what it costs, not that it is missing ────────────────
+     *
+     * Ratification is the sharpest: the act is in the software, no route
+     * reaches it, nothing records it — so every restriction lapses and the
+     * calendar counts down to a deadline against a thing nobody can do.
+     */
+    {
+      id: 'cannot',
+      label: t('flow.paneCannot'),
+      count: cannot.length,
+      body: (
+        <ul className="space-y-4">
+          {cannot.map((line, i) => (
+            <li key={i} className="flex gap-3">
+              <span className="mt-[7px] h-[7px] w-[7px] shrink-0 rounded-full bg-gold/70" />
+              <span className="max-w-[62ch] text-ui leading-relaxed text-sand">{line}</span>
+            </li>
+          ))}
+        </ul>
       ),
     },
   ];

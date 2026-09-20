@@ -263,12 +263,30 @@ describe('where the vote stands', () => {
 
 describe('when the server refuses', () => {
   it('the reason it gives is what the reader sees', async () => {
+    /*
+     * The refusal used here had to change, and the reason is the point.
+     *
+     * It was `no_deliberation`, pressed on a matter nobody had spoken to —
+     * which is now a press that cannot happen: the screen mirrors the
+     * server and the button is absent until something has been said. So
+     * the test was reaching a refusal by doing the one thing the interface
+     * exists to prevent.
+     *
+     * What it holds to is unchanged and is the whole of its value: whatever
+     * the server refuses with, the reader sees those words and not a
+     * paraphrase. So it now uses a refusal that press can really produce.
+     */
     stub({
-      matter: matter({ status: 'deliberation' }),
+      matter: matter({
+        status: 'deliberation',
+        deliberation: [
+          { id: 'd1', scholarId: 'member-a', body: 'A point about the mechanism.', at: T0, replyTo: null, liaisonAnswer: false },
+        ],
+      }),
       refuse: {
         status: 409,
-        error: 'no_deliberation',
-        message: 'Nothing has been said on this matter yet. Voting opens after deliberation, not instead of it.',
+        error: 'wrong_status',
+        message: 'This matter is deliberation. That step is available while it is voting.',
       },
     });
     renderMatter();
@@ -286,7 +304,9 @@ describe('when the server refuses', () => {
 
     // Verbatim. Replacing it with "something went wrong" throws away the only
     // part that helps.
-    expect(await screen.findByText(/Voting opens after deliberation, not instead of it/)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/That step is available while it is voting/),
+    ).toBeInTheDocument();
   });
 });
 

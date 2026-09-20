@@ -129,6 +129,12 @@ export default function Incidents() {
       title={t('snc.title')}
       says={t('snc.intro')}
       live={live}
+      /*
+       * §FAZA 9: who may report, and who pays, is not settled — so it is
+       * written here rather than left for somebody to discover by not
+       * finding the control. The list slot exists for exactly this.
+       */
+      limits={t('own.whoReports')}
     >
 
       {/*

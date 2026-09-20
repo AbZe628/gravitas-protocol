@@ -107,6 +107,14 @@ export default function VotePanel({
   /** Which of the five acts has its window open. Null when none has. */
   const [acting, setActing] = useState<string | null>(null);
 
+  /*
+   * Mirrors the server exactly: `matter.deliberation.length === 0`.
+   *
+   * Read from the same field the refusal is written against, so the two
+   * cannot drift into disagreeing about when a vote may open.
+   */
+  const hasBeenSaid = (matter.deliberation ?? []).length > 0;
+
   const signatory = role === 'signatory';
   const deliberator = signatory || role === 'advisory' || role === 'liaison';
   const countdown = useCountdown(matter.status === 'timelock' ? matter.timelockEndsAt : null);
@@ -519,8 +527,31 @@ export default function VotePanel({
           and where they are, because a chair who cannot open the vote needs to
           know what would let them.
         */}
+        {/*
+          And nothing is said, the vote does not open either.
+
+          The rule above was written and then only half applied: the button
+          was gated on the conditions and not on the deliberation, so on a
+          matter nobody had spoken to it appeared, was pressed, and the
+          server answered *voting opens after deliberation, not instead of
+          it*. Exactly the button the comment says must not exist.
+        */}
         {matter.status === 'deliberation' && signatory && stepsOutstanding === 0 &&
+          hasBeenSaid &&
           button(t('action.openVoting'), () => setActing('openVoting'))}
+
+        {/*
+          In its place, what would let them — the same courtesy the
+          conditions get. A chair who cannot open the vote needs to know
+          why, and "be the first to say something" is a thing they can do
+          right now, on this screen.
+        */}
+        {matter.status === 'deliberation' && signatory && stepsOutstanding === 0 &&
+          !hasBeenSaid && (
+            <p className="max-w-[62ch] text-ui leading-relaxed text-muted">
+              {t('vote.nothingSaidYet')}
+            </p>
+          )}
 
         {/*
           And the same rule when the tally never arrived: closing a vote
