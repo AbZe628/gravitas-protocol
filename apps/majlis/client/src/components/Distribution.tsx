@@ -113,11 +113,11 @@ export default function Distribution() {
       */}
       <ReadDocument
         fields={[
-          { key: 'grossProfit', label: t('dist.grossProfit') },
-          { key: 'perBalance', label: `${t('dist.perTitle')} — ${t('dist.balance')}` },
-          { key: 'perCap', label: `${t('dist.perTitle')} — ${t('dist.cap')}` },
-          { key: 'irrBalance', label: `${t('dist.irrTitle')} — ${t('dist.balance')}` },
-          { key: 'irrCap', label: `${t('dist.irrTitle')} — ${t('dist.cap')}` },
+          { key: 'grossProfit', label: t('dist.grossProfit'), kind: 'money' },
+          { key: 'perBalance', label: `${t('dist.perTitle')} — ${t('dist.balance')}`, kind: 'money' },
+          { key: 'perCap', label: `${t('dist.perTitle')} — ${t('dist.cap')}`, kind: 'money' },
+          { key: 'irrBalance', label: `${t('dist.irrTitle')} — ${t('dist.balance')}`, kind: 'money' },
+          { key: 'irrCap', label: `${t('dist.irrTitle')} — ${t('dist.cap')}`, kind: 'money' },
         ]}
         onConfirm={takeCandidate}
       />

@@ -41,9 +41,62 @@ import { Button } from './Button';
  * figures in and loses nothing but time.
  */
 
+/**
+ * What kind of thing a field holds.
+ *
+ * ── why a field's kind is part of the ask ─────────────────────────────────
+ *
+ * Found by running it. The late payment form asked for *the amount the
+ * contract names*, and the reader came back with **"1.5% per month"**,
+ * quoted correctly from the clause that says it. Every existing check
+ * passed: the value is in the quote, the quote is in the document. It is
+ * simply not an amount, and a button offering to put it into a money field
+ * was one press from a calculation whose stipulated figure is a rate.
+ *
+ * The screening on the server cannot catch this — it checks a value against
+ * its own quote, and both were honest. The form is the only place that knows
+ * what it asked for, so the form says, and a candidate of the wrong kind is
+ * shown with its quote and **not offered**: what was read, why it was not
+ * taken, and the field left for the member.
+ *
+ * `text` is the default and accepts anything, because most of what is read
+ * is a name or a reference and there is nothing to check it against.
+ */
+export type FieldKind = 'money' | 'date' | 'share' | 'text';
+
+/** Whether a value is the kind of thing the field asked for. */
+export function readsAs(kind: FieldKind | undefined, value: string): boolean {
+  const v = value.trim();
+  if (v === '') return false;
+
+  if (kind === 'money') {
+    /*
+     * Digits, separators, and a currency written beside them. What it must
+     * not contain is a period — "per month", "p.a.", "annually" — because
+     * that is a rate wearing an amount's clothes, which is the case this
+     * exists for.
+     */
+    if (/\b(per|p\.a\.|pa|annum|annually|monthly|month|year|day)\b/i.test(v)) return false;
+    if (/%/.test(v)) return false;
+    return /\d/.test(v) && /^[A-Za-z$€£¥.\s]*[\d.,\s]+[A-Za-z$€£¥.\s]*$/.test(v);
+  }
+
+  if (kind === 'date') {
+    // A date the form can hold: the field is <input type="date">.
+    return /^\d{4}-\d{2}-\d{2}$/.test(v);
+  }
+
+  if (kind === 'share') {
+    const n = Number(v.replace(/[\s,]/g, '').replace(/%$/, ''));
+    return /^[\d.,\s]+%?$/.test(v) && Number.isFinite(n) && n >= 0 && n <= 100;
+  }
+
+  return true;
+}
+
 export interface ReadDocumentProps {
   /** The fields this calculation wants, in the order the form shows them. */
-  fields: { key: string; label: string }[];
+  fields: { key: string; label: string; kind?: FieldKind }[];
   /**
    * Called once per confirmation, never in bulk.
    *
@@ -57,11 +110,13 @@ export interface ReadDocumentProps {
 function Candidate({
   candidate,
   label,
+  kind,
   documentName,
   onConfirm,
 }: {
   candidate: FigureCandidate;
   label: string;
+  kind?: FieldKind;
   documentName: string;
   onConfirm: (field: string, value: string, provenance: string) => void;
 }) {
@@ -116,7 +171,19 @@ function Candidate({
         <p className="mt-1.5 text-note leading-relaxed text-breach">{t('read.unverified')}</p>
       )}
 
-      {taken ? (
+      {/*
+        A value of the wrong kind is shown and not offered.
+
+        "1.5% per month" is a true reading of the clause that says it and a
+        false answer to "the amount the contract names". The quote stays —
+        the member should see what is in the document — and the button goes,
+        because the button is the one that puts it into the field.
+      */}
+      {!readsAs(kind, candidate.value ?? '') ? (
+        <p className="mt-2 max-w-[58ch] text-note leading-relaxed text-breach">
+          {t(`read.notA.${kind ?? 'text'}`)}
+        </p>
+      ) : taken ? (
         <p className="mt-2 text-note text-muted">{t('read.taken')}</p>
       ) : (
         <Button
@@ -188,6 +255,7 @@ export default function ReadDocument({ fields, onConfirm }: ReadDocumentProps) {
   }
 
   const labelOf = (key: string) => fields.find((f) => f.key === key)?.label ?? key;
+  const kindOf = (key: string) => fields.find((f) => f.key === key)?.kind;
 
   return (
     <div className="mb-4 rounded-card shadow-ring px-4 py-3.5">
@@ -259,6 +327,7 @@ export default function ReadDocument({ fields, onConfirm }: ReadDocumentProps) {
                 key={c.field}
                 candidate={c}
                 label={labelOf(c.field)}
+                kind={kindOf(c.field)}
                 documentName={result.documentName}
                 onConfirm={onConfirm}
               />

@@ -118,7 +118,7 @@ export default function Purification() {
             invite confirming figures this calculation will not use.
           */}
           <ReadDocument
-            fields={READABLE[method].map((r) => ({ key: r.key as string, label: t(r.label) }))}
+            fields={READABLE[method].map((r) => ({ key: r.key as string, label: t(r.label), kind: 'money' as const }))}
             onConfirm={takeCandidate}
           />
 

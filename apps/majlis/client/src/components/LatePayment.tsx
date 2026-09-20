@@ -11,6 +11,7 @@ import {
 import { useI18n } from '../lib/i18n.js';
 import { Choice, Compute, Money, Note, Rate, Refusal, Result, Text, useCalc } from './calc.js';
 import RecordCalculation from './RecordCalculation.js';
+import ReadDocument from './ReadDocument.js';
 import { Button } from './Button';
 
 /**
@@ -62,6 +63,51 @@ export default function LatePayment() {
 
   const { result, error, busy, compute } = useCalc<LatePaymentInput, Result_>(oversight.latePayment);
   const set = (k: keyof typeof f) => (v: string) => setF((was) => ({ ...was, [k]: v }));
+
+  /** A confirmed candidate fills its field and appends its provenance. */
+  const takeCandidate = (field: string, value: string, provenance: string) =>
+    setF((was) => ({
+      ...was,
+      [field]: value,
+      source: was.source.trim() ? `${was.source.trim()} ${provenance}` : provenance,
+    }));
+
+  /*
+   * What is read out of the contract, and what deliberately is not.
+   *
+   * These five are written in the agreement and the payment record in the
+   * words the form asks for: the obligation, the two dates, and whichever
+   * amount the chosen method wants. A scholar reading them off a screen
+   * beside the sentence they came from is doing the checking; typing them
+   * again is not.
+   *
+   * **The rate is not among them**, and the reason is the point of the whole
+   * calculation. A contract says *1.5% per month*; this form takes an annual
+   * rate, because the charge is worked as rate × days ÷ day count. Turning
+   * the one into the other is a reading of the contract's terms — which
+   * period it runs on, whether it compounds — and a field quietly filled with
+   * 1.5 would understate the charge twelvefold. So it is left for the board,
+   * and the screen says so where the rate is asked for rather than in a note
+   * nobody reads.
+   */
+  const readable = [
+    { key: 'obligation', label: t('late.obligation'), kind: 'text' as const },
+    { key: 'dueOn', label: t('late.dueOn'), kind: 'date' as const },
+    { key: 'paidOn', label: t('late.paidOn'), kind: 'date' as const },
+    /*
+     * Money, and said so. Asked for "the amount the contract names" against
+     * a murabaha schedule, the reader came back with "1.5% per month" — a
+     * correct quotation of clause 3.4 and not an amount. Naming the kind is
+     * what keeps that from being one press away from the figure a board
+     * votes on.
+     */
+    ...(method === 'stipulated_amount'
+      ? [{ key: 'stipulated', label: t('late.stipulated'), kind: 'money' as const }]
+      : []),
+    ...(method === 'rate_on_overdue'
+      ? [{ key: 'outstanding', label: t('late.outstanding'), kind: 'money' as const }]
+      : []),
+  ];
 
   const setCost = (i: number, patch: Partial<CollectionCost>) =>
     setCosts((was) => was.map((c, j) => (j === i ? { ...c, ...patch } : c)));
@@ -115,6 +161,14 @@ export default function LatePayment() {
 
       {method && (
         <>
+          {/*
+            The contract is in the record and the figures are in the contract.
+            It appears after the method is chosen because the method decides
+            which amount the form wants, and reading a figure into a field
+            that is not on screen would be reading for nothing.
+          */}
+          <ReadDocument fields={readable} onConfirm={takeCandidate} />
+
           <Text
             label={t('late.obligation')}
             hint={t('late.obligation.hint')}
@@ -152,6 +206,21 @@ export default function LatePayment() {
                 onChange={set('outstanding')}
               />
               <Rate label={t('late.rate')} hint={t('late.rate.hint')} bps={rate} onChange={setRate} />
+
+              {/*
+                The one figure on this form that is not read for you, said
+                where it is asked for.
+
+                A contract writes "1.5% per month". This takes an annual rate,
+                because the charge is rate × days ÷ day count. Which period
+                the contract's rate runs on is one of its terms, and a box
+                filled with 1.5 from that sentence would understate the charge
+                twelvefold without a word to anybody.
+              */}
+              <p className="-mt-2 mb-3 max-w-[58ch] text-note leading-relaxed text-muted">
+                {t('late.rate.notRead')}
+              </p>
+
               {/*
                 360 and 365 give different answers on the same debt, so this is
                 a choice rather than a default sitting in a select.

@@ -53,9 +53,33 @@ function everyScreen(dir: string): string[] {
   return out;
 }
 
+/**
+ * The file with its comments blanked out, line for line.
+ *
+ * A comment is prose about the code, not the code. This guard read them as
+ * markup, and a line of explanation that mentioned `<input type="date">`
+ * inside a `//` was reported as a box with no name — a control that does not
+ * exist, in a file that had nothing wrong with it.
+ *
+ * Every character a comment occupies becomes a space and every newline
+ * stays, so the line numbers this reports still point where a reader would
+ * look.
+ */
+function withoutComments(text: string): string {
+  const blank = (m: string) => m.replace(/[^\n]/g, ' ');
+  return text
+    .replace(/\/\*[\s\S]*?\*\//g, blank)
+    /*
+     * Line comments only where the line is one. A `//` in the middle of a
+     * line is as likely to be inside a string — "https://" — and losing the
+     * rest of a line of real markup would be the opposite mistake.
+     */
+    .replace(/^[ \t]*\/\/[^\n]*/gm, blank);
+}
+
 /** Every control in the file that nothing gives a name to, as file:line. */
 function unnamedIn(path: string): string[] {
-  const lines = readFileSync(path, 'utf8').split(/\r?\n/);
+  const lines = withoutComments(readFileSync(path, 'utf8')).split(/\r?\n/);
   const found: string[] = [];
   let labelDepth = 0;
 

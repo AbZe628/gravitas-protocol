@@ -2,6 +2,7 @@ import '@testing-library/jest-dom/vitest';
 import { beforeEach } from 'vitest';
 import { forgetIdentity } from './lib/identity.js';
 import { forgetPulse } from './lib/pulse.js';
+import { forgetHealth } from './lib/health.js';
 
 /*
  * Every test starts as a fresh page load would.
@@ -18,7 +19,15 @@ import { forgetPulse } from './lib/pulse.js';
  * same staleness a real member would hit signing out and back in as
  * somebody else, and `forgetIdentity` exists for both.
  */
+/*
+ * What this installation is, forgotten with the rest. It was written to be
+ * forgettable and then never was, so a file that renders one screen against
+ * an installation with the assistant on and again with it off got the first
+ * answer twice — the second case passing on the first case's data, which is
+ * a test that proves nothing. Found by exactly that pair.
+ */
 beforeEach(() => {
   forgetIdentity();
   forgetPulse();
+  forgetHealth();
 });

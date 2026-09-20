@@ -13,6 +13,7 @@ import { useI18n } from '../lib/i18n.js';
 import { Compute, Note, Refusal, Result, Text, useCalc } from './calc.js';
 import RecordCalculation from './RecordCalculation.js';
 import FromTheRegister from './FromTheRegister.js';
+import ReadDocument from './ReadDocument.js';
 import { Button } from './Button';
 
 /**
@@ -130,6 +131,52 @@ export default function Tradability() {
     setTakenFrom(from.assetId);
   }
 
+  /*
+   * Reading the shares out of the prospectus, for the parts the board named.
+   *
+   * ── why the board names them first ────────────────────────────────────
+   *
+   * Everywhere else the fields are fixed: a balance sheet has a cash line
+   * whatever the board thinks. A composition does not. What the parts of a
+   * pool are, and which of them are worth separating, is the classification
+   * question this whole screen exists to put to a board — so a reader that
+   * proposed the parts would be answering it, which is the one thing nothing
+   * here may do. The scholar writes the labels; the reader looks for those
+   * labels and nothing else.
+   *
+   * ── and a share is not an amount ──────────────────────────────────────
+   *
+   * A prospectus states "AED 4,250,000" far more often than "31%". Turning
+   * the first into the second needs a denominator, and which figures belong
+   * in it is again the board's. So an amount is not converted: it is set
+   * aside, shown with what was read, and the scholar enters the share. A
+   * silent division here would put a number nobody chose into a threshold
+   * the board votes on.
+   */
+  const named = parts
+    .map((p, i) => ({ key: `part-${i}`, label: p.label.trim(), kind: 'share' as const }))
+    .filter((p) => p.label !== '');
+
+  /*
+   * A share arrives as a share or it does not arrive.
+   *
+   * The reader will not offer an amount for a field asked for as a share —
+   * it says what it read and leaves the field alone — so nothing that
+   * reaches here needs converting from anything. All this does is put the
+   * per cent into basis points, which is the same conversion the typed
+   * field does.
+   */
+  const takeCandidate = (field: string, value: string, provenance: string) => {
+    const i = Number(field.slice('part-'.length));
+    if (!Number.isInteger(i) || !parts[i]) return;
+
+    const n = Number(value.replace(/[\s,]/g, '').replace(/%$/, ''));
+    if (!Number.isFinite(n)) return;
+
+    setPart(i, { bps: Math.round(n * 100) });
+    setSource((was) => (was.trim() ? `${was.trim()} ${provenance}` : provenance));
+  };
+
   const total = parts.reduce((sum, p) => sum + (Number.isFinite(p.bps) ? p.bps : 0), 0);
 
   const setPart = (i: number, patch: Partial<CompositionPart>) =>
@@ -227,6 +274,21 @@ export default function Tradability() {
         >
           {t('trade.addPart')}
         </Button>
+
+        {/*
+          The shares, read out of the document, for the parts the board has
+          named. Below the rows rather than above them, because naming the
+          parts comes first and a reader offered before there is anything to
+          look for would be a control that cannot work yet.
+        */}
+        <div className="mt-3">
+          {named.length === 0 ? (
+            <p className="text-note leading-relaxed text-muted">{t('trade.nameFirst')}</p>
+          ) : (
+            <ReadDocument fields={named} onConfirm={takeCandidate} />
+          )}
+        </div>
+
 
         {/*
           The running total, named while it is being typed rather than refused

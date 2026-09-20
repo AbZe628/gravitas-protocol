@@ -64,7 +64,14 @@ export type CalculationKind =
  * one would have been: it had no provenance line and no test.
  */
 
-const KNOWN: CalculationKind[] = [
+/**
+ * Every calculator this application has, in one place.
+ *
+ * Exported so a measure can walk it rather than keep its own copy. A list
+ * copied into a test is a list that stops being true the day a seventh is
+ * added, and the fault that gets missed is always the tool nobody listed.
+ */
+export const KNOWN: CalculationKind[] = [
   'screening',
   'purification',
   'zakat',
@@ -73,7 +80,8 @@ const KNOWN: CalculationKind[] = [
   'late_payment',
 ];
 
-function One({ kind }: { kind: CalculationKind }) {
+/** One calculator, chosen by kind. Exported for the same reason as KNOWN. */
+export function One({ kind }: { kind: CalculationKind }) {
   if (kind === 'screening') return <Screening />;
   if (kind === 'purification') return <Purification />;
   if (kind === 'zakat') return <Zakat />;

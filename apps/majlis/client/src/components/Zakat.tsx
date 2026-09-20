@@ -123,7 +123,7 @@ export default function Zakat() {
             reading beats typing, and the case the whole feature was built for.
           */}
           <ReadDocument
-            fields={fields.map((k) => ({ key: k as string, label: t(`zakat.${k}`) }))}
+            fields={fields.map((k) => ({ key: k as string, label: t(`zakat.${k}`), kind: 'money' as const }))}
             onConfirm={takeCandidate}
           />
 

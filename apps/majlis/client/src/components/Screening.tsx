@@ -176,7 +176,7 @@ export default function Screening() {
       <FromTheLastTime kind="screening" onTake={takeLastTime} />
 
       <ReadDocument
-        fields={FIELDS.map((f) => ({ key: f.key as string, label: t(f.label) }))}
+        fields={FIELDS.map((f) => ({ key: f.key as string, label: t(f.label), kind: 'money' as const }))}
         onConfirm={takeCandidate}
       />
 
