@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { oversight, type ContractReading } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import WhereTheDraftComesFrom from './WhereTheDraftComesFrom.js';
+import WhichShape from './WhichShape.js';
 import { Nothing } from './page.js';
 import { Button } from './Button';
 import Act from './Act.js';
@@ -87,13 +88,30 @@ export default function ReadTheContract({
   /* Opened by a press inside a matter; already open where it is the point. */
   const [open, setOpen] = useState(Boolean(startWith));
 
+  /*
+   * The shape, chosen here rather than on a screen before this one.
+   *
+   * Outside a matter the reading needs a shape named, and naming it used to
+   * mean a page of its own that reprinted all nineteen as cards. It is a
+   * list of names with one wanted, which is a dropdown, and it belongs
+   * beside the draft — with *compare them all* for the scholar who cannot
+   * name the shape yet, which is most of them.
+   *
+   * Inside a matter there is nothing to choose: the matter's own shape is
+   * what its conditions are, and offering a picker there would invite
+   * reading a matter's draft against somebody else's conditions.
+   */
+  const [shape, setShape] = useState(structureId ?? '');
+
   if (!canRead) return null;
+
+  const readsAgainst = matterId ? null : shape;
 
   async function read() {
     setReading(
       matterId
         ? await oversight.readContract(matterId, text)
-        : await oversight.readAgainstShape(structureId as string, text),
+        : await oversight.readAgainstShape(shape, text),
     );
   }
 
@@ -138,7 +156,7 @@ export default function ReadTheContract({
             contract was to open it elsewhere, select all, and paste.
           */}
           <WhereTheDraftComesFrom
-            structureId={structureId}
+            structureId={readsAgainst ?? undefined}
             onText={(t_, from) => {
               setText(t_);
               setTook(from);
@@ -165,10 +183,21 @@ export default function ReadTheContract({
               {text.trim().length} {t('draftfrom.characters')}
             </p>
           )}
+          {/*
+            Which conditions this is read against, below the draft rather
+            than on a page before it.
+
+            Below, because the draft is what a scholar arrives holding and
+            the shape is often what they want the reading to help them see.
+            Comparing all of them needs the text, so asking for the shape
+            first put the two the wrong way round.
+          */}
+          {!matterId && <div className="mt-4"><WhichShape value={shape} onChange={setShape} text={text} /></div>}
+
           <Button
             type="button"
             onClick={() => setAsking(true)}
-            disabled={text.trim().length < 40}
+            disabled={text.trim().length < 40 || (!matterId && shape === '')}
             className="mt-3 rounded-card bg-lapis px-6 py-3 text-body font-bold text-white shadow-act disabled:opacity-50"
           >
             {t('read.doIt')}

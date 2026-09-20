@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+
 import SlideOver from '../components/SlideOver.js';
+import ReadTheContract from '../components/ReadTheContract.js';
+import { mayDeliberate, useIdentity } from '../lib/identity.js';
 import StructureDetail from './StructureDetail.js';
 import { oversight, type HeldStructure, type Library as LibraryData } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
@@ -62,6 +64,7 @@ export default function Library() {
    */
   const [open, setOpen] = useState<{ id: string; name: string } | null>(null);
   const { t } = useI18n();
+  const { identity } = useIdentity();
   const [data, setData] = useState<LibraryData | null>(null);
   const [failed, setFailed] = useState(false);
   /** A failed refresh keeps a screen that is already there. */
@@ -96,16 +99,13 @@ export default function Library() {
       phase="inforce"
       title={t('adopt.title')}
       says={t('adopt.intro')}
-      /* Checking a draft is done against these shapes, so it is offered from
-         here rather than from a rail entry of its own. */
-      act={(
-        <Link
-          to="/check"
-          className="rounded-xl bg-lapis px-4 py-2 text-ui font-semibold text-white shadow-act"
-        >
-          {t('adopt.toCheck')}
-        </Link>
-      )}
+      /*
+        Checking a draft happens here, not through a door.
+        The act used to be a link to a screen that reprinted all nineteen
+        shapes as cards so one could be chosen — the same nineteen this page
+        has just listed. Choosing from a list of names is a dropdown, and it
+        now sits at the top of this page with the draft beside it.
+      */
       live={
         <span className="text-ui text-muted">
           <span className="font-mono tabular-nums text-paper">{untouched}</span>{' '}
@@ -129,6 +129,20 @@ export default function Library() {
           <Nothing>{t('adopt.neverUsed')}</Nothing>
         </div>
       )}
+
+      {/*
+        The draft, before the list of shapes.
+
+        A member opens this page for one of two reasons: to see what the
+        board holds, or because they have a contract in their hand. The
+        second was a link away to a screen of its own, and it is the one
+        people actually come for — so it is first, and the shapes it is read
+        against are listed directly underneath it.
+      */}
+      <Division heading={t('check.title')} note={t('check.lead')}>
+        <ReadTheContract onItsOwnScreen canRead={mayDeliberate(identity?.role)} />
+        {!mayDeliberate(identity?.role) && <Nothing>{t('check.readOnly')}</Nothing>}
+      </Division>
 
       {groups.map((g) => (
         <Division

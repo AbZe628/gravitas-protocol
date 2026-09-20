@@ -173,8 +173,8 @@ export const JOURNEY: Readonly<Record<string, Journey>> = {
     phase: 'inforce',
     does: 'do.library',
     next: [
-      { to: '/check', label: 'do.next.check' },
       { to: '/classic', label: 'do.next.open' },
+      { to: '/record', label: 'do.next.stands' },
     ],
   },
   '/check': {
@@ -341,9 +341,14 @@ export const DESK_JOURNEY: Readonly<Record<string, Journey>> = {
   '/library': {
     phase: 'bindsme',
     does: 'do.desk.library',
+    /*
+     * Not to /check any more: checking a draft happens on the library
+     * itself, and an onward link to a page that offers the same reading
+     * would send somebody away from the thing they are standing on.
+     */
     next: [
-      { to: '/check', label: 'do.next.check' },
       { to: '/binds-me', label: 'do.next.binds' },
+      { to: '/ask', label: 'do.next.ask' },
     ],
   },
   '/check': {
