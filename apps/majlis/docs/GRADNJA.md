@@ -524,7 +524,53 @@ bi znao *šta je novo*, pa dijeljenje te kopije nije bezopasno.
 - `aria-busy`, `aria-live`, `aria-invalid` — inače čitač ekrana ne zna ništa
   od ovoga
 
+#### Šest pitanja §35.5 — **20 od 20, 20.09.2026.**
+
+Mjeri se sa `sest2.mjs` (1, 3, 5, 6) i `traka2.mjs` (2). Četvrto se ne
+mjeri: *može li se korak obaviti bez miša* je prolazak, ne brojka.
+
+Od pet ekrana koji su padali, **tri nisu bila kvar nego mjera koja nije
+gledala** — puni nalaz je u FLOW §35.5. Dva su bila pravi kvar i popravljena
+su: postavke 436 → 335, obaveze 436 → 389.
+
+Uz njih jedan koji je vrijedio svuda: `Division` i `Part` nose
+`first:pt-0` da bi prva sekcija stajala spojena sa zaglavljem, a to nije
+važilo nijednom — `PageHead` iscrtava `<header>`, pa nijedna sekcija nije
+`:first-child`. Sa `first-of-type` prva sekcija napokon stoji spojena, na
+svakoj stranici.
+
+#### Tri natjerana stanja — **20 od 20, 20.09.2026.**
+
+`stanja.sh` lomi server na tri načina i gleda šta ekran kaže:
+
+| | |
+|---|---|
+| puklih | **0** |
+| „prazno" i „tišina" istim riječima | **0** |
+| bez ijednog `aria-live` u sva tri | **0** |
+| neizmjerenih | **0** |
+
+Dva ekrana su izuzeta **sa razlogom upisanim u mjeru**: `/calculations` i
+`/search` ne traže ništa pri otvaranju — računanja su aritmetika koja se
+radi ovdje, pretraga čeka upit — pa su im tri stanja ista s pravom.
+Provjereno sa `veze.mjs`: jedini zahtjevi na tim ekranima su ljuskini. Za
+njih se pravo pitanje postavlja drugdje, i postavljeno je: `cinnamrtvom.mjs`
+ukuca upit nad mrtvim serverom i pretraga kaže sve troje — *nije mogao
+pitati · zapis je netaknut · pokušaj ponovo, pa pogledaj server* — **8 od 8**.
+
+`SVE=1` skine te izuzetke i mjera ih odmah prijavi, što je dokaz da poređenje
+radi.
+
+**I jedno o samoj mjeri.** Sva tri stanja u jednom pregledniku ne rade: 60
+ekrana ga iscrpe i on počne prijavljivati nasumične ekrane kao pukle. Dva
+uzastopna prolaza optužila su *različite* ekrane — prvi obaveze, drugi
+prekršaje — a nijedan se ne ponovi kad se pokrene sam. Zato jedna faza po
+pregledniku, nalaz na disk, sažetak od tri fajla; `stanja.sh` to veže. Bez
+toga sam skoro popravljao dva ekrana koja nikad nisu bila pokvarena.
+
 **Gotovo je kad:** svaki čvor prođe test od šest pitanja iz §35.5.
+*Ispunjeno za šest pitanja i za tri natjerana stanja; ostaje **djelimično**
+— ekran koji je dobio dio odgovora a dio ne.*
 
 ---
 
