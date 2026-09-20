@@ -142,7 +142,17 @@ export default function StepWindow({
 
       {/* ── the work, and the pane beside it ──────────────────────────── */}
       <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
-        <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5 sm:px-6">
+        {/*
+          Named, because a rule is written about it.
+
+          §35.5 asks how many words stand in the work pane — "the place where
+          one condition stands" — and sets 150. The measure had no way to ask
+          for that pane, so it counted the whole window: the reference pane
+          beside it, the strip, and the sentence under the act bar, 203 words
+          against a limit written for this column alone. A rule with a name
+          in the specification should have the same name in the markup.
+        */}
+        <div data-pane="work" className="min-h-0 flex-1 overflow-y-auto px-5 py-5 sm:px-6">
           <div className="mb-3 text-label font-bold uppercase tracking-caps text-muted">
             {heading}
           </div>

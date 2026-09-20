@@ -2171,6 +2171,48 @@ Dugme koje samo rasklapa okno nije, i ne broji se; prepoznaje se po
 Izmjereno tako, padaju četiri: pitanja 709, pregledi 806, obaveze 436,
 postavke 436.
 
+### Nastavak, 20.09.2026. — svih šest prolazi, i četiri stvari su bile krivo mjerene
+
+Od te četiri, **tri nisu bile kvar na ekranu nego na mjeri**, i to se ovdje
+piše da se ne otkriva treći put:
+
+| šta | mjera je gledala | a bilo je |
+|---|---|---|
+| **pitanja 709** | samo `<button>` | glavni čin je `MainAct` koji vodi na obrazac, pa se iscrtava kao `<a>`. „Ask the board" stoji na **230**, u zaglavlju. Veza koja nosi `shadow-act` je čin i broji se |
+| **pregledi 806** | ekran očima predsjedavajućeg | pregled upisuje sekretar ili veza sa institucijom, i njima „Record an examination" stoji na **293**. Predsjedavajućem se nudi samo *Put this to the board*, a to je čin nad pročitanim pregledom i po prirodi dolazi poslije njega. Mjeri se očima onoga ko na ekranu može raditi |
+| **klasična ploča 751** | preglednik sa zatečenim `localStorage` | uvodno okno pamti je li pročitano, i jednom je ranije otvoreno. Sa stvarno praznim profilom prvi čin je na **150**. `svjez.sh` je brisao proces, ne profil |
+| **radni prozor 203 riječi** | cijeli `main` | granica od 150 vrijedi za **radno okno**, a brojani su i okno sa strane i rečenica nad trakom činova. Samo okno: **53** |
+
+Ta rečenica nad trakom činova — 69 riječi o tome šta znače *Does not apply ·
+Not met · Met* — nije višak. `recordFinding` je namjerno bez prozora, jer bi
+prozor pred svakim od šest do dvadeset uslova bio niz potvrda koje niko ne
+čita; ono što bi prozor rekao stoji jednom, uz dugmad. Radno okno se zato
+zove `[data-pane="work"]` u `StepWindow`: pravilo koje ima ime u
+specifikaciji treba da ima isto ime u kodu.
+
+**Dvije su bile pravi kvar, i popravljene su:**
+
+- **postavke 436 → 335.** Svaki panel je stajao u naboru koji ga imenuje pa
+  se odmah ispod imenovao ponovo — „Your password" nad „Your password". A
+  rečenica o tome šta promjena imena znači stajala je ispred polja umjesto
+  uz dugme; čita se prije pritiska, ne prije kucanja.
+- **obaveze 436 → 389.** Uvod je imao dvije rečenice gdje je jedna dovoljna,
+  a `Division` i `Part` su nosili `first:pt-0` koji nikad nije važio:
+  `PageHead` iscrtava `<header>`, pa nijedna sekcija nije `:first-child`.
+  Sa `first-of-type` prva sekcija napokon stoji spojena sa zaglavljem, na
+  svakoj stranici. Pregledi su time 399 → 380.
+
+**Drugo pitanje se do sada uopšte nije mjerilo.** `sest2.mjs` je za njega
+ispisivao „nijedan ekran nema traku činova" i to se čitalo kao da ne pada.
+Tražio je `bg-raised`, a traka je `bg-ink/40` — i traka i ne živi na
+listama nego u vođenom prolasku kroz predmet. Mjereno kako treba, kroz svih
+osam koraka jednog predmeta: **glavni čin na 42–43 piksela od dna, raspon 1
+piksel.** Prolazi. `traka2.mjs`, i sa `SABOTAZA=1` podigne traku na trećem
+koraku da se vidi da hvata.
+
+Gornja ivica trake jeste različita — 76 i 159 — ali zato što se na koracima
+sa uslovom prelama u dva reda. Ono što ruka pamti je dugme, ne ivica.
+
 **I jedna mjera koja je do sada nedostajala.** Za liste §35.5 traži i
 *koliko redova stane bez skrola* — osam. To se nije mjerilo nigdje. Izmjereno
 na dvanaest ekrana: redovi su 22 do 149 piksela, i tamo gdje ih ima osam ili
@@ -2183,9 +2225,19 @@ koji redove obuhvata, ne red — greška u prvoj verziji te mjere.
 **Pravilo koje pada na ekranu koji radi ispravno nije standard nego šum**, i
 to vrijedi jednako za peto i za šesto.
 
-`sest2.mjs` u `work/majlis-local/` mjeri 1, 2, 3, 5 i 6. Četvrto — *može li
-se korak obaviti bez miša* — nije brojka nego prolazak, i ne mjeri se; mjera
-koja bi tvrdila da ga je izmjerila lagala bi.
+`sest2.mjs` u `work/majlis-local/` mjeri 1, 3, 5 i 6; `traka2.mjs` mjeri 2,
+jer se ono pita kroz korake jednog predmeta a ne kroz liste. Četvrto — *može
+li se korak obaviti bez miša* — nije brojka nego prolazak, i ne mjeri se;
+mjera koja bi tvrdila da ga je izmjerila lagala bi.
+
+**Stanje 20.09.2026.: 20 od 20 ekrana, nijedan ne pada.**
+
+I jedno pravilo o samim mjerama, plaćeno četiri puta u jednom danu: **prije
+nego se povjeruje brojci, mora se vidjeti da mjera hvata.** Ubaci se pravi
+kvar i gleda se je li prijavljen. Četiri puta je ovdje „prolazi" značilo
+„nisam dogledao": mjera je tražila pogrešnu klasu, gledala pogrešnu osobu,
+nosila zatečeni profil preglednika, i čitala ekran prije nego se učitao.
+Sve četiri su izgledale kao uredan rezultat.
 
 ## 35.6 · Šta ovo znači za red gradnje
 
