@@ -148,7 +148,7 @@ export function Part({
   children: ReactNode;
 }) {
   return (
-    <section className="border-t border-line py-6 first:border-t-0 first:pt-0">
+    <section className="border-t border-line py-6 first-of-type:border-t-0 first-of-type:pt-0">
       <div className="flex gap-5">
         <span className="w-5 shrink-0 pt-1 font-mono text-note text-muted">{n}</span>
         <div className="min-w-0 flex-1">
@@ -167,6 +167,16 @@ export function Part({
  *
  * Same heading treatment as `Part`, without the number, so a list page and a
  * pack page read as the same application.
+ *
+ * ── `first-of-type`, not `first` ──────────────────────────────────────────
+ *
+ * The intent was always that the first section on a page sits flush against
+ * the page head rather than repeating a rule under it. It never once did:
+ * `PageHead` renders a `<header>`, so that is the first child and no section
+ * is ever `:first-child`. Measured on three screens — 24px of padding and a
+ * 1px rule, on every page with a head, doing the opposite of what the class
+ * was written for. `first-of-type` counts only sections, which is what the
+ * rule meant. Same on `Part`.
  */
 export function Division({
   heading,
@@ -187,7 +197,7 @@ export function Division({
   note?: string;
 }) {
   return (
-    <section className="border-t border-line py-6 first:border-t-0 first:pt-0">
+    <section className="border-t border-line py-6 first-of-type:border-t-0 first-of-type:pt-0">
       {heading && (
         <div className="mb-2.5 text-label font-bold uppercase tracking-caps text-muted">
           {heading}
