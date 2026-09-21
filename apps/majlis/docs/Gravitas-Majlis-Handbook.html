@@ -49,28 +49,45 @@
 }
 
 /*
- * The page has no margin, and the type is held off the edge by padding.
+ * The page has its margins back, and the colour is painted underneath.
  *
- * ── why, since a margin is the ordinary way ──────────────────────────
+ * ── the two wrong answers before this one ────────────────────────────
  *
- * A margin is not painted. With 17mm of it the ground colour stopped
- * 17mm short of the paper on all four sides, so every sheet was a cream
- * panel floating in a white frame — which is what it looked like: a
- * screenshot of a document rather than a document. Setting the colour on
- * the html element as well does not fix it; Chrome does not carry that
- * background into the margin when it prints.
+ * A page margin is not painted. With 17mm of it the ground stopped 17mm
+ * short of the paper on all four sides and every sheet was a cream panel
+ * in a white frame. Setting the colour on the html element does not help;
+ * Chrome does not carry it into the margin.
  *
- * So the margin is zero, the padding does the same job, and the ground
- * runs to all four edges. The one strip left is the footer, and the
- * footer template paints itself the same colour.
+ * So the margin was set to zero and padding put on the chapter instead.
+ * That painted the whole sheet and broke the reading: padding applies
+ * where the chapter begins, not on each page it runs onto, so a chapter
+ * spilling over started hard against the top edge of the next sheet and
+ * ran to the very bottom of it — where the page break cut through the
+ * middle of a line of type.
+ *
+ * The answer is neither. The margins are real, and a fixed element paints
+ * the ground: Chrome repeats a fixed element on every printed page, so
+ * one div covers all forty-one sheets, edge to edge, underneath.
  */
-@page { size: A4; margin: 0 0 13mm; }
+@page { size: A4; margin: 16mm 15mm 14mm; }
+/* The cover alone runs to the edge of the paper, so it keeps no margin.
+   Its own bottom padding holds the figures clear of the footer strip,
+   which is still drawn over it. */
+@page :first { margin: 0; }
 
-.chapter { padding: 16mm 16mm 6mm; }
+.ground {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: var(--vellum);
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
 
 /* On screen the sheet is centred, with the edge of the paper visible. */
 @media screen {
-  body { max-width: 210mm; margin: 0 auto; box-shadow: 0 0 0 1px rgba(25,23,19,.08); }
+  body { max-width: 210mm; margin: 0 auto; padding: 16mm 15mm; box-shadow: 0 0 0 1px rgba(25,23,19,.08); }
+  .cover { margin: -16mm -15mm 0; }
 }
 
 html {
@@ -96,10 +113,10 @@ body {
   /* 297 less the 13mm strip the footer sits in: at the full height
      the four figures at the foot of the cover were printed underneath
      it and came out with their second line sliced off. */
-  min-height: 284mm;
+  min-height: 297mm;
   display: flex;
   flex-direction: column;
-  padding: 0 18mm 16mm;
+  padding: 0 18mm 24mm;
   background: linear-gradient(170deg, #ffffff 0%, var(--vellum) 40%, #f2ebdf 100%);
   break-after: page;
 }
@@ -161,7 +178,9 @@ body {
 
 h2 {
   font-family: var(--display); font-size: 17pt; font-weight: 500; line-height: 1.2;
-  letter-spacing: -.015em; margin: 0 -16mm 6mm; padding: 5.4mm 16mm;
+  /* Inset rather than full bleed: with the page margins back, anything
+     pushed into them is clipped by the printer, not printed. */
+  letter-spacing: -.015em; margin: 0 0 6mm; padding: 4.6mm 6mm; border-radius: 1.5mm;
   /* A tint mixed as a colour rather than as black at low opacity: the
      transparent version came out grey on cream and read as a shadow. */
   background: linear-gradient(to right, #dbe5ef 0%, #eaf0f6 55%, rgba(234,240,246,0) 100%);
@@ -211,7 +230,7 @@ ul li::marker { color: var(--gold); }
  * (No back-ticks in this block: the stylesheet is a template literal, and
  * one of them ends it.)
  */
-table { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 9pt; margin: 0 0 5mm; break-inside: avoid; }
+table { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 9pt; margin: 0 0 5mm; break-inside: avoid; page-break-inside: avoid; }
 th, td { overflow-wrap: anywhere; }
 thead th { text-align: start; font-family: var(--body); font-size: 7.2pt; font-weight: 700;
   letter-spacing: .13em; text-transform: uppercase; color: var(--sand);
@@ -220,15 +239,39 @@ tbody td { padding: 2.4mm 4mm 2.4mm 0; border-bottom: .5px solid var(--rule); ve
 tbody tr:last-child td { border-bottom: 0; }
 td:first-child, th:first-child { padding-inline-end: 6mm; }
 
-figure { margin: 0 0 5mm; break-inside: avoid; }
+figure { margin: 0 0 5mm; break-inside: avoid; page-break-inside: avoid; }
 
 /* The frame: a window with a bar across the top of it, so a picture of a
    cream screen on a cream page has an edge. */
 .frame {
-  border-radius: 2.4mm; overflow: hidden; background: var(--sheet);
+  position: relative; border-radius: 2.4mm; overflow: hidden; background: var(--sheet);
   box-shadow: 0 0 0 .5px rgba(22,68,112,.16), 0 1.4mm 4mm rgba(25,23,19,.11);
+  /* On the figure alone this was not enough: the frame was still split
+     across the page break, and half a screenshot went over the edge.
+     Chrome honours the legacy spelling more reliably here. */
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+.frame img { break-inside: avoid; page-break-inside: avoid; }
+
+/*
+ * The foot of a cropped screenshot, faded into the page.
+ *
+ * These are whole-page captures cut to a band, and the cut goes through
+ * whatever happens to be there — half a row of type, the top of a card.
+ * Cut hard it reads as a printing fault. Faded, it reads as what it is:
+ * the top of a screen, and there is more of it.
+ */
+.frame::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 12mm;
+  background: linear-gradient(to bottom, rgba(251,248,241,0), rgba(251,248,241,.72) 55%, rgba(251,248,241,.97));
 }
 .bar {
+  border-radius: 2.4mm 2.4mm 0 0;
   height: 4.6mm; padding: 0 2.4mm; display: flex; align-items: center; gap: 1.2mm;
   background: linear-gradient(to bottom, #f4efe4, #ece5d7);
   border-bottom: .5px solid rgba(25,23,19,.09);
@@ -254,6 +297,7 @@ figcaption {
 </style>
 </head>
 <body>
+<div class="ground" aria-hidden="true"></div>
 
 <section class="cover">
   <div class="cover-top">
