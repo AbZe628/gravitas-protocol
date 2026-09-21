@@ -133,6 +133,19 @@ function StatusBar() {
         <span className={dot(health.assistantKind !== 'off')} />
         {t(health.assistantKind === 'off' ? 'shell.noAssistant' : 'shell.assistant')}
       </span>
+      {/*
+        Whether anybody outside this application is ever told.
+        The fourth thing a bank has to know about its own installation, and
+        the only one of the four with no other voice: signing is said here,
+        the chain is said here, the assistant is said here and again on the
+        screens that would use it — but a notice that was composed and
+        carried by nobody is visible only to whoever happened to be looking
+        at the screen that composed it.
+      */}
+      <span className="flex items-center gap-2">
+        <span className={dot(health.notice !== 'none')} />
+        {t(health.notice === 'none' ? 'shell.noRelay' : 'shell.relay')}
+      </span>
       <span className="ms-auto font-mono">
         {identity?.scholarId ?? t('shell.anonymous')}
       </span>

@@ -295,6 +295,23 @@ export default function Evidence({ matter, scholarId, canAttach, onChanged }: Pr
             {t('evidence.add')}
           </Button>
 
+          {/*
+            Where a document cannot be kept, the reason stands in the
+            button's place.
+
+            The control was absent and nothing was said, which is only half
+            of the rule: a member who came to attach a contract saw an empty
+            row and could not tell whether this application does not do it
+            or their installation has nowhere to put it. The first is a
+            missing feature; the second is a volume nobody mounted, and the
+            difference is the whole of what they can act on.
+          */}
+          {mayAdd && !mayAttachDocument && (
+            <span className="max-w-[46ch] text-note leading-relaxed text-muted">
+              {t('evidence.noVault')}
+            </span>
+          )}
+
           {mayAttachDocument && (
             <>
               <Button

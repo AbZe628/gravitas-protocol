@@ -308,6 +308,15 @@ export interface Health {
    */
   documents?: 'disk' | 'none';
   /**
+   * Whether anybody outside this application is ever told.
+   *
+   * `none` is the ordinary installation: a notice is composed, shown, and
+   * carried by a person. It is on the status bar because it is the one
+   * absence with no other voice — a notice nobody sent is visible only to
+   * whoever happened to be looking at the screen that wrote it.
+   */
+  notice?: 'none' | 'smtp';
+  /**
    * Whether an attached document may be read by a model.
    *
    * A separate decision from whether there is an assistant, and separately off.
