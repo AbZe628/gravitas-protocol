@@ -67,7 +67,21 @@ function stub() {
           status: 200,
           headers: { 'Content-Type': 'application/json' },
         });
-      if (url.includes('/api/adoptions')) return json(LIBRARY);
+      /*
+       * The library answers late, on purpose and always.
+       *
+       * A stub that answers in the same tick hides every ordering fault in
+       * the tests that use it: this file passed here and failed on CI
+       * because the picker's options happened to arrive before the
+       * assertion on one machine and after it on the other. A measure whose
+       * result depends on which computer ran it is not a measure. With the
+       * delay the race is certain rather than occasional, so a test that
+       * does not wait fails everywhere, immediately, including here.
+       */
+      if (url.includes('/api/adoptions')) {
+        await new Promise((r) => setTimeout(r, 30));
+        return json(LIBRARY);
+      }
       if (url.includes('/api/recognise')) return json(RANKING);
       if (url.includes('/api/attention'))
         return json({ scholarId: 'member-a', role: 'signatory', office: null, outstanding: 0, overdue: 0, items: [] });
@@ -109,7 +123,21 @@ describe('the shape is chosen from a dropdown', () => {
   it('reports the choice as it is made', async () => {
     stub();
     const onChange = show(DRAFT);
-    fireEvent.change(await screen.findByRole('combobox'), { target: { value: 'ijara' } });
+
+    /*
+     * Wait for the shapes, not just for the box.
+     *
+     * The picker renders before the library answers, holding only its
+     * placeholder. Selecting a value that is not an option yet leaves the
+     * box empty, `onChange` fires with "", and the test fails — which is
+     * what it did on CI while passing here, because the stubbed fetch
+     * happened to resolve before the assertion on this machine and not on
+     * that one. A race in the measure, not in the picker.
+     */
+    const picker = await screen.findByRole('combobox');
+    await waitFor(() => expect(within(picker).getAllByRole('option').length).toBe(3));
+
+    fireEvent.change(picker, { target: { value: 'ijara' } });
     expect(onChange).toHaveBeenCalledWith('ijara');
   });
 });
