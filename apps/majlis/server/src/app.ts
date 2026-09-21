@@ -781,7 +781,7 @@ export function createApp(
   app.use('/api', adoptionRoutes(store));
   app.use('/api', submissionRoutes(store, notifier));
   app.use('/api', examinationRoutes(store));
-  app.use('/api', meetingRoutes(store));
+  app.use('/api', meetingRoutes(store, undefined, notifier));
   /*
    * A member's own account.
    *

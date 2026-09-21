@@ -43,6 +43,7 @@ import {
 } from '../services/meeting.js';
 import type { Store } from '../store/index.js';
 import { handle, badRequest, identityOf, requireRole } from './http.js';
+import { compose, NoticeOff, type Notifier } from '../services/notice.js';
 
 const conveneSchema = z.object({
   boardId: z.string().min(1).max(64),
@@ -72,6 +73,14 @@ const minuteSchema = z.object({ minute: z.string().max(50_000) });
 export function meetingRoutes(
   store: Store,
   now: () => string = () => new Date().toISOString(),
+  /**
+   * Who is told that the board has been called to sit.
+   *
+   * Optional, and its default sends nothing — the same arrangement as
+   * everywhere else here: a channel that is not wired composes the words
+   * and says plainly that they did not go.
+   */
+  notifier: Notifier = new NoticeOff(),
 ): Router {
   const router = Router();
 
@@ -156,7 +165,33 @@ export function meetingRoutes(
         who.scholarId ?? 'unknown',
       );
 
-      res.status(201).json(await store.createMeeting(built));
+      const meeting = await store.createMeeting(built);
+
+      /*
+       * The one event where being told late is the same as not being told.
+       *
+       * A sitting called for Tuesday is of no use to a member who opens
+       * Majlis on Wednesday, so the notice is composed here rather than
+       * left to somebody remembering. Under the ordinary installation
+       * nothing is sent and the reply says so plainly — see
+       * `services/notice.ts` for why that is honest rather than a stub —
+       * and a board that has wired a relay has it delivered by the same
+       * call.
+       *
+       * It is returned beside the meeting, not instead of it: convening
+       * succeeded whether or not anybody could be written to, and a
+       * failure to notify must never look like a failure to convene.
+       */
+      const notice = compose(board, {
+        kind: 'meeting_convened',
+        meetingId: meeting.id,
+        at: meeting.at,
+        agenda: meeting.agenda.map((a) => a.item),
+        convenedBy: who.scholarId ?? 'unknown',
+      });
+      const delivery = await notifier.deliver(notice, now());
+
+      res.status(201).json({ ...meeting, notice, delivery });
     }),
   );
 

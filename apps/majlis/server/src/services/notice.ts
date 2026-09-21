@@ -55,6 +55,30 @@ export type NoticeEvent =
       title: string;
       reference: string | null;
       direction: 'permit' | 'restrict';
+    }
+  /**
+   * The board has been called to sit.
+   *
+   * The one event on this list that asks a member to be somewhere, and the
+   * only one where being told late is the same as not being told. A sitting
+   * convened for Tuesday is of no use to a member who opens Majlis on
+   * Wednesday.
+   *
+   * Two things go with it and nothing else: **when**, and **what it is
+   * about**. The agenda is already a list of headings the board wrote for
+   * each other, so it travels as it stands — unlike a question's substance,
+   * which does not leave the record.
+   *
+   * A member who has made a calendar address does not need this at all: the
+   * sitting is in their calendar before anybody writes to them. This is for
+   * the ones who have not, and for the record of having told them.
+   */
+  | {
+      kind: 'meeting_convened';
+      meetingId: string;
+      at: string;
+      agenda: string[];
+      convenedBy: string;
     };
 
 /**
@@ -155,6 +179,22 @@ export function compose(board: Board, event: NoticeEvent): Notice {
         `\nThe written ruling and the draft clauses are assembled and waiting in ` +
         `Majlis. Nothing has been sent to the institution by this system — that ` +
         `is a person's act, and this notice is the prompt for it.`,
+      concerns: everyone,
+    };
+  }
+
+  if (event.kind === 'meeting_convened') {
+    const when = event.at.replace('T', ' ').slice(0, 16);
+    return {
+      subject: `${board.name} will sit on ${event.at.slice(0, 10)}`,
+      body:
+        `${event.convenedBy} has called a sitting of the board.\n\n` +
+        `${when}\n\n` +
+        (event.agenda.length > 0
+          ? `Before the board:\n${event.agenda.map((item) => `  · ${item}`).join('\n')}\n`
+          : '') +
+        `\nThe papers for the sitting are assembled in Majlis. Attendance is ` +
+        `recorded there afterwards, and a quorum is counted from it.`,
       concerns: everyone,
     };
   }

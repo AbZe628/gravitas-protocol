@@ -74,7 +74,13 @@ const board = {
 const posted: { url: string; method: string; body: unknown }[] = [];
 let identity: Record<string, unknown> = { scholarId: 'member-a', role: 'signatory', office: 'chair' };
 
-function stub(body: unknown) {
+/*
+ * The second argument is what a write answers with. Convening now comes
+ * back carrying the notice it composed, and a stub that answered {} would
+ * let the screen pass while telling a chair nothing about whether the
+ * board was written to.
+ */
+function stub(body: unknown, wroteBack: unknown = {}) {
   posted.length = 0;
   vi.stubGlobal(
     'fetch',
@@ -85,7 +91,7 @@ function stub(body: unknown) {
 
       if (init?.method && init.method !== 'GET') {
         posted.push({ url, method: init.method, body: init.body ? JSON.parse(String(init.body)) : null });
-        return json({}, 200);
+        return json(wroteBack, 200);
       }
       if (url.includes('/api/attention')) return json(identity);
       if (url.includes('/api/boards/')) return json(board);
@@ -398,5 +404,48 @@ describe('convening says what it still needs', () => {
     });
 
     expect(screen.getByRole('button', { name: /Convene it/ })).toBeDisabled();
+  });
+});
+
+/**
+ * A sitting nobody was told about.
+ *
+ * Convening is the one act on this screen that asks people to be somewhere,
+ * and being told inside the application is only being told if you happen to
+ * look. The server composes the words; under the ordinary installation
+ * nothing carries them, and a chair who leaves this screen believing the
+ * board has been written to is the failure.
+ */
+describe('convening shows what the board would be told', () => {
+  it('shows the words, and that they did not go', async () => {
+    stub(data(), {
+      notice: {
+        subject: 'A board will sit on 2027-03-04',
+        body: 'chair called a sitting.\n\n  · The sukuk conditions',
+        concerns: ['s1', 's2'],
+      },
+      delivery: { kind: 'none', configured: false, sent: false, at: '2026-09-21T10:00:00.000Z' },
+    });
+    show();
+
+    await waitFor(() => screen.getByRole('button', { name: /Convene a meeting/ }));
+    fireEvent.click(screen.getByRole('button', { name: /Convene a meeting/ }));
+    fireEvent.change(screen.getByLabelText(/When/i), { target: { value: '2027-03-04T09:00' } });
+    fireEvent.change(screen.getByLabelText(/Agenda, one item per line/i), {
+      target: { value: 'The sukuk conditions' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /Convene it/ }));
+    {
+      const w = await screen.findByRole('dialog');
+      fireEvent.click(within(w).getByRole('button', { name: /Convene it/ }));
+    }
+
+    // The words themselves, as they would be pasted into an email.
+    await waitFor(() =>
+      expect(screen.getByText(/A board will sit on 2027-03-04/)).toBeInTheDocument(),
+    );
+    // And the fact that nothing carried them.
+    expect(screen.getByText(/Majlis has not sent this/i)).toBeInTheDocument();
+    expect(screen.getByText(/Nobody has been told yet/i)).toBeInTheDocument();
   });
 });

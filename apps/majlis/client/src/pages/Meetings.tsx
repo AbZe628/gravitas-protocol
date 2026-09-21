@@ -5,7 +5,9 @@ import {
   oversight,
   type Attendance,
   type Board,
+  type Delivery,
   type MeetingRow,
+  type Notice,
   type Meetings as MeetingsData,
 } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
@@ -16,6 +18,7 @@ import { useStillThere } from '../lib/stillThere.js';
 import { Button } from '../components/Button';
 import Act from '../components/Act.js';
 import AfterAct from '../components/AfterAct.js';
+import TheNotice from '../components/TheNotice.js';
 
 /**
  * Meetings, as a record rather than a room.
@@ -425,6 +428,15 @@ export default function Meetings() {
     means: string;
     next: readonly { label: string; to?: string; says?: string }[];
   } | null>(null);
+  /**
+   * What the board would be told about the sitting, and whether it went.
+   *
+   * Held beside the answer rather than folded into it: the words are the
+   * same whether a relay carried them or a person has to. Where nothing is
+   * wired they were not sent, and a chair must not leave this screen
+   * believing otherwise.
+   */
+  const [told, setTold] = useState<{ notice: Notice; delivery: Delivery } | null>(null);
   const [at, setAt] = useState('');
   const [joinUrl, setJoinUrl] = useState('');
   const [agenda, setAgenda] = useState('');
@@ -496,12 +508,22 @@ export default function Meetings() {
   if (agendaItems.length === 0) missingToConvene.push(t('meet.needAgenda'));
 
   async function convene() {
-    await oversight.convene({
+    const made = await oversight.convene({
       boardId: data!.boardId,
       at: new Date(at).toISOString(),
       joinUrl: joinUrl.trim() || null,
       agenda: agendaItems,
     });
+    /*
+     * What the board would be told, and whether they were.
+     *
+     * Convening is the one act here that asks people to be somewhere, and
+     * being told inside the application is only being told if you happen to
+     * look. The words are composed by the server; where no relay is wired
+     * they were not sent, and this screen says so rather than letting a
+     * chair leave believing the board has been written to.
+     */
+    setTold(made.notice && made.delivery ? { notice: made.notice, delivery: made.delivery } : null);
     setConvening(false);
     setAgenda('');
     setJoinUrl('');
@@ -518,6 +540,18 @@ export default function Meetings() {
             next={convened.next}
             onClose={() => setConvened(null)}
           />
+        </div>
+      )}
+
+      {/*
+        What the board would be told, under the answer rather than beside
+        it. Where no relay is wired these are words for a person to carry,
+        and the panel says so — a sitting nobody was told about is the one
+        way convening fails quietly.
+      */}
+      {told && (
+        <div className="mb-5">
+          <TheNotice notice={told.notice} delivery={told.delivery} />
         </div>
       )}
 

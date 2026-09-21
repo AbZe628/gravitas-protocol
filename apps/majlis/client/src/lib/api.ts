@@ -2005,7 +2005,13 @@ export const oversight = {
   meetings: () => get<Meetings>('/api/meetings'),
   meeting: (id: string) => get<MeetingRow>(`/api/meetings/${id}`),
   convene: (input: { boardId: string; at: string; joinUrl?: string | null; agenda: AgendaItem[] }) =>
-    send<Meeting>('/api/meetings', input),
+    /*
+     * The notice comes back with the sitting. Convening is the one act
+     * that asks people to be somewhere, so what the board would be told —
+     * and whether it went anywhere — is part of the answer rather than
+     * something a screen has to go and ask for.
+     */
+    send<Meeting & { notice?: Notice; delivery?: Delivery }>('/api/meetings', input),
   recordAttendance: (id: string, attendance: Attendance[]) =>
     send<Meeting>(`/api/meetings/${id}/attendance`, { attendance }, 'PUT'),
   writeMinute: (id: string, minute: string) =>
