@@ -60,7 +60,32 @@ odstupanje nosi oznaku u kodu, uz razlog, i broji se odvojeno:
 | 5 | *convene meeting* na *Coming* ne uradi ništa | **urađeno** — obrazac je stajao mrtav bez riječi, a Coming je čin nudio i onome ko ga ne smije izvršiti |
 | 6 | spajanje vlastitog kalendara, obavijesti na mejl | **urađeno** — žeton po članu za živu pretplatu; obavijest o sazivanju se sastavlja i jasno kaže da nije poslana |
 
-**Svih šest je zatvoreno.** Sljedeća je **Faza 10**.
+**Svih šest je zatvoreno.**
+
+### FAZA 10 — **URAĐENA 21.09.2026.**
+
+Prvi put prošetana **gola instalacija** — bez ključa, releja, diska i lanca,
+ona koju banka dobije. Diže se ovako, jer `.env` u repou postavlja lanac i
+prvi prolaz zato **nije bio gol**:
+
+```bash
+PORT=4106 MAJLIS_ENFORCEMENT=none MAJLIS_ASSISTANT=off MAJLIS_DICTATION=off \
+  MAJLIS_MEMBERS=<blok> npx tsx src/index.ts
+```
+
+Prva polovina pravila — *gumba nema* — vrijedila je svugdje. Druga —
+*kaže se šta nedostaje* — bila je napola: traka je šutjela o releju, a
+prilaganje dokumenta je bilo odsutno **bez ijedne riječi na svom mjestu**.
+Oboje popravljeno.
+
+**Čuvar je statički, i zna zašto.** Prvo je napisan probe koji pritisne svih
+81 dugme na 23 ekrana i čeka da server odbije sa `reading_off` ili
+`no_vault`. Nije našao ništa — **ni poslije ubačenog pravog kvara**, jer se
+do `/extract` stiže tek trećim pritiskom. Mjera koja ne vidi kvar zbog kojeg
+postoji nije mjera. Sad je pitanje postavljeno gdje se može odgovoriti
+potpuno: `src/WhatIsOutside.test.ts`.
+
+Sljedeća je **Faza 11**.
 
 ### Šta je odlučeno 21.09.2026, i vrijedi dalje
 
@@ -119,7 +144,7 @@ uhvatiti vlastiti neuspjeh a ne baciti ga dalje.
 
 ```bash
 cd apps/majlis/server && npx vitest run    # 1822
-cd apps/majlis/client && npx vitest run    # 420
+cd apps/majlis/client && npx vitest run    # 427
 cd apps/majlis/client && npm run tokens    # dvije palete se moraju slagati
 ```
 
@@ -185,7 +210,7 @@ rasprave · **kvorum** *(rute nema, a kod se štiti od promjene koja ne postoji)
 
 ## 7 · Zadnji commit
 
-`941b1c7` — *Calling a sitting composes the notice the board would be sent*.
+`0af1ddb` — *Faza 10: the installation says what it cannot do*.
 
 **Sve je gurnuto na 21.09.2026.** Guranje se i dalje pita svaki put.
 
