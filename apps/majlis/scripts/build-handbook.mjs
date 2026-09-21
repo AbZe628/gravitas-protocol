@@ -11,7 +11,15 @@
  * a document that sets the same way on whichever machine prints it.
  *
  *   node scripts/build-handbook.mjs
- *   node scripts/print-guide.mjs docs/Gravitas-Majlis-Handbook.html docs/Gravitas-Majlis-Handbook.pdf
+ *   node ../../../majlis-local/stampaj-prirucnik.mjs \
+ *     docs/Gravitas-Majlis-Handbook.html docs/Gravitas-Majlis-Handbook.pdf
+ *
+ * **It has to be printed with a footer.** The page carries no margin, so
+ * the ground colour reaches all four edges — with one exception, the 13mm
+ * strip at the foot that holds the page number, and the footer template
+ * paints that strip itself. Printed without one, every sheet comes out
+ * with a white band along the bottom. `print-guide.mjs` prints without
+ * one; it is for the older guide, which has margins of its own.
  *
  * The Markdown it understands is the Markdown the handbook uses: headings,
  * paragraphs, bullet and numbered lists, tables, block quotes, images,
@@ -331,17 +339,37 @@ const CSS = `
   --mono: 'IBM Plex Mono', Consolas, monospace;
 }
 
-@page { size: A4; margin: 17mm 16mm 18mm; }
+/*
+ * The page has no margin, and the type is held off the edge by padding.
+ *
+ * ── why, since a margin is the ordinary way ──────────────────────────
+ *
+ * A margin is not painted. With 17mm of it the ground colour stopped
+ * 17mm short of the paper on all four sides, so every sheet was a cream
+ * panel floating in a white frame — which is what it looked like: a
+ * screenshot of a document rather than a document. Setting the colour on
+ * the html element as well does not fix it; Chrome does not carry that
+ * background into the margin when it prints.
+ *
+ * So the margin is zero, the padding does the same job, and the ground
+ * runs to all four edges. The one strip left is the footer, and the
+ * footer template paints itself the same colour.
+ */
+@page { size: A4; margin: 0 0 13mm; }
 @page :first { margin: 0; }
 
-/* Page margins do not apply on screen, and text against the edge of the
-   window reads as a broken file rather than as a document to be printed. */
+.chapter { padding: 16mm 16mm 6mm; }
+
+/* On screen the sheet is centred, with the edge of the paper visible. */
 @media screen {
   body { max-width: 210mm; margin: 0 auto; box-shadow: 0 0 0 1px rgba(25,23,19,.08); }
-  .chapter { padding: 9mm 16mm; }
 }
 
-html { background: var(--vellum); }
+html {
+  background: var(--vellum);
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
 body {
   margin: 0;
   background: var(--vellum);
@@ -389,12 +417,27 @@ body {
 
 /* ── chapters ────────────────────────────────────────────────────── */
 
-.chapter.break { break-before: page; }
+/*
+ * Chapters run on; they do not each start a new sheet.
+ *
+ * One chapter per page is the tidy answer on paper and the wrong one
+ * here. Several of these chapters are half a page long, so the document
+ * came out as a run of sheets with a third of the ink at the top and
+ * nothing underneath — and most of it is read on a telephone, where an
+ * empty half-page is a swipe through nothing. What separates them
+ * instead is a band the eye cannot miss, and a heading that will not be
+ * left alone at the foot of a page.
+ */
+.chapter.break { margin-top: 9mm; }
 
 h2 {
-  font-family: var(--display); font-size: 19pt; font-weight: 500; line-height: 1.15;
-  letter-spacing: -.015em; margin: 0 0 5mm; padding-bottom: 3mm;
+  font-family: var(--display); font-size: 17pt; font-weight: 500; line-height: 1.2;
+  letter-spacing: -.015em; margin: 0 -16mm 6mm; padding: 5mm 16mm;
+  background: linear-gradient(to right, rgba(22,68,112,.07), rgba(22,68,112,.015) 70%, rgba(22,68,112,0));
+  border-top: .5px solid var(--rule);
   border-bottom: .5px solid var(--rule);
+  break-after: avoid;
+  break-inside: avoid;
 }
 h3 { font-family: var(--display); font-size: 12.5pt; font-weight: 600; margin: 7mm 0 2mm; letter-spacing: -.006em; break-after: avoid; }
 h2 + p, h3 + p { margin-top: 0; }
