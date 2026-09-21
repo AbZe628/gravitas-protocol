@@ -12,6 +12,43 @@ see, what you press, and what happens.
 
 ---
 
+## Why this exists
+
+A Shariah board decides what a bank may and may not do. Today most of them
+do it with email, spreadsheets and a folder of PDFs.
+
+**The problem is not that boards decide badly. It is that nothing holds the
+decision.** A ruling is written once and then lives in an attachment. The
+conditions attached to it are read by whoever remembers them. A review date
+sits in someone's calendar until that person leaves. A pool that was 51%
+tangible when the board approved it drifts to 47% and nobody finds out until
+the audit. A desk that wants to know whether it may sign an agreement asks a
+scholar by email and waits nine weeks.
+
+**Majlis holds all of it in one record.** The question arrives from the bank
+with the contract attached. The board judges it against the conditions of a
+named contract type, one condition at a time, each answer carrying the name
+of the member who gave it and the reason they gave. The vote needs the
+number of signatures the board's own constitution requires. What comes out
+is a document, and the conditions the agreement failed come back as clauses
+it has to add.
+
+**What the bank gets** is three screens: what it asked and what became of
+it, what binds it today, and what it still owes. No email thread, no
+attachment, no waiting to be told what was decided six months ago.
+
+**What the board gets** is its own record: every ruling, every reason,
+every position, searchable, with the review dates and the drifting numbers
+watched for it. And an audit export that answers, for any date, what was
+permitted, who approved it, on what reasoning, and who dissented.
+
+> Majlis never decides anything. Every calculation shows its arithmetic and
+> stops; every reading quotes the contract and stops. The ruling is the
+> board's, in the board's words, and the software's job is to make sure that
+> nothing else is ever mistaken for it.
+
+---
+
 ## Contents
 
 1. [How it works, in one page](#1--how-it-works-in-one-page)

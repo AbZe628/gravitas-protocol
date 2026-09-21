@@ -156,8 +156,16 @@ function render(markdown) {
        * nothing and the eye reads the same word twice in two styles.
        */
       const caption = fig[1].trim().toLowerCase() === heading ? '' : fig[1];
+      /*
+       * A screenshot sits in a frame with a bar across the top of it.
+       * Bare, a capture of a cream application on a cream page has no
+       * edge at all and reads as part of the paper; the frame says this
+       * is a picture of a screen.
+       */
       out.push(
-        `<figure class="${kind}"><img src="${picture(fig[2])}" alt="${escape(fig[1])}" />` +
+        `<figure class="${kind}">` +
+          '<div class="frame"><div class="bar"><i></i><i></i><i></i></div>' +
+          `<img src="${picture(fig[2])}" alt="${escape(fig[1])}" /></div>` +
           (caption ? `<figcaption>${inline(caption)}</figcaption>` : '') +
           '</figure>',
       );
@@ -177,10 +185,15 @@ function render(markdown) {
        */
       if (sections) out.push('</section>');
       sections++;
-      heading = line.replace(/^##\s+/, '').trim().toLowerCase();
+      const title = line.replace(/^##\s+/, '').trim();
+      heading = title.toLowerCase();
+      /* The number set apart, so the band reads as a chapter opening. */
+      const numbered = title.match(/^(\d+)\s*·\s*(.*)$/);
+      const head = numbered
+        ? `<span class="n">${numbered[1]}</span>${inline(numbered[2])}`
+        : inline(title);
       out.push(
-        `<section class="chapter${sections > 1 ? ' break' : ''}">` +
-          `<h2>${inline(line.replace(/^##\s+/, ''))}</h2>`,
+        `<section class="chapter${sections > 1 ? ' break' : ''}"><h2>${head}</h2>`,
       );
       i++;
       continue;
@@ -307,11 +320,12 @@ function cover(markdown) {
 
   return `
 <section class="cover">
-  <div class="mark">${MARK}<div>
-    <div class="wordmark">Gravitas <span>Majlis</span></div>
-    <div class="kicker">Shariah governance, from the question to the ruling</div>
-  </div></div>
-  <hr class="edge gold" />
+  <div class="cover-top">
+    <div class="mark">${MARK}<div>
+      <div class="wordmark">Gravitas <span>Majlis</span></div>
+      <div class="kicker">Shariah governance, from the question to the ruling</div>
+    </div></div>
+  </div>
   <h1>${inline(title)}</h1>
   ${lead.map((p) => `<p class="cover-lead">${inline(p)}</p>`).join('\n  ')}
   <div class="cover-shot"><img src="${picture('guide/10-pocetna.jpg')}" alt="" /></div>
@@ -356,7 +370,6 @@ const CSS = `
  * footer template paints itself the same colour.
  */
 @page { size: A4; margin: 0 0 13mm; }
-@page :first { margin: 0; }
 
 .chapter { padding: 16mm 16mm 6mm; }
 
@@ -385,17 +398,35 @@ body {
 
 .cover {
   box-sizing: border-box;
-  min-height: 297mm;
-  padding: 20mm 18mm 16mm;
-  background: linear-gradient(160deg, #ffffff 0%, var(--vellum) 46%, #f3ece0 100%);
+  /* 297 less the 13mm strip the footer sits in: at the full height
+     the four figures at the foot of the cover were printed underneath
+     it and came out with their second line sliced off. */
+  min-height: 284mm;
+  display: flex;
+  flex-direction: column;
+  padding: 0 18mm 16mm;
+  background: linear-gradient(170deg, #ffffff 0%, var(--vellum) 40%, #f2ebdf 100%);
   break-after: page;
 }
+
+/*
+ * The head of the cover is the board's own blue, full bleed.
+ *
+ * On a cream ground the document opened quietly and looked like a memo.
+ * A field of colour at the head of the page is what makes it read as a
+ * product's document at arm's length, which is how a cover is read.
+ */
+.cover-top {
+  margin: 0 -18mm 0;
+  padding: 16mm 18mm 13mm;
+  background: linear-gradient(150deg, #1E5A8A 0%, #164470 55%, #10314f 100%);
+  color: #fbf8f1;
+  border-bottom: 1.4mm solid var(--gold);
+}
 .mark { display: flex; align-items: center; gap: 5mm; }
-.wordmark { font-family: var(--display); font-size: 25pt; font-weight: 500; line-height: 1; letter-spacing: -.015em; }
-.wordmark span { color: var(--lapis); }
-.kicker { margin-top: 2.4mm; font-size: 7.4pt; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; color: var(--sand); }
-.edge { height: 1px; border: 0; margin: 7mm 0 0; background: linear-gradient(to right, rgba(25,23,19,.22), rgba(25,23,19,.08) 62%, rgba(25,23,19,0)); }
-.edge.gold { background: linear-gradient(to right, rgba(176,132,48,.6), rgba(176,132,48,.16) 55%, rgba(176,132,48,0)); }
+.wordmark { font-family: var(--display); font-size: 26pt; font-weight: 500; line-height: 1; letter-spacing: -.015em; color: #fbf8f1; }
+.wordmark span { color: #e3c07a; }
+.kicker { margin-top: 2.6mm; font-size: 7.4pt; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; color: rgba(251,248,241,.72); }
 
 .cover h1 { font-family: var(--display); font-size: 27pt; font-weight: 500; line-height: 1.14; letter-spacing: -.02em; margin: 11mm 0 5mm; max-width: 24ch; }
 .cover-lead { font-size: 10.2pt; line-height: 1.62; color: var(--muted); max-width: 62ch; margin: 0 0 3mm; }
@@ -410,7 +441,10 @@ body {
   box-shadow: 0 0 0 .5px rgba(25,23,19,.12), 0 2mm 6mm rgba(25,23,19,.12); }
 .cover-shot img { display: block; width: 100%; }
 
-.cover-figures { display: flex; gap: 10mm; margin-top: 10mm; }
+/* Pushed to the foot of the page: the four figures are what the eye
+   should land on last, and a quarter of a cover left blank under them
+   reads as a page that did not finish. */
+.cover-figures { display: flex; gap: 10mm; margin-top: auto; padding-top: 12mm; }
 .cover-figures div { display: flex; flex-direction: column; gap: 1.6mm; }
 .cover-figures .n { font-family: var(--mono); font-size: 19pt; font-weight: 500; letter-spacing: -.03em; color: var(--lapis); line-height: 1; }
 .cover-figures .l { font-size: 7.8pt; font-weight: 600; color: var(--sand); max-width: 33mm; line-height: 1.4; }
@@ -432,13 +466,22 @@ body {
 
 h2 {
   font-family: var(--display); font-size: 17pt; font-weight: 500; line-height: 1.2;
-  letter-spacing: -.015em; margin: 0 -16mm 6mm; padding: 5mm 16mm;
-  background: linear-gradient(to right, rgba(22,68,112,.07), rgba(22,68,112,.015) 70%, rgba(22,68,112,0));
-  border-top: .5px solid var(--rule);
-  border-bottom: .5px solid var(--rule);
+  letter-spacing: -.015em; margin: 0 -16mm 6mm; padding: 5.4mm 16mm;
+  /* A tint mixed as a colour rather than as black at low opacity: the
+     transparent version came out grey on cream and read as a shadow. */
+  background: linear-gradient(to right, #dbe5ef 0%, #eaf0f6 55%, rgba(234,240,246,0) 100%);
+  border-top: .5px solid rgba(22,68,112,.22);
+  border-bottom: .5px solid rgba(22,68,112,.22);
+  box-shadow: inset 1.6mm 0 0 var(--lapis);
   break-after: avoid;
   break-inside: avoid;
 }
+/* The chapter's number, set in the mono face and in the board's own blue. */
+h2 .n {
+  font-family: var(--mono); font-size: 12pt; font-weight: 500; color: var(--lapis);
+  margin-inline-end: 3.4mm;
+}
+h2 .n::after { content: '·'; margin-inline-start: 3.4mm; color: rgba(22,68,112,.4); }
 h3 { font-family: var(--display); font-size: 12.5pt; font-weight: 600; margin: 7mm 0 2mm; letter-spacing: -.006em; break-after: avoid; }
 h2 + p, h3 + p { margin-top: 0; }
 
@@ -483,20 +526,31 @@ tbody tr:last-child td { border-bottom: 0; }
 td:first-child, th:first-child { padding-inline-end: 6mm; }
 
 figure { margin: 0 0 5mm; break-inside: avoid; }
-figure img {
-  display: block; width: 100%; border-radius: 2mm; background: var(--sheet);
-  box-shadow: 0 0 0 .5px rgba(25,23,19,.12), 0 1mm 3mm rgba(25,23,19,.08);
+
+/* The frame: a window with a bar across the top of it, so a picture of a
+   cream screen on a cream page has an edge. */
+.frame {
+  border-radius: 2.4mm; overflow: hidden; background: var(--sheet);
+  box-shadow: 0 0 0 .5px rgba(22,68,112,.16), 0 1.4mm 4mm rgba(25,23,19,.11);
 }
+.bar {
+  height: 4.6mm; padding: 0 2.4mm; display: flex; align-items: center; gap: 1.2mm;
+  background: linear-gradient(to bottom, #f4efe4, #ece5d7);
+  border-bottom: .5px solid rgba(25,23,19,.09);
+}
+.bar i { width: 1.3mm; height: 1.3mm; border-radius: 50%; background: rgba(25,23,19,.18); }
+.frame img { display: block; width: 100%; }
 
 /* A whole-page capture of a wide screen, cropped to the part that shows
    what the screen is. Uncropped, one of these filled a sheet on its own. */
-figure.screen img { height: 78mm; object-fit: cover; object-position: top center; }
+figure.screen img { height: 76mm; object-fit: cover; object-position: top center; }
 
 /* A phone is set small, because a phone screen printed the width of a
    page is a picture of nothing in particular. Two of them side by side:
    stacked, each one left two thirds of the page empty beside it. */
 figure.phone { width: 56mm; display: inline-block; vertical-align: top; margin-inline-end: 7mm; }
-figure.phone img { height: 104mm; object-fit: cover; object-position: top center; }
+figure.phone img { height: 100mm; object-fit: cover; object-position: top center; }
+figure.phone .bar { height: 3.6mm; }
 figcaption {
   margin-top: 2mm; font-size: 7.6pt; font-weight: 600; letter-spacing: .1em;
   text-transform: uppercase; color: var(--sand);
