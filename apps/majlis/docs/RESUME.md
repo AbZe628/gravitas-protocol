@@ -56,11 +56,21 @@ odstupanje nosi oznaku u kodu, uz razlog, i broji se odvojeno:
 | 1 | gumb *Enter a holding* ne radi | **urađeno** — hookovi su bili ispod ranog `return`, peti put ista greška |
 | 2 | *check a contract* otvara ružnu zasebnu stranicu | **urađeno** — čitanje je sad na samoj biblioteci, padajući izbornik i *compare them all* |
 | 3 | AI koji čita ugovor i kaže šta piše | **urađeno** — `services/reading-with-a-model.ts`, i svih šest alata čita brojke iz dokumenta |
-| 4 | upload vlastitih ugovora, izmjena stavki u postojećim oblicima | **ostaje** |
-| 5 | *convene meeting* na *Coming* ne uradi ništa | **ostaje — nije provjereno ponovo poslije Faze 9** |
-| 6 | spajanje vlastitog kalendara, obavijesti na mejl | **ostaje** — `.ics` se nudi za preuzimanje, obavijesti mejlom nema |
+| 4 | upload vlastitih ugovora, izmjena stavki u postojećim oblicima | **urađeno** — `ChangeTheConditions` uz same uvjete; vlastiti standard se čita u pregledniku, u zapis ide samo ime |
+| 5 | *convene meeting* na *Coming* ne uradi ništa | **urađeno** — obrazac je stajao mrtav bez riječi, a Coming je čin nudio i onome ko ga ne smije izvršiti |
+| 6 | spajanje vlastitog kalendara, obavijesti na mejl | **urađeno** — žeton po članu za živu pretplatu; obavijest o sazivanju se sastavlja i jasno kaže da nije poslana |
 
-Redoslijed za sutra: **4, pa 5, pa 6**, pa Faza 10.
+**Svih šest je zatvoreno.** Sljedeća je **Faza 10**.
+
+### Šta je odlučeno 21.09.2026, i vrijedi dalje
+
+- **Žeton u adresi kalendara** je vlasnikova odluka, uz tri ograde: otvara
+  jednu rutu i nijednu drugu *(mjereno protiv sedam)*, čuva se kao otisak pa
+  kopija zapisa nije kopija adrese, i opoziv je jedan pritisak. Ekran kaže
+  cijenu prije pritiska.
+- **Mejl se ne šalje.** Obavijesti se sastavljaju i predaju čovjeku, sa
+  „Majlis has not sent this" iznad. Kad banka upiše svoj SMTP, počinje slati
+  bez ijedne druge izmjene.
 
 ---
 ### Faze 11 i 12, dodane 19.09.2026.
@@ -108,8 +118,8 @@ uhvatiti vlastiti neuspjeh a ne baciti ga dalje.
 ## 4 · Kako se ovo pokreće i provjerava
 
 ```bash
-cd apps/majlis/server && npx vitest run    # 1796
-cd apps/majlis/client && npx vitest run    # 394
+cd apps/majlis/server && npx vitest run    # 1822
+cd apps/majlis/client && npx vitest run    # 420
 cd apps/majlis/client && npm run tokens    # dvije palete se moraju slagati
 ```
 
@@ -175,7 +185,7 @@ rasprave · **kvorum** *(rute nema, a kod se štiti od promjene koja ne postoji)
 
 ## 7 · Zadnji commit
 
-`e72f0a7` — *Check a draft in the library, with a dropdown and a comparison*.
+`941b1c7` — *Calling a sitting composes the notice the board would be sent*.
 
 **Sve je gurnuto na 21.09.2026.** Guranje se i dalje pita svaki put.
 
