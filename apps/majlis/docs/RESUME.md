@@ -85,7 +85,37 @@ do `/extract` stiže tek trećim pritiskom. Mjera koja ne vidi kvar zbog kojeg
 postoji nije mjera. Sad je pitanje postavljeno gdje se može odgovoriti
 potpuno: `src/WhatIsOutside.test.ts`.
 
-Sljedeća je **Faza 11**.
+### FAZA 11 — **URAĐENA 21.09.2026.**
+
+Papir je u `apps/majlis/samples/`: dopis treasury stola i nacrt murabahe,
+sa HTML izvorom pored, da se može ponovo odštampati i da se vidi da nije
+namješten čitaču koji ga čita. Klauzula 3.4 uzima uvećanje na kašnjenje u
+prihod banke — uzorak u kojem nema ničega spornog dokazuje samo da se
+čitač zna složiti. Tu je i skenirana kopija istog papira.
+
+Riječi izlaze iz PDF-a **u pregledniku**, pa datoteka i dalje ne odlazi
+nigdje i radi na instalaciji bez diska. Čitač se dovlači tek kad neko
+izabere PDF — svoj komad od 472 KB, ne u glavnom svežnju.
+
+Izmjereno od kraja do kraja: **3 314 znakova** iz dvije stranice, pitanje
+poslano kroz *Ask* nosi riječi a ne ime datoteke, čitanje protiv murabahe
+vraća **šest uslova, šest navoda, svaki provjeren nazad u tekst PDF-a**.
+
+Mjere se pokreću iz `work/majlis-local/`:
+
+```bash
+node izpdf.mjs .../samples/treasury-enquiry.pdf   # šta stvarno izađe
+node faza11.mjs                                   # cijeli put, 13 provjera
+node faza11b.mjs                                  # četvrti uslov, protiv ijare
+node faza11c.mjs                                  # sken se odbija po imenu
+```
+
+**Četvrti uslov je prvi put prošao prazno** — papir je murabaha, pa su sva
+šest uslova nađena i „uslov bez navoda nikad ne stoji kao nađen" nije imao
+nijedan takav uslov. Protiv **ijare** ih ima četiri, i svaki je odsutan,
+imenovan rečenicom, nijedan nađen.
+
+Sljedeća je **Faza 12** — upute na engleskom.
 
 ### Šta je odlučeno 21.09.2026, i vrijedi dalje
 
@@ -144,7 +174,7 @@ uhvatiti vlastiti neuspjeh a ne baciti ga dalje.
 
 ```bash
 cd apps/majlis/server && npx vitest run    # 1822
-cd apps/majlis/client && npx vitest run    # 427
+cd apps/majlis/client && npx vitest run    # 436
 cd apps/majlis/client && npm run tokens    # dvije palete se moraju slagati
 ```
 
@@ -210,7 +240,7 @@ rasprave · **kvorum** *(rute nema, a kod se štiti od promjene koja ne postoji)
 
 ## 7 · Zadnji commit
 
-`0af1ddb` — *Faza 10: the installation says what it cannot do*.
+`fac2a89` — *Faza 11: a bank's question arrives as a PDF, and is read from the paper*.
 
 **Sve je gurnuto na 21.09.2026.** Guranje se i dalje pita svaki put.
 
