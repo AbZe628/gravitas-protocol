@@ -43,7 +43,24 @@ odstupanje nosi oznaku u kodu, uz razlog, i broji se odvojeno:
   izgovori. Petero: `setParameters`, `changeHowItDecides`,
   `recordComputation`, `withdrawComputation`, `report`.
 
-**Sljedeća je Faza 6** — pet stanja svakog ekrana, na svih 50 čvorova.
+### Faze 6 do 9 — **URAĐENE I GURNUTE**
+
+---
+
+## 1b · Popravke koje je vlasnik tražio 20.09.2026.
+
+Šest stavki iz jedne poruke, uz Fazu 10. Stanje na 21.09.2026:
+
+| | stavka | stanje |
+|---|---|---|
+| 1 | gumb *Enter a holding* ne radi | **urađeno** — hookovi su bili ispod ranog `return`, peti put ista greška |
+| 2 | *check a contract* otvara ružnu zasebnu stranicu | **urađeno** — čitanje je sad na samoj biblioteci, padajući izbornik i *compare them all* |
+| 3 | AI koji čita ugovor i kaže šta piše | **urađeno** — `services/reading-with-a-model.ts`, i svih šest alata čita brojke iz dokumenta |
+| 4 | upload vlastitih ugovora, izmjena stavki u postojećim oblicima | **ostaje** |
+| 5 | *convene meeting* na *Coming* ne uradi ništa | **ostaje — nije provjereno ponovo poslije Faze 9** |
+| 6 | spajanje vlastitog kalendara, obavijesti na mejl | **ostaje** — `.ics` se nudi za preuzimanje, obavijesti mejlom nema |
+
+Redoslijed za sutra: **4, pa 5, pa 6**, pa Faza 10.
 
 ---
 ### Faze 11 i 12, dodane 19.09.2026.
@@ -91,8 +108,8 @@ uhvatiti vlastiti neuspjeh a ne baciti ga dalje.
 ## 4 · Kako se ovo pokreće i provjerava
 
 ```bash
-cd apps/majlis/server && npx vitest run    # 1758
-cd apps/majlis/client && npx vitest run    # 366
+cd apps/majlis/server && npx vitest run    # 1796
+cd apps/majlis/client && npx vitest run    # 394
 cd apps/majlis/client && npm run tokens    # dvije palete se moraju slagati
 ```
 
@@ -158,7 +175,36 @@ rasprave · **kvorum** *(rute nema, a kod se štiti od promjene koja ne postoji)
 
 ## 7 · Zadnji commit
 
-`661be63` — *Izbor oblika kroz prozor, i mjera koja pritisne svako dugme na
-svakom ekranu*.
+`e72f0a7` — *Check a draft in the library, with a dropdown and a comparison*.
 
-**Sedamnaest commitova je lokalno i nije gurnuto.** Guranje se pita svaki put.
+**Sve je gurnuto na 21.09.2026.** Guranje se i dalje pita svaki put.
+
+### Tri posljednja, i šta su donijela
+
+- `32ca641` — AI čita ugovor po uslovima odbora. Dva čitača pod jednim imenom,
+  izbor se pravi **jednom**, u `readADraft` u `routes/governance.ts`, i čitanje
+  kaže koji je radio (`readBy`, `processor`). Podudarac riječi je propuštao
+  klauzulu 3.2 *(1.5% mjesečno)* koju model nađe, citira i locira.
+- `aad131b` — svih šest alata čita brojke iz dokumenta, ne četiri. **Vrsta polja
+  je dio pitanja**: na *iznos koji ugovor imenuje* model je vratio „1.5% per
+  month", tačno citirano, i ponudio dugme koje bi to upisalo u polje za novac.
+  Sad se takva vrijednost pokaže sa navodom i **ne nudi**.
+- `e72f0a7` — biblioteka: izbornik i usporedba, bez zasebne stranice.
+
+### Dvije mjere koje su bile pogrešne prije aplikacije
+
+Obje popravljene u repou, obje iz iste porodice kao §3:
+
+- `forgetHealth()` je postojao a nije bio u `test-setup.ts`, pa je stanje
+  instalacije curilo između testova — ekran provjeren sa uključenim pomoćnikom
+  i pa sa isključenim dobijao je prvi odgovor dvaput.
+- Čuvar neimenovanih polja čitao je `//` komentar koji spominje `<input>` kao
+  markup. Sad briše komentare, i dokazano je da i dalje hvata polje kojem se
+  oduzme ime.
+
+### Jedan nalaz koji čeka
+
+`lib/journey.ts` definiše **jedanaest ruta dvaput**; druga tiho pobjeđuje, pa
+je polovina unosa mrtav kod — uključujući `phase`, koji odlučuje gdje ekran
+sjedi u kičmi. Nije dirano osim `/library`. Traži odluku koja je kopija prava,
+i čuvara koji pada na duplikat.
