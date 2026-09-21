@@ -12,6 +12,7 @@ import { useI18n } from '../lib/i18n.js';
 import { mayVote, useIdentity } from '../lib/identity.js';
 import { Nothing } from '../components/page.js';
 import { ActionPanel, Facts, RecordPage } from '../components/shapes.js';
+import ChangeTheConditions from '../components/ChangeTheConditions.js';
 import HowItChanged from '../components/HowItChanged.js';
 import { ErrorText, Loading, Section } from '../components/ui.js';
 import { State, type Tone } from '../components/kit.js';
@@ -270,12 +271,12 @@ export default function StructureDetail({ structureId }: { structureId?: string 
               </div>
 
               {/*
-                Amending a condition's text is not offered here. Rewriting a
-                condition in a textarea is drafting, and it belongs beside the
-                condition it changes.
+                Amending is not offered here, and now there is a beside to
+                send people to: rewriting a condition is drafting, and it
+                happens under the conditions themselves.
               */}
               <p className="mt-3 text-note leading-relaxed text-muted">
-                {t('adopt.amendElsewhere')}
+                {t('adopt.amendBelow')}
               </p>
             </>
           )}
@@ -339,6 +340,25 @@ export default function StructureDetail({ structureId }: { structureId?: string 
             </li>
           ))}
         </ol>
+
+        {/*
+          The board's own version, written beside the conditions it changes.
+
+          The adoption panel promised this in so many words and there was
+          no beside: the server has taken an amended shape with its own
+          conditions since adoption was written, and nothing ever sent one.
+          A board could take the shipped conditions or refuse them.
+        */}
+        {canRule && (
+          <ChangeTheConditions
+            structureId={s.id}
+            boardId={data.boardId}
+            held={s.conditions}
+            supersedes={held.adoption?.id ?? null}
+            carried={carried}
+            onDone={() => void load()}
+          />
+        )}
       </Section>
 
       {/*

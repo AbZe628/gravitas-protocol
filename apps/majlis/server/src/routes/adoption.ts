@@ -48,12 +48,27 @@ const DECIDED = ['in_force', 'timelock', 'rejected', 'lapsed', 'withdrawn'];
 import type { Store } from '../store/index.js';
 import { handle, badRequest, identityOf, requireRole } from './http.js';
 
+/**
+ * A condition, exactly as `StructureCondition` defines one.
+ *
+ * ── the field that was not there ──────────────────────────────────────────
+ *
+ * This required an `authority` on every condition. Nothing in the system has
+ * ever had one: not the type, not the nineteen shipped shapes, not the
+ * service that stores them, not a single reader. It is a leftover from a
+ * shape the condition used to have.
+ *
+ * What it cost: **the route could not accept the library's own conditions
+ * back.** Every amendment was refused with a schema error naming a field a
+ * board cannot supply, so the whole amendment path — written, tested at the
+ * service, and reachable from nowhere — would have failed the first time
+ * anybody reached it. Found by reaching it.
+ */
 const conditionSchema = z.object({
   id: z.string().min(1).max(80),
   requirement: z.string().min(10).max(2_000),
   why: z.string().max(2_000),
   evidence: z.enum(['document', 'sequence', 'figure', 'undertaking']),
-  authority: z.string().min(1).max(300),
 });
 
 const adoptSchema = z.object({
