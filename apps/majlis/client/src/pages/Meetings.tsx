@@ -475,19 +475,32 @@ export default function Meetings() {
   const canConvene = office === 'chair';
   const canKeep = office === 'chair' || office === 'secretary';
 
+  /*
+   * One item per line. A board writing an agenda is writing a list, and a
+   * form with an "add item" button for each line is a form nobody finishes.
+   */
+  const agendaItems = agenda
+    .split('\n')
+    .map((line) => line.trim())
+    .filter((line) => line !== '')
+    .map((item) => ({ item }));
+
+  /*
+   * What the sitting still needs, in the order the form asks for it. These
+   * are the server's own two rules; repeating them does not replace the
+   * refusal, it is the difference between learning them before the press
+   * and after it.
+   */
+  const missingToConvene: string[] = [];
+  if (!at) missingToConvene.push(t('meet.needWhen'));
+  if (agendaItems.length === 0) missingToConvene.push(t('meet.needAgenda'));
+
   async function convene() {
     await oversight.convene({
       boardId: data!.boardId,
       at: new Date(at).toISOString(),
       joinUrl: joinUrl.trim() || null,
-        // One item per line. A board writing an agenda is writing a list, and
-        // a form with an "add item" button for each line is a form nobody
-        // finishes.
-      agenda: agenda
-        .split('\n')
-        .map((line) => line.trim())
-        .filter((line) => line !== '')
-        .map((item) => ({ item })),
+      agenda: agendaItems,
     });
     setConvening(false);
     setAgenda('');
@@ -613,11 +626,37 @@ export default function Meetings() {
             </p>
           )}
 
+          {/*
+            What is still missing, said before the press.
+
+            This form arrived dead and silent. *"Kad odes u coming i stisnes
+            convene meeting ne desi se nista"* — and from where the chair was
+            standing that was true: Coming sends them here with the form
+            already open, the act is greyed out because there is no date, and
+            nothing on the screen says so. A disabled button with no sentence
+            beside it is indistinguishable from a broken one.
+
+            The agenda is here too, and it was the worse of the two: it was
+            not gated at all, so a chair with a date and no agenda pressed,
+            waited, and got a refusal from the server. The server's rule is
+            the one that holds — a meeting is convened around something —
+            and this is only it, said early.
+          */}
+          {missingToConvene.length > 0 && (
+            <ul className="mb-2.5 space-y-1">
+              {missingToConvene.map((m, i) => (
+                <li key={i} className="max-w-[58ch] text-note leading-relaxed text-muted">
+                  {m}
+                </li>
+              ))}
+            </ul>
+          )}
+
           <div className="flex gap-2">
             <Button
               type="button"
               onClick={() => setConvenening(true)}
-              disabled={!at}
+              disabled={missingToConvene.length > 0}
               className="rounded-xl bg-raised shadow-ring px-3.5 py-1.5 text-ui text-lapis font-medium disabled:opacity-40"
             >
               {t('meet.conveneIt')}

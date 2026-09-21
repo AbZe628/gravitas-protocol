@@ -340,3 +340,63 @@ describe('attendance across the year', () => {
     await waitFor(() => expect(screen.queryByText('Last held')).toBeNull());
   });
 });
+
+/**
+ * The form a chair arrives at, and why it looked broken.
+ *
+ * *"Kad odes u coming i stisnes convene meeting ne desi se nista."* From
+ * where the chair was standing that was true. Coming sends them here with
+ * the form already open; the act is greyed out because there is no date;
+ * and nothing on the screen says so. A disabled button with no sentence
+ * beside it is indistinguishable from a broken one.
+ *
+ * The agenda was the worse of the two. It was not gated at all, so a chair
+ * with a date and no agenda pressed, waited, and got a refusal from the
+ * server — the right rule, learned in the wrong place.
+ */
+describe('convening says what it still needs', () => {
+  const open = async () => {
+    stub(data());
+    show();
+    await waitFor(() => screen.getByRole('button', { name: /Convene a meeting/ }));
+    fireEvent.click(screen.getByRole('button', { name: /Convene a meeting/ }));
+  };
+
+  it('names both, on a form that has just opened', async () => {
+    await open();
+
+    expect(screen.getByRole('button', { name: /Convene it/ })).toBeDisabled();
+    expect(screen.getByText(/Set the day and time/)).toBeInTheDocument();
+    expect(screen.getByText(/one item to a line/)).toBeInTheDocument();
+  });
+
+  it('still refuses on a date alone, which is the half that reached the server', async () => {
+    await open();
+    fireEvent.change(screen.getByLabelText(/When/i), { target: { value: '2026-09-10T09:00' } });
+
+    expect(screen.getByRole('button', { name: /Convene it/ })).toBeDisabled();
+    expect(screen.queryByText(/Set the day and time/)).not.toBeInTheDocument();
+    expect(screen.getByText(/one item to a line/)).toBeInTheDocument();
+  });
+
+  it('opens once the sitting has a day and something to sit about', async () => {
+    await open();
+    fireEvent.change(screen.getByLabelText(/When/i), { target: { value: '2026-09-10T09:00' } });
+    fireEvent.change(screen.getByLabelText(/Agenda, one item per line/i), {
+      target: { value: 'The sukuk conditions' },
+    });
+
+    expect(screen.getByRole('button', { name: /Convene it/ })).toBeEnabled();
+    expect(screen.queryByText(/one item to a line/)).not.toBeInTheDocument();
+  });
+
+  it('counts blank lines as nothing, like the agenda itself does', async () => {
+    await open();
+    fireEvent.change(screen.getByLabelText(/When/i), { target: { value: '2026-09-10T09:00' } });
+    fireEvent.change(screen.getByLabelText(/Agenda, one item per line/i), {
+      target: { value: '\n   \n' },
+    });
+
+    expect(screen.getByRole('button', { name: /Convene it/ })).toBeDisabled();
+  });
+});

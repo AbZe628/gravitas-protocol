@@ -102,7 +102,24 @@ function entryRow(entry: CalendarEntry, t: (k: string) => string) {
  * makes you go and find where to convene one is a screen that has told you off
  * rather than helped you.
  */
-function Rhythm({ cadence, nextConvened }: { cadence: Cadence | null; nextConvened: string | null }) {
+function Rhythm({
+  cadence,
+  nextConvened,
+  /**
+   * Whether the person looking can convene, which only the chair can.
+   *
+   * This block offered the act to everybody. A member who is not the chair
+   * pressed it, arrived at the sittings screen, and found nothing there —
+   * the form is the chair's — so from where they stood, pressing convene
+   * did nothing at all. A control that cannot be honoured is absent, and
+   * what stands in its place says who does it.
+   */
+  mayConvene,
+}: {
+  cadence: Cadence | null;
+  nextConvened: string | null;
+  mayConvene: boolean;
+}) {
   const { t } = useI18n();
   if (!cadence) return null;
 
@@ -138,10 +155,19 @@ function Rhythm({ cadence, nextConvened }: { cadence: Cadence | null; nextConven
         </div>
 
         {/*
-          Convened or not, said plainly and in the same place either way. The
-          act is a link rather than a form: convening asks for a date and an
-          agenda, and that belongs on the meetings screen where the rest of the
-          sitting lives.
+          Convened or not, said plainly and in the same place either way.
+
+          ── and the act is not repeated here ──────────────────────────────
+          This block used to carry a second *convene a meeting*, beside the
+          one in the page's own heading. Saying one thing twice on a page is
+          how two places end up disagreeing about it, and they did: the
+          heading's is the chair's alone, this one was offered to everybody.
+          A member who is not the chair pressed it, arrived at the sittings
+          screen, and found nothing — the form is the chair's — so from
+          where they stood, pressing convene did nothing at all.
+
+          What belongs here is the state. The act is in the heading, gated
+          once, pointing at the form rather than at the screen it sits on.
         */}
         <div className="shrink-0">
           {nextConvened ? (
@@ -149,12 +175,11 @@ function Rhythm({ cadence, nextConvened }: { cadence: Cadence | null; nextConven
               {t('meet.nextConvened')} <DateText iso={nextConvened} />
             </Link>
           ) : (
-            <Link
-              to="/meetings"
-              className="inline-block rounded-xl bg-lapis px-4 py-2 text-ui font-semibold text-white shadow-act"
-            >
-              {t('meet.convene')}
-            </Link>
+            !mayConvene && (
+              <p className="max-w-[34ch] text-ui leading-relaxed text-muted">
+                {t('meet.chairConvenes')}
+              </p>
+            )
           )}
         </div>
       </div>
@@ -261,7 +286,11 @@ export default function Calendar() {
         The download used to sit here, above every date: a person opening this
         screen was offered a file before they were told what was late.
       */}
-      <Rhythm cadence={cadence} nextConvened={nextConvened} />
+      <Rhythm
+        cadence={cadence}
+        nextConvened={nextConvened}
+        mayConvene={identity?.office === 'chair'}
+      />
 
       {entries.length === 0 ? (
         <Nothing>{t('cal.none')}</Nothing>
