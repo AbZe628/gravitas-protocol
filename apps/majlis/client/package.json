@@ -14,6 +14,7 @@
     "acts": "node scripts/acts.mjs src"
   },
   "dependencies": {
+    "pdfjs-dist": "^6.3.289",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.28.0"

@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>MRB-2026-118 — Commodity murabaha, request for a Shariah opinion</title>
+    <!--
+      The source of samples/treasury-enquiry.pdf.
+
+      Kept beside the PDF so the paper can be regenerated and so a reader can
+      see that nothing in it was arranged to suit the reader that reads it.
+      Printed with `node scripts/print-guide.mjs samples/treasury-enquiry.html
+      samples/treasury-enquiry.pdf`.
+
+      ── why it is written like this ──────────────────────────────────────
+
+      Every proof that the way in works has so far been a proof on text
+      typed by the person testing it. A bank does not send typed text: it
+      sends a letter on its own paper with a reference number and a
+      signature, and behind it a draft in the numbering its own lawyers
+      used. Clause numbers run 1.1, 2.1, 3.4; headings are set in capitals;
+      the pages break where a printer breaks them.
+
+      One clause is deliberately the one a board stops at. Clause 3.4 takes
+      an increase on late payment to the bank's own income. It is in here
+      because a sample with nothing wrong in it proves only that the reader
+      can agree.
+    -->
+    <style>
+      @page { size: A4; margin: 22mm 20mm; }
+      body {
+        font-family: Georgia, 'Times New Roman', serif;
+        font-size: 10.5pt;
+        line-height: 1.55;
+        color: #14181a;
+      }
+      .head { border-bottom: 1.5pt solid #14181a; padding-bottom: 7mm; margin-bottom: 9mm; }
+      .bank { font-size: 15pt; letter-spacing: 0.04em; font-weight: bold; }
+      .desk { font-size: 9pt; letter-spacing: 0.10em; text-transform: uppercase; color: #4a5560; margin-top: 2mm; }
+      .meta { margin: 7mm 0; font-size: 9.5pt; }
+      .meta div { margin-bottom: 1.5mm; }
+      .meta b { display: inline-block; min-width: 26mm; font-weight: normal; color: #4a5560; }
+      h2 { font-size: 11pt; margin: 8mm 0 3mm; letter-spacing: 0.02em; }
+      p { margin: 0 0 3.5mm; text-align: justify; }
+      .sign { margin-top: 12mm; }
+      .sign .rule { width: 62mm; border-bottom: 0.7pt solid #14181a; margin-bottom: 2mm; }
+      .draft { page-break-before: always; }
+      .draft h1 { font-size: 13pt; text-align: center; letter-spacing: 0.06em; margin-bottom: 8mm; }
+      .cl { margin: 0 0 3mm; }
+      .cl b { font-weight: normal; }
+      .num { display: inline-block; min-width: 12mm; }
+      .art { margin: 6mm 0 2.5mm; font-weight: bold; letter-spacing: 0.04em; }
+    </style>
+  </head>
+  <body>
+    <div class="head">
+      <div class="bank">AL MANARA BANK</div>
+      <div class="desk">Treasury &amp; Structured Finance</div>
+    </div>
+
+    <div class="meta">
+      <div><b>Our reference</b> MRB-2026-118</div>
+      <div><b>Date</b> 14 September 2026</div>
+      <div><b>To</b> The Shariah Supervisory Board</div>
+      <div><b>From</b> N. Haddad, Head of Treasury</div>
+      <div><b>Subject</b> Commodity murabaha facility — request for an opinion</div>
+    </div>
+
+    <p>
+      We are asked by a corporate client to provide a commodity murabaha facility of
+      AED 4,250,000 for a term of thirty-six months. The draft agreement prepared by
+      our counsel is attached at page 2 and has not yet been executed.
+    </p>
+
+    <p>
+      The board's opinion is sought before we respond to the client. We would be
+      grateful for a determination on whether the structure as drafted may be offered,
+      and for any amendments the board requires. We have not taken a view internally
+      and no commitment has been given to the client.
+    </p>
+
+    <p>
+      Two matters we expect the board will wish to look at. The commodity is purchased
+      through a broker and our operations desk holds it for a short period before the
+      onward sale. And clause 3.4 provides for an additional amount on late payment,
+      which our counsel has drafted as retained by the bank; we understand the board
+      may take a different view of where it should go.
+    </p>
+
+    <p>
+      We are content to wait for the board's ordinary process and have told the client
+      to expect a response in the usual period.
+    </p>
+
+    <div class="sign">
+      <div class="rule"></div>
+      <div>N. Haddad</div>
+      <div style="font-size: 9pt; color: #4a5560">Head of Treasury, Al Manara Bank</div>
+    </div>
+
+    <div class="draft">
+      <h1>COMMODITY MURABAHA MASTER AGREEMENT</h1>
+
+      <p style="font-size: 9.5pt; color: #4a5560">
+        Between AL MANARA BANK (the "Bank") and the counterparty named in the
+        Transaction Confirmation (the "Customer"). Draft of 11 September 2026, not for
+        execution.
+      </p>
+
+      <div class="art">1. PURCHASE BY THE BANK</div>
+      <p class="cl"><span class="num">1.1</span>
+        The Bank shall purchase the Commodity from the Supplier for a Cost Price of
+        AED 4,250,000 and shall take delivery of the Commodity at the Supplier's
+        warehouse.
+      </p>
+      <p class="cl"><span class="num">1.2</span>
+        Title to and risk in the Commodity shall pass to the Bank upon such delivery,
+        and the Bank shall bear all risk of loss or damage to the Commodity from that
+        moment until the sale to the Customer is concluded under clause 2.
+      </p>
+
+      <div class="art">2. SALE TO THE CUSTOMER</div>
+      <p class="cl"><span class="num">2.1</span>
+        Following the Bank's acquisition of the Commodity, the Bank shall sell the
+        Commodity to the Customer at the Cost Price plus a Profit Margin of
+        AED 318,750.
+      </p>
+      <p class="cl"><span class="num">2.2</span>
+        The Cost Price and the Profit Margin shall each be disclosed to the Customer in
+        writing before the Customer signs the Transaction Confirmation.
+      </p>
+      <p class="cl"><span class="num">2.3</span>
+        The Commodity shall be identified in the Transaction Confirmation by warehouse
+        receipt number, quantity and grade.
+      </p>
+
+      <div class="art">3. PAYMENT</div>
+      <p class="cl"><span class="num">3.1</span>
+        The Customer shall pay the Sale Price in thirty-six equal monthly instalments
+        commencing on 1 November 2026.
+      </p>
+      <p class="cl"><span class="num">3.2</span>
+        Payment shall be made to the account notified by the Bank and shall be made
+        without set-off or counterclaim.
+      </p>
+      <p class="cl"><span class="num">3.3</span>
+        Time shall be of the essence in respect of each instalment.
+      </p>
+      <p class="cl"><span class="num">3.4</span>
+        Should the Customer fail to pay any instalment when due, an additional amount of
+        1.5% per month shall accrue on the outstanding balance and shall be retained by
+        the Bank as compensation for the delay.
+      </p>
+
+      <div class="art">4. THE CUSTOMER'S UNDERTAKING</div>
+      <p class="cl"><span class="num">4.1</span>
+        The Customer's undertaking to purchase the Commodity is binding upon the
+        Customer from the date of this Agreement, and the Bank gives no corresponding
+        undertaking to sell until it has acquired the Commodity.
+      </p>
+
+      <div class="art">5. RESALE BY THE CUSTOMER</div>
+      <p class="cl"><span class="num">5.1</span>
+        The Customer may sell the Commodity to any third party at its own discretion.
+        The Bank shall not act as the Customer's agent for that sale and shall not
+        repurchase the Commodity.
+      </p>
+    </div>
+  </body>
+</html>
