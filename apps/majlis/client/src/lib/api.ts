@@ -356,6 +356,14 @@ export interface Me {
   passwordMinimum: number;
   /** False where nobody can be let back in, because nothing holds a password. */
   resetsPossible: boolean;
+  /**
+   * Whether this member has an address for the calendar, and since when.
+   *
+   * Never the token. It was shown once at the moment it was made and
+   * nothing can produce it again — what a screen needs is only whether one
+   * stands, so it can offer to withdraw it.
+   */
+  calendarFeed: { issuedAt: string } | null;
 }
 
 async function post<T>(path: string, body: unknown): Promise<T> {
@@ -403,6 +411,22 @@ export const account = {
     email?: string | null;
     telephone?: string | null;
   }) => post<Board['members'][number]>('/api/me/details', input),
+
+  /**
+   * An address that puts the board's dates in your own calendar.
+   *
+   * The token comes back once, here. Nothing can produce it again: what the
+   * record holds is a fingerprint of it, so a copy of the record is not a
+   * copy of the address.
+   */
+  issueCalendarFeed: () =>
+    post<{ token: string; issuedAt: string }>('/api/me/calendar-feed', {}),
+
+  /** Withdraw it. The address stops answering the moment this returns. */
+  revokeCalendarFeed: async (): Promise<void> => {
+    const res = await fetch('/api/me/calendar-feed', { method: 'DELETE' });
+    if (!res.ok) throw new Error('The address could not be withdrawn.');
+  },
 
   changePassword: (current: string, next: string) =>
     post<{ scholarId: string; setAt: string }>('/api/me/password', { current, next }),

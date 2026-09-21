@@ -65,6 +65,16 @@ export interface Scholar {
   email?: string;
   emailConfirmed?: boolean;
   telephone?: string;
+
+  /**
+   * This member's own address for the calendar feed, as a fingerprint.
+   *
+   * Absent until they ask for one, which is the ordinary state. The token
+   * itself is never here: what is kept is a SHA-256 of it, so a copy of the
+   * record hands nobody a working address. See `services/feed-token.ts` for
+   * what the address may do — read this board's dates, and nothing else.
+   */
+  calendarFeed?: { fingerprint: string; issuedAt: string };
 }
 
 /**

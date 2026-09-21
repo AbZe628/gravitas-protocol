@@ -7,6 +7,7 @@ import { Division, Gaps, Nothing } from '../components/page.js';
 import { ListPage, Row, Rows } from '../components/shapes.js';
 import { MainAct } from '../components/kit.js';
 import { DateText, ErrorText, Loading } from '../components/ui.js';
+import FollowInYourCalendar from '../components/FollowInYourCalendar.js';
 
 /**
  * What is coming.
@@ -310,8 +311,11 @@ export default function Calendar() {
 
       {/*
         Last, because taking the dates away with you is what you do once you
-        have read them, not before.
+        have read them, not before. The download stays: it needs no secret
+        and it is the right answer for somebody who wants the dates once.
       */}
+      <FollowInYourCalendar />
+
       <a
         href={oversight.hrefs.calendarFeed()}
         className="mt-7 block rounded-card shadow-ring bg-raised px-4 py-3 transition-colors hover:text-paper"

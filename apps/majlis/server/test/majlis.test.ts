@@ -580,6 +580,14 @@ describe('api', () => {
       // A member's own account. The reset is the one unauthenticated route.
       'POST /api/me/password',
       'POST /api/me/details',
+      /*
+       * The address that puts this board's dates in a member's own calendar.
+       * A bearer secret, so both halves are here: making one replaces
+       * whatever stood, and withdrawing one has to be as easy as making it.
+       * What the address opens is one route — see services/feed-token.ts.
+       */
+      'POST /api/me/calendar-feed',
+      'DELETE /api/me/calendar-feed',
       'POST /api/members/reset',
       'POST /api/members/password/reset',
     ]);

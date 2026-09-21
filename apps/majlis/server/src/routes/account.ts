@@ -36,6 +36,7 @@ import type { Members } from '../auth/members.js';
 import type { Store } from '../store/index.js';
 import { handle, badRequest, identityOf } from './http.js';
 import { changeYourOwnDetails } from '../services/yourself.js';
+import { issue, revoke } from '../services/feed-token.js';
 
 /*
  * No minimums here. The service refuses an empty name and a malformed address
@@ -148,7 +149,94 @@ export function accountRoutes(
          * that cannot be honoured is absent rather than disabled.
          */
         resetsPossible: members !== null,
+        /*
+         * Whether this member has an address for the calendar, and since
+         * when. Never the token: it was shown once when it was made and
+         * nothing here can produce it again. What a screen needs is only
+         * whether one stands, so it can offer to withdraw it.
+         */
+        calendarFeed: await (async () => {
+          if (!who.scholarId) return null;
+          const boards = await store.boards();
+          const member = boards
+            .flatMap((b) => b.members)
+            .find((m) => m.id === who.scholarId);
+          return member?.calendarFeed ? { issuedAt: member.calendarFeed.issuedAt } : null;
+        })(),
       });
+    }),
+  );
+
+  /**
+   * An address that puts this board's dates in your own calendar.
+   *
+   * ── what this hands over ──────────────────────────────────────────────
+   *
+   * No calendar client can answer a password prompt: it fetches an address
+   * every few hours and takes what comes back. So a live subscription is
+   * reached by an address carrying its own secret, and that secret is a
+   * bearer credential — whoever holds the address reads this board's dates,
+   * the titles and the times, without signing in.
+   *
+   * It is bounded three ways. It opens **one route** and no other. It is
+   * kept as a fingerprint, so a copy of the record does not hand anybody a
+   * working address. And it is replaced, not added to, so revoking works
+   * and one member never has two live addresses they have forgotten about.
+   *
+   * The token is returned **once**, here, and nothing can produce it again.
+   * A member who loses it issues another, which is also how a member who
+   * thinks theirs has been seen fixes it.
+   */
+  router.post(
+    '/me/calendar-feed',
+    handle(async (req, res) => {
+      const who = identityOf(req);
+      if (!who.scholarId) {
+        res.status(403).json({
+          error: 'no_identity',
+          message: 'This credential is not a member of a board, so there is no calendar to follow.',
+        });
+        return;
+      }
+
+      const boards = await store.boards();
+      const board = boards.find((b) => b.members.some((m) => m.id === who.scholarId));
+      if (!board) {
+        res.status(404).json({ error: 'not_found', message: 'No board here holds an entry for you.' });
+        return;
+      }
+
+      let token = '';
+      await store.updateBoard(board.id, (current) => {
+        const made = issue(current, who.scholarId as string, now());
+        token = made.token;
+        return made.board;
+      });
+
+      const member = (await store.board(board.id))?.members.find((m) => m.id === who.scholarId);
+      res.status(201).json({ token, issuedAt: member?.calendarFeed?.issuedAt ?? now() });
+    }),
+  );
+
+  /** Withdraw it. The address stops answering the moment this returns. */
+  router.delete(
+    '/me/calendar-feed',
+    handle(async (req, res) => {
+      const who = identityOf(req);
+      if (!who.scholarId) {
+        res.status(403).json({ error: 'no_identity', message: 'No entry to change.' });
+        return;
+      }
+
+      const boards = await store.boards();
+      const board = boards.find((b) => b.members.some((m) => m.id === who.scholarId));
+      if (!board) {
+        res.status(404).json({ error: 'not_found', message: 'No board here holds an entry for you.' });
+        return;
+      }
+
+      await store.updateBoard(board.id, (current) => revoke(current, who.scholarId as string));
+      res.status(204).end();
     }),
   );
 

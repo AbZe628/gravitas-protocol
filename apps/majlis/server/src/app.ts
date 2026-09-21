@@ -24,6 +24,7 @@ import { buildAuditExport } from './services/export.js';
 import { verifyParameters } from './services/hash.js';
 import { Limiter, REFUSAL_MESSAGES } from './services/limits.js';
 import { basicAuth, authFromEnv } from './middleware/basicAuth.js';
+import { whose } from './services/feed-token.js';
 import { buildSettings } from './services/settings.js';
 import { changeHowItDecides } from './services/constitution.js';
 import { Refused as LifecycleRefused } from './services/lifecycle.js';
@@ -196,7 +197,24 @@ export function createApp(
   // credential file against the board record. Nothing but ids and roles ever
   // leaves it.
   const auth = authFromEnv();
-  app.use(basicAuth(auth, logins, servingInstitution));
+
+  /*
+   * How a calendar subscription proves whose it is.
+   *
+   * The role comes from the credential file, not from the token: a member's
+   * standing is what their credential says it is, and a subscription must
+   * not be able to claim one. Where the file does not know them — a board
+   * seeded without credentials — the feed answers as an observer, which
+   * reads the dates and nothing else.
+   */
+  app.use(
+    basicAuth(auth, logins, servingInstitution, async (token) => {
+      const held = whose(await store.boards(), token);
+      if (!held) return null;
+      const known = auth.members?.roster().find((m) => m.scholarId === held.scholarId);
+      return known ?? { scholarId: held.scholarId, role: 'observer' };
+    }),
+  );
 
   /*
    * ── an act sent twice lands once ────────────────────────────────────────

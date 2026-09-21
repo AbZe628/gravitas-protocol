@@ -48,6 +48,27 @@ import { membersFromEnv, type Identity, type Members } from '../auth/members.js'
  */
 const EXEMPT = new Set(['/api/health', '/api/members/password/reset']);
 
+/**
+ * The one route a secret in the address may open, and only that one.
+ *
+ * A calendar client cannot answer a password prompt. It fetches an address
+ * every few hours and takes what comes back, so a board's dates can only
+ * reach the calendar a scholar already keeps if the address carries its own
+ * secret. That is a real cost — see `services/feed-token.ts` — and it is
+ * bounded here: the token is accepted on this path, by this method, and
+ * nowhere else. An identity made from one is a member's, so nothing that
+ * checks a role is fooled; what keeps it from doing more is that no other
+ * route will look at the query at all.
+ *
+ * A wrong token is counted as a failed attempt, like a wrong password. This
+ * is the one door that answers before anybody has signed in, so leaving it
+ * outside the throttle would make it the place to guess at.
+ */
+const FEED_PATH = '/api/calendar.ics';
+
+/** Resolves a feed token to the member who holds it, or to nobody. */
+export type FeedTokens = (token: string) => Promise<Identity | null>;
+
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Express {
@@ -143,6 +164,11 @@ export function basicAuth(
    * one is refused rather than admitted and then shown an empty record.
    */
   institutionId?: string,
+  /**
+   * How a calendar subscription proves whose it is. Absent in a deployment
+   * that has not wired one, and then the address opens nothing.
+   */
+  feedTokens?: FeedTokens,
 ) {
   // Accepts the old shape so existing callers and tests keep working.
   const opts: AuthOptions =
@@ -150,11 +176,31 @@ export function basicAuth(
 
   const realm = opts.shared?.realm ?? 'Gravitas Majlis';
 
-  return function authMiddleware(req: Request, res: Response, next: NextFunction) {
+  return async function authMiddleware(req: Request, res: Response, next: NextFunction) {
     // Nothing configured: development only. `assertConfiguredForProduction`
     // has already refused to start if this happens in production.
     if (!opts.shared && !opts.members) return next();
     if (EXEMPT.has(req.path)) return next();
+
+    /*
+     * A calendar asking for its subscription. Tried before the credential
+     * because there will not be one: no calendar client can answer a
+     * prompt. A token that resolves is the member's; one that does not
+     * falls through to the ordinary refusal, counted like a wrong password
+     * so this cannot become the quiet place to guess at.
+     */
+    if (feedTokens && req.method === 'GET' && req.path === FEED_PATH) {
+      const offered = req.query.feed;
+      if (typeof offered === 'string' && offered !== '') {
+        const identity = await feedTokens(offered);
+        if (identity) {
+          req.identity = identity;
+          attempts?.succeed(req.ip ?? 'unknown');
+          return next();
+        }
+        attempts?.fail(req.ip ?? 'unknown');
+      }
+    }
 
     const supplied = credentials(req.get('authorization') ?? '');
     if (supplied) {
