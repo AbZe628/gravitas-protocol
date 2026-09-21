@@ -1,6 +1,13 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { theWayIn, type Delivery, type Notice, type Submission } from '../lib/api.js';
+import {
+  api,
+  oversight,
+  theWayIn,
+  type Delivery,
+  type Matter,
+  type Notice,
+  type Submission,
+} from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import AttachTheContract from '../components/AttachTheContract.js';
 import { useIdentity, isInstitution } from '../lib/identity.js';
@@ -10,6 +17,7 @@ import { ErrorText } from '../components/ui.js';
 import { Field } from '../components/field.js';
 import Act from '../components/Act.js';
 import AfterAct from '../components/AfterAct.js';
+import { DocumentLink } from '../components/Documents.js';
 
 /**
  * The bank's own screen: put a question, and see what became of it.
@@ -42,8 +50,26 @@ function Standing({ s }: { s: Submission }) {
   return <State tone="attention">{t('queue.waiting')}</State>;
 }
 
+/**
+ * The statuses at which a written ruling exists.
+ *
+ * The route is the authority: it refuses with *a document is produced
+ * when the board has decided, and not before* on anything earlier. This
+ * list is that sentence, so a desk is never offered a link to it.
+ */
+const WRITTEN = ['in_force', 'timelock', 'rejected', 'lapsed', 'withdrawn'];
+
 /** One of my own questions, with whatever the board said back. */
-function Mine({ s, onWithdraw }: { s: Submission; onWithdraw: (id: string, why: string) => void }) {
+function Mine({
+  s,
+  written,
+  onWithdraw,
+}: {
+  s: Submission;
+  /** Whether the board has decided it, so there is a document to read. */
+  written: boolean;
+  onWithdraw: (id: string, why: string) => void;
+}) {
   const { t } = useI18n();
   const [why, setWhy] = useState('');
   const [open, setOpen] = useState(false);
@@ -73,20 +99,33 @@ function Mine({ s, onWithdraw }: { s: Submission; onWithdraw: (id: string, why: 
       )}
 
       {/*
-        Where the question went. A desk told its question was taken up and
-        given nowhere to go has been informed and then abandoned — and the
-        board's own screen has carried this link all along.
+        Where the question went.
+
+        A desk told its question was taken up and given nowhere to go has
+        been informed and then abandoned. The first answer to that was a
+        link to `/matters/:id` — the board's own working screen, which tells
+        an institution *this one is the board's* and lists three other
+        places. A link that leads to a refusal is a link that lied, and this
+        one lied to the reader the whole product is bought for.
+
+        So: the written ruling where there is one, and where there is not, a
+        sentence saying so. Both are true at every moment, which the link
+        never was.
       */}
-      {s.matterId && (
-        <p className="mt-3 text-ui">
-          <Link
-            to={`/matters/${s.matterId}`}
-            className="text-lapis underline decoration-line underline-offset-4"
-          >
-            {t('ask.seeMatter')}
-          </Link>
-        </p>
-      )}
+      {s.matterId &&
+        (written ? (
+          <div className="mt-3">
+            <DocumentLink
+              href={oversight.hrefs.fatwa(s.matterId)}
+              label={t('doc.fatwa')}
+              note={t('ask.rulingNote')}
+            />
+          </div>
+        ) : (
+          <p className="mt-3 max-w-[62ch] text-ui leading-relaxed text-muted">
+            {t('ask.withTheBoard')}
+          </p>
+        ))}
 
       {s.standing === 'waiting' &&
         (open ? (
@@ -141,10 +180,48 @@ export default function Ask({ boardId }: { boardId: string }) {
     next: readonly { label: string; to?: string; says?: string }[];
   } | null>(null);
 
+  /**
+   * Which of these have been decided, so the desk is offered a document
+   * rather than a door that shuts in its face.
+   *
+   * ── what this replaces ──────────────────────────────────────────────
+   *
+   * *See the matter this became* pointed at `/matters/:id`, which is the
+   * board's own working screen — and an institution opening it is told
+   * *this one is the board's, you have nothing to do on it*. The desk was
+   * informed its question had been taken up and then walked into a wall.
+   *
+   * What a desk may actually read is the written ruling, and the route for
+   * it refuses in as many words until the board has decided: *a document is
+   * produced when the board has decided, and not before*. So the status is
+   * what decides whether there is anything to offer, and where there is
+   * not, the row says so instead of linking.
+   */
+  const [decided, setDecided] = useState<Record<string, boolean>>({});
+
   const load = () => {
     theWayIn
       .list(boardId)
-      .then((r) => setMine(Array.isArray(r.submissions) ? r.submissions : []))
+      .then((r) => {
+        const rows = Array.isArray(r.submissions) ? r.submissions : [];
+        setMine(rows);
+
+        /*
+         * One request per question that became a matter, and only for
+         * those. A desk has a handful; the board's own list is elsewhere.
+         * A failure here leaves the row with no link, which is the safe
+         * side of this particular fault.
+         */
+        for (const s of rows) {
+          if (!s.matterId) continue;
+          api
+            .matter(s.matterId)
+            .then((m: Matter) =>
+              setDecided((was) => ({ ...was, [s.matterId as string]: WRITTEN.includes(m.status) })),
+            )
+            .catch(() => undefined);
+        }
+      })
       .catch(() => setMineFailed(true));
   };
 
@@ -376,7 +453,12 @@ export default function Ask({ boardId }: { boardId: string }) {
         ) : (
           <div className="space-y-3">
             {mine.map((s) => (
-              <Mine key={s.id} s={s} onWithdraw={withdraw} />
+              <Mine
+                key={s.id}
+                s={s}
+                written={!!s.matterId && decided[s.matterId] === true}
+                onWithdraw={withdraw}
+              />
             ))}
           </div>
         )}

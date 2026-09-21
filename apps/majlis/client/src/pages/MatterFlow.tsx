@@ -10,6 +10,7 @@ import {
   type Checklist as ChecklistData,
   type ConditionState,
   type Matter,
+  type Structure,
 } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { useIdentity } from '../lib/identity.js';
@@ -31,6 +32,8 @@ import VotePanel from '../components/VotePanel.js';
 import SignTheDocument from '../components/SignTheDocument.js';
 import { useStillThere } from '../lib/stillThere.js';
 import { Button } from '../components/Button';
+import Act from '../components/Act.js';
+import { Picker } from '../components/Checklist.js';
 
 /**
  * A question, worked one step at a time, inside a window.
@@ -90,6 +93,19 @@ export default function MatterFlow() {
   const [list, setList] = useState<ChecklistData | null>(null);
   /** The shape was asked for and did not come — not the same as having none. */
   const [listLost, setListLost] = useState(false);
+  /**
+   * And having none, said in the route's own words.
+   *
+   * Two things answer here: a matter with no shape, and a matter naming a
+   * shape that is not in the library. Both are the route refusing and
+   * neither is a fault, so the message it sent is what the member reads
+   * rather than a sentence this screen invents about which it is.
+   */
+  const [noShape, setNoShape] = useState<string | null>(null);
+  /** The library, for a member who may set the shape from here. */
+  const [shapes, setShapes] = useState<Structure[] | null>(null);
+  /** The shape whose window is open, while the member is choosing one. */
+  const [choosing, setChoosing] = useState<string | null>(null);
   /*
    * The words the board is told when the ruling takes force.
    *
@@ -213,10 +229,38 @@ export default function MatterFlow() {
       .then((l) => {
         setList(l);
         setListLost(false);
+        setNoShape(null);
       })
-      .catch(() => {
+      /*
+       * And the two were still being told apart by nothing.
+       *
+       * The sentence above was written and never implemented: every failure
+       * became `listLost`, including the route saying *this matter is not
+       * being judged against a contract shape*, which is the ordinary state
+       * and not a failure at all. Measured on a matter made from a bank's
+       * question — which always arrives without a shape — the screen said
+       * the shape "did not arrive" and told the member to reload, on a
+       * matter where reloading would never change anything, and offered no
+       * way to choose one. The demonstration stopped there.
+       *
+       * A refusal is the route answering. Anything else is the road.
+       */
+      .catch((e) => {
         setList(null);
-        setListLost(true);
+        const refused = e instanceof Refused && e.status === 409;
+        setListLost(!refused);
+        setNoShape(refused ? (e as Refused).message : null);
+        /*
+         * The library, only where there is a shape to choose. Fetched here
+         * rather than on every matter: most have one already, and a list of
+         * nineteen shapes nobody will look at is a request on every load.
+         */
+        if (refused) {
+          oversight
+            .structures()
+            .then((s) => setShapes(s.structures))
+            .catch(() => setShapes(null));
+        }
       });
   }
 
@@ -645,6 +689,31 @@ function lastSaid(
    * and *the steps did not come*. The first is a matter argued and voted
    * directly; the second is an incomplete screen.
    */
+  /*
+   * Choosing one chooses the whole list of conditions the board will answer,
+   * start to finish — so it is an act with a window, like every other.
+   */
+  const shapeAct = (
+    <Act
+      open={choosing !== null}
+      onClose={() => setChoosing(null)}
+      title={(shapes ?? []).find((x) => x.id === choosing)?.name ?? t('chk.noShape')}
+      does={t('wm.setShape.does')}
+      means={t('wm.setShape.means')}
+      label={t('wm.setShape.label')}
+      perform={async () => {
+        await oversight.setStructure(matter.id, choosing as string);
+        load();
+      }}
+      onDone={setJustDid}
+      after={{
+        did: t('wm.setShape.did'),
+        means: t('wm.setShape.didMeans'),
+        next: [{ label: t('wm.next.firstStep'), says: t('wm.next.firstStepSays') }],
+      }}
+    />
+  );
+
   const gapPanel = listLost ? (
     <div
       role="alert"
@@ -657,7 +726,40 @@ function lastSaid(
         {t('flow.stepsLostMeans')}
       </p>
     </div>
+  ) : noShape ? (
+    /*
+     * No shape, which is a place to start rather than something broken.
+     *
+     * The route's own sentence, then the library. A matter that came from a
+     * bank's question has no shape by definition — nobody has decided yet
+     * what kind of contract it is — and this is where that gets decided.
+     * Until now this screen printed a sentence about the shape not arriving
+     * and offered nothing, which is why a question could reach the board and
+     * then stop.
+     */
+    <div className="mb-5 rounded-card bg-raised px-5 py-4 shadow-ring">
+      <div className="text-label font-bold uppercase tracking-caps text-muted">
+        {t('sent.judgedAs')}
+      </div>
+      <p className="mt-2 max-w-[62ch] text-body leading-relaxed text-sand">{noShape}</p>
+      {canRule && !settled && shapes && (
+        <div className="mt-4">
+          {/*
+            The second half only. `chk.noShape` opens by saying the matter
+            has no shape, which the route has just said a line above — and
+            the same sentence twice, a hand's width apart, is the thing this
+            application keeps catching itself doing.
+          */}
+          <p className="mb-3 max-w-[62ch] text-ui leading-relaxed text-muted">
+            {t('flow.chooseShape')}
+          </p>
+          <Picker structures={shapes} onChoose={setChoosing} />
+        </div>
+      )}
+      {shapeAct}
+    </div>
   ) : null;
+
 
   const didPanel = justDid ? (
     <AfterAct

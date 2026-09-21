@@ -511,7 +511,16 @@ const FAMILIES = [
   'combination',
 ] as const;
 
-function Picker({
+/*
+ * Exported because the live matter screen needs the same one.
+ *
+ * `MatterFlow` is what `/matters/:id` opens, and a matter made from a bank's
+ * question always arrives with no shape. It had no way to choose one, so the
+ * work could not start there at all — while this component, which is on the
+ * dossier, had the picker all along. One picker, both screens: two would be
+ * two lists of families that drift.
+ */
+export function Picker({
   structures,
   onChoose,
 }: {
