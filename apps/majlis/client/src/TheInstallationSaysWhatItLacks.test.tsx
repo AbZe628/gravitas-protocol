@@ -64,20 +64,52 @@ const show = () =>
     </MemoryRouter>,
   );
 
+/*
+ * Each fact is written in two places — the bar along the foot of a window,
+ * and the list at the end of the page that a phone and a tablet get. Only
+ * one of the two is ever visible, by width, but a stylesheet is what hides
+ * the other and jsdom applies none, so both are in the document here.
+ *
+ * That is why these count rather than fetch: **two** is the right answer,
+ * and one would mean a screen size had been left with nothing.
+ */
+const bothPlaces = (says: RegExp) => screen.getAllByText(says);
+
 describe('the bare installation, which is the ordinary one', () => {
   it('says that nobody outside is told', async () => {
     stub();
     show();
-    await screen.findByText(/Nobody outside is told/);
+    await screen.findAllByText(/Nobody outside is told/);
+    expect(bothPlaces(/Nobody outside is told/)).toHaveLength(2);
   });
 
   it('says the other three too, so the bar is the whole answer', async () => {
     stub();
     show();
 
-    await screen.findByText(/Nothing here signs/);
-    expect(screen.getByText(/carried out elsewhere/)).toBeInTheDocument();
-    expect(screen.getByText(/No assistant/)).toBeInTheDocument();
+    await screen.findAllByText(/Nothing here signs/);
+    expect(bothPlaces(/carried out elsewhere/)).toHaveLength(2);
+    expect(bothPlaces(/No assistant/)).toHaveLength(2);
+  });
+
+  it('tells a phone exactly what it tells a desk', async () => {
+    stub();
+    show();
+
+    /*
+     * The invariant the two copies exist to keep. What a bank is told about
+     * its own installation must not depend on the width of the screen it is
+     * told on — and two lists written separately are two lists that drift.
+     */
+    await screen.findAllByText(/Nothing here signs/);
+    for (const says of [
+      /Nothing here signs/,
+      /carried out elsewhere/,
+      /No assistant/,
+      /Nobody outside is told/,
+    ]) {
+      expect(bothPlaces(says), String(says)).toHaveLength(2);
+    }
   });
 });
 
@@ -86,7 +118,8 @@ describe('an installation that has wired things', () => {
     stub({ notice: 'smtp' });
     show();
 
-    await screen.findByText(/Notices are sent/);
+    await screen.findAllByText(/Notices are sent/);
+    expect(bothPlaces(/Notices are sent/)).toHaveLength(2);
     expect(screen.queryByText(/Nobody outside is told/)).not.toBeInTheDocument();
   });
 });

@@ -189,3 +189,26 @@
     @apply rtl:-scale-x-100;
   }
 }
+
+@layer utilities {
+  /*
+   * A strip that scrolls sideways, without the bar that says so.
+   *
+   * Two rows on a phone slide rather than wrap — the group the member is
+   * standing in, and the seven tools. A desktop browser draws a grey trough
+   * under each of them, which on a 375-pixel screen is a second horizontal
+   * line of chrome above the work and reads as a fault rather than an
+   * affordance. Phones draw an overlay bar only while a finger is moving,
+   * which is the behaviour this keeps.
+   *
+   * The content is not hidden with it: both rows are reachable by swipe, and
+   * everything in them is also in the rail on a wide screen.
+   */
+  .slides {
+    scrollbar-width: none;
+  }
+
+  .slides::-webkit-scrollbar {
+    display: none;
+  }
+}

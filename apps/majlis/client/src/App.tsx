@@ -34,6 +34,7 @@ import Assistant from './pages/Assistant.js';
 import Record from './pages/Record.js';
 import Search from './pages/Search.js';
 import Shell from './components/Shell.js';
+import NoSuchAddress from './components/NoSuchAddress.js';
 import { useIdentity, isInstitution } from './lib/identity.js';
 
 /**
@@ -174,6 +175,21 @@ export default function App() {
           <Route path="/record" element={<WhatStands />} />
           <Route path="/classic/record" element={<Record />} />
           <Route path="/settings" element={<Settings />} />
+
+          {/*
+            Anything else, and it must stay last.
+
+            The table had no final line, so a mistyped address, a stale
+            bookmark or a link from a mail sent last quarter drew the whole
+            frame around an empty middle — rail, masthead, tab bar, status
+            bar, and between them nothing. Measured: zero characters inside
+            `main`, at every width.
+
+            See NoSuchAddress.tsx for why this is a different answer from
+            NotYourScreen: an address that is nobody's is not a screen that
+            is somebody else's.
+          */}
+          <Route path="*" element={<NoSuchAddress />} />
         </Routes>
 
       {/*

@@ -102,50 +102,84 @@ function Group({ title, items }: { title: string; items: Item[] }) {
 }
 
 /**
- * What this copy is, along the foot of the window.
+ * The four facts, written once.
  *
- * The same three facts the rail carried as three sentences, flat and short,
- * where an application puts them. A paragraph of small print down the side of
- * a screen is the shape of a page; a status bar is the shape of software, and
- * it stays out of the way while never being more than a glance away.
+ * They are shown in two places — along the foot of a window, and at the end
+ * of the page on a phone — and two lists would be two lists that disagree.
+ * What a bank is told about its own installation must not depend on the
+ * width of the screen it is told on.
  */
-function StatusBar() {
+function useFacts() {
   const { t } = useI18n();
-  const { identity } = useIdentity();
   const health = useHealth();
   if (!health) return null;
 
   const enforced = health.enforcement === 'gravitas-registry';
-  const dot = (on: boolean) =>
-    'h-1.5 w-1.5 shrink-0 rounded-full ' + (on ? 'bg-settled' : 'bg-line');
+  return [
+    { on: false, says: t('shell.nothingSigns') },
+    { on: enforced, says: t(enforced ? 'shell.enforced' : 'shell.notEnforced') },
+    {
+      on: health.assistantKind !== 'off',
+      says: t(health.assistantKind === 'off' ? 'shell.noAssistant' : 'shell.assistant'),
+    },
+    /*
+     * Whether anybody outside this application is ever told. The one
+     * absence with no other voice: a notice composed and carried by nobody
+     * is visible only to whoever happened to be looking at the screen that
+     * wrote it.
+     */
+    {
+      on: health.notice !== 'none',
+      says: t(health.notice === 'none' ? 'shell.noRelay' : 'shell.relay'),
+    },
+  ];
+}
+
+const dot = (on: boolean) =>
+  'h-1.5 w-1.5 shrink-0 rounded-full ' + (on ? 'bg-settled' : 'bg-line');
+
+/**
+ * The same four, at the end of the page, where a phone has room for them.
+ *
+ * The bar below is fixed to the foot of the window and the foot of a phone
+ * is the tab bar, so it was simply `hidden` there — on every screen, at
+ * every size below a desk. A bank reading Majlis on a tablet was never told
+ * that nothing signs, that nothing is enforced, that there is no assistant
+ * or that nobody outside is told. Here they scroll with the page, which is
+ * right: they are facts to find, not controls to reach.
+ */
+export function TheFacts() {
+  const facts = useFacts();
+  if (!facts) return null;
+
+  return (
+    <div className="mt-10 border-t border-line pt-4 lg:hidden">
+      <ul className="space-y-1.5">
+        {facts.map((f) => (
+          <li key={f.says} className="flex items-start gap-2 text-note leading-relaxed text-muted">
+            <span className={dot(f.on) + ' mt-[7px]'} />
+            <span>{f.says}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function StatusBar() {
+  const { t } = useI18n();
+  const { identity } = useIdentity();
+  const facts = useFacts();
+  if (!facts) return null;
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-20 hidden items-center gap-x-6 gap-y-1 border-t border-line bg-ink/85 px-4 py-1.5 text-note text-muted backdrop-blur-xl lg:flex lg:ps-[272px]">
-      <span className="flex items-center gap-2">
-        <span className={dot(false)} />
-        {t('shell.nothingSigns')}
-      </span>
-      <span className="flex items-center gap-2">
-        <span className={dot(enforced)} />
-        {t(enforced ? 'shell.enforced' : 'shell.notEnforced')}
-      </span>
-      <span className="flex items-center gap-2">
-        <span className={dot(health.assistantKind !== 'off')} />
-        {t(health.assistantKind === 'off' ? 'shell.noAssistant' : 'shell.assistant')}
-      </span>
-      {/*
-        Whether anybody outside this application is ever told.
-        The fourth thing a bank has to know about its own installation, and
-        the only one of the four with no other voice: signing is said here,
-        the chain is said here, the assistant is said here and again on the
-        screens that would use it — but a notice that was composed and
-        carried by nobody is visible only to whoever happened to be looking
-        at the screen that composed it.
-      */}
-      <span className="flex items-center gap-2">
-        <span className={dot(health.notice !== 'none')} />
-        {t(health.notice === 'none' ? 'shell.noRelay' : 'shell.relay')}
-      </span>
+      {facts.map((f) => (
+        <span key={f.says} className="flex items-center gap-2">
+          <span className={dot(f.on)} />
+          {f.says}
+        </span>
+      ))}
       <span className="ms-auto font-mono">
         {identity?.scholarId ?? t('shell.anonymous')}
       </span>
@@ -509,6 +543,47 @@ function Frame({ children }: { children: React.ReactNode }) {
     });
   }
 
+  /*
+   * The group the member is standing in — which is what a phone shows
+   * instead of the rail.
+   *
+   * ── the hole this fills ─────────────────────────────────────────────
+   *
+   * A wide screen carries every destination at once down the side. A phone
+   * carries the tab bar, and the tab bar carries **one** destination per
+   * group, because five tabs is what fits across 375 pixels. So a member on
+   * a phone reached a group's first screen and the rest of that group was
+   * reachable from nowhere at all: measured on the board's rail, fourteen of
+   * the eighteen. *Put a question*, *what went wrong*, the contract library
+   * and the record had no way in on the device a board member actually
+   * carries.
+   *
+   * ── why the group and not a drawer ──────────────────────────────────
+   *
+   * A drawer holding the desktop rail is what makes a phone a small desktop,
+   * and the artboard note says in as many words that it is not one. This is
+   * the same list the rail draws, in the same order, in the same words,
+   * narrowed to where the member already is — so what is learnt at a desk is
+   * what is found here.
+   *
+   * The match is the longest destination the path begins with, so a screen
+   * below a destination (a matter under the record, a tool under the
+   * calculations) keeps its group rather than falling out of the navigation
+   * the moment somebody opens something.
+   */
+  const siblings: Item[] =
+    groups
+      .map((g) => ({
+        items: g.items,
+        depth: Math.max(
+          ...g.items.map((i) =>
+            i.to === path || (i.to !== '/' && path.startsWith(i.to + '/')) ? i.to.length : -1,
+          ),
+        ),
+      }))
+      .filter((g) => g.depth >= 0)
+      .sort((a, b) => b.depth - a.depth)[0]?.items ?? [];
+
   const rail = (
     <div className="flex h-full flex-col">
       <Link to="/" className="mb-8 flex items-center gap-3 px-3">
@@ -625,6 +700,35 @@ function Frame({ children }: { children: React.ReactNode }) {
             not. Two marks in the masthead, where a phone puts them.
           */}
           <div className="flex shrink-0 items-center gap-1">
+            {/*
+              Putting something to the board, on a phone.
+
+              The wide bar carries this as a named act because it is the one
+              thing that belongs to no screen and the thing an institution
+              comes here to do. The masthead did not, and the screen it leads
+              to is reached from nowhere else a phone shows — so measured by
+              walking the application at 375 pixels, *put a question* was the
+              single address a member could not arrive at. A secretary taking
+              an enquiry by telephone had to find a desk first.
+
+              A mark rather than the words, because at 375 pixels the words
+              push the board's own name off the masthead, and the name is how
+              a member knows whose installation they are looking at. The
+              label is on it for anyone reading the screen aloud, and the
+              words themselves are still written out at the foot of the
+              arrival screen and on the queue.
+            */}
+            {maySubmit(identity?.role) && (
+              <Link
+                to="/ask"
+                aria-label={t('door.asked.put')}
+                className="grid h-9 w-9 place-items-center rounded-full bg-lapis text-white shadow-act transition-shadow hover:shadow-lift"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden="true">
+                  <path d="M12 5v14M5 12h14" />
+                </svg>
+              </Link>
+            )}
             <Link
               to="/search"
               aria-label={t('besides.search')}
@@ -663,6 +767,49 @@ function Frame({ children }: { children: React.ReactNode }) {
             ))}
           </div>
         </div>
+
+        {/*
+          The rest of the group you are standing in, on a phone.
+
+          ── the gap this closes ──────────────────────────────────────
+
+          The tab bar carries one destination per rail group — the three
+          the drawing names — and a member who taps one lands on that
+          group's main screen with the group's other destinations gone.
+          Measured on a phone: four of the eight were unreachable from
+          anywhere at all. Put a question, what went wrong, the contract
+          library and the record simply had no way in.
+
+          ── and it is the rail, not a second navigation ──────────────
+
+          The same groups, the same order, the same words. What a member
+          learns at a desk is what they find here; a phone is shown less
+          at once because it is narrower, never less in total. It scrolls
+          sideways rather than wrapping, so the row stays one line high
+          whatever the group holds.
+        */}
+        {siblings.length > 1 && (
+          <nav
+            aria-label={t('shell.thisGroup')}
+            className="slides flex gap-1.5 overflow-x-auto bg-ink/80 px-5 pb-2.5 backdrop-blur-xl lg:hidden"
+          >
+            {siblings.map((d) => (
+              <NavLink
+                key={d.to}
+                to={d.to}
+                end={d.end}
+                className={({ isActive }) =>
+                  'shrink-0 whitespace-nowrap rounded-lg px-3 py-1.5 text-note transition-all ' +
+                  (isActive
+                    ? 'bg-raised font-semibold text-paper shadow-hairline'
+                    : 'text-muted hover:text-paper')
+                }
+              >
+                {d.label}
+              </NavLink>
+            ))}
+          </nav>
+        )}
 
         {/* ── the wide bar: where you are, who you are ────────────────── */}
         <header className="sticky top-0 z-30 hidden items-center justify-between gap-4 bg-ink/80 px-5 py-3 shadow-[0_1px_0_rgba(25,23,19,0.055)] backdrop-blur-xl lg:flex">
@@ -815,8 +962,14 @@ function Frame({ children }: { children: React.ReactNode }) {
           A row rather than a stack, so the shelf is part of the frame and not
           something that opens over the work. Whatever the member is reading
           stays exactly where it is when a tool is opened.
+
+          On a phone the same two are stacked, shelf first: 375 pixels has no
+          edge to give a column, and the shelf was simply hidden there —
+          seven tools with no way in on the one screen size where the whole
+          board reads its papers. Stacked, it is a strip above the work and
+          the work still stays where it is.
         */}
-        <div className="flex min-h-0 flex-1">
+        <div className="flex min-h-0 flex-1 flex-col-reverse lg:flex-row">
         <main
           id="work"
           /*
@@ -906,6 +1059,14 @@ function Frame({ children }: { children: React.ReactNode }) {
               {children}
 
               <WhatNext />
+
+              {/*
+                What this installation is, at the end of the page.
+                The bar that says it is fixed to the foot of a window and
+                hidden below a desk, so on a phone and a tablet nobody was
+                told any of it. See TheFacts.
+              */}
+              <TheFacts />
             </>
           )}
         </main>

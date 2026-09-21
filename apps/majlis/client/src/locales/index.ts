@@ -1421,6 +1421,7 @@ const en: Dict = {
   "shell.relay": "Notices are sent",
   "evidence.noVault": "This installation keeps no documents, so there is nowhere to put one. A reference by name and a note can still be cited. Mounting a volume is what would change it.",
   "shell.menu": "Open the navigation",
+  "shell.thisGroup": "The rest of this group",
   "shell.where": "Gravitas Majlis",
   "shell.anonymous": "Not signed in",
   "calc.tab.distribution": "Profit distribution",
@@ -2355,6 +2356,12 @@ const en: Dict = {
     'This screen is where the board does its own work. Nothing is hidden from you here — it is ' +
     'simply not a screen you have anything to do on.',
   'notyours.yours': 'What you came for is probably one of these',
+  'nowhere.title': 'There is no screen at this address',
+  'nowhere.says':
+    'Nothing has gone wrong and nothing has been taken away. This application has never had a '+
+    'screen here, so either the address was mistyped or a link somewhere is pointing at one that '+
+    'never existed.',
+  'nowhere.instead': 'Where the work is',
 };
 
 const ar: Dict = {
@@ -3974,6 +3981,7 @@ const ar: Dict = {
   "shell.relay": "تُرسَل الإشعارات",
   "evidence.noVault": "هذه النسخة لا تحفظ مستندات، فلا مكان لوضع واحد. ويبقى بالإمكان الإحالة بالاسم مع ملاحظة. وتركيب وحدة تخزين هو ما يغيّر ذلك.",
   "shell.menu": "افتح القائمة",
+  "shell.thisGroup": "بقية هذه المجموعة",
   "shell.where": "مجلس غرافيتاس",
   "shell.anonymous": "غير مسجَّل",
   "calc.tab.distribution": "توزيع الأرباح",
@@ -4581,6 +4589,11 @@ const ar: Dict = {
   'notyours.says':
     'هذه الشاشة حيث يقوم المجلس بعمله. لا شيء مخفي عنك هنا — غير أنها ليست شاشة لك فيها عمل.',
   'notyours.yours': 'ما جئت له على الأرجح أحد هذه',
+  'nowhere.title': 'لا توجد شاشة على هذا العنوان',
+  'nowhere.says':
+    'لم يحدث خطأ ولم يُحذف شيء. لم تكن لهذا التطبيق شاشة هنا قط، فإما أن العنوان كُتب خطأً '+
+    'وإما أن رابطاً ما يشير إلى شاشة لم توجد أصلاً.',
+  'nowhere.instead': 'حيث يجري العمل',
 };
 
 const ur: Dict = {
@@ -6212,6 +6225,7 @@ const ur: Dict = {
   "shell.relay": "اطلاعات بھیجی جاتی ہیں",
   "evidence.noVault": "یہ تنصیب دستاویزات محفوظ نہیں کرتی، اس لیے رکھنے کی جگہ نہیں۔ نام کے ساتھ حوالہ اور نوٹ پھر بھی دیا جا سکتا ہے۔ یہ اسی وقت بدلے گا جب کوئی والیوم لگایا جائے۔",
   "shell.menu": "فہرست کھولیں",
+  "shell.thisGroup": "اس گروہ کے باقی صفحات",
   "shell.where": "گراویتاس مجلس",
   "shell.anonymous": "سائن ان نہیں",
   "calc.tab.distribution": "منافع کی تقسیم",
@@ -6815,6 +6829,11 @@ const ur: Dict = {
     'یہ اسکرین وہ جگہ ہے جہاں بورڈ اپنا کام کرتا ہے۔ یہاں آپ سے کچھ چھپایا نہیں گیا — بس یہ ' +
     'ایسی اسکرین نہیں جس پر آپ کا کوئی کام ہو۔',
   'notyours.yours': 'آپ غالباً اِن میں سے کسی کے لیے آئے',
+  'nowhere.title': 'اس پتے پر کوئی صفحہ نہیں',
+  'nowhere.says':
+    'کچھ خراب نہیں ہوا اور کچھ ہٹایا نہیں گیا۔ اس ایپلیکیشن میں یہاں کبھی کوئی صفحہ تھا ہی نہیں، '+
+    'یا تو پتہ غلط لکھا گیا ہے یا کہیں کوئی لنک ایسے صفحے کی طرف اشارہ کر رہا ہے جو کبھی موجود نہ تھا۔',
+  'nowhere.instead': 'کام کہاں ہوتا ہے',
 };
 
 const DICTS: Record<Lang, Dict> = { en, ar, ur };
