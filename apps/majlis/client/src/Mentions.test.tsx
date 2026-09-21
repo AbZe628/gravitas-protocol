@@ -115,16 +115,56 @@ describe('the names in a body are shown as names', () => {
     // name is a reference to a person, which is lapis, and gold is now the
     // clock. What the test holds is that your own name carries a ground and
     // somebody else's does not.
-    await waitFor(() => expect(screen.getByText('@s2')).toBeInTheDocument());
-    expect(screen.getByText('@s2').className).toContain('bg-lapis');
+    /*
+     * Wait for the mark, not for the name.
+     *
+     * The name renders as soon as the body does; whether it is yours is not
+     * known until the identity request answers, and until then it is drawn
+     * like anybody else's. Waiting for the text and asserting the ground
+     * passed here and failed on CI, where the answer arrived a moment
+     * later — a measure whose result depends on which machine ran it.
+     */
+    await waitFor(() => expect(screen.getByText('@s2').className).toContain('bg-lapis'));
   });
 
   it('marks somebody else’s name without the emphasis', async () => {
     identity = { scholarId: 's1', role: 'signatory', office: null };
+    /*
+     * Both names in the body, so the absence can be read against a
+     * presence. With only @s2 there was nothing in the rendered output to
+     * say the identity had arrived, and "no ground on @s2" was true before
+     * it did.
+     */
     stub();
-    show();
+    show(
+      matter({
+        deliberation: [
+          entry({
+            body: 'Does @s2 agree, @s1?',
+            segments: [
+              { text: 'Does ' },
+              { text: '@s2', scholarId: 's2' },
+              { text: ' agree, ' },
+              { text: '@s1', scholarId: 's1' },
+              { text: '?' },
+            ],
+          }),
+        ],
+      }),
+    );
 
-    await waitFor(() => expect(screen.getByText('@s2')).toBeInTheDocument());
+    /*
+     * An absence proves nothing until the thing that would fill it has
+     * arrived. Before the identity request answers, no name carries the
+     * ground — so this passed whether or not the rule works, which is the
+     * failure this project keeps finding in its own measures.
+     *
+     * So: wait for the component to have settled on an identity, by
+     * watching the case that does mark, then assert this one does not.
+     */
+    // Their own name carries the ground: the identity has arrived.
+    await waitFor(() => expect(screen.getByText('@s1').className).toContain('bg-lapis'));
+    // And only then does the absence on the other name mean anything.
     expect(screen.getByText('@s2').className).not.toContain('bg-lapis');
   });
 
