@@ -5,144 +5,105 @@
 25 ruta: šta leži ispod fiksnih traka, šta bježi iz svoje kutije, šta se
 preklapa, koliko je meta premala za prst, i prelijeva li se stranica.
 
-Mjera je `work/majlis-local/revizija.mjs`. Brojevi ispod su iz nje, ne iz
-oka.
+Mjera je `work/majlis-local/revizija.mjs`.
+
+> **Tri stvari koje je prva mjera prijavila kao kvar nisu bile kvar.**
+> Svaka je provjerena prije nego je išta dirano, i to je zapisano ovdje
+> jer bi inače neko za pola godine popravljao ono što nije pokvareno.
 
 ---
 
-## A · Pokvareno — izmjereno, nije utisak
+## A · Šta je bilo stvarno pokvareno, i šta je urađeno
 
-### A1. Sadržaj klizi ispod donje trake. Svaka ruta.
+### A1. Radni prozor predmeta crtao je tekst preko teksta
 
-Donja traka je fiksna i visoka 61 px, a stranica ispod nje nema nikakav
-razmak. Posljednji red teksta na svakom ekranu leži pod njom.
+`/matters/:id` na 375: **12 preklapanja**, najveće 21 840 px². Tri sloja
+teksta na istom mjestu, ništa se ne čita. Naslov odsječen na „Treat…",
+red okana presječen desnom ivicom.
 
-| ruta | koliko teksta je pod trakom |
-|---|---|
-| `/matters/matter-2026-07-03` | 15 008 px² |
-| `/questions` | 14 520 px² |
-| `/examinations` | 11 933 px² |
-| `/ask` | 4 414 px² |
-| ostale | 1 000 – 4 000 px² |
+**Uzrok:** `StepWindow` je bio jedna kutija fiksne visine na svakoj širini
+— `100vh − 7.5rem`, nikad manje od 560 px, sa `overflow: hidden` i četiri
+regije unutar nje. Na telefonu je okvir iznad 184 px, a ne 120 koliko ta
+visina pretpostavlja, pa su regije bile više od kutije koja ih je trebala
+isjeći.
 
-Na 768 isto. **Ovo je „gubljenje teksta" iz prijave.**
+**Urađeno:** ispod stola je to običan tok — naslov, traka, posao, okna,
+činovi. Ništa nema visinu u koju se mora uklopiti. Izmjereno ponovo:
+**nula preklapanja**, na telefonu, tabletu i kod banke, na svim rutama.
 
-Popravka: `padding-bottom` na poslu jednak visini trake, i to iz jednog
-mjesta a ne po ekranu.
+### A2. Četiri trake prije prvog reda posla
 
-### A2. Radni prozor predmeta na telefonu — tekst preko teksta
+Jarbol 60 px, jezik 41 px, red grupe, polica alata. **Posao je počinjao na
+184 px od 812**, plus donja traka 61 px.
 
-`/matters/:id` na 375 ima **12 preklapanja**, najveće 21 840 px². Tri
-sloja teksta se crtaju jedan preko drugog i ništa se ne može pročitati.
+**Urađeno:** jezik je jedna lista pored reda grupe; alati su jedan gumb u
+jarbolu koji otvara isti panel koji otvara i polica. Polica ostaje na
+stolu. **Posao počinje na 114 px.** Dvije trake umjesto četiri.
 
-Na istom ekranu:
+### A3. Mete premale za prst
 
-- naslov je odsječen na **„Treat…"** — tri slova, jer oznake stanja uzmu
-  ostatak reda;
-- red okana (`Guidance · What was said · Sources · Limits`) presječen je
-  desnom ivicom, zadnje okno se ne vidi;
-- traka koraka `i 01…06 V` radi, ali su dugmad 28×28 px.
+397 kontrola ispod 34 px na 25 ruta — 11 do 23 po ekranu. `Do not take it
+up` 94×**19**, `Withdraw this` 79×**19**, filteri 35×**19**, koraci
+predmeta 28×28, jezici 64×25, alati 83×26.
 
-Uzrok: `StepWindow` je građen za stol — okna stoje **pored** posla, a
-traka činova je na dnu. Na telefonu te tri zone padnu jedna na drugu.
+**Urađeno:** 44 px ispod stola na tihim činovima, filterima reda, traci
+koraka, jezičcima okana, biračima u alatima i oblicima, redu grupe,
+karticama na *what stands* i vezi u mrvicama. Gdje je red teksta sama
+kontrola, poraste pogodak a ne crta.
 
-Popravka: na telefonu okna nisu pored posla nego ispod njega, jedno po
-jedno, i traka činova je u toku stranice a ne apsolutna.
+**397 → 24.** Ostatak su pojedinačne veze usred rečenice, gdje bi 44 px
+razbilo red u kojem stoje.
 
-### A3. Detaljni ekrani bježe 328 px van kutije
+### A4. Tri reda oznaka prije naslova
 
-Na `/rules/:id`, `/register/:id` i `/library/:id` popis činjenica
-(`Family`, `Kind`, `Standing`, `In force from`, `Next review`, `The
-conditions`) je dvostupačna mreža koja se na telefonu **ne slama**.
-Vrijednosti su gurnute 328 px desno od ivice ekrana — dakle nevidljive.
+`/rules/:id` je otvarao sa `VERSION 3`, `THE TERMS MATCH WHAT WAS
+RECORDED`, `NO REVIEW SCHEDULED` — tri reda metapodatka prije nego se
+sazna o čemu je pravilo. **Urađeno:** oznake idu ispod naslova.
 
-Na tabletu isto: 4 do 6 elemenata po ekranu.
+### A5. Jarbol je stavljao ime proizvoda prvo
 
-Popravka: ispod 640 px jedan stupac, oznaka iznad vrijednosti.
-
-### A4. Mete premale za prst
-
-Preporuka je 44 px, apsolutni minimum 40. Izmjereno na 375:
-
-| kontrola | veličina |
-|---|---|
-| `Do not take it up` | 94 × **19** |
-| `Withdraw this` | 79 × **19** |
-| filteri `Asked` `Checked` | 35 × **19** |
-| jezik `English` `العربية` `اردو` | 64 × **25** |
-| alati na polici | 83 × **26** |
-| koraci `01`…`06` | 28 × **28** |
-| `Skip to the work` | 32 × **16** |
-
-**11 do 23 takvih po ekranu**, na svakoj ruti. Na tabletu do **33**
-(`/library`).
-
-Popravka: minimalna visina 44 px za sve što se pritišće ispod 1024 px.
-
-### A5. Četiri trake prije prvog reda posla
-
-Na telefonu, odozgo: jarbol 60 px, jezik 41 px, red grupe, polica alata.
-**Posao počinje na 184 px**, plus donja traka 61 px — **30 % ekrana je
-okvir**, prije nego se išta pročita.
-
-Na stolu okvir je 68 px gore i 30 px dolje, dakle 11 %.
-
-Popravka: na telefonu ostaju dvije trake. Jezik ide u meni pod avatarom
-(bira se jednom, ne svaki dan), polica alata ide u jedan gumb.
+Sa četiri kontrole veličine prsta nasuprot, „Gravitas Majlis" se lomilo u
+dva reda a ime odbora je bilo odsječeno. **Urađeno:** ime odbora dobija
+širinu; ime proizvoda je sitan red ispod.
 
 ---
 
-## B · Nelogično i neusklađeno
+## B · Prijavljeno kao kvar, a nije
 
-### B1. Jezik zauzima cijeli red na telefonu, a na stolu je sitnica
+### B1. „Tekst ispod donje trake"
 
-Tri dugmeta preko cijele širine, na svakom ekranu, za izbor koji član
-napravi jednom u životu. Na stolu je isti izbor mala kontrola u jarbolu.
+Prva mjera je prijavila do 15 008 px² teksta pod donjom trakom na svakoj
+ruti. To je bio tekst koji **prolazi** ispod poluprozirne trake dok se
+skrola, što radi svaki telefon na svijetu.
 
-### B2. Polica alata stoji i tamo gdje računanje nema smisla
+Provjereno posebnom mjerom (`dokraja.mjs`): skrolano do kraja, posljednji
+red završava **43 px iznad** trake, na svih 16 provjerenih ruta. `main`
+već nosi razmak od 104 px.
 
-Sedam alata je na `/settings`, `/search`, `/briefings` i na svakom
-detaljnom ekranu. Na telefonu je to cijela traka. Alat treba biti dostupan
-odasvud — ali kao **jedan gumb**, ne kao sedam natpisa preko ekrana.
+### B2. „Tekst bježi 328 px van kutije"
 
-### B3. „Skip to the work" je meta 32×16 i leži pod jarbolom
+Prijavljeno na `/rules/:id`, `/register/:id`, `/library/:id`. Izmjereno
+prema prozoru (`vanekrana.mjs`): **nijedan element ni na jednom ekranu
+nije van ekrana**, i nijedna stranica se ne prelijeva. Mjera je poredila
+dijete sa roditeljem koji ga smije prerasti.
 
-Veza za preskakanje navigacije je korisna, ali je ovdje i premala i
-prekrivena. Ili je treba pokazati kako spada (vidljiva na fokus, preko
-svega) ili je nema.
+### B3. „Banka vidi neke ekrane odbora a neke ne"
 
-### B4. Dvije oznake za isto stanje
-
-Na `/rules/:id` stoje tri oznake u tri reda prije naslova: `VERSION 3`,
-`THE TERMS MATCH WHAT WAS RECORDED`, `NO REVIEW SCHEDULED`. Tri reda
-metapodatka prije nego se sazna o čemu je pravilo.
-
-### B5. Banka vidi ekrane odbora kao „ovo je odborovo", ali ne sve
-
-`/undertakings` i `/incidents` banci prikazuju pravi sadržaj, a
-`/questions`, `/rules` i `/record` je odbiju sa *This one is the board's*.
-Nije pogrešno — ali nigdje nije rečeno zašto su dva od tih ekrana njeni a
-tri nisu.
+Pravilo **jeste** napisano na jednom mjestu: `client/src/lib/spine.ts`,
+`DESK_ROUTES`, sa razlogom uz svaki izuzetak — `/incidents` je tu jer
+*what I owe* vodi na zapis o pojedinom prekršaju, pa bi veza koja završi
+na *this one is the board's* bila kontradikcija jedan ekran kasnije.
 
 ---
 
-## C · Šta predlažem, po redu
+## C · Šta ostaje, i nije kvar nego dotjerivanje
 
-**Prvo, jer se vidi golim okom i jer je kvar:**
-
-1. razmak ispod posla na visinu donje trake (A1)
-2. radni prozor predmeta prepravljen za telefon (A2)
-3. popis činjenica u jedan stupac ispod 640 px (A3)
-4. 44 px za svaku metu ispod 1024 px (A4)
-
-**Drugo, jer je to „pojednostaviti za 70 %":**
-
-5. dvije trake umjesto četiri na telefonu (A5, B1, B2)
-6. oznake stanja ispod naslova, ne prije njega (B4, A2)
-
-**Treće, ako se složiš:**
-
-7. odluka šta banka smije vidjeti, napisana na jednom mjestu (B5)
+1. **24 sitne mete** — pojedinačne veze u rečenici.
+2. **Kartice na telefonu troše širinu** na stupac sa brojem dana
+   (~90 px od 375).
+3. **Ime odbora se skraćuje** na 375 („Demonstrati…").
+4. **Dvije tihe veze pod filterima** na početnom ekranu izgledaju kao
+   ostatak, ne kao izbor.
 
 Ništa od ovoga ne mijenja šta Majlis radi niti ijedan pojam iz
-priručnika. Mijenja gdje stvari stoje na uskom ekranu.
+priručnika.
