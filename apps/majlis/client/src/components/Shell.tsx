@@ -633,7 +633,7 @@ function Frame({ children }: { children: React.ReactNode }) {
    * calculations) keeps its group rather than falling out of the navigation
    * the moment somebody opens something.
    */
-  const siblings: Item[] =
+  const matched: Item[] =
     groups
       .map((g) => ({
         items: g.items,
@@ -645,6 +645,29 @@ function Frame({ children }: { children: React.ReactNode }) {
       }))
       .filter((g) => g.depth >= 0)
       .sort((a, b) => b.depth - a.depth)[0]?.items ?? [];
+
+  /*
+   * And where the screen is not a destination at all, the group the tab
+   * bar is lighting.
+   *
+   * Most screens are not in the rail: a matter, a sitting, the queue of
+   * questions, the contract check. On every one of them the row came out
+   * empty and what a member saw was a bar with a language menu floating
+   * in it — the frame looking unfinished on more screens than not. The
+   * bar downstairs already answers where they are; this asks it the same
+   * question rather than a second one of its own.
+   */
+  const siblings: Item[] =
+    matched.length > 0
+      ? matched
+      : desk
+        ? []
+        : (() => {
+            const door = phaseOf(path);
+            if (!door) return [];
+            const g = groups[door === 'inforce' ? 1 : 0];
+            return g ? g.items : [];
+          })();
 
   const rail = (
     <div className="flex h-full flex-col">
