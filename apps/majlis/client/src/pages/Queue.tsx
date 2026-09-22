@@ -90,7 +90,17 @@ function Row({ row, n }: { row: QueueRow; n?: number }) {
           on the row that is a fact about now rather than about the record,
           and it is what a person scans for.
         */}
-        <div className="w-[4.5rem] shrink-0 text-end">
+        {/*
+          A column on a desk, one line on a phone.
+
+          The column is 4.5rem wide — a quarter of a 375-pixel screen given
+          to one number, on every row, which pushed the sentence a member
+          actually reads into the remaining three quarters and broke it over
+          four lines. On a desk there is width to spare and the figure is
+          what the eye scans down; on a phone it goes where the other facts
+          about the row are.
+        */}
+        <div className="hidden w-[4.5rem] shrink-0 text-end sm:block">
           <div
             className={
               'font-mono text-title leading-none tabular-nums ' +
@@ -112,6 +122,14 @@ function Row({ row, n }: { row: QueueRow; n?: number }) {
               }
             >
               {t(`needs.kind.${row.kind}`)}
+            </span>
+            <span
+              className={
+                'font-mono text-label tabular-nums sm:hidden ' +
+                (row.overdue ? 'text-breach' : 'text-muted')
+              }
+            >
+              {row.days} {t('needs.daysHere')}
             </span>
             {row.overdue && (
               <span className="text-label font-bold uppercase tracking-caps text-breach">
@@ -301,30 +319,6 @@ export default function Queue() {
         ))}
       </div>
 
-      {/*
-        The two full lists, under the queue rather than in the rail.
-
-        This screen shows what is waiting on somebody. The complete list of
-        questions and the complete list of matters are a different thing —
-        wanted occasionally, by somebody looking for one that is not waiting
-        on anybody. They left the rail with six others when it was cut to the
-        nine places the drawing shows, and this is the screen they belong to.
-      */}
-      <nav className="mb-6 flex flex-wrap gap-2">
-        {[
-          ['/questions', 'needs.allQuestions'],
-          ['/classic', 'needs.allMatters'],
-        ].map(([to, key]) => (
-          <Link
-            key={to}
-            to={to}
-            className="text-ui text-muted underline decoration-line underline-offset-4 hover:text-paper"
-          >
-            {t(key)}
-          </Link>
-        ))}
-      </nav>
-
       {shown.length === 0 ? (
         <Nothing>{t(rows.length === 0 ? 'queue.nothing' : 'queue.noneHere')}</Nothing>
       ) : (
@@ -344,6 +338,31 @@ export default function Queue() {
       <p className="mt-6 max-w-[62ch] text-note leading-relaxed text-muted">
         {t('needs.limits')}
       </p>
+
+      {/*
+        The two full lists, at the end of the queue.
+
+        Their own note said what they are: wanted occasionally, by somebody
+        looking for a question that is not waiting on anybody. They stood
+        above the list — a third block of controls between a member and the
+        first thing asked of them, on the one screen that is supposed to say
+        what to do next. Occasional things go after the work, not in front
+        of it.
+      */}
+      <nav className="mt-6 flex flex-wrap gap-x-5 gap-y-1">
+        {[
+          ['/questions', 'needs.allQuestions'],
+          ['/classic', 'needs.allMatters'],
+        ].map(([to, key]) => (
+          <Link
+            key={to}
+            to={to}
+            className="inline-flex min-h-[44px] items-center text-ui text-muted underline decoration-line underline-offset-4 hover:text-paper lg:min-h-0"
+          >
+            {t(key)}
+          </Link>
+        ))}
+      </nav>
     </div>
   );
 }

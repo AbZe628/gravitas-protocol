@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 
 import SlideOver from '../components/SlideOver.js';
-import ReadTheContract from '../components/ReadTheContract.js';
 import { mayDeliberate, useIdentity } from '../lib/identity.js';
 import StructureDetail from './StructureDetail.js';
 import { oversight, type HeldStructure, type Library as LibraryData } from '../lib/api.js';
@@ -9,7 +8,7 @@ import { useI18n } from '../lib/i18n.js';
 import { Division, Nothing } from '../components/page.js';
 import { ListPage, Row, Rows } from '../components/shapes.js';
 import { ErrorText, Loading } from '../components/ui.js';
-import { State, type Tone } from '../components/kit.js';
+import { Quiet, State, type Tone } from '../components/kit.js';
 import { useStillThere } from '../lib/stillThere.js';
 
 /**
@@ -131,18 +130,20 @@ export default function Library() {
       )}
 
       {/*
-        The draft, before the list of shapes.
+        The reader is named here and done on its own screen.
 
-        A member opens this page for one of two reasons: to see what the
-        board holds, or because they have a contract in their hand. The
-        second was a link away to a screen of its own, and it is the one
-        people actually come for — so it is first, and the shapes it is read
-        against are listed directly underneath it.
+        It used to be embedded whole: the heading, two paragraphs, the box
+        that says where the draft comes from, and the paste field — which
+        is every part of /check, printed inside a screen called the
+        library. On a phone that put the nineteen shapes the screen is
+        named for entirely below the fold, under a tool for a different
+        task. One screen is not a section of another.
       */}
-      <Division heading={t('check.title')} note={t('check.lead')}>
-        <ReadTheContract onItsOwnScreen canRead={mayDeliberate(identity?.role)} />
-        {!mayDeliberate(identity?.role) && <Nothing>{t('check.readOnly')}</Nothing>}
-      </Division>
+      {mayDeliberate(identity?.role) && (
+        <div className="mb-8">
+          <Quiet to="/check">{t('check.title')}</Quiet>
+        </div>
+      )}
 
       {groups.map((g) => (
         <Division

@@ -709,7 +709,8 @@ The checklist always says which of those is the case.
 
 ![Comparing types](guide/71-biblioteka-usporedba.jpg)
 
-Pick from the list, or press **compare them all** and Majlis reads the draft
+This is done on **Check a contract**, which the library links to. Pick a type
+from the list, or press **compare them all** and Majlis reads the draft
 against every type and ranks them. Pressing a ranked row only fills in the
 list; it does not choose for you.
 
