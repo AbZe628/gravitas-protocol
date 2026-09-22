@@ -303,12 +303,64 @@ function TabBar() {
         to: mainOf(door),
         label: t(door.label),
         icon: drawing[door.phase] ?? door.phase,
+        /* The desk lights by its own three doors; this is not read there. */
+        group: -1,
       }))
     : RAIL.map((group, i) => ({
         to: (group.destinations.find((d) => d.main) ?? group.destinations[0]).to,
         label: t(group.label),
         icon: (['asked', 'inforce', 'checked'] as const)[i] ?? 'asked',
+        /*
+         * Which group this tab is, so the bar can light the right one.
+         *
+         * It was lit by comparing the tab's drawing to the phase of the
+         * path — and the tabs are the three groups of the rail while the
+         * phases are the four doors, which are a different division of
+         * the same application. "What stands" lit because its drawing
+         * happens to be called inforce and /rules is in the In force
+         * door; "What we hold" never lit at all, because the register is
+         * also in the In force door and the names did not match. A
+         * member standing on a screen was told they were nowhere.
+         */
+        group: i,
       }));
+
+  /*
+   * The rail group the path is in — the same longest-match the group row
+   * uses, so the bar and the row cannot disagree about where a member is.
+   */
+  const inGroup = (() => {
+    /* A plain loop, not forEach: assigning inside a callback loses the
+       type of what is assigned, and the index comes back as never. */
+    let which = -1;
+    let longest = -1;
+    for (let i = 0; i < RAIL.length; i++) {
+      for (const d of RAIL[i].destinations) {
+        const hit = path === d.to || (d.to !== '/' && path.startsWith(d.to + '/'));
+        if (hit && d.to.length > longest) {
+          which = i;
+          longest = d.to.length;
+        }
+      }
+    }
+    if (which !== -1) return which;
+
+    /*
+     * A screen that is not a rail destination still stands somewhere.
+     *
+     * A matter, a sitting, an examination, the contract check: a member
+     * opened them from one of the three groups and has not left it. With
+     * nothing matched the bar went dark on all three and told them they
+     * were nowhere — measured on /matters/:id, no tab lit.
+     *
+     * The four doors answer where such a screen is, and three of them are
+     * the board's own work; only what is in force belongs with what
+     * stands.
+     */
+    const door = phaseOf(path);
+    if (!door) return null;
+    return door === 'inforce' ? 1 : 0;
+  })();
 
   /*
    * One drawing per phase, each of the thing itself rather than a symbol to
@@ -372,11 +424,21 @@ function TabBar() {
          * would be telling them they had left. `phaseOf` answers where they
          * are, including for screens that are not themselves tabs.
          */
-        const active = here === tab.icon;
+        const active = desk ? here === tab.icon : inGroup === tab.group;
         return (
-          <NavLink
+          /*
+            A Link, not a NavLink.
+
+            NavLink computes aria-current from the path it points at and
+            overrides the one it is given — and these tabs are lit by which
+            rail group a member is in, not by whether they are standing on
+            the group's main screen. With NavLink the mark was right on
+            three screens out of twenty and absent on the rest.
+          */
+          <Link
             key={tab.to}
             to={tab.to}
+            aria-current={active ? 'page' : undefined}
             className="flex flex-1 flex-col items-center gap-1.5 pb-1.5"
           >
             {icon(tab.icon, active)}
@@ -387,7 +449,7 @@ function TabBar() {
             >
               {tab.label}
             </span>
-          </NavLink>
+          </Link>
         );
       })}
 
@@ -931,7 +993,6 @@ function Frame({ children }: { children: React.ReactNode }) {
               padding purely to dodge it. A control that hovers over the work
               is the habit of a website with a support widget bolted on.
             */}
-            {!desk && <Guide />}
 
             {/*
               The palette. A faster way to the same seven tools and eight
@@ -1140,6 +1201,17 @@ function Frame({ children }: { children: React.ReactNode }) {
         </div>
 
         <StatusBar />
+
+        {/*
+          The guide, at the level of the frame rather than inside the wide bar.
+
+          It was mounted inside the desk's header, which is `hidden` below
+          1024 pixels — so on a phone the component never rendered, its
+          listener never attached, and the Guide tab in the bottom bar did
+          nothing at all when pressed. Its own trigger is still desk-only;
+          what moved is where the panel lives, so the tab can open it.
+        */}
+        {!desk && <Guide />}
 
         <Tools open={tools} at={toolAt} onClose={() => setTools(false)} />
 
