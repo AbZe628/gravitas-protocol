@@ -103,8 +103,27 @@ export default function StepWindow({
   const [showing, setShowing] = useState<string | null>(null);
   const { t } = useI18n();
 
+  /*
+   * A frame on a desk. On a phone, a page.
+   *
+   * ── what this was ─────────────────────────────────────────────────
+   *
+   * One fixed-height box at every width: `100vh - 7.5rem`, never less
+   * than 560px, with `overflow: hidden` and four regions inside it —
+   * title, strip, the work beside its panes, the act bar. That is the
+   * right shape on a desk and it cannot hold on a phone, where the frame
+   * above it is 184px rather than the 120 the height assumes. The regions
+   * were then taller than the box that was meant to clip them and they
+   * drew on top of each other: measured on one matter at 375 pixels,
+   * twelve overlaps, the largest 21 840px² — three layers of type in the
+   * same place, none of it readable.
+   *
+   * Below a desk the window is ordinary flow now: title, strip, the work,
+   * the panes under it, the acts at the end. Nothing is clipped, because
+   * nothing is given a height it has to fit into.
+   */
   return (
-    <div className="flex h-[calc(100vh-7.5rem)] min-h-[560px] flex-col overflow-hidden rounded-sheet bg-raised shadow-card lg:h-[calc(100vh-6rem)]">
+    <div className="flex flex-col overflow-hidden rounded-sheet bg-raised shadow-card lg:h-[calc(100vh-6rem)] lg:min-h-[560px]">
       {/* ── the title bar ─────────────────────────────────────────────── */}
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-line px-5 py-3.5 sm:px-6">
         <h1 className="min-w-0 flex-1 truncate font-display text-sub leading-tight tracking-title text-paper">
@@ -152,7 +171,9 @@ export default function StepWindow({
           against a limit written for this column alone. A rule with a name
           in the specification should have the same name in the markup.
         */}
-        <div data-pane="work" className="min-h-0 flex-1 overflow-y-auto px-5 py-5 sm:px-6">
+        {/* It scrolls inside itself on a desk, where it has a height to
+            scroll within. On a phone the page scrolls and this does not. */}
+        <div data-pane="work" className="min-h-0 flex-1 px-5 py-5 sm:px-6 lg:overflow-y-auto">
           <div className="mb-3 text-label font-bold uppercase tracking-caps text-muted">
             {heading}
           </div>
@@ -168,7 +189,7 @@ export default function StepWindow({
             member would never find it — worse than wrapping, because a
             wrapped tab is at least visible.
           */
-          <aside className="grid min-h-0 shrink-0 grid-rows-[auto,1fr] border-line lg:w-[368px] lg:border-s">
+          <aside className="min-h-0 shrink-0 border-t border-line lg:grid lg:grid-rows-[auto,1fr] lg:w-[368px] lg:border-s lg:border-t-0">
             {/*
               The tabs stay on one line and the strip scrolls.
 
@@ -206,12 +227,12 @@ export default function StepWindow({
                 </Button>
               ))}
             </div>
-            <div className="min-h-0 overflow-y-auto px-5 py-5 sm:px-6">
+            <div className="min-h-0 px-5 py-5 sm:px-6 lg:overflow-y-auto">
               {(asidePanes.find((p) => p.id === showing) ?? asidePanes[0]).body}
             </div>
           </aside>
         ) : aside ? (
-          <aside className="min-h-0 shrink-0 overflow-y-auto border-line px-5 py-5 sm:px-6 lg:w-[320px] lg:border-s">
+          <aside className="min-h-0 shrink-0 border-t border-line px-5 py-5 sm:px-6 lg:w-[320px] lg:overflow-y-auto lg:border-s lg:border-t-0">
             {aside}
           </aside>
         ) : null}

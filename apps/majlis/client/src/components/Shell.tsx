@@ -674,15 +674,32 @@ function Frame({ children }: { children: React.ReactNode }) {
           as a fault.
         */}
         <header className="sticky top-0 z-30 flex items-center justify-between gap-3 bg-ink/80 px-5 py-3 shadow-[0_1px_0_rgba(25,23,19,0.055)] backdrop-blur-xl lg:hidden">
-          <Link to="/" className="flex min-w-0 items-center gap-3">
+          {/*
+            The board's name first, the product's second.
+
+            It was the other way round, and with four round controls
+            opposite it at a size a thumb can hit there was no room for
+            both: "Gravitas Majlis" broke over two lines and the board's
+            own name was cut to "Demonstration B…". A member knows which
+            application they opened. What they need the masthead to tell
+            them is whose board this is, so that is the line that gets the
+            width, on one line, and the product's name goes under it.
+          */}
+          <Link to="/" className="flex min-w-0 items-center gap-2.5">
             <Mark />
             <div className="min-w-0">
-              <div className="font-display text-sub leading-none tracking-title">
-                {t('app.name')}
-              </div>
-              {boardName && (
-                <div className="mt-1.5 truncate text-note leading-none text-muted">
-                  {boardName}
+              {boardName ? (
+                <>
+                  <div className="truncate font-display text-sub leading-none tracking-title">
+                    {boardName}
+                  </div>
+                  <div className="mt-1.5 truncate text-label uppercase tracking-caps leading-none text-muted">
+                    {t('app.name')}
+                  </div>
+                </>
+              ) : (
+                <div className="truncate font-display text-sub leading-none tracking-title">
+                  {t('app.name')}
                 </div>
               )}
             </div>
@@ -722,17 +739,40 @@ function Frame({ children }: { children: React.ReactNode }) {
               <Link
                 to="/ask"
                 aria-label={t('door.asked.put')}
-                className="grid h-9 w-9 place-items-center rounded-full bg-lapis text-white shadow-act transition-shadow hover:shadow-lift"
+                className="grid h-11 w-11 place-items-center rounded-full bg-lapis text-white shadow-act transition-shadow hover:shadow-lift"
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden="true">
                   <path d="M12 5v14M5 12h14" />
                 </svg>
               </Link>
             )}
+            {/*
+              The tools, on a phone: one button, not a bar of seven.
+
+              It opens the same panel the shelf opens on a desk — the
+              seven are inside it, named, at a size a thumb can hit. On
+              the shelf they were 83×26, which is under half the height a
+              finger needs, and they cost a whole row of the screen on
+              every page whether or not anybody wanted a calculator.
+            */}
+            {!desk && (
+              <Button
+                type="button"
+                onClick={() => setTools(true)}
+                aria-label={t('tools.title')}
+                className="grid h-11 w-11 place-items-center rounded-full text-muted transition-colors hover:bg-raised/60 hover:text-paper lg:hidden"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M4 7h10M4 12h16M4 17h7" />
+                  <circle cx="18" cy="7" r="2" />
+                  <circle cx="15" cy="17" r="2" />
+                </svg>
+              </Button>
+            )}
             <Link
               to="/search"
               aria-label={t('besides.search')}
-              className="grid h-9 w-9 place-items-center rounded-full text-muted transition-colors hover:bg-raised/60 hover:text-paper"
+              className="grid h-11 w-11 place-items-center rounded-full text-muted transition-colors hover:bg-raised/60 hover:text-paper"
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
                 <circle cx="11" cy="11" r="7" />
@@ -744,29 +784,6 @@ function Frame({ children }: { children: React.ReactNode }) {
             </Link>
           </div>
         </header>
-
-        {/* The language, before anything else, because a reader who cannot
-            read the screen needs this before they need the screen. */}
-        <div className="sticky top-[60px] z-20 flex justify-end bg-ink/80 px-5 pb-2.5 backdrop-blur-xl lg:hidden">
-          <div className="flex gap-0.5 rounded-xl bg-paper/[0.045] p-[3px]">
-            {LANGS.map((l) => (
-              <Button
-                key={l.code}
-                type="button"
-                onClick={() => setLang(l.code)}
-                aria-pressed={lang === l.code}
-                className={
-                  'rounded-lg px-3 py-1 text-note transition-all ' +
-                  (lang === l.code
-                    ? 'bg-raised font-semibold text-paper shadow-hairline'
-                    : 'text-muted')
-                }
-              >
-                {l.label}
-              </Button>
-            ))}
-          </div>
-        </div>
 
         {/*
           The rest of the group you are standing in, on a phone.
@@ -788,12 +805,22 @@ function Frame({ children }: { children: React.ReactNode }) {
           sideways rather than wrapping, so the row stays one line high
           whatever the group holds.
         */}
-        {siblings.length > 1 && (
-          <nav
-            aria-label={t('shell.thisGroup')}
-            className="slides flex gap-1.5 overflow-x-auto bg-ink/80 px-5 pb-2.5 backdrop-blur-xl lg:hidden"
-          >
-            {siblings.map((d) => (
+        {/*
+          ── and the language sits at the end of it ───────────────────
+
+          It had a row to itself: three buttons across the full width of
+          the screen, on every page, for a choice a member makes once.
+          Four bars stood between the top of a phone and the first line
+          of work — 184 pixels of 812, and another 61 for the tab bar,
+          so thirty per cent of the screen was frame. It rides at the
+          end of this row now, where it is still on every screen and
+          still the first thing a reader who cannot read English can
+          reach.
+        */}
+        <div className="sticky top-[60px] z-20 flex items-center gap-2 bg-ink/80 px-5 pb-2.5 backdrop-blur-xl lg:hidden">
+        <nav aria-label={t('shell.thisGroup')} className="slides flex min-w-0 flex-1 items-center gap-1.5 overflow-x-auto">
+          {siblings.length > 1 &&
+            siblings.map((d) => (
               <NavLink
                 key={d.to}
                 to={d.to}
@@ -808,8 +835,33 @@ function Frame({ children }: { children: React.ReactNode }) {
                 {d.label}
               </NavLink>
             ))}
-          </nav>
-        )}
+
+        </nav>
+
+          {/*
+            The language, as one control rather than three.
+
+            Three buttons beside the group row took 190 of 375 pixels —
+            half the row, permanently, for a choice a member makes once —
+            and the group's own destinations were clipped to make space:
+            "The record" read "The reo". A list that opens is what a
+            phone uses for a choice of three, it is 70 pixels wide, and
+            the reader who cannot read the screen still finds it in the
+            same place on every page.
+          */}
+          <select
+            aria-label={t('shell.language')}
+            value={lang}
+            onChange={(e) => setLang(e.target.value as (typeof LANGS)[number]['code'])}
+            className="h-9 shrink-0 rounded-xl bg-paper/[0.045] px-2.5 text-note text-paper shadow-hairline outline-none"
+          >
+            {LANGS.map((l) => (
+              <option key={l.code} value={l.code} className="text-ink">
+                {l.label}
+              </option>
+            ))}
+          </select>
+        </div>
 
         {/* ── the wide bar: where you are, who you are ────────────────── */}
         <header className="sticky top-0 z-30 hidden items-center justify-between gap-4 bg-ink/80 px-5 py-3 shadow-[0_1px_0_rgba(25,23,19,0.055)] backdrop-blur-xl lg:flex">
@@ -1071,7 +1123,20 @@ function Frame({ children }: { children: React.ReactNode }) {
           )}
         </main>
 
-        {!desk && <ToolShelf at={tools ? toolAt : undefined} onOpen={openTool} />}
+        {/*
+          The shelf is the desk's. A phone gets one button for it.
+
+          Seven names across the top of a phone is a whole bar of frame,
+          on every screen, for tools a member opens now and then — and
+          the panel it opens is the same panel the button opens. The
+          shelf keeps its place beside the work where there is room for
+          it, which is what the drawing shows.
+        */}
+        {!desk && (
+          <div className="hidden lg:block">
+            <ToolShelf at={tools ? toolAt : undefined} onOpen={openTool} />
+          </div>
+        )}
         </div>
 
         <StatusBar />
