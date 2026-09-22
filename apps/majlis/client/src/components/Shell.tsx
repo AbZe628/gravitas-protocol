@@ -826,7 +826,7 @@ function Frame({ children }: { children: React.ReactNode }) {
                 to={d.to}
                 end={d.end}
                 className={({ isActive }) =>
-                  'shrink-0 whitespace-nowrap rounded-lg px-3 py-1.5 text-note transition-all ' +
+                  'inline-flex min-h-[44px] shrink-0 items-center whitespace-nowrap rounded-lg px-3 py-1.5 text-note transition-all ' +
                   (isActive
                     ? 'bg-raised font-semibold text-paper shadow-hairline'
                     : 'text-muted hover:text-paper')

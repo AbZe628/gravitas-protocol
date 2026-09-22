@@ -406,7 +406,7 @@ export default function Examinations({ boardId }: { boardId: string }) {
                                 type="button"
                                 onClick={() => setHeld({ ...held, [r.against]: { ...v, held: h } })}
                                 className={
-                                  'rounded-xl px-3 py-1.5 text-note transition-all ' +
+                                  'inline-flex min-h-[44px] items-center rounded-xl px-3 py-1.5 text-note transition-all lg:min-h-0 ' +
                                   (v.held === h
                                     ? 'bg-lapistint font-semibold text-lapis shadow-pick'
                                     : 'bg-raised text-sand shadow-ring hover:text-paper')

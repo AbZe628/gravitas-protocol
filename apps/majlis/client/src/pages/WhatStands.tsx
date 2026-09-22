@@ -71,7 +71,7 @@ export default function WhatStands() {
               aria-selected={tab === k}
               onClick={() => setTab(k)}
               className={
-                'rounded-lg px-3.5 py-1.5 text-ui transition-all ' +
+                'inline-flex min-h-[44px] items-center rounded-lg px-3.5 py-1.5 text-ui transition-all lg:min-h-0 ' +
                 (tab === k
                   ? 'bg-raised font-semibold text-paper shadow-hairline'
                   : 'text-muted hover:text-sand')

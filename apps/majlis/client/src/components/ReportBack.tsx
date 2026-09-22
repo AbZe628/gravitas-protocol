@@ -128,7 +128,7 @@ export default function ReportBack({
                       setPositions((p) => ({ ...p, [m]: { ...p[m], at } }))
                     }
                     className={
-                      'rounded-full px-3 py-1 text-note transition-all ' +
+                      'inline-flex min-h-[44px] items-center rounded-full px-3 py-1 text-note transition-all lg:min-h-0 ' +
                       (positions[m].at === at
                         ? at === 'dissents'
                           ? 'bg-breach font-semibold text-white'

@@ -64,7 +64,7 @@ export function PhaseBar() {
                 to={p.to}
                 aria-current={current ? 'step' : undefined}
                 className={
-                  'flex items-baseline gap-1.5 rounded-full px-3 py-1.5 text-note leading-none transition-colors ' +
+                  'inline-flex min-h-[44px] items-center gap-1.5 rounded-full px-3 py-1.5 text-note leading-none transition-colors lg:min-h-0 ' +
                   (current
                     ? 'bg-lapis font-bold text-white'
                     : passed

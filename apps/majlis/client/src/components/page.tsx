@@ -66,7 +66,11 @@ function Breadcrumb({ phase, tail }: { phase?: AnyPhase; tail?: string }) {
 
   return (
     <div className="mb-4 flex flex-wrap items-center gap-2.5 text-ui text-muted">
-      <Link to={door.destinations[0].to} className="transition-colors hover:text-paper">
+      {/* The one link in the crumb is a target too: it was 43×19. */}
+      <Link
+        to={door.destinations[0].to}
+        className="inline-flex min-h-[44px] items-center transition-colors hover:text-paper lg:min-h-0"
+      >
         {t(door.label)}
       </Link>
       {tail && (
@@ -113,13 +117,22 @@ export function PageHead({
 
       <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
         <div className="min-w-0">
-          {live && <div className="mb-3 flex flex-wrap items-center gap-2.5">{live}</div>}
           <h1
             className="max-w-[24ch] font-display text-head font-normal leading-tight tracking-display text-paper sm:text-display"
             style={{ textWrap: 'balance' }}
           >
             {title}
           </h1>
+          {/*
+            The state under the title, not above it.
+
+            Above, a ruling opened with three tags in three rows on a
+            phone — VERSION 3, THE TERMS MATCH WHAT WAS RECORDED, NO
+            REVIEW SCHEDULED — so a reader met three lines of metadata
+            before finding out what the ruling was about. They belong to
+            the title and are read after it.
+          */}
+          {live && <div className="mt-3 flex flex-wrap items-center gap-2.5">{live}</div>}
           {/* A record has no standing sentence: its title and its state say what it is. */}
           {says && (
             <p className="mt-3 max-w-[62ch] text-body leading-relaxed text-muted">{says}</p>

@@ -143,7 +143,9 @@ export default function StepWindow({
               aria-current={s.state === 'here' ? 'step' : undefined}
               title={`${t('win.step')} ${s.ordinal}`}
               className={
-                'grid h-7 w-7 shrink-0 place-items-center rounded-lg font-mono text-note transition-colors ' +
+                /* 44 on a phone, 28 on a desk: a step is a target before
+                   it is a mark, and the strip scrolls either way. */
+                'grid h-11 w-11 shrink-0 place-items-center rounded-lg font-mono text-note transition-colors lg:h-7 lg:w-7 ' +
                 (s.state === 'here'
                   ? 'bg-lapis font-semibold text-white'
                   : s.state === 'done'
@@ -212,7 +214,7 @@ export default function StepWindow({
                   tone={undefined}
                   onClick={() => setShowing(pane.id)}
                   className={
-                    'flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-t-lg px-2.5 py-1.5 text-note font-bold ' +
+                    'flex min-h-[44px] shrink-0 items-center gap-1.5 whitespace-nowrap rounded-t-lg px-3 py-1.5 text-note font-bold lg:min-h-0 ' +
                     (pane.id === (showing ?? asidePanes[0]?.id)
                       ? 'bg-raised text-paper shadow-ring'
                       : 'text-muted hover:text-paper')

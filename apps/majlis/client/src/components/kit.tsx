@@ -232,7 +232,17 @@ export function MainAct({
   );
 }
 
-/** Everything else a reader may do. Quiet, and never a box. */
+/**
+ * Everything else a reader may do. Quiet, and never a box.
+ *
+ * ── and on a phone it is still a target ───────────────────────────────
+ *
+ * A line of underlined type is 19 pixels tall. A finger needs 44, and
+ * these are not small acts: *withdraw this*, *do not take it up*. Every
+ * one of them was measured at 19 on a phone, several to a screen. The
+ * hit area grows below a desk and the drawn line does not — it stays
+ * quiet, and it can be hit.
+ */
 export function Quiet({
   children,
   onClick,
@@ -243,7 +253,7 @@ export function Quiet({
   to?: string;
 }) {
   const shape =
-    'text-ui text-muted underline decoration-line underline-offset-4 transition-colors hover:text-paper';
+    'inline-flex min-h-[44px] items-center text-ui text-muted underline decoration-line underline-offset-4 transition-colors hover:text-paper lg:min-h-0';
 
   if (to) {
     return (

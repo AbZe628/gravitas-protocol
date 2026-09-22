@@ -154,7 +154,7 @@ export default function TheCalculator({
               aria-pressed={picked === k}
               onClick={() => setPicked(k)}
               className={
-                'rounded-full px-3.5 py-1.5 text-note transition-all ' +
+                'inline-flex min-h-[44px] items-center rounded-full px-3.5 py-1.5 text-note transition-all lg:min-h-0 ' +
                 (picked === k
                   ? 'bg-lapis font-semibold text-white'
                   : 'bg-raised text-sand shadow-ring hover:text-paper')
