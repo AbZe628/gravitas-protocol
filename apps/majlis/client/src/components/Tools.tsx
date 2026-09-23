@@ -114,7 +114,7 @@ export default function Tools({
             className={
               'rounded-lg px-3 py-1.5 text-ui transition-colors ' +
               (kind === k
-                ? 'bg-lapis font-semibold text-white'
+                ? 'bg-lapistint font-semibold text-lapis shadow-ring'
                 : 'bg-ink text-sand shadow-ring hover:text-paper')
             }
           >

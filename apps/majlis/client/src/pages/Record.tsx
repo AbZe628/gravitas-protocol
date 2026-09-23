@@ -151,18 +151,6 @@ export default function Record({ embedded = false }: { embedded?: boolean }) {
       */}
       <Decided matters={decided} lost={decidedLost} />
 
-      {/*
-        The briefings, which left the rail with seven others when it was cut
-        to the nine places the drawing shows. A briefing is a paper about the
-        record, so the record is where it is reached from.
-      */}
-      <Link
-        to="/briefings"
-        className="mb-5 inline-block rounded-xl bg-raised px-4 py-2 text-ui font-semibold text-lapis shadow-ring"
-      >
-        {t('record.toPapers')}
-      </Link>
-
       {health?.recordSince && (
         <div className="mb-5 rounded-card shadow-ring bg-raised px-4 py-3">
           <div className="text-ui text-paper">
@@ -201,13 +189,29 @@ export default function Record({ embedded = false }: { embedded?: boolean }) {
         </div>
       )}
 
+      {/*
+        The papers, in one place at the end.
+
+        They were scattered down the screen: a link to the briefings styled
+        as a button in the middle of the list, the annual report under a
+        year picker, and the audit export in a card of its own at the foot
+        — which put the one act of this screen 1 027 pixels down. Reading
+        is what the screen is for and the papers are what it produces, so
+        they are gathered where a reader arrives after reading.
+      */}
       <Card>
-        <div className="text-lead font-medium">{t('record.export')}</div>
-        <p className="mt-1.5 text-ui leading-relaxed text-muted">{t('record.exportNote')}</p>
+        <Link
+          to="/briefings"
+          className="inline-flex min-h-[44px] items-center rounded-xl bg-raised px-4 py-2 text-ui font-semibold text-lapis shadow-ring lg:min-h-0"
+        >
+          {t('record.toPapers')}
+        </Link>
+
+        <p className="mt-4 text-ui leading-relaxed text-muted">{t('record.exportNote')}</p>
         <Button
           type="button"
           onClick={() => setExporting(true)}
-          className="mt-3 rounded bg-lapis px-4 py-2 text-ui text-white font-semibold shadow-act transition-colors hover:bg-lapis"
+          className="mt-3 rounded-xl bg-lapis px-5 py-2.5 text-ui font-semibold text-white shadow-act transition-colors hover:bg-lapissoft"
         >
           {t('record.export')}
         </Button>

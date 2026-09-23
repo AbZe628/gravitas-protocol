@@ -95,7 +95,7 @@ export function Chip({
       className={
         'inline-flex min-h-[44px] items-center rounded-full px-3.5 py-1.5 text-note transition-all lg:min-h-0 ' +
         (on
-          ? 'bg-lapis font-semibold text-white'
+          ? 'bg-lapistint font-semibold text-lapis shadow-ring'
           : 'bg-raised text-sand shadow-ring hover:text-paper')
       }
     >

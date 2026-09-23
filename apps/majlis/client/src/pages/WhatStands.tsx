@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useI18n } from '../lib/i18n.js';
-import { PageHead } from '../components/page.js';
+import { ListPage } from '../components/shapes.js';
 import Record from './Record.js';
 import Rules from './Rules.js';
 import { Button } from '../components/Button';
@@ -51,17 +51,24 @@ export default function WhatStands() {
   const { t } = useI18n();
   const [tab, setTab] = useState<Tab>('decided');
 
+  /*
+   * The two tabs are a filter, and they sit where filters sit.
+   *
+   * They were passed as the screen's act — the slot that holds the one
+   * thing a member came here to start, and which on every other screen
+   * holds a button. Two of the same control in the same place meaning
+   * different things is how an application starts feeling arbitrary.
+   */
   return (
-    <div>
-      <PageHead
-        phase="inforce"
-        title={t('stands.title')}
-        says={t('stands.lead')}
-        act={
+    <ListPage
+      phase="inforce"
+      title={t('stands.title')}
+      says={t('stands.lead')}
+      filters={
         <div
           role="tablist"
           aria-label={t('stands.title')}
-          className="flex shrink-0 gap-0.5 self-start rounded-xl bg-paper/[0.045] p-[3px] sm:self-auto"
+          className="flex shrink-0 gap-0.5 rounded-xl bg-paper/[0.045] p-[3px]"
         >
           {TABS.map((k) => (
             <Button
@@ -81,15 +88,14 @@ export default function WhatStands() {
             </Button>
           ))}
         </div>
-        }
-      />
-
+      }
+    >
       {/*
         The pages themselves, unchanged. Nothing here reimplements either —
         `embedded` only stops each of them setting a second title under the
         first.
       */}
       {tab === 'decided' ? <Record embedded /> : <Rules embedded />}
-    </div>
+    </ListPage>
   );
 }
