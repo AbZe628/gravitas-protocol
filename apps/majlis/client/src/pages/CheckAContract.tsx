@@ -74,7 +74,7 @@ export default function CheckAContract() {
   }, [from]);
 
   return (
-    <div className="mx-auto max-w-reading px-5 pb-16 pt-6">
+    <div>
       <PageHead phase="inforce" title={t('check.title')} says={t('check.lead')} />
 
       {/*

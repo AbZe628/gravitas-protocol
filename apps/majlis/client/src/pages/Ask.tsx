@@ -11,13 +11,14 @@ import {
 import { useI18n } from '../lib/i18n.js';
 import AttachTheContract from '../components/AttachTheContract.js';
 import { useIdentity, isInstitution } from '../lib/identity.js';
-import { MainAct, Card, Edge, Quiet, State } from '../components/kit.js';
+import { MainAct, Card, Quiet, State } from '../components/kit.js';
 import TheNotice from '../components/TheNotice.js';
 import { ErrorText } from '../components/ui.js';
 import { Field } from '../components/field.js';
 import Act from '../components/Act.js';
 import AfterAct from '../components/AfterAct.js';
 import { DocumentLink } from '../components/Documents.js';
+import { PageHead } from '../components/page.js';
 
 /**
  * The bank's own screen: put a question, and see what became of it.
@@ -268,13 +269,19 @@ export default function Ask({ boardId }: { boardId: string }) {
   }
 
   return (
-    <div className="mx-auto max-w-reading px-5 pb-16 pt-6">
-      <h1 className="font-display text-head leading-tight tracking-title">{t('ask.title')}</h1>
-      <p className="mt-2 max-w-[62ch] text-ui leading-relaxed text-muted">{t('ask.lead')}</p>
+    <div>
+      {/*
+        The same head as every other screen.
 
-      <Edge />
+        This one wrote its own -- a heading and a sentence and a rule --
+        so the bank's main screen was the only one in the application
+        whose title did not begin where every other title begins. The
+        crumb it gets is the desk's own door, which the shared head
+        already knows how to draw.
+      */}
+      <PageHead phase="iasked" title={t('ask.title')} says={t('ask.lead')} />
 
-      <div className="mt-6">
+      <div>
         <Card>
           <Field label={t('ask.subject')} className="mb-4" headingClass={label}>
             {(attrs) => (

@@ -380,7 +380,7 @@ export default function Questions({ boardId }: { boardId: string }) {
   if (all.length > 0) gaps.push(t('queue.gap.only'));
 
   return (
-    <div className="mx-auto max-w-reading px-5 pb-16 pt-6">
+    <div>
       <PageHead
         phase="asked"
         title={t('queue.title')}

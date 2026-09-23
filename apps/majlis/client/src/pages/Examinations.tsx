@@ -268,7 +268,7 @@ export default function Examinations({ boardId }: { boardId: string }) {
   const rows = [...(subject?.conditions ?? []), ...(subject?.terms ?? [])];
 
   return (
-    <div className="mx-auto max-w-reading px-5 pb-16 pt-6">
+    <div>
       <PageHead
         phase="checked"
         title={t('exam.title')}
