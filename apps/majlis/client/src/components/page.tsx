@@ -65,7 +65,7 @@ function Breadcrumb({ phase, tail }: { phase?: AnyPhase; tail?: string }) {
   if (!door) return null;
 
   return (
-    <div className="mb-4 flex flex-wrap items-center gap-2.5 text-ui text-muted">
+    <div className="mb-2 flex flex-wrap items-center gap-2.5 text-note text-muted">
       {/* The one link in the crumb is a target too: it was 43×19. */}
       <Link
         to={door.destinations[0].to}
@@ -111,14 +111,32 @@ export function PageHead({
   /** The one thing a reader might come here to do. */
   act?: ReactNode;
 }) {
+  /*
+   * A bar at the head of a screen, not the opening of an article.
+   *
+   * ── what it was, measured ────────────────────────────────────────
+   *
+   * A breadcrumb, then a 36-pixel serif title, then the state, then a
+   * paragraph set in body type, then the filters — and the one act
+   * floating somewhere to the right at a height of its own. The header
+   * ran to 131–166 pixels on a desk and 182–267 on a phone, which put
+   * the first row of /rules at 315 pixels of 812 and the first row of
+   * /calendar at 393. Half a phone screen to say what the screen is
+   * called.
+   *
+   * The same parts, in one band: the title with the act on its line,
+   * the state under it, the sentence in note type beside them where
+   * there is room. Nothing was removed — the sentence is not optional
+   * and it is still here.
+   */
   return (
-    <header className="mb-8">
+    <header className="mb-6">
       <Breadcrumb phase={phase} tail={tail} />
 
-      <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
+      <div className="flex flex-wrap items-start justify-between gap-x-8 gap-y-3">
         <div className="min-w-0">
           <h1
-            className="max-w-[24ch] font-display text-head font-normal leading-tight tracking-display text-paper sm:text-display"
+            className="max-w-[28ch] font-display text-head font-normal leading-tight tracking-display text-paper"
             style={{ textWrap: 'balance' }}
           >
             {title}
@@ -132,10 +150,10 @@ export function PageHead({
             before finding out what the ruling was about. They belong to
             the title and are read after it.
           */}
-          {live && <div className="mt-3 flex flex-wrap items-center gap-2.5">{live}</div>}
+          {live && <div className="mt-2 flex flex-wrap items-center gap-2.5">{live}</div>}
           {/* A record has no standing sentence: its title and its state say what it is. */}
           {says && (
-            <p className="mt-3 max-w-[62ch] text-body leading-relaxed text-muted">{says}</p>
+            <p className="mt-2 max-w-[68ch] text-ui leading-relaxed text-muted">{says}</p>
           )}
         </div>
         {act && <div className="shrink-0">{act}</div>}

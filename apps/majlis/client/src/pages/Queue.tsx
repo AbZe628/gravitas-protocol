@@ -3,6 +3,7 @@ import { useRevision } from '../lib/pulse.js';
 import { Link, useNavigate } from 'react-router-dom';
 import { governance, type QueueRow } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
+import { ListPage } from '../components/shapes.js';
 import { Nothing } from '../components/page.js';
 import { ErrorText, Loading } from '../components/ui.js';
 import { useStillThere } from '../lib/stillThere.js';
@@ -249,17 +250,19 @@ export default function Queue() {
   onScreen.current = shown;
   const countOf = (p: QueuePhase) => rows.filter((r) => r.phase === p).length;
 
-  return (
-    <div>
-      {/*
-        The heading is the first thing, and it is a heading. The screen it
-        replaces had no <h1> at all: a person arrived somewhere with no name.
-      */}
-      <div className="mb-5 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
-        <h1 className="font-display text-head leading-tight tracking-display text-paper">
-          {t('needs.title')}
-        </h1>
-        <div className="text-ui text-muted">
+  /*
+    The same head as every other list.
+
+    This screen had its own: a heading, a count beside it, the chips in a
+    block of their own, all written here. Ten screens out of thirty-four
+    used the shared shape and the rest each had a head of their own, which
+    is the reason the application reads as a set of pages rather than as
+    one thing. The parts are identical — heading, the one live fact, the
+    filters, what the list cannot see — so they are the shared component
+    now, and moving them moves every screen at once.
+  */
+  const counts = (
+    <div className="text-ui text-muted">
           <span className="font-mono tabular-nums text-paper">{rows.length}</span>{' '}
           {t('needs.waiting')}
           {overdue > 0 && (
@@ -269,11 +272,12 @@ export default function Queue() {
               <span className="text-breach">{t('needs.overdue')}</span>
             </>
           )}
-        </div>
-      </div>
+    </div>
+  );
 
-      <div className="mb-5 flex flex-wrap gap-2">
-        {/*
+  const filters = (
+    <>
+      {/*
           Which filter is on, said to the machine as well as painted.
 
           The chips carried their state in colour alone: a member driving this
@@ -317,8 +321,11 @@ export default function Queue() {
             <span className="ms-1.5 font-mono tabular-nums opacity-60">{countOf(p)}</span>
           </Button>
         ))}
-      </div>
+    </>
+  );
 
+  return (
+    <ListPage title={t('needs.title')} says="" live={counts} filters={filters} limits={t('needs.limits')}>
       {shown.length === 0 ? (
         <Nothing>{t(rows.length === 0 ? 'queue.nothing' : 'queue.noneHere')}</Nothing>
       ) : (
@@ -328,16 +335,6 @@ export default function Queue() {
           ))}
         </ul>
       )}
-
-      {/*
-        What this list cannot see. Said in place rather than left for somebody
-        to discover: a question that arrived by email and was never entered
-        here is not waiting as far as this screen is concerned, and a member
-        who believes the list is complete will stop looking.
-      */}
-      <p className="mt-6 max-w-[62ch] text-note leading-relaxed text-muted">
-        {t('needs.limits')}
-      </p>
 
       {/*
         The two full lists, at the end of the queue.
@@ -363,6 +360,6 @@ export default function Queue() {
           </Link>
         ))}
       </nav>
-    </div>
+    </ListPage>
   );
 }

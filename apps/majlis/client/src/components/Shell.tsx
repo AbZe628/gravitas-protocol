@@ -230,7 +230,39 @@ function Mark() {
  * A matter is one now: it is a window with a strip, two panes and an act bar,
  * and a reading width would squeeze it into a third of the screen.
  */
-const WORK_AREA = ['/register', '/library', '/calculations'];
+/**
+ * A list is work. A single record is reading.
+ *
+ * ── what this was ────────────────────────────────────────────────────
+ *
+ * Three screens were work and everything else was a column of prose
+ * 58rem wide, centred in whatever was left — so the queue, the rulings,
+ * the record, the calendar, the sittings and the breaches were all set
+ * like an article with 250 pixels of margin on either side of them.
+ * That is the shape of a page to read, and it is most of why this still
+ * felt like a website on a desk.
+ *
+ * What stays in the reading column is what is actually read: one ruling,
+ * one breach, one briefing, one holding, and the forms. A list of rows
+ * takes the width it is given.
+ */
+const WORK_AREA = [
+  '/',
+  '/questions',
+  '/examinations',
+  '/classic',
+  '/register',
+  '/library',
+  '/calculations',
+  '/rules',
+  '/record',
+  '/calendar',
+  '/meetings',
+  '/undertakings',
+  '/incidents',
+  '/briefings',
+  '/search',
+];
 
 function atWorkArea(path: string): boolean {
   return (
