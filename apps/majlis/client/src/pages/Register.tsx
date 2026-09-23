@@ -6,6 +6,7 @@ import { ErrorText, Loading } from '../components/ui.js';
 import { State, type Tone } from '../components/kit.js';
 import { Division, Gaps, Nothing, PageHead } from '../components/page.js';
 import { Row, Rows } from '../components/shapes.js';
+import { Button } from '../components/Button';
 import { mayDeliberate, useIdentity } from '../lib/identity.js';
 import EnterAHolding from '../components/EnterAHolding.js';
 
@@ -91,6 +92,8 @@ export default function Register() {
   const { identity } = useIdentity();
   const [data, setData] = useState<RegisterData | null>(null);
   const [failed, setFailed] = useState(false);
+  /** Whether the panel that enters a holding is open. The button is in the head. */
+  const [entering, setEntering] = useState(false);
 
   const load = () =>
     oversight
@@ -147,6 +150,17 @@ export default function Register() {
         phase="inforce"
         title={t('reg.title')}
         says={t('reg.intro')}
+        act={
+          mayDeliberate(identity?.role) ? (
+            <Button
+              type="button"
+              onClick={() => setEntering(true)}
+              className="rounded-xl bg-lapis px-5 py-2.5 text-ui font-semibold text-white shadow-act transition-all hover:bg-lapissoft"
+            >
+              {t('reg.enter')}
+            </Button>
+          ) : undefined
+        }
         live={
           assets.length > 0 ? (
             <>
@@ -177,13 +191,12 @@ export default function Register() {
       />
 
       {/*
-        The one thing a person comes here to start.
-
-        The register could be read and never added to, on a screen whose whole
-        subject is what the board has not looked at yet. The route to add one
-        has always worked; nothing asked for it.
+        The one thing a person comes here to start. The button is in the
+        head with every other screen's act; this is the panel it opens.
       */}
-      {mayDeliberate(identity?.role) && <EnterAHolding onEntered={() => void load()} />}
+      {mayDeliberate(identity?.role) && (
+        <EnterAHolding open={entering} onClose={() => setEntering(false)} onEntered={() => void load()} />
+      )}
 
       {assets.length === 0 ? (
         <Nothing>{t('reg.none')}</Nothing>

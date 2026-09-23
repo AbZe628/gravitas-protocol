@@ -11,6 +11,7 @@ import {
   type Meetings as MeetingsData,
 } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
+import SlideOver from '../components/SlideOver.js';
 import { Division, Gaps, Nothing, PageHead } from '../components/page.js';
 import { useIdentity } from '../lib/identity.js';
 import { Card, DateText, ErrorText, Loading, Tag } from '../components/ui.js';
@@ -559,6 +560,22 @@ export default function Meetings() {
         phase="deciding"
         title={t('meet.title')}
         says={t('meet.intro')}
+        /*
+          The act in the head, where every screen's act is. It stood under
+          the cadence card at 241 pixels, which is the same act as the one
+          on the calendar standing at 41.
+        */
+        act={
+          canConvene ? (
+            <Button
+              type="button"
+              onClick={() => setConvening(true)}
+              className="rounded-xl bg-lapis px-5 py-2.5 text-ui font-semibold text-white shadow-act transition-all hover:bg-lapissoft"
+            >
+              {t('meet.convene')}
+            </Button>
+          ) : undefined
+        }
       />
 
       {/*
@@ -600,18 +617,14 @@ export default function Meetings() {
         )}
       </div>
 
-      {canConvene && !convening && (
-        <Button
-          type="button"
-          onClick={() => setConvening(true)}
-          className="mb-5 rounded-xl bg-lapis px-5 py-2.5 text-ui font-semibold text-white shadow-act transition-all hover:bg-lapissoft"
+      {canConvene && (
+        <SlideOver
+          open={convening}
+          title={t('meet.convene')}
+          says={t('meet.intro')}
+          onClose={() => setConvening(false)}
         >
-          {t('meet.convene')}
-        </Button>
-      )}
-
-      {canConvene && convening && (
-        <form onSubmit={convene} className="mb-5 rounded-sheet bg-raised px-6 py-5 shadow-card">
+        <form onSubmit={convene}>
           {/*
             Wrapping labels rather than sitting beside the field. A label a
             screen reader cannot associate with its input is a label only some
@@ -728,6 +741,7 @@ export default function Meetings() {
             </Button>
           </div>
         </form>
+        </SlideOver>
       )}
 
       <Division heading={t('meet.held')}>

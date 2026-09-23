@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { oversight, type Incident, type IncidentList } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { Nothing } from '../components/page.js';
+import SlideOver from '../components/SlideOver.js';
 import { ListPage, Row, Rows } from '../components/shapes.js';
 import { ErrorText, Loading } from '../components/ui.js';
 import { mayDeliberate, useIdentity } from '../lib/identity.js';
@@ -135,6 +136,25 @@ export default function Incidents() {
        * finding the control. The list slot exists for exactly this.
        */
       limits={t('own.whoReports')}
+      /*
+        The act in the head, where every screen's act is.
+
+        It sat under the head and expanded into a form in place, so the
+        one thing a person comes to this screen to do was at 173 pixels
+        on one screen and 41 on another, and pressing it pushed the list
+        it belongs to down the page. The button is in the band now and
+        the form is where forms are: in a panel over the work.
+      */
+      act={
+        mayDeliberate(identity?.role) ? (
+          <Button
+            onClick={() => setOpen(true)}
+            className="rounded-xl bg-lapis px-5 py-2.5 text-ui font-semibold text-white shadow-act transition-all hover:bg-lapissoft"
+          >
+            {t('snc.report')}
+          </Button>
+        ) : undefined
+      }
     >
 
       {/*
@@ -143,9 +163,9 @@ export default function Incidents() {
         person is available is a scholar watching a clock that has not started.
       */}
       {mayDeliberate(identity?.role) && (
-        <div className="mb-6">
-          {open ? (
-            <form onSubmit={report} className="rounded-sheet bg-raised px-6 py-5 shadow-card">
+        <SlideOver open={open} title={t('snc.report')} says={t('snc.intro')} onClose={() => setOpen(false)}>
+          {(
+            <form onSubmit={report}>
               <Field label={t('snc.reference')} className="mb-3" headingClass={HEADING}>
                 {(attrs) => (
                   <input
@@ -210,15 +230,8 @@ export default function Incidents() {
                 </Button>
               </div>
             </form>
-          ) : (
-            <Button
-              onClick={() => setOpen(true)}
-              className="rounded-xl bg-lapis px-5 py-2.5 text-ui font-semibold text-white shadow-act transition-all hover:bg-lapissoft"
-            >
-              {t('snc.report')}
-            </Button>
           )}
-        </div>
+        </SlideOver>
       )}
 
       {incidents.length === 0 ? (

@@ -2,6 +2,7 @@ import Act from './Act.js';
 import AfterAct from './AfterAct.js';
 import { useState } from 'react';
 import { oversight, type AssetIdentifier, type AssetKind } from '../lib/api.js';
+import SlideOver from './SlideOver.js';
 import { useI18n } from '../lib/i18n.js';
 import { Field, HEADING } from './field.js';
 import { Button } from './Button';
@@ -38,10 +39,27 @@ const SCHEMES: AssetIdentifier['scheme'][] = ['chain', 'isin', 'ticker', 'intern
 
 const BOX = 'w-full rounded-xl bg-raised px-3 py-2.5 text-body shadow-ring outline-none';
 
-export default function EnterAHolding({ onEntered }: { onEntered: () => void }) {
+/**
+ * ── who opens it ──────────────────────────────────────────────────────
+ *
+ * The button used to live here and the form expanded in its place, in
+ * the middle of the register. So the one act of that screen stood at 156
+ * pixels while the same act on another screen stood at 41, and pressing
+ * it pushed the list it belongs to down the page. The screen owns the
+ * button now, in its head where every screen's act is, and this draws
+ * the form in a panel over the work.
+ */
+export default function EnterAHolding({
+  open,
+  onClose,
+  onEntered,
+}: {
+  open: boolean;
+  onClose: () => void;
+  onEntered: () => void;
+}) {
   const { t } = useI18n();
 
-  const [open, setOpen] = useState(false);
   const [kind, setKind] = useState<AssetKind>('token');
   const [name, setName] = useState('');
   const [scheme, setScheme] = useState<AssetIdentifier['scheme']>('chain');
@@ -73,17 +91,6 @@ export default function EnterAHolding({ onEntered }: { onEntered: () => void }) 
    * opened form as an effect, and not by `HooksAboveReturns.test.ts`, which
    * is the thing written to make this impossible.
    */
-  if (!open) {
-    return (
-      <Button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="rounded-xl bg-lapis px-5 py-2.5 text-ui font-semibold text-white shadow-act transition-all hover:bg-lapissoft"
-      >
-        {t('reg.enter')}
-      </Button>
-    );
-  }
 
   async function enter() {
     await oversight.addAsset({
@@ -100,12 +107,12 @@ export default function EnterAHolding({ onEntered }: { onEntered: () => void }) 
     setName('');
     setValue('');
     setNetwork('');
-    setOpen(false);
+    onClose();
     onEntered();
   }
 
   return (
-    <div className="mb-6 rounded-sheet bg-raised px-6 py-5 shadow-card">
+    <SlideOver open={open} title={t('reg.enter')} says={t('reg.enterNote')} onClose={onClose}>
       {justDid && (
         <div className="mb-4">
           <AfterAct
@@ -207,7 +214,7 @@ export default function EnterAHolding({ onEntered }: { onEntered: () => void }) 
         </Button>
         <Button
           type="button"
-          onClick={() => setOpen(false)}
+          onClick={() => onClose()}
           className="text-ui text-muted underline decoration-line underline-offset-4"
         >
           {t('common.cancel')}
@@ -236,9 +243,6 @@ export default function EnterAHolding({ onEntered }: { onEntered: () => void }) 
         }}
       />
 
-      <p className="mt-3 max-w-[62ch] text-note leading-relaxed text-muted">
-        {t('reg.enterNote')}
-      </p>
-    </div>
+    </SlideOver>
   );
 }

@@ -309,7 +309,7 @@ describe('who is offered what', () => {
      * opens the window that says so. The act is the press inside it.
      */
     {
-      const w = await screen.findByRole('dialog');
+      const w = await screen.findByRole('dialog', { name: /Convene it/ });
       expect(w.textContent).toContain('counted from the last one held');
       fireEvent.click(within(w).getByRole('button', { name: /Convene it/ }));
     }
@@ -436,7 +436,7 @@ describe('convening shows what the board would be told', () => {
     });
     fireEvent.click(screen.getByRole('button', { name: /Convene it/ }));
     {
-      const w = await screen.findByRole('dialog');
+      const w = await screen.findByRole('dialog', { name: /Convene it/ });
       fireEvent.click(within(w).getByRole('button', { name: /Convene it/ }));
     }
 
