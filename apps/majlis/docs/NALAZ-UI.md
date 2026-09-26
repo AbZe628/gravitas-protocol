@@ -107,3 +107,62 @@ na *this one is the board's* bila kontradikcija jedan ekran kasnije.
 
 Ništa od ovoga ne mijenja šta Majlis radi niti ijedan pojam iz
 priručnika.
+
+---
+
+## D · Drugi prolaz, 26.09.2026 — „izgleda kao stranica, ne kao aplikacija"
+
+Četiri mjere, svaka pokrenuta prije i poslije. Skripte su u
+`work/majlis-local/`.
+
+### D1. Veze na dnu svakog ekrana
+
+`onward.mjs` — 31 veza kroz 17 ruta, i **svaka** vodi na odredište koje
+jarbol već nosi. To nije bila ponuda nego prepis okvira, u jedinom
+obliku koji pripada web stranici: srodne veze na dnu. Poslije: 0.
+
+Komponenta `WhatNext` je izvađena, sa njom 37 popisa u `lib/journey.ts`
+i 48 ključeva iz tri jezika.
+
+### D2. Glavni čin nije bio na istom mjestu
+
+`cinovi.mjs` — pet ekrana je držalo svoj čin u glavi na 41 px, a tri
+negdje između 701 i 1 054. Izvoz revizije je bio na **974 px**, u
+kartici ispod tri druge kutije.
+
+Poslije: osam na 41 px. Ostala su dva — `/check` i `/ask` — i oba su
+dugme na kraju obrasca, što je mjesto na kojem dugme obrasca i stoji.
+
+### D3. Dva zapisa na jednom ekranu
+
+Dnevnik asistenta je stajao na dnu ekrana zapisa, ispod odluka odbora.
+Sada je na ekranu asistenta. Ekran zapisa: 1 188 → **923 px**, a odluke
+su 44 % njegove visine umjesto 34 %.
+
+Čuvar: `WhatWasAskedBefore.test.tsx`.
+
+### D4. Red pitanja je nosio arhivu ispod posla
+
+`sloj.mjs questions` — 2 873 px, od toga 1 072 px „already dealt with",
+ispod onoga što čeka. Sada su to dva čipa sa brojem, ekran je **1 659
+px** i otvara se na onome što čeka. Provjereno pritiskom u pregledniku
+(`chip-radi.mjs`), ne samo testom.
+
+### D5. Mete za prst na telefonu
+
+`revizija.mjs` + `sitno-gdje.mjs` — mjera je razdvojila vezu koja stoji
+sama od veze usred rečenice, jer 44 px u redu proze lomi red. Samostalnih
+ispod 34 px: **4 prije, 0 poslije**. U rečenici ih ostaje 17, namjerno.
+
+Obje veličine `Button`-a su sada 44 px ispod širokog praga, i 28/36 iznad.
+
+### D6. Treća lažna prijava — „tekst bježi iz kutije"
+
+`revizija.mjs` je prijavila 15 bježanja na tri ekrana. **Nijedno nije
+stvarno.** Roditelj je `div` sa `display: contents`, čiji je pravougaonik
+nula na (0,0), pa svako dijete „bježi" tačno onoliko koliko je udaljeno
+od lijeve ivice — otuda „3" koje bježi za 343 px.
+
+Dokaz je `bjezi-provjera.mjs`, koji ispisuje oba pravougaonika i označi
+prijavu lažnom kad roditelj ima nultu širinu. Ovo je treći put da mjera
+laže prije nego aplikacija.
