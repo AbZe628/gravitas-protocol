@@ -87,7 +87,7 @@ export default function HowThisIsHeld({
         <Button
           type="button"
           onClick={() => setMarking(true)}
-          className="mt-3 text-ui text-lapis underline decoration-line underline-offset-4"
+          className="mt-3 inline-flex min-h-[44px] items-center text-ui text-lapis underline decoration-line underline-offset-4 lg:min-h-0"
         >
           {t(mark === 'tokenised' ? 'held.markConventional' : 'held.markTokenised')}
         </Button>

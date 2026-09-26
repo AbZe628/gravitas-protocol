@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useI18n } from '../lib/i18n.js';
 import { ListPage } from '../components/shapes.js';
-import Record from './Record.js';
+import Record, { ExportForAudit } from './Record.js';
 import Rules from './Rules.js';
 import { Button } from '../components/Button';
 
@@ -14,10 +14,13 @@ import { Button } from '../components/Button';
  * two entries in a navigation of twelve, and a person had to know which of the
  * two words meant which.
  *
- * Neither page is touched. This renders one or the other, and everything each
- * of them did it still does: the year picker, the annual report, the audit
- * export, the retained explanations, the review dates, the rules that carry no
- * review interval and will therefore never be raised by anything.
+ * This renders one or the other, and everything each of them did is still done
+ * somewhere: the year picker, the annual report, the review dates, and the
+ * rules that carry no review interval and will therefore never be raised by
+ * anything. Two things moved out. The audit export is the act in the head
+ * band, because that is where an act belongs on every other screen. What was
+ * asked of the assistant is on the assistant's own screen, because it was a
+ * second record stacked under this one and nobody came here looking for it.
  *
  * ── the decided one leads ─────────────────────────────────────────────────
  *
@@ -64,6 +67,12 @@ export default function WhatStands() {
       phase="inforce"
       title={t('stands.title')}
       says={t('stands.lead')}
+      /*
+        The one act this screen has, where every other screen keeps its own.
+        It was in a card at the foot of the decided tab, under three other
+        boxes, and a member looking for it had to already know it was there.
+      */
+      act={<ExportForAudit />}
       filters={
         <div
           role="tablist"

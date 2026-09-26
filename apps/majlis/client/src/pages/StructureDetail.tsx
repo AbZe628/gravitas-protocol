@@ -405,7 +405,10 @@ export default function StructureDetail({ structureId }: { structureId?: string 
           <ul className="space-y-1.5">
             {(held.usedBy ?? []).map((u) => (
               <li key={u.matterId} className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                <Link to={`/matters/${u.matterId}`} className="text-ui text-lapis hover:underline">
+                <Link
+                  to={`/matters/${u.matterId}`}
+                  className="inline-flex min-h-[44px] items-center text-ui text-lapis hover:underline lg:min-h-0"
+                >
                   {u.title}
                 </Link>
                 <span className="text-note text-muted">{t(`matter.status.${u.status}`)}</span>

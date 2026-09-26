@@ -61,10 +61,19 @@ const BASE =
   'focus-visible:ring-offset-2 focus-visible:ring-offset-ink ' +
   'disabled:cursor-not-allowed disabled:opacity-40 aria-busy:cursor-progress';
 
-/** Heights are the reason the act bar lands on the same pixel twice. */
+/**
+ * Heights are the reason the act bar lands on the same pixel twice.
+ *
+ * Two heights, not one, because a finger and a cursor are not the same
+ * instrument. Below the wide breakpoint every control is 44 pixels tall
+ * whichever size it is — a 28 pixel button is a button a thumb misses, and
+ * missing it on a screen that records what a board decided is worse than
+ * the row of space it costs. Above it they go back to 28 and 36, where a
+ * cursor is exact and the density is the point.
+ */
 const SIZE = {
-  sm: 'inline-flex items-center justify-center gap-1.5 h-7 rounded-md px-2.5 text-note font-bold',
-  md: 'inline-flex items-center justify-center gap-2 h-9 rounded-lg px-3.5 text-ui font-bold',
+  sm: 'inline-flex items-center justify-center gap-1.5 h-11 lg:h-7 rounded-md px-2.5 text-note font-bold',
+  md: 'inline-flex items-center justify-center gap-2 h-11 lg:h-9 rounded-lg px-3.5 text-ui font-bold',
 } as const;
 
 const TONE: Record<ButtonTone, string> = {

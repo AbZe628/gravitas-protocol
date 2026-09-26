@@ -81,7 +81,7 @@ export default function RaiseMatter({ boardId }: { boardId: string }) {
       <Button
         type="button"
         onClick={() => setOpen(true)}
-        className="mb-5 rounded-xl shadow-ring px-3 py-1.5 text-note hover:bg-raised"
+        className="mb-5 inline-flex min-h-[44px] items-center rounded-xl shadow-ring px-3 py-1.5 text-note hover:bg-raised lg:min-h-0"
       >
         {t('raise.open')}
       </Button>

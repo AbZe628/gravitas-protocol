@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { api, type AssistantExchange } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { useHealth } from '../lib/health.js';
@@ -6,8 +6,61 @@ import { mayDeliberate, useIdentity } from '../lib/identity.js';
 import RaiseAMatter from '../components/RaiseAMatter.js';
 import { Nothing } from '../components/page.js';
 import { PageHead } from '../components/page.js';
-import { Sources, Tag } from '../components/ui.js';
+import { DateText, ErrorText, Loading, Sources, Tag } from '../components/ui.js';
 import { Button } from '../components/Button';
+
+/**
+ * Everything this board has ever asked the assistant.
+ *
+ * Its own component and its own request, so the thread above it does not
+ * wait on it: a member who has just typed a question is not made to wait for
+ * the history of every other question before their own answer can be drawn.
+ */
+function Earlier() {
+  const { t } = useI18n();
+  const [log, setLog] = useState<AssistantExchange[] | null>(null);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    api
+      .assistantLog()
+      .then((r) => (Array.isArray(r) ? setLog(r) : setFailed(true)))
+      .catch(() => setFailed(true));
+  }, []);
+
+  if (!failed && log && log.length === 0) return null;
+
+  return (
+    <section className="mb-6">
+      <h2 className="mb-2 text-label font-bold uppercase tracking-caps text-muted">
+        {t('record.assistantLog')}
+      </h2>
+      <p className="mb-3.5 max-w-[62ch] text-ui leading-relaxed text-muted">
+        {t('record.assistantLogNote')}
+      </p>
+
+      {failed ? (
+        <ErrorText />
+      ) : !log ? (
+        <Loading />
+      ) : (
+        <ul className="overflow-hidden rounded-card bg-raised shadow-ring [&>li+li]:border-t [&>li+li]:border-line">
+          {log.map((x) => (
+            <li key={x.id} className="px-4 py-3.5">
+              <div className="mb-1.5 flex flex-wrap items-center gap-2 text-note text-muted">
+                <DateText iso={x.at} />
+                {x.declinedAsRuling && <Tag tone="warn">{t('asst.declined')}</Tag>}
+                {x.escalated && <Tag tone="gold">{t('asst.escalated')}</Tag>}
+              </div>
+              <div className="text-body">{x.question}</div>
+              <div className="mt-1.5 text-ui text-sand line-clamp-3">{x.answer}</div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  );
+}
 
 export default function Assistant() {
   const { t } = useI18n();
@@ -95,6 +148,17 @@ export default function Assistant() {
           </li>
         ))}
       </ul>
+
+      {/*
+        What was asked before, by anybody.
+
+        This stood at the foot of the record screen, under the board's
+        decisions, four boxes deep — a second record on a screen already
+        holding one, and nowhere near the place a person wonders what the
+        assistant has been asked. It is kept, and it is kept here, where the
+        question above it is the same kind of thing.
+      */}
+      <Earlier />
 
       {error && <div className="mb-4 text-ui text-breach">{t('asst.error')}</div>}
 

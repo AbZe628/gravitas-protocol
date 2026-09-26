@@ -16,7 +16,6 @@ import {
   mainOf,
   phaseOf,
 } from '../lib/spine.js';
-import { WhatNext } from './Journey.js';
 import NotYourScreen from './NotYourScreen.js';
 import Tools, { type Kind } from './Tools.js';
 import ToolShelf from './ToolShelf.js';
@@ -1204,12 +1203,14 @@ function Frame({ children }: { children: React.ReactNode }) {
             So the bar and the line are gone. What they were compensating for
             was the real fault — twenty-five screens with no shared shape —
             and signposting a maze is not the same as drawing a map.
+            `WhatNext` is gone too, and this is the change that took it out.
 
-            `WhatNext` stays for now, deliberately. It sits at the foot, so it
-            costs nothing above the fold, and removing it before the queue
-            exists would restore the dead ends it was built to close. It comes
-            out when the queue has proved itself, and not in the same change,
-            because two removals at once cannot be told apart in a measurement.
+            It drew a row of onward links at the foot of every screen. Thirty-one
+            of them across seventeen routes, and every single target was already a
+            rail destination — so it was not an offer, it was the frame written out
+            a second time, in the one shape the rest of the application does not
+            use: related links at the bottom of a page. It was kept until the queue
+            could carry the weight on its own. It can.
           */}
           {/*
             A board screen opened by a bank says whose it is.
@@ -1225,8 +1226,6 @@ function Frame({ children }: { children: React.ReactNode }) {
           ) : (
             <>
               {children}
-
-              <WhatNext />
 
               {/*
                 What this installation is, at the end of the page.

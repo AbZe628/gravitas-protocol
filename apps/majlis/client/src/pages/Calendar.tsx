@@ -172,7 +172,10 @@ function Rhythm({
         */}
         <div className="shrink-0">
           {nextConvened ? (
-            <Link to="/meetings" className="block text-ui text-lapis">
+            <Link
+              to="/meetings"
+              className="inline-flex min-h-[44px] items-center text-ui text-lapis lg:min-h-0"
+            >
               {t('meet.nextConvened')} <DateText iso={nextConvened} />
             </Link>
           ) : (

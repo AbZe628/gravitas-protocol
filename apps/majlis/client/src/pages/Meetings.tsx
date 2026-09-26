@@ -225,7 +225,10 @@ function MeetingCard({
         {m.agenda.map((item, i) => (
           <li key={i} className="text-ui leading-snug">
             {item.matterId ? (
-              <Link to={`/matters/${item.matterId}`} className="underline underline-offset-2 hover:text-fg">
+              <Link
+                to={`/matters/${item.matterId}`}
+                className="inline-flex min-h-[44px] items-center underline underline-offset-2 hover:text-fg lg:min-h-0"
+              >
                 {item.item}
               </Link>
             ) : (
@@ -243,14 +246,14 @@ function MeetingCard({
         */}
         <Link
           to={`/meetings/${row.meeting.id}/book`}
-          className="text-ui font-semibold text-lapis underline decoration-line underline-offset-4"
+          className="inline-flex min-h-[44px] items-center text-ui font-semibold text-lapis underline decoration-line underline-offset-4 lg:min-h-0"
         >
           {t('book.open')}
         </Link>
         <Button
           type="button"
           onClick={() => setOpen(!open)}
-          className="text-note text-muted underline underline-offset-2 hover:text-paper"
+          className="inline-flex min-h-[44px] items-center text-note text-muted underline underline-offset-2 hover:text-paper lg:min-h-0"
         >
           {open ? t('meet.hide') : t('meet.show')}
         </Button>
@@ -298,7 +301,7 @@ function MeetingCard({
                 <Button
                   type="button"
                   onClick={() => setActing('attend')}
-                  className="rounded-xl shadow-ring px-3 py-1.5 text-ui text-muted hover:text-paper"
+                  className="inline-flex min-h-[44px] items-center rounded-xl shadow-ring px-3 py-1.5 text-ui text-muted hover:text-paper lg:min-h-0"
                 >
                   {t('meet.saveAttendance')}
                 </Button>

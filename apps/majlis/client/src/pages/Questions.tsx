@@ -181,7 +181,10 @@ function One({
 
       {s.matterId && (
         <p className="mt-3 text-ui">
-          <Link to={`/matters/${s.matterId}`} className="text-lapis underline underline-offset-2">
+          <Link
+            to={`/matters/${s.matterId}`}
+            className="inline-flex min-h-[44px] items-center text-lapis underline underline-offset-2 lg:min-h-0"
+          >
             {t('queue.seeMatter')}
           </Link>
         </p>

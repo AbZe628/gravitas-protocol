@@ -21,23 +21,16 @@ import { DESK_DOORS, DOORS, type AnyPhase } from './spine.js';
  * Because a screen must not be able to forget. If every page were asked to
  * declare its own next steps, the ones that most need them are exactly the
  * ones that would be missed — they are already the thinnest. The frame reads
- * this table and renders the same three things on every route, so a dead end
+ * this table and renders the same line on every route, so a dead end
  * is impossible by construction rather than by discipline.
  *
  * ── the three things every screen gets ────────────────────────────────────
  *
  *   1. where this sits in the four phases, with the current one lit
  *   2. one plain line saying what **you** do here, addressed to the reader
- *   3. what to do next, as real links, at the foot
  *
  * Everything here is an i18n key. Nothing in this file is English.
  */
-
-export interface NextStep {
-  to: string;
-  /** i18n key. What the reader would call this, as an action. */
-  label: string;
-}
 
 export interface Journey {
   phase: AnyPhase | null;
@@ -49,8 +42,6 @@ export interface Journey {
    *   good  "Find a holding and see the ruling that allows it."
    */
   does: string;
-  /** Where a person goes from here. One to three, never more. */
-  next: readonly NextStep[];
 }
 
 /**
@@ -61,84 +52,48 @@ export const JOURNEY: Readonly<Record<string, Journey>> = {
   '/': {
     phase: null,
     does: 'do.home',
-    next: [
-      { to: '/questions', label: 'do.next.queue' },
-      { to: '/classic', label: 'do.next.open' },
-      { to: '/calendar', label: 'do.next.dates' },
-    ],
   },
 
   // ── 01 asked ────────────────────────────────────────────────────────────
   '/questions': {
     phase: 'asked',
     does: 'do.questions',
-    next: [
-      { to: '/classic', label: 'do.next.open' },
-      { to: '/library', label: 'do.next.shapes' },
-    ],
   },
   '/ask': {
     phase: 'asked',
     does: 'do.ask',
-    next: [{ to: '/questions', label: 'do.next.queue' }],
   },
 
   // ── 02 deciding ─────────────────────────────────────────────────────────
   '/classic': {
     phase: 'deciding',
     does: 'do.open',
-    next: [
-      { to: '/questions', label: 'do.next.queue' },
-      { to: '/meetings', label: 'do.next.meetings' },
-      { to: '/rules', label: 'do.next.stands' },
-    ],
   },
   '/matters/*': {
     phase: 'deciding',
     does: 'do.matter',
-    next: [
-      { to: '/classic', label: 'do.next.open' },
-      { to: '/check', label: 'do.next.check' },
-    ],
   },
   '/meetings': {
     phase: 'deciding',
     does: 'do.meetings',
-    next: [
-      { to: '/undertakings', label: 'do.next.undertaken' },
-      { to: '/calendar', label: 'do.next.dates' },
-    ],
   },
   '/meetings/*': {
     phase: 'deciding',
     does: 'do.book',
-    next: [
-      { to: '/meetings', label: 'do.next.meetings' },
-      { to: '/classic', label: 'do.next.open' },
-    ],
   },
   '/undertakings': {
     phase: 'deciding',
     does: 'do.undertakings',
-    next: [{ to: '/meetings', label: 'do.next.meetings' }],
   },
   '/calendar': {
     phase: 'deciding',
     does: 'do.calendar',
-    next: [
-      { to: '/meetings', label: 'do.next.meetings' },
-      { to: '/rules', label: 'do.next.stands' },
-    ],
   },
 
   // ── 03 in force ─────────────────────────────────────────────────────────
   '/rules': {
     phase: 'inforce',
     does: 'do.rules',
-    next: [
-      { to: '/register', label: 'do.next.register' },
-      { to: '/examinations', label: 'do.next.examine' },
-    ],
   },
   /*
    * The same screen at its other address. It answers, so it gets a journey;
@@ -148,50 +103,26 @@ export const JOURNEY: Readonly<Record<string, Journey>> = {
   '/record': {
     phase: 'inforce',
     does: 'do.rules',
-    next: [
-      { to: '/register', label: 'do.next.register' },
-      { to: '/examinations', label: 'do.next.examine' },
-    ],
   },
   '/register': {
     phase: 'inforce',
     does: 'do.register',
-    next: [
-      { to: '/examinations', label: 'do.next.examine' },
-      { to: '/rules', label: 'do.next.stands' },
-    ],
   },
   '/register/*': {
     phase: 'inforce',
     does: 'do.holding',
-    next: [
-      { to: '/register', label: 'do.next.register' },
-      { to: '/calculations', label: 'do.next.figures' },
-    ],
   },
   '/library': {
     phase: 'inforce',
     does: 'do.library',
-    next: [
-      { to: '/classic', label: 'do.next.open' },
-      { to: '/record', label: 'do.next.stands' },
-    ],
   },
   '/check': {
     phase: 'inforce',
     does: 'do.check',
-    next: [
-      { to: '/library', label: 'do.next.shapes' },
-      { to: '/ask', label: 'do.next.ask' },
-    ],
   },
   '/calculations': {
     phase: 'inforce',
     does: 'do.calculations',
-    next: [
-      { to: '/register', label: 'do.next.register' },
-      { to: '/ask', label: 'do.next.ask' },
-    ],
   },
   /*
    * One recorded calculation at its own address. A figure is arrived at from
@@ -202,61 +133,38 @@ export const JOURNEY: Readonly<Record<string, Journey>> = {
   '/figures/*': {
     phase: 'inforce',
     does: 'do.figure',
-    next: [
-      { to: '/calculations', label: 'do.next.figures' },
-      { to: '/register', label: 'do.next.register' },
-    ],
   },
   '/briefings': {
     phase: 'inforce',
     does: 'do.briefings',
-    next: [
-      { to: '/ask', label: 'do.next.ask' },
-      { to: '/rules', label: 'do.next.stands' },
-    ],
   },
 
   // ── 04 checked ──────────────────────────────────────────────────────────
   '/examinations': {
     phase: 'checked',
     does: 'do.examinations',
-    next: [
-      { to: '/incidents', label: 'do.next.breaches' },
-      { to: '/register', label: 'do.next.register' },
-    ],
   },
   '/incidents': {
     phase: 'checked',
     does: 'do.incidents',
-    next: [
-      { to: '/examinations', label: 'do.next.examine' },
-      { to: '/rules', label: 'do.next.stands' },
-    ],
   },
   '/incidents/*': {
     phase: 'checked',
     does: 'do.incident',
-    next: [
-      { to: '/incidents', label: 'do.next.breaches' },
-      { to: '/calculations', label: 'do.next.figures' },
-    ],
   },
 
   // ── beside the four ─────────────────────────────────────────────────────
   '/search': {
     phase: null,
     does: 'do.search',
-    next: [{ to: '/rules', label: 'do.next.stands' }],
   },
   '/settings': {
     phase: null,
     does: 'do.settings',
-    next: [{ to: '/meetings', label: 'do.next.meetings' }],
   },
   '/assistant': {
     phase: null,
     does: 'do.assistant',
-    next: [{ to: '/ask', label: 'do.next.ask' }],
   },
 
   /*
@@ -275,18 +183,10 @@ export const JOURNEY: Readonly<Record<string, Journey>> = {
   '/binds-me': {
     phase: null,
     does: 'do.binds',
-    next: [
-      { to: '/check', label: 'do.next.check' },
-      { to: '/ask', label: 'do.next.ask' },
-    ],
   },
   '/i-owe': {
     phase: null,
     does: 'do.owe',
-    next: [
-      { to: '/incidents', label: 'do.next.breaches' },
-      { to: '/undertakings', label: 'do.next.undertaken' },
-    ],
   },
 };
 
@@ -316,27 +216,15 @@ export const DESK_JOURNEY: Readonly<Record<string, Journey>> = {
   '/': {
     phase: 'iasked',
     does: 'do.desk.home',
-    next: [
-      { to: '/binds-me', label: 'do.next.binds' },
-      { to: '/i-owe', label: 'do.next.owe' },
-    ],
   },
   '/ask': {
     phase: 'iasked',
     does: 'do.ask',
-    next: [
-      { to: '/check', label: 'do.next.check' },
-      { to: '/binds-me', label: 'do.next.binds' },
-    ],
   },
 
   '/binds-me': {
     phase: 'bindsme',
     does: 'do.binds',
-    next: [
-      { to: '/check', label: 'do.next.check' },
-      { to: '/ask', label: 'do.next.ask' },
-    ],
   },
   '/library': {
     phase: 'bindsme',
@@ -346,65 +234,36 @@ export const DESK_JOURNEY: Readonly<Record<string, Journey>> = {
      * itself, and an onward link to a page that offers the same reading
      * would send somebody away from the thing they are standing on.
      */
-    next: [
-      { to: '/binds-me', label: 'do.next.binds' },
-      { to: '/ask', label: 'do.next.ask' },
-    ],
   },
   '/check': {
     phase: 'bindsme',
     does: 'do.check',
-    next: [
-      { to: '/ask', label: 'do.next.ask' },
-      { to: '/binds-me', label: 'do.next.binds' },
-    ],
   },
 
   '/i-owe': {
     phase: 'iowe',
     does: 'do.owe',
-    next: [
-      { to: '/incidents', label: 'do.next.breaches' },
-      { to: '/undertakings', label: 'do.next.undertaken' },
-    ],
   },
   '/incidents': {
     phase: 'iowe',
     does: 'do.desk.incidents',
-    next: [
-      { to: '/i-owe', label: 'do.next.owe' },
-      { to: '/ask', label: 'do.next.ask' },
-    ],
   },
   '/incidents/*': {
     phase: 'iowe',
     does: 'do.desk.incident',
-    next: [
-      { to: '/i-owe', label: 'do.next.owe' },
-      { to: '/incidents', label: 'do.next.breaches' },
-    ],
   },
   '/undertakings': {
     phase: 'iowe',
     does: 'do.desk.undertakings',
-    next: [
-      { to: '/i-owe', label: 'do.next.owe' },
-      { to: '/ask', label: 'do.next.ask' },
-    ],
   },
 
   '/settings': {
     phase: null,
     does: 'do.desk.settings',
-    next: [{ to: '/ask', label: 'do.next.ask' }],
   },
   '/search': {
     phase: null,
     does: 'do.desk.search',
-    next: [
-      { to: '/binds-me', label: 'do.next.binds' },
-      { to: '/ask', label: 'do.next.ask' },
-    ],
   },
 };
 
