@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Gravitas Protocol · A Shariah board's decision, enforced inside the transaction</title>
-<meta name="description" content="A board decides in Majlis, the rule goes into an on-chain Policy Registry, and every Teleport migration has to pass it. Atomic execution, EIP-712 signed intents, verified contracts on Arbitrum Sepolia.">
+<meta name="description" content="Majlis is where a Shariah board works and keeps its record: a bank asks with its contract attached, the board judges it condition by condition against one of nineteen contract types, and the ruling comes out as a document. Where a board wants it enforced, the rule goes into an on-chain Policy Registry and every Teleport migration has to pass it.">
 <meta name="theme-color" content="#0E1017">
 <meta name="color-scheme" content="dark">
 <link rel="icon" href="/favicon.ico" sizes="32x32 48x48">
@@ -546,7 +546,7 @@ section{position:relative}
 .vow{margin-top:clamp(36px,5vh,66px);padding:clamp(30px,4vw,56px);text-align:center}
 .vow q{display:block;font-weight:800;font-size:clamp(1.95rem,4.7vw,3.6rem);letter-spacing:-.046em;line-height:1.06;quotes:none}
 .vow p{margin:20px auto 0;color:var(--text-2);font-weight:300;max-width:62ch;line-height:1.6}
-.mj-cards{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:clamp(28px,4vh,50px)}
+.mj-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:clamp(28px,4vh,50px)}
 @media (max-width:1080px){.mj-cards{grid-template-columns:repeat(2,1fr)}}
 .mj-card{padding:24px 22px;min-height:222px;display:flex;flex-direction:column}
 .mj-card .ic{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;border:1px solid var(--glass-line);
@@ -1196,40 +1196,45 @@ body.paused *,body.paused *::before,body.paused *::after{animation-play-state:pa
     <div class="zaha" data-zaha="1" aria-hidden="true"></div>
     <div class="wrap">
       <div class="shead" data-rv="up">
-        <div><span class="kick">Majlis · for Shariah boards</span><h2 class="h2">Where the decision is made, and kept.</h2></div>
-        <p class="lede">Gravitas makes an approved ruling enforceable at the moment of execution. That solves one problem and creates another: once a rule has operational force, the process by which it is proposed, understood and amended becomes the most sensitive part of the system.</p>
+        <div><span class="kick">Majlis · for Shariah boards</span><h2 class="h2">The bank asks. The board answers. A document comes out.</h2></div>
+        <p class="lede">Most Shariah boards work with email, spreadsheets and a folder of PDFs. Nothing holds the decision: a ruling lives in an attachment, its conditions are read by whoever remembers them, a review date sits in somebody's calendar until that person leaves, and a desk waiting to sign an agreement waits weeks for an answer. Majlis is the board's own record and workplace, and it stands on its own — a bank can run it with nothing else from us attached.</p>
       </div>
 
       <div class="glass vow" data-rv="scale"><span class="sheen"></span>
-        <q class="gd">The vote is the signature.</q>
-        <p>A scholar's vote does not produce a recommendation that someone else then executes. What is signed is a hash of the exact operative parameters as displayed at the moment of voting. The question "was what the board approved the same as what was deployed" becomes a comparison rather than a matter of testimony.</p>
+        <q class="gd">It computes. It never concludes.</q>
+        <p>Every calculation in Majlis shows its arithmetic and stops before the ruling. Every reading of a contract quotes the passage and stops. Nothing in the software returns a field called compliant, permissible or approved — the ruling is the board's, in the board's own words, and the whole design exists to make sure nothing else is ever mistaken for it.</p>
       </div>
 
       <div class="mj-cards stag">
         <article class="glass mj-card tilt"><span class="sheen"></span>
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4 5h16M4 12h16M4 19h9"/></svg></span>
-          <h4 class="h4">Matters</h4>
-          <p>A plain-language brief, the operative parameters, what is deliberately not being decided, the mechanism, the simulation, and the deliberation record.</p>
+          <h4 class="h4">A question, worked one step at a time</h4>
+          <p>The bank writes the question in its own words and attaches the draft. The board judges it against a named contract — murabaha, ijara, sukuk — one condition at a time. Every answer carries the name of the member who gave it and the reason they gave.</p>
         </article>
         <article class="glass mj-card tilt"><span class="sheen"></span>
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M5 4h14v16l-7-3-7 3z"/></svg></span>
-          <h4 class="h4">Rules in force</h4>
-          <p>Every rule with its parameters, its hash, and a live check that the two still match. A mismatch means the record was altered.</p>
-        </article>
-        <article class="glass mj-card tilt"><span class="sheen"></span>
-          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v5l3 2"/></svg></span>
-          <h4 class="h4">Briefings</h4>
-          <p>A standing brief on technological change: what changed, why, which rules it touches, and a question for the board. Never a conclusion.</p>
-        </article>
-        <article class="glass mj-card tilt"><span class="sheen"></span>
-          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg></span>
-          <h4 class="h4">Assistant</h4>
-          <p>Explains mechanism in ordinary language with its sources named, and is prevented in code from issuing anything that reads as a ruling.</p>
+          <h4 class="h4">Nineteen contract types</h4>
+          <p>Ten families, 89 conditions between them — sale, lease, partnership, agency, sukuk, sarf, security, gratuitous, takaful, and contracts in combination. They ship as drafts and bind nobody: a board adopts one, amends its conditions, declines it with a reason, or rules beside it. Every screen says which of those it is showing.</p>
         </article>
         <article class="glass mj-card tilt"><span class="sheen"></span>
           <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h5"/></svg></span>
-          <h4 class="h4">Record</h4>
-          <p>Retained explanations and a one-action audit export carrying an integrity hash, readable without any knowledge of the application.</p>
+          <h4 class="h4">The draft, read against the conditions</h4>
+          <p>Condition by condition: <b>found</b> with the passage quoted, <b>unclear</b>, or <b>absent</b>. None of the three is a verdict. A PDF is read in the browser on the desk's own computer — the file is never uploaded — and a scanned one is refused and told it is a scan, because twenty characters off a stamp would report every condition missing.</p>
+        </article>
+        <article class="glass mj-card tilt"><span class="sheen"></span>
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M5 3h14v18H5z"/><path d="M8 7h8M8 11h8M8 15h4"/></svg></span>
+          <h4 class="h4">Six calculations, none of them a verdict</h4>
+          <p>Screening against the board's own thresholds, purification by three methods that give three different answers, zakat on either base and either year, profit distribution with PER before the split and IRR after, tradability by what sits behind the paper, and a late-payment charge that has no field for becoming income. Every sum is shown; money is exact decimal throughout.</p>
+        </article>
+        <article class="glass mj-card tilt"><span class="sheen"></span>
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v5l3 2"/></svg></span>
+          <h4 class="h4">What it watches without being asked</h4>
+          <p>A pool approved at 51% tangible drifts to 47% and nobody finds out until the audit — unless something is comparing. Majlis compares, counts review dates down, marks a restriction lapsed when its ratification window closes, and reports what was executed against what was approved. All four report. None of them re-rules.</p>
+        </article>
+        <article class="glass mj-card tilt"><span class="sheen"></span>
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg></span>
+          <h4 class="h4">What the bank gets back</h4>
+          <p>Three screens of its own: what it asked and what became of it, what binds it today with the figures it has to hold to, and what it still owes. When the board decides, the written ruling is on the desk's own screen — and every condition the agreement failed comes back as a clause it has to add.</p>
         </article>
       </div>
       <p class="swipe-hint"><s></s>Swipe</p>
@@ -1238,7 +1243,7 @@ body.paused *,body.paused *::before,body.paused *::after{animation-play-state:pa
         <div data-rv="left">
           <span class="kick">The assistant</span>
           <h3 class="h3" style="margin:16px 0 14px;font-size:clamp(1.5rem,2.6vw,2.1rem);font-weight:800;letter-spacing:-.038em">Three gates, and every one fails closed.</h3>
-          <p class="body">The failure this guards against is a faithful ruling founded on an unfaithful explanation. A wrong explanation does not fail loudly, it produces a confident scholar ruling correctly on a mechanism that does not exist. So the constraint lives in code rather than in the model's discretion. Pick a question and watch where it stops.</p>
+          <p class="body">The failure this guards against is a faithful ruling founded on an unfaithful explanation. A wrong explanation does not fail loudly, it produces a confident scholar ruling correctly on a mechanism that does not exist. So the constraint lives in code rather than in the model's discretion. An installation that configures no model key has no assistant at all &#8212; the application says the assistant is off rather than answering anyway, and everything else in Majlis works without it. Pick a question and watch where it stops.</p>
           <div class="asst-q" role="group" aria-label="Example questions">
             <button class="qbtn" data-q="0" aria-pressed="true">Is this halal?</button>
             <button class="qbtn" data-q="1" aria-pressed="false">Summarise what scholars generally hold on this.</button>
@@ -1292,15 +1297,16 @@ body.paused *,body.paused *::before,body.paused *::after{animation-play-state:pa
       <div class="stages">
         <article class="glass stg" data-rv="up"><span class="s">Stage one</span><h4 class="h4">Record and comprehension</h4><p>The record, the briefings and the assistant. A test still asserts that no route can write a rule directly; matters are how a rule changes.</p></article>
         <article class="glass stg" data-rv="up"><span class="now-tag">Built</span><span class="s">Stage two</span><h4 class="h4">Deliberation</h4><p>A board raises a matter, deliberates in threads, votes with written reasoning, and objects during a timelock. The vote is recorded. Nothing here signs.</p></article>
-        <article class="glass stg" data-rv="up"><span class="s">Stage three</span><h4 class="h4">The vote becomes the signature</h4><p>Threshold signing moves into Majlis, with a timelock countdown and an emergency restriction path.</p></article>
+        <article class="glass stg" data-rv="up"><span class="s">Stage three</span><h4 class="h4">The vote becomes the signature</h4><p>The waiting period, the objection and the emergency restriction already run here. What is missing is the scholar&#8217;s own key: today a member signs a document this installation sealed, and Stage three is the member holding the key himself, so the vote is the signature that moves the registry.</p></article>
         <article class="glass stg" data-rv="up"><span class="s">Stage four</span><h4 class="h4">Plurality</h4><p>Multiple boards and institutions, cross-reference between them, and a published reference from the accumulated record.</p></article>
       </div>
 
-      <p class="note-g" data-rv="up" style="margin-top:clamp(28px,4vh,48px)">Stage two is what exists today. A board can take a decision here and the record shows who decided what and why &#8212; a vote is refused without written reasoning, because a position nobody can review, cite or disagree with later is not a record of anything. What Stage two still cannot do is sign: a decision taken in Majlis does not itself change the Policy Registry, and closing that gap is Stage three. Permitting is deliberately slow and restricting is deliberately fast, then ratified within a window or it lapses on its own. Three languages, English, Arabic and Urdu, with full right-to-left support &#8212; though the Arabic and Urdu still need a native reviewer and are marked as such in the source. Every record in the running application is fabricated demonstration data and represents no real scholar, board or institution.</p>
+      <p class="note-g" data-rv="up" style="margin-top:clamp(28px,4vh,48px)">Stage two is what exists today, and it is a working application rather than a demonstration of one: 36 addresses in the application, 145 routes on the server, 2&#8239;277 tests passing. A question arrives from the bank with its contract attached, the board judges it against a named contract type one condition at a time, votes with written reasoning &#8212; a vote is refused without it, because a position nobody can review, cite or disagree with later is not a record of anything &#8212; and the ruling comes out as a document the bank opens on its own screen. The record is append&#8209;only: a correction supersedes rather than replaces, and what stands is derived from the chain of entries rather than from a timestamp. Three languages, English, Arabic and Urdu, with full right&#8209;to&#8209;left support. <b>What it does not do is stated on every screen in the application itself.</b> Nothing here signs on the board&#8217;s behalf: what a member signs is a sealed document attesting to an authentication this installation performed, not a scholar&#8217;s own key, and that key is Stage three. Unless an installation is wired to the registry, a decision taken in Majlis does not change what executes. Unless a mail relay is configured, nobody outside the application is told &#8212; the notice is composed and shown, and whether it was actually sent is stated rather than assumed. The Arabic and the Urdu still need a native reviewer and are marked as such in the source. Every record in the running application is fabricated demonstration data and represents no real scholar, board or institution.</p>
 
       <div class="cta" style="justify-content:flex-start;margin-top:clamp(24px,3.6vh,40px)" data-rv="up">
         <a class="btn" href="https://majlis.gravitasprotocol.xyz" target="_blank" rel="noopener noreferrer">Open Majlis</a>
         <a class="btn ghost" href="#contact">Request access</a>
+        <a class="btn ghost" href="https://github.com/AbZe628/gravitas-protocol/blob/main/apps/majlis/docs/HANDBOOK.md" target="_blank" rel="noopener noreferrer">The handbook</a>
         <a class="btn ghost" href="https://github.com/AbZe628/gravitas-protocol/tree/main/apps/majlis" target="_blank" rel="noopener noreferrer">Read the source</a>
         <a class="btn ghost" href="https://github.com/AbZe628/gravitas-protocol/blob/main/apps/majlis/docs/ASSISTANT-RULES.md" target="_blank" rel="noopener noreferrer">The assistant's constraints</a>
       </div>
@@ -1437,7 +1443,7 @@ console.<span class="f">log</span>(sim.gasEstimate);</code></pre>
       <div class="stats stag">
         <div class="glass stat"><b data-count="94.4" data-suffix="%">0</b><span>Line coverage across the three contracts</span></div>
         <div class="glass stat"><b data-count="86" data-suffix="">0</b><span>Contract tests passing</span></div>
-        <div class="glass stat"><b data-count="278" data-suffix="">0</b><span>Majlis tests passing</span></div>
+        <div class="glass stat"><b data-count="2277" data-suffix="">0</b><span>Majlis tests passing</span></div>
         <div class="glass stat"><b data-count="0" data-suffix="">0</b><span>Funds ever held by the protocol</span></div>
       </div>
 
@@ -1500,6 +1506,8 @@ console.<span class="f">log</span>(sim.gasEstimate);</code></pre>
         <div class="q"><button type="button"><span>You have no certification. Why would a board look at this?</span><span class="sg" aria-hidden="true">+</span></button><div class="qa-p"><p>Because the board is the one who certifies. Gravitas is the machinery that enforces whatever a board decides, and the registry holds their list rather than ours. Certification of the protocol matters for procurement and is in progress. It is not what makes the enforcement work.</p></div></div>
         <div class="q"><button type="button"><span>How do I check any of this without trusting you?</span><span class="sg" aria-hidden="true">+</span></button><div class="qa-p"><p>Read the contracts on Arbiscan and query the registry directly. Every compliance decision is emitted as an event. The one thing not to do is read the verified source and assume it matches the repository, because right now it does not, and the notice above says which two fixes are missing.</p></div></div>
         <div class="q"><button type="button"><span>What happens to my position if something fails mid-migration?</span><span class="sg" aria-hidden="true">+</span></button><div class="qa-p"><p>The transaction reverts and you keep what you started with, less the gas. There is no custody step, so there is no state where the protocol holds your position and fails.</p></div></div>
+        <div class="q"><button type="button"><span>Can a bank take Majlis on its own, without the rest of this?</span><span class="sg" aria-hidden="true">+</span></button><div class="qa-p"><p>Yes, and most will. Majlis is one installation for one institution &#8212; its own board, its own members, its own record, nothing shared with anybody else&#8217;s. The registry is something an installation can be wired to when the institution wants a decision to reach what executes; until then Majlis is the board&#8217;s record and workplace and says plainly, on the screen, that a decision taken here has not moved anything on a chain.</p></div></div>
+        <div class="q"><button type="button"><span>Who is actually using Majlis, and what does each of them see?</span><span class="sg" aria-hidden="true">+</span></button><div class="qa-p"><p>Four kinds of people, and none of them sees the others&#8217; work. A desk at the bank writes a question in its own words, attaches the draft, and afterwards has three screens: what it asked and what became of it, what binds it today with the figures it has to hold to, and what it still owes. The secretariat takes the question, gives it a shape, convenes the meeting and keeps the record. A board member deliberates, answers the conditions one at a time in writing, and votes &#8212; and the vote is refused until every condition is answered, because voting on a matter half of which nobody has looked at is not a decision. The institution&#8217;s own officers see what was approved against what was executed. Every act carries the name of whoever did it.</p></div></div>
         <div class="q"><button type="button"><span>Why does Majlis refuse to answer whether something is permissible?</span><span class="sg" aria-hidden="true">+</span></button><div class="qa-p"><p>Because an assistant that rules would be doing the board's work with none of the board's authority, and a wrong explanation there does not fail loudly. It produces a confident scholar ruling correctly on a mechanism that does not exist. The assistant sets out the mechanism the ruling attaches to, and the ruling stays with the people who are answerable for it.</p></div></div>
         <div class="q"><button type="button"><span>Why build liquidity migration first?</span><span class="sg" aria-hidden="true">+</span></button><div class="qa-p"><p>Because it is the smallest complete case. One transaction carries a compliance decision, a custody risk and an execution guarantee, so it proves the model without asking anyone to move real money first.</p></div></div>
         <div class="q"><button type="button"><span>Is the fee riba?</span><span class="sg" aria-hidden="true">+</span></button><div class="qa-p"><p>No. It is charged once on a completed service, at five to ten basis points, and it does not accrue with time. Time is what makes a return riba.</p></div></div>

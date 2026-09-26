@@ -184,8 +184,10 @@
     <h2 id="majlis">5. Majlis</h2>
     <p>
       <code>majlis.gravitasprotocol.xyz</code> is not a public application. It is used by members
-      of a Shariah board, each holding a credential issued to them, and by observers holding a
-      shared read-only credential.
+      of a Shariah board and by the secretariat that keeps its record, each holding a credential
+      issued to them; by a desk at the institution, which may put a question to the board and read
+      what became of its own questions and nothing else; and by observers holding a shared
+      read-only credential.
     </p>
     <div class="tbl">
       <table>
@@ -205,6 +207,29 @@
             asked</td>
           <td>Kept so the board can see afterwards what was asked of the assistant and what it
             said.</td>
+        </tr>
+        <tr>
+          <td>A device's <strong>public</strong> key, where a member enrols one</td>
+          <td>A member may enrol a device &mdash; a laptop, a phone &mdash; and sign with it instead
+            of typing a password. What is kept is the device's public key, the identifier the device
+            chose, the name the member gave it, and a counter. The private key never leaves the
+            device and we never hold it.</td>
+        </tr>
+        <tr>
+          <td>The contract draft a question is about, and what a reading found in it</td>
+          <td>A draft is attached to the question so the board can judge it, and the passages a
+            reading quotes are kept with it so anyone can see afterwards what was read. Where an
+            installation has chosen the model-assisted reading, the text of the draft is sent to
+            Anthropic PBC for that reading; the reading built into the application does its work in
+            the browser on the desk's own computer and the file is not uploaded anywhere. Which of
+            the two ran is stated on the reading itself.</td>
+        </tr>
+        <tr>
+          <td>A fingerprint of a member's calendar address</td>
+          <td>A member may subscribe a calendar to the board's dates. That address carries its own
+            secret, because no calendar can answer a password prompt: whoever holds it can read this
+            board's dates &mdash; titles and times, nothing else. It is shown once, revoked in one
+            press, and we keep only a hash of it, never the address itself.</td>
         </tr>
         <tr>
           <td>IP address, briefly</td>
