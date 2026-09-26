@@ -64,10 +64,11 @@ function Row({ row, n }: { row: QueueRow; n?: number }) {
       <Link
         to={row.to}
         className={
-          'flex gap-5 rounded-card px-5 py-4 transition-all hover:-translate-y-px hover:shadow-card ' +
-          (row.overdue
-            ? 'bg-breachtint shadow-ringbreach'
-            : 'bg-raised shadow-ring')
+          /* One surface, a line between rows — the same as every other
+             list in the application. It was a card of its own, lifting
+             on hover, with eight pixels of page showing underneath. */
+          'flex gap-5 px-5 py-4 transition-colors ' +
+          (row.overdue ? 'bg-breachtint' : 'hover:bg-ink/[0.02]')
         }
       >
         {/*
@@ -329,7 +330,7 @@ export default function Queue() {
       {shown.length === 0 ? (
         <Nothing>{t(rows.length === 0 ? 'queue.nothing' : 'queue.noneHere')}</Nothing>
       ) : (
-        <ul className="space-y-2">
+        <ul className="overflow-hidden rounded-card bg-raised shadow-ring [&>li+li]:border-t [&>li+li]:border-line">
           {shown.map((r, i) => (
             <Row key={r.kind + r.id} row={r} n={i + 1} />
           ))}

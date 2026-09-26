@@ -179,7 +179,16 @@ export function Part({
   children: ReactNode;
 }) {
   return (
-    <section className="border-t border-line py-6 first-of-type:border-t-0 first-of-type:pt-0">
+    /*
+      Five, not six, and no rule between a group and the next.
+
+      A list broken into three groups spent 24 pixels of padding above,
+      24 below and a line between each pair — about 80 pixels of page per
+      divider, on a screen whose whole job is to show what is waiting.
+      The heading is what separates the groups; the rule was saying the
+      same thing a second time.
+    */
+    <section className="py-5 first-of-type:pt-0">
       <div className="flex gap-5">
         <span className="w-5 shrink-0 pt-1 font-mono text-note text-muted">{n}</span>
         <div className="min-w-0 flex-1">

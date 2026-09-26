@@ -107,8 +107,26 @@ export function Chip({
   );
 }
 
+/**
+ * A list of rows on one surface, not a stack of cards.
+ *
+ * ── why this changed ──────────────────────────────────────────────────
+ *
+ * Every row was a card of its own: its own ring, its own shadow, eight
+ * pixels of page showing between it and the next. That is how a website
+ * lists things — each one a little panel, floating — and it was a large
+ * part of why this application read as one. A list in an application is
+ * one surface with lines drawn between its rows.
+ *
+ * Nine to thirteen rows fitted a 900-pixel window before. The rows are
+ * the same height; what went is the gap and the twelve shadows.
+ */
 export function Rows({ children }: { children: ReactNode }) {
-  return <ul className="space-y-2">{children}</ul>;
+  return (
+    <ul className="overflow-hidden rounded-card bg-raised shadow-ring [&>li+li]:border-t [&>li+li]:border-line">
+      {children}
+    </ul>
+  );
 }
 
 const PHASE_TONE: Record<string, string> = {
@@ -192,10 +210,10 @@ export function Row({
   return (
     <li
       className={
-        'flex items-center gap-4 rounded-card px-5 py-3.5 ' +
+        'flex items-center gap-4 px-5 py-3.5 transition-colors ' +
         (overdue
-          ? 'border-s-[3px] border-breach bg-breachtint shadow-ringbreach'
-          : 'bg-raised shadow-ring')
+          ? 'border-s-[3px] border-breach bg-breachtint'
+          : 'hover:bg-ink/[0.02]')
       }
     >
       {days === undefined ? (
