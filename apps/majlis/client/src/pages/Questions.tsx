@@ -6,10 +6,11 @@ import TheDraftThatCame from '../components/TheDraftThatCame.js';
 import Fold from '../components/Fold.js';
 import { useIdentity, mayDeliberate, maySubmit } from '../lib/identity.js';
 import { MainAct, Card, Quiet, State } from '../components/kit.js';
+import { Chip } from '../components/shapes.js';
 import Act from '../components/Act.js';
 import AfterAct from '../components/AfterAct.js';
 import TheNotice from '../components/TheNotice.js';
-import { Division, Gaps, Nothing, PageHead } from '../components/page.js';
+import { Gaps, Nothing, PageHead } from '../components/page.js';
 import { Field } from '../components/field.js';
 import { ErrorText, Loading } from '../components/ui.js';
 import { useStillThere } from '../lib/stillThere.js';
@@ -328,6 +329,11 @@ export default function Questions({ boardId }: { boardId: string }) {
   const { identity } = useIdentity();
   const [all, setAll] = useState<Submission[] | null>(null);
   const [failed, setFailed] = useState(false);
+  /**
+   * Which of the two lists is on screen. Not remembered between visits: a
+   * board coming back to its queue is coming back to what is waiting.
+   */
+  const [show, setShow] = useState<'waiting' | 'settled'>('waiting');
   /** A failed refresh keeps a screen that is already there. */
   const there = useStillThere();
   const [notice, setNotice] = useState<{ notice: Notice; delivery: Delivery } | null>(null);
@@ -412,8 +418,29 @@ export default function Questions({ boardId }: { boardId: string }) {
         </div>
       )}
 
-      <Division heading={t('queue.waitingHere')}>
-        {open.length === 0 ? (
+      {/*
+        Two headings became two chips.
+
+        The screen drew both lists, one under the other, and what was already
+        dealt with ran to 1 072 pixels — as much room as the live work, under
+        it, on a screen 2 873 pixels tall. An archive is not something a board
+        scrolls past on the way to its queue. It is one press away, counted so
+        nobody has to wonder whether anything is there, and the queue opens on
+        what is waiting.
+      */}
+      <div className="mb-5 flex flex-wrap gap-2">
+        <Chip on={show === 'waiting'} onPick={() => setShow('waiting')} count={open.length}>
+          {t('queue.waitingHere')}
+        </Chip>
+        {settled.length > 0 && (
+          <Chip on={show === 'settled'} onPick={() => setShow('settled')} count={settled.length}>
+            {t('queue.settledHere')}
+          </Chip>
+        )}
+      </div>
+
+      {show === 'waiting' ? (
+        open.length === 0 ? (
           <Nothing>{t('queue.none')}</Nothing>
         ) : (
           <div className="space-y-3">
@@ -428,17 +455,18 @@ export default function Questions({ boardId }: { boardId: string }) {
               />
             ))}
           </div>
-        )}
-      </Division>
-
-      {settled.length > 0 && (
-        <Division heading={t('queue.settledHere')} note={t('queue.settledNote')}>
+        )
+      ) : (
+        <>
+          <p className="mb-3.5 max-w-[62ch] text-ui leading-relaxed text-muted">
+            {t('queue.settledNote')}
+          </p>
           <div className="space-y-3">
             {settled.map((s) => (
               <One key={s.id} s={s} onDone={load} />
             ))}
           </div>
-        </Division>
+        </>
       )}
 
       <Gaps items={gaps} />

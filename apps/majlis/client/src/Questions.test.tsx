@@ -159,6 +159,14 @@ describe('the queue', () => {
     });
     show();
 
+    /*
+     * The queue opens on what is waiting. Everything already dealt with is
+     * behind its own chip, counted, one press away — so a test about a
+     * declined question has to go where a member would go.
+     */
+    await waitFor(() => expect(screen.getByText(/Already dealt with/i)).toBeInTheDocument());
+    fireEvent.click(screen.getByText(/Already dealt with/i));
+
     await waitFor(() => expect(screen.getByText(/audit of the mint and burn/)).toBeInTheDocument());
     fireEvent.click(screen.getByText(/Take it up as a matter/i));
     expect(screen.getByText(/declined once/i)).toBeInTheDocument();
