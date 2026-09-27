@@ -430,8 +430,12 @@ describe('raising a matter', () => {
      * The press opens the window that says what opening a matter does: it
      * waits on the board from now, under the name of whoever opened it, and
      * the title and proposal are not edited afterwards.
+     *
+     * By name, because two panels are open by now: the form, which slides
+     * over the screen rather than pushing the matters down it, and the act
+     * window on top of that.
      */
-    const window_ = await screen.findByRole('dialog');
+    const window_ = await screen.findByRole('dialog', { name: /Open as a draft/ });
     expect(window_.textContent).toContain('not edited afterwards');
     fireEvent.click(within(window_).getByRole('button', { name: /Open as a draft/ }));
 

@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Gaps } from '../components/page.js';
-import { Link } from 'react-router-dom';
+import { ListPage, Row, Rows } from '../components/shapes.js';
+import { State } from '../components/kit.js';
 import { api, oversight, type EnforcementSnapshot, type MatterSummary, type Wait } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { DateText, ErrorText, Loading, Tag } from '../components/ui.js';
-import Attention from '../components/Attention.js';
 import DriftPanel from '../components/Drift.js';
 import Pace, { WaitingFor } from '../components/Pace.js';
 import WhoYouAre from '../components/WhoYouAre.js';
@@ -94,120 +94,111 @@ export default function Dashboard() {
   const settled = matters.filter((m) => m.status === 'in_force' || m.status === 'lapsed');
 
   return (
-    <div>
-      {/*
-        The page says what it is, first.
+    /*
+      The matters, first.
 
-        This heading was rendered 855 pixels down, under four panels — who you
-        are, what a Shariah board is, what is waiting for you, and how long
-        the board takes. Each of them is worth having and not one of them is
-        this page. A screen whose name arrives after almost a full screen of
-        scrolling is a screen a person has to identify by its contents, and
-        the complaint that the application "jumps from screen to screen
-        illogically" is largely this: nothing at the top ever said where you
-        had landed.
-      */}
-      <h1 className="mb-5 font-display text-head font-normal leading-tight tracking-display sm:text-display">
-        {t('dash.title')}
-      </h1>
+      The heading was moved to the top of this screen once already, and the
+      list stayed where it was: 843 pixels down, under what is waiting for
+      you, how long the board takes, what has drifted, and a paragraph about
+      what this stage does not do. Each is worth having. Not one of them is
+      the reason a person presses *Matters in hand* in the rail.
 
-      {/*
-        Before anything else. Someone who cannot act needs to know that before
-        they go looking for the buttons, not after.
-      */}
-      <WhoYouAre />
+      So the head band carries the name, the sentence and the one act, the
+      way it does on every other list; the matters begin under it; and the
+      four panels are still here, below the work rather than in front of it.
 
-      {/* What this is, before the work. Folded once somebody has read it. */}
-      <WhatThisIs open={intro} onToggle={toggleIntro} />
-
-      <Attention />
-
-      {/*
-        What the board costs the institution in time. Institutional rather than
-        personal, which is why it sits below what this member owes and above
-        everything else.
-      */}
-      <Pace />
-
-      {/*
-        Below the pace and above the list, because it is the one thing on this
-        page nobody asked the system to look for. It reports and links; it does
-        not raise anything.
-      */}
-      <DriftPanel />
-
-      <div className="mb-5 rounded-card shadow-ring bg-raised px-4 py-3 text-ui text-muted">
-        {t('dash.stageNotice')}
-      </div>
-
-      {mayDeliberate(identity?.role) && <RaiseMatter boardId="demo-board" />}
-
+      *What is waiting for you* is gone from this screen altogether. It is
+      the whole of the arrival screen at `/`, which is the rail's first
+      destination and the first thing anybody sees.
+    */
+    <ListPage
+      phase="deciding"
+      title={t('dash.title')}
+      says={t('dash.stageNotice')}
+      act={mayDeliberate(identity?.role) ? <RaiseMatter boardId="demo-board" /> : undefined}
+    >
       {open.length === 0 ? (
         <p className="text-muted text-sm">{t('dash.none')}</p>
       ) : (
-        <ul className="space-y-2">
+        /*
+          The same row every other list in here uses.
+
+          These were cards: each one its own panel with its own ring and its
+          own shadow, 100 pixels of padding between four facts. A list of
+          matters is a list, and the board reads it the way it reads the
+          queue, the register and the record — one surface, a line between
+          rows, the state where the state always is.
+        */
+        <Rows>
           {open.map((m) => (
-            <li key={m.id}>
-              <Link
-                to={`/matters/${m.id}`}
-                className="block rounded-sheet bg-raised/75 px-6 py-5 shadow-ring transition-all hover:-translate-y-px hover:shadow-card"
-              >
-                <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-2">
-                    <Tag tone={m.direction === 'restrict' ? 'breach' : 'ok'}>
-                      {t(`matter.direction.${m.direction}`)}
-                    </Tag>
-                    <Tag>{t(`matter.status.${m.status}`)}</Tag>
-                </div>
-                  <div className="max-w-[46ch] font-display text-sub leading-snug tracking-title">
-                    {m.title}
-                  </div>
-                  <div className="mt-2.5 text-note text-muted">
-                    {t(`matter.origin.${m.origin}`)}
-                    <span className="mx-1.5 opacity-40">·</span>
-                    {t('common.opened')} <DateText iso={m.openedAt} />
-                    {waits.has(m.id) && (
-                      <>
-                        <span className="mx-1.5 opacity-40">·</span>
-                        <WaitingFor wait={waits.get(m.id)} />
-                      </>
-                    )}
-                    {m.affected !== null && (
-                      <>
-                        <span className="mx-1.5 opacity-40">·</span>
-                        <span className="text-lapis">
-                          {m.affected} {t('sim.affected')}
-                        </span>
-                      </>
-                    )}
-                  </div>
-              </Link>
-            </li>
+            <Row
+              key={m.id}
+              to={`/matters/${m.id}`}
+              phase="deciding"
+              kind={t(`matter.direction.${m.direction}`)}
+              title={m.title}
+              note={
+                <>
+                  {t(`matter.origin.${m.origin}`)}
+                  <span className="mx-1.5 opacity-40">·</span>
+                  {t('common.opened')} <DateText iso={m.openedAt} />
+                  {waits.has(m.id) && (
+                    <>
+                      <span className="mx-1.5 opacity-40">·</span>
+                      <WaitingFor wait={waits.get(m.id)} />
+                    </>
+                  )}
+                  {m.affected !== null && (
+                    <>
+                      <span className="mx-1.5 opacity-40">·</span>
+                      <span className="text-lapis">
+                        {m.affected} {t('sim.affected')}
+                      </span>
+                    </>
+                  )}
+                </>
+              }
+              standing={<State tone="plain">{t(`matter.status.${m.status}`)}</State>}
+            />
           ))}
-        </ul>
+        </Rows>
       )}
 
       {settled.length > 0 && (
-        <>
-          <h2 className="mb-3 mt-8 text-label font-bold uppercase tracking-caps text-muted">
+        <div className="mt-8">
+          <h2 className="mb-3 text-label font-bold uppercase tracking-caps text-muted">
             {t('matter.status.in_force')}
           </h2>
-          <ul className="space-y-2">
+          <Rows>
             {settled.map((m) => (
-              <li key={m.id}>
-                <Link
-                  to={`/matters/${m.id}`}
-                  className="block rounded-card shadow-ring px-4 py-3 hover:text-paper"
-                >
-                  <div className="text-body leading-snug">{m.title}</div>
-                  <div className="mt-1 text-note text-muted">
-                    <DateText iso={m.openedAt} />
-                  </div>
-                </Link>
-              </li>
+              <Row
+                key={m.id}
+                to={`/matters/${m.id}`}
+                phase="inforce"
+                kind={t(`matter.direction.${m.direction}`)}
+                title={m.title}
+                note={<DateText iso={m.openedAt} />}
+              />
             ))}
-          </ul>
-        </>
+          </Rows>
+        </div>
       )}
+
+      {/*
+        The four panels, below the work.
+
+        Every one of them answers a question somebody has while looking at
+        these matters — how long the board is taking, what has moved under a
+        ruling already made, what a Shariah board is, and whether this member
+        may act at all. None of them is a reason to open this screen, so none
+        of them stands in front of it any more.
+      */}
+      <div className="mt-10">
+        <Pace />
+        <DriftPanel />
+        <WhatThisIs open={intro} onToggle={toggleIntro} />
+        <WhoYouAre />
+      </div>
 
       {/*
         An installation with nothing attached says so in a sentence rather than
@@ -247,6 +238,6 @@ export default function Dashboard() {
           paceLost ? t('gap.paceLost') : null,
         ].filter((x): x is string => x !== null)}
       />
-    </div>
+    </ListPage>
   );
 }

@@ -3,7 +3,8 @@ import Act from './Act.js';
 import { useNavigate } from 'react-router-dom';
 import { governance } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
-import { Card } from './ui.js';
+import SlideOver from './SlideOver.js';
+import { MainAct } from './kit.js';
 import { Field } from './field.js';
 import { Button } from './Button';
 
@@ -76,24 +77,29 @@ export default function RaiseMatter({ boardId }: { boardId: string }) {
     navigate(`/matters/${created.id}`);
   }
 
-  if (!open) {
-    return (
-      <Button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="mb-5 inline-flex min-h-[44px] items-center rounded-xl shadow-ring px-3 py-1.5 text-note hover:bg-raised lg:min-h-0"
-      >
-        {t('raise.open')}
-      </Button>
-    );
-  }
+  /*
+    The one act of the screen it stands on, painted like one.
 
+    It was a quiet outline in note type, 29 pixels tall, sitting in the head
+    band beside a title — next to screens whose act is a filled lapis button
+    of 39. Raising a matter is how every ruling this board makes begins, and
+    it looked like a footnote.
+  */
   const field = 'w-full rounded-xl bg-raised shadow-ring p-2 text-body leading-relaxed outline-none';
 
-  return (
-    <Card>
-      <div className="mb-3 text-ui font-medium">{t('raise.title')}</div>
+  /*
+    The act stays where it is; the form arrives over the screen.
 
+    Pressing this used to replace the button with a card of five fields, in
+    place — which on this screen means in the head band, beside the title,
+    pushing the matters down the page to make room for a form nobody had
+    finished filling in. The same panel every other form in here opens in.
+  */
+  return (
+    <>
+      <MainAct onClick={() => setOpen(true)}>{t('raise.open')}</MainAct>
+
+      <SlideOver open={open} title={t('raise.title')} onClose={() => setOpen(false)}>
       <Field label={t('raise.subject')} className="mb-3" headingClass={TIGHT}>
         {(attrs) => (
           <input
@@ -229,11 +235,9 @@ export default function RaiseMatter({ boardId }: { boardId: string }) {
           label={t('raise.submit')}
           perform={submit}
         />
-        <Button type="button" onClick={() => setOpen(false)} className="text-note text-muted hover:text-paper">
-          {t('say.cancel')}
-        </Button>
       </div>
       <p className="mt-2 text-note text-muted">{t('raise.draftNote')}</p>
-    </Card>
+      </SlideOver>
+    </>
   );
 }
