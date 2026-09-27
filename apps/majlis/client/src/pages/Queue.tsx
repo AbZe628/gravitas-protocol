@@ -7,6 +7,7 @@ import { ListPage } from '../components/shapes.js';
 import { Nothing } from '../components/page.js';
 import { ErrorText, Loading } from '../components/ui.js';
 import { useStillThere } from '../lib/stillThere.js';
+import { useIdentity } from '../lib/identity.js';
 import type { QueuePhase } from '../lib/api.js';
 import { Button } from '../components/Button';
 
@@ -171,6 +172,16 @@ export default function Queue() {
   const [rows, setRows] = useState<QueueRow[] | null>(null);
   const [overdue, setOverdue] = useState(0);
   const [only, setOnly] = useState<QueuePhase | null>(null);
+  /**
+   * Narrowed to this member's own steps on arrival.
+   *
+   * The screen's name is a claim, and a list that opens with three of its ten
+   * rows waiting on somebody else does not keep it. Everything is still one
+   * press away, with its count on the chip, so nothing is hidden — what
+   * changes is which of the two questions the screen answers first.
+   */
+  const [onlyMine, setOnlyMine] = useState(true);
+  const { identity } = useIdentity();
   const [failed, setFailed] = useState(false);
   /** A failed refresh keeps a screen that is already there. */
   const there = useStillThere();
@@ -247,9 +258,33 @@ export default function Queue() {
   if (failed) return <ErrorText />;
   if (!rows) return <Loading />;
 
-  const shown = only === null ? rows : rows.filter((r) => r.phase === only);
+  /**
+   * Whether this row's next step is this member's own.
+   *
+   * The screen is called *what needs you* and ten rows answered it, three of
+   * which were waiting on the institution or on another member. Both belong
+   * on the list — a board wants to see that the desk has been sitting on
+   * something for forty-four days — but a member arriving to find out what is
+   * theirs had to read the owner off every row and do the filtering by eye.
+   *
+   * Named on the row, so the rule here is only a reading of what the row
+   * already says: a step with somebody's name on it is theirs, a step that is
+   * the board's is every member's, and a step reserved to the signatories is
+   * a signatory's. Everything else — the institution, its liaison, a clock —
+   * is somebody else's, which is worth knowing and is not yours to do.
+   */
+  const mine = (r: QueueRow) => {
+    if (r.whoName) return r.whoName === identity?.scholarId;
+    if (r.whose === 'board') return true;
+    if (r.whose === 'signatory') return identity?.role === 'signatory';
+    return false;
+  };
+
+  const mineCount = rows.filter(mine).length;
+  const byOwner = onlyMine ? rows.filter(mine) : rows;
+  const shown = only === null ? byOwner : byOwner.filter((r) => r.phase === only);
   onScreen.current = shown;
-  const countOf = (p: QueuePhase) => rows.filter((r) => r.phase === p).length;
+  const countOf = (p: QueuePhase) => byOwner.filter((r) => r.phase === p).length;
 
   /*
     The same head as every other list.
@@ -278,6 +313,51 @@ export default function Queue() {
 
   const filters = (
     <>
+      {/*
+          Whose, before which stage.
+
+          Offered only where there is a difference to see: a member whose
+          every row is already theirs gains nothing from a control that
+          filters to the same list, and this application does not draw
+          controls that cannot change anything.
+        */}
+        {mineCount > 0 && mineCount < rows.length && (
+          /*
+            A recess with the chosen one raised out of it, not a round chip.
+
+            Whose and which stage are two different questions, and as two
+            rows of identical pills they read as one: *Yours* lit beside
+            *Everything* lit, on a list showing seven of ten. Two devices,
+            so the shape itself says which question is being answered —
+            the same recess the language switch and the record's two views
+            already use.
+          */
+          <div
+            role="group"
+            aria-label={t('needs.title')}
+            className="flex shrink-0 gap-0.5 rounded-xl bg-paper/[0.045] p-[3px]"
+          >
+            {[true, false].map((k) => (
+              <Button
+                key={String(k)}
+                type="button"
+                aria-pressed={onlyMine === k}
+                onClick={() => setOnlyMine(k)}
+                className={
+                  'inline-flex min-h-[44px] items-center rounded-lg px-3.5 py-1.5 text-note transition-all lg:min-h-0 ' +
+                  (onlyMine === k
+                    ? 'bg-raised font-semibold text-paper shadow-hairline'
+                    : 'text-muted hover:text-sand')
+                }
+              >
+                {t(k ? 'needs.mine' : 'needs.everyone')}
+                <span className="ms-1.5 font-mono tabular-nums opacity-60">
+                  {k ? mineCount : rows.length}
+                </span>
+              </Button>
+            ))}
+          </div>
+        )}
       {/*
           Which filter is on, said to the machine as well as painted.
 
@@ -328,7 +408,24 @@ export default function Queue() {
   return (
     <ListPage title={t('needs.title')} says="" live={counts} filters={filters} limits={t('needs.limits')}>
       {shown.length === 0 ? (
-        <Nothing>{t(rows.length === 0 ? 'queue.nothing' : 'queue.noneHere')}</Nothing>
+        /*
+          Three different emptinesses, and they are not the same claim.
+
+          Nothing waiting on anybody, nothing at the stage you picked, and
+          nothing waiting on you while the list still has work on it. The
+          last one used to read as the second, which told a member there was
+          work at the other stages when what was true is that the work is
+          with somebody else.
+        */
+        <Nothing>
+          {t(
+            rows.length === 0
+              ? 'queue.nothing'
+              : only === null && onlyMine
+                ? 'needs.noneMine'
+                : 'queue.noneHere',
+          )}
+        </Nothing>
       ) : (
         <ul className="overflow-hidden rounded-card bg-raised shadow-ring [&>li+li]:border-t [&>li+li]:border-line">
           {shown.map((r, i) => (

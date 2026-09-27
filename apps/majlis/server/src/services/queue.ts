@@ -194,7 +194,16 @@ export function buildQueue(input: QueueInput): QueueRow[] {
     rows.push({
       kind: 'undertaking',
       id: u.id,
-      to: '/undertakings',
+      /*
+       * The one it names, not the list it is on.
+       *
+       * An undertaking has no address of its own, so this row sent a member
+       * to a list of them with the act — say what happened, and close it —
+       * written on the row they had just left. The list finds the one named
+       * here and opens on it. It is still the list, which is right: what
+       * else was undertaken at that sitting is the context for closing this.
+       */
+      to: `/undertakings#${u.id}`,
       title: u.what,
       phase: 'deciding',
       next: 'Say what happened, and close it',

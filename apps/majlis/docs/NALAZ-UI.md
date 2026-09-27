@@ -166,3 +166,47 @@ od lijeve ivice — otuda „3" koje bježi za 343 px.
 Dokaz je `bjezi-provjera.mjs`, koji ispisuje oba pravougaonika i označi
 prijavu lažnom kad roditelj ima nultu širinu. Ovo je treći put da mjera
 laže prije nego aplikacija.
+
+---
+
+## E · Treći prolaz, 27.09.2026 — put kojim se stvarno ide
+
+### E1. Ekran predmeta je bio kontrolna tabla
+
+`sloj.mjs classic` — jarbol na vratima *Deciding* vodi tu, a predmeti su
+počinjali na **843 px**, ispod četiri panela. Sada na **145 px**, a paneli
+stoje ispod posla. Redovi su isti red koji koristi svaki drugi popis.
+
+Čin *Raise a matter* je bio tiha kontura od 29 px pored naslova, dok je
+na susjednim ekranima čin puno lapis dugme od 39. Sada je čin od 44 px, a
+obrazac se otvara u panelu umjesto da se razmota na mjestu. Mjereno
+pritiskom (`podigni.mjs`): panel od 720 px sa četiri polja, prvi red se
+ne pomjeri — 213 px prije i poslije.
+
+### E2. „Šta te treba" je pokazivalo i ono što treba nekog drugog
+
+`ceka.mjs` — deset redova na `/`, od toga tri čekaju na instituciju ili na
+drugog člana. Svaki red **jeste** pisao čije je, ali je ekran koji se zove
+*What needs you* tražio da to čitaš red po red.
+
+Sada par u udubljenju — *Yours 7 · Everyone 10* — odvojen od okruglih
+čipova za stupanj, jer su to dva različita pitanja. Otvara se na tvojima.
+Mjereno pritiskom (`cip-tvoje.mjs`): 7 → 10 → 7, i brojevi po stupnju
+prate.
+
+### E3. Obaveza je vodila na popis, ne na sebe
+
+Red je govorio *say what happened, and close it* i imenovao obavezu, a
+vodio na cijeli popis. Obaveza nema svoju adresu, pa je red sada
+`/undertakings#<id>`: popis se otvori na toj obavezi, osvijetljenoj.
+Provjereno (`obaveza-sidro.mjs`) — nađena, u vidnom polju, lapis podloga.
+
+### E4. Četvrta lažna prijava — „ekran bez ijednog čina"
+
+Mjera činova traži pun lapis sa bijelim slovima. Ekran prekršaja je tako
+ispao bez ijednog čina, a ima oba: *Record: this is a breach* i *Record:
+this is not a breach*, na 478 px, unutar koraka kojem pripadaju. Nisu
+lapis nego `grave` i `quiet`, jer to i jesu.
+
+Četvrti put da mjera laže prije nego aplikacija. Provjera je
+`prov-cin.mjs`, koji ispiše svako dugme bez obzira na boju.

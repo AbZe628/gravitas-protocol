@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Act from '../components/Act.js';
 import AfterAct from '../components/AfterAct.js';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { oversight, type Undertaking } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { useIdentity, mayKeepMinutes } from '../lib/identity.js';
@@ -83,8 +83,30 @@ function One({
     onChanged();
   }
 
+  /*
+    The one the queue named, found and marked.
+
+    A row on the arrival screen says *say what happened, and close it* and
+    names the undertaking it means. Until now it could only hand over the
+    whole list, and a member arriving from it had to read down until they
+    recognised the sentence they had just pressed. The address carries the
+    id; this scrolls to it once and leaves it lit.
+  */
+  const nazvan = useLocation().hash.slice(1) === u.id;
+  const ovdje = useRef<HTMLLIElement>(null);
+  useEffect(() => {
+    if (nazvan && ovdje.current) ovdje.current.scrollIntoView({ block: 'center' });
+  }, [nazvan]);
+
   return (
-    <li className="rounded-card bg-raised/60 px-5 py-4 shadow-ring">
+    <li
+      id={u.id}
+      ref={ovdje}
+      className={
+        'rounded-card px-5 py-4 shadow-ring ' +
+        (nazvan ? 'bg-lapistint shadow-ringlapis' : 'bg-raised/60')
+      }
+    >
       <div className="flex flex-wrap items-center gap-2.5">
         <State tone={u.state === 'open' ? (row.overdue ? 'breach' : 'attention') : 'plain'}>
           {t(row.overdue ? 'und.overdue' : `book.state.${u.state}`)}
