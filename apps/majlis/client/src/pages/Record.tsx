@@ -6,7 +6,7 @@ import { useI18n } from '../lib/i18n.js';
 import { DateText } from '../components/ui.js';
 import { DocumentLink, YearPicker } from '../components/Documents.js';
 import { Row, Rows } from '../components/shapes.js';
-import { State } from '../components/kit.js';
+import { Quiet, State } from '../components/kit.js';
 import { Button } from '../components/Button';
 
 /** Everything this board has settled, newest first. */
@@ -210,6 +210,20 @@ export default function Record({ embedded = false }: { embedded?: boolean }) {
           label={t('doc.annual')}
           note={t('doc.annualNote')}
         />
+
+        {/*
+          The papers, still reachable from the screen that produces them.
+
+          This link was taken out with the card it stood in, on the reasoning
+          that the briefings are a destination the rail carries. They are a
+          destination the *spine* carries, which is not the same thing: the
+          rail draws nine of them, and measured from the arrival screen the
+          briefings became the one address in the application no link led
+          to. Read the data, believe the screen.
+        */}
+        <div className="mt-3">
+          <Quiet to="/briefings">{t('record.toPapers')}</Quiet>
+        </div>
       </div>
 
       {/*

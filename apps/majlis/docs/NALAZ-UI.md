@@ -210,3 +210,34 @@ lapis nego `grave` i `quiet`, jer to i jesu.
 
 Četvrti put da mjera laže prije nego aplikacija. Provjera je
 `prov-cin.mjs`, koji ispiše svako dugme bez obzira na boju.
+
+### E5. Vadjenje veza sa dna je odsjeklo jednu — i čuvar je to prespavao
+
+Kad je `WhatNext` izvađen, svaka od 31 veze je provjerena kao „odredište
+jarbola". To je **čitano iz `spine.ts`**, a ne sa ekrana. Iscrtani jarbol
+nosi devet odredišta; kičma ih nabraja više.
+
+Mjereno tek sada, `dohvatljivo.mjs` — širina-prvo od dolaska, paleta se
+namjerno ne broji:
+
+| | |
+|---|---|
+| nedohvatljivo na stolu | 7 od 23 |
+| od toga namjerno | `/guided`, tri bančina ekrana, `/calculations` *(polica)*, `/assistant` *(ugašen)* |
+| **stvarno izgubljeno** | **`/briefings`** |
+
+Vraćeno kao tiha veza na ekranu zapisa, odakle papiri i dolaze. Poslije:
+6 nedohvatljivih, svih šest namjerno. Na telefonu isto, sve u tri pritiska.
+
+**Čuvar je postojao i bio zelen.** `Reachable.test.tsx` traži adresu kao
+niz bilo gdje u izvoru — pa je `<Route path="/briefings">` u `App.tsx`
+zadovoljio uslov. Ruta koja sama sebi dokazuje dohvatljivost.
+
+Sada se broji samo `to=`/`href=` i par u tablici, a `App.tsx` je izuzet
+kao i `spine.ts`. Dokazano tako što je veza izvađena i čuvar je pao sa
+*„/briefings left the rail and nothing links to it"* — pa vraćena.
+
+Dodana je i gornja ograda, koja je cijelo vrijeme falila: `/guided` je
+ruta koju ništa namjerno ne vezuje, pa čuvar koji je prijavi kao vezanu
+opet čita tablicu ruta. Tvrdnja „našao sam dosta veza" je zamijenjena
+time — jer skener koji ne nađe ništa ionako pada deset puta.

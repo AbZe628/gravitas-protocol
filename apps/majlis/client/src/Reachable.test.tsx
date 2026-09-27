@@ -59,23 +59,47 @@ function addressesLinked(): Set<string> {
   const out = new Set<string>();
 
   for (const file of everySourceFile(SRC)) {
+    /*
+     * Neither the spine nor the route table is a way in.
+     *
+     * `spine.ts` was excluded from the first day: it is the data the rail is
+     * drawn from, and a destination listed there is not thereby on anybody's
+     * screen. `App.tsx` had to join it, and the reason is a fault this guard
+     * sat through: the briefings lost their only link, and the test passed,
+     * because `<Route path="/briefings">` is a string literal on a line of
+     * code and satisfied the match. A route proving its own reachability is
+     * a guard that guards nothing.
+     */
     if (file.endsWith(join('lib', 'spine.ts'))) continue;
+    if (file.endsWith(join('src', 'App.tsx'))) continue;
     const source = readFileSync(file, 'utf8');
 
     /*
-     * Any address written as a string, on a line that is not a comment.
+     * An address in a place that makes it a link, and nowhere else.
      *
-     * Matching only `to="/x"` was too narrow and the guard said so on its
-     * first run: two of the links it was looking for are built from a table
-     * and rendered as `to={to}`, so the address never appears next to the
-     * attribute. Comment lines are dropped because an address named in prose
-     * is not a way in, and this test exists to tell those two apart.
+     * Any string literal was too loose, and the guard sat through the fault
+     * it exists for: the briefings lost their only link and every one of
+     * these still matched — the route table, the list of routes given the
+     * full width, and a key in the journey table. None of the three is a
+     * control anybody can press.
+     *
+     * Any string literal was chosen because two of the links come from a
+     * table and render as `to={to}`, so the address is never beside the
+     * attribute. Both forms are matched here instead: the attribute, and a
+     * tuple whose first element is the address — which is what such a table
+     * looks like, and what a bare list of routes does not.
+     *
+     * A form nobody thought of is missed, and the guard then names a route
+     * as unreachable when it is not. That is the direction to be wrong in.
      */
     for (const line of source.split(/\r?\n/)) {
       const code = line.trim();
       if (code.startsWith('*') || code.startsWith('//') || code.startsWith('/*')) continue;
 
-      for (const m of code.matchAll(/['"`](\/[A-Za-z0-9\-/]*)['"`]/g)) {
+      for (const m of code.matchAll(/(?:to|href)\s*=\s*[{(]?\s*['"`](\/[A-Za-z0-9\-/]*)['"`]/g)) {
+        out.add(m[1]);
+      }
+      for (const m of code.matchAll(/\[\s*['"`](\/[A-Za-z0-9\-/]*)['"`]\s*,/g)) {
         out.add(m[1]);
       }
     }
@@ -136,8 +160,28 @@ describe('nothing was lost when it was cut', () => {
     });
   }
 
-  it('found enough links to be sure it was actually looking', () => {
-    // A scanner that matched nothing would pass every case above by accident.
-    expect(linked.size).toBeGreaterThan(15);
+  /*
+    What the scanner must not find, which is the half that was missing.
+
+    The old claim here was that a scanner matching nothing would pass the
+    cases above by accident. It would not — every one of them asserts a
+    route *is* linked, so a scanner that found nothing fails ten times. The
+    danger was always the other direction, and the other direction is what
+    happened: a scanner matching every string literal called the route table
+    a link, and the briefings sat unreachable behind a green test.
+
+    `/guided` is the probe, and it is a good one because the application
+    means it: the arrival the queue replaced, kept at its address so an old
+    bookmark still opens, deliberately linked from nowhere. A scanner that
+    reports it as linked is reading the route table again.
+  */
+  it('is not fooled by the route table', () => {
+    expect(linked.has('/guided')).toBe(false);
+    expect(linked.has('/more')).toBe(false);
+  });
+
+  it('found every address it was asked about, and then some', () => {
+    for (const { route } of MOVED) expect(linked.has(route)).toBe(true);
+    expect(linked.size).toBeGreaterThan(MOVED.length);
   });
 });
