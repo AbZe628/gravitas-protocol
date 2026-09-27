@@ -624,6 +624,14 @@ approved.
 The screen lists the differences. There is no score and no pass mark; the
 conclusion is the board's.
 
+This is where most compliance is lost, and it is why the screen exists. The
+ruling is sound. The transactions drift away from it, a little at a time.
+Nobody compares the two until an audit years later, by which point the
+drift is the finding. An examination is recorded by the institution's own
+secretary or liaison, never by the board: a board writing its own audit
+findings would be producing a document saying something nobody outside the
+room ever said.
+
 ---
 
 ## 12 · The documents

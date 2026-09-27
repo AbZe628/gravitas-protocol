@@ -269,6 +269,17 @@ export default function Examinations({ boardId }: { boardId: string }) {
 
   return (
     <div>
+      {/*
+        One sentence, not three.
+
+        The lede used to go on: this is where most compliance is lost, the
+        ruling is sound, the transactions drift away from it, and nobody
+        compares the two until an audit years later. All of that is true and
+        it is why this screen exists — but it is an argument for the product,
+        and a scholar opening this screen for the hundredth time is not being
+        sold anything. The argument is in the handbook, where it is read once.
+        What stays on the screen is what the screen is.
+      */}
       <PageHead
         phase="checked"
         title={t('exam.title')}
@@ -486,6 +497,16 @@ export default function Examinations({ boardId }: { boardId: string }) {
           )}
         </div>
       ) : (
+        /*
+          Who may record one, and nothing about why.
+
+          The reason is good — a board writing its own audit findings would
+          be producing a document saying something nobody outside the room
+          ever said — but a member reading this is being told they cannot do
+          something, and what they need is the rule and who to ask. The
+          reasoning is here, where it is a record rather than a paragraph in
+          somebody's way.
+        */
         <p className="mt-5 max-w-[62ch] rounded-card bg-raised/60 px-4 py-3 text-ui leading-relaxed text-muted shadow-ring">
           {t('exam.onlyInstitution')}
         </p>

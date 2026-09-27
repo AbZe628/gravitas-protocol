@@ -97,7 +97,7 @@ function One({
         )}
         <Link
           to={`/meetings/${u.meetingId}/book`}
-          className="ms-auto text-note text-muted hover:text-paper"
+          className="ms-auto inline-flex min-h-[44px] items-center text-note text-muted hover:text-paper lg:min-h-0"
         >
           {t('und.fromSitting')}
         </Link>
@@ -115,7 +115,7 @@ function One({
         <Button
           type="button"
           onClick={() => setOpen(true)}
-          className="mt-3 text-ui font-semibold text-lapis underline decoration-line underline-offset-4"
+          className="mt-3 inline-flex min-h-[44px] items-center text-ui font-semibold text-lapis underline decoration-line underline-offset-4 lg:min-h-0"
         >
           {t('und.closeIt')}
         </Button>

@@ -127,6 +127,14 @@ export default function WhichShape({
         </Button>
       </div>
 
+      {/*
+        Why the button is dead, and only that.
+
+        It used to go on to explain what comparing against every shape at
+        once is for. A person reading the reason a control will not work
+        wants the one thing that would make it work, and everything after
+        that is an advertisement standing between them and the field.
+      */}
       {!enough && (
         <p className="mt-1.5 max-w-[58ch] text-note leading-relaxed text-muted">
           {t('which.needText')}
