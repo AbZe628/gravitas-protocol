@@ -81,7 +81,7 @@ nešto što nije predmet.
     red otvara tačno pitanje i tačnu odluku
   - — obaveza namjerno bez kontrole: ime onoga ko je obećao pobjeđuje dodjelu
   - ✅ bankin desk ne vidi ko u odboru drži šta (`visibleTo`), ni tuđa pitanja
-  - ⬜ desk čita cijeli red odbora, s tuđim pitanjima — prijedlog u NASTAVAK.md
+  - ✅ desk dobija samo red svojih pitanja; zvono deska ne čita red odbora
   - ⬜ dodjela **jednog koraka** (ne cijele stvari) postoji na serveru, nema je u
     sučelju
   - ⬜ arapski i urdu za `hold.*` — moji, nepregledani

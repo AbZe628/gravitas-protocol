@@ -86,6 +86,21 @@ const namesAnybody = (p: P) =>
   Boolean(p.holder) || p.groups.some((g) => g.steps.some((s) => s.who === 'member-b'));
 
 describe('what a desk is told', () => {
+  it('is answered on the queue with its own questions, and nothing of the board’s', async () => {
+    /*
+     * It was the board's whole queue: every matter and breach, every
+     * undertaking with the member who gave it, and the other desk's question.
+     */
+    type Row = { kind: string; id: string };
+    const desk = (await get('desk-treasury', '/api/queue')).body.rows as Row[];
+    expect(desk.map((r) => `${r.kind} ${r.id}`)).toEqual(['question q-ours']);
+
+    const member = (await get('member-b', '/api/queue')).body.rows as Row[];
+    const kinds = new Set(member.map((r) => r.kind));
+    expect(member.map((r) => r.id)).toEqual(expect.arrayContaining(['q-ours', 'q-theirs']));
+    expect(kinds.has('matter') && kinds.has('breach')).toBe(true);
+  });
+
   it('reads the passages of its own questions only, and nobody’s name on them', async () => {
     const desk = await get('desk-treasury', '/api/passages/question');
     expect(desk.status).toBe(200);
@@ -122,15 +137,7 @@ describe('what a desk is told', () => {
   it('is told nobody’s name on the queue', async () => {
     type Row = { kind: string; id: string; holder?: string; who?: string };
     const desk = (await get('desk-treasury', '/api/queue')).body.rows as Row[];
-    /*
-     * An undertaking's row names whoever gave it, and that name is the
-     * minute's own record rather than an assignment — so it reaches a desk
-     * because the desk reads the board's whole queue at all. That is a wider
-     * question than this one, recorded in docs/NASTAVAK.md, and it is named
-     * here rather than filtered out quietly.
-     */
-    const assigned = desk.filter((r) => r.holder || (r.kind !== 'undertaking' && r.who));
-    expect(assigned).toEqual([]);
+    expect(desk.filter((r) => r.holder || r.who)).toEqual([]);
 
     const member = (await get('member-b', '/api/queue')).body.rows as Row[];
     expect(member.filter((r) => r.holder === 'member-b').length).toBeGreaterThan(0);

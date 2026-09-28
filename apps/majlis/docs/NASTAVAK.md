@@ -97,13 +97,18 @@ imena) i kao član (ima), inače prva ne znači ništa.
 1. dodjela **jednog koraka** postoji na serveru, ne u sučelju
 2. arapski i urdu za `hold.*` su moji i nepregledani
 
-**Otvoreno, nije moje da tiho odlučim — prijedlog:**
-- **Desk čita cijeli red odbora** (`/api/queue`): naslove pitanja **drugih
-  deskova** iste banke, sve predmete, prekršaje i obaveze s imenom člana koji
-  ih je dao. To krši pravilo koje `/submissions` već drži (*dva deska jedne
-  banke ne dijele red*). `NewsProvider` čita red za svakoga, pa i za desk, zato
-  bi 403 dirao bankino sučelje. Prijedlog: red deskovu odgovara samo redovima
-  njegovih pitanja, a `NewsProvider` za desk ne čita red odbora.
+**Desk više ne čita red odbora — zatvoreno (tvoj izbor prijedloga).**
+`/api/queue` je desku davao cijeli red odbora: sve predmete i prekršaje, obaveze
+s imenom člana koji ih je dao, i **naslove pitanja drugih deskova** iste banke.
+Sad mu odgovara samo redovima njegovih pitanja — isti test kao `/submissions`,
+pa se dvije ograde ne mogu razići. `NewsProvider` (zvono i baner, oba sakrivena
+za desk) za desk više ne pita. `Arrival` još šalje jedan zahtjev za red u pola
+sekunde prije nego zna da čita desk — namjerna UX odluka (bez praznog ekrana),
+ostavljena; bezopasna je zato što granicu drži server, ne ekran. Uživo: desk
+dobija prazan red, član svojih 7 redova, a zvono člana i dalje javi novo
+pitanje.
+
+**Otvoreno, sitno:**
 - Gornja traka ~0,7 s tvrdi *Not signed in · reads only* dok se identitet
   učitava (`Shell` ne gleda `loading`) — star, sitan, nije diran.
 

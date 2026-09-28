@@ -1616,15 +1616,28 @@ export function governanceRoutes(
         return;
       }
 
+      /*
+       * A bank desk is answered with its own questions and nothing else.
+       *
+       * This answered a desk with the board's whole queue: every matter and
+       * breach, every undertaking with the member who gave it, and the
+       * questions of every other desk at the same bank — though
+       * `/submissions` has always fenced a desk to the questions it recorded,
+       * because two desks at one bank should not share a queue. Found by
+       * asking with a desk's credential. The same test as there, so the two
+       * cannot come apart.
+       */
+      const who = identityOf(req);
+      const desk = who.role === 'institution';
       const rows = buildQueue({
         board,
-        submissions,
-        matters,
-        rules,
-        incidents,
-        undertakings,
+        submissions: desk ? submissions.filter((s) => s.recordedBy === who.scholarId) : submissions,
+        matters: desk ? [] : matters,
+        rules: desk ? [] : rules,
+        incidents: desk ? [] : incidents,
+        undertakings: desk ? [] : undertakings,
         structures,
-        assignments: visibleTo(identityOf(req).role, assignments),
+        assignments: visibleTo(who.role, assignments),
         now: at,
       });
 

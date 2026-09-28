@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from 'react';
 import { governance, type QueueRow } from './api.js';
+import { isInstitution, useIdentity } from './identity.js';
 import { useRevision, whatIsNew } from './pulse.js';
 
 /**
@@ -87,7 +88,19 @@ export function NewsProvider({ children }: { children: ReactNode }) {
   /** The queue as it last stood. Never rendered, never written down. */
   const stood = useRef<QueueRow[] | null>(null);
 
+  /*
+   * Not for a bank desk, and not before we know who is reading.
+   *
+   * The bell and the announcement are both hidden from a desk, and this read
+   * the board's whole queue for it anyway on every change to the record — the
+   * board's work, shipped to the bank for nothing. The server answers a desk
+   * with its own questions only; this does not ask at all.
+   */
+  const { identity } = useIdentity();
+  const reads = identity !== null && !isInstitution(identity.role);
+
   useEffect(() => {
+    if (!reads) return;
     let current = true;
     governance
       .queue()
@@ -127,7 +140,7 @@ export function NewsProvider({ children }: { children: ReactNode }) {
     return () => {
       current = false;
     };
-  }, [revision]);
+  }, [revision, reads]);
 
   const looked = useCallback(() => setFresh([]), []);
   const quieten = useCallback(

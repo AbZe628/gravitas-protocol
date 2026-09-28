@@ -48,8 +48,14 @@ import { useIdentity, isInstitution } from './lib/identity.js';
  * built for it.
  *
  * Nothing waits on a blank screen. Until the identity answers this renders the
- * board's arrival, which is the common case and is harmless to a desk for the
- * half second before it is replaced.
+ * board's arrival, which is the common case, for the half second before a
+ * desk's is put in its place.
+ *
+ * That half second sends the board's queue request from the desk's browser.
+ * It was called harmless and was not: the queue answered a desk with the
+ * board's whole backlog and other desks' questions. It is harmless now for a
+ * reason that does not depend on this screen — the server answers a desk with
+ * its own questions only (see `/queue` in routes/governance.ts).
  *
  * ── the board's arrival is now the queue ──────────────────────────────────
  *
