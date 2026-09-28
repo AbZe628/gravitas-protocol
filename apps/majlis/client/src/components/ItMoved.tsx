@@ -1,5 +1,6 @@
 import { useI18n } from '../lib/i18n.js';
 import Dialog from './Dialog.js';
+import { useNameOf } from './Person.js';
 import { Button } from './Button';
 
 /**
@@ -49,6 +50,7 @@ export default function ItMoved({
   onClose: () => void;
 }) {
   const { t } = useI18n();
+  const nameOf = useNameOf();
 
   return (
     <Dialog
@@ -75,7 +77,7 @@ export default function ItMoved({
         <div className="flex flex-col gap-3">
           <section className="rounded-card bg-goldtint px-4 py-3">
             <h3 className="text-label font-bold uppercase tracking-caps text-goldink">
-              {theirs ? `${t('moved.theirs')} · ${theirs.who}` : t('moved.theirs')}
+              {theirs ? `${t('moved.theirs')} · ${nameOf(theirs.who)}` : t('moved.theirs')}
             </h3>
             <p className="mt-1.5 font-display text-body leading-snug text-paper">
               {theirs ? theirs.what : t('moved.theirsUnknown')}

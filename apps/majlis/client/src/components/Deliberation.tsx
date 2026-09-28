@@ -4,6 +4,7 @@ import { useIdentity } from '../lib/identity.js';
 import { useI18n } from '../lib/i18n.js';
 import { DateText, Tag } from './ui.js';
 import { Button } from './Button';
+import Person from './Person.js';
 
 /**
  * The deliberation, as a thread.
@@ -180,7 +181,7 @@ function Entry({
       }
     >
       <div className="mb-2.5 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-note">
-        <span className="font-semibold text-lapis">{entry.scholarId}</span>
+        <span className="font-semibold text-lapis"><Person id={entry.scholarId} /></span>
         {entry.liaisonAnswer && <Tag>{t('matter.liaison')}</Tag>}
         <span className="text-muted">
           <DateText iso={entry.at} />
@@ -203,7 +204,7 @@ function Entry({
       {replying && (
         <div className="mt-3">
           <p className="mb-2 text-note text-muted">
-            {t('say.replyingTo')} {entry.scholarId}
+            {t('say.replyingTo')} <Person id={entry.scholarId} />
           </p>
           <Composer
             matterId={matterId}
@@ -220,7 +221,7 @@ function Entry({
           {replies.map((reply) => (
             <li key={reply.id}>
               <div className="mb-2 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-note">
-                <span className="font-semibold text-lapis">{reply.scholarId}</span>
+                <span className="font-semibold text-lapis"><Person id={reply.scholarId} /></span>
                 {reply.liaisonAnswer && <Tag>{t('matter.liaison')}</Tag>}
                 <span className="text-muted">
                   <DateText iso={reply.at} />

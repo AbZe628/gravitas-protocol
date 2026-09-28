@@ -8,6 +8,7 @@ import { Nothing } from './page.js';
 import { Button } from './Button';
 import Act from './Act.js';
 import AfterAct from './AfterAct.js';
+import Person from './Person.js';
 
 /**
  * What the board has asked this institution, and the box to answer in.
@@ -136,7 +137,7 @@ export default function WhatTheBoardAsked({ boardId }: { boardId: string }) {
             >
               <div className="mb-1.5 flex flex-wrap items-baseline gap-x-3 gap-y-1 text-note text-muted">
                 <DateText iso={row.askedAt} />
-                <span>{row.askedBy}</span>
+                <span><Person id={row.askedBy} /></span>
                 <Link
                   to={`/matters/${row.matter.id}`}
                   className="text-lapis underline decoration-line underline-offset-4"

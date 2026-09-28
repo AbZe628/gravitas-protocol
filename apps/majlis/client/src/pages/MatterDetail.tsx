@@ -19,6 +19,7 @@ import Carrying from '../components/Carrying.js';
 import Inherited from '../components/Inherited.js';
 import WhereItEnds from '../components/WhereItEnds.js';
 import SignTheDocument from '../components/SignTheDocument.js';
+import Person from '../components/Person.js';
 
 /** The statuses a document exists for. Mirrors SETTLED in services/fatwa.ts. */
 const DECIDED = ['in_force', 'timelock', 'rejected', 'lapsed', 'withdrawn'];
@@ -308,7 +309,7 @@ export default function MatterDetail() {
                 }
               >
                 <div className="mb-1.5 flex flex-wrap items-center gap-2 text-note">
-                  <span className={r.releasedAt ? 'text-muted' : 'font-semibold text-lapis'}>{r.scholarId}</span>
+                  <span className={r.releasedAt ? 'text-muted' : 'font-semibold text-lapis'}><Person id={r.scholarId} /></span>
                   <Tag tone={r.releasedAt ? 'neutral' : r.position === 'against' ? 'warn' : 'neutral'}>
                     {r.position}
                   </Tag>

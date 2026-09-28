@@ -7,6 +7,7 @@ import { Nothing, PageHead } from '../components/page.js';
 import { ErrorText } from '../components/ui.js';
 import { DateText, Tag } from '../components/ui.js';
 import { Button } from '../components/Button';
+import Person from '../components/Person.js';
 
 /**
  * Finding what the board decided before.
@@ -189,7 +190,7 @@ function Hit({ hit }: { hit: SearchHit }) {
             <li key={i}>
               <div className="mb-1.5 text-label font-bold uppercase tracking-caps text-muted">
                 {t(`search.field.${m.field}`)}
-                {m.by && <span className="ms-2 normal-case tracking-normal">{m.by}</span>}
+                {m.by && <span className="ms-2 normal-case tracking-normal"><Person id={m.by} /></span>}
               </div>
               {/* What matched, in the face the board wrote it in. */}
               <p className="max-w-[62ch] border-s-2 border-gold/50 ps-4 font-display text-lead leading-relaxed text-sand">

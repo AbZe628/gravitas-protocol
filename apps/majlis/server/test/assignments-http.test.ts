@@ -78,7 +78,7 @@ const passageOf = async (id: string) => {
   expect(res.status).toBe(200);
   return {
     holder: res.body.holder as { to: string } | null,
-    steps: (res.body.groups as { steps: { key: string; whose: string; whoName?: string }[] }[]).flatMap(
+    steps: (res.body.groups as { steps: { key: string; whose: string; who?: string }[] }[]).flatMap(
       (g) => g.steps,
     ),
   };
@@ -94,7 +94,7 @@ describe('the four acts', () => {
     expect(passage.holder?.to).toBe('member-b');
     // No step of a breach carries the name: the finding is every signatory's,
     // and the plan is the institution's.
-    for (const s of passage.steps) expect(s.whoName, s.key).toBeUndefined();
+    for (const s of passage.steps) expect(s.who, s.key).toBeUndefined();
   });
 
   it('refuses a colleague taking it out of the holder’s hands', async () => {
@@ -159,9 +159,9 @@ describe('on a matter', () => {
     const passage = await request(app)
       .get(`/api/matters/${open!.id}/passage`)
       .set('Authorization', as('member-b'));
-    const named = (passage.body.groups as { steps: { whoName?: string }[] }[])
+    const named = (passage.body.groups as { steps: { who?: string }[] }[])
       .flatMap((g) => g.steps)
-      .filter((s) => s.whoName === 'member-c');
+      .filter((s) => s.who === 'member-c');
     expect(named.length).toBeGreaterThan(0);
   });
 });

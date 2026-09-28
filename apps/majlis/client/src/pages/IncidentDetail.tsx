@@ -10,6 +10,7 @@ import { mayRecordInstitutionAct, mayVote, useIdentity } from '../lib/identity.j
 import { Button } from '../components/Button';
 import Act from '../components/Act.js';
 import AfterAct from '../components/AfterAct.js';
+import Person from '../components/Person.js';
 
 /**
  * One reported non-compliance, as the nine steps it actually is.
@@ -265,7 +266,7 @@ export default function IncidentDetail() {
       key: 'reported',
       detail: (
         <>
-          {i.reportedBy} · <DateText iso={i.reportedAt} />
+          <Person id={i.reportedBy} /> · <DateText iso={i.reportedAt} />
         </>
       ),
     },
@@ -280,7 +281,7 @@ export default function IncidentDetail() {
                   {c.actual ? t('snc.isBreach') : t('snc.notBreach')}
                 </span>
                 <span className="mx-1.5 opacity-40">·</span>
-                {c.scholarId}
+                <Person id={c.scholarId} />
                 <p className="mt-0.5 text-muted">{c.reason}</p>
               </li>
             ))}
@@ -874,8 +875,8 @@ export default function IncidentDetail() {
                       {/* Whose it is, which only the reading can say. */}
                       {row.step && (
                         <span className="text-label font-bold uppercase tracking-caps text-muted">
-                          {row.step.whoName
-                            ? nameOf(members, row.step.whoName)
+                          {row.step.who
+                            ? nameOf(members, row.step.who)
                             : t(`passage.whose.${row.step.whose}`)}
                         </span>
                       )}

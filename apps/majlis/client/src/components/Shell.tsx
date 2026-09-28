@@ -26,6 +26,7 @@ import Keys from './Keys.js';
 import Announcement from './Announcement.js';
 import { NewsProvider } from '../lib/news.js';
 import { Button } from './Button';
+import Person, { initialsOf, useNameOf } from './Person.js';
 
 /**
  * The application's frame.
@@ -179,8 +180,8 @@ function StatusBar() {
           {f.says}
         </span>
       ))}
-      <span className="ms-auto font-mono">
-        {identity?.scholarId ?? t('shell.anonymous')}
+      <span className="ms-auto">
+        {identity ? <Person id={identity.scholarId} /> : t('shell.anonymous')}
       </span>
     </div>
   );
@@ -274,9 +275,20 @@ function atWorkArea(path: string): boolean {
 
 /** The member, as a mark. Same in both mastheads, so it is written once. */
 function Avatar({ id }: { id?: string }) {
+  const nameOf = useNameOf();
+  /*
+   * Their initials, from their name. It was the first letter of the scholar
+   * id, and on a board whose ids all begin `member-` every avatar was an M.
+   */
+  const letters = id ? initialsOf(nameOf(id)) : '?';
   return (
-    <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-gradient-to-br from-lapissoft to-[#133A5F] font-display text-lead text-[#F2DFB5] shadow-[0_2px_6px_-1px_rgba(19,58,95,0.35)]">
-      {(id ?? '?').slice(0, 1).toUpperCase()}
+    <div
+      className={
+        'grid h-9 w-9 shrink-0 place-items-center rounded-full bg-gradient-to-br from-lapissoft to-[#133A5F] font-display text-[#F2DFB5] shadow-[0_2px_6px_-1px_rgba(19,58,95,0.35)] ' +
+        (letters.length > 1 ? 'text-ui' : 'text-lead')
+      }
+    >
+      {letters}
     </div>
   );
 }
@@ -1102,7 +1114,7 @@ function Frame({ children }: { children: React.ReactNode }) {
             >
               <div className="text-end">
                 <div className="text-ui font-semibold leading-tight text-paper">
-                  {identity?.scholarId ?? t('shell.anonymous')}
+                  {identity ? <Person id={identity.scholarId} /> : t('shell.anonymous')}
                 </div>
                 <div className="text-note leading-tight text-muted">
                   {t(`role.${identity?.role ?? 'observer'}`)}

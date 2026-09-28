@@ -26,6 +26,7 @@ import Fold from '../components/Fold.js';
 import NextAct, { whatToDoNow } from '../components/NextAct.js';
 import Holding from '../components/Holding.js';
 import { useStillThere } from '../lib/stillThere.js';
+import Person from '../components/Person.js';
 
 /**
  * One matter, everything for it, one act.
@@ -583,7 +584,7 @@ export default function MatterPack() {
                         : 'bg-muted')
                   }
                 />
-                <span className="min-w-0 flex-1 truncate text-ui">{r.scholarId}</span>
+                <span className="min-w-0 flex-1 truncate text-ui"><Person id={r.scholarId} /></span>
                 <span className="shrink-0 text-note text-muted">
                   {t(`vote.${r.position}`)}
                 </span>

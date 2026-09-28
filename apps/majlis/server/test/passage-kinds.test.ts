@@ -282,7 +282,7 @@ describe('a name belongs to the step, not to the record', () => {
     const p = buildUndertakingPassage(undertaking(), NOW);
 
     expect(p.next?.key).toBe('due_date');
-    expect(p.next?.whoName).toBeUndefined();
+    expect(p.next?.who).toBeUndefined();
   });
 
   it('names the person once the act is theirs', () => {
@@ -290,6 +290,6 @@ describe('a name belongs to the step, not to the record', () => {
     const p = buildUndertakingPassage(dated, NOW);
 
     expect(p.next?.key).toBe('account');
-    expect(p.next?.whoName).toBe('member-b');
+    expect(p.next?.who).toBe('member-b');
   });
 });

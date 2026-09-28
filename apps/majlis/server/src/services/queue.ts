@@ -19,7 +19,7 @@ import { buildUndertakingPassage } from './passage-undertaking.js';
  */
 function nextOn(
   read: () => Passage,
-): { next: Say | null; whose: Whose | null; whoName?: string; holder?: string } {
+): { next: Say | null; whose: Whose | null; who?: string; holder?: string } {
   try {
     return fromPassage(read());
   } catch {
@@ -30,11 +30,11 @@ function nextOn(
 /** What a row carries from its passage — one place, so no kind can drop a field. */
 function fromPassage(
   p: Passage,
-): { next: Say | null; whose: Whose | null; whoName?: string; holder?: string } {
+): { next: Say | null; whose: Whose | null; who?: string; holder?: string } {
   return {
     next: p.next?.act ?? null,
     whose: p.next?.whose ?? null,
-    whoName: p.next?.whoName,
+    who: p.next?.who,
     holder: p.holder?.to ?? undefined,
   };
 }
@@ -113,11 +113,11 @@ export interface QueueRow {
    * undertaking row once named the wrong member. Absent where nobody has the
    * step; never invented from the role.
    */
-  whoName?: string;
+  who?: string;
   /**
    * Who is carrying the whole of it, where anybody is.
    *
-   * Not the same as `whoName`. A matter at the vote is every signatory's step
+   * Not the same as `who`. A matter at the vote is every signatory's step
    * — nobody's name goes on it — and it is still being carried by the member
    * who took it on, whose list it belongs on.
    */

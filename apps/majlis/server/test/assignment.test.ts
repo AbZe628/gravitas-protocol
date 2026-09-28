@@ -164,13 +164,13 @@ describe('a name on a passage', () => {
       bare.groups.forEach((g, gi) =>
         g.steps.forEach((s, si) => {
           const after = named.groups[gi].steps[si];
-          if (s.whoName) {
+          if (s.who) {
             // A name the reading already carried stays: nobody moves who gave a promise.
-            expect(after.whoName, s.key).toBe(s.whoName);
+            expect(after.who, s.key).toBe(s.who);
           } else if (s.whose === 'board' && (s.state === 'open' || s.state === 'ahead')) {
-            expect(after.whoName, s.key).toBe('member-z');
+            expect(after.who, s.key).toBe('member-z');
           } else {
-            expect(after.whoName, `${s.key} (${s.whose}, ${s.state})`).toBeUndefined();
+            expect(after.who, `${s.key} (${s.whose}, ${s.state})`).toBeUndefined();
           }
         }),
       );
@@ -190,7 +190,7 @@ describe('a name on a passage', () => {
       placed({ ofKind: kind, ofId: id, to: 'member-z' }),
       placed({ ofKind: kind, ofId: id, stepKey: s.key, to: 'member-y' }),
     ]);
-    expect(steps(named).find((x) => x.key === s.key)?.whoName).toBe('member-y');
+    expect(steps(named).find((x) => x.key === s.key)?.who).toBe('member-y');
   });
 
   it('never names a signatory’s step, even one placed on its own — it is every signatory’s', () => {
@@ -210,7 +210,7 @@ describe('a name on a passage', () => {
       placed({ ofKind: kind, ofId: id, to: 'member-z' }),
       placed({ ofKind: kind, ofId: id, stepKey: s.key, to: 'member-y' }),
     ]);
-    expect(steps(named).find((x) => x.key === s.key)?.whoName).toBeUndefined();
+    expect(steps(named).find((x) => x.key === s.key)?.who).toBeUndefined();
     // And the thing is still being carried, by whoever took the whole of it.
     expect(named.holder?.to).toBe('member-z');
   });
@@ -321,7 +321,7 @@ describe('the queue names whoever the passage names', () => {
       for (const r of mine) {
         const source = everyone.find((x) => x.kind === toPassageKind[kind] && x.id === r.id)!;
         const passage = withAssignments(source.read(), assignments);
-        expect(r.whoName, `${kind} ${r.id} step`).toBe(passage.next?.whoName);
+        expect(r.who, `${kind} ${r.id} step`).toBe(passage.next?.who);
         expect(r.holder, `${kind} ${r.id} holder`).toBe(passage.holder?.to);
       }
       // And the holder is really there, rather than absent on both sides.
@@ -330,6 +330,6 @@ describe('the queue names whoever the passage names', () => {
   }
 
   it('names somebody on a step somewhere, or the step comparison proves nothing', () => {
-    expect(rows.some((r) => r.whoName === 'member-z')).toBe(true);
+    expect(rows.some((r) => r.who === 'member-z')).toBe(true);
   });
 });

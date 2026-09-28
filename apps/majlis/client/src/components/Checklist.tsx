@@ -17,6 +17,7 @@ import AskTheBank from './AskTheBank.js';
 import { Button } from './Button';
 import Act from './Act.js';
 import AfterAct from './AfterAct.js';
+import Person from './Person.js';
 
 /**
  * The conditions of a contract shape, ruled on one at a time.
@@ -365,7 +366,7 @@ function Condition({
                     {t(`chk.${f.holds}`)}
                   </span>
                   <span className="mx-1.5 opacity-40">·</span>
-                  <span className="text-muted">{f.scholarId}</span>
+                  <span className="text-muted"><Person id={f.scholarId} /></span>
                   {f.supersededAt && (
                     <>
                       <span className="mx-1.5 opacity-40">·</span>

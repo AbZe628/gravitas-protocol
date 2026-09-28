@@ -6,6 +6,7 @@ import TellTheBank from './TellTheBank.js';
 import { Steps } from './calc.js';
 import { Tag } from './ui.js';
 import { Button } from './Button';
+import Person from './Person.js';
 
 /**
  * What the board has noted, and what happened to each.
@@ -63,7 +64,7 @@ function Entry({ entry }: { entry: HistoryEntry }) {
       </div>
 
       <p className="mt-1 text-note leading-relaxed text-muted">
-        {t('recorded.by')} {c.recordedBy} · {c.recordedAt.slice(0, 10)} · {c.source}
+        {t('recorded.by')} <Person id={c.recordedBy} /> · {c.recordedAt.slice(0, 10)} · {c.source}
       </p>
 
       {/*

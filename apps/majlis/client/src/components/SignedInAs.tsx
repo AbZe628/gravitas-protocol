@@ -1,5 +1,6 @@
 import { useIdentity } from '../lib/identity.js';
 import { useI18n } from '../lib/i18n.js';
+import Person from './Person.js';
 
 /**
  * Who the interface thinks you are.
@@ -34,7 +35,7 @@ export default function SignedInAs() {
       >
         {t(`who.role.${identity.role}`)}
       </div>
-      <div className="text-label text-muted">{identity.scholarId}</div>
+      <div className="text-label text-muted"><Person id={identity.scholarId} /></div>
     </div>
   );
 }

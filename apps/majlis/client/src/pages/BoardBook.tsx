@@ -5,6 +5,7 @@ import { useI18n } from '../lib/i18n.js';
 import { Loading, ErrorText } from '../components/ui.js';
 import { State } from '../components/kit.js';
 import { Division, Gaps, Nothing, Part, PageHead } from '../components/page.js';
+import Person from '../components/Person.js';
 
 /**
  * The board book: everything for one sitting, in one document.
@@ -194,7 +195,7 @@ export default function BoardBook() {
                   <State tone={u.state === 'open' ? 'attention' : 'plain'}>
                     {t(`book.state.${u.state}`)}
                   </State>
-                  <span className="text-ui font-semibold">{u.who}</span>
+                  <span className="text-ui font-semibold"><Person id={u.who} /></span>
                   {u.dueAt ? (
                     <span className="font-mono text-note text-muted">{day(u.dueAt)}</span>
                   ) : (

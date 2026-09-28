@@ -68,7 +68,7 @@ function Step({ step, ordinal }: { step: PassageStep; ordinal?: number }) {
           {/* Whose it is, on every step. The commonest way a matter stalls is
               that everyone believes it is with somebody else. */}
           <span className="text-label font-bold uppercase tracking-caps text-muted">
-            {step.whoName ? nameOf(members, step.whoName) : t(`passage.whose.${step.whose}`)}
+            {step.who ? nameOf(members, step.who) : t(`passage.whose.${step.whose}`)}
           </span>
           {step.state === 'done' && (
             <span className="text-note text-gold/70">{t('passage.done')}</span>
@@ -135,8 +135,8 @@ export default function Passage({ matterId }: { matterId: string }) {
               {/* Whose act it is, as a state rather than as a caption stuck
                   to the end of the sentence. */}
               <span className="rounded-full bg-black/[0.045] px-2.5 py-0.5 text-label font-bold uppercase tracking-label text-sand">
-                {passage.next.whoName
-                  ? nameOf(members, passage.next.whoName)
+                {passage.next.who
+                  ? nameOf(members, passage.next.who)
                   : t(`passage.whose.${passage.next.whose}`)}
               </span>
             </div>

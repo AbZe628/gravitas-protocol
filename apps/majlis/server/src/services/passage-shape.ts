@@ -43,7 +43,7 @@ export type StepState = 'done' | 'open' | 'ahead' | 'skipped' | 'not_applicable'
  *
  * A role and not a person. Which person, of the people who could, is doing
  * it is a separate record — see `assignment.ts` — written onto the step as
- * `whoName` after the reading, so the reading itself never knows.
+ * `who` after the reading, so the reading itself never knows.
  */
 export type Whose = 'board' | 'signatory' | 'liaison' | 'institution' | 'software' | 'clock';
 
@@ -92,19 +92,28 @@ export interface Step {
   /** What the step is for. Shown where a scholar asks why it exists. */
   why: Say;
   /**
-   * The person this step is with, where anybody holds it.
+   * The person this step is with, where anybody holds it — a scholar id.
    *
    * An undertaking names the member who gave it, on the step that person
-   * carries out. Every other name is an assignment, written on by
+   * carries out. Every other one is an assignment, written on by
    * `withAssignments` and only on a step still to be done that a person on
    * the board can hold.
+   *
+   * `who` and not `whoName`, because it is not a name. It was called
+   * `whoName`, and the queue drew it as one: the column that says who is
+   * holding something up read `member-a`, a key from a configuration file.
+   * Two routes do send a name in a field called `whoName` — the undertakings
+   * and the margin notes resolve it on the server — so the same word meant a
+   * name in one place and an id in the other, and each screen had to know
+   * which. `who` is an id everywhere here, as it is on an undertaking; the
+   * screen turns it into a name.
    *
    * The queue once took the name from the record rather than from the step,
    * so an undertaking whose next act was *the board sets a date* was listed
    * against the member who gave it — naming the wrong person as the one
    * holding it up, on the screen everybody opens first.
    */
-  whoName?: string;
+  who?: string;
 }
 
 /**

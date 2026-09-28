@@ -92,7 +92,7 @@ export interface Doing {
    * The person it is with, where the step was placed with somebody else — a
    * scholar id, named on the card by the board's list.
    */
-  whoName?: string;
+  who?: string;
   /**
    * What to press, where there is something.
    *
@@ -195,11 +195,11 @@ export function whatToDoNow(input: {
    * shouting *do this* in lapis at five members for one member's work is how
    * two people end up answering the same condition. It names whom it is with.
    */
-  if (step.whoName && step.whoName !== mine) {
+  if (step.who && step.who !== mine) {
     return {
       says: say(step.act),
       standing: say(step.standing),
-      whoName: step.whoName,
+      who: step.who,
       tone: 'waiting',
     };
   }
@@ -247,9 +247,9 @@ export default function NextAct({ doing, children }: { doing: Doing; children?: 
           {doing.says}
         </p>
         {/* Whom it is with, where it is not with you — the person where there is one. */}
-        {doing.whoName ? (
+        {doing.who ? (
           <span className="rounded-full bg-black/[0.045] px-2.5 py-0.5 text-label font-bold uppercase tracking-label text-sand">
-            {t('hold.with', { name: nameOf(members, doing.whoName) })}
+            {t('hold.with', { name: nameOf(members, doing.who) })}
           </span>
         ) : doing.whose && (
           <span className="rounded-full bg-black/[0.045] px-2.5 py-0.5 text-label font-bold uppercase tracking-label text-sand">

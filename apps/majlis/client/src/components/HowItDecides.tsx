@@ -6,6 +6,7 @@ import { useIdentity } from '../lib/identity.js';
 import { DateText } from './ui.js';
 import { Field, HEADING } from './field.js';
 import { Button } from './Button';
+import Person from './Person.js';
 
 /**
  * The quorum, the confirmation window, and the name the board issues under.
@@ -288,7 +289,7 @@ export default function HowItDecides({
                 </div>
                 <p className="mt-1 max-w-[62ch] text-ui leading-relaxed text-sand">{c.reason}</p>
                 <p className="mt-1 text-note text-muted">
-                  {c.by}
+                  <Person id={c.by} />
                   <span className="mx-1.5 opacity-40">·</span>
                   <DateText iso={c.at} />
                 </p>

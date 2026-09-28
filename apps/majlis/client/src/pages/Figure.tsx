@@ -12,6 +12,7 @@ import { mayDeliberate, useIdentity } from '../lib/identity.js';
 import { ErrorText, Loading } from '../components/ui.js';
 import { useStillThere } from '../lib/stillThere.js';
 import { Button } from '../components/Button';
+import Person from '../components/Person.js';
 
 /**
  * One recorded calculation, at an address of its own.
@@ -186,7 +187,7 @@ export default function Figure() {
             <span className="font-mono text-head tabular-nums">{c.amount}</span>
           </div>
           <p className="mt-3 max-w-[62ch] text-ui leading-relaxed text-muted">
-            {t('recorded.by')} {c.recordedBy} · {day(c.recordedAt)} · {c.source}
+            {t('recorded.by')} <Person id={c.recordedBy} /> · {day(c.recordedAt)} · {c.source}
           </p>
         </div>
       </Division>

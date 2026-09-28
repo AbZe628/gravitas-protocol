@@ -18,6 +18,7 @@ import { ErrorText, Loading, Section } from '../components/ui.js';
 import { State, type Tone } from '../components/kit.js';
 import { Button } from '../components/Button';
 import Act from '../components/Act.js';
+import Person from '../components/Person.js';
 
 /**
  * One contract shape, as this board holds it.
@@ -384,7 +385,7 @@ export default function StructureDetail({ structureId }: { structureId?: string 
               {held.adoption.matterId}
             </Link>
             <span className="mx-1.5 opacity-40">·</span>
-            {held.adoption.decidedBy}
+            <Person id={held.adoption.decidedBy} />
           </p>
         </Section>
       )}

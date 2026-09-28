@@ -15,6 +15,7 @@ import { Field } from '../components/field.js';
 import { ErrorText, Loading } from '../components/ui.js';
 import { useStillThere } from '../lib/stillThere.js';
 import { Button } from '../components/Button';
+import Person from '../components/Person.js';
 
 /**
  * What the institution has asked, and what the board did about it.
@@ -111,7 +112,7 @@ function One({
       <div className="font-display text-sub leading-snug">{s.subject}</div>
 
       <div className="mt-1 text-note text-muted">
-        {s.askedBy}
+        <Person id={s.askedBy} />
         {s.onBehalf && (
           <>
             <span className="mx-1.5 opacity-40">·</span>

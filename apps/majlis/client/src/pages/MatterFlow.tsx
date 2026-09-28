@@ -36,6 +36,7 @@ import { useStillThere } from '../lib/stillThere.js';
 import { Button } from '../components/Button';
 import Act from '../components/Act.js';
 import { Picker } from '../components/Checklist.js';
+import Person from '../components/Person.js';
 
 /**
  * A question, worked one step at a time, inside a window.
@@ -1110,7 +1111,7 @@ function lastSaid(
               <ul className="space-y-1.5">
                 {said.slice(0, 4).map((f, i) => (
                   <li key={i} className="text-ui leading-snug text-sand">
-                    <span className="font-semibold">{f.scholarId}</span> —{' '}
+                    <span className="font-semibold"><Person id={f.scholarId} /></span> —{' '}
                     {t(`chk.${f.holds}`)}
                     {f.reason ? `: ${f.reason}` : ''}
                   </li>

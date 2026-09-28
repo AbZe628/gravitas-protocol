@@ -71,10 +71,12 @@ nešto što nije predmet.
   mora **pogađati iz uloge** umjesto da pročita. Predsjednik ne može dati članu
   predmet da ga pripremi — a to je prva stvar koju predsjednik radi.
   - ✅ server: zapis dodjela, jedna ruta za četiri čina, `holder`/`holdable` na
-    prolazu, red nosi `whoName` i `holder` za svih pet vrsta
+    prolazu, red nosi `who` i `holder` za svih pet vrsta
   - ✅ predmet (`MatterFlow`, bočna ploča) i prekršaj: *uzmi / predaj / vrati
     sobi*, uživo provjereno na 390 i 1440 px, s dva člana u dva prozora
   - ✅ red: ime umjesto `member-a`; *moje* čita držaoca
+  - ✅ imena umjesto id-a na sva 24 mjesta (gornja traka, avatar, rasprava,
+    glasovi, sjednice, prekršaj…); `whoName` koji je nosio id preimenovan u `who`
   - ⬜ pitanje, obaveza i revizija nemaju ekran koji čita prolaz, pa ni kontrolu
     (server ih prima; sučelja nema)
   - ⬜ dodjela **jednog koraka** (ne cijele stvari) postoji na serveru, nema je u

@@ -182,10 +182,10 @@ export function withAssignments(p: Passage, assignments: readonly Assignment[]):
   const name = (s: Step): Step => {
     // A name already on the step wins: an undertaking names the person who
     // gave it, and no assignment moves who made a promise.
-    if (s.whoName || !placeable(s)) return s;
+    if (s.who || !placeable(s)) return s;
     const held = heldBy(assignments, p.of.kind, p.of.id, s);
     if (!held?.to) return s;
-    return { ...s, whoName: held.to };
+    return { ...s, who: held.to };
   };
 
   const groups = p.groups.map((g) => ({ ...g, steps: g.steps.map(name) }));

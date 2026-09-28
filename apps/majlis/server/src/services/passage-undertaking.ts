@@ -20,7 +20,7 @@ import { overdue, type Undertaking } from './undertaking.js';
  * would do a thing, and the minute has their name on it.
  *
  * So this is the one reading that can say *this is yours* and mean a person.
- * It is carried on the passage as `whoName` rather than folded into the
+ * It is carried on the passage as `who` rather than folded into the
  * owner, because the grammar still has no way to say a step belongs to
  * somebody — that is the next item — and pretending otherwise here would put
  * a name into a field every other kind fills with a role.
@@ -93,7 +93,7 @@ function stepsOf(u: Undertaking, now: string): Step[] {
           ? say('undertaking.step.account.standingLate', { days })
           : say('undertaking.step.account.standing', { days }),
       ),
-      whoName: u.who,
+      who: u.who,
     });
   }
 

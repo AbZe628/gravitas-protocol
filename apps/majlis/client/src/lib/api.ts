@@ -866,10 +866,10 @@ export interface QueueRow {
    * The person the next step is with, where anybody holds it — a scholar id,
    * not a name. The board's list says what they are called.
    */
-  whoName?: string;
+  who?: string;
   /**
    * Who is carrying the whole of it, where anybody is — a scholar id. Not the
-   * same as `whoName`: a vote is every signatory's and carries no name, and is
+   * same as `who`: a vote is every signatory's and carries no name, and is
    * still being carried by whoever took the matter on.
    */
   holder?: string;
@@ -1329,7 +1329,7 @@ export interface PassageStep {
    * Who this step is with, where anybody is: the member who gave an
    * undertaking, or whoever the step was placed with. A scholar id.
    */
-  whoName?: string;
+  who?: string;
 }
 
 /**

@@ -20,6 +20,7 @@ import { Button } from '../components/Button';
 import Act from '../components/Act.js';
 import AfterAct from '../components/AfterAct.js';
 import TheNotice from '../components/TheNotice.js';
+import Person from '../components/Person.js';
 
 /**
  * Meetings, as a record rather than a room.
@@ -311,7 +312,7 @@ function MeetingCard({
                 {m.attendance.map((a) => (
                   <li key={a.scholarId}>
                     <span className={a.present ? '' : 'text-muted'}>
-                      {a.scholarId} · {t(a.present ? 'meet.present' : 'meet.absent')}
+                      <Person id={a.scholarId} /> · {t(a.present ? 'meet.present' : 'meet.absent')}
                     </span>
                     {a.note && <span className="text-muted"> — {a.note}</span>}
                   </li>

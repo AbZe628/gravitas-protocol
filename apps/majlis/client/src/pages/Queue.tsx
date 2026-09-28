@@ -95,8 +95,8 @@ function Row({ row, n }: { row: QueueRow; n?: number }) {
     called. Where somebody carries the whole of it but the step is everyone's
     — the vote — the role stays first and the person follows it.
   */
-  const whom = row.whoName
-    ? nameOf(members, row.whoName)
+  const whom = row.who
+    ? nameOf(members, row.who)
     : [row.whose ? t(`passage.whose.${row.whose}`) : '', row.holder ? nameOf(members, row.holder) : '']
         .filter(Boolean)
         .join(' · ');
@@ -261,7 +261,7 @@ export default function Queue() {
    */
   const mine = (r: QueueRow) => {
     const me = identity?.scholarId;
-    if (r.whoName) return r.whoName === me;
+    if (r.who) return r.who === me;
     if (r.holder && r.holder === me && (r.whose === 'board' || r.whose === 'signatory')) return true;
     if (r.whose === 'board') return true;
     if (r.whose === 'signatory') return identity?.role === 'signatory';

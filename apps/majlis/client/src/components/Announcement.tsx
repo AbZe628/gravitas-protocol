@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useI18n } from '../lib/i18n.js';
 import { rowKey, useNews } from '../lib/news.js';
 import type { QueueRow } from '../lib/api.js';
+import Person from './Person.js';
 
 /**
  * The thing that appears by itself when a question arrives.
@@ -92,7 +93,12 @@ function One({ row }: { row: QueueRow }) {
           {row.next && (
             <p className="mt-0.5 text-note leading-snug text-muted">
               {say(row.next)}
-              {row.whoName ? ` · ${row.whoName}` : ''}
+              {row.who && (
+                <>
+                  {' · '}
+                  <Person id={row.who} />
+                </>
+              )}
             </p>
           )}
         </div>

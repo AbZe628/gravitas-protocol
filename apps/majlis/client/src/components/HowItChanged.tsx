@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { oversight, type AdoptedStructure } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { DateText } from './ui.js';
+import Person from './Person.js';
 
 /**
  * Every time this board changed its mind about a contract shape.
@@ -61,7 +62,7 @@ export default function HowItChanged({ structureId }: { structureId: string }) {
                 {t(`adopt.${adoption.standing}`)}
               </span>
               <DateText iso={adoption.decidedAt} />
-              <span>{adoption.decidedBy}</span>
+              <span><Person id={adoption.decidedBy} /></span>
             </div>
 
             {/* The board's own words for what it changed, where it said. */}

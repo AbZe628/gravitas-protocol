@@ -59,8 +59,8 @@ otvoriti. `test/reading-is-quiet.test.ts` sad zove **svaki** GET i pada ako je
 ijedan tražio od pohrane nešto što zvono broji kao pisanje.
 
 **Model koji stoji:**
-- ime na korak (`whoName`) ide samo na korake **odbora** koji još nisu gotovi —
-  posao koji jedan član radi za odbor;
+- osoba na koraku (`who`, scholar id) ide samo na korake **odbora** koji još
+  nisu gotovi — posao koji jedan član radi za odbor;
 - korak potpisnika nikad ne nosi ime: svaki potpisnik ga radi sam za sebe;
 - cijelu stvar nosi `holder` na prolazu, i to može biti bilo ko s ove strane
   stola (potpisnik ili savjetnik), i na prekršaju;
@@ -73,8 +73,19 @@ ijedan tražio od pohrane nešto što zvono broji kao pisanje.
    kontrolu; server ih prima
 2. dodjela **jednog koraka** postoji na serveru, ne u sučelju
 3. arapski i urdu za `hold.*` su moji i nepregledani
-4. na prekršaju `Reported · liaison-1` i dalje crta sirovi id prijavioca — isti
-   razred kvara, drugo mjesto; nije dirano
+
+**Imena umjesto id-a — zatvoreno (poslije CI-ja).** Sirovi scholar id crtao se
+na 24 mjesta u 20 datoteka, plus avatar: gornja traka svakog ekrana (`member-b`), avatar
+(svi „M"), autori u raspravi, glasovi, prisutni na sjednici, utvrđivanja i
+prijavilac na prekršaju, ko je upisao izračun, ko je usvojio oblik, baner reda…
+Korijen nije bio na ekranima: polje `whoName` je u prolazu i redu nosilo **id**,
+a u rutama obaveza i napomena **ime** — ista riječ, dva značenja. U prolazu i
+redu je sada `who` (id, kao `Undertaking.who`); `whoName` ostaje samo gdje nosi
+ime. Sve ide kroz `<Person id>`; `EveryoneIsNamed.test.ts` čita svaki ekran i
+pada ako se polje osobe nacrta kao tekst — dva namjerna izuzetka imaju razlog
+upisan uz sebe (Postavke; rečenica o porijeklu koja se pohranjuje u zapis).
+Straža ne vidi kroz varijable; to drži test ponašanja u
+`WorkIsWithAPerson.test.tsx`.
 
 **Probni server** za ovo (izvan repoa): `MAJLIS_MEMBERS` s lažnom lozinkom,
 `PORT=4105`, `MAJLIS_DB` u scratchpadu, dva `vite` na 5177/5178 s

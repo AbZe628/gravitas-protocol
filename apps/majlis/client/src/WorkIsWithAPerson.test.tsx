@@ -3,6 +3,7 @@ import { render, screen, waitFor, fireEvent, within } from '@testing-library/rea
 import { MemoryRouter } from 'react-router-dom';
 import Queue from './pages/Queue.js';
 import Holding from './components/Holding.js';
+import Person, { initialsOf } from './components/Person.js';
 import { whatToDoNow } from './components/NextAct.js';
 import { I18nProvider } from './lib/i18n.js';
 import { forgetIdentity, type Identity } from './lib/identity.js';
@@ -86,7 +87,7 @@ const row = (over: Partial<QueueRow>): QueueRow => ({
 describe('the queue', () => {
   it('names the person, never the scholar id', async () => {
     // Yours, so it is on the list the screen opens with.
-    wire({ scholarId: 'member-b' }, [row({ whoName: 'member-b' })]);
+    wire({ scholarId: 'member-b' }, [row({ who: 'member-b' })]);
     render(
       <I18nProvider>
         <MemoryRouter>
@@ -100,7 +101,7 @@ describe('the queue', () => {
 
   it('keeps a board step placed with a colleague off your list, and puts what you carry on it', async () => {
     wire({ scholarId: 'advisor-1', role: 'advisory' }, [
-      row({ id: 'theirs', title: 'Placed with Bilal', whoName: 'member-b' }),
+      row({ id: 'theirs', title: 'Placed with Bilal', who: 'member-b' }),
       row({ id: 'carried', title: 'Carried by you', whose: 'signatory', holder: 'advisor-1' }),
       row({ id: 'everyones', title: 'The board’s', whose: 'board' }),
     ]);
@@ -147,14 +148,14 @@ describe('the card that says what now', () => {
   });
 
   it('is quiet, and names the colleague, on a step placed with somebody else', () => {
-    const doing = whatToDoNow(input(step({ whoName: 'member-b' }), 'member-c'))!;
+    const doing = whatToDoNow(input(step({ who: 'member-b' }), 'member-c'))!;
     expect(doing.tone).toBe('waiting');
     expect(doing.act).toBeUndefined();
-    expect(doing.whoName).toBe('member-b');
+    expect(doing.who).toBe('member-b');
   });
 
   it('still says do this to the person it was placed with', () => {
-    const doing = whatToDoNow(input(step({ whoName: 'member-c' }), 'member-c'))!;
+    const doing = whatToDoNow(input(step({ who: 'member-c' }), 'member-c'))!;
     expect(doing.tone).toBe('act');
     expect(doing.act).toBeTruthy();
   });
@@ -225,5 +226,29 @@ describe('the control', () => {
       </I18nProvider>,
     );
     expect(container.textContent).toBe('');
+  });
+});
+
+describe('a person, drawn', () => {
+  it('is their name, and what the record holds where the board does not know them', async () => {
+    wire({ scholarId: 'member-c' });
+    const { container } = render(
+      <I18nProvider>
+        <p>
+          <Person id="member-b" /> | <Person id="Treasury desk" />
+        </p>
+      </I18nProvider>,
+    );
+    await waitFor(() => expect(container.textContent).toContain('Bilal Rahman'));
+    expect(container.textContent).toContain('Treasury desk');
+    expect(container.textContent).not.toContain('member-b');
+  });
+
+  it('gives an avatar the initials of the name, not the first letter of the id', () => {
+    expect(initialsOf('Bilal Rahman')).toBe('BR');
+    expect(initialsOf('Amina')).toBe('A');
+    expect(initialsOf('  ')).toBe('?');
+    // The fault: every id on the demonstration board begins `member-`.
+    expect(initialsOf('member-b')).toBe('M');
   });
 });
