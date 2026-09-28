@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { useParams } from 'react-router-dom';
 import { oversight, type Incident, type Passage, type PassageStep } from '../lib/api.js';
+import { nameOf, useMembers } from '../lib/members.js';
+import Holding from '../components/Holding.js';
 import { useI18n } from '../lib/i18n.js';
 import { DateText, ErrorText, Loading, Tag } from '../components/ui.js';
 import { ClockLine } from './Incidents.js';
@@ -133,6 +135,7 @@ export default function IncidentDetail() {
   const { id = '' } = useParams();
   const { t, say } = useI18n();
   const { identity } = useIdentity();
+  const members = useMembers();
   const [incident, setIncident] = useState<Incident | null>(null);
   const [passage, setPassage] = useState<Passage | null>(null);
   const [failed, setFailed] = useState(false);
@@ -819,6 +822,20 @@ export default function IncidentDetail() {
         and the plan; what they lose is the claim about where it stands, which
         is the one thing this screen must not invent.
       */}
+      {/*
+        Who is carrying this breach to its finding, and taking it on.
+
+        A breach has no step of the board's own — every step on this side of
+        it is the signatories', and each does those for themselves — so no
+        name goes on any step below. The breach itself is still something one
+        member takes on and chases, and this is where that is said.
+      */}
+      {passage?.holdable && (
+        <div className="mb-6 rounded-card bg-raised px-5 py-4 shadow-card">
+          <Holding passage={passage} onChanged={load} ruled={false} />
+        </div>
+      )}
+
       {halves.map((half) => (
         <div key={half.key} className="mb-6">
           <h2 className="mb-1 text-label font-bold uppercase tracking-caps text-muted">
@@ -857,7 +874,9 @@ export default function IncidentDetail() {
                       {/* Whose it is, which only the reading can say. */}
                       {row.step && (
                         <span className="text-label font-bold uppercase tracking-caps text-muted">
-                          {t(`passage.whose.${row.step.whose}`)}
+                          {row.step.whoName
+                            ? nameOf(members, row.step.whoName)
+                            : t(`passage.whose.${row.step.whose}`)}
                         </span>
                       )}
                     </div>

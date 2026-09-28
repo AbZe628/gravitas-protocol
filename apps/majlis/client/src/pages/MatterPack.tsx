@@ -24,6 +24,7 @@ import TellTheBank from '../components/TellTheBank.js';
 import Checklist from '../components/Checklist.js';
 import Fold from '../components/Fold.js';
 import NextAct, { whatToDoNow } from '../components/NextAct.js';
+import Holding from '../components/Holding.js';
 import { useStillThere } from '../lib/stillThere.js';
 
 /**
@@ -247,7 +248,14 @@ export default function MatterPack() {
           member does not arrive wanting to know what a pack is; they arrive
           wanting to know what is wanted of them.
         */}
-        {doing && <NextAct doing={doing} />}
+        {doing && (
+          <NextAct doing={doing}>
+            {/* Who is carrying it, and taking it on — on the card, because it is part of *what now*. */}
+            {passage && (
+              <Holding passage={passage} onChanged={load} loud={doing.tone === 'act'} />
+            )}
+          </NextAct>
+        )}
 
         {/*
           The first part needs no assembling, so it is outside the guard.

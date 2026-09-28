@@ -9,6 +9,7 @@ import { Nothing } from '../components/page.js';
 import { ErrorText, Loading } from '../components/ui.js';
 import { useStillThere } from '../lib/stillThere.js';
 import { useIdentity } from '../lib/identity.js';
+import { nameOf, useMembers } from '../lib/members.js';
 import type { QueuePhase } from '../lib/api.js';
 import { Button } from '../components/Button';
 
@@ -83,6 +84,22 @@ const COLS = (t: (k: string) => string): readonly Column[] => [
  */
 function Row({ row, n }: { row: QueueRow; n?: number }) {
   const { t, say } = useI18n();
+  const members = useMembers();
+
+  /*
+    Whom it is with, by name.
+
+    The server sends a scholar id, and this column drew it as it came —
+    `member-a`, a string from a configuration file, in the column a board reads
+    to see who is holding something up. The board's list says what they are
+    called. Where somebody carries the whole of it but the step is everyone's
+    — the vote — the role stays first and the person follows it.
+  */
+  const whom = row.whoName
+    ? nameOf(members, row.whoName)
+    : [row.whose ? t(`passage.whose.${row.whose}`) : '', row.holder ? nameOf(members, row.holder) : '']
+        .filter(Boolean)
+        .join(' · ');
 
   return (
     <Line
@@ -126,7 +143,7 @@ function Row({ row, n }: { row: QueueRow; n?: number }) {
           {row.next ? say(row.next) : <span className="text-muted">{t('needs.nothingToDo')}</span>}
         </span>,
         <span className="block truncate text-ui text-muted">
-          {row.whoName ?? (row.whose ? t(`passage.whose.${row.whose}`) : '')}
+          {whom}
         </span>,
         <Figure tone={row.overdue ? 'text-breach' : 'text-muted'}>{row.days}</Figure>,
       ]}
@@ -235,13 +252,17 @@ export default function Queue() {
    * theirs had to read the owner off every row and do the filtering by eye.
    *
    * Named on the row, so the rule here is only a reading of what the row
-   * already says: a step with somebody's name on it is theirs, a step that is
-   * the board's is every member's, and a step reserved to the signatories is
-   * a signatory's. Everything else — the institution, its liaison, a clock —
-   * is somebody else's, which is worth knowing and is not yours to do.
+   * already says: a step with somebody's name on it is theirs and nobody
+   * else's; a step on this side of the table of something you carry is yours;
+   * a step that is the board's is every member's, and a step reserved to the
+   * signatories is every signatory's. Everything else — the institution, its
+   * liaison, a clock — is somebody else's, which is worth knowing and is not
+   * yours to do.
    */
   const mine = (r: QueueRow) => {
-    if (r.whoName) return r.whoName === identity?.scholarId;
+    const me = identity?.scholarId;
+    if (r.whoName) return r.whoName === me;
+    if (r.holder && r.holder === me && (r.whose === 'board' || r.whose === 'signatory')) return true;
     if (r.whose === 'board') return true;
     if (r.whose === 'signatory') return identity?.role === 'signatory';
     return false;

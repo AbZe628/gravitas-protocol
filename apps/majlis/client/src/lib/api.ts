@@ -862,8 +862,17 @@ export interface QueueRow {
   /** The act to do next, or null where it is waiting on a clock. */
   next: Say | null;
   whose: 'board' | 'signatory' | 'liaison' | 'institution' | 'software' | 'clock' | null;
-  /** The person it belongs to, where the record names one. Undertakings only. */
+  /**
+   * The person the next step is with, where anybody holds it — a scholar id,
+   * not a name. The board's list says what they are called.
+   */
   whoName?: string;
+  /**
+   * Who is carrying the whole of it, where anybody is — a scholar id. Not the
+   * same as `whoName`: a vote is every signatory's and carries no name, and is
+   * still being carried by whoever took the matter on.
+   */
+  holder?: string;
   /** Whole days it has stood here. */
   days: number;
   overdue: boolean;
@@ -1316,6 +1325,11 @@ export interface PassageStep {
   /** Whether the system actually refuses to go on without this. */
   enforced: boolean;
   why: Say;
+  /**
+   * Who this step is with, where anybody is: the member who gave an
+   * undertaking, or whoever the step was placed with. A scholar id.
+   */
+  whoName?: string;
 }
 
 /**
@@ -1354,7 +1368,32 @@ export interface Passage {
   next: PassageStep | null;
   waiting: { days: number; since: string; on: Whose; note: Say } | null;
   settled: Say | null;
+  /** Who is carrying the whole of it, where anybody is. Written by the server. */
+  holder?: { to: string; by: string; at: string } | null;
+  /** Whether anything here is left for a person on the board to hold. Written by the server. */
+  holdable?: boolean;
 }
+
+/**
+ * One entry in the record of who is doing what.
+ *
+ * Appended, never edited: giving, taking, handing on and putting back are all
+ * this, and which of the four it was is read back off the record by the
+ * server. `to: null` is putting it back to the room.
+ */
+export interface Assignment {
+  id: string;
+  boardId: string;
+  ofKind: PassageKind;
+  ofId: string;
+  stepKey: string | null;
+  to: string | null;
+  by: string;
+  at: string;
+  note?: string;
+}
+
+export type HowAssigned = 'given' | 'taken' | 'handed_on' | 'released';
 
 // ── late payment ──────────────────────────────────────────────────────────
 
@@ -2109,6 +2148,20 @@ export const oversight = {
    * itself, in nine steps written out by hand.
    */
   incidentPassage: (id: string) => get<Passage>(`/api/incidents/${id}/passage`),
+
+  /**
+   * Place the whole of something with a person, or put it back to the room.
+   *
+   * One call for the four acts. The server decides which it was, and refuses
+   * on the same rule `assignment.ts` states; a screen only stops offering
+   * what would be refused.
+   */
+  assign: (body: { ofKind: PassageKind; ofId: string; to: string | null; stepKey?: string | null }) =>
+    post<{ assignment: Assignment; how: HowAssigned }>('/api/assignments', body),
+  assignments: (ofId?: string) =>
+    get<{ assignments: Assignment[]; asOf: string }>(
+      '/api/assignments' + (ofId ? `?ofId=${encodeURIComponent(ofId)}` : ''),
+    ),
 
   /**
    * What the institution owes, and what it still has to do.

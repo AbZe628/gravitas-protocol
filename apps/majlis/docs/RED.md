@@ -64,12 +64,22 @@ nešto što nije predmet.
   samo **stavka registra**, koja nema svoj tok nego je ulaz u lanac iz tačke 7.
 - ✅ **L2** (ostatak) — puni spisak koraka dolazi na živi ekran.
 
-## 2 · Dodjela — korak pripada čovjeku, ne samo ulozi ⬜
+## 2 · Dodjela — korak pripada čovjeku, ne samo ulozi ◐
 
-- **L8** — `whose` je uvijek uloga: odbor, potpisnik, institucija. Nikad čovjek.
+- ◐ **L8** — `whose` je uvijek uloga: odbor, potpisnik, institucija. Nikad čovjek.
   Nema dodjele, nema preuzimanja, nema predaje. Zato filter „ono što tebe čeka"
   mora **pogađati iz uloge** umjesto da pročita. Predsjednik ne može dati članu
   predmet da ga pripremi — a to je prva stvar koju predsjednik radi.
+  - ✅ server: zapis dodjela, jedna ruta za četiri čina, `holder`/`holdable` na
+    prolazu, red nosi `whoName` i `holder` za svih pet vrsta
+  - ✅ predmet (`MatterFlow`, bočna ploča) i prekršaj: *uzmi / predaj / vrati
+    sobi*, uživo provjereno na 390 i 1440 px, s dva člana u dva prozora
+  - ✅ red: ime umjesto `member-a`; *moje* čita držaoca
+  - ⬜ pitanje, obaveza i revizija nemaju ekran koji čita prolaz, pa ni kontrolu
+    (server ih prima; sučelja nema)
+  - ⬜ dodjela **jednog koraka** (ne cijele stvari) postoji na serveru, nema je u
+    sučelju
+  - ⬜ arapski i urdu za `hold.*` — moji, nepregledani
 
 ## 3 · Sat stvara posao ◐
 

@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import type { Matter, Passage, Say, SignedDocument, Whose } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { mayDeliberate, mayVote, type Identity } from '../lib/identity.js';
+import { nameOf, useMembers } from '../lib/members.js';
 import { Button } from './Button';
 
 /**
@@ -87,6 +88,11 @@ export interface Doing {
    * is that each side believes it is with the other.
    */
   whose?: Whose;
+  /**
+   * The person it is with, where the step was placed with somebody else — a
+   * scholar id, named on the card by the board's list.
+   */
+  whoName?: string;
   /**
    * What to press, where there is something.
    *
@@ -183,6 +189,21 @@ export function whatToDoNow(input: {
 
   const where = WHERE[step.key];
 
+  /*
+   * Placed with a colleague. The step is the board's and this member could
+   * press it — the route would let them — but it is with somebody, and a card
+   * shouting *do this* in lapis at five members for one member's work is how
+   * two people end up answering the same condition. It names whom it is with.
+   */
+  if (step.whoName && step.whoName !== mine) {
+    return {
+      says: say(step.act),
+      standing: say(step.standing),
+      whoName: step.whoName,
+      tone: 'waiting',
+    };
+  }
+
   if (!theirs(step.whose, identity) || !where) {
     return {
       says: say(step.act),
@@ -202,6 +223,7 @@ export function whatToDoNow(input: {
 
 export default function NextAct({ doing, children }: { doing: Doing; children?: ReactNode }) {
   const { t } = useI18n();
+  const members = useMembers();
   const loud = doing.tone === 'act';
 
   return (
@@ -224,8 +246,12 @@ export default function NextAct({ doing, children }: { doing: Doing; children?: 
         <p className={'max-w-[52ch] text-lead leading-snug ' + (loud ? 'text-white' : 'text-paper')}>
           {doing.says}
         </p>
-        {/* Whom it is with, where it is not with you. */}
-        {doing.whose && (
+        {/* Whom it is with, where it is not with you — the person where there is one. */}
+        {doing.whoName ? (
+          <span className="rounded-full bg-black/[0.045] px-2.5 py-0.5 text-label font-bold uppercase tracking-label text-sand">
+            {t('hold.with', { name: nameOf(members, doing.whoName) })}
+          </span>
+        ) : doing.whose && (
           <span className="rounded-full bg-black/[0.045] px-2.5 py-0.5 text-label font-bold uppercase tracking-label text-sand">
             {t(`passage.whose.${doing.whose}`)}
           </span>

@@ -10,6 +10,7 @@ import {
   type Checklist as ChecklistData,
   type ConditionState,
   type Matter,
+  type Passage,
   type Structure,
 } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
@@ -21,6 +22,7 @@ import AfterAct from '../components/AfterAct.js';
 import { DocumentLink } from '../components/Documents.js';
 import TheNotice from '../components/TheNotice.js';
 import StepWindow, { type Step } from '../components/StepWindow.js';
+import Holding from '../components/Holding.js';
 import TheCalculator from '../components/TheCalculator.js';
 import AskTheBank from '../components/AskTheBank.js';
 import WhatTheySent from '../components/WhatTheySent.js';
@@ -114,6 +116,15 @@ export default function MatterFlow() {
    * that received these would be unmounted before anybody read them.
    */
   const [told, setTold] = useState<{ notice: Notice; delivery: Delivery } | null>(null);
+  /**
+   * The reading of this matter, for who is carrying it.
+   *
+   * Only for that. This screen walks the conditions from the checklist and
+   * decides nothing from the passage; what it needs from the server here is
+   * who holds the matter and whether there is anything left to hold, which
+   * only the passage says.
+   */
+  const [passage, setPassage] = useState<Passage | null>(null);
   const [failed, setFailed] = useState(false);
   const there = useStillThere();
 
@@ -198,6 +209,10 @@ export default function MatterFlow() {
 
   function load() {
     if (!id) return;
+    oversight
+      .passage(id)
+      .then((p) => setPassage(Array.isArray(p?.groups) ? p : null))
+      .catch(() => setPassage(null));
     api
       .matterToWorkOn(id)
       .then(({ it: m, version: v }) => {
@@ -529,6 +544,19 @@ function lastSaid(
 
   const aside = (
     <>
+      {/*
+        Who is carrying this matter, first in the pane beside the work.
+
+        It was nowhere on this screen. The control was written into the
+        dossier's card, and the dossier is not what /matters/:id draws — found
+        by opening the matter in a browser, not by any test, all of which were
+        green against a screen nobody reaches from the list.
+      */}
+      {passage && (
+        <div className="mb-5 border-b border-line pb-4">
+          <Holding passage={passage} onChanged={load} ruled={false} />
+        </div>
+      )}
       <div className="mb-1.5 text-label font-bold uppercase tracking-caps text-muted">
         {t('flow.theQuestion')}
       </div>

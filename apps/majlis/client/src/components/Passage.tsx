@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { nameOf, useMembers } from '../lib/members.js';
 import { oversight, type Passage as Passage_, type PassageStep } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { Button } from './Button';
@@ -49,6 +50,7 @@ const DOT: Record<PassageStep['state'], string> = {
 
 function Step({ step, ordinal }: { step: PassageStep; ordinal?: number }) {
   const { t, say } = useI18n();
+  const members = useMembers();
   const dim = step.state === 'ahead' || step.state === 'not_applicable' || step.state === 'skipped';
 
   return (
@@ -66,7 +68,7 @@ function Step({ step, ordinal }: { step: PassageStep; ordinal?: number }) {
           {/* Whose it is, on every step. The commonest way a matter stalls is
               that everyone believes it is with somebody else. */}
           <span className="text-label font-bold uppercase tracking-caps text-muted">
-            {t(`passage.whose.${step.whose}`)}
+            {step.whoName ? nameOf(members, step.whoName) : t(`passage.whose.${step.whose}`)}
           </span>
           {step.state === 'done' && (
             <span className="text-note text-gold/70">{t('passage.done')}</span>
@@ -88,6 +90,7 @@ function Step({ step, ordinal }: { step: PassageStep; ordinal?: number }) {
 
 export default function Passage({ matterId }: { matterId: string }) {
   const { t, say } = useI18n();
+  const members = useMembers();
   const [passage, setPassage] = useState<Passage_ | null>(null);
   const [open, setOpen] = useState(false);
 
@@ -132,7 +135,9 @@ export default function Passage({ matterId }: { matterId: string }) {
               {/* Whose act it is, as a state rather than as a caption stuck
                   to the end of the sentence. */}
               <span className="rounded-full bg-black/[0.045] px-2.5 py-0.5 text-label font-bold uppercase tracking-label text-sand">
-                {t(`passage.whose.${passage.next.whose}`)}
+                {passage.next.whoName
+                  ? nameOf(members, passage.next.whoName)
+                  : t(`passage.whose.${passage.next.whose}`)}
               </span>
             </div>
             {passage.next.standing && (

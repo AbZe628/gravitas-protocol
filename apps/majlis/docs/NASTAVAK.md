@@ -3,8 +3,8 @@
 Ovo je ulazna stranica za sljedeću sesiju. Red posla je u
 [RED.md](RED.md); ovdje je samo stanje i ono što se ne vidi iz koda.
 
-Zadnje stanje: **tačka 1 zatvorena i pushana** (`0b5d835`), **tačka 2 napola**
-(commit iznad ovog, serverska strana).
+Zadnje stanje: **tačka 1 zatvorena i pushana** (`0b5d835`), **tačka 2 radi na
+predmetu i prekršaju, server i klijent**, lokalno commitano, **nije pushano**.
 
 ---
 
@@ -36,37 +36,50 @@ kaže na jeziku čitaoca. Oko 220 rečenica u tri jezika.
   **svakom** stanju koraka, ne samo u jednom
 - nijedan ključ u rječniku nije napisan dvaput, po jeziku posebno
 
-## 2 · Šta je u zraku — tačka 2, dodjela
+## 2 · Tačka 2, dodjela — šta je urađeno i šta je nađeno
 
-Serverska strana je napisana i `tsc` prolazi. **Testovi nisu pušteni na ovu
-izmjenu, i klijent nije ni takniut.**
+Testovi pušteni na serversku polovinu su pali (4 od 1917). Popravak toga bio je
+najmanji dio. Nađeno, svako sa stražom koja je gledana kako pada kad se kvar
+vrati:
 
-Napisano:
-- `services/assignment.ts` — zapis se dodaje i nikad ne mijenja; posljednji za
-  isti korak je onaj koji stoji; `to: null` znači vraćeno sobi. `mayAssign`
-  drži pravilo: predsjednik i sekretar smiju premjestiti bilo šta, svako smije
-  uzeti ono što niko ne drži, a samo držalac predaje svoje dalje.
-- `withAssignments(passage, assignments)` — upisuje ime na korak, primijenjeno
-  **poslije** čitanja, tako da čitanja i dalje ne znaju ništa o dodjelama.
-- `routes/assignments.ts` — jedna ruta za četiri čina (dodijeli, uzmi, predaj,
-  vrati); koji je od četiri bio čita se iz zapisa, ne šalje se.
-- Pohrana u sve četiri izvedbe (`store`, `memory`, `file`, `tenant`).
-- Red i obje rute prolaza prolaze kroz dodjele.
+| kvar | kako nađen |
+|---|---|
+| red je gubio ime držaoca za predmet, prekršaj i reviziju — samo pitanje i obaveza su ga nosili | čitanjem koda |
+| držalac cijelog predmeta upisivao se i na korake institucije — član je stajao kao onaj koji drži bankin plan | čitanjem koda |
+| ime je išlo i na gotove korake, gdje se čita kao *ovaj je to uradio* | čitanjem koda |
+| ruta je primala bilo koji id i bilo koji korak | čitanjem koda |
+| rad se mogao dodijeliti **likvidatoru banke** — `board.members` ga nosi kao člana | seed |
+| ime na koraku potpisnika (glasanje) skidalo je glasanje sa liste svim ostalim potpisnicima | razmišljanjem o prekršaju, koji nema nijedan korak odbora |
+| kontrola je bila u `MatterPack`, a `/matters/:id` crta `MatterFlow` | **preglednik** |
+| `assignments` nije bio na listi čitača u `pulsing.ts` → svako čitanje reda zvonilo je zvono → red se ponovo čitao **zauvijek**, ekran vječno *Loading…* | **preglednik** |
+| isti kvar, stariji: `assistantLog` | nova straža, prvi put puštena |
 
-**Prvo što sljedeća sesija treba uraditi:**
+Zadnja dva su najvažnija: sve je bilo zeleno, a početni ekran se nije mogao
+otvoriti. `test/reading-is-quiet.test.ts` sad zove **svaki** GET i pada ako je
+ijedan tražio od pohrane nešto što zvono broji kao pisanje.
 
-```bash
-cd apps/majlis/server && npx vitest run
-```
+**Model koji stoji:**
+- ime na korak (`whoName`) ide samo na korake **odbora** koji još nisu gotovi —
+  posao koji jedan član radi za odbor;
+- korak potpisnika nikad ne nosi ime: svaki potpisnik ga radi sam za sebe;
+- cijelu stvar nosi `holder` na prolazu, i to može biti bilo ko s ove strane
+  stola (potpisnik ili savjetnik), i na prekršaju;
+- `holdable` kaže server — klijent ne računa sam ima li šta za držati;
+- *moje* u redu: ime na koraku → samo taj; ono što nosiš → tvoje; odbor → svih;
+  potpisnik → svih potpisnika.
 
-Zatim klijent:
-1. `lib/api.ts` — tip `Assignment`, `PassageStep.whoName`, poziv `assign()`
-2. Kontrola na ekranu: *uzmi ovo* / *predaj* / *vrati sobi*, na kartici sljedeće
-   radnje i na redu prolaza
-3. `Queue.tsx` — pravilo `mine` već čita `r.whoName` i radit će bez izmjene,
-   ali **ime se crta kao sirovi `member-a`**; treba ga razriješiti kroz
-   `board.members` u pravo ime
-4. Uživo na 390 px i 1440 px
+**Ostalo od tačke 2:**
+1. pitanje, obaveza, revizija — nemaju ekran koji čita prolaz, pa nemaju ni
+   kontrolu; server ih prima
+2. dodjela **jednog koraka** postoji na serveru, ne u sučelju
+3. arapski i urdu za `hold.*` su moji i nepregledani
+4. na prekršaju `Reported · liaison-1` i dalje crta sirovi id prijavioca — isti
+   razred kvara, drugo mjesto; nije dirano
+
+**Probni server** za ovo (izvan repoa): `MAJLIS_MEMBERS` s lažnom lozinkom,
+`PORT=4105`, `MAJLIS_DB` u scratchpadu, dva `vite` na 5177/5178 s
+`MAJLIS_AS=member-b:…` i `member-c:…` — dva člana u dva prozora. Tako su
+nađena zadnja dva kvara.
 
 ---
 
