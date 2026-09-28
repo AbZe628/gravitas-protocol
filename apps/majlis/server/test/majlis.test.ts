@@ -558,6 +558,11 @@ describe('api', () => {
       'POST /api/committees/:id/dissolve',
       'POST /api/referrals',
       'POST /api/referrals/:id/report',
+      /*
+       * Who is doing a thing. Appended, never edited — giving, taking, handing
+       * on and putting back are all this one route; see routes/assignments.ts.
+       */
+      'POST /api/assignments',
       'POST /api/referrals/:id/withdraw',
       'POST /api/undertakings',
       'POST /api/undertakings/:id/close',

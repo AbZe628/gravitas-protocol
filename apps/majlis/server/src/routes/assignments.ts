@@ -1,8 +1,17 @@
+import { randomUUID } from 'node:crypto';
 import { Router } from 'express';
 import { z } from 'zod';
-import { howOf, heldBy, mayAssign, type Assignment } from '../services/assignment.js';
-import type { PassageKind } from '../services/passage-shape.js';
+import { structures } from '../data/structures.js';
+import { howOf, heldBy, mayAssign, placeable, type Assignment } from '../services/assignment.js';
+import { buildPassage } from '../services/passage.js';
+import { buildIncidentPassage } from '../services/passage-incident.js';
+import { buildQuestionPassage } from '../services/passage-question.js';
+import { buildReviewPassage } from '../services/passage-review.js';
+import { buildUndertakingPassage } from '../services/passage-undertaking.js';
+import type { Passage, PassageKind } from '../services/passage-shape.js';
+import type { Members, Role } from '../auth/members.js';
 import type { Store } from '../store/index.js';
+import type { Board } from '../types.js';
 import { badRequest, handle, identityOf } from './http.js';
 
 /**
@@ -21,9 +30,17 @@ import { badRequest, handle, identityOf } from './http.js';
  *
  * ── who it may name ───────────────────────────────────────────────────────
  *
- * Somebody on this board. Not the institution, not its liaison desk: those
- * are the other side of the table, and placing work with them from in here
- * would be this board minuting a commitment the bank never made.
+ * Somebody who sits on this board: on the board's own list **and** holding a
+ * signatory's or an advisory member's credential. Not the institution, not
+ * its liaison: those are the other side of the table, and placing work with
+ * them from in here would be this board minuting a commitment the bank never
+ * made.
+ *
+ * Both lists, because neither is enough. The board's list carries the
+ * liaison as a member — they attend and answer on mechanism — and a check
+ * against that list alone let work be placed with the bank's own person,
+ * which is what the paragraph above says cannot happen. The credential file
+ * says what each person is.
  *
  * ── and it never says the work is done ────────────────────────────────────
  *
@@ -44,11 +61,64 @@ const placing = z.object({
   note: z.string().max(2000).optional(),
 });
 
+/**
+ * The reading of the thing an assignment is about, or null where there is no
+ * such thing on this board.
+ *
+ * Read so the route can refuse an assignment to something that does not
+ * exist, or to a step the thing does not have. Without it the record could
+ * say somebody holds step `conditions` of matter `nonsense`, and the screen
+ * that asks what needs you would count it against them forever.
+ */
+async function passageOf(
+  store: Store,
+  board: Board,
+  ofKind: PassageKind,
+  ofId: string,
+  at: string,
+): Promise<Passage | null> {
+  switch (ofKind) {
+    case 'matter': {
+      const m = await store.matter(ofId);
+      if (!m || m.boardId !== board.id) return null;
+      const shape = m.structureId ? (structures.find((s) => s.id === m.structureId) ?? null) : null;
+      return buildPassage(board, m, shape, at);
+    }
+    case 'breach': {
+      const i = await store.incident(ofId);
+      return i && i.boardId === board.id ? buildIncidentPassage(i, at) : null;
+    }
+    case 'question': {
+      const q = await store.submission(ofId);
+      return q && q.boardId === board.id ? buildQuestionPassage(q, at) : null;
+    }
+    case 'undertaking': {
+      const u = await store.undertaking(ofId);
+      return u && u.boardId === board.id ? buildUndertakingPassage(u, at) : null;
+    }
+    case 'review': {
+      const r = await store.rule(ofId);
+      return r && r.boardId === board.id ? buildReviewPassage(r, at) : null;
+    }
+  }
+}
+
+/** The two roles that sit on this side of the table. */
+const SITS: readonly Role[] = ['signatory', 'advisory'];
+
 export function assignmentRoutes(
   store: Store,
+  members: Members | null,
   now: () => string = () => new Date().toISOString(),
 ): Router {
   const router = Router();
+
+  /** What the credential file says somebody is, or null where it does not know them. */
+  const roleOf = (scholarId: string): Role | null =>
+    members?.roster().find((m) => m.scholarId === scholarId)?.role ?? null;
+
+  const sits = (board: Board, scholarId: string, role: Role | null): boolean =>
+    board.members.some((m) => m.id === scholarId) && role !== null && SITS.includes(role);
 
   /*
    * One board per installation, and the store is already scoped to one
@@ -104,33 +174,67 @@ export function assignmentRoutes(
         return;
       }
 
-      /*
-       * Somebody on this board, checked against the board's own list.
-       *
-       * The other side of the table is deliberately not placeable: a board
-       * that could assign work to the bank's liaison would be minuting a
-       * commitment the bank never made.
-       */
-      if (to !== null && !board.members.some((m) => m.id === to)) {
+      if (to !== null && !sits(board, to, roleOf(to))) {
         res.status(400).json({
           error: 'not_a_member',
           message:
-            'Work is placed with somebody on this board. The institution’s own steps are ' +
+            'Work is placed with somebody who sits on this board. The institution’s own steps are ' +
             'theirs to arrange, and this board recording who does them would be putting ' +
             'words in their mouth.',
         });
         return;
       }
 
+      const passage = await passageOf(store, board, ofKind, ofId, now());
+      if (!passage) {
+        res.status(404).json({ error: 'not_found', message: 'There is no such thing on this board.' });
+        return;
+      }
+
+      /*
+       * The step, where one is named: it has to be a step this thing has, and
+       * one a person on this board can hold.
+       */
+      const step = stepKey
+        ? (passage.groups.flatMap((g) => g.steps).find((s) => s.key === stepKey) ?? null)
+        : null;
+      if (stepKey && !step) {
+        res.status(404).json({ error: 'no_such_step', message: 'That is not a step of this.' });
+        return;
+      }
+      if (step && !placeable(step)) {
+        res.status(400).json({
+          error: 'not_placeable',
+          message:
+            step.state === 'open' || step.state === 'ahead'
+              ? 'That step is not the board’s to place: it belongs to the institution, or to a clock.'
+              : 'That step is already behind it. Who was asked to do it changes nothing now.',
+        });
+        return;
+      }
+
+      /*
+       * A signatory's step, named on its own, goes to a signatory. Carrying a
+       * whole matter to its finding can be anybody's work; being the one who
+       * determines it cannot, and a name on that step would say otherwise.
+       */
+      if (step?.whose === 'signatory' && to !== null) {
+        if (roleOf(to) !== 'signatory') {
+          res.status(400).json({
+            error: 'not_a_signatory',
+            message: 'That step is a signatory’s own act. It can be placed with a signatory.',
+          });
+          return;
+        }
+      }
+
       const assignments = await store.assignments(board.id);
-      const standing = stepKey
-        ? heldBy(assignments, ofKind as PassageKind, ofId, stepKey)
-        : (heldBy(assignments, ofKind as PassageKind, ofId, '') ?? null);
+      const standing = heldBy(assignments, ofKind, ofId, step);
 
       const refusal = mayAssign({
         by: who.scholarId,
         office: who.office ?? null,
-        onTheBoard: board.members.some((m) => m.id === who.scholarId),
+        onTheBoard: sits(board, who.scholarId, who.role),
         to,
         heldBy: standing?.to ?? null,
       });
@@ -149,9 +253,9 @@ export function assignmentRoutes(
       }
 
       const assignment: Assignment = {
-        id: `asg-${ofId}-${Date.now().toString(36)}`,
+        id: `asg-${randomUUID()}`,
         boardId: board.id,
-        ofKind: ofKind as PassageKind,
+        ofKind,
         ofId,
         stepKey,
         to,

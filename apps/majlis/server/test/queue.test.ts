@@ -114,7 +114,7 @@ function matter(id: string, status: Matter['status'], openedAt: string): Matter 
   return { ...BASE, id, title: 'Matter ' + id, status, openedAt, boardId: BOARD.id };
 }
 
-const EMPTY = { rules: [], undertakings: [], structures, now: NOW };
+const EMPTY = { rules: [], undertakings: [], structures, assignments: [], now: NOW };
 
 describe('what is waiting, and whose it is', () => {
   it('puts what is past its date first, whatever kind it is', () => {

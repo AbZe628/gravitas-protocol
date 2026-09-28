@@ -41,10 +41,9 @@ export type StepState = 'done' | 'open' | 'ahead' | 'skipped' | 'not_applicable'
  * Named on every step, because the commonest way anything here stalls is that
  * everyone believes it is with somebody else.
  *
- * A role and not a person, which is a gap rather than a decision: nothing in
- * the record can yet say *this step is member B's*, so the screen that asks
- * what needs **you** has to infer it from the role. Naming people is the next
- * item after this one.
+ * A role and not a person. Which person, of the people who could, is doing
+ * it is a separate record — see `assignment.ts` — written onto the step as
+ * `whoName` after the reading, so the reading itself never knows.
  */
 export type Whose = 'board' | 'signatory' | 'liaison' | 'institution' | 'software' | 'clock';
 
@@ -93,16 +92,17 @@ export interface Step {
   /** What the step is for. Shown where a scholar asks why it exists. */
   why: Say;
   /**
-   * The person this step belongs to, where the record names one.
+   * The person this step is with, where anybody holds it.
    *
-   * Only an undertaking does, and only on the step that person carries out.
-   * The queue used to take the name from the record rather than from the step,
+   * An undertaking names the member who gave it, on the step that person
+   * carries out. Every other name is an assignment, written on by
+   * `withAssignments` and only on a step still to be done that a person on
+   * the board can hold.
+   *
+   * The queue once took the name from the record rather than from the step,
    * so an undertaking whose next act was *the board sets a date* was listed
    * against the member who gave it — naming the wrong person as the one
    * holding it up, on the screen everybody opens first.
-   *
-   * A first seam rather than the whole of it: steps still belong to roles, and
-   * making them belong to people is its own piece of work.
    */
   whoName?: string;
 }

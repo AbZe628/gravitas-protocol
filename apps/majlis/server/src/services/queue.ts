@@ -97,11 +97,13 @@ export interface QueueRow {
   /** Whose that act is. Null only where there is no act. */
   whose: Whose | null;
   /**
-   * The person it belongs to, where the record names one.
+   * The person the next step is with, where anybody holds it.
    *
-   * Only an undertaking does. Everything else is the board's, a signatory's
-   * or the institution's as a body, and inventing a name for those would be
-   * assigning work nobody agreed to take.
+   * Read off the passage's own next step, for every kind — the undertaking's
+   * giver, or whoever the step was placed with. Taken from anywhere else it
+   * can name somebody other than the step's own holder, which is how the
+   * undertaking row once named the wrong member. Absent where nobody has the
+   * step; never invented from the role.
    */
   whoName?: string;
   /** How long it has stood here. Days, floored — never rounded up. */
@@ -197,6 +199,7 @@ export function buildQueue(input: QueueInput): QueueRow[] {
      */
     let next: Say | null = null;
     let whose: Whose | null = null;
+    let whoName: string | undefined;
     let days = daysSince(m.openedAt, now);
     try {
       const shape = m.structureId
@@ -205,6 +208,7 @@ export function buildQueue(input: QueueInput): QueueRow[] {
       const passage = withAssignments(buildPassage(board, m, shape, now), input.assignments);
       next = passage.next?.act ?? null;
       whose = passage.next?.whose ?? null;
+      whoName = passage.next?.whoName;
       days = passage.waiting?.days ?? days;
     } catch {
       // Left as it stands: the row without its next act.
@@ -218,6 +222,7 @@ export function buildQueue(input: QueueInput): QueueRow[] {
       phase: 'deciding',
       next,
       whose,
+      whoName,
       days,
       overdue: false,
     });
@@ -240,7 +245,6 @@ export function buildQueue(input: QueueInput): QueueRow[] {
       to: `/undertakings#${u.id}`,
       title: u.what,
       phase: 'deciding',
-      ...nextOn(() => withAssignments(buildUndertakingPassage(u, now), input.assignments)),
       /*
        * The person, by name — but only where the step is theirs.
        *
@@ -255,7 +259,7 @@ export function buildQueue(input: QueueInput): QueueRow[] {
        * the column that says who is holding it up, on the screen everybody
        * opens first. Found by reading the list rather than by any test.
        */
-      whoName: nextOn(() => withAssignments(buildUndertakingPassage(u, now), input.assignments)).whoName,
+      ...nextOn(() => withAssignments(buildUndertakingPassage(u, now), input.assignments)),
       days: daysSince(u.minutedAt, now),
       overdue: undertakingOverdue(u, now),
     });
@@ -278,7 +282,9 @@ export function buildQueue(input: QueueInput): QueueRow[] {
    * step belonging to the board, and so does one whose date has arrived.
    */
   for (const rule of input.rules) {
-    const { next, whose } = nextOn(() => withAssignments(buildReviewPassage(rule, now), input.assignments));
+    const { next, whose, whoName } = nextOn(() =>
+      withAssignments(buildReviewPassage(rule, now), input.assignments),
+    );
     if (!next) continue;
 
     const status = reviewStatus(rule, now);
@@ -290,6 +296,7 @@ export function buildQueue(input: QueueInput): QueueRow[] {
       phase: 'inforce',
       next,
       whose,
+      whoName,
       /*
        * Days past the date where there is one. A ruling with no interval is
        * not late — nothing was ever promised — so it waits at zero and takes
@@ -318,10 +325,12 @@ export function buildQueue(input: QueueInput): QueueRow[] {
      */
     let next: Say | null = null;
     let whose: Whose | null = null;
+    let whoName: string | undefined;
     try {
       const passage = withAssignments(buildIncidentPassage(i, now), input.assignments);
       next = passage.next?.act ?? null;
       whose = passage.next?.whose ?? null;
+      whoName = passage.next?.whoName;
     } catch {
       // Left as it stands: the row without its next act.
     }
@@ -337,6 +346,7 @@ export function buildQueue(input: QueueInput): QueueRow[] {
       phase: 'checked',
       next,
       whose,
+      whoName,
       days: daysSince(i.reportedAt, now),
       /*
        * The thirty days run from the board finding an event actual, not from

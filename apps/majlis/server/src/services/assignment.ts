@@ -1,4 +1,4 @@
-import type { PassageKind, Passage, Step } from './passage-shape.js';
+import type { PassageKind, Passage, Step, Whose } from './passage-shape.js';
 
 /**
  * Who is actually doing a thing, as opposed to whose kind of thing it is.
@@ -88,31 +88,60 @@ export function howOf(a: Assignment, previous: Assignment | null): HowAssigned {
 }
 
 /**
+ * The kinds of step a person on this board can hold.
+ *
+ * The board's own steps, and a signatory's. Not the institution's or its
+ * liaison's — those are the other side of the table, and this board naming who
+ * does them would be minuting a commitment the bank never made. Not the clock's
+ * or the software's, which nobody does.
+ */
+export const PLACEABLE: readonly Whose[] = ['board', 'signatory'];
+
+/** Whether a step can carry a person's name at all. */
+export function placeable(step: Pick<Step, 'whose' | 'state'>): boolean {
+  return PLACEABLE.includes(step.whose) && (step.state === 'open' || step.state === 'ahead');
+}
+
+/**
  * The assignment that stands for one step, or null where nobody holds it.
  *
  * Later entries supersede earlier ones for the same step, and an entry naming
- * nobody means the step went back to the room. A step with no entry of its own
- * falls back to whoever holds the whole thing.
+ * nobody means the step went back to the room.
+ *
+ * A step with no entry of its own falls back to whoever holds the whole thing
+ * — **but only a step on this side of the table**, the board's or a
+ * signatory's. Whoever took a matter or a breach on is the one carrying it to
+ * a finding, and that includes the finding. They do not hold the
+ * institution's filing: a member who took a matter on was listed as the one
+ * holding up the bank's plan, which is the wrong person in the column that
+ * says who is holding it up — the same fault the undertaking row once had.
+ *
+ * Every step of a breach that is not the institution's is a signatory's, so
+ * a rule covering only the board's own steps would have made a breach
+ * something nobody could take at all.
+ *
+ * Pass null for the step to ask who holds the whole thing.
  */
 export function heldBy(
   assignments: readonly Assignment[],
   ofKind: PassageKind,
   ofId: string,
-  stepKey: string,
+  step: Pick<Step, 'key' | 'whose'> | null,
 ): Assignment | null {
   let onStep: Assignment | null = null;
   let onWhole: Assignment | null = null;
 
   for (const a of assignments) {
     if (a.ofKind !== ofKind || a.ofId !== ofId) continue;
-    if (a.stepKey === stepKey) onStep = a;
-    else if (a.stepKey === null) onWhole = a;
+    if (a.stepKey === null) onWhole = a;
+    else if (step && a.stepKey === step.key) onStep = a;
   }
 
   // The specific beats the general, including where the specific released it:
   // a step handed back to the room is back with the room, not back with
   // whoever holds the rest.
-  const standing = onStep ?? onWhole;
+  const standing =
+    step === null ? onWhole : (onStep ?? (PLACEABLE.includes(step.whose) ? onWhole : null));
   return standing && standing.to !== null ? standing : null;
 }
 
@@ -123,14 +152,19 @@ export function heldBy(
  * the record and know nothing about who picked what up. Every route that
  * serves a passage runs it through here; a route that forgets shows a passage
  * where nobody holds anything, which is what they all did before.
+ *
+ * Only on steps still to be done. A name on a finished step would read as
+ * *this person did it*, and an assignment says who was asked, not who acted —
+ * the record of who acted is the act itself.
  */
 export function withAssignments(p: Passage, assignments: readonly Assignment[]): Passage {
   const name = (s: Step): Step => {
-    const held = heldBy(assignments, p.of.kind, p.of.id, s.key);
     // A name already on the step wins: an undertaking names the person who
     // gave it, and no assignment moves who made a promise.
-    if (!held || s.whoName) return s;
-    return { ...s, whoName: held.to ?? undefined };
+    if (s.whoName || !placeable(s)) return s;
+    const held = heldBy(assignments, p.of.kind, p.of.id, s);
+    if (!held?.to) return s;
+    return { ...s, whoName: held.to };
   };
 
   const groups = p.groups.map((g) => ({ ...g, steps: g.steps.map(name) }));

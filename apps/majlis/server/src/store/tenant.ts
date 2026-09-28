@@ -390,11 +390,6 @@ export class TenantStore implements Store {
   }
 
   /*
-   * Undertakings are scoped through the board, like matters and incidents.
-   * An undertaking names what a member of one bank's board agreed to do, and
-   * there is nothing about it another bank should read.
-   */
-  /*
    * Scoped through the board, like undertakings. Who is doing what on another
    * institution's board is that institution's business and not this one's.
    */
@@ -412,6 +407,11 @@ export class TenantStore implements Store {
     return this.inner.assign(assignment);
   }
 
+  /*
+   * Undertakings are scoped through the board, like matters and incidents.
+   * An undertaking names what a member of one bank's board agreed to do, and
+   * there is nothing about it another bank should read.
+   */
   async undertakings(boardId?: string): Promise<Undertaking[]> {
     if (boardId && !(await this.owns(boardId))) return [];
     const mine = await this.ownBoardIds();
