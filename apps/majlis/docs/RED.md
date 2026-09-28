@@ -48,21 +48,21 @@ bude jedna, svaki ekran se sam od sebe počne ponašati isto.
 
 ---
 
-## 1 · Gramatika se proširi sa predmeta na sve vrste ⬜
+## 1 · Gramatika se proširi sa predmeta na sve vrste ◐
 
 Najveći posao i jedini koji mijenja logiku a ne izgled. Radi se prvi jer briše
 ručnu izvedbu na ekranu prekršaja i time odmah dokaže da gramatika drži i za
 nešto što nije predmet.
 
-- **L4** — `queue.ts` tvrdi da ništa ne računa sam, a računa: `BREACH_NEXT` je
+- ✅ **L4** — `queue.ts` tvrdi da ništa ne računa sam, a računa: `BREACH_NEXT` je
   ručna tablica od šest faza, u samom `queue.ts`. Za pitanje, obavezu i reviziju
   čin je upisan doslovno. Jedino predmet zove `buildPassage`.
-- **L6** — ekran prekršaja piše gramatiku **treći put**, rukom u komponenti,
+- ✅ **L6** — ekran prekršaja piše gramatiku **treći put**, rukom u komponenti,
   devet koraka, sa `current: i.stage === 'reported'` — i drugačijim riječima za
   iste činove nego `BREACH_NEXT`.
-- **L7** — pitanje, obaveza, revizija i **stavka registra** nemaju gramatiku
+- ◐ **L7** — prekršaj gotov; pitanje, obaveza, revizija i **stavka registra** nemaju gramatiku
   uopće.
-- **L2** (ostatak) — puni spisak koraka dolazi na živi ekran.
+- ✅ **L2** (ostatak) — puni spisak koraka dolazi na živi ekran.
 
 ## 2 · Dodjela — korak pripada čovjeku, ne samo ulozi ⬜
 
