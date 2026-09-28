@@ -4,7 +4,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { I18nProvider } from './lib/i18n.js';
 import Shell from './components/Shell.js';
 import { RAIL } from './lib/spine.js';
-import { DICTIONARIES } from './locales/index.js';
+import { DICTIONARIES } from './locales/all.js';
 
 /**
  * The bar at the foot of a phone, and what it says about where you are.

@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import Act from '../components/Act.js';
 import { api, oversight, type Health, type MatterSummary } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
-import { DateText } from '../components/ui.js';
+import { DateText, Loading } from '../components/ui.js';
 import { DocumentLink, YearPicker } from '../components/Documents.js';
 import { Sheet, Line, Mark, Figure, type Column } from '../components/sheet.js';
 import { Quiet } from '../components/kit.js';
@@ -22,7 +22,7 @@ const SETTLED = ['in_force', 'rejected', 'lapsed', 'withdrawn'];
 function Decided({ matters, lost }: { matters: MatterSummary[] | null; lost: boolean }) {
   const { t } = useI18n();
 
-  if (matters === null) return <p className="mb-6 text-ui text-muted">{t('common.loading')}</p>;
+  if (matters === null) return <div className="mb-6"><Loading rows={3} bare /></div>;
 
   const settled = matters
     .filter((m) => SETTLED.includes(m.status))

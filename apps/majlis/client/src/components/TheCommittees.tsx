@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { oversight } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { Nothing } from './page.js';
+import { Loading } from './ui.js';
 
 /**
  * The committees a board keeps.
@@ -62,7 +63,7 @@ export default function TheCommittees() {
   }, []);
 
   if (failed) return <Nothing>{t('cttee.unavailable')}</Nothing>;
-  if (!held) return <p className="text-ui text-muted">{t('common.loading')}</p>;
+  if (!held) return <Loading rows={2} bare />;
   if (keepsNone) return <Nothing>{t('set.keepsNoCommittees')}</Nothing>;
 
   return (

@@ -221,6 +221,49 @@ describe('the control', () => {
     expect(screen.getAllByRole('option').length).toBeGreaterThan(1);
   });
 
+  /*
+   * The act is drawn at once and the server's answer replaces it. Both halves:
+   * a test that only waited for the write would pass on the old screen, which
+   * spun until the second read came back.
+   */
+  it('draws the new holder the moment the member takes it, before the server has answered', async () => {
+    const { onChanged, container } = await draw({ scholarId: 'member-c' }, p(null));
+    let answer: (r: Response) => void = () => undefined;
+    const pending = new Promise<Response>((ok) => (answer = ok));
+    const underneath = globalThis.fetch;
+    vi.stubGlobal('fetch', (input: RequestInfo | URL, init?: RequestInit) =>
+      init?.method === 'POST' ? pending : underneath(input, init),
+    );
+
+    fireEvent.click(await screen.findByRole('button', { name: /take this on/i }));
+    expect(container.textContent).toContain('With you');
+    expect(container.textContent).not.toContain('Nobody has taken this on');
+    expect(onChanged).not.toHaveBeenCalled();
+
+    answer(new Response(JSON.stringify({ assignment: {}, how: 'taken' }), { status: 201 }));
+    await waitFor(() => expect(onChanged).toHaveBeenCalled());
+  });
+
+  it('puts the holder back, and says why, when the server refuses', async () => {
+    const { onChanged, container } = await draw({ scholarId: 'member-c' }, p(null));
+    const underneath = globalThis.fetch;
+    vi.stubGlobal('fetch', (input: RequestInfo | URL, init?: RequestInit) =>
+      init?.method === 'POST'
+        ? Promise.resolve(
+            new Response(JSON.stringify({ error: 'forbidden', message: 'Somebody took it a moment ago.' }), {
+              status: 403,
+            }),
+          )
+        : underneath(input, init),
+    );
+
+    fireEvent.click(await screen.findByRole('button', { name: /take this on/i }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('Somebody took it a moment ago.');
+    expect(container.textContent).toContain('Nobody has taken this on');
+    expect(container.textContent).not.toContain('With you');
+    expect(onChanged).not.toHaveBeenCalled();
+  });
+
   it('is not drawn where there is nothing left to hold', async () => {
     wire({ scholarId: 'member-c' });
     const { container } = render(

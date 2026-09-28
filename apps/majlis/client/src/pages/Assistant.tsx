@@ -42,7 +42,7 @@ function Earlier() {
       {failed ? (
         <ErrorText />
       ) : !log ? (
-        <Loading />
+        <Loading rows={2} bare />
       ) : (
         <ul className="overflow-hidden rounded-card bg-raised shadow-ring [&>li+li]:border-t [&>li+li]:border-line">
           {log.map((x) => (

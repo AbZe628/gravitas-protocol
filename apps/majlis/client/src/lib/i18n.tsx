@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
-import { dirFor, translate, type Lang, type Vars } from '../locales/index.js';
+import { dirFor, isLoaded, loadLang, translate, type Lang, type Vars } from '../locales/index.js';
 
 interface I18nValue {
   lang: Lang;
@@ -33,9 +33,19 @@ const I18nContext = createContext<I18nValue | null>(null);
 
 const STORAGE_KEY = 'majlis.lang';
 
-function initialLang(): Lang {
+/**
+ * The language this reader chose last time, or the browser's, or English.
+ *
+ * Exported for `main.tsx`, which fetches it before the first screen is drawn.
+ */
+export function initialLang(): Lang {
   if (typeof window === 'undefined') return 'en';
-  const stored = window.localStorage?.getItem(STORAGE_KEY);
+  let stored: string | null = null;
+  try {
+    stored = window.localStorage?.getItem(STORAGE_KEY) ?? null;
+  } catch {
+    /* storage refused — a private window, or site data blocked */
+  }
   if (stored === 'en' || stored === 'ar' || stored === 'ur') return stored;
   const nav = window.navigator?.language?.slice(0, 2);
   if (nav === 'ar' || nav === 'ur') return nav;
@@ -43,8 +53,30 @@ function initialLang(): Lang {
 }
 
 export function I18nProvider({ children }: { children: ReactNode }) {
-  const [lang, setLangState] = useState<Lang>(initialLang);
+  /*
+   * The first language is the one `main.tsx` already fetched. If that fetch
+   * failed the page is in English, which is what the reader is actually being
+   * shown, rather than in a language whose sentences are not here.
+   */
+  const [lang, setLangState] = useState<Lang>(() => {
+    const first = initialLang();
+    return isLoaded(first) ? first : 'en';
+  });
   const dir = dirFor(lang);
+
+  /*
+   * A language is fetched before it is switched to, so the screen changes once
+   * — from one whole language to the other — and never shows the fallback
+   * English in a right-to-left frame while the chunk is on its way. One
+   * already here switches in the same tick, as it always did.
+   */
+  const setLang = useMemo(
+    () => (l: Lang) => {
+      if (isLoaded(l)) setLangState(l);
+      else loadLang(l).then(() => setLangState(l), () => undefined);
+    },
+    [],
+  );
 
   useEffect(() => {
     document.documentElement.lang = lang;
@@ -59,12 +91,12 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   const value = useMemo<I18nValue>(
     () => ({
       lang,
-      setLang: setLangState,
+      setLang,
       t: (key: string, vars?: Vars) => translate(lang, key, vars),
       say: (s) => (s ? translate(lang, s.key, s.vars) : ''),
       dir,
     }),
-    [lang, dir],
+    [lang, dir, setLang],
   );
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;

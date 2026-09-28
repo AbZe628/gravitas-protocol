@@ -1,7 +1,8 @@
 import fs from 'node:fs';
+import { KEY_LINE, LANGS, open } from './dictionaries.mjs';
 
 /*
- * Take strings out of `src/locales/index.ts`, in all three languages at once.
+ * Take strings out of the dictionaries, in all three languages at once.
  *
  *   node scripts/remove-strings.mjs dead.txt      # run from apps/majlis/client
  *
@@ -10,7 +11,7 @@ import fs from 'node:fs';
  * ── why a script and not an editor ────────────────────────────────────────
  *
  * The same reason `merge-strings.mjs` exists. The dictionaries are three
- * object literals in one 3,800-line file and a hand edit has twice destroyed
+ * object literals of 2,500 lines each and a hand edit has twice destroyed
  * half a language without the file looking any different. Removing by exact
  * key match, one line at a time, in each of the three blocks, cannot take a
  * neighbouring line with it.
@@ -83,40 +84,28 @@ if (stillUsed.length > 0) {
 
 /* ── remove ────────────────────────────────────────────────────────────── */
 
-const p = 'src/locales/index.ts';
-const lines = fs.readFileSync(p, 'utf8').split(/\r?\n/);
-
-const head = (lang) => lines.findIndex((l) => l.startsWith('const ' + lang + ': Dict = {'));
-const at = { en: head('en'), ar: head('ar'), ur: head('ur') };
-const dictsAt = lines.findIndex((l) => l.startsWith('const DICTS'));
-if (Object.values(at).some((i) => i < 0) || dictsAt < 0) {
-  console.error('cannot find the dictionaries');
-  process.exit(1);
-}
-
-const order = ['en', 'ar', 'ur'].sort((a, b) => at[a] - at[b]);
-const ends = { [order[0]]: at[order[1]], [order[1]]: at[order[2]], [order[2]]: dictsAt };
-
 const wanted = new Set(listed);
-const removed = Object.fromEntries(order.map((l) => [l, 0]));
-const keep = [];
+const removed = Object.fromEntries(LANGS.map((l) => [l, 0]));
+const seen = new Set();
 
-for (let i = 0; i < lines.length; i++) {
-  const lang = order.find((l) => i > at[l] && i < ends[l]);
-  if (lang) {
-    const m = /^\s{2}["']?([A-Za-z0-9_.\-]+)["']?\s*:/.exec(lines[i]);
-    if (m && wanted.has(m[1])) {
-      removed[lang]++;
-      continue;
+for (const lang of LANGS) {
+  const dict = open(lang);
+  const keep = [];
+  dict.lines.forEach((line, i) => {
+    if (i > dict.from && i < dict.to) {
+      const m = KEY_LINE.exec(line);
+      if (m) seen.add(m[1]);
+      if (m && wanted.has(m[1])) {
+        removed[lang]++;
+        return;
+      }
     }
-  }
-  keep.push(lines[i]);
+    keep.push(line);
+  });
+  dict.lines.splice(0, dict.lines.length, ...keep);
+  dict.save();
 }
 
-fs.writeFileSync(p, keep.join('\n'));
-
-const notFound = listed.filter(
-  (k) => !lines.some((l) => new RegExp('^\\s{2}["\']?' + k.replace(/\./g, '\\.') + '["\']?\\s*:').test(l)),
-);
-console.log(order.map((l) => l + ' -' + removed[l]).join('   '));
+const notFound = listed.filter((k) => !seen.has(k));
+console.log(LANGS.map((l) => l + ' -' + removed[l]).join('   '));
 if (notFound.length) console.log('not in the dictionary: ' + notFound.join(' '));

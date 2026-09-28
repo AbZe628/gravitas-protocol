@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { oversight, type Passage } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { useIdentity } from '../lib/identity.js';
@@ -51,6 +51,19 @@ export default function Holding({
   const [to, setTo] = useState('');
   const [busy, setBusy] = useState(false);
   const [refused, setRefused] = useState<string | null>(null);
+  /*
+   * What the member just did, drawn before the server has answered.
+   *
+   * *Take this* used to wait on the write and then on a second read of the
+   * whole passage before anything on the screen moved — two round trips, the
+   * better part of a second on a phone, during which the button only spun.
+   * The result is not in doubt: the button is offered only where the server's
+   * own rule allows the act. So the new holder is drawn at once; the passage
+   * the screen reads next replaces it, and a refusal puts the old one back and
+   * says why.
+   */
+  const [shown, setShown] = useState<{ to: string | null; by: string } | null>(null);
+  useEffect(() => setShown(null), [passage]);
 
   if (!passage.holdable) return null;
 
@@ -61,7 +74,8 @@ export default function Holding({
     (members ?? []).some((m) => m.scholarId === me);
   const office = identity?.office === 'chair' || identity?.office === 'secretary';
 
-  const holder = passage.holder?.to ?? null;
+  const held = shown ? (shown.to === null ? null : { to: shown.to, by: shown.by }) : (passage.holder ?? null);
+  const holder = held?.to ?? null;
   const mine = holder !== null && holder === me;
   const free = holder === null;
 
@@ -73,11 +87,13 @@ export default function Holding({
     if (busy) return;
     setBusy(true);
     setRefused(null);
+    if (me !== null) setShown({ to: target, by: me });
     try {
       await oversight.assign({ ofKind: passage.of.kind, ofId: passage.of.id, to: target });
       setTo('');
       onChanged();
     } catch (e) {
+      setShown(null);
       setRefused(e instanceof Error && e.message ? e.message : t('hold.failed'));
     } finally {
       setBusy(false);
@@ -92,9 +108,7 @@ export default function Holding({
 
   const who = holder === null ? null : mine ? t('hold.withYou') : nameOf(members, holder);
   const placedBy =
-    passage.holder && passage.holder.by !== passage.holder.to
-      ? t('hold.placedBy', { name: nameOf(members, passage.holder.by) })
-      : null;
+    held && held.by !== held.to ? t('hold.placedBy', { name: nameOf(members, held.by) }) : null;
 
   return (
     <div className={ruled ? 'mt-4 border-t pt-3 ' + (loud ? 'border-white/20' : 'border-line') : ''}>

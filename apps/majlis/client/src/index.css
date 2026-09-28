@@ -184,6 +184,37 @@
   }
 }
 
+@layer components {
+  /*
+   * The shape of a screen that is on its way. See `Loading` in ui.tsx: it waits
+   * a fifth of a second before it shows, so an answer that comes sooner never
+   * flickers a placeholder, and then breathes rather than spins.
+   */
+  .skeleton {
+    opacity: 0;
+    animation: skeleton-in 240ms ease-out 200ms forwards;
+  }
+  .skeleton-bar {
+    border-radius: 6px;
+    background: linear-gradient(90deg, rgba(25, 23, 19, 0.055), rgba(25, 23, 19, 0.095), rgba(25, 23, 19, 0.055));
+    background-size: 200% 100%;
+    animation: skeleton-breathe 1.6s ease-in-out infinite;
+  }
+  @keyframes skeleton-in {
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes skeleton-breathe {
+    from {
+      background-position: 100% 0;
+    }
+    to {
+      background-position: -100% 0;
+    }
+  }
+}
+
 @layer utilities {
   .rtl-flip {
     @apply rtl:-scale-x-100;

@@ -8,6 +8,7 @@ import { Nothing } from './page.js';
 import ReportBack from './ReportBack.js';
 import { useStillThere } from '../lib/stillThere.js';
 import { Button } from './Button';
+import { Loading } from './ui.js';
 
 /**
  * What the board asked a committee to look at, and what came back.
@@ -217,7 +218,7 @@ export default function WhatTheCommitteeFound({ matterId }: { matterId: string }
   }
 
   if (failed) return <Nothing>{t('cttee.unavailable')}</Nothing>;
-  if (!data) return <p className="text-ui text-muted">{t('common.loading')}</p>;
+  if (!data) return <Loading rows={2} bare />;
 
   /*
    * A control that cannot be honoured is absent. A board that keeps no

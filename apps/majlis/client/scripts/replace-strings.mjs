@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import { LANGS, open } from './dictionaries.mjs';
 
 /*
  * Replace strings that already exist, in one language.
@@ -24,22 +25,14 @@ if (!lang || !file) {
 }
 
 const batch = JSON.parse(fs.readFileSync(file, 'utf8'));
-const p = 'src/locales/index.ts';
-const lines = fs.readFileSync(p, 'utf8').split(/\r?\n/);
-
-const head = (l) => lines.findIndex((x) => x.startsWith('const ' + l + ': Dict = {'));
-const at = { en: head('en'), ar: head('ar'), ur: head('ur') };
-const dictsAt = lines.findIndex((x) => x.startsWith('const DICTS'));
-if (Object.values(at).some((i) => i < 0) || dictsAt < 0) {
-  console.error('cannot find the dictionaries');
+if (!LANGS.includes(lang)) {
+  console.error('no such language: ' + lang);
   process.exit(1);
 }
-
-const order = ['en', 'ar', 'ur'].sort((a, b) => at[a] - at[b]);
-const ends = { [order[0]]: at[order[1]], [order[1]]: at[order[2]], [order[2]]: dictsAt };
-
-const from = at[lang];
-const to = ends[lang];
+const dict = open(lang);
+const lines = dict.lines;
+const from = dict.from;
+const to = dict.to;
 
 let changed = 0;
 const missing = [];
@@ -71,5 +64,5 @@ if (missing.length) {
   process.exit(1);
 }
 
-fs.writeFileSync(p, lines.join('\n'));
+dict.save();
 console.log(lang + ': ' + changed + ' rewritten');

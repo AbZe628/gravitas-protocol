@@ -13,7 +13,7 @@ import AttachTheContract from '../components/AttachTheContract.js';
 import { useIdentity, isInstitution } from '../lib/identity.js';
 import { MainAct, Card, Quiet, State } from '../components/kit.js';
 import TheNotice from '../components/TheNotice.js';
-import { ErrorText } from '../components/ui.js';
+import { ErrorText, Loading } from '../components/ui.js';
 import { Field } from '../components/field.js';
 import Act from '../components/Act.js';
 import AfterAct from '../components/AfterAct.js';
@@ -454,7 +454,7 @@ export default function Ask({ boardId }: { boardId: string }) {
         {mineFailed ? (
           <ErrorText />
         ) : !mine ? (
-          <p className="text-ui text-muted">{t('common.loading')}</p>
+          <Loading rows={2} bare />
         ) : mine.length === 0 ? (
           <p className="text-ui text-muted">{t('ask.mineNone')}</p>
         ) : (

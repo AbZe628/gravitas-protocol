@@ -546,7 +546,7 @@ export default function MatterPack() {
             Waiting passes by itself; failing to read does not, and the member
             cannot tell which they are looking at unless the screen says so.
           */
-          packFailed ? <ErrorText what={t('pack.what')} /> : <Loading />
+          packFailed ? <ErrorText what={t('pack.what')} /> : <Loading rows={2} bare />
         )}
       </div>
 

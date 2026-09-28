@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { DICTIONARIES, LANGS, translate } from './locales';
+import { LANGS, translate } from './locales/index.js';
+import { DICTIONARIES } from './locales/all.js';
 
 const CODES = LANGS.map((l) => l.code);
 

@@ -34,21 +34,21 @@ import { resolve } from 'node:path';
  * From the project root rather than from `import.meta.url`: these tests run in
  * a jsdom environment where the module URL is not a file URL, and resolving it
  * throws before a single assertion has run.
+ *
+ * One file per language, since a reader is sent only their own (see
+ * `loadLang` in ./index.ts). Each file holds one block.
  */
-const SOURCE = resolve(process.cwd(), 'src/locales/index.ts');
+const LANGS = ['en', 'ar', 'ur'] as const;
 
-/** Where each language's block starts, found rather than assumed. */
-function blocks(lines: readonly string[]): { lang: string; from: number }[] {
-  const found: { lang: string; from: number }[] = [];
-  lines.forEach((line, i) => {
-    const m = line.match(/^const (en|ar|ur): Dict = \{/);
-    if (m) found.push({ lang: m[1], from: i });
-  });
-  return found;
+/** Where the language's block starts and ends in its own file, found rather than assumed. */
+function block(lang: string): { lang: string; lines: string[]; from: number; to: number } {
+  const lines = readFileSync(resolve(process.cwd(), `src/locales/${lang}.ts`), 'utf8').split('\n');
+  const from = lines.findIndex((line) => new RegExp(`^const ${lang}: Dict = \\{`).test(line));
+  const to = lines.findIndex((line, i) => i > from && line === '};');
+  return { lang, lines, from, to };
 }
 
-const lines = readFileSync(SOURCE, 'utf8').split('\n');
-const starts = blocks(lines);
+const starts = LANGS.map(block);
 
 describe('the dictionary says each thing once', () => {
   /*
@@ -59,11 +59,11 @@ describe('the dictionary says each thing once', () => {
    * seventy-four and reported itself green.
    */
   it('found all three languages', () => {
-    expect(starts.map((b) => b.lang)).toEqual(['en', 'ar', 'ur']);
+    expect(starts.filter((b) => b.from >= 0 && b.to > b.from).map((b) => b.lang)).toEqual(['en', 'ar', 'ur']);
   });
 
-  for (const [n, block] of starts.entries()) {
-    const end = n + 1 < starts.length ? starts[n + 1].from : lines.length;
+  for (const block of starts) {
+    const { lines, to: end } = block;
 
     it(`has no key twice in ${block.lang}`, () => {
       const seen = new Map<string, number>();

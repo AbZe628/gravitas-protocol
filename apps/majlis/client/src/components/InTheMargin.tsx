@@ -7,6 +7,7 @@ import { mayDeliberate, useIdentity } from '../lib/identity.js';
 import { Nothing } from './page.js';
 import { useStillThere } from '../lib/stillThere.js';
 import { Button } from './Button';
+import { Loading } from './ui.js';
 
 /**
  * The papers, with what members wrote in the margin beside them.
@@ -303,7 +304,7 @@ export default function InTheMargin({
   }
 
   if (failed) return <Nothing>{t('margin.unavailable')}</Nothing>;
-  if (!margin) return <p className="text-ui text-muted">{t('common.loading')}</p>;
+  if (!margin) return <Loading rows={2} bare />;
 
   const standing = margin.threads.filter((x) => !x.note.annotation.withdrawn);
 

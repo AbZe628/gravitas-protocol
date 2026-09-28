@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { useI18n } from '../lib/i18n.js';
 import { Button } from './Button';
 
@@ -104,6 +104,36 @@ export default function StepWindow({
   const { t } = useI18n();
 
   /*
+   * A new step starts at its top.
+   *
+   * Moving from one step to the next changes only the address's `?step=`, so
+   * nothing scrolled: on a phone, where the page scrolls, a member who pressed
+   * *Met — next* at the foot of one condition was left looking at the foot of
+   * the next — its act bar, with the condition it asks about off the top of
+   * the screen. Seen on the live walk, not in a test. The work pane is taken
+   * back to its own top, and where the window's top has scrolled out of the
+   * frame the frame is brought back to it. Nothing moves on the first draw.
+   */
+  const root = useRef<HTMLDivElement>(null);
+  const work = useRef<HTMLDivElement>(null);
+  const drawn = useRef(false);
+  useEffect(() => {
+    if (!drawn.current) {
+      drawn.current = true;
+      return;
+    }
+    const pane = work.current;
+    if (pane) pane.scrollTop = 0;
+    const el = root.current;
+    const frame = el?.closest('#work');
+    if (!el || !(frame instanceof HTMLElement)) return;
+    const above = el.getBoundingClientRect().top - frame.getBoundingClientRect().top;
+    if (above < 0 && typeof frame.scrollTo === 'function') {
+      frame.scrollTo({ top: frame.scrollTop + above - 12, behavior: 'smooth' });
+    }
+  }, [heading]);
+
+  /*
    * A frame on a desk. On a phone, a page.
    *
    * ── what this was ─────────────────────────────────────────────────
@@ -123,7 +153,7 @@ export default function StepWindow({
    * nothing is given a height it has to fit into.
    */
   return (
-    <div className="flex flex-col overflow-hidden rounded-sheet bg-raised shadow-card lg:h-[calc(100vh-6rem)] lg:min-h-[560px]">
+    <div ref={root} className="flex flex-col overflow-hidden rounded-sheet bg-raised shadow-card lg:h-[calc(100vh-6rem)] lg:min-h-[560px]">
       {/* ── the title bar ─────────────────────────────────────────────── */}
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-line px-5 py-3.5 sm:px-6">
         <h1 className="min-w-0 flex-1 truncate font-display text-sub leading-tight tracking-title text-paper">
@@ -175,7 +205,7 @@ export default function StepWindow({
         */}
         {/* It scrolls inside itself on a desk, where it has a height to
             scroll within. On a phone the page scrolls and this does not. */}
-        <div data-pane="work" className="min-h-0 flex-1 px-5 py-5 sm:px-6 lg:overflow-y-auto">
+        <div ref={work} data-pane="work" className="min-h-0 flex-1 px-5 py-5 sm:px-6 lg:overflow-y-auto">
           <div className="mb-3 text-label font-bold uppercase tracking-caps text-muted">
             {heading}
           </div>

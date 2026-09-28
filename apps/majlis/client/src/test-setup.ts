@@ -1,8 +1,27 @@
 import '@testing-library/jest-dom/vitest';
 import { beforeEach } from 'vitest';
+import { configure } from '@testing-library/react';
 import { forgetIdentity } from './lib/identity.js';
 import { forgetPulse } from './lib/pulse.js';
 import { forgetHealth } from './lib/health.js';
+/*
+ * Arabic and Urdu are fetched when chosen in the application; a test renders
+ * in them in the same tick it asks, so all three are held from the start.
+ */
+import './locales/all.js';
+
+/*
+ * How long a test waits for a screen to say something.
+ *
+ * Screens are fetched when first drawn now (see `screens.ts`), so the first
+ * test in a file that opens one also waits for that screen's module to be
+ * read and compiled. Alone that is a few hundred milliseconds; with fifty
+ * files running side by side it was once past the one second a `findBy`
+ * waits by default, and a test failed for having been scheduled behind the
+ * others. The assertions are unchanged — a screen that never says the thing
+ * still fails, four seconds later.
+ */
+configure({ asyncUtilTimeout: 4000 });
 
 /*
  * Every test starts as a fresh page load would.

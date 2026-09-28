@@ -104,7 +104,7 @@ export function DateText({ iso }: { iso: string | null }) {
 }
 
 /**
- * Waiting, said out loud.
+ * Waiting, said out loud — and drawn as the shape of what is coming.
  *
  * `role="status"` with `aria-live="polite"` means a screen reader announces
  * this when it arrives, and waits for a gap rather than cutting the member
@@ -113,17 +113,35 @@ export function DateText({ iso }: { iso: string | null }) {
  *
  * Before this, a member working by ear pressed something and heard nothing at
  * all: not while it waited, not when it failed, not when it arrived.
+ *
+ * ── why a shape and not the word ──────────────────────────────────────────
+ *
+ * It was the word *Loading…*, centred, on twenty-nine screens: a blank page
+ * with a sentence in it, which is what a web page does while it waits. An
+ * application draws where the work is about to be — a heading and rows — so
+ * the screen has already arrived and only its words are on their way, and
+ * nothing jumps when they land. The word is still said, to a screen reader.
+ *
+ * The shape waits a fifth of a second before it shows. Most answers come
+ * sooner than that, and a placeholder flashed for eighty milliseconds reads
+ * as a flicker, not as speed.
  */
-export function Loading() {
+export function Loading({ rows = 5, bare = false }: { rows?: number; bare?: boolean } = {}) {
   const { t } = useI18n();
   return (
-    <div
-      role="status"
-      aria-live="polite"
-      aria-busy="true"
-      className="py-10 text-center text-sm text-muted"
-    >
-      {t('common.loading')}
+    <div role="status" aria-live="polite" aria-busy="true" className={bare ? '' : 'py-2'}>
+      <span className="sr-only">{t('common.loading')}</span>
+      <div aria-hidden="true" className="skeleton">
+        {!bare && <div className="skeleton-bar mb-6 h-7 w-[38%] max-w-[18rem]" />}
+        <div className="overflow-hidden rounded-card bg-raised shadow-ring">
+          {Array.from({ length: rows }, (_, i) => (
+            <div key={i} className={'px-5 py-4 ' + (i > 0 ? 'ms-5 border-t border-line/70 ps-0' : '')}>
+              <div className="skeleton-bar h-3.5" style={{ width: `${68 - ((i * 11) % 30)}%` }} />
+              <div className="skeleton-bar mt-2.5 h-2.5" style={{ width: `${34 + ((i * 7) % 20)}%` }} />
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

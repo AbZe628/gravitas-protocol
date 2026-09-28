@@ -194,6 +194,55 @@ describe('a finding needs a reason, in every direction', () => {
   });
 });
 
+describe('the work moves on as soon as the answer is taken', () => {
+  /*
+   * It waited on the write and then on a second read of the whole checklist
+   * before the next condition opened. The second read is held open here for
+   * good, so the only way the next condition can open is from the answer the
+   * server already took.
+   */
+  it('opens the next condition before the checklist has been read again', async () => {
+    const second = condition({ id: 'profit-known', requirement: 'The profit is fixed and known when the sale is made.' });
+    const two = checklist({
+      structure: { ...checklist().structure, conditions: [condition(), second] },
+      conditions: [
+        { condition: condition(), finding: null, history: [], answeredBy: [] },
+        { condition: second, finding: null, history: [], answeredBy: [] },
+      ],
+      unanswered: ['ownership-before-sale', 'profit-known'],
+      total: 2,
+    });
+    let reads = 0;
+    vi.stubGlobal('fetch', async (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = String(input);
+      const json = (b: unknown) => new Response(JSON.stringify(b), { status: 200, headers: { 'Content-Type': 'application/json' } });
+      if (init?.method === 'POST') return json({});
+      if (url.includes('/api/attention')) return json({ scholarId: 'member-b', role: 'signatory', office: null, items: [] });
+      if (url.includes('/structures')) return json({ structures: [], note: '' });
+      if (url.includes('/checklist')) {
+        reads++;
+        if (reads > 1) return new Promise<Response>(() => undefined);
+        return json(two);
+      }
+      return json({});
+    });
+    show();
+
+    await waitFor(() => screen.getByRole('button', { name: /Record a finding/ }));
+    fireEvent.click(screen.getByRole('button', { name: /Record a finding/ }));
+    fireEvent.click(screen.getByRole('button', { name: /^Met$/ }));
+    fireEvent.change(screen.getByRole('textbox'), { target: { value: 'Title passed on the ninth, the sale was on the tenth.' } });
+    fireEvent.click(screen.getByRole('button', { name: /^Record it$/ }));
+
+    // The second condition is the one being worked on now…
+    await waitFor(() => expect(screen.getByText(/The profit is fixed and known/).closest('li')).toHaveTextContent(/Record a finding/));
+    // …the first says what was answered…
+    expect(screen.getByText(/owns the asset/).closest('li')).toHaveTextContent(/Met/);
+    // …and the checklist has not been read again yet.
+    expect(reads).toBe(2);
+  });
+});
+
 describe('disagreement is shown, not resolved', () => {
   it('marks a contested condition and keeps both readings', async () => {
     stub(

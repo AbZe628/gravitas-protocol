@@ -6,11 +6,13 @@ import {
   type Checklist as ChecklistData,
   type AskedOfTheInstitution,
   type Computation,
+  type ConditionFinding,
   type ConditionState,
   type Proposal,
   type Structure,
 } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
+import { useIdentity } from '../lib/identity.js';
 import { Tag } from './ui.js';
 import TheCalculator from './TheCalculator.js';
 import AskTheBank from './AskTheBank.js';
@@ -593,6 +595,7 @@ export default function Checklist({
 }) {
   const { t } = useI18n();
   const [data, setData] = useState<ChecklistData | null>(null);
+  const { identity } = useIdentity();
   const [structures, setStructures] = useState<Structure[] | null>(null);
   const [none, setNone] = useState(false);
 
@@ -734,6 +737,36 @@ export default function Checklist({
   async function choose(structureId: string) {
     await oversight.setStructure(matterId, structureId);
     await load();
+  }
+
+  /**
+   * An answer the server has taken, drawn before the checklist is read again.
+   *
+   * Answering waited on the write and then on a second read of the whole
+   * checklist before the form closed and the next condition opened — two round
+   * trips for one press, which on a phone is long enough to press again. The
+   * write is what matters and it has been accepted, so the answer is drawn and
+   * the work moves on at once; the read that follows replaces this with the
+   * server's own reading, contested marks and all.
+   */
+  function answeredHere(conditionId: string, holds: ConditionFinding['holds'], reason: string) {
+    const me = identity?.scholarId;
+    if (!data || !me) return;
+    const finding: ConditionFinding = { conditionId, holds, reason, scholarId: me, at: new Date().toISOString() };
+    const conditions = data.conditions.map((s) =>
+      s.condition.id !== conditionId
+        ? s
+        : {
+            ...s,
+            finding,
+            history: [finding, ...s.history],
+            answeredBy: s.answeredBy.includes(me) ? s.answeredBy : [...s.answeredBy, me],
+          },
+    );
+    const unanswered = data.unanswered.filter((id) => id !== conditionId);
+    setData({ ...data, conditions, unanswered, answered: data.total - unanswered.length });
+    setPinned(null);
+    onProgress?.({ answered: data.total - unanswered.length, total: data.total, unanswered: unanswered.length });
   }
 
   /** The shape the window is asking about, held while the window is open. */
@@ -916,7 +949,8 @@ export default function Checklist({
             onCarry={() => void carry(c.condition.id)}
             onRecord={async (holds, reason) => {
               await oversight.recordFinding(matterId, { conditionId: c.condition.id, holds, reason });
-              await load();
+              answeredHere(c.condition.id, holds, reason);
+              void load();
             }}
           />
         ))}
