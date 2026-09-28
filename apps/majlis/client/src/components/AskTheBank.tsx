@@ -160,9 +160,10 @@ export default function AskTheBank({
                 {t('toDesk.send')}
               </Button>
               <Button
+                tone="plainquiet"
                 type="button"
                 onClick={() => setOpen(false)}
-                className="text-note text-muted underline decoration-line underline-offset-4"
+                className="text-note inline-flex items-center min-h-[44px] lg:min-h-0 lg:py-1"
               >
                 {t('common.cancel')}
               </Button>
@@ -170,6 +171,7 @@ export default function AskTheBank({
           </form>
         ) : (
           <Button
+            tone="plain"
             type="button"
             onClick={() => {
               /* The draft opens with the condition in it, because that is what
@@ -177,7 +179,7 @@ export default function AskTheBank({
               setAsking(`${t('toDesk.draftPrefix')}\n\n${requirement}\n\n${t('toDesk.draftTail')}`);
               setOpen(true);
             }}
-            className="text-ui font-semibold text-lapis underline decoration-line underline-offset-4"
+            className="text-ui font-semibold inline-flex items-center min-h-[44px] lg:min-h-0 lg:py-1"
           >
             {t('toDesk.title')}
           </Button>

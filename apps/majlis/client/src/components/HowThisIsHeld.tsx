@@ -85,9 +85,10 @@ export default function HowThisIsHeld({
       */}
       {mayMark && (
         <Button
+          tone="plain"
           type="button"
           onClick={() => setMarking(true)}
-          className="mt-3 inline-flex min-h-[44px] items-center text-ui text-lapis underline decoration-line underline-offset-4 lg:min-h-0"
+          className="mt-3 inline-flex min-h-[44px] items-center text-ui lg:min-h-0 lg:py-1"
         >
           {t(mark === 'tokenised' ? 'held.markConventional' : 'held.markTokenised')}
         </Button>

@@ -39,7 +39,7 @@ import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from 'react';
  * person who is mid-press cannot tell whether they hit what they aimed at.
  */
 
-export type ButtonTone = 'act' | 'quiet' | 'grave' | 'bare';
+export type ButtonTone = 'act' | 'quiet' | 'grave' | 'bare' | 'plain' | 'plainquiet';
 
 /*
  * The base is behaviour only — no colour, no size, no radius.
@@ -85,6 +85,15 @@ const TONE: Record<ButtonTone, string> = {
   grave: 'bg-raised text-breach shadow-ringbreach hover:bg-breachtint',
   /** A control that is not a button on the screen, only to the machine. */
   bare: 'bg-transparent text-sand hover:text-paper',
+  /**
+   * An act written as its words, the way the device writes one in a list or
+   * under a form: the accent colour, no box, a ground only under the pointer
+   * — and never underlined, which is how a page marks a link, not how an
+   * application marks something it will do.
+   */
+  plain: '-mx-2 rounded-lg bg-transparent px-2 text-lapis hover:bg-lapistint',
+  /** The same, for an act that is only a way out. */
+  plainquiet: '-mx-2 rounded-lg bg-transparent px-2 text-sand hover:bg-raised hover:text-paper',
 };
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {

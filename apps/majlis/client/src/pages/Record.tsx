@@ -1,11 +1,11 @@
 import { Nothing } from '../components/page.js';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import Act from '../components/Act.js';
 import { api, oversight, type Health, type MatterSummary } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { DateText, Loading } from '../components/ui.js';
 import { DocumentLink, YearPicker } from '../components/Documents.js';
-import { Sheet, Line, Mark, Figure, type Column } from '../components/sheet.js';
+import { Sheet, Line, Mark, Figure, InTheColumn, type Column } from '../components/sheet.js';
 import { Quiet } from '../components/kit.js';
 import { Button } from '../components/Button';
 
@@ -167,6 +167,8 @@ export default function Record({ embedded = false }: { embedded?: boolean }) {
   const [decidedLost, setDecidedLost] = useState(false);
   const [health, setHealth] = useState<Health | null>(null);
   const [year, setYear] = useState(new Date().getUTCFullYear());
+  /* Beside a matter, the record is the list of what was decided and nothing else. */
+  const column = useContext(InTheColumn);
 
   useEffect(() => {
     api.health().then(setHealth).catch(() => setHealth(null));
@@ -182,6 +184,8 @@ export default function Record({ embedded = false }: { embedded?: boolean }) {
         setDecidedLost(true);
       });
   }, []);
+
+  if (column) return <Decided matters={decided} lost={decidedLost} />;
 
   return (
     <div>

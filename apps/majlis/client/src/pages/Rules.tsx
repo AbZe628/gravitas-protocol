@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { api, oversight, type ReviewStatus, type Rule } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { DocumentLink } from '../components/Documents.js';
 import { Nothing } from '../components/page.js';
 import { ListPage } from '../components/shapes.js';
-import { Sheet, Line, Mark, Figure, type Column } from '../components/sheet.js';
+import { Sheet, Line, Mark, Figure, InTheColumn, type Column } from '../components/sheet.js';
 import { DateText, ErrorText, Loading } from '../components/ui.js';
 import { type Tone } from '../components/kit.js';
 
@@ -61,6 +61,7 @@ export default function Rules({ embedded = false }: { embedded?: boolean }) {
   const [failed, setFailed] = useState(false);
   /** Which rulings fall due was asked for and did not come. */
   const [reviewsLost, setReviewsLost] = useState(false);
+  const column = useContext(InTheColumn);
 
   useEffect(() => {
     api
@@ -138,6 +139,8 @@ export default function Rules({ embedded = false }: { embedded?: boolean }) {
    * already set, so it contributes the list and nothing above it. On its own
    * path it is a list screen like every other.
    */
+  if (embedded && column) return list;
+
   if (embedded) {
     return (
       <div>

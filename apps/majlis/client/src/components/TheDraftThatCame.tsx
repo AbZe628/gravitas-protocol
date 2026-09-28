@@ -122,9 +122,10 @@ export default function TheDraftThatCame({
       )}
 
       <Button
+        tone="plain"
         type="button"
         onClick={() => setShowing((was) => !was)}
-        className="mt-3 text-ui font-semibold text-lapis underline decoration-line underline-offset-4"
+        className="mt-3 text-ui font-semibold inline-flex items-center min-h-[44px] lg:min-h-0 lg:py-1"
       >
         {t(showing ? 'camewith.hide' : 'camewith.show')}
       </Button>

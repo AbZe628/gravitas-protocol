@@ -252,9 +252,10 @@ function MeetingCard({
           {t('book.open')}
         </Link>
         <Button
+          tone="plainquiet"
           type="button"
           onClick={() => setOpen(!open)}
-          className="inline-flex min-h-[44px] items-center text-note text-muted underline underline-offset-2 hover:text-paper lg:min-h-0"
+          className="inline-flex min-h-[44px] items-center text-note lg:min-h-0 lg:py-1"
         >
           {open ? t('meet.hide') : t('meet.show')}
         </Button>

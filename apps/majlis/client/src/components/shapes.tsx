@@ -1,8 +1,9 @@
-import type { ReactNode } from 'react';
+import { useContext, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { useI18n } from '../lib/i18n.js';
 import type { AnyPhase } from '../lib/spine.js';
 import { PageHead } from './page.js';
+import { InTheColumn } from './sheet.js';
 import { Button } from './Button';
 
 /**
@@ -63,6 +64,7 @@ export function ListPage({
    */
   limits?: string;
 }) {
+  const column = useContext(InTheColumn);
   return (
     <div>
       <PageHead phase={phase} title={title} says={says} live={live} act={act} />
@@ -73,12 +75,18 @@ export function ListPage({
         of work it was filtering.
       */}
       {filters && (
-        <div className="slides -mx-4 mb-5 flex gap-2 overflow-x-auto px-4 [&>*]:shrink-0 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
+        <div
+          className={
+            column
+              ? 'slides -mx-3 mb-3 flex gap-2 overflow-x-auto px-3 [&>*]:shrink-0'
+              : 'slides -mx-4 mb-5 flex gap-2 overflow-x-auto px-4 [&>*]:shrink-0 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0'
+          }
+        >
           {filters}
         </div>
       )}
       {children}
-      {limits && (
+      {limits && !column && (
         <p className="mt-6 max-w-[62ch] text-note leading-relaxed text-muted">{limits}</p>
       )}
     </div>

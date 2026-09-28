@@ -151,9 +151,17 @@ export default function StepWindow({
    * Below a desk the window is ordinary flow now: title, strip, the work,
    * the panes under it, the acts at the end. Nothing is clipped, because
    * nothing is given a height it has to fit into.
+   *
+   * And on a desk it ends above the status bar, not under it. The height
+   * was `100vh - 6rem`, which counted the bar across the top and forgot the
+   * one along the foot: measured at 1440×900, the act bar's lower half sat
+   * behind the bar that says what this copy is — *Met — next* cut through
+   * the middle, on the one screen whose whole point is that press. The
+   * frame above the window is 84 pixels and the foot 48 (the pane's own
+   * padding, which is the status bar's room), so the window is the rest.
    */
   return (
-    <div ref={root} className="flex flex-col overflow-hidden rounded-sheet bg-raised shadow-card lg:h-[calc(100vh-6rem)] lg:min-h-[560px]">
+    <div ref={root} className="flex flex-col overflow-hidden rounded-sheet bg-raised shadow-card lg:h-[calc(100dvh-8.25rem)] lg:min-h-[560px]">
       {/* ── the title bar ─────────────────────────────────────────────── */}
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-line px-5 py-3.5 sm:px-6">
         {/*

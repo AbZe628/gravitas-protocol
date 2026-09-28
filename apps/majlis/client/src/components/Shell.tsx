@@ -1,11 +1,11 @@
 
-import { useCallback, useEffect, useState } from 'react';
-import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Link, NavLink, useLocation, useNavigate, useNavigationType } from 'react-router-dom';
 import { useI18n } from '../lib/i18n.js';
 import { isInstitution, useIdentity, maySubmit } from '../lib/identity.js';
 import { useHealth } from '../lib/health.js';
 import { useBoardName } from '../lib/board.js';
-import { LANGS, dirFor } from '../locales/index.js';
+import { dirFor } from '../locales/index.js';
 import {
   BESIDES,
   DESK_DOORS,
@@ -21,12 +21,16 @@ import Tools, { type Kind } from './Tools.js';
 import ToolShelf from './ToolShelf.js';
 import Palette from './Palette.js';
 import Bell from './Bell.js';
-import Guide from './Guide.js';
+import Guide, { OpenTheGuide } from './Guide.js';
 import Keys from './Keys.js';
 import Announcement from './Announcement.js';
 import { NewsProvider } from '../lib/news.js';
 import { Button } from './Button';
 import Person, { initialsOf, useNameOf } from './Person.js';
+import ListColumn from './ListColumn.js';
+import { LIST_TITLES, cameFrom, listFor, notePath, rememberList, rememberOpened, useDeskWide } from '../lib/split.js';
+import { useScrollMemory } from '../lib/scroll.js';
+import { useLineKeys } from '../lib/lineKeys.js';
 
 /**
  * The application's frame.
@@ -166,22 +170,39 @@ export function TheFacts() {
   );
 }
 
-function StatusBar() {
+function StatusBar({ beside }: { beside: boolean }) {
   const { t } = useI18n();
-  const { identity } = useIdentity();
+  const { identity, loading } = useIdentity();
   const facts = useFacts();
   if (!facts) return null;
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-20 hidden items-center gap-x-6 gap-y-1 border-t border-line bg-ink/85 px-4 py-1.5 text-note text-muted backdrop-blur-xl lg:flex lg:ps-[272px]">
+    <div
+      /*
+        One line, always. The pane under it leaves it the room of one line,
+        and where the words are wider than the window — beside the list
+        column, or in a language that runs longer — a fact is cut short
+        rather than the bar growing a second line over the work.
+      */
+      className={
+        'fixed inset-x-0 bottom-0 z-20 hidden h-8 items-center gap-x-6 overflow-hidden whitespace-nowrap border-t border-line bg-ink/85 px-4 text-note text-muted backdrop-blur-xl lg:flex ' +
+        (beside ? 'lg:ps-[332px]' : 'lg:ps-[272px]')
+      }
+    >
       {facts.map((f) => (
-        <span key={f.says} className="flex items-center gap-2">
+        <span key={f.says} title={f.says} className="flex min-w-0 items-center gap-2">
           <span className={dot(f.on)} />
-          {f.says}
+          <span className="truncate">{f.says}</span>
         </span>
       ))}
-      <span className="ms-auto">
-        {identity ? <Person id={identity.scholarId} /> : t('shell.anonymous')}
+      {/*
+        Nobody, only once it is known. The frame is drawn before the answer
+        to *who is this* arrives, and for most of a second it said *Not
+        signed in* to a member who was — the one claim on the screen that
+        was false, on every screen, every time it opened.
+      */}
+      <span className="ms-auto shrink-0">
+        {identity ? <Person id={identity.scholarId} /> : loading ? null : t('shell.anonymous')}
       </span>
     </div>
   );
@@ -566,11 +587,13 @@ function Frame({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener('keydown', onKey);
   }, [navigate, palette]);
 
-  const { t, lang, setLang } = useI18n();
-  const { identity } = useIdentity();
+  const { t, lang } = useI18n();
+  const { identity, loading: asking } = useIdentity();
   const health = useHealth();
   const boardName = useBoardName();
-  const path = useLocation().pathname;
+  const location = useLocation();
+  const path = location.pathname;
+  const returning = useNavigationType() === 'POP';
 
   /*
    * The rail is the four doors, and nothing is written out here.
@@ -595,6 +618,54 @@ function Frame({ children }: { children: React.ReactNode }) {
    */
   const desk = isInstitution(identity?.role);
   const doors = desk ? DESK_DOORS : DOORS;
+
+  /*
+   * The list beside the work — see `lib/split.ts` and `ListColumn.tsx`.
+   *
+   * On a desk, for a member: a thing opened from a list keeps that list in a
+   * column down the side. A bank's screens are not in it — its arrival is
+   * the question it puts, not a queue, and it opens nothing from a list of
+   * the board's.
+   */
+  const deskWide = useDeskWide();
+  const listHere = desk ? null : listFor(path);
+  const beside = deskWide && listHere !== null ? listHere : null;
+  const [railOpen, setRailOpen] = useState(false);
+  useEffect(() => {
+    rememberList(path);
+    if (listFor(path)) rememberOpened(path);
+    notePath(path);
+    setRailOpen(false);
+  }, [path]);
+  useEffect(() => {
+    if (!railOpen) return;
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setRailOpen(false);
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [railOpen]);
+
+  /** The work pane, so the way back lands where the member was in it. */
+  const work = useRef<HTMLElement>(null);
+  useScrollMemory(work, location.key, returning);
+  /* A list that is the screen moves the member along its lines; beside the work, the column does. */
+  useLineKeys(work, { opens: false, on: beside === null });
+
+  /*
+   * A phone's way back, to the list a thing was opened from.
+   *
+   * A phone pushes a screen over the list and names the list in the corner
+   * to go back to; the masthead drew the board's name on a matter exactly as
+   * it did on the queue, so the only way back was the browser's own. Back
+   * is the history's when the member came from that list — which is what
+   * puts them at the same line, scrolled where they were — and the list's
+   * address when they arrived some other way.
+   */
+  const goBack = () => {
+    if (!listHere) return;
+    const idx = (window.history.state as { idx?: number } | null)?.idx ?? 0;
+    if (cameFrom() === listHere && idx > 0) navigate(-1);
+    else navigate(listHere);
+  };
 
   /*
    * The board reads its rail from the drawing; the desk still reads its own
@@ -782,11 +853,38 @@ function Frame({ children }: { children: React.ReactNode }) {
       <div className="g-sweep" aria-hidden="true" />
 
       {/* ── the rail, permanent on a wide screen ────────────────────── */}
-      <aside className="fixed inset-y-0 start-0 z-20 hidden w-[260px] overflow-y-auto bg-surface/70 px-3 py-6 shadow-[1px_0_0_rgba(25,23,19,0.055)] backdrop-blur-xl lg:block">
+      <aside
+        className={
+          'fixed inset-y-0 start-0 hidden w-[260px] overflow-y-auto px-3 py-6 backdrop-blur-xl ' +
+          (beside === null
+            ? 'z-20 bg-surface/70 shadow-[1px_0_0_rgba(25,23,19,0.055)] lg:block'
+            : railOpen
+              ? 'z-40 bg-surface shadow-lift lg:block'
+              : '')
+        }
+      >
         {rail}
       </aside>
 
-      <div className="relative flex min-h-0 flex-1 flex-col lg:ps-[260px]">
+      {beside !== null && (
+        <>
+          <ListColumn
+            key={beside}
+            list={beside}
+            railOpen={railOpen}
+            onRail={() => setRailOpen((was) => !was)}
+          />
+          {railOpen && (
+            <div
+              aria-hidden="true"
+              onClick={() => setRailOpen(false)}
+              className="fixed inset-0 z-30 hidden bg-paper/10 lg:block"
+            />
+          )}
+        </>
+      )}
+
+      <div className={'relative flex min-h-0 flex-1 flex-col ' + (beside !== null ? 'lg:ps-[320px]' : 'lg:ps-[260px]')}>
         {/*
           ── the phone's masthead ──────────────────────────────────────
 
@@ -813,6 +911,19 @@ function Frame({ children }: { children: React.ReactNode }) {
             them is whose board this is, so that is the line that gets the
             width, on one line, and the product's name goes under it.
           */}
+          {listHere ? (
+            <Button
+              type="button"
+              onClick={goBack}
+              aria-label={t('split.back', { list: t(LIST_TITLES[listHere] ?? 'needs.title') })}
+              className="-ms-2 flex min-h-[44px] min-w-0 items-center gap-1.5 rounded-lg pe-2 ps-1 text-lapis"
+            >
+              <svg width="10" height="17" viewBox="0 0 8 13" aria-hidden="true" className="shrink-0 rtl:-scale-x-100">
+                <path d="M6.5 1.5 1.5 6.5 6.5 11.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              <span className="truncate text-body">{t(LIST_TITLES[listHere] ?? 'needs.title')}</span>
+            </Button>
+          ) : (
           <Link to="/" className="flex min-w-0 items-center gap-2.5">
             <Mark />
             <div className="min-w-0">
@@ -832,6 +943,7 @@ function Frame({ children }: { children: React.ReactNode }) {
               )}
             </div>
           </Link>
+          )}
           {/*
             Search and the settings, on a phone.
 
@@ -983,9 +1095,9 @@ function Frame({ children }: { children: React.ReactNode }) {
 
         {/* ── the wide bar: where you are, who you are ────────────────── */}
         <header className="sticky top-0 z-30 hidden items-center justify-between gap-4 bg-ink/80 px-5 py-3 shadow-[0_1px_0_rgba(25,23,19,0.055)] backdrop-blur-xl lg:flex">
-          <span className="text-ui text-muted">{t('shell.where')}</span>
+          <span className="hidden whitespace-nowrap text-ui text-muted xl:inline">{t('shell.where')}</span>
 
-          <div className="flex items-center gap-4">
+          <div className="ms-auto flex items-center gap-3 whitespace-nowrap xl:gap-4">
             {/*
               Search, in the frame rather than on a screen of its own.
 
@@ -1049,6 +1161,7 @@ function Frame({ children }: { children: React.ReactNode }) {
               padding purely to dodge it. A control that hovers over the work
               is the habit of a website with a support widget bolted on.
             */}
+            {!desk && <OpenTheGuide />}
 
             {/*
               The palette. A faster way to the same seven tools and eight
@@ -1061,9 +1174,12 @@ function Frame({ children }: { children: React.ReactNode }) {
               <Button
                 type="button"
                 onClick={() => setPalette(true)}
+                aria-label={t('palette.title')}
+                title={t('palette.title')}
                 className="flex items-center gap-2 rounded-xl bg-raised px-3 py-2 text-ui font-semibold text-sand shadow-ring hover:text-paper"
               >
-                {t('palette.title')}
+                {/* The words where there is room for them; the key always. */}
+                <span className="hidden xl:inline">{t('palette.title')}</span>
                 <kbd className="rounded border border-line px-1 font-mono text-label font-medium text-muted">
                   Ctrl K
                 </kbd>
@@ -1071,31 +1187,15 @@ function Frame({ children }: { children: React.ReactNode }) {
             )}
 
             {/*
-              A segmented control: the container is the recess, the chosen one
-              is a raised sheet. Three outlined buttons said nothing about
-              which of them was in force.
+              The language is not in the bar any more, on a desk either.
 
-              It is only here. The phone masthead has no room for it, and on a
-              phone it lives on `/more`, which is that screen's whole job.
+              It was a segmented control of three here, on every screen, for a
+              choice a member makes once — and at 1024 pixels it was what
+              pushed the bar past its width, so *Ask the board* broke over
+              three lines and *Go to, or open* over four. It is on the
+              member's own page, reached from their name at the end of this
+              bar, which is where the phone already keeps it.
             */}
-            <div className="flex gap-0.5 rounded-xl bg-paper/[0.045] p-[3px]">
-              {LANGS.map((l) => (
-                <Button
-                  key={l.code}
-                  type="button"
-                  onClick={() => setLang(l.code)}
-                  aria-pressed={lang === l.code}
-                  className={
-                    'rounded-lg px-2.5 py-1 text-note transition-all ' +
-                    (lang === l.code
-                      ? 'bg-raised font-semibold text-paper shadow-hairline'
-                      : 'text-muted hover:text-sand')
-                  }
-                >
-                  {l.label}
-                </Button>
-              ))}
-            </div>
 
             {/*
               Who is here, what they may do, and the way to their own page.
@@ -1112,12 +1212,12 @@ function Frame({ children }: { children: React.ReactNode }) {
               className="flex items-center gap-3 rounded-xl px-2 py-1 transition-colors hover:bg-raised/60"
               aria-label={t('shell.yourPage')}
             >
-              <div className="text-end">
+              <div className="hidden text-end xl:block">
                 <div className="text-ui font-semibold leading-tight text-paper">
-                  {identity ? <Person id={identity.scholarId} /> : t('shell.anonymous')}
+                  {identity ? <Person id={identity.scholarId} /> : asking ? null : t('shell.anonymous')}
                 </div>
                 <div className="text-note leading-tight text-muted">
-                  {t(`role.${identity?.role ?? 'observer'}`)}
+                  {asking && !identity ? null : t(`role.${identity?.role ?? 'observer'}`)}
                 </div>
               </div>
               <Avatar id={identity?.scholarId} />
@@ -1147,6 +1247,7 @@ function Frame({ children }: { children: React.ReactNode }) {
            * smije trositi jedan Tab svakome ko prolazi kroz ekran.
            */
           tabIndex={-1}
+          ref={work}
           key={path}
           className={
             /*
@@ -1256,7 +1357,7 @@ function Frame({ children }: { children: React.ReactNode }) {
         )}
         </div>
 
-        <StatusBar />
+        <StatusBar beside={beside !== null} />
 
         {/*
           The guide, at the level of the frame rather than inside the wide bar.

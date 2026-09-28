@@ -1,14 +1,15 @@
-import { useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { useRevision } from '../lib/pulse.js';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { governance, type QueueRow } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { ListPage } from '../components/shapes.js';
-import { Sheet, Line, Mark, Figure, type Column } from '../components/sheet.js';
+import { Sheet, Line, Mark, Figure, InTheColumn, type Column } from '../components/sheet.js';
 import { Nothing } from '../components/page.js';
-import { ErrorText, Loading } from '../components/ui.js';
+import { ErrorText, Loading, Rows } from '../components/ui.js';
 import { useStillThere } from '../lib/stillThere.js';
 import { useIdentity } from '../lib/identity.js';
+import { keep, kept } from '../lib/kept.js';
 import { nameOf, useMembers } from '../lib/members.js';
 import type { QueuePhase } from '../lib/api.js';
 import { Button } from '../components/Button';
@@ -50,6 +51,35 @@ import { Button } from '../components/Button';
  */
 
 const PHASES: readonly QueuePhase[] = ['asked', 'deciding', 'inforce', 'checked'];
+
+/**
+ * The queue as it was last read, and for whom.
+ *
+ * Opening a row on a desk puts this list in the column beside the work, which
+ * is a second drawing of the same list — and it drew *Loading* where a moment
+ * before it had drawn the rows, so the list the member had just pressed
+ * vanished and came back. It draws what it last had and reads again, the way
+ * it already does whenever the record moves. Kept against the member it was
+ * read for, so a second person signing in on the same window never meets the
+ * first one's list.
+ */
+interface LastRead {
+  who: string;
+  rows: QueueRow[];
+  overdue: number;
+}
+
+/**
+ * And how it was narrowed. The column and the way back both draw the list the
+ * member was looking at, not the list as it opens — a row picked from
+ * *everyone* is not in *yours*, and a list that drops the line whose work is
+ * open beside it has lost the one thing the column is for.
+ */
+interface Narrowed {
+  onlyMine: boolean;
+  only: QueuePhase | null;
+}
+const narrowed = (): Narrowed => kept<Narrowed>('queue.narrowed') ?? { onlyMine: true, only: null };
 
 /** The stage's own colour, from the vocabulary the doors already use. */
 const TONE: Record<QueuePhase, string> = {
@@ -153,9 +183,22 @@ function Row({ row, n }: { row: QueueRow; n?: number }) {
 
 export default function Queue() {
   const { t } = useI18n();
-  const [rows, setRows] = useState<QueueRow[] | null>(null);
-  const [overdue, setOverdue] = useState(0);
-  const [only, setOnly] = useState<QueuePhase | null>(null);
+  const { identity } = useIdentity();
+  const last = kept<LastRead>('queue.read');
+  const had = last && last.who === identity?.scholarId ? last : null;
+  const [rows, setRows] = useState<QueueRow[] | null>(had?.rows ?? null);
+  const [overdue, setOverdue] = useState(had?.overdue ?? 0);
+  /**
+   * Beside the work rather than the work itself. The numbers that open a line
+   * are the queue's own keys only while the queue is the screen: beside a
+   * matter, `1` is *met*, and a press cannot mean two things.
+   */
+  const column = useContext(InTheColumn);
+  const [only, setOnlyHere] = useState<QueuePhase | null>(() => narrowed().only);
+  const setOnly = (p: QueuePhase | null) => {
+    keep<Narrowed>('queue.narrowed', { ...narrowed(), only: p });
+    setOnlyHere(p);
+  };
   /**
    * Narrowed to this member's own steps on arrival.
    *
@@ -164,8 +207,11 @@ export default function Queue() {
    * press away, with its count on the chip, so nothing is hidden — what
    * changes is which of the two questions the screen answers first.
    */
-  const [onlyMine, setOnlyMine] = useState(true);
-  const { identity } = useIdentity();
+  const [onlyMine, setOnlyMineHere] = useState(() => narrowed().onlyMine);
+  const setOnlyMine = (k: boolean) => {
+    keep<Narrowed>('queue.narrowed', { ...narrowed(), onlyMine: k });
+    setOnlyMineHere(k);
+  };
   const [failed, setFailed] = useState(false);
   /** A failed refresh keeps a screen that is already there. */
   const there = useStillThere();
@@ -192,6 +238,7 @@ export default function Queue() {
   const onScreen = useRef<QueueRow[]>([]);
 
   useEffect(() => {
+    if (column) return;
     const onKey = (e: KeyboardEvent) => {
       const inABox =
         e.target instanceof HTMLElement &&
@@ -217,7 +264,7 @@ export default function Queue() {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [navigate]);
+  }, [navigate, column]);
 
   useEffect(() => {
     let current = true;
@@ -226,8 +273,11 @@ export default function Queue() {
       .then((q) => {
         if (!current) return;
         there.arrived();
-        setRows(Array.isArray(q.rows) ? q.rows : []);
+        const read = Array.isArray(q.rows) ? q.rows : [];
+        setRows(read);
         setOverdue(q.overdue ?? 0);
+        if (identity?.scholarId)
+          keep<LastRead>('queue.read', { who: identity.scholarId, rows: read, overdue: q.overdue ?? 0 });
       })
       .catch(() => {
         if (current) there.lost(setFailed);
@@ -417,7 +467,7 @@ export default function Queue() {
       ) : (
         <Sheet columns={COLS(t)}>
           {shown.map((r, i) => (
-            <Row key={r.kind + r.id} row={r} n={i + 1} />
+            <Row key={r.kind + r.id} row={r} n={column ? undefined : i + 1} />
           ))}
         </Sheet>
       )}
@@ -432,19 +482,13 @@ export default function Queue() {
         what to do next. Occasional things go after the work, not in front
         of it.
       */}
-      <nav className="mt-6 flex flex-wrap gap-x-5 gap-y-1">
-        {[
-          ['/questions', 'needs.allQuestions'],
-          ['/classic', 'needs.allMatters'],
-        ].map(([to, key]) => (
-          <Link
-            key={to}
-            to={to}
-            className="inline-flex min-h-[44px] items-center text-ui text-muted underline decoration-line underline-offset-4 hover:text-paper lg:min-h-0"
-          >
-            {t(key)}
-          </Link>
-        ))}
+      <nav aria-label={t('needs.allQuestions')} className="mt-6">
+        <Rows
+          items={[
+            { to: '/questions', label: t('needs.allQuestions') },
+            { to: '/classic', label: t('needs.allMatters') },
+          ]}
+        />
       </nav>
     </ListPage>
   );

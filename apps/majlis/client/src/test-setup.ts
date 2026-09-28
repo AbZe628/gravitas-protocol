@@ -4,6 +4,8 @@ import { configure } from '@testing-library/react';
 import { forgetIdentity } from './lib/identity.js';
 import { forgetPulse } from './lib/pulse.js';
 import { forgetHealth } from './lib/health.js';
+import { forgetKept } from './lib/kept.js';
+import { forgetList } from './lib/split.js';
 /*
  * Arabic and Urdu are fetched when chosen in the application; a test renders
  * in them in the same tick it asks, so all three are held from the start.
@@ -49,4 +51,6 @@ beforeEach(() => {
   forgetIdentity();
   forgetPulse();
   forgetHealth();
+  forgetKept();
+  forgetList();
 });

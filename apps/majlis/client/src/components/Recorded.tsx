@@ -91,9 +91,10 @@ function Entry({ entry }: { entry: HistoryEntry }) {
       */}
       <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1.5">
         <Button
+          tone="plainquiet"
           type="button"
           onClick={() => setOpen(!open)}
-          className="text-note text-muted underline underline-offset-2 hover:text-paper"
+          className="text-note inline-flex items-center min-h-[44px] lg:min-h-0 lg:py-1"
         >
           {open ? t('recorded.hideWorking') : t('recorded.showWorking')}
         </Button>

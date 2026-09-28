@@ -189,9 +189,10 @@ export default function WhatTheBoardAsked({ boardId }: { boardId: string }) {
                       }}
                     />
                     <Button
+                      tone="plainquiet"
                       type="button"
                       onClick={() => setAnswering(null)}
-                      className="text-note text-muted underline decoration-line underline-offset-4"
+                      className="text-note inline-flex items-center min-h-[44px] lg:min-h-0 lg:py-1"
                     >
                       {t('common.cancel')}
                     </Button>

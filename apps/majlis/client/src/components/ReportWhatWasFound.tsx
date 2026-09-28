@@ -157,9 +157,10 @@ export default function ReportWhatWasFound({
           perform={send}
         />
         <Button
+          tone="plainquiet"
           type="button"
           onClick={() => setOpen(false)}
-          className="text-ui text-muted underline decoration-line underline-offset-4"
+          className="text-ui inline-flex items-center min-h-[44px] lg:min-h-0 lg:py-1"
         >
           {t('common.back')}
         </Button>

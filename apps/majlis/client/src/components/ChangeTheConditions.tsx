@@ -300,9 +300,10 @@ export default function ChangeTheConditions({
             <div className="mb-1.5 flex flex-wrap items-baseline justify-between gap-2">
               <span className="font-mono text-note text-muted">{r.id}</span>
               <Button
+                tone="plainquiet"
                 type="button"
                 onClick={() => setRows((was) => was.filter((_, j) => j !== i))}
-                className="text-note text-muted underline decoration-line underline-offset-4 hover:text-breach"
+                className="inline-flex min-h-[44px] items-center text-note hover:text-breach lg:min-h-0 lg:py-1"
               >
                 {t('amend.drop')}
               </Button>

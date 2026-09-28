@@ -193,9 +193,10 @@ function Entry({
 
       {canSpeak && !replying && (
         <Button
+          tone="plainquiet"
           type="button"
           onClick={() => setReplying(true)}
-          className="mt-3 text-ui text-muted underline decoration-line underline-offset-4 transition-colors hover:text-paper"
+          className="mt-3 text-ui inline-flex items-center min-h-[44px] lg:min-h-0 lg:py-1"
         >
           {t('say.reply')}
         </Button>

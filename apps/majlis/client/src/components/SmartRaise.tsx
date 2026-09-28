@@ -237,9 +237,10 @@ export default function SmartRaise({ boardId }: { boardId: string }) {
               perform={submit}
             />
             <Button
+              tone="plainquiet"
               type="button"
               onClick={() => setOpen(false)}
-              className="text-ui text-muted underline decoration-line underline-offset-4 hover:text-paper"
+              className="text-ui inline-flex items-center min-h-[44px] lg:min-h-0 lg:py-1"
             >
               {t('smart.cancel')}
             </Button>

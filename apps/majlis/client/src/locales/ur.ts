@@ -9,6 +9,13 @@ import type { Dict } from './dict.js';
  */
 
 const ur: Dict = {
+  "keys.rowsOnALine": "جس قطار پر ہیں وہاں سے آگے پیچھے جائیں",
+  "keys.besideList": "ساتھ والی فہرست",
+  "keys.besideRows": "کام چھوڑے بغیر اگلا یا پچھلا کھولیں",
+  "split.showRail": "سب جگہیں دکھائیں",
+  "split.hideRail": "جگہیں چھپائیں",
+  "split.fullList": "یہ فہرست، پوری چوڑائی میں",
+  "split.back": "واپس {list} پر",
   "snc.amountComesFrom": "رقم وہ آمدنی ہے جو ناحق لی گئی۔ یہ اوپر کے منصوبے کے تحت ادارے کی اپنی مطابقت سے آتی ہے، کسی ایسے حساب سے نہیں جو یہ بورڈ چلا سکے۔",
   "snc.planDueBy": "منصوبے کی مقررہ تاریخ",
   "screen.recordHeadline": "تین تناسب، اُن حدود کے مقابل جو اس بورڈ نے مقرر کیں",

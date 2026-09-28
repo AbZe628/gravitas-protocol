@@ -271,11 +271,11 @@ export default function Incidents() {
                   it, so deriving it again here would be a second place
                   saying what happens next.
                 */
-                <span className="block truncate font-mono text-note text-goldink">
-                  {i.purification && !i.purification.paidAt
-                    ? `${i.purification.amount} ${i.purification.currency}`
-                    : ''}
-                </span>,
+                i.purification && !i.purification.paidAt ? (
+                  <span className="block truncate font-mono text-note text-goldink">
+                    {`${i.purification.amount} ${i.purification.currency}`}
+                  </span>
+                ) : null,
                 <Figure>{i.reportedAt.slice(0, 10)}</Figure>,
                 <Figure tone={i.clock?.overdue ? 'text-breach' : 'text-muted'}>
                   {daysSince(i.reportedAt)}

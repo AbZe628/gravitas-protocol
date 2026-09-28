@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { keep, kept } from '../lib/kept.js';
 import { useI18n } from '../lib/i18n.js';
 import { ListPage } from '../components/shapes.js';
 import Record, { ExportForAudit } from './Record.js';
@@ -52,7 +53,15 @@ const TABS: Tab[] = ['decided', 'inForce'];
 
 export default function WhatStands() {
   const { t } = useI18n();
-  const [tab, setTab] = useState<Tab>('decided');
+  /*
+   * Kept, so the list beside a ruling opened from *in force* is the list it
+   * was opened from, and the way back lands on the same tab.
+   */
+  const [tab, setTabHere] = useState<Tab>(() => kept<Tab>('stands.tab') ?? 'decided');
+  const setTab = (k: Tab) => {
+    keep('stands.tab', k);
+    setTabHere(k);
+  };
 
   /*
    * The two tabs are a filter, and they sit where filters sit.

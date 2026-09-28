@@ -1,6 +1,18 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigationType } from 'react-router-dom';
 import { Button } from './Button';
-import { useEffect, useState, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
+import { Chevron } from './ui.js';
+import { wasJustOpened, rememberOpened } from '../lib/split.js';
+
+/**
+ * Whether this list is drawn in the column beside a thing that is open.
+ *
+ * The same list, narrower: on a desk, opening a row puts the list in a column
+ * down the side and the row's work beside it (see the list column in
+ * Shell.tsx). A table does not fit 340 pixels, so a list told it is in the
+ * column draws the phone's lines whatever the width of the window.
+ */
+export const InTheColumn = createContext(false);
 
 /**
  * A list with columns, which is what an application shows and a page does not.
@@ -130,6 +142,36 @@ function useWide(): boolean {
   return wide;
 }
 
+/**
+ * How wide a table has to be before its columns can be read.
+ *
+ * Every fixed column at its width, the title at no less than fourteen
+ * characters' room and any other shared column at eight, the gaps between
+ * them and the line's own padding. Measured in the root's units, which is
+ * what the widths are written in.
+ */
+function needs(columns: readonly Column[]): number {
+  const rem =
+    typeof document !== 'undefined'
+      ? parseFloat(getComputedStyle(document.documentElement).fontSize) || 16
+      : 16;
+  const lead = Math.max(0, columns.findIndex((c) => c.phone === 'lead'));
+  const each = columns.map((c, i) => {
+    const w = c.width.trim();
+    const n = parseFloat(w);
+    if (/^[\d.]+rem$/.test(w)) return n * rem;
+    if (/^[\d.]+px$/.test(w)) return n;
+    return (i === lead ? 14 : 8) * rem;
+  });
+  return each.reduce((a, b) => a + b, 0) + 16 * (columns.length - 1) + 40;
+}
+
+/**
+ * Whether the table this line is in has room for its columns — `null` for a
+ * line drawn outside any table, which then asks the window instead.
+ */
+const Fits = createContext<boolean | null>(null);
+
 export function Sheet({
   columns,
   children,
@@ -137,18 +179,50 @@ export function Sheet({
   columns: readonly Column[];
   children: ReactNode;
 }) {
+  const column = useContext(InTheColumn);
+  /*
+   * Columns where there is room for them, lines where there is not — asked
+   * of the table's own width, not the window's.
+   *
+   * The window was the wrong thing to ask. At 1024 pixels it is a desk, but
+   * the table sits in 616 of them beside the rail and the shelf, and the
+   * list of breaches has 512 pixels of fixed columns: the title's share came
+   * to nothing, and every breach on the screen was a row of stages with no
+   * name. Measured live; no test could see it, because under a test runner
+   * nothing has a width. The same question answers the list column beside a
+   * matter, a tablet held upright and a phone, with one rule.
+   */
+  const box = useRef<HTMLDivElement>(null);
+  const [fits, setFits] = useState(true);
+  const widths = columns.map((c) => c.width).join('|');
+  useLayoutEffect(() => {
+    const el = box.current;
+    if (!el || typeof ResizeObserver === 'undefined') return;
+    const need = needs(columns);
+    const measure = () => setFits(el.clientWidth >= need);
+    measure();
+    const seen = new ResizeObserver(measure);
+    seen.observe(el);
+    return () => seen.disconnect();
+    // The widths are what the need is made of; `columns` is rebuilt every render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [widths]);
+  const wide = fits && !column;
+
   return (
-    <div className="overflow-hidden rounded-card bg-raised shadow-ring">
+    <Fits.Provider value={wide}>
+    <div ref={box} className="overflow-hidden rounded-card bg-raised shadow-ring">
       {/*
         The headings, held at the top of the scroll.
 
         A column heading that scrolls away takes the meaning of every figure
         under it with it, on exactly the long lists where that matters most.
       */}
+      {wide && (
       <div
         role="row"
         style={{ ['--cols' as string]: template(columns) }}
-        className="sticky top-0 z-[1] hidden gap-4 border-b border-line bg-raised px-5 py-2.5 sm:grid sm:[grid-template-columns:var(--cols)]"
+        className="sticky top-0 z-[1] grid gap-4 border-b border-line bg-raised px-5 py-2.5 [grid-template-columns:var(--cols)]"
       >
         {columns.map((c, i) => (
           <div
@@ -163,9 +237,11 @@ export function Sheet({
           </div>
         ))}
       </div>
+      )}
 
       <ul className="[&>li+li]:border-t [&>li+li]:border-line">{children}</ul>
     </div>
+    </Fits.Provider>
   );
 }
 
@@ -191,7 +267,22 @@ export function Line({
   /** A line that is past its date, or otherwise marked. */
   tone?: 'plain' | 'breach';
 }) {
-  const wide = useWide();
+  const column = useContext(InTheColumn);
+  const fits = useContext(Fits);
+  const byWindow = useWide();
+  const wide = (fits ?? byWindow) && !column;
+  const here = useLocation();
+  const returning = useNavigationType() === 'POP';
+
+  /*
+   * The line whose work is open beside the list, lit — the way a list in any
+   * application marks what you are looking at. And the line just come back
+   * from, lit for a moment, so a member returning to the list sees where
+   * they were rather than hunting for it. Only coming back: a list reached
+   * afresh from the rail has nowhere the member was.
+   */
+  const open = to !== undefined && (to === here.pathname || to === here.pathname + here.hash);
+  const back = to !== undefined && !open && returning && wasJustOpened(to);
 
   const roleOf = (i: number): 'lead' | 'trailing' | 'under' | 'hide' =>
     columns[i]?.phone ?? (i === 0 ? 'lead' : 'under');
@@ -199,30 +290,44 @@ export function Line({
   const leadAt = columns.findIndex((_, i) => roleOf(i) === 'lead');
   const lead = leadAt === -1 ? 0 : leadAt;
   const trailing = columns.findIndex((_, i) => roleOf(i) === 'trailing');
+  /* A cell with nothing in it is left out of the line, or it leaves its `·` behind. */
   const under = cells
     .map((cell, i) => ({ cell, i }))
-    .filter(({ i }) => roleOf(i) === 'under');
+    .filter(({ cell, i }) => roleOf(i) === 'under' && cell !== null && cell !== undefined && cell !== false && cell !== '');
 
   /** The title, as the one link, stretched over the whole line. */
   const opener = (cell: ReactNode, phone: boolean) => {
+    /* The whole line shows where the keyboard is, so the words need no box of their own. */
     const shape =
-      'block truncate text-start after:absolute after:inset-0 hover:underline hover:underline-offset-[3px] ' +
-      (phone ? 'text-lead text-paper' : 'text-body text-paper');
+      'block truncate text-start after:absolute after:inset-0 focus-visible:outline-none ' +
+      (phone ? 'text-body text-paper' : 'text-body text-paper');
     return onPress ? (
       <Button type="button" onClick={onPress} className={'w-full ' + shape}>
         {cell}
       </Button>
     ) : (
-      <Link to={to ?? '#'} className={shape}>
+      <Link
+        to={to ?? '#'}
+        aria-current={open ? 'page' : undefined}
+        data-line=""
+        onClick={() => to && rememberOpened(to)}
+        className={shape}
+      >
         {cell}
       </Link>
     );
   };
 
-  const mark =
-    tone === 'breach'
+  /* The line the keyboard is on, lit the way the pointer lights it. */
+  const onIt =
+    '[&:has(a:focus-visible)]:bg-lapistint/60 [&:has(a:focus-visible)]:ring-2 [&:has(a:focus-visible)]:ring-inset [&:has(a:focus-visible)]:ring-lapis/50 ';
+  const mark = onIt + (open
+    ? tone === 'breach'
+      ? 'border-s-[3px] border-breach bg-lapistint'
+      : 'bg-lapistint'
+    : tone === 'breach'
       ? 'border-s-[3px] border-breach bg-breachtint'
-      : 'hover:bg-ink/[0.025]';
+      : 'hover:bg-ink/[0.025] ' + (back ? 'line-returned' : ''));
 
   /*
     A phone is not a narrow desk.
@@ -234,25 +339,41 @@ export function Line({
   */
   if (!wide) {
     return (
-      <li className={'relative px-5 py-3 ' + mark}>
-        <div className="flex items-baseline gap-3">
-          <div className="min-w-0 flex-1">{opener(cells[lead], true)}</div>
-          {trailing !== -1 && <div className="shrink-0">{cells[trailing]}</div>}
-        </div>
-        {under.length > 0 && (
-          <div className="mt-1 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-            {under.map(({ cell, i }, n) => (
-              <span key={i} className="flex min-w-0 items-baseline gap-2">
-                {n > 0 && (
-                  <span aria-hidden="true" className="text-note text-muted">
-                    ·
-                  </span>
-                )}
-                {cell}
-              </span>
-            ))}
+      <li className={'relative flex items-center gap-3 py-3 pe-4 ps-5 ' + mark}>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-baseline gap-3">
+            <div className="min-w-0 flex-1">{opener(cells[lead], true)}</div>
+            {trailing !== -1 && <div className="shrink-0">{cells[trailing]}</div>}
           </div>
-        )}
+          {/*
+            One line under the title, never two.
+
+            It wrapped, and what wrapped was the owner, which then opened its
+            own line with the separator in front of it — *· the board* on a
+            line of its own under every question. The first fact gives way
+            and is cut short; the ones after it keep their place, because
+            whose a thing is, is the part a member scans the list for.
+          */}
+          {under.length > 0 && (
+            <div className="mt-0.5 flex min-w-0 items-baseline gap-x-2">
+              {under.map(({ cell, i }, n) => (
+                <span
+                  key={i}
+                  className={n === 0 ? 'min-w-0 truncate' : 'flex shrink-0 items-baseline gap-2'}
+                >
+                  {n > 0 && (
+                    <span aria-hidden="true" className="text-note text-muted">
+                      ·
+                    </span>
+                  )}
+                  {cell}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+        {/* What opens something else says so, as every list on the device does. */}
+        {(to !== undefined || onPress) && <Chevron />}
       </li>
     );
   }

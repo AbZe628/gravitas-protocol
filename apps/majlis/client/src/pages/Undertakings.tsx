@@ -135,9 +135,10 @@ function One({
 
       {mayClose && !open && (
         <Button
+          tone="plain"
           type="button"
           onClick={() => setOpen(true)}
-          className="mt-3 inline-flex min-h-[44px] items-center text-ui font-semibold text-lapis underline decoration-line underline-offset-4 lg:min-h-0"
+          className="mt-3 inline-flex min-h-[44px] items-center text-ui font-semibold lg:min-h-0 lg:py-1"
         >
           {t('und.closeIt')}
         </Button>

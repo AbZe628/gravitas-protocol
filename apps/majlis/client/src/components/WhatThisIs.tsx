@@ -65,7 +65,8 @@ export default function WhatThisIs({
       <Button
         type="button"
         onClick={onToggle}
-        className="mb-5 text-ui text-muted underline decoration-line underline-offset-4 transition-colors hover:text-paper"
+        tone="plainquiet"
+        className="mb-5 min-h-[44px] text-ui lg:min-h-0 lg:py-1"
       >
         {t('intro.reopen')}
       </Button>

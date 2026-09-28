@@ -82,9 +82,10 @@ export default function RaiseAMatter({
   if (!open) {
     return (
       <Button
+        tone="plain"
         type="button"
         onClick={() => setOpen(true)}
-        className="mt-3 inline-flex min-h-[44px] items-center text-ui font-semibold text-lapis underline decoration-line underline-offset-4 lg:min-h-0"
+        className="mt-3 inline-flex min-h-[44px] items-center text-ui font-semibold lg:min-h-0 lg:py-1"
       >
         {label}
       </Button>
@@ -146,9 +147,10 @@ export default function RaiseAMatter({
               perform={raise}
             />
         <Button
+          tone="plainquiet"
           type="button"
           onClick={() => setOpen(false)}
-          className="text-ui text-muted underline decoration-line underline-offset-4"
+          className="text-ui inline-flex items-center min-h-[44px] lg:min-h-0 lg:py-1"
         >
           {t('common.back')}
         </Button>

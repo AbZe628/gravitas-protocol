@@ -165,9 +165,10 @@ function Note({
       <div className="mt-2.5 flex flex-wrap items-center gap-4 text-note">
         {!a.withdrawn && !replying && (
           <Button
+            tone="plain"
             type="button"
             onClick={() => setReplying(true)}
-            className="font-semibold text-lapis underline decoration-line underline-offset-4"
+            className="font-semibold inline-flex items-center min-h-[44px] lg:min-h-0 lg:py-1"
           >
             {t('margin.reply')}
           </Button>
@@ -179,9 +180,10 @@ function Note({
         */}
         {!a.withdrawn && a.by === mine && (
           <Button
+            tone="plainquiet"
             type="button"
             onClick={() => setDropping(true)}
-            className="text-muted underline decoration-line underline-offset-4"
+            className="inline-flex items-center min-h-[44px] lg:min-h-0 lg:py-1"
           >
             {t('margin.withdraw')}
           </Button>
@@ -228,9 +230,10 @@ function Note({
               {t('margin.send')}
             </Button>
             <Button
+              tone="plainquiet"
               type="button"
               onClick={() => setReplying(false)}
-              className="text-note text-muted underline decoration-line underline-offset-4"
+              className="text-note inline-flex items-center min-h-[44px] lg:min-h-0 lg:py-1"
             >
               {t('common.back')}
             </Button>
@@ -340,9 +343,10 @@ export default function InTheMargin({
                   {t('margin.write')}
                 </Button>
                 <Button
+                  tone="plainquiet"
                   type="button"
                   onClick={() => setSelected('')}
-                  className="text-note text-muted underline decoration-line underline-offset-4"
+                  className="text-note inline-flex items-center min-h-[44px] lg:min-h-0 lg:py-1"
                 >
                   {t('common.back')}
                 </Button>

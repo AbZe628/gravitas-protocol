@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useI18n } from '../lib/i18n.js';
+import { listFor } from '../lib/split.js';
 
 /**
  * What the keyboard does **here**, on one press.
@@ -67,9 +68,18 @@ function sheetsFor(path: string, t: (k: string) => string): Sheet[] {
     sheets.push({
       heading: t('keys.list'),
       keys: [
-        { press: '↑ ↓', does: t('keys.rows') },
+        { press: 'j k', does: t('keys.rows') },
+        { press: '↑ ↓', does: t('keys.rowsOnALine') },
         { press: '↵', does: t('keys.openRow') },
       ],
+    });
+  }
+
+  /* A thing opened from a list has that list beside it on a desk, and its keys. */
+  if (listFor(path)) {
+    sheets.push({
+      heading: t('keys.besideList'),
+      keys: [{ press: 'j k', does: t('keys.besideRows') }],
     });
   }
 

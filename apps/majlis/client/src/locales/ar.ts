@@ -9,6 +9,13 @@ import type { Dict } from './dict.js';
  */
 
 const ar: Dict = {
+  "keys.rowsOnALine": "الانتقال من الصف الذي أنت عليه",
+  "keys.besideList": "القائمة بجانبه",
+  "keys.besideRows": "افتح التالي أو السابق دون مغادرة العمل",
+  "split.showRail": "إظهار كل الأماكن",
+  "split.hideRail": "إخفاء الأماكن",
+  "split.fullList": "هذه القائمة بكامل العرض",
+  "split.back": "العودة إلى {list}",
   "snc.amountComesFrom": "المبلغ هو الدخل المأخوذ بغير وجه حق. يأتي من تسوية المؤسسة نفسها بموجب الخطة أعلاه، لا من حساب يجريه هذا المجلس.",
   "snc.planDueBy": "موعد إتمام الخطة",
   "screen.recordHeadline": "النسب الثلاث، مقابل الحدود التي وضعها هذا المجلس",

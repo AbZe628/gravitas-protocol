@@ -252,12 +252,13 @@ export default function WhatTheCommitteeFound({ matterId }: { matterId: string }
 
       {canRefer && !open && (
         <Button
+          tone="plain"
           type="button"
           onClick={() => {
             setOpen(true);
             setPick(committees?.[0]?.id ?? '');
           }}
-          className="mt-3 text-ui font-semibold text-lapis underline decoration-line underline-offset-4"
+          className="mt-3 text-ui font-semibold inline-flex items-center min-h-[44px] lg:min-h-0 lg:py-1"
         >
           {t('cttee.refer')}
         </Button>
@@ -330,9 +331,10 @@ export default function WhatTheCommitteeFound({ matterId }: { matterId: string }
               {t('cttee.sendIt')}
             </Button>
             <Button
+              tone="plainquiet"
               type="button"
               onClick={() => setOpen(false)}
-              className="text-ui text-muted underline decoration-line underline-offset-4"
+              className="text-ui inline-flex items-center min-h-[44px] lg:min-h-0 lg:py-1"
             >
               {t('common.back')}
             </Button>

@@ -274,10 +274,11 @@ export default function SignTheDocument({ matter }: { matter: Matter }) {
             )}
             <Button
               type="button"
+              tone={withDevice ? 'plainquiet' : undefined}
               onClick={() => setSigning('own')}
               className={
                 withDevice
-                  ? 'text-ui text-muted underline decoration-line underline-offset-4'
+                  ? 'inline-flex min-h-[44px] items-center text-ui lg:min-h-0 lg:py-1'
                   : 'rounded-card bg-lapis px-6 py-3 text-body font-bold text-white shadow-act disabled:opacity-60'
               }
             >

@@ -91,12 +91,16 @@ function addressesLinked(): Set<string> {
      *
      * A form nobody thought of is missed, and the guard then names a route
      * as unreachable when it is not. That is the direction to be wrong in.
+     *
+     * And the third form, a line of a grouped list: `{ to: '/questions',
+     * label }` handed to `Rows`, which draws each as a link. It is the key
+     * `to` and nothing looser — a bare list of routes still does not count.
      */
     for (const line of source.split(/\r?\n/)) {
       const code = line.trim();
       if (code.startsWith('*') || code.startsWith('//') || code.startsWith('/*')) continue;
 
-      for (const m of code.matchAll(/(?:to|href)\s*=\s*[{(]?\s*['"`](\/[A-Za-z0-9\-/]*)['"`]/g)) {
+      for (const m of code.matchAll(/(?:\bto|\bhref)\s*[=:]\s*[{(]?\s*['"`](\/[A-Za-z0-9\-/]*)['"`]/g)) {
         out.add(m[1]);
       }
       for (const m of code.matchAll(/\[\s*['"`](\/[A-Za-z0-9\-/]*)['"`]\s*,/g)) {

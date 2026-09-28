@@ -136,7 +136,8 @@ export default function AfterAct({
           <Button
             type="button"
             onClick={onClose}
-            className="text-ui text-muted underline decoration-line underline-offset-4"
+            tone="plainquiet"
+            className="min-h-[44px] text-ui lg:min-h-0 lg:py-1"
           >
             {t('after.nothingMore')}
           </Button>

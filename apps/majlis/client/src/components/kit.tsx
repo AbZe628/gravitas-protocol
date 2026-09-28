@@ -252,18 +252,29 @@ export function Quiet({
   onClick?: () => void;
   to?: string;
 }) {
-  const shape =
-    'inline-flex min-h-[44px] items-center text-ui text-muted underline decoration-line underline-offset-4 transition-colors hover:text-paper lg:min-h-0';
-
+  /*
+   * A way to somewhere is written as a link, underlined, because that is
+   * what it is.
+   */
   if (to) {
     return (
-      <Link to={to} className={shape}>
+      <Link
+        to={to}
+        className="inline-flex min-h-[44px] items-center text-ui text-muted underline decoration-line underline-offset-4 transition-colors hover:text-paper lg:min-h-0"
+      >
         {children}
       </Link>
     );
   }
+  /*
+   * An act is not. *Do not take it up* and *withdraw this* were drawn as
+   * underlined type — the mark a page puts on a link — so the one control on
+   * a card that changes the record looked like the one that only goes
+   * somewhere. It is the device's plain button now: its words, no box, a
+   * ground under the pointer, and the full height a finger needs.
+   */
   return (
-    <Button type="button" onClick={onClick} className={shape}>
+    <Button type="button" tone="plainquiet" onClick={onClick} className="min-h-[44px] text-ui lg:min-h-0 lg:py-1">
       {children}
     </Button>
   );

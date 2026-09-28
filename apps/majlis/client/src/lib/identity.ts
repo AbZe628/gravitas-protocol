@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { governance, type Role } from './api.js';
+import { forgetKept } from './kept.js';
 
 /**
  * Who is looking, so the interface can stop offering what would be refused.
@@ -87,6 +88,8 @@ export function forgetIdentity(): void {
   upit = null;
   poznato = null;
   odgovoreno = false;
+  /* And what the last person's screens had, which was theirs. */
+  forgetKept();
 }
 
 export function useIdentity(): { identity: Identity | null; loading: boolean } {

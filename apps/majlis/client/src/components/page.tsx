@@ -1,9 +1,10 @@
-import type { ReactNode } from 'react';
+import { useContext, type ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useI18n } from '../lib/i18n.js';
 import { isInstitution, useIdentity } from '../lib/identity.js';
 import { journeyFor } from '../lib/journey.js';
 import { DESK_DOORS, DOORS, isDeskRoute, type AnyPhase } from '../lib/spine.js';
+import { InTheColumn } from './sheet.js';
 
 /**
  * One shape for every page.
@@ -146,6 +147,19 @@ export function PageHead({
 
     The title, the live marks and the act stay. Those are the screen.
   */
+  /*
+    Beside the work, the list is not the screen, and its head is one line.
+
+    The column names the list at its top, where a member can press the name
+    to have the list back at full width; a second title under it would be
+    the list saying what it is twice, and an `h1` there would give the
+    window two. The sentence and the act are the list's own screen's, not
+    the column's. What stays is the one fact about now — how many, how many
+    are late — because that is what a member glances at between two rows.
+  */
+  const column = useContext(InTheColumn);
+  if (column) return live ? <div className="mb-3 flex flex-wrap items-center gap-2.5">{live}</div> : null;
+
   return (
     <header className="mb-6">
       <div className="hidden sm:block">
@@ -283,7 +297,9 @@ export function Division({
  */
 export function Gaps({ items }: { items: readonly string[] }) {
   const { t } = useI18n();
-  if (items.length === 0) return null;
+  /* What the list cannot see is said on the list's own screen, at full width. */
+  const column = useContext(InTheColumn);
+  if (items.length === 0 || column) return null;
 
   return (
     <section className="border-t border-line py-6">

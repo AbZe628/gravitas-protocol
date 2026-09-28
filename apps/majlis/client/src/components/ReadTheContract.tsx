@@ -313,12 +313,13 @@ export default function ReadTheContract({
           <p className="mt-4 max-w-[58ch] text-ui leading-relaxed text-muted">{t('read.thenWhat')}</p>
 
           <Button
+            tone="plainquiet"
             type="button"
             onClick={() => {
               setReading(null);
               setText('');
             }}
-            className="mt-3 text-ui text-muted underline decoration-line underline-offset-4 hover:text-paper"
+            className="mt-3 text-ui inline-flex items-center min-h-[44px] lg:min-h-0 lg:py-1"
           >
             {t('read.again')}
           </Button>

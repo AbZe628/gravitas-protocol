@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import type { SourceRef } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
+import { Link } from 'react-router-dom';
 
 /**
  * The oldest primitives in the application, and the most used — twenty-five
@@ -182,5 +183,65 @@ export function ErrorText({ what }: { what?: string } = {}) {
       <p className="mt-1.5 text-sand">{t('common.error.means')}</p>
       <p className="mt-1.5 text-muted">{t('common.error.todo')}</p>
     </div>
+  );
+}
+
+/**
+ * The mark that says a row opens something else.
+ *
+ * Every list on the device a member carries puts it there, so a row with one
+ * reads as a way in and a row without one reads as a fact. It points along
+ * the reading direction, so it turns round on a right-to-left screen.
+ */
+export function Chevron({ className = '' }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden="true"
+      width="8"
+      height="13"
+      viewBox="0 0 8 13"
+      className={'shrink-0 text-muted rtl:-scale-x-100 ' + className}
+    >
+      <path
+        d="M1.5 1.5 6.5 6.5 1.5 11.5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+/**
+ * Places to go, as a grouped list — not as underlined words.
+ *
+ * The rows of a settings screen: one surface, a line between rows that starts
+ * where the words start rather than at the edge, and a chevron at the end of
+ * each. Links written as underlined words at the foot of a list are how a web
+ * page offers somewhere else to go; this is how an application does.
+ */
+export function Rows({ items }: { items: readonly { to: string; label: string; note?: string }[] }) {
+  return (
+    <ul className="overflow-hidden rounded-card bg-raised shadow-ring">
+      {items.map((it, i) => (
+        <li key={it.to} className={i > 0 ? 'ms-5 border-t border-line/80' : ''}>
+          <Link
+            to={it.to}
+            className={
+              'flex min-h-[44px] items-center gap-3 py-2.5 pe-4 transition-colors hover:bg-ink/[0.03] ' +
+              (i > 0 ? '' : 'ps-5')
+            }
+          >
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-ui text-paper">{it.label}</span>
+              {it.note && <span className="block truncate text-note text-muted">{it.note}</span>}
+            </span>
+            <Chevron />
+          </Link>
+        </li>
+      ))}
+    </ul>
   );
 }

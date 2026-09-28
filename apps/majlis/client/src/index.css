@@ -208,6 +208,37 @@
       background-position: -100% 0;
     }
   }
+
+  /*
+   * The line a member has just come back from, lit and let go.
+   *
+   * Back on a list, where they were is the first thing they look for. The
+   * line holds the tint the open line is drawn in, then fades out of it over
+   * a second and a half — long enough to be found, short enough to be gone
+   * before it reads as a selection that is still there. Without motion it
+   * is simply lit for that long.
+   */
+  .line-returned {
+    animation: line-returned 1.6s ease-out 0.2s backwards;
+  }
+  @keyframes line-returned {
+    from {
+      background-color: theme('colors.lapistint');
+    }
+    to {
+      background-color: transparent;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .line-returned {
+      animation: line-returned-still 1.6s steps(1, end);
+    }
+    @keyframes line-returned-still {
+      from {
+        background-color: theme('colors.lapistint');
+      }
+    }
+  }
 }
 
 @layer utilities {

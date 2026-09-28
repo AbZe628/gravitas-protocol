@@ -110,20 +110,15 @@ export default function Guide() {
    * the bell and the palette, where the member already looks for the things
    * that are always available.
    */
-  if (!open) {
-    return (
-      <Button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="hidden items-center gap-2 rounded-xl bg-raised px-3 py-2 text-ui font-semibold text-sand shadow-ring transition-colors hover:text-paper lg:flex"
-      >
-        <svg aria-hidden width="14" height="14" viewBox="0 0 16 16" fill="none">
-          <path d="M8 1 L9.6 6.4 L15 8 L9.6 9.6 L8 15 L6.4 9.6 L1 8 L6.4 6.4 Z" fill="#B08430" />
-        </svg>
-        {t('guide.open')}
-      </Button>
-    );
-  }
+  /*
+   * Closed, it draws nothing. What opens it is in the frame: the tab on a
+   * phone, the mark in the bar on a desk (`OpenTheGuide`). Its own button
+   * used to be drawn here, and once the panel moved to the frame's level
+   * that button moved with it — to the foot of the work column, under the
+   * status bar, where it was drawn on every desk screen and could be pressed
+   * on none.
+   */
+  if (!open) return null;
 
   return (
     <div className="fixed inset-block-end-auto bottom-4 end-4 z-50 w-[min(26rem,calc(100vw-2rem))] lg:bottom-auto lg:end-[5.5rem] lg:top-[4.25rem]">
@@ -234,5 +229,24 @@ export default function Guide() {
         </form>
       </div>
     </div>
+  );
+}
+
+/** The guide's mark in the desk's bar, beside the bell. */
+export function OpenTheGuide() {
+  const { t } = useI18n();
+  return (
+    <Button
+      type="button"
+      onClick={() => window.dispatchEvent(new CustomEvent('majlis:guide'))}
+      aria-label={t('guide.open')}
+      title={t('guide.open')}
+      className="flex items-center gap-2 rounded-xl bg-raised px-3 py-2 text-ui font-semibold text-sand shadow-ring transition-colors hover:text-paper"
+    >
+      <svg aria-hidden width="14" height="14" viewBox="0 0 16 16" fill="none">
+        <path d="M8 1 L9.6 6.4 L15 8 L9.6 9.6 L8 15 L6.4 9.6 L1 8 L6.4 6.4 Z" fill="#B08430" />
+      </svg>
+      <span className="hidden xl:inline">{t('guide.open')}</span>
+    </Button>
   );
 }

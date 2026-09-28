@@ -90,7 +90,8 @@ export default function WhatMustHappen({ matter, canEdit, onChanged }: Props) {
           <Button
             type="button"
             onClick={start}
-            className="mt-3 text-ui font-semibold text-lapis underline decoration-line underline-offset-4"
+            tone="plain"
+            className="mt-3 min-h-[44px] text-ui font-semibold lg:min-h-0 lg:py-1"
           >
             {steps.length === 0 ? t('doing.write') : t('doing.change')}
           </Button>
@@ -133,9 +134,10 @@ export default function WhatMustHappen({ matter, canEdit, onChanged }: Props) {
       </ol>
 
       <Button
+        tone="plain"
         type="button"
         onClick={() => setRows((r) => [...r, ''])}
-        className="mt-2.5 text-ui text-lapis underline decoration-line underline-offset-4"
+        className="mt-2.5 text-ui inline-flex items-center min-h-[44px] lg:min-h-0 lg:py-1"
       >
         {t('doing.addStep')}
       </Button>
@@ -177,9 +179,10 @@ export default function WhatMustHappen({ matter, canEdit, onChanged }: Props) {
           {t('doing.save')}
         </Button>
         <Button
+          tone="plainquiet"
           type="button"
           onClick={() => setEditing(false)}
-          className="text-ui text-muted underline decoration-line underline-offset-4"
+          className="text-ui inline-flex items-center min-h-[44px] lg:min-h-0 lg:py-1"
         >
           {t('common.cancel')}
         </Button>

@@ -9,6 +9,13 @@ import type { Dict } from './dict.js';
  */
 
 const en: Dict = {
+  "keys.rowsOnALine": "Move on from the row you are on",
+  "keys.besideList": "The list beside it",
+  "keys.besideRows": "Open the next one, or the one before, without leaving the work",
+  "split.showRail": "Show every place",
+  "split.hideRail": "Hide the places",
+  "split.fullList": "This list, at full width",
+  "split.back": "Back to {list}",
   "snc.amountComesFrom": "The amount is the income wrongly taken. It comes from the institution's own reconciliation under the plan above, not from a calculation this board can run.",
   "snc.planDueBy": "The plan is due by",
   "screen.recordHeadline": "The three ratios, against the limits this board set",
@@ -1236,7 +1243,7 @@ const en: Dict = {
   "keys.notApplicable": "Does not apply",
   "keys.steps": "Previous / next step",
   "keys.list": "This list",
-  "keys.rows": "Move through the rows",
+  "keys.rows": "Move down or up the rows",
   "keys.openRow": "Open the row",
   "keys.anywhere": "Anywhere",
   "keys.palette": "A tool, a place, a matter",

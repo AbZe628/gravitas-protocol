@@ -143,9 +143,10 @@ export default function YourDevices() {
                 )}
               </span>
               <Button
+                tone="plainquiet"
                 type="button"
                 onClick={() => setForgetting(d)}
-                className="ms-auto text-note text-muted underline decoration-line underline-offset-4"
+                className="ms-auto text-note inline-flex items-center min-h-[44px] lg:min-h-0 lg:py-1"
               >
                 {t('devices.forget')}
               </Button>
