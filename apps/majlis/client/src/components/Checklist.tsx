@@ -255,7 +255,7 @@ function Condition({
         </span>
       </div>
 
-      <p className="max-w-[62ch] font-display text-lead leading-relaxed">{c.requirement}</p>
+      <p className="max-w-[62ch] font-read text-lead leading-relaxed">{c.requirement}</p>
 
       {/*
         A step that needs a figure carries the calculator, and what has already
@@ -376,7 +376,7 @@ function Condition({
                     </>
                   )}
                 </div>
-                <p className="mt-1.5 max-w-[62ch] font-display text-lead leading-relaxed text-sand">
+                <p className="mt-1.5 max-w-[62ch] font-read text-lead leading-relaxed text-sand">
                   {f.reason}
                 </p>
               </li>

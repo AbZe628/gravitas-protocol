@@ -47,7 +47,7 @@ export default {
         // Text.
         paper: '#191713',
         sand: '#4E483F',
-        muted: '#9C9284',
+        muted: '#726B60',
 
         // The board's own acts.
         lapis: '#164470',
@@ -85,12 +85,21 @@ export default {
         breachink: '#7A3A33',
         faint: '#B3A896',
       },
+      /*
+       * The faces, by what they are for — each a variable in tokens.css, so
+       * the script a screen is in can change them without the markup knowing.
+       *
+       *   ui / body / sans / display   the system face: the application's voice
+       *   read / serif                 the words of the record, set to be read
+       *   mono                         figures that must line up
+       */
       fontFamily: {
-        display: ['Newsreader', 'Iowan Old Style', 'Palatino Linotype', 'Amiri', 'serif'],
-        body: ['Manrope', 'system-ui', '-apple-system', 'Segoe UI', 'Noto Sans Arabic', 'Noto Nastaliq Urdu', 'sans-serif'],
-        mono: ['IBM Plex Mono', 'ui-monospace', 'SF Mono', 'Menlo', 'monospace'],
-        sans: ['Manrope', 'system-ui', 'Segoe UI', 'Noto Sans Arabic', 'Noto Nastaliq Urdu', 'sans-serif'],
-        serif: ['Newsreader', 'Iowan Old Style', 'Palatino Linotype', 'Georgia', 'Amiri', 'serif'],
+        display: 'var(--font-display)',
+        read: 'var(--font-read)',
+        body: 'var(--font-ui)',
+        sans: 'var(--font-ui)',
+        serif: 'var(--font-read)',
+        mono: 'var(--font-mono)',
       },
       /*
        * ── jedna ljestvica, i nista izvan nje ──────────────────────────────
@@ -107,18 +116,24 @@ export default {
        *
        * Bez line-height u ntorci, namjerno — inace bi fontSize gasio svaki
        * leading-* na istom elementu.
+       *
+       * Koraci su sada varijable (tokens.css): telefon dobija Appleove
+       * velicine — 17 / 15 / 13, nista ispod 12 — a sto zadrzava gustocu
+       * instrumenta. Bila je jedna ljestvica za sve, pa je telefon citao
+       * 12,5 px. Arapski i urdu mnoze svaki korak svojim faktorom.
        */
       fontSize: {
-        label: '10px', note: '11.5px', ui: '12.5px', body: '13.5px',
-        lead: '15px', sub: '18px', title: '22px', head: '28px',
-        display: '36px', hero: '44px',
+        label: 'var(--fs-label)', note: 'var(--fs-note)', ui: 'var(--fs-ui)', body: 'var(--fs-body)',
+        lead: 'var(--fs-lead)', sub: 'var(--fs-sub)', title: 'var(--fs-title)', head: 'var(--fs-head)',
+        display: 'var(--fs-display)', hero: 'var(--fs-hero)',
       },
       lineHeight: {
-        none: '0.95', tight: '1.15', snug: '1.45', relaxed: '1.6', loose: '1.7',
+        none: 'var(--lh-none)', tight: 'var(--lh-tight)', snug: 'var(--lh-snug)',
+        relaxed: 'var(--lh-relaxed)', loose: 'var(--lh-loose)',
       },
       letterSpacing: {
-        display: '-0.026em', title: '-0.018em', tight: '-0.01em',
-        label: '0.1em', caps: '0.14em',
+        display: 'var(--ls-display)', title: 'var(--ls-title)', tight: 'var(--ls-tight)',
+        label: 'var(--ls-label)', caps: 'var(--ls-caps)',
       },
       /*
        * Two widths, and a page belongs to one of them.

@@ -189,7 +189,7 @@ export default function Register() {
               {data.neverExamined > 0 && (
                 <Link
                   to="/examinations"
-                  className="text-ui text-gold underline decoration-gold/30 underline-offset-4 transition-colors hover:text-paper"
+                  className="text-ui text-goldink underline decoration-gold/30 underline-offset-4 transition-colors hover:text-paper"
                 >
                   {data.neverExamined} {t('spine.checked.count')}
                 </Link>

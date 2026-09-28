@@ -67,7 +67,7 @@ export default function MatterDetail() {
       </div>
 
       <h1
-        className="mb-4 max-w-[21ch] font-display text-head font-normal leading-tight tracking-display sm:text-display"
+        className="mb-4 max-w-[21ch] font-display text-head leading-tight tracking-display sm:text-display"
         style={{ textWrap: 'balance' }}
       >
         {matter.title}
@@ -163,7 +163,7 @@ export default function MatterDetail() {
           <div className="mb-3 font-display text-sub leading-snug tracking-title">
             {rule.title}
           </div>
-          <p className="mb-5 border-s-2 border-gold/50 ps-4 font-display text-lead leading-relaxed text-paper">
+          <p className="mb-5 border-s-2 border-gold/50 ps-4 font-read text-lead leading-relaxed text-paper">
             {rule.statement}
           </p>
 

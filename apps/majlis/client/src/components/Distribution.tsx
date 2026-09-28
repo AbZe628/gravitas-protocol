@@ -50,7 +50,7 @@ function ReserveRow({ r, currency }: { r: Reserve; currency: string }) {
         {r.movement.replace('-', '')} · {t('dist.headroom')} {r.headroom}
       </p>
       {/* A capped deduction is not the deduction the board approved. */}
-      {r.cappedAt && <p className="mt-1 text-note text-warn">{t('dist.capped')}</p>}
+      {r.cappedAt && <p className="mt-1 text-note text-goldink">{t('dist.capped')}</p>}
     </li>
   );
 }

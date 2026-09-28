@@ -83,7 +83,7 @@ export default function FollowInYourCalendar() {
 
       {shown && (
         <div className="mb-3 rounded-xl bg-ink px-3.5 py-3 shadow-ring">
-          <div className="mb-1.5 text-label font-bold uppercase tracking-caps text-gold">
+          <div className="mb-1.5 text-label font-bold uppercase tracking-caps text-goldink">
             {t('feed.onceOnly')}
           </div>
           {/*

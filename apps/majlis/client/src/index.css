@@ -1,4 +1,37 @@
 @import "./design/tokens.css";
+/*
+ * The one face that ships with the application: the serif the record is read
+ * in. Latin and Latin-extended only are fetched, and only once a glyph needs
+ * them. See tokens.css for why nothing comes from Google any more.
+ */
+@import "@fontsource-variable/newsreader/wght.css";
+
+/*
+ * Nastaliq for Urdu, and for the Arabic script only.
+ *
+ * The package's own rules also cover Latin, so a face named first for Urdu
+ * would draw every asset name and ISIN in nastaliq's condensed Latin as well.
+ * Named here with the Arabic ranges alone, Latin falls through to the system
+ * face. Fetched only on an Urdu screen, because nothing else names it.
+ */
+@font-face {
+  font-family: 'Majlis Nastaliq';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url('@fontsource/noto-nastaliq-urdu/files/noto-nastaliq-urdu-arabic-400-normal.woff2') format('woff2');
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E,
+    U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC;
+}
+@font-face {
+  font-family: 'Majlis Nastaliq';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 700;
+  src: url('@fontsource/noto-nastaliq-urdu/files/noto-nastaliq-urdu-arabic-700-normal.woff2') format('woff2');
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0897-08E1, U+08E3-08FF, U+200C-200E,
+    U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC;
+}
 
 @tailwind base;
 @tailwind components;
@@ -63,6 +96,14 @@
   h1, h2, .font-display {
     letter-spacing: var(--g-track-title);
   }
+  /*
+   * A title in the system face is semibold, as the system's own titles are.
+   * The serif was set at its regular weight; the same weight in a sans reads
+   * as a caption that grew, not as a title.
+   */
+  .font-display {
+    font-weight: 600;
+  }
   [dir='rtl'] {
     letter-spacing: 0;
   }
@@ -83,6 +124,15 @@
    * left to right inside it, and nothing in the markup has to know which it is
    * about to be handed.
    */
+  /*
+   * And a line cut short keeps its own beginning.
+   *
+   * A title from the record is often English on an Arabic screen. Truncated
+   * as though it ran right to left, it lost its first words instead of its
+   * last — *…through a commodity sale* — which is the one part of a title
+   * that says what it is. Seen on the Arabic and Urdu queue, live.
+   */
+  [dir='rtl'] .truncate,
   [dir='rtl'] p,
   [dir='rtl'] h1,
   [dir='rtl'] h2,
@@ -95,67 +145,12 @@
   }
 
   /*
-   * The script faces, by language.
-   *
-   * `tokens.css` has set `--g-font-text` and `--g-font-ui` for right-to-left
-   * since the palette was written, and nothing read them: the application sets
-   * its faces with Tailwind's `font-display` and `font-body` utilities, which
-   * come from `tailwind.config.js` and know nothing about a CSS variable. The
-   * Arabic build was rendering in whatever the machine had.
-   *
-   * These are ancestor-qualified utilities — `[lang] .font-display` is two
-   * selectors to Tailwind's one — so they win on specificity without
-   * `!important`, and only when the language is actually set.
+   * The script faces, by language, are variables now — `--font-ui` and
+   * `--font-read` in tokens.css, set per `lang` — so every `font-*` class
+   * follows the script without a rule of its own here. The rules that stood
+   * here named Manrope first so that Latin came from it; with the system face
+   * that job is done by the nastaliq face covering only the Arabic script.
    */
-  /*
-   * The Latin face comes first in every one of these stacks, and that is not a
-   * preference — font fallback runs per glyph. A record is full of English:
-   * asset names, contract references, `0xaf88…5831`. With the script face
-   * first, Noto Sans Arabic and Nastaliq both draw Latin, and they draw it
-   * badly — Nastaliq's Latin is a condensed afterthought and an ISIN set in it
-   * is a chore to read. Naming Manrope first means Latin comes from Manrope
-   * and the Arabic-script glyphs it does not have fall through to the face
-   * that does.
-   */
-  [lang='ar'] body,
-  [lang='ar'] .font-body,
-  [lang='ar'] .font-sans {
-    font-family: Manrope, 'Noto Sans Arabic', system-ui, sans-serif;
-  }
-  [lang='ar'] h1,
-  [lang='ar'] h2,
-  [lang='ar'] .font-display,
-  [lang='ar'] .font-serif {
-    font-family: Newsreader, Amiri, 'Noto Naskh Arabic', serif;
-  }
-
-  /*
-   * Urdu is written in nastaliq. Noto Sans Arabic carries every Urdu glyph, so
-   * left to ordinary font fallback it would win and an Urdu reader would get a
-   * naskh sans — legible in the way a ransom note is legible. It is named
-   * first here for that reason, and given the line height the script needs:
-   * nastaliq descends steeply and at 1.6 the lines collide.
-   */
-  [lang='ur'] body,
-  [lang='ur'] .font-body,
-  [lang='ur'] .font-sans {
-    font-family: Manrope, 'Noto Nastaliq Urdu', serif;
-  }
-  [lang='ur'] h1,
-  [lang='ur'] h2,
-  [lang='ur'] .font-display,
-  [lang='ur'] .font-serif {
-    font-family: Newsreader, 'Noto Nastaliq Urdu', serif;
-  }
-  /* Nastaliq descends steeply; at 1.6 the lines collide. */
-  [lang='ur'] p,
-  [lang='ur'] li {
-    line-height: 2.1;
-  }
-  [lang='ur'] h1,
-  [lang='ur'] h2 {
-    line-height: 1.7;
-  }
   ::selection {
     @apply bg-gold/20;
   }
@@ -169,12 +164,12 @@
    */
   .btn-action {
     @apply inline-flex items-center justify-center gap-2 rounded-xl bg-lapis px-5 py-2.5
-           text-sm font-semibold text-white shadow-act transition-all duration-150
+           text-ui font-semibold text-white shadow-act transition-all duration-150
            hover:bg-lapissoft active:scale-[0.98];
   }
 
   .btn-ghost {
-    @apply inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm text-sand
+    @apply inline-flex items-center justify-center rounded-xl px-4 py-2 text-ui text-sand
            transition-all hover:bg-raised hover:shadow-ring;
   }
 

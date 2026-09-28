@@ -93,7 +93,7 @@ export default function AskTheBank({
                   <div className="mt-2.5 text-label font-bold uppercase tracking-caps text-muted">
                     {t('toDesk.theySaid')} {q.answeredBy}
                   </div>
-                  <p className="mt-1 max-w-[58ch] font-display text-lead leading-relaxed text-paper">
+                  <p className="mt-1 max-w-[58ch] font-read text-lead leading-relaxed text-paper">
                     {q.answer}
                   </p>
                 </>

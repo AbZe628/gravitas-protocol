@@ -119,7 +119,7 @@ function One({ e, canReport }: { e: Examination; canReport: boolean }) {
                   </span>
                 </div>
                 {f.inWords && (
-                  <div className="mt-1 font-mono text-label text-muted opacity-70">
+                  <div className="mt-1 font-mono text-label text-muted">
                     {f.against.replace(/^term:/, '')}
                   </div>
                 )}

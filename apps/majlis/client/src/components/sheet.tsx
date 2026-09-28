@@ -244,7 +244,7 @@ export function Line({
             {under.map(({ cell, i }, n) => (
               <span key={i} className="flex min-w-0 items-baseline gap-2">
                 {n > 0 && (
-                  <span aria-hidden="true" className="text-note text-faint">
+                  <span aria-hidden="true" className="text-note text-muted">
                     ·
                   </span>
                 )}

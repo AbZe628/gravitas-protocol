@@ -140,7 +140,7 @@ export default function RuleDetail() {
     >
       {/* The board's own words, set the way the board's words are set. */}
       <Section title={t('rule.statement')}>
-        <p className="max-w-[62ch] font-display text-sub leading-relaxed text-paper">
+        <p className="max-w-[62ch] font-read text-sub leading-relaxed text-paper">
           {rule.statement}
         </p>
       </Section>

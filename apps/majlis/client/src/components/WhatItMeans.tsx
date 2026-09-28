@@ -59,7 +59,7 @@ function Question({
 /** The board's own words, set the way the board's words are set everywhere. */
 function Said({ children }: { children: React.ReactNode }) {
   return (
-    <p className="font-display text-lead leading-relaxed text-paper">{children}</p>
+    <p className="font-read text-lead leading-relaxed text-paper">{children}</p>
   );
 }
 

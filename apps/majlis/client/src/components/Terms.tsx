@@ -83,7 +83,7 @@ export default function Terms({ matter, canEdit, onChanged }: Props) {
                 */}
                 <div className="min-w-0">
                   <p className="text-body leading-snug text-paper">{p.meaning}</p>
-                  <div className="mt-1 font-mono text-label text-muted opacity-70">{p.key}</div>
+                  <div className="mt-1 font-mono text-label text-muted">{p.key}</div>
                 </div>
                 <div className="shrink-0 text-end">
                   <div className="font-mono text-sub font-medium tabular-nums tracking-tight text-lapis">

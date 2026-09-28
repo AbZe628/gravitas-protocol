@@ -194,7 +194,7 @@ export default function Dashboard() {
                     ? `${waits.get(m.id)!.days}${waits.get(m.id)!.partial ? '*' : ''}`
                     : ''}
                 </Figure>,
-                <Figure tone={m.affected ? 'text-lapis' : 'text-faint'}>
+                <Figure tone={m.affected ? 'text-lapis' : 'text-muted'}>
                   {m.affected ?? '—'}
                 </Figure>,
               ]}

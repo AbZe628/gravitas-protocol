@@ -189,7 +189,7 @@ export default function Palette({
           onChange={(e) => setTyped(e.target.value)}
           placeholder={t('palette.says')}
           aria-label={t('palette.says')}
-          className="w-full border-b border-line bg-raised px-5 py-4 text-lead text-paper outline-none placeholder:text-faint"
+          className="w-full border-b border-line bg-raised px-5 py-4 text-lead text-paper outline-none placeholder:text-muted"
         />
 
         <div className="max-h-[46vh] overflow-y-auto py-1">
@@ -213,7 +213,7 @@ export default function Palette({
           ))}
         </div>
 
-        <footer className="flex flex-wrap gap-4 border-t border-line px-5 py-2 text-label text-faint">
+        <footer className="flex flex-wrap gap-4 border-t border-line px-5 py-2 text-label text-muted">
           <span>{t('palette.keyTake')}</span>
           <span>{t('palette.keyMove')}</span>
           <span>{t('palette.keyLeave')}</span>
@@ -225,7 +225,7 @@ export default function Palette({
 
 function Heading({ children }: { children: React.ReactNode }) {
   return (
-    <p className="px-5 pb-1 pt-3 text-label font-bold uppercase tracking-caps text-faint">
+    <p className="px-5 pb-1 pt-3 text-label font-bold uppercase tracking-caps text-muted">
       {children}
     </p>
   );
@@ -247,7 +247,7 @@ function Line({ row, on, take }: { row: Row; on: boolean; take: (r: Row) => void
       }
     >
       <span className="truncate">{row.label}</span>
-      <span className="ms-auto shrink-0 text-label uppercase tracking-caps text-faint">
+      <span className="ms-auto shrink-0 text-label uppercase tracking-caps text-muted">
         {row.sort === 'tool'
           ? t('palette.opensHere')
           : row.sort === 'record'

@@ -779,7 +779,7 @@ export default function IncidentDetail() {
       {windows}
 
       <div className="mb-1 font-mono text-note text-muted">{i.reference}</div>
-      <h1 className="mb-2 font-display font-normal leading-tight tracking-display text-head sm:text-display">{i.title}</h1>
+      <h1 className="mb-2 font-display leading-tight tracking-display text-head sm:text-display">{i.title}</h1>
 
       <div className="mb-4 flex flex-wrap items-center gap-2">
         <Tag tone={i.clock?.overdue ? 'warn' : i.stage === 'closed' ? 'ok' : undefined}>

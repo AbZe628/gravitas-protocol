@@ -185,7 +185,7 @@ export default function Record({ embedded = false }: { embedded?: boolean }) {
 
   return (
     <div>
-      {!embedded && (<h1 className="mb-5 font-display font-normal leading-tight tracking-display text-head sm:text-display">{t('record.title')}</h1>)}
+      {!embedded && (<h1 className="mb-5 font-display leading-tight tracking-display text-head sm:text-display">{t('record.title')}</h1>)}
 
       {/*
         What the board decided, which is what this page is named after and

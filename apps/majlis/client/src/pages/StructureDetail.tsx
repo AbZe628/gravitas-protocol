@@ -335,7 +335,7 @@ export default function StructureDetail({ structureId }: { structureId?: string 
         <ol className="space-y-3">
           {s.conditions.map((c) => (
             <li key={c.id} className="rounded-card bg-raised px-4 py-3 shadow-ring">
-              <p className="font-display text-lead leading-relaxed text-paper">{c.requirement}</p>
+              <p className="font-read text-lead leading-relaxed text-paper">{c.requirement}</p>
               <p className="mt-1.5 text-ui leading-relaxed text-muted">{c.why}</p>
               <p className="mt-1.5 text-note text-muted">{t(`chk.evidence.${c.evidence}`)}</p>
             </li>
@@ -371,7 +371,7 @@ export default function StructureDetail({ structureId }: { structureId?: string 
         <Section title={t('adopt.reason')}>
           <ul className="space-y-2 border-s-2 border-gold/50 ps-4">
             {held.adoption.amendments.map((a, i) => (
-              <li key={i} className="font-display text-lead leading-relaxed text-paper">
+              <li key={i} className="font-read text-lead leading-relaxed text-paper">
                 {a}
               </li>
             ))}

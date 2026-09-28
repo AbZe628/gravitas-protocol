@@ -99,7 +99,7 @@ export default function Pace() {
       {longest && (
         <p className="mt-2 text-note leading-relaxed text-muted">
           {t('pace.longest')}{' '}
-          <Link to={`/matters/${longest.matterId}`} className="underline underline-offset-2 hover:text-fg">
+          <Link to={`/matters/${longest.matterId}`} className="underline underline-offset-2 hover:text-paper">
             {longest.title}
           </Link>
           <span className="mx-1.5 opacity-40">·</span>

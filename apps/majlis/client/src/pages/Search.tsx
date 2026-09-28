@@ -193,7 +193,7 @@ function Hit({ hit }: { hit: SearchHit }) {
                 {m.by && <span className="ms-2 normal-case tracking-normal"><Person id={m.by} /></span>}
               </div>
               {/* What matched, in the face the board wrote it in. */}
-              <p className="max-w-[62ch] border-s-2 border-gold/50 ps-4 font-display text-lead leading-relaxed text-sand">
+              <p className="max-w-[62ch] border-s-2 border-gold/50 ps-4 font-read text-lead leading-relaxed text-sand">
                 {m.snippet}
               </p>
             </li>

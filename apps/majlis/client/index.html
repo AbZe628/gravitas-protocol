@@ -5,25 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <!-- The vellum the application is actually painted on. -->
     <meta name="theme-color" content="#FBF8F1" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <!--
-      Four families for the Latin interface and three for the scripts it is
-      read in.
+      No fonts from anybody else's server.
 
-      `tokens.css` has named Amiri, Noto Naskh Arabic and Noto Nastaliq Urdu
-      since the palette was written and none of them were ever fetched, so
-      Arabic rendered in whatever the machine happened to have and Urdu — which
-      needs nastaliq, not a naskh and certainly not a sans — rendered in
-      something no Urdu reader would choose.
-
-      The browser downloads a face only when a glyph needs it, so an English
-      session pays for the stylesheet and none of the files.
+      Seven families came from Google here, on a stylesheet that held up the
+      first paint until Google answered and told it each time the record was
+      opened. The interface is the system's own face now, and the serif and
+      nastaliq ship with the application — see src/design/tokens.css.
     -->
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=IBM+Plex+Mono:wght@400;500&family=Amiri:wght@400;700&family=Noto+Sans+Arabic:wght@400;500;600;700&family=Noto+Nastaliq+Urdu:wght@400;700&display=swap"
-    />
     <link rel="icon" href="/favicon.ico" sizes="32x32 48x48" />
     <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
     <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />

@@ -586,7 +586,7 @@ function lastSaid(
       <div className="mb-1.5 text-label font-bold uppercase tracking-caps text-muted">
         {t('flow.theQuestion')}
       </div>
-      <p className="mb-5 font-display text-body leading-relaxed text-paper">{matter.proposal}</p>
+      <p className="mb-5 font-read text-body leading-relaxed text-paper">{matter.proposal}</p>
 
       {matter.notDecided.length > 0 && (
         <>
@@ -1064,7 +1064,7 @@ function lastSaid(
         {didPanel}
       {step && (
         <>
-          <p className="mb-4 max-w-[62ch] font-display text-sub leading-snug text-paper">
+          <p className="mb-4 max-w-[62ch] font-read text-sub leading-snug text-paper">
             {step.condition.requirement}
           </p>
 
@@ -1102,7 +1102,7 @@ function lastSaid(
           */}
           {already?.holds === 'not_met' && (
             <div className="mb-5 rounded-card bg-[#FCF6EC] px-4 py-3.5 shadow-ring">
-              <div className="mb-1.5 text-label font-bold uppercase tracking-caps text-gold">
+              <div className="mb-1.5 text-label font-bold uppercase tracking-caps text-goldink">
                 {t('win.notMetNext')}
               </div>
               <p className="mb-3 max-w-[62ch] text-ui leading-relaxed text-sand">
@@ -1203,7 +1203,7 @@ function lastSaid(
         </p>
 
         {step && (
-          <p className="mb-4 rounded-card bg-ink px-4 py-3 font-display text-body leading-snug text-paper">
+          <p className="mb-4 rounded-card bg-ink px-4 py-3 font-read text-body leading-snug text-paper">
             {step.condition.requirement}
           </p>
         )}

@@ -91,7 +91,7 @@ export default function WhereItEnds({ matter }: { matter: Matter }) {
         </span>
       </div>
 
-      <p className="max-w-[62ch] font-display text-sub leading-relaxed">
+      <p className="max-w-[62ch] font-read text-sub leading-relaxed">
         {t(reading ? 'ends.enforcedWhat' : 'ends.documentWhat')}
       </p>
 

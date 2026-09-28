@@ -138,7 +138,7 @@ export default function Keys({ open, onOpen, onClose }: {
       >
         <h2 className="flex items-center gap-3 border-b border-line px-5 py-3.5 font-display text-sub tracking-title">
           {t('keys.title')}
-          <kbd className="ms-auto rounded border border-line px-1.5 font-mono text-label font-medium text-faint">
+          <kbd className="ms-auto rounded border border-line px-1.5 font-mono text-label font-medium text-muted">
             Esc
           </kbd>
         </h2>
@@ -146,13 +146,13 @@ export default function Keys({ open, onOpen, onClose }: {
         <div className="grid gap-x-8 gap-y-4 px-5 py-4 sm:grid-cols-2">
           {sheetsFor(path, t).map((sheet) => (
             <section key={sheet.heading}>
-              <h3 className="pb-1.5 text-label font-bold uppercase tracking-caps text-faint">
+              <h3 className="pb-1.5 text-label font-bold uppercase tracking-caps text-muted">
                 {sheet.heading}
               </h3>
               <ul className="space-y-1">
                 {sheet.keys.map((key) => (
                   <li key={key.press} className="flex items-center gap-3 text-ui text-sand">
-                    <kbd className="min-w-[3.2rem] shrink-0 rounded border border-line px-1.5 py-0.5 text-center font-mono text-label font-medium text-faint">
+                    <kbd className="min-w-[3.2rem] shrink-0 rounded border border-line px-1.5 py-0.5 text-center font-mono text-label font-medium text-muted">
                       {key.press}
                     </kbd>
                     {key.does}

@@ -155,7 +155,7 @@ export type Tone = 'settled' | 'attention' | 'breach' | 'lapis' | 'plain';
 export function State({ tone = 'plain', children }: { tone?: Tone; children: ReactNode }) {
   const paint: Record<Tone, string> = {
     settled: 'bg-settledtint text-settled shadow-ringsettled',
-    attention: 'bg-goldtint text-gold shadow-ringgold',
+    attention: 'bg-goldtint text-goldink shadow-ringgold',
     breach: 'bg-breachtint text-breach shadow-ringbreach',
     lapis: 'bg-lapistint text-lapis shadow-ringlapis',
     plain: 'bg-black/[0.045] text-sand',
@@ -288,7 +288,7 @@ export function Figure({
 }) {
   const paint: Record<Tone, string> = {
     settled: 'text-settled',
-    attention: 'text-gold',
+    attention: 'text-goldink',
     breach: 'text-breach',
     lapis: 'text-lapis',
     plain: 'text-paper',

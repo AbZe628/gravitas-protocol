@@ -63,7 +63,7 @@ function Terms({ rule }: { rule: Rule }) {
                 {p.unit && <span className="ms-1.5 text-note text-muted">{p.unit}</span>}
               </span>
             </div>
-            <div className="mt-1 font-mono text-label text-muted opacity-70">{p.key}</div>
+            <div className="mt-1 font-mono text-label text-muted">{p.key}</div>
           </li>
         ))}
       </ul>
@@ -93,7 +93,7 @@ function One({ rule, pending }: { rule: Rule; pending: boolean }) {
       <div className="font-display text-sub leading-snug">{rule.title}</div>
 
       {/* The condition itself, in the board's words and at reading size. */}
-      <p className="mt-2.5 max-w-[62ch] font-display text-lead leading-relaxed">
+      <p className="mt-2.5 max-w-[62ch] font-read text-lead leading-relaxed">
         {rule.statement}
       </p>
 
@@ -110,7 +110,7 @@ function One({ rule, pending }: { rule: Rule; pending: boolean }) {
         <Link to="/ask" className="text-lapis underline underline-offset-2">
           {t('binds.askAboutIt')}
         </Link>
-        <span className="font-mono text-label text-muted opacity-70">{rule.id}</span>
+        <span className="font-mono text-label text-muted">{rule.id}</span>
       </div>
     </Card>
   );

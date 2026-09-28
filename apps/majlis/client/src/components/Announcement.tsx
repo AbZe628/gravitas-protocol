@@ -107,7 +107,7 @@ function One({ row }: { row: QueueRow }) {
           type="button"
           onClick={() => quieten(rowKey(row))}
           aria-label={t('announce.dismiss')}
-          className="-me-1 -mt-1 grid h-7 w-7 shrink-0 place-items-center rounded-lg text-faint hover:bg-ink hover:text-paper"
+          className="-me-1 -mt-1 grid h-7 w-7 shrink-0 place-items-center rounded-lg text-muted hover:bg-ink hover:text-paper"
         >
           <span aria-hidden="true" className="text-lead leading-none">
             &times;

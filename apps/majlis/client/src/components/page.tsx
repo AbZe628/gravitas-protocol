@@ -155,7 +155,7 @@ export function PageHead({
       <div className="flex flex-wrap items-start justify-between gap-x-8 gap-y-3">
         <div className="min-w-0">
           <h1
-            className="max-w-[28ch] font-display text-head font-normal leading-tight tracking-display text-paper"
+            className="max-w-[28ch] font-display text-head leading-tight tracking-display text-paper"
             style={{ textWrap: 'balance' }}
           >
             {title}

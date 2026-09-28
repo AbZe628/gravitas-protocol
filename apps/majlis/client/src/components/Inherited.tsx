@@ -74,7 +74,7 @@ function Item({
       </div>
 
       {/* The board's own words from its own past ruling. Never rewritten. */}
-      <p className="mt-2.5 max-w-[62ch] font-display text-lead leading-relaxed">
+      <p className="mt-2.5 max-w-[62ch] font-read text-lead leading-relaxed">
         {proposal.value}
         {proposal.unit && <span className="ms-1.5 font-body text-note text-muted">{proposal.unit}</span>}
       </p>
@@ -259,7 +259,7 @@ export default function Inherited({
                       {t(`inherit.kind.${p.kind}`)}
                       {p.key && <span className="ms-2 font-mono normal-case tracking-normal">{p.key}</span>}
                     </div>
-                    <p className="mt-2.5 max-w-[62ch] font-display text-lead leading-relaxed">
+                    <p className="mt-2.5 max-w-[62ch] font-read text-lead leading-relaxed">
                       {p.value}
                       {p.unit && <span className="ms-1.5 font-body text-note text-muted">{p.unit}</span>}
                     </p>

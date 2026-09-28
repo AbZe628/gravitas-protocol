@@ -30,7 +30,13 @@
   /* Text. */
   --g-paper: #191713;
   --g-sand: #4E483F;
-  --g-muted: #9C9284;
+  /*
+   * Context, and readable as text. It was #9C9284, 3.0:1 on white and 2.7:1
+   * on the vellum — under the 4.5:1 WCAG asks of text this size, on 761
+   * places. This is the same warm grey taken darker until the worst ground it
+   * sits on (the lapis tint) still reads at 4.6:1.
+   */
+  --g-muted: #726B60;
   --g-faint: #B3A896;
 
   /* The board's own acts. */
@@ -77,25 +83,85 @@
    */
   --g-line-flat: #E8E1D4;
 
-  /* Typography */
-  --g-font-text: "Newsreader", "Iowan Old Style", "Palatino Linotype", Palatino, serif;
-  --g-font-ui: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --g-font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
-
-  /* Scale — fluid, but dense: Majlis is an instrument. */
-  --g-text-xs: clamp(0.8125rem, 0.8rem + 0.05vw, 0.875rem);
-  --g-text-sm: clamp(0.875rem, 0.85rem + 0.1vw, 0.9375rem);
-  --g-text-base: clamp(0.9375rem, 0.9rem + 0.15vw, 1rem);
-  --g-text-lg: clamp(1.125rem, 1.05rem + 0.3vw, 1.25rem);
-  --g-text-xl: clamp(1.375rem, 1.25rem + 0.5vw, 1.625rem);
-  --g-text-2xl: clamp(1.75rem, 1.5rem + 1vw, 2.25rem);
+  /*
+   * Typography.
+   *
+   * The interface is set in the system's own face — San Francisco on Apple
+   * devices, Segoe on Windows, Roboto on Android — because that is what makes
+   * an application read as one on the device it runs on, and because it costs
+   * nothing to fetch. Manrope and IBM Plex Mono came from Google's servers on
+   * every page load: a stylesheet that held up the first paint until another
+   * company answered, and told that company each time a board member opened
+   * the record.
+   *
+   * The serif stays, for what is read: a question, a ruling, a member's
+   * reasoning. It ships with the application (see index.css) rather than being
+   * fetched from anybody.
+   */
+  --font-ui: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI Variable Text", "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "Noto Sans", "Noto Sans Arabic", sans-serif;
+  --font-display: var(--font-ui);
+  --font-read: "Newsreader Variable", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --g-font-text: var(--font-read);
+  --g-font-ui: var(--font-ui);
+  --g-font-mono: var(--font-mono);
 
   /*
-   * Display type is set tight. At 36px a serif tracked at zero reads as loose
-   * on a light ground in a way it does not on a dark one.
+   * ── the scale, and it is a phone's first ────────────────────────────────
+   *
+   * Ten steps, each a variable, so a size can change with the screen and the
+   * script without a single class in the markup changing.
+   *
+   * It was one scale for every screen — 10, 11.5, 12.5, 13.5 and 15px — set
+   * for density on a desk and handed to a phone unchanged, where 12.5px is
+   * below what anybody reads at arm's length. A phone and a tablet now get
+   * Apple's own reading sizes: body 17, subheadline 15, footnote 13, and
+   * nothing under 12. A desk keeps an instrument's density, one step larger
+   * than it was.
+   *
+   * `--fs-k` is the script. Arabic is drawn smaller than Latin at the same
+   * size and wants about an eighth more to read the same; nastaliq more still.
    */
-  --g-track-display: -0.024em;
-  --g-track-title: -0.018em;
+  --fs-k: 1;
+  --fs-label: calc(12px * var(--fs-k));
+  --fs-note: calc(13px * var(--fs-k));
+  --fs-ui: calc(15px * var(--fs-k));
+  --fs-body: calc(17px * var(--fs-k));
+  --fs-lead: calc(18px * var(--fs-k));
+  --fs-sub: calc(20px * var(--fs-k));
+  --fs-title: calc(22px * var(--fs-k));
+  --fs-head: calc(28px * var(--fs-k));
+  --fs-display: calc(34px * var(--fs-k));
+  --fs-hero: calc(40px * var(--fs-k));
+
+  /* Leading, by the same token: Arabic and Urdu need more room between lines. */
+  --lh-none: 1;
+  --lh-tight: 1.2;
+  --lh-snug: 1.45;
+  --lh-relaxed: 1.6;
+  --lh-loose: 1.7;
+
+  /*
+   * Tracking. The caps above a heading were 10px spaced 0.14em apart — a
+   * pattern, not a word — and are now a word: 12px, spaced a little.
+   */
+  --ls-display: -0.022em;
+  --ls-title: -0.016em;
+  --ls-tight: -0.008em;
+  --ls-label: 0.03em;
+  --ls-caps: 0.06em;
+
+  /* Scale — kept for the few rules that still name it. */
+  --g-text-xs: var(--fs-note);
+  --g-text-sm: var(--fs-ui);
+  --g-text-base: var(--fs-body);
+  --g-text-lg: var(--fs-sub);
+  --g-text-xl: var(--fs-title);
+  --g-text-2xl: var(--fs-head);
+
+  --g-track-display: var(--ls-display);
+  --g-track-title: var(--ls-title);
 
   --g-leading-body: 1.62;
   --g-leading-tight: 1.25;
@@ -126,14 +192,60 @@
     0 40px 64px -40px rgba(25, 23, 19, 0.24);
 }
 
+/* A desk: an instrument's density, one step larger than it was, nothing under 12. */
+@media (min-width: 1024px) {
+  :root {
+    --fs-note: calc(12.5px * var(--fs-k));
+    --fs-ui: calc(14px * var(--fs-k));
+    --fs-body: calc(15px * var(--fs-k));
+    --fs-lead: calc(16.5px * var(--fs-k));
+    --fs-sub: calc(18px * var(--fs-k));
+    --fs-hero: calc(44px * var(--fs-k));
+  }
+}
+
+/*
+ * Arabic: an eighth larger, lines further apart for the marks above and below,
+ * and no tracking — spacing the letters of a joined script pulls it apart.
+ */
+:root[lang='ar'] {
+  --fs-k: 1.12;
+  --lh-none: 1.3;
+  --lh-tight: 1.4;
+  --lh-snug: 1.65;
+  --lh-relaxed: 1.8;
+  --lh-loose: 1.9;
+  --font-read: "Newsreader Variable", "Noto Naskh Arabic", "Geeza Pro", "Traditional Arabic", "Times New Roman", serif;
+}
+
+/*
+ * Urdu is written in nastaliq, which descends steeply: at 1.6 the lines
+ * collide. The nastaliq face is named first and covers only the Arabic script
+ * (see index.css), so Latin in an Urdu screen — an asset name, an ISIN — falls
+ * through to the system face rather than to nastaliq's condensed Latin.
+ */
+:root[lang='ur'] {
+  --fs-k: 1.15;
+  --lh-none: 1.55;
+  --lh-tight: 1.7;
+  --lh-snug: 1.95;
+  --lh-relaxed: 2.1;
+  --lh-loose: 2.2;
+  --font-ui: "Majlis Nastaliq", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-read: "Newsreader Variable", "Majlis Nastaliq", serif;
+}
+
 /* RTL adjustments */
 [dir='rtl'] {
-  --g-font-ui: "Noto Sans Arabic", "Manrope", sans-serif;
-  --g-font-text: "Amiri", "Noto Naskh Arabic", serif;
   --g-leading-body: 1.85;
-  /* Arabic naskh does not take negative tracking. */
-  --g-track-display: 0;
-  --g-track-title: 0;
+  --ls-display: 0;
+  --ls-title: 0;
+  --ls-tight: 0;
+  --ls-label: 0;
+  --ls-caps: 0;
+}
+:root[lang='ur'] {
+  --g-leading-body: 2.1;
 }
 
 body {
@@ -166,11 +278,11 @@ body {
 
 .g-label {
   font-family: var(--g-font-ui);
-  font-size: 10px;
-  letter-spacing: 0.15em;
+  font-size: var(--fs-label);
+  letter-spacing: var(--ls-caps);
   text-transform: uppercase;
-  font-weight: 700;
-  color: var(--g-faint);
+  font-weight: 600;
+  color: var(--g-muted);
 }
 
 /*

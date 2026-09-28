@@ -228,7 +228,7 @@ export default function Act({
               value={said}
               onChange={(e) => setSaid(e.target.value)}
               rows={3}
-              className="w-full rounded-card border border-line bg-raised px-3 py-2 font-display text-body leading-relaxed text-paper"
+              className="w-full rounded-card border border-line bg-raised px-3 py-2 font-read text-body leading-relaxed text-paper"
             />
             {reason.help && (
               <span className="mt-1.5 block text-note leading-snug text-muted">{reason.help}</span>

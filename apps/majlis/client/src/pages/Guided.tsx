@@ -79,7 +79,7 @@ function TheOneThing({ item }: { item: AttentionItem }) {
           <span
             className={
               'font-mono text-ui tabular-nums ' +
-              (item.overdue ? 'text-breach' : 'text-gold')
+              (item.overdue ? 'text-breach' : 'text-goldink')
             }
           >
             {left}
@@ -308,7 +308,7 @@ export default function Guided() {
                                 <span
                                   className={
                                     'font-mono tabular-nums ' +
-                                    (item.overdue ? 'text-breach' : 'text-gold')
+                                    (item.overdue ? 'text-breach' : 'text-goldink')
                                   }
                                 >
                                   {left}

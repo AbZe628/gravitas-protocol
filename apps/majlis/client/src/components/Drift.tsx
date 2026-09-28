@@ -114,7 +114,7 @@ export default function DriftPanel() {
           <ul className="space-y-2">
             {data.unwatched.map((u, i) => (
               <li key={`u${i}`} className="text-ui leading-relaxed text-muted">
-                <Link to={`/register/${u.assetId}`} className="underline underline-offset-2 hover:text-fg">
+                <Link to={`/register/${u.assetId}`} className="underline underline-offset-2 hover:text-paper">
                   <span className="font-mono text-note">{u.key}</span>
                 </Link>
                 <span className="mx-1.5 opacity-40">·</span>
@@ -123,7 +123,7 @@ export default function DriftPanel() {
             ))}
             {data.unmeasured.map((u, i) => (
               <li key={`m${i}`} className="text-ui leading-relaxed text-muted">
-                <Link to={`/register/${u.assetId}`} className="underline underline-offset-2 hover:text-fg">
+                <Link to={`/register/${u.assetId}`} className="underline underline-offset-2 hover:text-paper">
                   {u.assetName}
                 </Link>
                 <span className="mx-1.5 opacity-40">·</span>
@@ -170,7 +170,7 @@ export function DriftForAsset({ assetId }: { assetId: string }) {
             <p className="mt-1 text-note text-muted">
               <Link
                 to={`/matters/${d.matterId}`}
-                className="font-mono underline underline-offset-2 hover:text-fg"
+                className="font-mono underline underline-offset-2 hover:text-paper"
               >
                 {d.matterId}
               </Link>

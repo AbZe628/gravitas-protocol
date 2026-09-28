@@ -328,7 +328,7 @@ export default function VotePanel({
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
                 rows={4}
-                className="w-full resize-y rounded-card bg-raised px-4 py-3 font-display text-lead leading-relaxed shadow-ring outline-none focus:shadow-pick"
+                className="w-full resize-y rounded-card bg-raised px-4 py-3 font-read text-lead leading-relaxed shadow-ring outline-none focus:shadow-pick"
               />
             )}
           </Field>

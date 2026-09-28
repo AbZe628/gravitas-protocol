@@ -69,7 +69,7 @@ export default function HowItChanged({ structureId }: { structureId: string }) {
             {adoption.amendments.length > 0 && (
               <ul className="space-y-1.5 border-s-2 border-gold/50 ps-4">
                 {adoption.amendments.map((a, i) => (
-                  <li key={i} className="font-display text-lead leading-relaxed text-paper">
+                  <li key={i} className="font-read text-lead leading-relaxed text-paper">
                     {a}
                   </li>
                 ))}

@@ -64,7 +64,7 @@ function Marked({ text, threads }: { text: string; threads: AnnotationThread[] }
   if (at < text.length) parts.push({ text: text.slice(at), marked: false });
 
   return (
-    <p className="max-w-[58ch] whitespace-pre-wrap font-display text-sub leading-relaxed">
+    <p className="max-w-[58ch] whitespace-pre-wrap font-read text-sub leading-relaxed">
       {parts.map((p, i) =>
         p.marked ? (
           <mark
@@ -126,7 +126,7 @@ function Note({
       </p>
 
       {thread.note.adrift && (
-        <p className="mb-2 text-note leading-relaxed text-gold">{t('margin.adrift')}</p>
+        <p className="mb-2 text-note leading-relaxed text-goldink">{t('margin.adrift')}</p>
       )}
 
       <p
@@ -142,7 +142,7 @@ function Note({
         <span>{a.whoName ?? thread.whoName ?? a.by}</span>
         <span className="opacity-40">·</span>
         <span className="font-mono">{a.atTime.slice(0, 10)}</span>
-        {a.withdrawn && <span className="text-gold">{t('margin.withdrawn')}</span>}
+        {a.withdrawn && <span className="text-goldink">{t('margin.withdrawn')}</span>}
       </div>
 
       {thread.replies.length > 0 && (
@@ -394,7 +394,7 @@ export default function InTheMargin({
         <div className="mt-5">
           <div className="mb-2.5 text-label font-bold uppercase tracking-caps text-muted">
             {t('margin.heading')}
-            <span className="ms-2 font-mono tabular-nums opacity-70">{standing.length}</span>
+            <span className="ms-2 font-mono tabular-nums text-muted">{standing.length}</span>
           </div>
           <ul className="space-y-2.5">
             {margin.threads.map((thread) => (

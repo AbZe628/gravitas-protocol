@@ -70,7 +70,7 @@ export default function WhatTheySent({
 
   return (
     <section className="mb-7 rounded-sheet bg-raised p-6 shadow-card sm:p-7">
-      <h2 className="mb-4 font-display text-title font-normal leading-tight tracking-title">
+      <h2 className="mb-4 font-display text-title leading-tight tracking-title">
         {t('sent.title')}
       </h2>
 
@@ -98,7 +98,7 @@ export default function WhatTheySent({
           <dt className="mb-1 text-label font-bold uppercase tracking-caps text-muted">
             {t('sent.whatTheyAsk')}
           </dt>
-          <dd className="max-w-[62ch] font-display text-lead leading-relaxed text-paper">
+          <dd className="max-w-[62ch] font-read text-lead leading-relaxed text-paper">
             {matter.proposal}
           </dd>
         </div>

@@ -72,7 +72,7 @@ export function PhaseBar() {
                       : 'text-muted hover:text-sand')
                 }
               >
-                <span className="font-mono text-label opacity-70">{p.ordinal}</span>
+                <span className="font-mono text-label text-muted">{p.ordinal}</span>
                 {t(p.label)}
               </Link>
               {i < bar.length - 1 && (

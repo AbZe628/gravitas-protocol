@@ -141,7 +141,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       {hint && (
         <kbd
           aria-hidden="true"
-          className="ms-1.5 hidden rounded border border-current/25 px-1 font-mono text-label font-medium opacity-60 lg:inline-block"
+          className="ms-1.5 hidden rounded border border-current/25 px-1 font-mono text-label font-medium opacity-80 lg:inline-block"
         >
           {hint}
         </kbd>

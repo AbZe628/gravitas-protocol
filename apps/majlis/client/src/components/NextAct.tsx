@@ -236,7 +236,7 @@ export default function NextAct({ doing, children }: { doing: Doing; children?: 
       <div
         className={
           'mb-2 text-label font-bold uppercase tracking-caps ' +
-          (loud ? 'text-white/70' : 'text-muted')
+          (loud ? 'text-white/80' : 'text-muted')
         }
       >
         {t('now.title')}

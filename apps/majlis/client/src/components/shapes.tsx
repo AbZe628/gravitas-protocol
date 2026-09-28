@@ -66,7 +66,17 @@ export function ListPage({
   return (
     <div>
       <PageHead phase={phase} title={title} says={says} live={live} act={act} />
-      {filters && <div className="mb-5 flex flex-wrap gap-2">{filters}</div>}
+      {/*
+        One row on a phone, sliding sideways, and wrapping only where there is
+        room. At the phone's reading size the queue's two groups of filters
+        wrapped into three rows — a band of chrome taller than the first row
+        of work it was filtering.
+      */}
+      {filters && (
+        <div className="slides -mx-4 mb-5 flex gap-2 overflow-x-auto px-4 [&>*]:shrink-0 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
+          {filters}
+        </div>
+      )}
       {children}
       {limits && (
         <p className="mt-6 max-w-[62ch] text-note leading-relaxed text-muted">{limits}</p>
@@ -101,7 +111,7 @@ export function Chip({
     >
       {children}
       {count !== undefined && (
-        <span className="ms-1.5 font-mono tabular-nums opacity-60">{count}</span>
+        <span className="ms-1.5 font-mono tabular-nums text-muted">{count}</span>
       )}
     </Button>
   );

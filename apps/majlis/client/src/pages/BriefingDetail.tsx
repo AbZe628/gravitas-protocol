@@ -82,11 +82,11 @@ export default function BriefingDetail() {
       </div>
 
       <div className="mt-6 rounded-card bg-goldtint px-5 py-4 shadow-ringgold">
-        <div className="text-label font-bold uppercase tracking-caps text-gold">
+        <div className="text-label font-bold uppercase tracking-caps text-goldink">
           {t('brief.question')}
         </div>
         {/* The one part addressed to the board, in the board's face. */}
-        <p className="mt-2 max-w-[62ch] font-display text-lead leading-relaxed">
+        <p className="mt-2 max-w-[62ch] font-read text-lead leading-relaxed">
           {b.questionForBoard}
         </p>
 

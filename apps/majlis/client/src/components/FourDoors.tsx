@@ -54,9 +54,9 @@ const COUNT_KEY: Record<Phase, string> = {
 
 const FIGURE: Record<string, string> = {
   lapis: 'text-lapis',
-  attention: 'text-gold',
+  attention: 'text-goldink',
   settled: 'text-settled',
-  breach: 'text-gold',
+  breach: 'text-goldink',
 };
 
 const EDGE: Record<string, string> = {
@@ -121,7 +121,7 @@ export default function FourDoors({ counts }: { counts: DoorCounts }) {
                 {/* What is true right now, in one line. */}
                 <div className="mt-2 min-w-0 text-ui leading-snug text-sand sm:mt-0 sm:flex-1">
                   {moved ? (
-                    <span className="text-gold">
+                    <span className="text-goldink">
                       {counts.moved} · {t('spine.moved')}
                     </span>
                   ) : quiet ? (
@@ -160,7 +160,7 @@ export default function FourDoors({ counts }: { counts: DoorCounts }) {
                 stroke="currentColor"
                 strokeWidth="2.2"
                 strokeLinecap="round"
-                className="shrink-0 text-line rtl:rotate-180"
+                className="shrink-0 text-muted rtl:rotate-180"
                 aria-hidden="true"
               >
                 <path d="M9 5l7 7-7 7" />

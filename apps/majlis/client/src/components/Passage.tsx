@@ -71,10 +71,10 @@ function Step({ step, ordinal }: { step: PassageStep; ordinal?: number }) {
             {step.who ? nameOf(members, step.who) : t(`passage.whose.${step.whose}`)}
           </span>
           {step.state === 'done' && (
-            <span className="text-note text-gold/70">{t('passage.done')}</span>
+            <span className="text-note text-goldink">{t('passage.done')}</span>
           )}
           {step.enforced && step.state === 'open' && (
-            <span className="rounded-full px-2.5 py-0.5 text-label font-bold uppercase tracking-label bg-goldtint text-gold shadow-ringgold">
+            <span className="rounded-full px-2.5 py-0.5 text-label font-bold uppercase tracking-label bg-goldtint text-goldink shadow-ringgold">
               {t('passage.enforced')}
             </span>
           )}
@@ -155,7 +155,7 @@ export default function Passage({ matterId }: { matterId: string }) {
           */}
           {passage.waiting && (
             <div className="shrink-0 text-end">
-              <div className="font-display text-display leading-none tabular-nums tracking-display text-gold">
+              <div className="font-display text-display leading-none tabular-nums tracking-display text-goldink">
                 {passage.waiting.days}
               </div>
               <div className="mt-1.5 text-note text-muted">{t('passage.days')}</div>

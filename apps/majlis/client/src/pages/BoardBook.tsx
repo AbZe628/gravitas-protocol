@@ -103,7 +103,7 @@ export default function BoardBook() {
           >
             {entry.pack ? (
               <>
-                <p className="max-w-[58ch] font-display text-lead leading-relaxed">
+                <p className="max-w-[58ch] font-read text-lead leading-relaxed">
                   {entry.pack.question.text}
                 </p>
 

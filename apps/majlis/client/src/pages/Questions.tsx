@@ -155,7 +155,7 @@ function One({
         <div className="mb-1 text-label font-bold uppercase tracking-caps text-muted">
           {t('queue.theirWords')}
         </div>
-        <p className="max-w-[62ch] font-display text-lead leading-relaxed">{s.question}</p>
+        <p className="max-w-[62ch] font-read text-lead leading-relaxed">{s.question}</p>
       </div>
 
       {/*
@@ -449,7 +449,7 @@ export default function Questions({ boardId }: { boardId: string }) {
               </State>
               <span className="text-ui text-muted">
                 {t('spine.longestWait')}{' '}
-                <span className="font-mono tabular-nums text-gold">{span(longest, t)}</span>
+                <span className="font-mono tabular-nums text-goldink">{span(longest, t)}</span>
               </span>
             </>
           ) : undefined

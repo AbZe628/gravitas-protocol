@@ -145,7 +145,7 @@ export default function WhatTheBoardAsked({ boardId }: { boardId: string }) {
                   {row.matter.title}
                 </Link>
               </div>
-              <p className="max-w-[62ch] font-display text-lead leading-relaxed text-paper">
+              <p className="max-w-[62ch] font-read text-lead leading-relaxed text-paper">
                 {row.asking}
               </p>
 
@@ -227,7 +227,7 @@ export default function WhatTheBoardAsked({ boardId }: { boardId: string }) {
                         {row.matter.title}
                       </div>
                       <p className="max-w-[62ch] text-ui leading-relaxed text-sand">{row.asking}</p>
-                      <p className="mt-2 max-w-[62ch] font-display text-lead leading-relaxed text-paper">
+                      <p className="mt-2 max-w-[62ch] font-read text-lead leading-relaxed text-paper">
                         {row.answer}
                       </p>
                     </li>

@@ -227,17 +227,17 @@ export default function MatterPack() {
           {q && q.waitedDays !== null && (
             <span className="text-ui text-muted">
               {t('pack.waiting')}{' '}
-              <span className="font-mono tabular-nums text-gold">{q.waitedDays}</span>{' '}
+              <span className="font-mono tabular-nums text-goldink">{q.waitedDays}</span>{' '}
               {t('guided.days')}
               {q.waitPartlyUnknown && (
-                <span className="ms-1.5 opacity-70">{t('pack.waitUnderstated')}</span>
+                <span className="ms-1.5 text-muted">{t('pack.waitUnderstated')}</span>
               )}
             </span>
           )}
         </div>
 
         <h1
-          className="mb-3 max-w-[24ch] font-display text-head font-normal leading-tight tracking-display sm:text-display"
+          className="mb-3 max-w-[24ch] font-display text-head leading-tight tracking-display sm:text-display"
           style={{ textWrap: 'balance' }}
         >
           {matter.title}
@@ -363,7 +363,7 @@ export default function MatterPack() {
                         {term.unit ? ` ${term.unit}` : ''}
                       </span>
                     </div>
-                    <div className="mt-1 font-mono text-label text-muted opacity-70">
+                    <div className="mt-1 font-mono text-label text-muted">
                       {term.key}
                     </div>
                   </li>

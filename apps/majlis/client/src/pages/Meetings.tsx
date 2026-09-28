@@ -228,7 +228,7 @@ function MeetingCard({
             {item.matterId ? (
               <Link
                 to={`/matters/${item.matterId}`}
-                className="inline-flex min-h-[44px] items-center underline underline-offset-2 hover:text-fg lg:min-h-0"
+                className="inline-flex min-h-[44px] items-center underline underline-offset-2 hover:text-paper lg:min-h-0"
               >
                 {item.item}
               </Link>

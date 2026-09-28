@@ -1064,7 +1064,7 @@ function Frame({ children }: { children: React.ReactNode }) {
                 className="flex items-center gap-2 rounded-xl bg-raised px-3 py-2 text-ui font-semibold text-sand shadow-ring hover:text-paper"
               >
                 {t('palette.title')}
-                <kbd className="rounded border border-line px-1 font-mono text-label font-medium text-faint">
+                <kbd className="rounded border border-line px-1 font-mono text-label font-medium text-muted">
                   Ctrl K
                 </kbd>
               </Button>

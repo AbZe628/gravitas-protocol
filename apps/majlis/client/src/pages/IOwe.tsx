@@ -107,7 +107,7 @@ function Event({ e }: { e: Disclosure['events'][number] }) {
         <div className="mt-3">
           <div className="mb-1.5 text-label font-bold uppercase tracking-caps text-muted">
             {e.rectified ? t('owe.stepsDone') : t('owe.steps')}
-            <span className="ms-2 font-mono tabular-nums opacity-70">
+            <span className="ms-2 font-mono tabular-nums text-muted">
               {e.rectification.length}
             </span>
           </div>

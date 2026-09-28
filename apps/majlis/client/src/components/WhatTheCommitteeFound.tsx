@@ -44,7 +44,7 @@ function Standing({ r }: { r: ReferralOnMatter }) {
       {r.stood.unanimous ? (
         <p className="text-ui text-settled">{t('cttee.ofOneMind')}</p>
       ) : (
-        <p className="text-ui text-gold">{t('cttee.notOfOneMind')}</p>
+        <p className="text-ui text-goldink">{t('cttee.notOfOneMind')}</p>
       )}
 
       {r.stood.agreedNames.length > 0 && (
@@ -60,7 +60,7 @@ function Standing({ r }: { r: ReferralOnMatter }) {
       */}
       {r.stood.dissentedNames.map((d) => (
         <div key={d.scholarId} className="mt-3 rounded-card bg-[#FCF6EA] px-4 py-3 shadow-ring">
-          <div className="mb-1.5 text-note font-semibold text-gold">
+          <div className="mb-1.5 text-note font-semibold text-goldink">
             {d.name} {t('cttee.didNot')}
           </div>
           <p className="max-w-[58ch] text-body leading-relaxed text-paper">{d.said}</p>
@@ -119,7 +119,7 @@ function One({
           <div className="mb-1 text-label font-bold uppercase tracking-caps text-muted">
             {t('cttee.found')}
           </div>
-          <p className="max-w-[58ch] font-display text-lead leading-relaxed text-paper">
+          <p className="max-w-[58ch] font-read text-lead leading-relaxed text-paper">
             {r.referral.report.found}
           </p>
           <p className="mt-1.5 text-note font-mono text-muted">

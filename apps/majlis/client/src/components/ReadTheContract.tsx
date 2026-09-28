@@ -50,7 +50,7 @@ import Act from './Act.js';
 
 const STANDING: Record<string, { tone: string; key: string }> = {
   found: { tone: 'text-settled', key: 'read.found' },
-  unclear: { tone: 'text-gold', key: 'read.unclear' },
+  unclear: { tone: 'text-goldink', key: 'read.unclear' },
   absent: { tone: 'text-breach', key: 'read.absent' },
 };
 
@@ -280,7 +280,7 @@ export default function ReadTheContract({
                           {p.label}
                         </div>
                       )}
-                      <p className="max-w-[58ch] font-display text-body leading-relaxed text-sand">
+                      <p className="max-w-[58ch] font-read text-body leading-relaxed text-sand">
                         {p.text}
                       </p>
                     </div>

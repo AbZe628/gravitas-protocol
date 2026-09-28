@@ -118,7 +118,7 @@ function Row({ row, n }: { row: QueueRow; n?: number }) {
           {n !== undefined && n < 10 && (
             <kbd
               aria-hidden="true"
-              className="hidden h-5 w-5 shrink-0 place-items-center rounded border border-line font-mono text-label font-medium text-faint lg:grid"
+              className="hidden h-5 w-5 shrink-0 place-items-center rounded border border-line font-mono text-label font-medium text-muted lg:grid"
             >
               {n}
             </kbd>
@@ -339,7 +339,7 @@ export default function Queue() {
                 }
               >
                 {t(k ? 'needs.mine' : 'needs.everyone')}
-                <span className="ms-1.5 font-mono tabular-nums opacity-60">
+                <span className="ms-1.5 font-mono tabular-nums text-muted">
                   {k ? mineCount : rows.length}
                 </span>
               </Button>
@@ -387,7 +387,7 @@ export default function Queue() {
             }
           >
             {t(`door.${p}`)}
-            <span className="ms-1.5 font-mono tabular-nums opacity-60">{countOf(p)}</span>
+            <span className="ms-1.5 font-mono tabular-nums text-muted">{countOf(p)}</span>
           </Button>
         ))}
     </>

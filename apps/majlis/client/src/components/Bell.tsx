@@ -60,7 +60,7 @@ export default function Bell() {
             aria-label={t('bell.title')}
             className="absolute end-0 z-50 mt-2 w-[330px] overflow-hidden rounded-sheet bg-raised shadow-sheeted"
           >
-            <p className="border-b border-line px-4 py-2.5 text-label font-bold uppercase tracking-caps text-faint">
+            <p className="border-b border-line px-4 py-2.5 text-label font-bold uppercase tracking-caps text-muted">
               {t('bell.title')}
             </p>
 

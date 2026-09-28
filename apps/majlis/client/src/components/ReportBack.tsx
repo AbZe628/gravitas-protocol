@@ -162,7 +162,7 @@ export default function ReportBack({
       </ul>
 
       {incomplete && (
-        <p className="mt-3 text-note leading-relaxed text-gold">{t('cttee.dissentNeedsWords')}</p>
+        <p className="mt-3 text-note leading-relaxed text-goldink">{t('cttee.dissentNeedsWords')}</p>
       )}
 
       <Act

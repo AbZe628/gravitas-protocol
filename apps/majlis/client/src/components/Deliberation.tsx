@@ -187,7 +187,7 @@ function Entry({
           <DateText iso={entry.at} />
         </span>
       </div>
-      <p className="max-w-[62ch] font-display text-lead leading-relaxed">
+      <p className="max-w-[62ch] font-read text-lead leading-relaxed">
         <Body entry={entry} />
       </p>
 
@@ -227,7 +227,7 @@ function Entry({
                   <DateText iso={reply.at} />
                 </span>
               </div>
-              <p className="max-w-[62ch] font-display text-lead leading-relaxed">{reply.body}</p>
+              <p className="max-w-[62ch] font-read text-lead leading-relaxed">{reply.body}</p>
             </li>
           ))}
         </ul>

@@ -183,7 +183,7 @@ export default function SignTheDocument({ matter }: { matter: Matter }) {
 
   return (
     <div className="rounded-sheet bg-raised p-6 shadow-card sm:p-7">
-      <h2 className="font-display text-title font-normal leading-tight tracking-title">
+      <h2 className="font-display text-title leading-tight tracking-title">
         {t('sign.title')}
       </h2>
       <p className="mt-2.5 max-w-[62ch] text-body leading-relaxed text-sand">

@@ -75,7 +75,7 @@ export default function TheCommittees() {
               {c.name}
             </span>
             {summary.waiting > 0 && (
-              <span className="text-note text-gold">
+              <span className="text-note text-goldink">
                 <span className="font-mono tabular-nums">{summary.waiting}</span>{' '}
                 {t('set.carrying')}
               </span>

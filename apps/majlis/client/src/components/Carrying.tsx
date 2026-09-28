@@ -158,9 +158,9 @@ export default function Carrying({ matterId }: { matterId: string }) {
                     sentence the board actually wrote.
                   */}
                   <p className="text-body leading-snug text-paper">{term.meaning}</p>
-                  <div className="mt-1 font-mono text-label text-muted opacity-70">{term.key}</div>
+                  <div className="mt-1 font-mono text-label text-muted">{term.key}</div>
                   {term.onBreach && (
-                    <p className="mt-1.5 text-note leading-snug text-gold">
+                    <p className="mt-1.5 text-note leading-snug text-goldink">
                       {t('carry.onBreach')} {term.onBreach}
                     </p>
                   )}

@@ -239,7 +239,7 @@ export default function Evidence({ matter, scholarId, canAttach, onChanged }: Pr
                 {s.file ? (
                   <a
                     href={governance.documentHref(matter.id, s.id ?? '')}
-                    className="mt-0.5 inline-block break-words text-ui underline underline-offset-2 hover:text-fg"
+                    className="mt-0.5 inline-block break-words text-ui underline underline-offset-2 hover:text-paper"
                   >
                     {s.file.name}{' '}
                     <span className="font-mono text-note text-muted">

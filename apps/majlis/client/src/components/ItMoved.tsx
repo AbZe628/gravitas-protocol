@@ -79,7 +79,7 @@ export default function ItMoved({
             <h3 className="text-label font-bold uppercase tracking-caps text-goldink">
               {theirs ? `${t('moved.theirs')} · ${nameOf(theirs.who)}` : t('moved.theirs')}
             </h3>
-            <p className="mt-1.5 font-display text-body leading-snug text-paper">
+            <p className="mt-1.5 font-read text-body leading-snug text-paper">
               {theirs ? theirs.what : t('moved.theirsUnknown')}
             </p>
           </section>
@@ -88,7 +88,7 @@ export default function ItMoved({
             <h3 className="text-label font-bold uppercase tracking-caps text-lapis">
               {t('moved.yours')}
             </h3>
-            <p className="mt-1.5 font-display text-body leading-snug text-paper">
+            <p className="mt-1.5 font-read text-body leading-snug text-paper">
               {yours || t('moved.yoursEmpty')}
             </p>
             <p className="mt-1.5 text-note text-muted">{t('moved.yoursKept')}</p>

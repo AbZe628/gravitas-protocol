@@ -156,7 +156,12 @@ export default function StepWindow({
     <div ref={root} className="flex flex-col overflow-hidden rounded-sheet bg-raised shadow-card lg:h-[calc(100vh-6rem)] lg:min-h-[560px]">
       {/* ── the title bar ─────────────────────────────────────────────── */}
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-line px-5 py-3.5 sm:px-6">
-        <h1 className="min-w-0 flex-1 truncate font-display text-sub leading-tight tracking-title text-paper">
+        {/*
+          The whole title on a phone, with the marks under it. It shared a line
+          with them and was cut to its first letter — *T…* — which is to say
+          the one screen about a matter did not say which matter.
+        */}
+        <h1 className="min-w-0 basis-full font-display text-sub leading-tight tracking-title text-paper lg:flex-1 lg:basis-0 lg:truncate">
           {title}
         </h1>
         {chips}
@@ -181,7 +186,7 @@ export default function StepWindow({
                   : s.state === 'done'
                     ? 'bg-settledtint text-settled'
                     : s.state === 'contested'
-                      ? 'bg-[#FBF1DF] text-gold'
+                      ? 'bg-[#FBF1DF] text-goldink'
                       : 'bg-raised text-muted shadow-ring')
               }
             >

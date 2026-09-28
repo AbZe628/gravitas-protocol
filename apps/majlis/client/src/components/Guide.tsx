@@ -152,7 +152,7 @@ export default function Guide() {
             <>
               <p
                 className={
-                  'text-body leading-relaxed ' + (answer.refused ? 'text-attention' : 'text-sand')
+                  'text-body leading-relaxed ' + (answer.refused ? 'text-goldink' : 'text-sand')
                 }
               >
                 {answer.answer}
@@ -162,7 +162,7 @@ export default function Guide() {
                 <Link
                   to={answer.goTo.path}
                   onClick={() => setOpen(false)}
-                  className="mt-3 inline-block text-ui text-gold underline decoration-gold/40 underline-offset-4"
+                  className="mt-3 inline-block text-ui text-goldink underline decoration-gold/40 underline-offset-4"
                 >
                   {answer.goTo.label} →
                 </Link>

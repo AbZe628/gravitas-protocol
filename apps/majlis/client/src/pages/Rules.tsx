@@ -126,8 +126,8 @@ export default function Rules({ embedded = false }: { embedded?: boolean }) {
       {dueCount > 0 && (
         <>
           <span className="mx-2 opacity-40">·</span>
-          <span className="font-mono tabular-nums text-goldsoft">{dueCount}</span>{' '}
-          <span className="text-goldsoft">{t('review.dueCount')}</span>
+          <span className="font-mono tabular-nums text-goldink">{dueCount}</span>{' '}
+          <span className="text-goldink">{t('review.dueCount')}</span>
         </>
       )}
     </span>

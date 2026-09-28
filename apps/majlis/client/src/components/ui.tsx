@@ -52,8 +52,8 @@ export function Tag({
    */
   const tones = {
     neutral: 'bg-black/[0.045] text-sand',
-    gold: 'bg-goldtint text-gold shadow-ringgold',
-    warn: 'bg-goldtint text-gold shadow-ringgold',
+    gold: 'bg-goldtint text-goldink shadow-ringgold',
+    warn: 'bg-goldtint text-goldink shadow-ringgold',
     ok: 'bg-settledtint text-settled shadow-ringsettled',
     // The fourth state the palette has and this had no name for: overdue,
     // refused, a threshold crossed. Callers were reaching for 'warn', which

@@ -97,7 +97,7 @@ export default function ToolShelf({
       className={
         'slides flex shrink-0 gap-0.5 border-line bg-surface/70 ' +
         'w-full flex-row items-stretch overflow-x-auto border-t px-2 py-2 ' +
-        'lg:w-[68px] lg:flex-col lg:items-center lg:overflow-visible lg:border-s lg:border-t-0 lg:px-0 lg:py-4'
+        'lg:w-[100px] lg:flex-col lg:items-center lg:overflow-visible lg:border-s lg:border-t-0 lg:px-0 lg:py-4'
       }
     >
       {/*
@@ -112,7 +112,7 @@ export default function ToolShelf({
       {/* The heading is the shelf saying what it is. Across the top of a
           phone it is a word in the way of the tools it names, so it stays
           on the desk where the column has room for it. */}
-      <span className="mb-2 hidden px-1 text-center text-label font-bold uppercase tracking-label text-faint lg:block">
+      <span className="mb-2 hidden px-1 text-center text-label font-bold uppercase tracking-label text-muted lg:block">
         {t('tools.open')}
       </span>
 
@@ -134,7 +134,7 @@ export default function ToolShelf({
            */
           className={
             'flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg px-2.5 py-1.5 ' +
-            'lg:w-[56px] lg:flex-col lg:gap-1 lg:whitespace-normal lg:px-1 lg:py-2 ' +
+            'lg:w-[92px] lg:flex-col lg:gap-1 lg:whitespace-normal lg:px-1 lg:py-2 lg:text-center ' +
             'text-label font-bold leading-tight transition-colors ' +
             (at === k
               ? 'bg-raised text-paper shadow-ring'

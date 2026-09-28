@@ -16,8 +16,8 @@ import type { ReactNode } from 'react';
  * different. Eleven, twelve, twelve and a half, thirteen and thirteen and a
  * half are one size with rounding error, and that is what this replaces.
  *
- *   `Display`  the one thing this screen is about — serif, and large enough
- *              that a reader's eye lands on it before anything else
+ *   `Display`  the one thing this screen is about — large enough that a
+ *              reader's eye lands on it before anything else
  *   `Title`    the divisions within it
  *   `Body`     what is read — set at a size somebody would actually read
  *   `Label`    what a thing is, above it
@@ -26,9 +26,14 @@ import type { ReactNode } from 'react';
  * ── the serif carries the meaning ─────────────────────────────────────────
  *
  * Everything a board wrote — a question, a ruling, a member's reasoning — is
- * set in the display face. Everything the application says about it is sans.
- * That is not decoration: a scholar can tell at a glance whose words they are
- * reading, and no legend is needed to learn it.
+ * set in the reading serif, `font-read`. Everything the application says about
+ * it, titles included, is the system face. That is not decoration: a scholar
+ * can tell at a glance whose words they are reading, and no legend is needed
+ * to learn it.
+ *
+ * Titles were serif too, and so was every row of the queue: the typography of
+ * an article on a work list. A title is the application naming a place, so it
+ * is set the way the device sets its own — see tokens.css.
  */
 
 export function Display({ children, className = '' }: { children: ReactNode; className?: string }) {
@@ -92,7 +97,7 @@ export function Note({ children, className = '' }: { children: ReactNode; classN
  */
 export function Quoted({ children }: { children: ReactNode }) {
   return (
-    <blockquote className="border-s-2 border-gold/50 ps-4 font-display text-sub leading-relaxed text-paper">
+    <blockquote className="border-s-2 border-gold/50 ps-4 font-read text-sub leading-relaxed text-paper">
       {children}
     </blockquote>
   );

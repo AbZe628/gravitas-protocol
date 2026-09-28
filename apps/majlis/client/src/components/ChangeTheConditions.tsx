@@ -285,7 +285,7 @@ export default function ChangeTheConditions({
                 {paper.text.length} {t('draftfrom.characters')}
               </span>
             </div>
-            <pre className="max-h-64 overflow-auto whitespace-pre-wrap font-display text-note leading-relaxed text-sand">
+            <pre className="max-h-64 overflow-auto whitespace-pre-wrap font-read text-note leading-relaxed text-sand">
               {paper.text}
             </pre>
           </div>
