@@ -125,6 +125,10 @@ function gets(): string[] {
 
 /** A real id for the parameter, where the path says what kind of thing it is. */
 function filled(path: string): string {
+  /* A passage of any kind: a question, which reads the submissions and the assignments. */
+  if (path.includes('/passages/:kind')) {
+    return path.replace(':kind', 'question').replace(':id', submissions[0].id);
+  }
   const id =
     /\/matters\//.test(path) ? 'matter-2026-07-03'
     : /\/incidents\//.test(path) ? incidents[0].id
@@ -156,7 +160,14 @@ describe('reading the record never rings the bell', () => {
     current = '';
 
     // The four this was written for really ran, against real records.
-    for (const p of ['/api/queue', '/api/assignments', '/api/matters/:id/passage', '/api/incidents/:id/passage']) {
+    for (const p of [
+      '/api/queue',
+      '/api/assignments',
+      '/api/matters/:id/passage',
+      '/api/incidents/:id/passage',
+      '/api/passages/:kind',
+      '/api/passages/:kind/:id',
+    ]) {
       expect(answered[p], `${p} did not answer`).toBe(200);
     }
     expect(called.has('assignments'), 'no GET read the assignments, so this proves nothing').toBe(true);

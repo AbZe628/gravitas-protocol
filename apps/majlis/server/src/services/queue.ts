@@ -181,7 +181,11 @@ export function buildQueue(input: QueueInput): QueueRow[] {
     rows.push({
       kind: 'question',
       id: s.id,
-      to: '/questions',
+      /*
+       * The one it names, not only the list it is on — as the undertakings'
+       * rows do. The list opens on it, which is where taking it up is offered.
+       */
+      to: `/questions#${s.id}`,
       title: s.subject,
       phase: 'asked',
       ...nextOn(() => withAssignments(buildQuestionPassage(s, now), input.assignments)),
@@ -299,7 +303,13 @@ export function buildQueue(input: QueueInput): QueueRow[] {
     rows.push({
       kind: 'review',
       id: rule.id,
-      to: '/rules',
+      /*
+       * The ruling itself. This sent a member to the list of every ruling in
+       * force with the act — look at it again — written on the row they had
+       * just left; the ruling's own page is where that act and taking it on
+       * both are.
+       */
+      to: `/rules/${rule.id}`,
       title: rule.title,
       phase: 'inforce',
       ...read,

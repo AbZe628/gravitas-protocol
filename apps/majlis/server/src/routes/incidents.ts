@@ -41,7 +41,7 @@ import {
   stopActivities,
 } from '../services/incident.js';
 import { buildIncidentPassage } from '../services/passage-incident.js';
-import { withAssignments } from '../services/assignment.js';
+import { visibleTo, withAssignments } from '../services/assignment.js';
 import type { Store } from '../store/index.js';
 import type { Incident } from '../types.js';
 import { badRequest, handle, identityOf, requireRole } from './http.js';
@@ -198,7 +198,7 @@ export function incidentRoutes(store: Store, now: () => string = () => new Date(
        * serves a passage does this; one that forgets shows a breach where
        * nobody holds anything.
        */
-      const assignments = await store.assignments(incident.boardId);
+      const assignments = visibleTo(identityOf(req).role, await store.assignments(incident.boardId));
       res.json(withAssignments(buildIncidentPassage(incident, now()), assignments));
     }),
   );

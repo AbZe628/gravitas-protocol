@@ -20,10 +20,10 @@ import { overdue, type Undertaking } from './undertaking.js';
  * would do a thing, and the minute has their name on it.
  *
  * So this is the one reading that can say *this is yours* and mean a person.
- * It is carried on the passage as `who` rather than folded into the
- * owner, because the grammar still has no way to say a step belongs to
- * somebody — that is the next item — and pretending otherwise here would put
- * a name into a field every other kind fills with a role.
+ * It is carried on the step as `who` rather than folded into the owner,
+ * which is a role on every kind. Every other `who` is an assignment, written
+ * on after the reading by `withAssignments`; this one is the reading's own,
+ * and no assignment moves it — nobody hands on who made a promise.
  *
  * ── a date the board never set is its own problem ─────────────────────────
  *

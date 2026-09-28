@@ -329,6 +329,16 @@ describe('the queue names whoever the passage names', () => {
     });
   }
 
+  it('opens the thing it names, on every kind — never only the list it is on', () => {
+    /*
+     * A row said *take this up* or *look at it again* and handed over the
+     * whole list of questions, or of rulings, so the member had to find the
+     * one they had pressed. Where taking it on is offered is the thing's own
+     * card or page, so the address has to name it.
+     */
+    for (const r of rows) expect(r.to, `${r.kind} ${r.id}`).toContain(r.id);
+  });
+
   it('names somebody on a step somewhere, or the step comparison proves nothing', () => {
     expect(rows.some((r) => r.who === 'member-z')).toBe(true);
   });

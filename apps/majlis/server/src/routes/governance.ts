@@ -90,7 +90,7 @@ import { assess, crossings, type Assessment, type Figures } from '../services/sc
 import { search, type SearchFilters } from '../services/search.js';
 import { relatedTo } from '../services/precedent.js';
 import { buildPassage } from '../services/passage.js';
-import { withAssignments } from '../services/assignment.js';
+import { visibleTo, withAssignments } from '../services/assignment.js';
 import { buildQueue } from '../services/queue.js';
 import { buildInheritance, checklistStanding } from '../services/inherit.js';
 import type { Store } from '../store/index.js';
@@ -1495,7 +1495,7 @@ export function governanceRoutes(
 
       // See the note in withAssignments: the reading says what the record
       // holds, and this says who picked it up.
-      const assignments = await store.assignments(board.id);
+      const assignments = visibleTo(identityOf(req).role, await store.assignments(board.id));
       res.json(
         withAssignments(
           buildPassage(board, matter, structure, new Date().toISOString()),
@@ -1593,7 +1593,7 @@ export function governanceRoutes(
    */
   router.get(
     '/queue',
-    handle(async (_req, res) => {
+    handle(async (req, res) => {
       const at = now();
       const [boards, submissions, matters, rules, incidents, undertakings, assignments] = await Promise.all([
         store.boards(),
@@ -1624,7 +1624,7 @@ export function governanceRoutes(
         incidents,
         undertakings,
         structures,
-        assignments,
+        assignments: visibleTo(identityOf(req).role, assignments),
         now: at,
       });
 

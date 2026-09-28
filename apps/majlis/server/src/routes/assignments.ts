@@ -1,16 +1,11 @@
 import { randomUUID } from 'node:crypto';
 import { Router } from 'express';
 import { z } from 'zod';
-import { structures } from '../data/structures.js';
 import { howOf, heldBy, mayAssign, onOurSide, placeable, type Assignment } from '../services/assignment.js';
-import { buildPassage } from '../services/passage.js';
-import { buildIncidentPassage } from '../services/passage-incident.js';
-import { buildQuestionPassage } from '../services/passage-question.js';
-import { buildReviewPassage } from '../services/passage-review.js';
-import { buildUndertakingPassage } from '../services/passage-undertaking.js';
-import type { Passage, PassageKind } from '../services/passage-shape.js';
+import type { PassageKind } from '../services/passage-shape.js';
 import type { Members, Role } from '../auth/members.js';
 import type { Store } from '../store/index.js';
+import { passageOf } from './passages.js';
 import type { Board } from '../types.js';
 import { badRequest, handle, identityOf } from './http.js';
 
@@ -61,48 +56,6 @@ const placing = z.object({
   note: z.string().max(2000).optional(),
 });
 
-/**
- * The reading of the thing an assignment is about, or null where there is no
- * such thing on this board.
- *
- * Read so the route can refuse an assignment to something that does not
- * exist, or to a step the thing does not have. Without it the record could
- * say somebody holds step `conditions` of matter `nonsense`, and the screen
- * that asks what needs you would count it against them forever.
- */
-async function passageOf(
-  store: Store,
-  board: Board,
-  ofKind: PassageKind,
-  ofId: string,
-  at: string,
-): Promise<Passage | null> {
-  switch (ofKind) {
-    case 'matter': {
-      const m = await store.matter(ofId);
-      if (!m || m.boardId !== board.id) return null;
-      const shape = m.structureId ? (structures.find((s) => s.id === m.structureId) ?? null) : null;
-      return buildPassage(board, m, shape, at);
-    }
-    case 'breach': {
-      const i = await store.incident(ofId);
-      return i && i.boardId === board.id ? buildIncidentPassage(i, at) : null;
-    }
-    case 'question': {
-      const q = await store.submission(ofId);
-      return q && q.boardId === board.id ? buildQuestionPassage(q, at) : null;
-    }
-    case 'undertaking': {
-      const u = await store.undertaking(ofId);
-      return u && u.boardId === board.id ? buildUndertakingPassage(u, at) : null;
-    }
-    case 'review': {
-      const r = await store.rule(ofId);
-      return r && r.boardId === board.id ? buildReviewPassage(r, at) : null;
-    }
-  }
-}
-
 /** The two roles that sit on this side of the table. */
 const SITS: readonly Role[] = ['signatory', 'advisory'];
 
@@ -135,11 +88,20 @@ export function assignmentRoutes(
    * while it sat for forty days* is a question a board asks and a list of
    * current holders cannot answer.
    *
-   * Open to observers. Seeing who is doing what is reading.
+   * Open to observers: seeing who is doing what is reading. Not to the
+   * institution — who on the board holds the bank's own question is the
+   * board's business, and see `visibleTo` for why.
    */
   router.get(
     '/assignments',
     handle(async (req, res) => {
+      if (identityOf(req).role === 'institution') {
+        res.status(403).json({
+          error: 'forbidden',
+          message: 'Who on the board is carrying what is the board’s own record.',
+        });
+        return;
+      }
       const board = await theBoard();
       if (!board) {
         res.status(404).json({ error: 'not_found', message: 'No such board.' });

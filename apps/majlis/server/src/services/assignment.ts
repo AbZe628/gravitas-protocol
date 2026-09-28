@@ -1,4 +1,5 @@
 import type { PassageKind, Passage, Step } from './passage-shape.js';
+import type { Role } from '../auth/members.js';
 
 /**
  * Who is actually doing a thing, as opposed to whose kind of thing it is.
@@ -274,4 +275,23 @@ export function mayAssign(input: {
 
   // Their own: they may hand it on or put it back.
   return null;
+}
+
+/**
+ * The assignments a reader may see: all of them, or none.
+ *
+ * **None for the institution.** Who on the board is carrying the bank's own
+ * question is the board's business and not the bank's. A desk that knew which
+ * scholar held its question would know whom to lobby, and a board whose
+ * members can be approached one at a time about work in their hands is not
+ * independent in the way the bank is paying for.
+ *
+ * It was all of them, for everybody: the passage routes, the queue and the
+ * assignment record itself answered a bank desk with the name of the member
+ * holding each thing — found by asking them with a desk's credential, after
+ * every test had passed. One rule, applied wherever assignments are applied,
+ * so no route can be the one that forgot.
+ */
+export function visibleTo(role: Role | undefined, assignments: readonly Assignment[]): readonly Assignment[] {
+  return role === 'institution' ? [] : assignments;
 }
