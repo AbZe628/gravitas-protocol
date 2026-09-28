@@ -40,6 +40,7 @@ import type { Signing } from '../services/signature.js';
 import type { Credential } from '../services/account.js';
 import type { EnrolledDevice } from '../auth/passkeys.js';
 import type { Undertaking } from '../services/undertaking.js';
+import type { Assignment } from '../services/assignment.js';
 import type { Annotation } from '../services/annotation.js';
 import type { Committee, Referral } from '../services/committee.js';
 
@@ -292,6 +293,24 @@ export interface Store {
    * @throws NotFound if there is no such undertaking.
    */
   updateUndertaking(id: string, change: (current: Undertaking) => Undertaking): Promise<Undertaking>;
+
+  // ── who is actually doing a thing ──────────────────────────────────────
+
+  /**
+   * Every assignment ever written on this board, in the order it was written.
+   *
+   * Never filtered to the ones that stand: what stands is derived, and a store
+   * that returned only the current holder could not answer *who was this with
+   * while it sat for forty days*, which is the question a board asks.
+   */
+  assignments(boardId?: string): Promise<Assignment[]>;
+
+  /**
+   * Append one. There is no update: handing on and putting back are both new
+   * entries, and an assignment that could be edited would be a record that
+   * could be improved after the fact.
+   */
+  assign(assignment: Assignment): Promise<Assignment>;
 
   // ── some of the board, looking at something first ─────────────────────
 

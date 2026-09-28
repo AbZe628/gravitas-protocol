@@ -55,6 +55,7 @@ import { createOnce, once } from './middleware/once.js';
 import { pulsing } from './store/pulsing.js';
 import { pulseRoutes } from './routes/pulse.js';
 import { incidentRoutes } from './routes/incidents.js';
+import { assignmentRoutes } from './routes/assignments.js';
 
 
 /**
@@ -777,6 +778,7 @@ export function createApp(
   app.use('/api', governanceRoutes(store, undefined, vault, reading, passkeys, notifier));
   app.use('/api', deviceRoutes(store, passkeys.challenges, passkeys.expected));
   app.use('/api', incidentRoutes(store));
+  app.use('/api', assignmentRoutes(store));
   app.use('/api', computationRoutes(store));
   app.use('/api', adoptionRoutes(store));
   app.use('/api', submissionRoutes(store, notifier));

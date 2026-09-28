@@ -58,6 +58,7 @@ import { ASSISTANT_LOG_MAX, NotFound, type Store, type StoredSigning } from './s
 import type { Credential } from '../services/account.js';
 import type { EnrolledDevice } from '../auth/passkeys.js';
 import type { Undertaking } from '../services/undertaking.js';
+import type { Assignment } from '../services/assignment.js';
 import type { Annotation } from '../services/annotation.js';
 import type { Committee, Referral } from '../services/committee.js';
 
@@ -112,6 +113,7 @@ interface Document {
   devices?: EnrolledDevice[];
   /** What somebody undertook to do at a sitting, and what became of it. */
   undertakings?: Undertaking[];
+  assignments?: Assignment[];
   annotations?: Annotation[];
   committees?: Committee[];
   referrals?: Referral[];
@@ -206,6 +208,7 @@ export class FileStore implements Store {
       loaded.credentials ??= [];
       loaded.devices ??= [];
       loaded.undertakings ??= [];
+      loaded.assignments ??= [];
       loaded.annotations ??= [];
       loaded.committees ??= [];
       loaded.referrals ??= [];
@@ -555,6 +558,20 @@ export class FileStore implements Store {
 
   async credential(scholarId: string): Promise<Credential | null> {
     return copy((this.doc.credentials ?? []).find((c) => c.scholarId === scholarId) ?? null);
+  }
+
+  async assignments(boardId?: string): Promise<Assignment[]> {
+    const all = this.doc.assignments ?? [];
+    return copy(boardId === undefined ? all : all.filter((a) => a.boardId === boardId));
+  }
+
+  async assign(assignment: Assignment): Promise<Assignment> {
+    return this.serialise(() => {
+      this.doc.assignments ??= [];
+      this.doc.assignments.push(copy(assignment));
+      this.persist();
+      return copy(assignment);
+    });
   }
 
   async undertakings(boardId?: string): Promise<Undertaking[]> {

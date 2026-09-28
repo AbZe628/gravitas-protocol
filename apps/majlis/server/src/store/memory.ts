@@ -38,6 +38,7 @@ import { ASSISTANT_LOG_MAX, NotFound, type Store, type StoredSigning } from './s
 import type { Credential } from '../services/account.js';
 import type { EnrolledDevice } from '../auth/passkeys.js';
 import type { Undertaking } from '../services/undertaking.js';
+import type { Assignment } from '../services/assignment.js';
 import type { Annotation } from '../services/annotation.js';
 import type { Committee, Referral } from '../services/committee.js';
 
@@ -57,6 +58,7 @@ export interface MemorySeed {
   submissions?: Submission[];
   examinations?: Examination[];
   undertakings?: Undertaking[];
+  assignments?: Assignment[];
   annotations?: Annotation[];
   committees?: Committee[];
   referrals?: Referral[];
@@ -88,6 +90,8 @@ export class MemoryStore implements Store {
   /** Keyed by scholar: a member holds one credential or none. */
   private readonly _credentials = new Map<string, Credential>();
   private readonly _undertakings: Map<string, Undertaking>;
+  /* A list and not a map: assignments are appended and the order is the record. */
+  private readonly _assignments: Assignment[];
   private readonly _annotations: Map<string, Annotation>;
   private readonly _committees: Map<string, Committee>;
   private readonly _referrals: Map<string, Referral>;
@@ -117,6 +121,7 @@ export class MemoryStore implements Store {
     // claim in the record and the one least earned.
     this._examinations = new Map((seed.examinations ?? []).map((x) => [x.id, copy(x)]));
     this._undertakings = new Map((seed.undertakings ?? []).map((u) => [u.id, copy(u)]));
+    this._assignments = (seed.assignments ?? []).map((a) => copy(a));
     this._annotations = new Map((seed.annotations ?? []).map((a) => [a.id, copy(a)]));
     this._committees = new Map((seed.committees ?? []).map((c) => [c.id, copy(c)]));
     this._referrals = new Map((seed.referrals ?? []).map((r) => [r.id, copy(r)]));
@@ -350,6 +355,17 @@ export class MemoryStore implements Store {
   async credential(scholarId: string): Promise<Credential | null> {
     const found = this._credentials.get(scholarId);
     return found ? copy(found) : null;
+  }
+
+  async assignments(boardId?: string): Promise<Assignment[]> {
+    return copy(
+      boardId === undefined ? this._assignments : this._assignments.filter((a) => a.boardId === boardId),
+    );
+  }
+
+  async assign(assignment: Assignment): Promise<Assignment> {
+    this._assignments.push(copy(assignment));
+    return copy(assignment);
   }
 
   async undertakings(boardId?: string): Promise<Undertaking[]> {

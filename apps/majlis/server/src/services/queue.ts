@@ -2,6 +2,7 @@ import type { Board, Incident, Matter, Rule, Structure, Submission } from '../ty
 import { standingOf } from './submission.js';
 import { buildPassage, say, type Say, type Whose } from './passage.js';
 import { buildIncidentPassage } from './passage-incident.js';
+import { withAssignments, type Assignment } from './assignment.js';
 import { buildQuestionPassage } from './passage-question.js';
 import { buildReviewPassage } from './passage-review.js';
 import { buildUndertakingPassage } from './passage-undertaking.js';
@@ -139,6 +140,14 @@ export interface QueueInput {
    * sentences — which is the fault this file's own preamble is about.
    */
   structures: readonly Structure[];
+  /**
+   * Who is actually doing what, so the row can name a person.
+   *
+   * Passed in rather than read here: this file decides ordering and nothing
+   * else, and a second place that read the assignment record would be a second
+   * place that could disagree with the passages about who holds a step.
+   */
+  assignments: readonly Assignment[];
   now: string;
 }
 
@@ -157,7 +166,7 @@ export function buildQueue(input: QueueInput): QueueRow[] {
       to: '/questions',
       title: s.subject,
       phase: 'asked',
-      ...nextOn(() => buildQuestionPassage(s, now)),
+      ...nextOn(() => withAssignments(buildQuestionPassage(s, now), input.assignments)),
       days: daysSince(s.arrivedAt, now),
       overdue: false,
     });
@@ -193,7 +202,7 @@ export function buildQueue(input: QueueInput): QueueRow[] {
       const shape = m.structureId
         ? (input.structures.find((s) => s.id === m.structureId) ?? null)
         : null;
-      const passage = buildPassage(board, m, shape, now);
+      const passage = withAssignments(buildPassage(board, m, shape, now), input.assignments);
       next = passage.next?.act ?? null;
       whose = passage.next?.whose ?? null;
       days = passage.waiting?.days ?? days;
@@ -231,7 +240,7 @@ export function buildQueue(input: QueueInput): QueueRow[] {
       to: `/undertakings#${u.id}`,
       title: u.what,
       phase: 'deciding',
-      ...nextOn(() => buildUndertakingPassage(u, now)),
+      ...nextOn(() => withAssignments(buildUndertakingPassage(u, now), input.assignments)),
       /*
        * The person, by name — but only where the step is theirs.
        *
@@ -246,7 +255,7 @@ export function buildQueue(input: QueueInput): QueueRow[] {
        * the column that says who is holding it up, on the screen everybody
        * opens first. Found by reading the list rather than by any test.
        */
-      whoName: nextOn(() => buildUndertakingPassage(u, now)).whoName,
+      whoName: nextOn(() => withAssignments(buildUndertakingPassage(u, now), input.assignments)).whoName,
       days: daysSince(u.minutedAt, now),
       overdue: undertakingOverdue(u, now),
     });
@@ -269,7 +278,7 @@ export function buildQueue(input: QueueInput): QueueRow[] {
    * step belonging to the board, and so does one whose date has arrived.
    */
   for (const rule of input.rules) {
-    const { next, whose } = nextOn(() => buildReviewPassage(rule, now));
+    const { next, whose } = nextOn(() => withAssignments(buildReviewPassage(rule, now), input.assignments));
     if (!next) continue;
 
     const status = reviewStatus(rule, now);
@@ -310,7 +319,7 @@ export function buildQueue(input: QueueInput): QueueRow[] {
     let next: Say | null = null;
     let whose: Whose | null = null;
     try {
-      const passage = buildIncidentPassage(i, now);
+      const passage = withAssignments(buildIncidentPassage(i, now), input.assignments);
       next = passage.next?.act ?? null;
       whose = passage.next?.whose ?? null;
     } catch {

@@ -17,6 +17,7 @@ import { NotFound, type Store, type StoredSigning } from './store.js';
 import type { Credential } from '../services/account.js';
 import type { EnrolledDevice } from '../auth/passkeys.js';
 import type { Undertaking } from '../services/undertaking.js';
+import type { Assignment } from '../services/assignment.js';
 import type { Annotation } from '../services/annotation.js';
 import type { Committee, Referral } from '../services/committee.js';
 
@@ -393,6 +394,24 @@ export class TenantStore implements Store {
    * An undertaking names what a member of one bank's board agreed to do, and
    * there is nothing about it another bank should read.
    */
+  /*
+   * Scoped through the board, like undertakings. Who is doing what on another
+   * institution's board is that institution's business and not this one's.
+   */
+  async assignments(boardId?: string): Promise<Assignment[]> {
+    if (boardId && !(await this.owns(boardId))) return [];
+    const mine = await this.ownBoardIds();
+    const all = await this.inner.assignments(boardId);
+    return all.filter((a) => mine.has(a.boardId));
+  }
+
+  async assign(assignment: Assignment): Promise<Assignment> {
+    if (!(await this.owns(assignment.boardId))) {
+      throw new Error('That board belongs to another tenant.');
+    }
+    return this.inner.assign(assignment);
+  }
+
   async undertakings(boardId?: string): Promise<Undertaking[]> {
     if (boardId && !(await this.owns(boardId))) return [];
     const mine = await this.ownBoardIds();
