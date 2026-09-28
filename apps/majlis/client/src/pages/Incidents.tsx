@@ -3,7 +3,8 @@ import { oversight, type Incident, type IncidentList } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { Nothing } from '../components/page.js';
 import SlideOver from '../components/SlideOver.js';
-import { ListPage, Row, Rows } from '../components/shapes.js';
+import { ListPage } from '../components/shapes.js';
+import { Sheet, Line, Mark, Figure, type Column } from '../components/sheet.js';
 import { ErrorText, Loading } from '../components/ui.js';
 import { mayDeliberate, useIdentity } from '../lib/identity.js';
 import { useStillThere } from '../lib/stillThere.js';
@@ -59,6 +60,14 @@ export function ClockLine({ incident }: { incident: Incident }) {
     </span>
   );
 }
+
+const COLS = (t: (k: string) => string): readonly Column[] => [
+  { head: t('col.what'), width: 'minmax(0,3fr)', phone: 'lead' },
+  { head: t('col.stage'), width: '12rem', phone: 'under' },
+  { head: t('col.owed'), width: '9rem', phone: 'under' },
+  { head: t('col.reported'), width: '6.5rem', end: true, phone: 'hide' },
+  { head: t('col.days'), width: '4.5rem', end: true, phone: 'trailing' },
+];
 
 export default function Incidents() {
   const { t } = useI18n();
@@ -237,37 +246,44 @@ export default function Incidents() {
       {incidents.length === 0 ? (
         <Nothing>{t('snc.none')}</Nothing>
       ) : (
-        <Rows>
+        <Sheet columns={COLS(t)}>
           {incidents.map((i) => (
-            <Row
+            <Line
               key={i.id}
               to={`/incidents/${i.id}`}
-              phase="checked"
-              /*
-               * On a list of one kind of thing, the label carries the stage
-               * rather than the kind. Repeating "a reported non-compliance"
-               * down every row of a page headed exactly that is noise; the
-               * stage is what differs from one row to the next.
-               */
-              kind={t(`snc.stage.${i.stage}`)}
-              title={i.title}
-              days={daysSince(i.reportedAt)}
-              daysLabel={t('needs.daysHere')}
-              overdue={Boolean(i.clock?.overdue)}
-              /*
-               * No act on the row here. The one act a breach is waiting for
-               * is worked out on the server, and this screen does not ask for
-               * it — only the queue does. Deriving it again on this side
-               * would be a second place saying what happens next.
-               */
-              heldBy={
-                i.purification && !i.purification.paidAt
-                  ? `${i.purification.amount} ${i.purification.currency} ${t('snc.owed')}`
-                  : undefined
-              }
+              columns={COLS(t)}
+              tone={i.clock?.overdue ? 'breach' : 'plain'}
+              cells={[
+                i.title,
+                /*
+                  On a list of one kind of thing the mark carries the stage
+                  rather than the kind: repeating "non-compliance" down every
+                  row of a screen headed exactly that says nothing, and the
+                  stage is what differs from one row to the next.
+                */
+                <Mark tone={i.clock?.overdue ? 'text-breach' : 'text-muted'}>
+                  {t(`snc.stage.${i.stage}`)}
+                </Mark>,
+                /*
+                  What is owed to charity, where anything is and it has not
+                  been paid. No act on the line: the one act a breach waits
+                  for is worked out on the server and only the queue asks for
+                  it, so deriving it again here would be a second place
+                  saying what happens next.
+                */
+                <span className="block truncate font-mono text-note text-goldink">
+                  {i.purification && !i.purification.paidAt
+                    ? `${i.purification.amount} ${i.purification.currency}`
+                    : ''}
+                </span>,
+                <Figure>{i.reportedAt.slice(0, 10)}</Figure>,
+                <Figure tone={i.clock?.overdue ? 'text-breach' : 'text-muted'}>
+                  {daysSince(i.reportedAt)}
+                </Figure>,
+              ]}
             />
           ))}
-        </Rows>
+        </Sheet>
       )}
     </ListPage>
   );

@@ -3,9 +3,10 @@ import { api, oversight, type ReviewStatus, type Rule } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { DocumentLink } from '../components/Documents.js';
 import { Nothing } from '../components/page.js';
-import { ListPage, Row, Rows } from '../components/shapes.js';
+import { ListPage } from '../components/shapes.js';
+import { Sheet, Line, Mark, Figure, type Column } from '../components/sheet.js';
 import { DateText, ErrorText, Loading } from '../components/ui.js';
-import { State, type Tone } from '../components/kit.js';
+import { type Tone } from '../components/kit.js';
 
 /**
  * What is in force, and when each of it comes back to the board.
@@ -45,6 +46,13 @@ function reviewWord(review: ReviewStatus | undefined, t: (k: string) => string):
   return t('rule.inForce');
 }
 
+const COLS = (t: (k: string) => string): readonly Column[] => [
+  { head: t('col.ruling'), width: 'minmax(0,3fr)', phone: 'lead' },
+  { head: t('rule.version'), width: '5rem', end: true, phone: 'hide' },
+  { head: t('col.inForceFrom'), width: '7rem', end: true, phone: 'trailing' },
+  { head: t('col.review'), width: '9rem', phone: 'under' },
+];
+
 export default function Rules({ embedded = false }: { embedded?: boolean }) {
   const { t } = useI18n();
   const [rules, setRules] = useState<Rule[] | null>(null);
@@ -83,31 +91,32 @@ export default function Rules({ embedded = false }: { embedded?: boolean }) {
     rules.length === 0 ? (
       <Nothing>{t('rule.none')}</Nothing>
     ) : (
-      <Rows>
+      <Sheet columns={COLS(t)}>
         {rules.map((r) => {
           const review = reviews.get(r.id);
           return (
-            <Row
+            <Line
               key={r.id}
               to={`/rules/${r.id}`}
-              phase="inforce"
-              kind={`${t('rule.version')} ${r.version}`}
-              title={r.title}
-              note={
-                <>
-                  <span className="line-clamp-2">{r.statement}</span>
-                  {r.inForceFrom && (
-                    <span className="mt-0.5 block text-note">
-                      {t('rule.inForceFrom')} <DateText iso={r.inForceFrom} />
-                    </span>
-                  )}
-                </>
-              }
-              standing={<State tone={reviewTone(review)}>{reviewWord(review, t)}</State>}
+              columns={COLS(t)}
+              cells={[
+                r.title,
+                /*
+                  The statement is the rule itself and it is two lines long.
+                  It belongs on the rule's own screen, not in a column: a
+                  table where one cell is a paragraph is a stack of cards
+                  again, with headings on top of it.
+                */
+                <Figure>{r.version}</Figure>,
+                <Figure>{r.inForceFrom ? <DateText iso={r.inForceFrom} /> : '—'}</Figure>,
+                <Mark tone={reviewTone(review) === 'attention' ? 'text-goldink' : 'text-muted'}>
+                  {reviewWord(review, t)}
+                </Mark>,
+              ]}
             />
           );
         })}
-      </Rows>
+      </Sheet>
     );
 
   const live = (

@@ -1,16 +1,48 @@
 import { useEffect, useState } from 'react';
 import { Gaps } from '../components/page.js';
-import { ListPage, Row, Rows } from '../components/shapes.js';
-import { State } from '../components/kit.js';
+import { ListPage } from '../components/shapes.js';
+import { Sheet, Line, Mark, Figure, type Column } from '../components/sheet.js';
 import { api, oversight, type EnforcementSnapshot, type MatterSummary, type Wait } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { DateText, ErrorText, Loading, Tag } from '../components/ui.js';
 import DriftPanel from '../components/Drift.js';
-import Pace, { WaitingFor } from '../components/Pace.js';
+import Pace from '../components/Pace.js';
 import WhoYouAre from '../components/WhoYouAre.js';
 import RaiseMatter from '../components/RaiseMatter.js';
 import { mayDeliberate, useIdentity } from '../lib/identity.js';
 import WhatThisIs from '../components/WhatThisIs.js';
+
+/**
+ * The columns, handed to the heading row and to every line alike.
+ *
+ * Declared beside the screen rather than inside it so the two are given one
+ * object and cannot drift apart — a heading that stops sitting over its own
+ * column is worse than no heading. The title is first because that is where
+ * the link goes and what a phone shows.
+ */
+const OPEN_COLS = (t: (k: string) => string): readonly Column[] => [
+  { head: t('col.matter'), width: 'minmax(0,2.4fr)', phone: 'lead' },
+  { head: t('col.direction'), width: '7rem', phone: 'under' },
+  { head: t('col.stage'), width: '7rem', phone: 'under' },
+  { head: t('col.origin'), width: 'minmax(0,1fr)', phone: 'hide' },
+  { head: t('col.opened'), width: '6.5rem', end: true, phone: 'hide' },
+  { head: t('col.waiting'), width: '5rem', end: true, phone: 'trailing' },
+  /*
+    How many transactions the proposed rule would have stopped.
+
+    It was a clause inside the row's sentence and it came off the table with
+    the rest of that sentence — which a test caught, and rightly: it is the
+    one figure on this screen that says what a ruling would cost, and the
+    board sees it before it votes. A figure belongs in a column.
+  */
+  { head: t('col.wouldStop'), width: '5.5rem', end: true, phone: 'hide' },
+];
+
+const SETTLED_COLS = (t: (k: string) => string): readonly Column[] => [
+  { head: t('col.ruling'), width: 'minmax(0,3fr)', phone: 'lead' },
+  { head: t('col.direction'), width: '7rem', phone: 'under' },
+  { head: t('col.opened'), width: '6.5rem', end: true, phone: 'trailing' },
+];
 
 export default function Dashboard() {
   const { t } = useI18n();
@@ -121,47 +153,54 @@ export default function Dashboard() {
         <p className="text-muted text-sm">{t('dash.none')}</p>
       ) : (
         /*
-          The same row every other list in here uses.
+          A table, with the fields under their own headings.
 
-          These were cards: each one its own panel with its own ring and its
-          own shadow, 100 pixels of padding between four facts. A list of
-          matters is a list, and the board reads it the way it reads the
-          queue, the register and the record — one surface, a line between
-          rows, the state where the state always is.
+          These were cards, then they were three-line rows, and both of them
+          set one record in a hundred pixels: the direction, the title, the
+          origin, the date and the wait all stacked, so nothing on one line
+          sat above the same thing on the next. Seven matters filled a
+          screen and no two of their dates could be compared without reading
+          each sentence.
+
+          Five columns now, and the eye runs down whichever one it came for.
         */
-        <Rows>
+        <Sheet columns={OPEN_COLS(t)}>
           {open.map((m) => (
-            <Row
+            <Line
               key={m.id}
               to={`/matters/${m.id}`}
-              phase="deciding"
-              kind={t(`matter.direction.${m.direction}`)}
-              title={m.title}
-              note={
-                <>
+              columns={OPEN_COLS(t)}
+              cells={[
+                m.title,
+                <Mark tone={m.direction === 'restrict' ? 'text-breach' : 'text-settled'}>
+                  {t(`matter.direction.${m.direction}`)}
+                </Mark>,
+                <Mark tone="text-goldink">{t(`matter.status.${m.status}`)}</Mark>,
+                <span className="block truncate text-note text-muted">
                   {t(`matter.origin.${m.origin}`)}
-                  <span className="mx-1.5 opacity-40">·</span>
-                  {t('common.opened')} <DateText iso={m.openedAt} />
-                  {waits.has(m.id) && (
-                    <>
-                      <span className="mx-1.5 opacity-40">·</span>
-                      <WaitingFor wait={waits.get(m.id)} />
-                    </>
-                  )}
-                  {m.affected !== null && (
-                    <>
-                      <span className="mx-1.5 opacity-40">·</span>
-                      <span className="text-lapis">
-                        {m.affected} {t('sim.affected')}
-                      </span>
-                    </>
-                  )}
-                </>
-              }
-              standing={<State tone="plain">{t(`matter.status.${m.status}`)}</State>}
+                </span>,
+                <Figure>
+                  <DateText iso={m.openedAt} />
+                </Figure>,
+                /*
+                  The figure alone, because the column is already headed.
+                  `WaitingFor` writes "waiting 54 days", which under a heading
+                  reading WAITING is the word three times and wraps the cell
+                  onto two lines. The asterisk stays: it says the count covers
+                  only the part this system witnessed.
+                */
+                <Figure>
+                  {waits.has(m.id)
+                    ? `${waits.get(m.id)!.days}${waits.get(m.id)!.partial ? '*' : ''}`
+                    : ''}
+                </Figure>,
+                <Figure tone={m.affected ? 'text-lapis' : 'text-faint'}>
+                  {m.affected ?? '—'}
+                </Figure>,
+              ]}
             />
           ))}
-        </Rows>
+        </Sheet>
       )}
 
       {settled.length > 0 && (
@@ -169,18 +208,24 @@ export default function Dashboard() {
           <h2 className="mb-3 text-label font-bold uppercase tracking-caps text-muted">
             {t('matter.status.in_force')}
           </h2>
-          <Rows>
+          <Sheet columns={SETTLED_COLS(t)}>
             {settled.map((m) => (
-              <Row
+              <Line
                 key={m.id}
                 to={`/matters/${m.id}`}
-                phase="inforce"
-                kind={t(`matter.direction.${m.direction}`)}
-                title={m.title}
-                note={<DateText iso={m.openedAt} />}
+                columns={SETTLED_COLS(t)}
+                cells={[
+                  m.title,
+                  <Mark tone={m.direction === 'restrict' ? 'text-breach' : 'text-settled'}>
+                    {t(`matter.direction.${m.direction}`)}
+                  </Mark>,
+                  <Figure>
+                    <DateText iso={m.openedAt} />
+                  </Figure>,
+                ]}
               />
             ))}
-          </Rows>
+          </Sheet>
         </div>
       )}
 

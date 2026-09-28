@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { governance, type QueueRow } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { ListPage } from '../components/shapes.js';
+import { Sheet, Line, Mark, Figure, type Column } from '../components/sheet.js';
 import { Nothing } from '../components/page.js';
 import { ErrorText, Loading } from '../components/ui.js';
 import { useStillThere } from '../lib/stillThere.js';
@@ -57,113 +58,79 @@ const TONE: Record<QueuePhase, string> = {
   checked: 'text-breach',
 };
 
+/*
+  On a phone: what it is, how long it has stood there, and one quiet line
+  saying what to do and whose it is. The stage is dropped there — the kind
+  is already the first two words of the act, and a fifth fact under a title
+  is the stack this was built to get rid of.
+*/
+const COLS = (t: (k: string) => string): readonly Column[] => [
+  { head: t('col.what'), width: 'minmax(0,2.4fr)', phone: 'lead' },
+  { head: t('col.stage'), width: '8rem', phone: 'hide' },
+  { head: t('col.next'), width: 'minmax(0,1.9fr)', phone: 'under' },
+  { head: t('col.with'), width: '8rem', phone: 'under' },
+  { head: t('col.days'), width: '4.5rem', end: true, phone: 'trailing' },
+];
+
+/**
+ * One waiting thing, as a line of a table.
+ *
+ * The four facts were stacked: kind, then title, then the act and its owner
+ * underneath, with the age in a column of its own to the left — a hundred
+ * pixels a row and nine to a screen. They are five columns now, and the
+ * thing a member came to do is that everything under WITH can be read in one
+ * sweep, and everything under DAYS compared without reading a word.
+ */
 function Row({ row, n }: { row: QueueRow; n?: number }) {
   const { t } = useI18n();
 
   return (
-    <li>
-      <Link
-        to={row.to}
-        className={
-          /* One surface, a line between rows — the same as every other
-             list in the application. It was a card of its own, lifting
-             on hover, with eight pixels of page showing underneath. */
-          'flex gap-5 px-5 py-4 transition-colors ' +
-          (row.overdue ? 'bg-breachtint' : 'hover:bg-ink/[0.02]')
-        }
-      >
-        {/*
-          The key that opens this row, on the row.
-
-          The first nine only: past that a member is scanning rather than
-          reaching, and a tenth cap would be decoration. Hidden on a phone,
-          where there is no key to press.
-        */}
-        {n !== undefined && n < 10 && (
-          <kbd
-            aria-hidden="true"
-            className="hidden h-5 w-5 shrink-0 place-items-center self-start rounded border border-line font-mono text-label font-medium text-faint lg:grid"
-          >
-            {n}
-          </kbd>
-        )}
-
-        {/*
-          How long it has stood here, first and largest. It is the one figure
-          on the row that is a fact about now rather than about the record,
-          and it is what a person scans for.
-        */}
-        {/*
-          A column on a desk, one line on a phone.
-
-          The column is 4.5rem wide — a quarter of a 375-pixel screen given
-          to one number, on every row, which pushed the sentence a member
-          actually reads into the remaining three quarters and broke it over
-          four lines. On a desk there is width to spare and the figure is
-          what the eye scans down; on a phone it goes where the other facts
-          about the row are.
-        */}
-        <div className="hidden w-[4.5rem] shrink-0 text-end sm:block">
-          <div
-            className={
-              'font-mono text-title leading-none tabular-nums ' +
-              (row.overdue ? 'text-breach' : '')
-            }
-          >
-            {row.days}
-          </div>
-          <div className="mt-1 text-label uppercase tracking-label text-muted">
-            {t('needs.daysHere')}
-          </div>
-        </div>
-
-        <div className="min-w-0 flex-1">
-          <div className="mb-1 flex flex-wrap items-center gap-x-2.5 gap-y-1">
-            <span
-              className={
-                'text-label font-bold uppercase tracking-caps ' + TONE[row.phase]
-              }
-            >
-              {t(`needs.kind.${row.kind}`)}
-            </span>
-            <span
-              className={
-                'font-mono text-label tabular-nums sm:hidden ' +
-                (row.overdue ? 'text-breach' : 'text-muted')
-              }
-            >
-              {row.days} {t('needs.daysHere')}
-            </span>
-            {row.overdue && (
-              <span className="text-label font-bold uppercase tracking-caps text-breach">
-                {t('needs.overdue')}
-              </span>
-            )}
-          </div>
-
-          <div className="font-display text-lead leading-snug">{row.title}</div>
-
+    <Line
+      to={row.to}
+      columns={COLS(t)}
+      tone={row.overdue ? 'breach' : 'plain'}
+      cells={[
+        <span className="flex min-w-0 items-baseline gap-2">
           {/*
-            The act and whose it is, on one line. The commonest way anything
-            here stalls is that every side believes it is with the other, so
-            the owner is never left to be inferred.
+            The key that opens this line, on the line.
+
+            The first nine only: past that a member is scanning rather than
+            reaching, and a tenth cap would be decoration. Hidden on a phone,
+            where there is no key to press.
           */}
-          <div className="mt-1.5 flex flex-wrap items-baseline gap-x-2 text-ui">
-            {row.next ? (
-              <>
-                <span className="text-paper">{row.next}</span>
-                <span className="text-muted">
-                  ·{' '}
-                  {row.whoName ?? (row.whose ? t(`passage.whose.${row.whose}`) : '')}
-                </span>
-              </>
-            ) : (
-              <span className="text-muted">{t('needs.nothingToDo')}</span>
-            )}
-          </div>
-        </div>
-      </Link>
-    </li>
+          {n !== undefined && n < 10 && (
+            <kbd
+              aria-hidden="true"
+              className="hidden h-5 w-5 shrink-0 place-items-center rounded border border-line font-mono text-label font-medium text-faint lg:grid"
+            >
+              {n}
+            </kbd>
+          )}
+          <span className="truncate">{row.title}</span>
+        </span>,
+        <span className="block truncate">
+          <Mark tone={TONE[row.phase]}>{t(`needs.kind.${row.kind}`)}</Mark>
+          {row.overdue && (
+            <span className="mt-0.5 block text-label font-bold uppercase tracking-caps text-breach">
+              {t('needs.overdue')}
+            </span>
+          )}
+        </span>,
+        /*
+          The act, and beside it in its own column whose it is. The commonest
+          way anything here stalls is that every side believes it is with the
+          other, so the owner is never left to be inferred — and in a column
+          it can be read down the list rather than one line at a time.
+        */
+        <span className="block truncate text-ui text-paper">
+          {row.next ?? <span className="text-muted">{t('needs.nothingToDo')}</span>}
+        </span>,
+        <span className="block truncate text-ui text-muted">
+          {row.whoName ?? (row.whose ? t(`passage.whose.${row.whose}`) : '')}
+        </span>,
+        <Figure tone={row.overdue ? 'text-breach' : 'text-muted'}>{row.days}</Figure>,
+      ]}
+    />
   );
 }
 
@@ -427,11 +394,11 @@ export default function Queue() {
           )}
         </Nothing>
       ) : (
-        <ul className="overflow-hidden rounded-card bg-raised shadow-ring [&>li+li]:border-t [&>li+li]:border-line">
+        <Sheet columns={COLS(t)}>
           {shown.map((r, i) => (
             <Row key={r.kind + r.id} row={r} n={i + 1} />
           ))}
-        </ul>
+        </Sheet>
       )}
 
       {/*

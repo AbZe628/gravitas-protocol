@@ -129,9 +129,28 @@ export function PageHead({
    * there is room. Nothing was removed — the sentence is not optional
    * and it is still here.
    */
+  /*
+    On a phone the head band is most of the screen, and it was.
+
+    Measured on the register at 390×844: the kicker, the title, three marks,
+    a two-line sentence and the act came to about 470 pixels — and under the
+    two bars above it, the first holding began at roughly 790 of 844. A
+    member saw the name of the screen and nothing on it.
+
+    Two things come off there and only there. The **breadcrumb**, because a
+    phone already says where you are twice over — the tab lit at the foot
+    and the screen named in the row above — and a third saying is furniture.
+    The **sentence**, because it explains the screen to somebody opening it
+    for the first time, every time, forever; it is still on the desk, where
+    there is room for it beside the title rather than under it.
+
+    The title, the live marks and the act stay. Those are the screen.
+  */
   return (
     <header className="mb-6">
-      <Breadcrumb phase={phase} tail={tail} />
+      <div className="hidden sm:block">
+        <Breadcrumb phase={phase} tail={tail} />
+      </div>
 
       <div className="flex flex-wrap items-start justify-between gap-x-8 gap-y-3">
         <div className="min-w-0">
@@ -153,7 +172,9 @@ export function PageHead({
           {live && <div className="mt-2 flex flex-wrap items-center gap-2.5">{live}</div>}
           {/* A record has no standing sentence: its title and its state say what it is. */}
           {says && (
-            <p className="mt-2 max-w-[68ch] text-ui leading-relaxed text-muted">{says}</p>
+            <p className="mt-2 hidden max-w-[68ch] text-ui leading-relaxed text-muted sm:block">
+              {says}
+            </p>
           )}
         </div>
         {act && <div className="shrink-0">{act}</div>}

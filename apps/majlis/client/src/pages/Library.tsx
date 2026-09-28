@@ -6,9 +6,10 @@ import StructureDetail from './StructureDetail.js';
 import { oversight, type HeldStructure, type Library as LibraryData } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { Division, Nothing } from '../components/page.js';
-import { ListPage, Row, Rows } from '../components/shapes.js';
+import { ListPage } from '../components/shapes.js';
+import { Sheet, Line, Mark, Figure, type Column } from '../components/sheet.js';
 import { ErrorText, Loading } from '../components/ui.js';
-import { Quiet, State, type Tone } from '../components/kit.js';
+import { Quiet, type Tone } from '../components/kit.js';
 import { useStillThere } from '../lib/stillThere.js';
 
 /**
@@ -52,6 +53,14 @@ function toneFor(held: HeldStructure): Tone {
 
 /** Untouched first: it is the state most shapes are in and the one worth acting on. */
 const ORDER: HeldStructure['source'][] = ['draft', 'amended', 'adopted'];
+
+const COLS = (t: (k: string) => string): readonly Column[] => [
+  { head: t('col.shape'), width: 'minmax(0,2fr)', phone: 'lead' },
+  { head: t('col.family'), width: '10rem', phone: 'under' },
+  { head: t('col.conditions'), width: '6rem', end: true, phone: 'trailing' },
+  { head: t('col.basis'), width: 'minmax(0,1.6fr)', phone: 'hide' },
+  { head: t('col.standing'), width: '10rem', phone: 'under' },
+];
 
 export default function Library() {
   /**
@@ -150,41 +159,33 @@ export default function Library() {
           key={g.source}
           heading={`${t(g.source === 'draft' ? 'adopt.draft' : `adopt.${g.source}`)} · ${g.items.length}`}
         >
-          <Rows>
+          <Sheet columns={COLS(t)}>
             {g.items.map((h) => (
-              <Row
+              <Line
                 key={h.structure.id}
                 onPress={() => setOpen({ id: h.structure.id, name: h.structure.name })}
-                phase="inforce"
-                kind={t(`family.${h.structure.family}`)}
-                title={h.structure.name}
-                /*
-                  The basis only where the board has stated one. Seventeen
-                  untouched shapes each carrying "this board has not said what
-                  these rest on" is the page telling a reader seventeen times
-                  that it has nothing for them — which is what the count at the
-                  top already said once.
-                */
-                note={
-                  <>
-                    {h.adoption?.basis ? (
-                      <>
-                        {h.adoption.basis}
-                        <span className="mx-2 opacity-40">·</span>
-                      </>
-                    ) : null}
-                    <span className="tabular-nums">{h.structure.conditions.length}</span>{' '}
-                    {t('adopt.conditions')}
-                  </>
-                }
-                standing={
-                  <State tone={toneFor(h)}>
+                columns={COLS(t)}
+                cells={[
+                  h.structure.name,
+                  <Mark>{t(`family.${h.structure.family}`)}</Mark>,
+                  <Figure>{h.structure.conditions.length}</Figure>,
+                  /*
+                    The basis only where the board has stated one. Seventeen
+                    untouched shapes each carrying "this board has not said
+                    what these rest on" is the screen telling a reader
+                    seventeen times that it has nothing for them, which is
+                    what the count at the top already said once.
+                  */
+                  <span className="block truncate text-note text-muted">
+                    {h.adoption?.basis ?? ''}
+                  </span>,
+                  <Mark tone={toneFor(h) === 'settled' ? 'text-settled' : 'text-muted'}>
                     {t(h.declined ? 'adopt.declined' : `adopt.${h.source}`)}
-                  </State>
-                }
+                  </Mark>,
+                ]}
               />
             ))}
-          </Rows>
+          </Sheet>
         </Division>
       ))}
       {/*

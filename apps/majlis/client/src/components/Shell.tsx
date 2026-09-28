@@ -955,28 +955,18 @@ function Frame({ children }: { children: React.ReactNode }) {
         </nav>
 
           {/*
-            The language, as one control rather than three.
+            The language is not here any more.
 
-            Three buttons beside the group row took 190 of 375 pixels —
-            half the row, permanently, for a choice a member makes once —
-            and the group's own destinations were clipped to make space:
-            "The record" read "The reo". A list that opens is what a
-            phone uses for a choice of three, it is 70 pixels wide, and
-            the reader who cannot read the screen still finds it in the
-            same place on every page.
+            It was three buttons, then one list, and the list still took a
+            fifth of the row on every screen a member will ever open — for a
+            choice made once, on the first day, and then never again. It is
+            on the settings screen, which is where a phone keeps a thing you
+            set once, and the member's own mark in the masthead opens it.
+
+            Set from nowhere else, it is still the first control a reader who
+            cannot read the screen needs. That is the trade: two presses on
+            the first day against a fifth of a row for the rest of the years.
           */}
-          <select
-            aria-label={t('shell.language')}
-            value={lang}
-            onChange={(e) => setLang(e.target.value as (typeof LANGS)[number]['code'])}
-            className="h-9 shrink-0 rounded-xl bg-paper/[0.045] px-2.5 text-note text-paper shadow-hairline outline-none"
-          >
-            {LANGS.map((l) => (
-              <option key={l.code} value={l.code} className="text-ink">
-                {l.label}
-              </option>
-            ))}
-          </select>
         </div>
 
         {/* ── the wide bar: where you are, who you are ────────────────── */}

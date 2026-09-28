@@ -5,7 +5,7 @@ import { useI18n } from '../lib/i18n.js';
 import { ErrorText, Loading } from '../components/ui.js';
 import { State, type Tone } from '../components/kit.js';
 import { Division, Gaps, Nothing, PageHead } from '../components/page.js';
-import { Row, Rows } from '../components/shapes.js';
+import { Sheet, Line, Mark, type Column } from '../components/sheet.js';
 import { Button } from '../components/Button';
 import { mayDeliberate, useIdentity } from '../lib/identity.js';
 import EnterAHolding from '../components/EnterAHolding.js';
@@ -63,26 +63,35 @@ function toneFor(status: AssetStatus): Tone {
  * The identifiers sit under the name because that is what a desk matches
  * against when it is looking for one particular instrument.
  */
+const COLS = (t: (k: string) => string): readonly Column[] => [
+  { head: t('col.holding'), width: 'minmax(0,2.2fr)', phone: 'lead' },
+  { head: t('col.kind'), width: '9rem', phone: 'under' },
+  { head: t('col.identifier'), width: 'minmax(0,1.4fr)', phone: 'hide' },
+  { head: t('col.standing'), width: '10rem', phone: 'under' },
+];
+
 function holdingRow(s: AssetStanding, t: (k: string) => string) {
   return (
-    <Row
+    <Line
       key={s.asset.id}
       to={`/register/${s.asset.id}`}
-      phase="inforce"
-      kind={t(`reg.kind.${s.asset.kind}`)}
-      title={s.asset.name}
-      note={
-        <>
-          {s.asset.identifiers.map((id, i) => (
-            <span key={i} className="me-3 break-all font-mono text-note">
-              {id.value}
-              {id.network ? <span className="opacity-60"> · {id.network}</span> : null}
-            </span>
-          ))}
-          <span className="block">{s.note}</span>
-        </>
-      }
-      standing={<State tone={toneFor(s.status)}>{t(`reg.status.${s.status}`)}</State>}
+      columns={COLS(t)}
+      cells={[
+        s.asset.name,
+        <Mark>{t(`reg.kind.${s.asset.kind}`)}</Mark>,
+        /*
+          The first identifier, not all of them. A holding can carry three,
+          and a column that grows with the record is a column that stops
+          being one. The rest are on the holding's own screen, which is
+          where a desk that is matching one goes anyway.
+        */
+        <span className="block truncate font-mono text-note text-muted">
+          {s.asset.identifiers[0]?.value ?? '—'}
+        </span>,
+        <Mark tone={toneFor(s.status) === 'breach' ? 'text-breach' : 'text-settled'}>
+          {t(`reg.status.${s.status}`)}
+        </Mark>,
+      ]}
     />
   );
 }
@@ -204,7 +213,7 @@ export default function Register() {
         <>
           {grouped.map((g) => (
             <Division key={g.band} heading={`${t(`reg.status.${g.band}`)} · ${g.items.length}`}>
-              <Rows>{g.items.map((s) => holdingRow(s, t))}</Rows>
+              <Sheet columns={COLS(t)}>{g.items.map((s) => holdingRow(s, t))}</Sheet>
             </Division>
           ))}
 

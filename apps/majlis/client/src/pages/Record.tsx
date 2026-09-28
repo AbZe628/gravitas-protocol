@@ -5,9 +5,16 @@ import { api, oversight, type Health, type MatterSummary } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { DateText } from '../components/ui.js';
 import { DocumentLink, YearPicker } from '../components/Documents.js';
-import { Row, Rows } from '../components/shapes.js';
-import { Quiet, State } from '../components/kit.js';
+import { Sheet, Line, Mark, Figure, type Column } from '../components/sheet.js';
+import { Quiet } from '../components/kit.js';
 import { Button } from '../components/Button';
+
+const DECIDED_COLS = (t: (k: string) => string): readonly Column[] => [
+  { head: t('col.matter'), width: 'minmax(0,3fr)', phone: 'lead' },
+  { head: t('col.direction'), width: '7rem', phone: 'under' },
+  { head: t('col.stage'), width: '8rem', phone: 'under' },
+  { head: t('col.opened'), width: '6.5rem', end: true, phone: 'trailing' },
+];
 
 /** Everything this board has settled, newest first. */
 const SETTLED = ['in_force', 'rejected', 'lapsed', 'withdrawn'];
@@ -46,28 +53,30 @@ function Decided({ matters, lost }: { matters: MatterSummary[] | null; lost: boo
       ) : settled.length === 0 ? (
         <Nothing>{t('decided.none')}</Nothing>
       ) : (
-        <Rows>
+        /*
+          The two facts a reader scans for stand in their own columns now:
+          which way it went, and what became of it. Stacked under the title
+          they had to be read one record at a time.
+        */
+        <Sheet columns={DECIDED_COLS(t)}>
           {settled.map((m) => (
-            /*
-              The two facts a reader scans for, before the title: which way it
-              went, and what became of it. A list of titles with the outcome
-              buried in the sentence is a list nobody can read at a glance.
-            */
-            <Row
+            <Line
               key={m.id}
               to={`/matters/${m.id}`}
-              phase="inforce"
-              kind={t(`matter.direction.${m.direction}`)}
-              title={m.title}
-              note={<span className="font-mono text-note">{m.openedAt.slice(0, 10)}</span>}
-              standing={
-                <State tone={m.status === 'in_force' ? 'settled' : 'plain'}>
+              columns={DECIDED_COLS(t)}
+              cells={[
+                m.title,
+                <Mark tone={m.direction === 'restrict' ? 'text-breach' : 'text-settled'}>
+                  {t(`matter.direction.${m.direction}`)}
+                </Mark>,
+                <Mark tone={m.status === 'in_force' ? 'text-settled' : 'text-muted'}>
                   {t(`matter.status.${m.status}`)}
-                </State>
-              }
+                </Mark>,
+                <Figure>{m.openedAt.slice(0, 10)}</Figure>,
+              ]}
             />
           ))}
-        </Rows>
+        </Sheet>
       )}
     </div>
   );

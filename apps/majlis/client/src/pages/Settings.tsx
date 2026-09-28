@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { api, oversight, type Health, type Settings as SettingsData } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
+import { LANGS } from '../locales/index.js';
+import { Button } from '../components/Button';
 import { Gaps, PageHead } from '../components/page.js';
 import YourAccount from '../components/YourAccount.js';
 import WhoYouAreOnPaper from '../components/WhoYouAreOnPaper.js';
@@ -30,7 +32,7 @@ import TheCommittees from '../components/TheCommittees.js';
  */
 
 export default function Settings() {
-  const { t } = useI18n();
+  const { t, lang, setLang } = useI18n();
   const [data, setData] = useState<SettingsData | null>(null);
   const [health, setHealth] = useState<Health | null>(null);
   const [failed, setFailed] = useState(false);
@@ -54,6 +56,41 @@ export default function Settings() {
         title={data.boardName}
         says={t('set.intro')}
       />
+
+      {/*
+        The language, where a phone keeps what you set once.
+
+        It rode in the bar above every screen — three buttons, then a list,
+        always a fifth of the row — for a choice a member makes on the first
+        day. This is the screen their own mark in the masthead opens, and it
+        is first on it, because a reader who cannot read the rest of this
+        screen needs it before anything else here.
+      */}
+      <div className="mb-6 flex flex-wrap items-center gap-3">
+        <span className="text-ui text-sand">{t('shell.language')}</span>
+        <div
+          role="group"
+          aria-label={t('shell.language')}
+          className="flex shrink-0 gap-0.5 rounded-xl bg-paper/[0.045] p-[3px]"
+        >
+          {LANGS.map((l) => (
+            <Button
+              key={l.code}
+              type="button"
+              aria-pressed={lang === l.code}
+              onClick={() => setLang(l.code)}
+              className={
+                'inline-flex min-h-[44px] items-center rounded-lg px-4 py-1.5 text-ui transition-all lg:min-h-0 ' +
+                (lang === l.code
+                  ? 'bg-raised font-semibold text-paper shadow-hairline'
+                  : 'text-muted hover:text-sand')
+              }
+            >
+              {l.label}
+            </Button>
+          ))}
+        </div>
+      </div>
 
       {/*
         Who you are on paper, above the password.
