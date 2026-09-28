@@ -23,7 +23,7 @@ import { rowKey, useNews } from '../lib/news.js';
  * still needing them is still in the queue, where it belongs.
  */
 export default function Bell() {
-  const { t } = useI18n();
+  const { t, say } = useI18n();
   const { fresh, looked } = useNews();
   const [open, setOpen] = useState(false);
 
@@ -83,7 +83,7 @@ export default function Bell() {
                         {row.title}
                       </span>
                       {row.next && (
-                        <span className="mt-0.5 block text-note text-muted">{row.next}</span>
+                        <span className="mt-0.5 block text-note text-muted">{say(row.next)}</span>
                       )}
                     </Link>
                   </li>

@@ -63,25 +63,50 @@ export type StepState = 'done' | 'open' | 'ahead' | 'skipped' | 'not_applicable'
  */
 export type Whose = 'board' | 'signatory' | 'liaison' | 'institution' | 'software' | 'clock';
 
+/**
+ * A sentence this file wants said, and what to put in its gaps.
+ *
+ * ── why these are not words ───────────────────────────────────────────────
+ *
+ * They were. Every act, every reason and every sentence about what stands in
+ * the way was written here in English and rendered exactly as written — about
+ * sixty-three of them, and the queue's own acts besides. The application is in
+ * three languages, and this is the one text that tells a member what to do: so
+ * the chrome was in Arabic and the work was in English, on the screen a board
+ * opens first. Nobody noticed because everybody testing it reads English.
+ *
+ * The server says **which** sentence and **with what figures**. What the
+ * sentence is in is the reader's business and the interface's.
+ */
+export interface Say {
+  /** The i18n key, looked up on the other side. */
+  key: string;
+  /** Substituted into `{name}` gaps, where a sentence counts something. */
+  vars?: Record<string, string | number>;
+}
+
+export const say = (key: string, vars?: Record<string, string | number>): Say =>
+  vars ? { key, vars } : { key };
+
 export interface Step {
   key: string;
-  /** The act, in the words the interface shows. */
-  act: string;
+  /** The act, as a sentence the interface says in the reader's language. */
+  act: Say;
   whose: Whose;
   state: StepState;
   /** When it was done, where that can be said. Null otherwise. */
   at: string | null;
   /**
-   * What is in the way, in plain words, or null.
+   * What is in the way, or null.
    *
    * Present on an open step whether or not the system would refuse — the
    * distinction is carried by `enforced`, not by hiding one of them.
    */
-  standing: string | null;
+  standing: Say | null;
   /** Whether the system actually refuses to go on without this. */
   enforced: boolean;
   /** What the step is for. Shown where a scholar asks why it exists. */
-  why: string;
+  why: Say;
 }
 
 export interface Passage {
@@ -98,9 +123,9 @@ export interface Passage {
    */
   next: Step | null;
   /** How long the question has been here, and on whom it now waits. */
-  waiting: { days: number; since: string; on: Whose; note: string } | null;
+  waiting: { days: number; since: string; on: Whose; note: Say } | null;
   /** Said where the matter is finished, in place of a next act. */
-  settled: string | null;
+  settled: Say | null;
 }
 
 const DAY = 86_400_000;
@@ -108,26 +133,56 @@ const DAY = 86_400_000;
 const daysSince = (iso: string, now: string): number =>
   Math.max(0, Math.floor((Date.parse(now) - Date.parse(iso)) / DAY));
 
+/**
+ * The act and the reason follow from the step's own name, always.
+ *
+ * `conditions` is `step.conditions.act` and `step.conditions.why`, and there
+ * is no way to give a step an act belonging to another. Written out by hand
+ * the pair drifted: the same act appeared with two wordings on two screens,
+ * which is how a board ends up asking which of them the software meant.
+ */
+const actOf = (key: string): Say => say(`step.${key}.act`);
+const whyOf = (key: string): Say => say(`step.${key}.why`);
+
 /** A step that is done, with the moment it became so where that is knowable. */
-const done = (key: string, act: string, whose: Whose, why: string, at: string | null = null): Step => ({
+const done = (key: string, whose: Whose, at: string | null = null): Step => ({
   key,
-  act,
+  act: actOf(key),
   whose,
   state: 'done',
   at,
   standing: null,
   enforced: false,
-  why,
+  why: whyOf(key),
 });
 
 const open = (
   key: string,
-  act: string,
   whose: Whose,
-  why: string,
-  standing: string,
+  standing: Say,
   enforced = false,
-): Step => ({ key, act, whose, state: 'open', at: null, standing, enforced, why });
+): Step => ({
+  key,
+  act: actOf(key),
+  whose,
+  state: 'open',
+  at: null,
+  standing,
+  enforced,
+  why: whyOf(key),
+});
+
+/** A step whose turn has not come, with the one sentence saying what it waits on. */
+const ahead = (key: string, whose: Whose, standing: Say): Step => ({
+  key,
+  act: actOf(key),
+  whose,
+  state: 'ahead',
+  at: null,
+  standing,
+  enforced: false,
+  why: whyOf(key),
+});
 
 /**
  * Putting the question in shape.
@@ -141,50 +196,26 @@ function shapingOf(matter: Matter, structure: Structure | null): Step[] {
 
   steps.push(
     matter.proposal.trim()
-      ? done('asked', 'The question, as it was put', 'institution', 'What the board was actually asked. Everything else answers this.', matter.openedAt)
-      : open(
-          'asked',
-          'The question, as it was put',
-          'institution',
-          'What the board was actually asked. Everything else answers this.',
-          'No question has been written down. A matter with no question is a title.',
-        ),
+      ? done('asked', 'institution', matter.openedAt)
+      : open('asked', 'institution', say('step.asked.standing')),
   );
 
   steps.push(
     matter.mechanism.trim()
-      ? done('mechanism', 'What actually happens', 'liaison', 'The transaction as it occurs, step by step — before any judgement of it. A board ruling on a description rather than on the thing is the failure this exists to prevent.')
-      : open(
-          'mechanism',
-          'What actually happens',
-          'liaison',
-          'The transaction as it occurs, step by step — before any judgement of it. A board ruling on a description rather than on the thing is the failure this exists to prevent.',
-          'The mechanism has not been written down. This is the step a technical liaison exists for.',
-        ),
+      ? done('mechanism', 'liaison')
+      : open('mechanism', 'liaison', say('step.mechanism.standing')),
   );
 
   steps.push(
     matter.notDecided.length > 0
-      ? done('not_decided', 'What is not being decided', 'board', 'Isolating the point at issue, so a later reader cannot take the ruling further than the board took it.')
-      : open(
-          'not_decided',
-          'What is not being decided',
-          'board',
-          'Isolating the point at issue, so a later reader cannot take the ruling further than the board took it.',
-          'Nothing has been set outside the question. A ruling with no stated limits gets read as covering whatever resembles it.',
-        ),
+      ? done('not_decided', 'board')
+      : open('not_decided', 'board', say('step.not_decided.standing')),
   );
 
   steps.push(
     matter.structureId
-      ? done('shape', 'What it is judged against', 'board', 'The contract shape, and with it the conditions this board holds such a contract to.')
-      : open(
-          'shape',
-          'What it is judged against',
-          'board',
-          'The contract shape, and with it the conditions this board holds such a contract to.',
-          'No contract shape has been chosen, so no checklist of conditions applies. Choosing one is the board’s characterisation of the arrangement.',
-        ),
+      ? done('shape', 'board')
+      : open('shape', 'board', say('step.shape.standing')),
   );
 
   // Conditions only exist once a shape has been chosen, so this is genuinely
@@ -192,13 +223,13 @@ function shapingOf(matter: Matter, structure: Structure | null): Step[] {
   if (!structure) {
     steps.push({
       key: 'conditions',
-      act: 'The conditions, answered',
+      act: actOf('conditions'),
       whose: 'board',
       state: 'not_applicable',
       at: null,
-      standing: 'Follows from the shape. Nothing to answer until one is chosen.',
+      standing: say('step.conditions.noShape'),
       enforced: false,
-      why: 'Each condition is a question the board answers about this arrangement, in its own words.',
+      why: whyOf('conditions'),
     });
   } else {
     const total = structure.conditions.length;
@@ -215,13 +246,11 @@ function shapingOf(matter: Matter, structure: Structure | null): Step[] {
     ).size;
     steps.push(
       answered >= total && total > 0
-        ? done('conditions', 'The conditions, answered', 'board', 'Each condition is a question the board answers about this arrangement, in its own words.')
+        ? done('conditions', 'board')
         : open(
             'conditions',
-            'The conditions, answered',
             'board',
-            'Each condition is a question the board answers about this arrangement, in its own words.',
-            `${total - answered} of ${total} conditions are unanswered. A board may also rule against a condition it considers wrongly drawn — that is an answer too.`,
+            say('step.conditions.standing', { left: total - answered, total }),
           ),
     );
   }
@@ -229,26 +258,14 @@ function shapingOf(matter: Matter, structure: Structure | null): Step[] {
   const standingSources = matter.sources.filter((s) => !s.withdrawnAt);
   steps.push(
     standingSources.length > 0
-      ? done('rests_on', 'What it rests on', 'board', 'The standard, the document, the code, the chain — attributed, so the reasoning can be checked rather than taken.')
-      : open(
-          'rests_on',
-          'What it rests on',
-          'board',
-          'The standard, the document, the code, the chain — attributed, so the reasoning can be checked rather than taken.',
-          'Nothing has been cited. A ruling whose basis is not on the record cannot be checked by anyone who was not in the room.',
-        ),
+      ? done('rests_on', 'board')
+      : open('rests_on', 'board', say('step.rests_on.standing')),
   );
 
   steps.push(
     matter.proposedRule.parameters.length > 0
-      ? done('terms', 'The operative terms', 'board', 'A key, a value, a unit, and what it does. This is the part a system can carry out and the part an auditor tests against.')
-      : open(
-          'terms',
-          'The operative terms',
-          'board',
-          'A key, a value, a unit, and what it does. This is the part a system can carry out and the part an auditor tests against.',
-          'No terms have been stated, so there is nothing for the ruling to operate on.',
-        ),
+      ? done('terms', 'board')
+      : open('terms', 'board', say('step.terms.standing')),
   );
 
   return steps;
@@ -261,7 +278,19 @@ function shapingOf(matter: Matter, structure: Structure | null): Step[] {
  * has not come is `ahead` rather than open — showing it as outstanding would
  * put four things in front of a scholar when only one of them is theirs to do.
  */
-function decidingOf(board: Board, matter: Matter, now: string): Step[] {
+function decidingOf(
+  board: Board,
+  matter: Matter,
+  now: string,
+  /**
+   * Whether every condition of the shape has a finding that stands.
+   *
+   * Passed in rather than worked out again, because `shapingOf` above has
+   * already counted them and two counts of one thing is how they come to
+   * disagree.
+   */
+  conditionsSettled: boolean,
+): Step[] {
   const steps: Step[] = [];
   const settled = ['in_force', 'rejected', 'lapsed', 'withdrawn'].includes(matter.status);
 
@@ -269,34 +298,46 @@ function decidingOf(board: Board, matter: Matter, now: string): Step[] {
   const spoken = matter.deliberation.length > 0;
   steps.push(
     spoken
-      ? done('deliberation', 'Say something on it', 'board', 'The record of what the board thought, not only what it concluded. A ruling with no reasoning behind it teaches nobody anything the next time.', matter.deliberation[0]?.at ?? null)
+      ? done('deliberation', 'board', matter.deliberation[0]?.at ?? null)
       : matter.status === 'draft'
-        ? { key: 'deliberation', act: 'Say something on it', whose: 'board', state: 'ahead', at: null, standing: 'Opens when the matter does.', enforced: false, why: 'The record of what the board thought, not only what it concluded.' }
+        ? ahead('deliberation', 'board', say('step.deliberation.ahead'))
         : open(
             'deliberation',
-            'Say something on it',
             'board',
-            'The record of what the board thought, not only what it concluded. A ruling with no reasoning behind it teaches nobody anything the next time.',
-            'Nothing has been said on this matter yet. Voting opens after deliberation, not instead of it.',
+            say('step.deliberation.standing'),
             // The one thing the lifecycle actually refuses.
             true,
           ),
     );
 
-  // ── the vote opening, which freezes the terms ─────────────────────────
+  /*
+   * ── the vote opening, which freezes the terms ─────────────────────────
+   *
+   * And which the conditions come before.
+   *
+   * This step used to open the moment somebody had spoken, whatever state the
+   * shape was in — so a matter with four conditions unanswered told its
+   * signatory, in the largest words on the screen, to open the vote. Pressing
+   * it came back 400 `conditions_unanswered` from `routes/governance.ts`.
+   *
+   * That is the failure this file exists to prevent, in this file. Two places
+   * knew what came next and only one of them was consulted before the sentence
+   * was written. A spine that names an act the application will refuse is
+   * worse than no spine, because a member trusts it once and then stops.
+   *
+   * So the step waits, and with it waiting nothing in deciding is open — which
+   * sends `next` down to the shaping half and lands it on the conditions,
+   * which is the act that actually moves this matter.
+   */
   const voteOpened = ['voting', 'timelock', 'in_force', 'rejected', 'lapsed'].includes(matter.status);
   steps.push(
     voteOpened
-      ? done('open_vote', 'Open the vote', 'signatory', 'The terms stop moving here. Every position afterwards is recorded against the hash of exactly these terms, so whether a member approved these words is a comparison rather than a recollection.')
-      : spoken
-        ? open(
-            'open_vote',
-            'Open the vote',
-            'signatory',
-            'The terms stop moving here. Every position afterwards is recorded against the hash of exactly these terms, so whether a member approved these words is a comparison rather than a recollection.',
-            'The terms are still moving. Opening the vote fixes them.',
-          )
-        : { key: 'open_vote', act: 'Open the vote', whose: 'signatory', state: 'ahead', at: null, standing: 'Waits on deliberation.', enforced: false, why: 'The terms stop moving here.' },
+      ? done('open_vote', 'signatory')
+      : !spoken
+        ? ahead('open_vote', 'signatory', say('step.open_vote.ahead'))
+        : conditionsSettled
+          ? open('open_vote', 'signatory', say('step.open_vote.standing'))
+          : ahead('open_vote', 'signatory', say('step.open_vote.conditionsFirst')),
   );
 
   // ── positions ─────────────────────────────────────────────────────────
@@ -308,36 +349,36 @@ function decidingOf(board: Board, matter: Matter, now: string): Step[] {
     steps.push(
       open(
         'positions',
-        'Record your position, with your reasoning',
         'signatory',
-        'Compulsory, and the reasoning with it. A tally of names without reasons is a show of hands, and a board that cannot say why it decided cannot be followed the next time.',
         counted.outstanding.length > 0
-          ? `${recorded} recorded, ${counted.required} needed. Waiting on ${counted.outstanding.join(', ')}.`
-          : `${recorded} recorded, ${counted.required} needed.`,
+          ? say('step.positions.standingWaiting', {
+              recorded,
+              needed: counted.required,
+              who: counted.outstanding.join(', '),
+            })
+          : say('step.positions.standing', { recorded, needed: counted.required }),
       ),
     );
   } else if (voteOpened) {
-    steps.push(done('positions', 'Record your position, with your reasoning', 'signatory', 'Compulsory, and the reasoning with it.'));
+    steps.push(done('positions', 'signatory'));
   } else {
-    steps.push({ key: 'positions', act: 'Record your position, with your reasoning', whose: 'signatory', state: 'ahead', at: null, standing: 'Waits on the vote opening.', enforced: false, why: 'Compulsory, and the reasoning with it.' });
+    steps.push(ahead('positions', 'signatory', say('step.positions.ahead')));
   }
 
   // ── closing ───────────────────────────────────────────────────────────
   const closed = ['timelock', 'in_force', 'rejected', 'lapsed'].includes(matter.status);
   steps.push(
     closed
-      ? done('close', 'Close the vote', 'signatory', 'The threshold permits closing. It never closes itself — a decision that happened because a counter reached a number is a decision nobody took.', matter.settledAt ?? null)
+      ? done('close', 'signatory', matter.settledAt ?? null)
       : matter.status === 'voting'
         ? open(
             'close',
-            'Close the vote',
             'signatory',
-            'The threshold permits closing. It never closes itself — a decision that happened because a counter reached a number is a decision nobody took.',
             counted.met
-              ? `The threshold of ${required} is met. Closing is still an act somebody takes.`
-              : `The threshold of ${required} is not met. ${counted.for} in favour so far.`,
+              ? say('step.close.standingMet', { required })
+              : say('step.close.standingShort', { required, inFavour: counted.for }),
           )
-        : { key: 'close', act: 'Close the vote', whose: 'signatory', state: 'ahead', at: null, standing: 'Waits on the positions.', enforced: false, why: 'It never closes itself.' },
+        : ahead('close', 'signatory', say('step.close.ahead')),
   );
 
   // ── the delay ─────────────────────────────────────────────────────────
@@ -346,67 +387,46 @@ function decidingOf(board: Board, matter: Matter, now: string): Step[] {
       matter.status === 'timelock'
         ? open(
             'timelock',
-            'The delay before it takes effect',
             'clock',
-            'A permission takes effect after a delay, during which a member who has seen something can object. A restriction does not wait — waiting is the greater risk there.',
             matter.timelockEndsAt
-              ? `Runs until ${matter.timelockEndsAt}. Any member may object during it.`
-              : 'Running.',
+              ? say('step.timelock.standingUntil', { until: matter.timelockEndsAt })
+              : say('step.timelock.standingRunning'),
           )
         : closed
-          ? done('timelock', 'The delay before it takes effect', 'clock', 'A permission takes effect after a delay, during which a member who has seen something can object.', matter.timelockEndsAt)
-          : { key: 'timelock', act: 'The delay before it takes effect', whose: 'clock', state: 'ahead', at: null, standing: 'Begins when the vote closes.', enforced: false, why: 'A permission takes effect after a delay.' },
+          ? done('timelock', 'clock', matter.timelockEndsAt)
+          : ahead('timelock', 'clock', say('step.timelock.ahead')),
     );
   } else {
     steps.push({
       key: 'timelock',
-      act: 'The delay before it takes effect',
+      act: actOf('timelock'),
       whose: 'clock',
       state: 'not_applicable',
       at: null,
-      standing: 'A restriction takes effect at once and is ratified afterwards. Waiting is the greater risk.',
+      standing: say('step.timelock.restricting'),
       enforced: false,
-      why: 'The asymmetry between permitting and restricting.',
+      why: whyOf('timelock'),
     });
   }
 
   // ── the document ──────────────────────────────────────────────────────
   steps.push(
     matter.status === 'in_force'
-      ? done('fatwa', 'The ruling, written up', 'software', 'The ruling, its conditions, how it is implemented, what it rests on, who signed and who disagreed — assembled and ready to send. This is the moment the institution stops waiting.', matter.inForceAt)
+      ? done('fatwa', 'software', matter.inForceAt)
       : settled
-        ? {
-            key: 'fatwa',
-            act: 'The ruling, written up',
-            whose: 'software',
-            state: 'done',
-            at: matter.settledAt ?? null,
-            standing: null,
-            enforced: false,
-            why: 'What the board decided, assembled.',
-          }
-        : {
-            key: 'fatwa',
-            act: 'The ruling, written up',
-            whose: 'software',
-            state: 'ahead',
-            at: null,
-            standing:
-              'Produced when the board has decided, and not before. A page that looks final for an open question will be acted on.',
-            enforced: false,
-            why: 'This is the moment the institution stops waiting.',
-          },
+        ? done('fatwa', 'software', matter.settledAt ?? null)
+        : ahead('fatwa', 'software', say('step.fatwa.ahead')),
   );
 
   void now;
   return steps;
 }
 
-const SETTLED: Record<string, string> = {
-  in_force: 'This ruling is in force. What remains is the review it is held to.',
-  rejected: 'The board refused this. The reasoning is on the record and stands as precedent.',
-  lapsed: 'This lapsed without being ratified inside the window, and no longer stands.',
-  withdrawn: 'This was withdrawn before it was decided. Everything said on it remains readable.',
+const SETTLED: Record<string, Say> = {
+  in_force: say('passage.settled.in_force'),
+  rejected: say('passage.settled.rejected'),
+  lapsed: say('passage.settled.lapsed'),
+  withdrawn: say('passage.settled.withdrawn'),
 };
 
 /**
@@ -421,21 +441,6 @@ function waitingOn(matter: Matter, next: Step | null): Whose {
   return next?.whose ?? 'board';
 }
 
-/**
- * A settled matter has no outstanding acts.
- *
- * Found on the screen rather than in a test: an in-force ruling was showing
- * ,
- * which reads as a job for whoever is looking. Its moment has gone; nobody is
- * going to deliberate on a question that was decided in March.
- *
- * It is not simply hidden, because the fact underneath it is worth having: this
- * board brought a permission into force with nothing on the record behind it.
- * So the step is reported as **skipped** — the past tense of open — and says
- * plainly that it did not happen and the matter went ahead. A spine that
- * quietly tidied that away would be improving the record, which is the one
- * thing this application exists to make impossible.
- */
 /**
  * A settled matter has no outstanding acts.
  *
@@ -459,7 +464,7 @@ function asPast(step: Step): Step {
     state: 'skipped',
     // Never enforced in the past tense. Nothing is being refused any more.
     enforced: false,
-    standing: 'This was not done, and the matter was decided without it.',
+    standing: say('step.notDone'),
   };
 }
 
@@ -472,7 +477,19 @@ export function buildPassage(
   const settledNote = SETTLED[matter.status] ?? null;
 
   const shaping = shapingOf(matter, structure).map((s) => (settledNote ? asPast(s) : s));
-  const deciding = decidingOf(board, matter, now).map((s) => (settledNote ? asPast(s) : s));
+
+  /*
+   * Read off the shaping half rather than counted a second time. A step that
+   * is done, or that cannot apply because no shape was chosen, is not in the
+   * way of the vote; an open one is, and the route refuses on exactly that.
+   */
+  const conditions = shaping.find((s) => s.key === 'conditions');
+  const conditionsSettled =
+    conditions === undefined || conditions.state === 'done' || conditions.state === 'not_applicable';
+
+  const deciding = decidingOf(board, matter, now, conditionsSettled).map((s) =>
+    settledNote ? asPast(s) : s,
+  );
 
   /*
    * The next act, and deciding comes first.
@@ -501,10 +518,9 @@ export function buildPassage(
           days,
           since: arrived,
           on: waitingOn(matter, next),
-          note:
-            matter.arrivedAt
-              ? `${days} days since the institution asked.`
-              : `${days} days since this reached the board. The institution may have asked earlier.`,
+          note: matter.arrivedAt
+            ? say('passage.waiting.sinceAsked', { days })
+            : say('passage.waiting.sinceReached', { days }),
         },
     settled: settledNote,
   };

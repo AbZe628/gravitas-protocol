@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import request from 'supertest';
 import type { Express } from 'express';
 import { createApp } from '../src/app.js';
+import { words } from './words.js';
 import { MemoryStore } from '../src/store/index.js';
 import { hashPassword } from '../src/auth/members.js';
 import { structures } from '../src/data/structures.js';
@@ -1646,7 +1647,7 @@ describe('when the institution asked', () => {
       .set('Authorization', as('member-a'))
       .expect(200);
 
-    expect(passage.body.waiting.note).toContain('since the institution asked');
+    expect(words(passage.body.waiting.note)).toContain('since the institution asked');
     expect(passage.body.waiting.note).not.toContain('may have asked earlier');
   });
 
@@ -1662,7 +1663,7 @@ describe('when the institution asked', () => {
       .set('Authorization', as('member-a'))
       .expect(200);
 
-    expect(passage.body.waiting.note).toContain('may have asked earlier');
+    expect(words(passage.body.waiting.note)).toContain('may have asked earlier');
   });
 
   it('refuses a date that is not an instant', async () => {

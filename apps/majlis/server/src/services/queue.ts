@@ -1,6 +1,6 @@
-import type { Board, Incident, Matter, Rule, Submission } from '../types.js';
+import type { Board, Incident, Matter, Rule, Structure, Submission } from '../types.js';
 import { standingOf } from './submission.js';
-import { buildPassage, type Whose } from './passage.js';
+import { buildPassage, say, type Say, type Whose } from './passage.js';
 import { reviewsDue } from './review.js';
 import { overdue as undertakingOverdue, type Undertaking } from './undertaking.js';
 
@@ -64,7 +64,7 @@ export interface QueueRow {
    * The one act to do next, in the words the interface shows, or null where
    * the thing is waiting on a clock rather than on a person.
    */
-  next: string | null;
+  next: Say | null;
   /** Whose that act is. Null only where there is no act. */
   whose: Whose | null;
   /**
@@ -98,13 +98,13 @@ const SETTLED: readonly Matter['status'][] = ['in_force', 'withdrawn', 'rejected
  * board, and saying so is most of the value of this row: the commonest way a
  * breach stalls is that each side believes it is with the other.
  */
-const BREACH_NEXT: Record<Incident['stage'], { act: string; whose: Whose } | null> = {
-  reported: { act: 'Determine whether it is an actual non-compliance', whose: 'board' },
-  determined: { act: 'File a plan to put it right', whose: 'institution' },
-  plan_filed: { act: 'Endorse the plan, or send it back', whose: 'board' },
-  endorsed: { act: 'Put it to the Board of Directors', whose: 'institution' },
-  approved: { act: 'File it with the regulator', whose: 'institution' },
-  submitted: { act: 'Close it once purification is recorded', whose: 'board' },
+const BREACH_NEXT: Record<Incident['stage'], { act: Say; whose: Whose } | null> = {
+  reported: { act: say('snc.step.determine'), whose: 'board' },
+  determined: { act: say('snc.step.plan'), whose: 'institution' },
+  plan_filed: { act: say('snc.step.endorse'), whose: 'board' },
+  endorsed: { act: say('snc.step.directors'), whose: 'institution' },
+  approved: { act: say('snc.step.regulator'), whose: 'institution' },
+  submitted: { act: say('snc.step.close'), whose: 'board' },
   not_actual: null,
   closed: null,
 };
@@ -116,6 +116,19 @@ export interface QueueInput {
   rules: readonly Rule[];
   incidents: readonly Incident[];
   undertakings: readonly Undertaking[];
+  /**
+   * The shapes, so a matter's own one can be found.
+   *
+   * This row used to build the passage with no shape at all, on the reasoning
+   * that the shape only affects the shaping steps and the row shows the next
+   * act, which was the same either way. That stopped being true the moment the
+   * spine learned that the vote waits on the conditions: with no shape the
+   * conditions read as *not applicable*, nothing was in the way, and this
+   * screen told a signatory to open a vote while the matter's own screen told
+   * them to answer six conditions. The same function, the same matter, two
+   * sentences — which is the fault this file's own preamble is about.
+   */
+  structures: readonly Structure[];
   now: string;
 }
 
@@ -134,7 +147,7 @@ export function buildQueue(input: QueueInput): QueueRow[] {
       to: '/questions',
       title: s.subject,
       phase: 'asked',
-      next: 'Take it up as a matter, or say why not',
+      next: say('queue.next.question'),
       whose: 'board',
       days: daysSince(s.arrivedAt, now),
       overdue: false,
@@ -146,10 +159,10 @@ export function buildQueue(input: QueueInput): QueueRow[] {
     if (SETTLED.includes(m.status)) continue;
 
     /*
-     * The same function the matter's own screen uses, so the sentence a
-     * member reads in the queue is the sentence they read when they open it.
-     * A structure is not passed: the passage needs one only for the shaping
-     * steps, and the row shows the next act, which is the same either way.
+     * The same function the matter's own screen uses, with the same shape, so
+     * the sentence a member reads in the queue is the sentence they read when
+     * they open it. Both halves of that matter: the function alone was not
+     * enough, because it answers differently depending on what it is given.
      *
      * ── and one bad record does not take the screen down ─────────────────
      *
@@ -164,11 +177,14 @@ export function buildQueue(input: QueueInput): QueueRow[] {
      * is and how long it has waited, which is enough to find it and open it,
      * and the page it opens will say what is wrong in its own words.
      */
-    let next: string | null = null;
+    let next: Say | null = null;
     let whose: Whose | null = null;
     let days = daysSince(m.openedAt, now);
     try {
-      const passage = buildPassage(board, m, null, now);
+      const shape = m.structureId
+        ? (input.structures.find((s) => s.id === m.structureId) ?? null)
+        : null;
+      const passage = buildPassage(board, m, shape, now);
       next = passage.next?.act ?? null;
       whose = passage.next?.whose ?? null;
       days = passage.waiting?.days ?? days;
@@ -206,7 +222,7 @@ export function buildQueue(input: QueueInput): QueueRow[] {
       to: `/undertakings#${u.id}`,
       title: u.what,
       phase: 'deciding',
-      next: 'Say what happened, and close it',
+      next: say('queue.next.undertaking'),
       whose: 'board',
       /*
        * And the person, by name. An undertaking belongs to whoever gave it;
@@ -230,7 +246,7 @@ export function buildQueue(input: QueueInput): QueueRow[] {
       to: '/rules',
       title: r.title,
       phase: 'inforce',
-      next: 'Review it, and record what was found',
+      next: say('queue.next.review'),
       whose: 'board',
       days: r.daysUntilDue === null ? 0 : Math.max(0, -r.daysUntilDue),
       overdue: r.overdue,

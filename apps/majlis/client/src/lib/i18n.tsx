@@ -1,10 +1,31 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
-import { dirFor, translate, type Lang } from '../locales/index.js';
+import { dirFor, translate, type Lang, type Vars } from '../locales/index.js';
 
 interface I18nValue {
   lang: Lang;
   setLang: (l: Lang) => void;
-  t: (key: string) => string;
+  /**
+   * The sentence, in the reader's language.
+   *
+   * `vars` fills the gaps in sentences the work grammar counts things into —
+   * *{left} of {total} conditions are unanswered*. Optional, so every call
+   * written before it stays as it was.
+   */
+  t: (key: string, vars?: Vars) => string;
+  /**
+   * The same, for a sentence the server chose.
+   *
+   * The server decides *which* sentence and sends its key and figures — see
+   * `Say` in `lib/api.ts`. It is `t` with the two halves already packed
+   * together, so a step's act reads `say(step.act)` rather than
+   * `t(step.act.key, step.act.vars)` at every one of the fourteen places that
+   * draw one.
+   *
+   * Null and undefined give the empty string. A passage that is settled has no
+   * next act, and the alternative is fourteen guards that all say the same
+   * thing.
+   */
+  say: (s: { key: string; vars?: Vars } | null | undefined) => string;
   dir: 'ltr' | 'rtl';
 }
 
@@ -39,7 +60,8 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     () => ({
       lang,
       setLang: setLangState,
-      t: (key: string) => translate(lang, key),
+      t: (key: string, vars?: Vars) => translate(lang, key, vars),
+      say: (s) => (s ? translate(lang, s.key, s.vars) : ''),
       dir,
     }),
     [lang, dir],

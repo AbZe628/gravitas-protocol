@@ -1613,6 +1613,7 @@ export function governanceRoutes(
         rules,
         incidents,
         undertakings,
+        structures,
         now: at,
       });
 

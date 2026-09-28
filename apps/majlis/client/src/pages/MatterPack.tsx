@@ -1,6 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { api, oversight, type Matter, type Pack, type SignedDocument } from '../lib/api.js';
+import {
+  api,
+  oversight,
+  type Matter,
+  type Pack,
+  type Passage,
+  type SignedDocument,
+} from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { mayDeliberate, useIdentity } from '../lib/identity.js';
 import { Loading, ErrorText } from '../components/ui.js';
@@ -63,7 +70,7 @@ function day(iso: string): string {
 
 export default function MatterPack() {
   const { id } = useParams<{ id: string }>();
-  const { t } = useI18n();
+  const { t, say } = useI18n();
   const { identity } = useIdentity();
   const [pack, setPack] = useState<Pack | null>(null);
   // Null while it is still coming; true only once it actually failed.
@@ -85,6 +92,15 @@ export default function MatterPack() {
    * it is folded shut, and the whole point is that they are told to open it.
    */
   const [doc, setDoc] = useState<SignedDocument | null>(null);
+  /**
+   * Where this matter stands, decided on the server.
+   *
+   * The card at the top of this screen used to work it out here, from the
+   * status and the role and the counts — and told a signatory to open a vote
+   * the server then refused, because the two had different rules. There is one
+   * set of rules now and they are `services/passage.ts`; this fetches them.
+   */
+  const [passage, setPassage] = useState<Passage | null>(null);
   const [failed, setFailed] = useState(false);
   /** A failed refresh keeps a screen that is already there. */
   const there = useStillThere();
@@ -140,6 +156,16 @@ export default function MatterPack() {
       .checklist(id)
       .then((c) => setStepsOutstanding(c?.unanswered?.length ?? 0))
       .catch(() => setStepsOutstanding(0));
+
+    /*
+     * The spine. Checked rather than assumed, and a failure leaves the card
+     * undrawn rather than guessed — the parts below are all still readable,
+     * and a sentence made up here is how the disagreement started.
+     */
+    oversight
+      .passage(id)
+      .then((p) => setPassage(Array.isArray(p?.shaping) && Array.isArray(p?.deciding) ? p : null))
+      .catch(() => setPassage(null));
   }
 
   useEffect(load, [id]);
@@ -158,28 +184,26 @@ export default function MatterPack() {
    * be the same as not arriving.
    */
   const doing = whatToDoNow({
+    passage,
     matter,
     identity,
-    stepsOutstanding,
-    saidCount: matter.deliberation?.length ?? 0,
     doc,
     t,
+    say,
     go: (where) => {
       const target = document.getElementById(`at-${where}`);
       target?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     },
   });
 
-  /** Which part the act points at, so that one is drawn open. */
-  const pointingAt = doing.act
-    ? (doing.says === t('now.readyToVote') || matter.status === 'voting'
-        ? 'vote'
-        : matter.status === 'in_force'
-          ? 'sign'
-          : stepsOutstanding > 0
-            ? 'steps'
-            : 'discussion')
-    : null;
+  /**
+   * Which part the act points at, so that one is drawn open.
+   *
+   * Carried by the act rather than worked out a second time from the sentence
+   * it produced. The old version compared the card's words against a
+   * translated string, so the page opened the wrong part in Arabic.
+   */
+  const pointingAt = doing?.act?.pane ?? null;
 
   return (
     <article className="flex flex-col gap-9 lg:flex-row lg:items-start">
@@ -223,7 +247,7 @@ export default function MatterPack() {
           member does not arrive wanting to know what a pack is; they arrive
           wanting to know what is wanted of them.
         */}
-        <NextAct doing={doing} />
+        {doing && <NextAct doing={doing} />}
 
         {/*
           The first part needs no assembling, so it is outside the guard.

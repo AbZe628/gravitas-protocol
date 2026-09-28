@@ -58,7 +58,7 @@ export default function Announcement() {
 }
 
 function One({ row }: { row: QueueRow }) {
-  const { t } = useI18n();
+  const { t, say } = useI18n();
   const { quieten } = useNews();
 
   /* Escape puts it away, like every other window in this application. */
@@ -91,7 +91,7 @@ function One({ row }: { row: QueueRow }) {
           <p className="mt-1 font-display text-body leading-snug text-paper">{row.title}</p>
           {row.next && (
             <p className="mt-0.5 text-note leading-snug text-muted">
-              {row.next}
+              {say(row.next)}
               {row.whoName ? ` · ${row.whoName}` : ''}
             </p>
           )}

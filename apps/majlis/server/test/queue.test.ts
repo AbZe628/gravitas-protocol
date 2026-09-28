@@ -2,6 +2,8 @@ import { describe, it, expect } from 'vitest';
 import { buildQueue } from '../src/services/queue.js';
 import type { Incident, Matter, Submission } from '../src/types.js';
 import { boards, matters as seeded } from '../src/data/seed.js';
+import { structures } from '../src/data/structures.js';
+import { buildPassage } from '../src/services/passage.js';
 
 /**
  * The queue says what is waiting, whose it is, and in what order.
@@ -85,7 +87,7 @@ function matter(id: string, status: Matter['status'], openedAt: string): Matter 
   return { ...BASE, id, title: 'Matter ' + id, status, openedAt, boardId: BOARD.id };
 }
 
-const EMPTY = { rules: [], undertakings: [], now: NOW };
+const EMPTY = { rules: [], undertakings: [], structures, now: NOW };
 
 describe('what is waiting, and whose it is', () => {
   it('puts what is past its date first, whatever kind it is', () => {
@@ -205,4 +207,59 @@ describe('what is waiting, and whose it is', () => {
     expect(row?.title, 'the row lost the one thing that makes it findable').toBe('Matter broken');
     expect(row?.next, 'a sentence was invented for a record that could not be read').toBeNull();
   });
+});
+
+/**
+ * The queue and the matter say the same thing.
+ *
+ * This file's own preamble says it computes nothing of its own — that
+ * `buildPassage` decides what is next and this only orders rows. That was
+ * true of the function it called and false of the arguments it called it
+ * with: it passed no shape, on the reasoning that a shape only affects the
+ * shaping steps.
+ *
+ * Then the spine learned that the vote waits on the conditions, and the
+ * reasoning quietly inverted. With no shape the conditions read as *not
+ * applicable*; nothing was in the way; the queue told a signatory to **open
+ * the vote** on a matter whose own screen told them **six conditions have no
+ * answer**. One function, one matter, one moment, two sentences — found by
+ * opening the two screens next to each other, which no test here was looking
+ * for.
+ *
+ * So this looks for it. For every matter, the act on the row is the act on
+ * the matter, or the row has none because the matter is settled.
+ */
+describe('the queue and the matter never disagree', () => {
+  /*
+   * Matters with a shape, because a matter without one cannot show the
+   * disagreement: it is the shape that makes the conditions applicable, and
+   * a test built only of shapeless matters would have passed throughout.
+   */
+  const withShape = seeded.filter((m) => m.structureId);
+
+  it('has matters with a shape to compare, or this proves nothing', () => {
+    expect(withShape.length).toBeGreaterThan(0);
+  });
+
+  for (const m of withShape) {
+    it(`says the same as ${m.id} does itself`, () => {
+      const rows = buildQueue({
+        ...EMPTY,
+        board: BOARD,
+        submissions: [],
+        matters: [m],
+        incidents: [],
+      });
+
+      const row = rows.find((r) => r.kind === 'matter' && r.id === m.id);
+      // A settled matter is not waiting on anybody and has no row at all.
+      if (!row) return;
+
+      const shape = structures.find((s) => s.id === m.structureId) ?? null;
+      const passage = buildPassage(BOARD, m, shape, NOW);
+
+      expect(row.next).toEqual(passage.next?.act ?? null);
+      expect(row.whose).toEqual(passage.next?.whose ?? null);
+    });
+  }
 });

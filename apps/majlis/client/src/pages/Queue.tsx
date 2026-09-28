@@ -82,7 +82,7 @@ const COLS = (t: (k: string) => string): readonly Column[] => [
  * sweep, and everything under DAYS compared without reading a word.
  */
 function Row({ row, n }: { row: QueueRow; n?: number }) {
-  const { t } = useI18n();
+  const { t, say } = useI18n();
 
   return (
     <Line
@@ -123,7 +123,7 @@ function Row({ row, n }: { row: QueueRow; n?: number }) {
           it can be read down the list rather than one line at a time.
         */
         <span className="block truncate text-ui text-paper">
-          {row.next ?? <span className="text-muted">{t('needs.nothingToDo')}</span>}
+          {row.next ? say(row.next) : <span className="text-muted">{t('needs.nothingToDo')}</span>}
         </span>,
         <span className="block truncate text-ui text-muted">
           {row.whoName ?? (row.whose ? t(`passage.whose.${row.whose}`) : '')}

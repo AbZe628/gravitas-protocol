@@ -48,7 +48,7 @@ const DOT: Record<PassageStep['state'], string> = {
 };
 
 function Step({ step, ordinal }: { step: PassageStep; ordinal?: number }) {
-  const { t } = useI18n();
+  const { t, say } = useI18n();
   const dim = step.state === 'ahead' || step.state === 'not_applicable' || step.state === 'skipped';
 
   return (
@@ -62,7 +62,7 @@ function Step({ step, ordinal }: { step: PassageStep; ordinal?: number }) {
           {ordinal !== undefined && (
             <span className="font-mono text-note tabular-nums text-muted">{ordinal}</span>
           )}
-          <span className={'text-ui ' + (dim ? 'text-muted' : 'text-paper')}>{step.act}</span>
+          <span className={'text-ui ' + (dim ? 'text-muted' : 'text-paper')}>{say(step.act)}</span>
           {/* Whose it is, on every step. The commonest way a matter stalls is
               that everyone believes it is with somebody else. */}
           <span className="text-label font-bold uppercase tracking-caps text-muted">
@@ -79,7 +79,7 @@ function Step({ step, ordinal }: { step: PassageStep; ordinal?: number }) {
         </div>
 
         {step.standing && (
-          <p className="mt-1 text-note leading-relaxed text-muted">{step.standing}</p>
+          <p className="mt-1 text-note leading-relaxed text-muted">{say(step.standing)}</p>
         )}
       </div>
     </li>
@@ -87,7 +87,7 @@ function Step({ step, ordinal }: { step: PassageStep; ordinal?: number }) {
 }
 
 export default function Passage({ matterId }: { matterId: string }) {
-  const { t } = useI18n();
+  const { t, say } = useI18n();
   const [passage, setPassage] = useState<Passage_ | null>(null);
   const [open, setOpen] = useState(false);
 
@@ -127,7 +127,7 @@ export default function Passage({ matterId }: { matterId: string }) {
             </div>
             <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
               <span className="font-display text-title leading-snug tracking-title">
-                {passage.next.act}
+                {say(passage.next.act)}
               </span>
               {/* Whose act it is, as a state rather than as a caption stuck
                   to the end of the sentence. */}
@@ -137,7 +137,7 @@ export default function Passage({ matterId }: { matterId: string }) {
             </div>
             {passage.next.standing && (
               <p className="mt-2.5 max-w-[62ch] text-ui leading-relaxed text-muted">
-                {passage.next.standing}
+                {say(passage.next.standing)}
               </p>
             )}
           </div>
@@ -158,11 +158,13 @@ export default function Passage({ matterId }: { matterId: string }) {
           )}
         </div>
       ) : (
-        <p className="max-w-[62ch] font-display text-sub leading-relaxed">{passage.settled}</p>
+        <p className="max-w-[62ch] font-display text-sub leading-relaxed">{say(passage.settled)}</p>
       )}
 
       {passage.waiting && (
-        <p className="mt-3 max-w-[62ch] text-note leading-relaxed text-muted">{passage.waiting.note}</p>
+        <p className="mt-3 max-w-[62ch] text-note leading-relaxed text-muted">
+          {say(passage.waiting.note)}
+        </p>
       )}
 
       <Button

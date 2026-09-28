@@ -818,6 +818,25 @@ export interface Related {
   relations: { kind: RelationKind; shared: string }[];
 }
 
+/**
+ * A sentence the server means, rather than a sentence the server wrote.
+ *
+ * The server used to send finished English — *Open the vote*, *Two conditions
+ * are still open*. That made the language of the work English for everybody,
+ * including the boards this is built for, whose minutes are in Arabic and
+ * whose members read Urdu. A member could switch the interface and still be
+ * told what to do next in a language they had just switched out of.
+ *
+ * So what crosses the wire is the key of the sentence and the figures that go
+ * in it, and the interface says it in the language the reader chose. The
+ * server keeps deciding *which* sentence — that judgement is the work — and
+ * gives up only the wording, which was never its business.
+ */
+export interface Say {
+  key: string;
+  vars?: Record<string, string | number>;
+}
+
 /** Which of the four stages a waiting thing stands in. */
 export type QueuePhase = 'asked' | 'deciding' | 'inforce' | 'checked';
 
@@ -841,7 +860,7 @@ export interface QueueRow {
   title: string;
   phase: QueuePhase;
   /** The act to do next, or null where it is waiting on a clock. */
-  next: string | null;
+  next: Say | null;
   whose: 'board' | 'signatory' | 'liaison' | 'institution' | 'software' | 'clock' | null;
   /** The person it belongs to, where the record names one. Undertakings only. */
   whoName?: string;
@@ -1288,15 +1307,15 @@ export type Whose = 'board' | 'signatory' | 'liaison' | 'institution' | 'softwar
 
 export interface PassageStep {
   key: string;
-  act: string;
+  act: Say;
   whose: Whose;
   state: StepState;
   at: string | null;
   /** What is in the way, in plain words, or null. */
-  standing: string | null;
+  standing: Say | null;
   /** Whether the system actually refuses to go on without this. */
   enforced: boolean;
-  why: string;
+  why: Say;
 }
 
 export interface Passage {
@@ -1307,8 +1326,8 @@ export interface Passage {
   deciding: PassageStep[];
   /** The one act to do next, or null where the matter is settled. */
   next: PassageStep | null;
-  waiting: { days: number; since: string; on: Whose; note: string } | null;
-  settled: string | null;
+  waiting: { days: number; since: string; on: Whose; note: Say } | null;
+  settled: Say | null;
 }
 
 // ── late payment ──────────────────────────────────────────────────────────

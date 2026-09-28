@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { buildPassage } from '../src/services/passage.js';
+import { known, words } from './words.js';
 import type { Board, Matter, Structure } from '../src/types.js';
 
 /**
@@ -98,7 +99,7 @@ describe('a step is done when the thing is in the record', () => {
      * would report this board as having answered two of three for having
      * changed its mind about one.
      */
-    expect(step(buildPassage(board, twice, structure(3), NOW), 'conditions').standing).toContain(
+    expect(words(step(buildPassage(board, twice, structure(3), NOW), 'conditions').standing)).toContain(
       '2 of 3 conditions are unanswered',
     );
   });
@@ -106,7 +107,7 @@ describe('a step is done when the thing is in the record', () => {
   it('calls the conditions not applicable where no shape has been chosen', () => {
     const s = step(buildPassage(board, matter(), null, NOW), 'conditions');
     expect(s.state).toBe('not_applicable');
-    expect(s.standing).toContain('Nothing to answer until one is chosen');
+    expect(words(s.standing)).toContain('Nothing to answer until one is chosen');
   });
 });
 
@@ -126,7 +127,7 @@ describe('it never says the question is ready to be decided', () => {
 
     // And it says a board may rule against a condition, because that is an
     // answer too and a checklist that did not say so would be a gate.
-    expect(conditions.standing).toContain('wrongly drawn');
+    expect(words(conditions.standing)).toContain('wrongly drawn');
   });
 
   it('marks only deliberation as enforced, because it is the only thing refused', () => {
@@ -172,7 +173,7 @@ describe('the one next act', () => {
   it('has no next act once the matter is settled', () => {
     const p = buildPassage(board, matter({ status: 'in_force', inForceAt: '2026-08-20' }), null, NOW);
     expect(p.next).toBeNull();
-    expect(p.settled).toContain('in force');
+    expect(words(p.settled)).toContain('in force');
   });
 });
 
@@ -186,7 +187,7 @@ describe('waiting is a fact about the past', () => {
     );
 
     expect(p.waiting?.days).toBe(66);
-    expect(p.waiting?.note).toContain('since the institution asked');
+    expect(words(p.waiting?.note)).toContain('since the institution asked');
   });
 
   it('says the institution may have asked earlier where nothing records when', () => {
@@ -194,7 +195,7 @@ describe('waiting is a fact about the past', () => {
 
     // Honest about its own blind spot rather than presenting the opened date
     // as the moment the business started waiting.
-    expect(p.waiting?.note).toContain('may have asked earlier');
+    expect(words(p.waiting?.note)).toContain('may have asked earlier');
   });
 
   it('waits on the clock rather than on a person during the delay', () => {
@@ -216,7 +217,7 @@ describe('waiting is a fact about the past', () => {
   it('stops counting once the matter is settled', () => {
     const p = buildPassage(board, matter({ status: 'rejected' }), null, NOW);
     expect(p.waiting).toBeNull();
-    expect(p.settled).toContain('refused');
+    expect(words(p.settled)).toContain('refused');
   });
 });
 
@@ -226,7 +227,7 @@ describe('the asymmetry between permitting and restricting', () => {
     const delay = step(p, 'timelock');
 
     expect(delay.state).toBe('not_applicable');
-    expect(delay.standing).toContain('Waiting is the greater risk');
+    expect(words(delay.standing)).toContain('Waiting is the greater risk');
   });
 
   it('counts the threshold for the direction the matter actually is', () => {
@@ -238,7 +239,7 @@ describe('the asymmetry between permitting and restricting', () => {
     } as unknown as Partial<Matter>);
 
     // Restricting takes the reduced quorum: two, not three.
-    expect(step(buildPassage(board, voting, null, NOW), 'close').standing).toContain('threshold of 2');
+    expect(words(step(buildPassage(board, voting, null, NOW), 'close').standing)).toContain('threshold of 2');
   });
 });
 
@@ -255,7 +256,7 @@ describe('the vote does not close itself', () => {
     } as unknown as Partial<Matter>);
 
     const close = step(buildPassage(board, met, null, NOW), 'close');
-    expect(close.standing).toContain('Closing is still an act somebody takes');
+    expect(words(close.standing)).toContain('Closing is still an act somebody takes');
     expect(close.state).toBe('open');
   });
 
@@ -266,7 +267,7 @@ describe('the vote does not close itself', () => {
       reasoning: [{ scholarId: 'm-a', position: 'for', reason: 'r', at: '1' }],
     } as unknown as Partial<Matter>);
 
-    expect(step(buildPassage(board, partial, null, NOW), 'positions').standing).toContain('Waiting on');
+    expect(words(step(buildPassage(board, partial, null, NOW), 'positions').standing)).toContain('Waiting on');
   });
 });
 
@@ -275,7 +276,7 @@ describe('the document is not offered before there is one', () => {
     const s = step(buildPassage(board, matter(), null, NOW), 'fatwa');
 
     expect(s.state).toBe('ahead');
-    expect(s.standing).toContain('will be acted on');
+    expect(words(s.standing)).toContain('will be acted on');
   });
 
   it('is done once the ruling is in force', () => {
@@ -285,7 +286,7 @@ describe('the document is not offered before there is one', () => {
     );
 
     expect(s.state).toBe('done');
-    expect(s.why).toContain('stops waiting');
+    expect(words(s.why)).toContain('stops waiting');
   });
 });
 
@@ -318,7 +319,7 @@ describe('a settled matter has no outstanding acts', () => {
      * be improving the record.
      */
     expect(s.state).toBe('skipped');
-    expect(s.standing).toContain('decided without it');
+    expect(words(s.standing)).toContain('decided without it');
   });
 
   it('marks nothing as enforced once the matter is settled', () => {
@@ -331,4 +332,62 @@ describe('a settled matter has no outstanding acts', () => {
     expect(step(p, 'fatwa').state).toBe('done');
     expect(step(p, 'asked').state).toBe('done');
   });
+});
+
+/**
+ * Every sentence the spine can reach has words behind it.
+ *
+ * The spine sends keys now, and a key the dictionary does not answer renders
+ * as `step.conditions.standing` on the screen — in the largest words on the
+ * matter, where the next act goes. `tsc` cannot catch it: the key is a string
+ * on one side of the wire and a lookup on the other, and nothing joins them.
+ *
+ * So this joins them. It walks the passage of every shape of matter this file
+ * can build and refuses any act, standing, reason, settled sentence or waiting
+ * note whose key the English dictionary does not answer.
+ *
+ * The other languages are not checked here on purpose. A missing Arabic entry
+ * falls back to the English one — deliberately, so a board reads a sentence in
+ * the wrong language rather than an identifier — and holding all three to the
+ * same bar would fail this test for a translation gap, which is a person's
+ * decision and not a fault in the code.
+ */
+describe('every sentence the spine can reach has words behind it', () => {
+  const shapes: [string, ReturnType<typeof buildPassage>][] = [
+    ['a bare matter', buildPassage(board, matter(), null, NOW)],
+    ['with a shape and nothing answered', buildPassage(board, matter(), structure(3), NOW)],
+    ['mid-deliberation', buildPassage(board, matter({ status: 'deliberation' }), null, NOW)],
+    ['mid-vote', buildPassage(board, matter({ status: 'voting' }), null, NOW)],
+    ['a restriction', buildPassage(board, matter({ direction: 'restrict' }), null, NOW)],
+    ['in the delay', buildPassage(board, matter({ status: 'timelock' }), null, NOW)],
+    ['in force', buildPassage(board, matter({ status: 'in_force' }), null, NOW)],
+    ['refused', buildPassage(board, matter({ status: 'rejected' }), null, NOW)],
+  ];
+
+  for (const [what, p] of shapes) {
+    it(`says something in English for ${what}`, () => {
+      const unknown: string[] = [];
+
+      for (const s of [...p.shaping, ...p.deciding]) {
+        for (const said of [s.act, s.standing, s.why]) {
+          if (!known(said)) unknown.push(said?.key ?? '(none)');
+        }
+      }
+      if (!known(p.settled)) unknown.push(p.settled?.key ?? '(none)');
+      if (!known(p.waiting?.note)) unknown.push(p.waiting?.note?.key ?? '(none)');
+
+      expect(unknown).toEqual([]);
+    });
+
+    /*
+     * And the walk actually reached something.
+     *
+     * A passage that came back with no steps would pass the test above by
+     * having nothing to check — which is how a guard comes to watch two of
+     * seventy-four routes and report itself green.
+     */
+    it(`has steps to check for ${what}`, () => {
+      expect(p.shaping.length + p.deciding.length).toBeGreaterThanOrEqual(12);
+    });
+  }
 });
