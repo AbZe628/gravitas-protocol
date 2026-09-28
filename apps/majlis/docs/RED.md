@@ -48,7 +48,7 @@ bude jedna, svaki ekran se sam od sebe počne ponašati isto.
 
 ---
 
-## 1 · Gramatika se proširi sa predmeta na sve vrste ◐
+## 1 · Gramatika se proširi sa predmeta na sve vrste ✅
 
 Najveći posao i jedini koji mijenja logiku a ne izgled. Radi se prvi jer briše
 ručnu izvedbu na ekranu prekršaja i time odmah dokaže da gramatika drži i za
@@ -60,8 +60,8 @@ nešto što nije predmet.
 - ✅ **L6** — ekran prekršaja piše gramatiku **treći put**, rukom u komponenti,
   devet koraka, sa `current: i.stage === 'reported'` — i drugačijim riječima za
   iste činove nego `BREACH_NEXT`.
-- ◐ **L7** — prekršaj gotov; pitanje, obaveza, revizija i **stavka registra** nemaju gramatiku
-  uopće.
+- ✅ **L7** — prekršaj, pitanje, obaveza i revizija čitaju istu gramatiku. Ostaje
+  samo **stavka registra**, koja nema svoj tok nego je ulaz u lanac iz tačke 7.
 - ✅ **L2** (ostatak) — puni spisak koraka dolazi na živi ekran.
 
 ## 2 · Dodjela — korak pripada čovjeku, ne samo ulozi ⬜
@@ -71,14 +71,14 @@ nešto što nije predmet.
   mora **pogađati iz uloge** umjesto da pročita. Predsjednik ne može dati članu
   predmet da ga pripremi — a to je prva stvar koju predsjednik radi.
 
-## 3 · Sat stvara posao ⬜
+## 3 · Sat stvara posao ◐
 
 - **L9** — `sweep.ts` radi ono što radi: obara neratificirano ograničenje, uvodi
   odluku u snagu. Ali dospjela revizija se **izračuna pri čitanju** — ništa ne
   nastane i ne padne nikome u red. Zato „automatizirano" ne može postojati:
   sistem nikad ne pokreće, samo izvještava. Isto za rok koji ističe i prag koji
   je probijen.
-- **L11** — odluka bez intervala revizije: `reviewStatus` to već imenuje
+- ✅ **L11** — odluka bez intervala revizije: `reviewStatus` to već imenuje
   riječima „ništa je neće vratiti pred odbor", i tu stane. Nije sat koji radi
   krivo, nego sat kojeg nema.
 

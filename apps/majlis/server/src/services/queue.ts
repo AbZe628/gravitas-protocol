@@ -2,7 +2,34 @@ import type { Board, Incident, Matter, Rule, Structure, Submission } from '../ty
 import { standingOf } from './submission.js';
 import { buildPassage, say, type Say, type Whose } from './passage.js';
 import { buildIncidentPassage } from './passage-incident.js';
-import { reviewsDue } from './review.js';
+import { buildQuestionPassage } from './passage-question.js';
+import { buildReviewPassage } from './passage-review.js';
+import { buildUndertakingPassage } from './passage-undertaking.js';
+
+/**
+ * The next act on one thing, or nothing where the reading cannot be made.
+ *
+ * Every kind is wrapped the same way and for the same reason: this is the
+ * screen a member opens first, and one malformed record must not take every
+ * other row down with it. The row survives without its sentence — it still
+ * says what the thing is and how long it has waited, which is enough to find
+ * it and open it, and the page it opens says what is wrong in its own words.
+ */
+function nextOn(
+  read: () => { next: { act: Say; whose: Whose; whoName?: string } | null },
+): { next: Say | null; whose: Whose | null; whoName?: string } {
+  try {
+    const p = read();
+    return {
+      next: p.next?.act ?? null,
+      whose: p.next?.whose ?? null,
+      whoName: p.next?.whoName,
+    };
+  } catch {
+    return { next: null, whose: null };
+  }
+}
+import { reviewStatus } from './review.js';
 import { overdue as undertakingOverdue, type Undertaking } from './undertaking.js';
 
 /**
@@ -130,8 +157,7 @@ export function buildQueue(input: QueueInput): QueueRow[] {
       to: '/questions',
       title: s.subject,
       phase: 'asked',
-      next: say('queue.next.question'),
-      whose: 'board',
+      ...nextOn(() => buildQuestionPassage(s, now)),
       days: daysSince(s.arrivedAt, now),
       overdue: false,
     });
@@ -205,34 +231,63 @@ export function buildQueue(input: QueueInput): QueueRow[] {
       to: `/undertakings#${u.id}`,
       title: u.what,
       phase: 'deciding',
-      next: say('queue.next.undertaking'),
-      whose: 'board',
+      ...nextOn(() => buildUndertakingPassage(u, now)),
       /*
-       * And the person, by name. An undertaking belongs to whoever gave it;
-       * a row that said only "the board" would be handing it back to the room
-       * it was taken out of, which is how undertakings are lost.
+       * The person, by name — but only where the step is theirs.
+       *
+       * An undertaking belongs to whoever gave it, and a row saying only *the
+       * board* would be handing it back to the room it was taken out of, which
+       * is how undertakings are lost. So the name was taken from the record
+       * and put on every row.
+       *
+       * That was wrong the moment the reading could say a different act was
+       * next. An undertaking with no date is waiting on **the board** to set
+       * one, and the row named the member who gave it — the wrong person, in
+       * the column that says who is holding it up, on the screen everybody
+       * opens first. Found by reading the list rather than by any test.
        */
-      whoName: u.who,
+      whoName: nextOn(() => buildUndertakingPassage(u, now)).whoName,
       days: daysSince(u.minutedAt, now),
       overdue: undertakingOverdue(u, now),
     });
   }
 
   // ── in force ────────────────────────────────────────────────────────────
-  for (const r of reviewsDue(input.rules as Rule[], now)) {
-    // 'due' covers due-now and overdue; the distinction is carried by the
-    // overdue flag, not by a second state.
-    if (r.state !== 'due') continue;
+  /*
+   * Every ruling with something outstanding, not only the ones whose date has
+   * come.
+   *
+   * This walked the reviews that were **due** and skipped the rest, which
+   * quietly excluded the worst case in the whole register: a ruling with no
+   * review interval at all. reviewStatus names it — nothing will bring this
+   * back before the board — and because such a ruling can never become due, it
+   * could never appear here. The ruling least likely to be looked at again was
+   * the one this screen was surest to leave out.
+   *
+   * The reading decides now. A ruling with an interval and a date still ahead
+   * has no open step and produces no row; one with no interval has an open
+   * step belonging to the board, and so does one whose date has arrived.
+   */
+  for (const rule of input.rules) {
+    const { next, whose } = nextOn(() => buildReviewPassage(rule, now));
+    if (!next) continue;
+
+    const status = reviewStatus(rule, now);
     rows.push({
       kind: 'review',
-      id: r.ruleId,
+      id: rule.id,
       to: '/rules',
-      title: r.title,
+      title: rule.title,
       phase: 'inforce',
-      next: say('queue.next.review'),
-      whose: 'board',
-      days: r.daysUntilDue === null ? 0 : Math.max(0, -r.daysUntilDue),
-      overdue: r.overdue,
+      next,
+      whose,
+      /*
+       * Days past the date where there is one. A ruling with no interval is
+       * not late — nothing was ever promised — so it waits at zero and takes
+       * its place by kind rather than by a number this file invented.
+       */
+      days: status.daysUntilDue === null ? 0 : Math.max(0, -status.daysUntilDue),
+      overdue: status.overdue,
     });
   }
 

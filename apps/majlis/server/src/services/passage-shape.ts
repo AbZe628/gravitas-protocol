@@ -92,6 +92,19 @@ export interface Step {
   enforced: boolean;
   /** What the step is for. Shown where a scholar asks why it exists. */
   why: Say;
+  /**
+   * The person this step belongs to, where the record names one.
+   *
+   * Only an undertaking does, and only on the step that person carries out.
+   * The queue used to take the name from the record rather than from the step,
+   * so an undertaking whose next act was *the board sets a date* was listed
+   * against the member who gave it — naming the wrong person as the one
+   * holding it up, on the screen everybody opens first.
+   *
+   * A first seam rather than the whole of it: steps still belong to roles, and
+   * making them belong to people is its own piece of work.
+   */
+  whoName?: string;
 }
 
 /**
