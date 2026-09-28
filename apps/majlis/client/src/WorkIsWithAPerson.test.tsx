@@ -2,6 +2,9 @@ import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
 import { render, screen, waitFor, fireEvent, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Queue from './pages/Queue.js';
+import Questions from './pages/Questions.js';
+import RuleDetail from './pages/RuleDetail.js';
+import { Route, Routes } from 'react-router-dom';
 import Holding from './components/Holding.js';
 import Person, { initialsOf } from './components/Person.js';
 import { whatToDoNow } from './components/NextAct.js';
@@ -250,5 +253,157 @@ describe('a person, drawn', () => {
     expect(initialsOf('  ')).toBe('?');
     // The fault: every id on the demonstration board begins `member-`.
     expect(initialsOf('member-b')).toBe('M');
+  });
+});
+
+describe('a question, on the screen that holds the questions', () => {
+  const question = {
+    id: 'sub-1',
+    boardId: 'demo-board',
+    institutionId: 'inst-1',
+    arrivedAt: '2026-09-01T08:00:00.000Z',
+    recordedAt: '2026-09-01T08:00:00.000Z',
+    askedBy: 'Layla Haddad, Treasury',
+    recordedBy: 'desk-treasury',
+    onBehalf: false,
+    subject: 'Wrapped sukuk for the treasury desk',
+    question: 'May we hold the wrapped form?',
+    background: '',
+    awaiting: '',
+    attachments: [],
+    dispositions: [],
+    standing: 'waiting',
+    matterId: null,
+    waitedHours: 145,
+  };
+  const passage = (holder: string | null) => ({
+    of: { kind: 'question', id: 'sub-1' },
+    groups: [],
+    next: null,
+    waiting: null,
+    settled: null,
+    holder: holder ? { to: holder, by: 'member-a', at: '2026-09-02T00:00:00Z' } : null,
+    holdable: true,
+  });
+
+  const open = (holder: string | null, at = '/questions') => {
+    posted = [];
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
+        const url = String(input);
+        if (init?.method === 'POST') {
+          posted.push(JSON.parse(String(init.body)));
+          return json({ assignment: {}, how: 'taken' });
+        }
+        if (url.includes('/api/attention')) return json({ scholarId: 'member-c', role: 'signatory', office: null, items: [] });
+        if (url.includes('/api/settings')) return json({ members: MEMBERS });
+        if (url.includes('/api/passages/question')) return json({ asOf: '', passages: [passage(holder)] });
+        if (url.includes('/api/submissions')) return json({ submissions: [question], waiting: ['sub-1'] });
+        return json({});
+      }),
+    );
+    return render(
+      <I18nProvider>
+        <MemoryRouter initialEntries={[at]}>
+          <Questions boardId="demo-board" />
+        </MemoryRouter>
+      </I18nProvider>,
+    );
+  };
+
+  it('offers taking it up, and writes it for the question', async () => {
+    open(null);
+    fireEvent.click(await screen.findByRole('button', { name: /take this on/i }));
+    await waitFor(() => expect(posted).toEqual([{ ofKind: 'question', ofId: 'sub-1', to: 'member-c' }]));
+  });
+
+  it('says whom it is with, by name, and who placed it there', async () => {
+    const { container } = open('member-b');
+    await waitFor(() => expect(container.textContent).toContain('With Bilal Rahman'));
+    expect(container.textContent).toContain('placed by Amina Chair');
+    expect(screen.queryByRole('button', { name: /take this on/i })).toBeNull();
+  });
+
+  it('opens on the one the arrival screen named, lit, and scrolls to it', async () => {
+    // jsdom draws nothing and has no scrolling; the browser's own call is recorded instead.
+    const scrolled: Element[] = [];
+    Element.prototype.scrollIntoView = function (this: Element) {
+      scrolled.push(this);
+    };
+    try {
+      const { container } = open(null, '/questions#sub-1');
+      await screen.findByRole('button', { name: /take this on/i });
+      // The card itself, not anything inside it: the waiting chip wears the same ring.
+      expect(container.querySelector('#sub-1 > .shadow-ringgold')).not.toBeNull();
+      expect(scrolled.map((e) => e.id)).toContain('sub-1');
+    } finally {
+      delete (Element.prototype as { scrollIntoView?: unknown }).scrollIntoView;
+    }
+  });
+
+  it('is not lit when the address names another', async () => {
+    const { container } = open(null, '/questions#sub-2');
+    await screen.findByRole('button', { name: /take this on/i });
+    expect(container.querySelector('#sub-1 > .shadow-ringgold')).toBeNull();
+  });
+});
+
+describe('a ruling, on its own page', () => {
+  const rule = {
+    id: 'rule-1',
+    boardId: 'demo-board',
+    title: 'Tangible asset ratio for secondary trading',
+    statement: 'Secondary trading is suspended while the ratio is below the threshold.',
+    parameters: [],
+    parameterHash: '0xabc',
+    parameterHashVerified: true,
+    version: 1,
+    inForceFrom: '2026-01-01T00:00:00Z',
+    supersededBy: null,
+    supersedes: null,
+    sources: [],
+  };
+  const open = (holdable: boolean) => {
+    posted = [];
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
+        const url = String(input);
+        if (init?.method === 'POST') {
+          posted.push(JSON.parse(String(init.body)));
+          return json({ assignment: {}, how: 'taken' });
+        }
+        if (url.includes('/api/attention')) return json({ scholarId: 'member-c', role: 'signatory', office: null, items: [] });
+        if (url.includes('/api/settings')) return json({ members: MEMBERS });
+        if (url.includes('/api/passages/review/rule-1'))
+          return json({ of: { kind: 'review', id: 'rule-1' }, groups: [], next: null, waiting: null, settled: null, holder: null, holdable });
+        if (url.includes('/api/reviews')) return json({ items: [{ ruleId: 'rule-1', state: 'unscheduled', overdue: false, dueAt: null }] });
+        if (url.includes('/api/rules')) return json([rule]);
+        return json({});
+      }),
+    );
+    return render(
+      <I18nProvider>
+        <MemoryRouter initialEntries={['/rules/rule-1']}>
+          <Routes>
+            <Route path="/rules/:id" element={<RuleDetail />} />
+          </Routes>
+        </MemoryRouter>
+      </I18nProvider>,
+    );
+  };
+
+  it('offers taking the review on, where there is something to bring back', async () => {
+    open(true);
+    fireEvent.click(await screen.findByRole('button', { name: /take this on/i }));
+    await waitFor(() => expect(posted).toEqual([{ ofKind: 'review', ofId: 'rule-1', to: 'member-c' }]));
+  });
+
+  it('offers nothing where the server says there is nothing to hold', async () => {
+    const { container } = open(false);
+    await waitFor(() => expect(container.textContent).toContain('Tangible asset ratio'));
+    await new Promise((ok) => setTimeout(ok, 50));
+    expect(screen.queryByRole('button', { name: /take this on/i })).toBeNull();
   });
 });

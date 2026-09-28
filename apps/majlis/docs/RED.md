@@ -77,8 +77,11 @@ nešto što nije predmet.
   - ✅ red: ime umjesto `member-a`; *moje* čita držaoca
   - ✅ imena umjesto id-a na sva 24 mjesta (gornja traka, avatar, rasprava,
     glasovi, sjednice, prekršaj…); `whoName` koji je nosio id preimenovan u `who`
-  - ⬜ pitanje, obaveza i revizija nemaju ekran koji čita prolaz, pa ni kontrolu
-    (server ih prima; sučelja nema)
+  - ✅ pitanje i revizija: kontrola na kartici pitanja i na stranici odluke;
+    red otvara tačno pitanje i tačnu odluku
+  - — obaveza namjerno bez kontrole: ime onoga ko je obećao pobjeđuje dodjelu
+  - ✅ bankin desk ne vidi ko u odboru drži šta (`visibleTo`), ni tuđa pitanja
+  - ⬜ desk čita cijeli red odbora, s tuđim pitanjima — prijedlog u NASTAVAK.md
   - ⬜ dodjela **jednog koraka** (ne cijele stvari) postoji na serveru, nema je u
     sučelju
   - ⬜ arapski i urdu za `hold.*` — moji, nepregledani

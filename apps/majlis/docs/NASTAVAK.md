@@ -68,11 +68,44 @@ ijedan tražio od pohrane nešto što zvono broji kao pisanje.
 - *moje* u redu: ime na koraku → samo taj; ono što nosiš → tvoje; odbor → svih;
   potpisnik → svih potpisnika.
 
+**Pitanje i revizija — zatvoreno.** `routes/passages.ts`: prolaz bilo koje
+vrste, jedan (`/passages/:kind/:id`) ili svi jedne vrste odjednom
+(`/passages/:kind`, da lista ne šalje zahtjev po kartici). Kartica pitanja i
+stranica odluke nude *uzmi / daj / vrati*. Red sad otvara **tačno** pitanje
+(`/questions#id`, osvijetljeno) i tačnu odluku (`/rules/:id`) — prije je slao na
+cijelu listu. Uživo: predsjednik iz reda otvori pitanje, da ga Bilalu, kartica
+kaže *With Board Member B · placed by Board Member A*; likvidator nije ponuđen.
+
+**Obaveza — namjerno bez kontrole.** Obavezu je dao član i njegovo ime na
+koraku pobjeđuje dodjelu (*nijedna dodjela ne mijenja ko je obećao*), pa bi
+*uzmi ovo* na obavezi promijenilo tek držaoca, a ne ono što red kaže da je
+čije. Predati obavezu drugome je drugi čin (promijeniti `Undertaking.who`, sa
+zapisom) i nije napravljen.
+
+**Bankin desk ne smije znati ko u odboru drži šta — zatvoreno.** Nađeno
+pitajući rute desk kredencijalom, poslije zelenih testova: nova ruta prolaza
+pitanja davala je desku **sva** pitanja odbora s držaocem, a zapis dodjela, red
+i prolazi predmeta i prekršaja imenovali su člana koji drži svaku stvar. Desk
+koji zna koji učenjak drži njegovo pitanje zna koga da pritisne — a nezavisnost
+odbora je ono što banka kupuje. Jedno pravilo, `visibleTo`, primijenjeno
+svuda gdje se dodjele primjenjuju; desk vidi prolaze samo svojih pitanja (ista
+ograda kao `/submissions`); zapis dodjela desku 403.
+`test/the-desk-is-not-told.test.ts`, svaka provjera dvaput — kao desk (nema
+imena) i kao član (ima), inače prva ne znači ništa.
+
 **Ostalo od tačke 2:**
-1. pitanje, obaveza, revizija — nemaju ekran koji čita prolaz, pa nemaju ni
-   kontrolu; server ih prima
-2. dodjela **jednog koraka** postoji na serveru, ne u sučelju
-3. arapski i urdu za `hold.*` su moji i nepregledani
+1. dodjela **jednog koraka** postoji na serveru, ne u sučelju
+2. arapski i urdu za `hold.*` su moji i nepregledani
+
+**Otvoreno, nije moje da tiho odlučim — prijedlog:**
+- **Desk čita cijeli red odbora** (`/api/queue`): naslove pitanja **drugih
+  deskova** iste banke, sve predmete, prekršaje i obaveze s imenom člana koji
+  ih je dao. To krši pravilo koje `/submissions` već drži (*dva deska jedne
+  banke ne dijele red*). `NewsProvider` čita red za svakoga, pa i za desk, zato
+  bi 403 dirao bankino sučelje. Prijedlog: red deskovu odgovara samo redovima
+  njegovih pitanja, a `NewsProvider` za desk ne čita red odbora.
+- Gornja traka ~0,7 s tvrdi *Not signed in · reads only* dok se identitet
+  učitava (`Shell` ne gleda `loading`) — star, sitan, nije diran.
 
 **Imena umjesto id-a — zatvoreno (poslije CI-ja).** Sirovi scholar id crtao se
 na 24 mjesta u 20 datoteka, plus avatar: gornja traka svakog ekrana (`member-b`), avatar

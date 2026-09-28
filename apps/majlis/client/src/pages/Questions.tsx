@@ -1,6 +1,13 @@
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { theWayIn, type Delivery, type Notice, type Submission } from '../lib/api.js';
+import { useEffect, useRef, useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import {
+  oversight,
+  theWayIn,
+  type Delivery,
+  type Notice,
+  type Passage,
+  type Submission,
+} from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import TheDraftThatCame from '../components/TheDraftThatCame.js';
 import Fold from '../components/Fold.js';
@@ -16,6 +23,7 @@ import { ErrorText, Loading } from '../components/ui.js';
 import { useStillThere } from '../lib/stillThere.js';
 import { Button } from '../components/Button';
 import Person from '../components/Person.js';
+import Holding from '../components/Holding.js';
 
 /**
  * What the institution has asked, and what the board did about it.
@@ -58,12 +66,28 @@ function clock(s: Submission, t: (k: string) => string): string {
 
 function One({
   s,
+  passage,
   onDone,
 }: {
   s: Submission;
+  /** Its reading, for who is taking it up. Absent where it did not come. */
+  passage?: Passage;
   onDone: (notice?: { notice: Notice; delivery: Delivery }) => void;
 }) {
   const { t } = useI18n();
+  /*
+    The one the arrival screen named.
+
+    A row there says *take this up* and names the question. It handed over
+    the whole list, and a member arriving from it had to read down until they
+    recognised the one they had pressed — the same thing the undertakings did
+    until their rows carried the id. This scrolls to it once and leaves it lit.
+  */
+  const named = useLocation().hash.slice(1) === s.id;
+  const here = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (named && here.current) here.current.scrollIntoView({ block: 'center' });
+  }, [named]);
   const [act, setAct] = useState<'none' | 'open' | 'decline'>('none');
   const [title, setTitle] = useState('');
   const [proposal, setProposal] = useState('');
@@ -95,7 +119,8 @@ function One({
   }
 
   return (
-    <Card>
+    <div id={s.id} ref={here}>
+    <Card tone={named ? 'attention' : 'plain'}>
       <div className="mb-2 flex flex-wrap items-center gap-x-3 gap-y-2">
         {s.standing === 'waiting' && <State tone="attention">{t('queue.waiting')}</State>}
         {s.standing === 'opened' && <State tone="settled">{t('queue.opened')}</State>}
@@ -198,6 +223,16 @@ function One({
           <Quiet onClick={() => setAct('decline')}>{t('queue.decline')}</Quiet>
         </div>
       )}
+
+      {/*
+        Who is taking it up, and taking it up yourself or giving it to somebody.
+
+        The first thing a chair does with a question is give it to the member
+        who knows that market, and until now nothing on the screen that holds
+        the questions could say so. Beneath the two acts, because deciding what
+        the question becomes is the work and this is only who does it.
+      */}
+      {!settled && passage && <Holding passage={passage} onChanged={() => onDone()} />}
 
       {/*
         A decline that is being reconsidered says so. Without it a member would
@@ -322,6 +357,7 @@ function One({
         </div>
       )}
     </Card>
+    </div>
   );
 }
 
@@ -329,6 +365,7 @@ export default function Questions({ boardId }: { boardId: string }) {
   const { t } = useI18n();
   const { identity } = useIdentity();
   const [all, setAll] = useState<Submission[] | null>(null);
+  const [passages, setPassages] = useState<Map<string, Passage>>(new Map());
   const [failed, setFailed] = useState(false);
   /**
    * Which of the two lists is on screen. Not remembered between visits: a
@@ -349,6 +386,15 @@ export default function Questions({ boardId }: { boardId: string }) {
         setAll(Array.isArray(r.submissions) ? r.submissions : []);
       })
       .catch(() => there.lost(setFailed));
+    /*
+     * Every question's reading at once, for who is taking each up. Not
+     * required: without it the cards are as they were, and taking up is
+     * simply not offered.
+     */
+    oversight
+      .passages('question')
+      .then((r) => setPassages(new Map((r.passages ?? []).map((p) => [p.of.id, p]))))
+      .catch(() => setPassages(new Map()));
   };
 
   useEffect(load, [boardId]);
@@ -449,6 +495,7 @@ export default function Questions({ boardId }: { boardId: string }) {
               <One
                 key={s.id}
                 s={s}
+                passage={passages.get(s.id)}
                 onDone={(n) => {
                   if (n) setNotice(n);
                   load();

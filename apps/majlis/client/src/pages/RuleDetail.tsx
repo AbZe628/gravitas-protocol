@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { api, oversight, type ReviewStatus, type Rule } from '../lib/api.js';
+import { api, oversight, type Passage, type ReviewStatus, type Rule } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { mayDeliberate, useIdentity } from '../lib/identity.js';
 import ReconsiderThis from '../components/ReconsiderThis.js';
+import Holding from '../components/Holding.js';
 import { DocumentLink } from '../components/Documents.js';
 import WhatItMeans from '../components/WhatItMeans.js';
 import { Nothing } from '../components/page.js';
@@ -35,9 +36,18 @@ export default function RuleDetail() {
 
   const [rules, setRules] = useState<Rule[] | null>(null);
   const [review, setReview] = useState<ReviewStatus | undefined>(undefined);
+  /** The review's reading, for who is carrying it. Not required; without it nothing is offered. */
+  const [passage, setPassage] = useState<Passage | null>(null);
   const [failed, setFailed] = useState(false);
 
+  const readPassage = () =>
+    oversight
+      .passageOf('review', id)
+      .then((p) => setPassage(Array.isArray(p?.groups) ? p : null))
+      .catch(() => setPassage(null));
+
   useEffect(() => {
+    void readPassage();
     api
       .rules()
       .then((r) => (Array.isArray(r) ? setRules(r) : setFailed(true)))
@@ -48,6 +58,7 @@ export default function RuleDetail() {
       .reviews()
       .then((r) => setReview((r.items ?? []).find((x) => x.ruleId === id)))
       .catch(() => undefined);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   if (failed) return <ErrorText />;
@@ -75,6 +86,12 @@ export default function RuleDetail() {
           than shown greyed out.
         */}
         {(dueNow || unscheduled) && <ReconsiderThis rule={rule} canOpen={canOpen} />}
+        {/*
+          Who is bringing it back before the board. Offered only where the
+          server says there is something left for the board to do — a ruling
+          whose review is years away has nothing to take on.
+        */}
+        {passage && <Holding passage={passage} onChanged={readPassage} />}
       </ActionPanel>
 
       <Facts

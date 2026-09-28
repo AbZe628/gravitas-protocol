@@ -2158,6 +2158,15 @@ export const oversight = {
    */
   assign: (body: { ofKind: PassageKind; ofId: string; to: string | null; stepKey?: string | null }) =>
     post<{ assignment: Assignment; how: HowAssigned }>('/api/assignments', body),
+  /**
+   * The passage of every one of a kind, at once, so a list does not ask per
+   * card. The same reading the queue makes, through the same assignments.
+   */
+  passages: (kind: PassageKind) =>
+    get<{ asOf: string; passages: Passage[] }>(`/api/passages/${kind}`),
+  /** The passage of one thing, of any kind. */
+  passageOf: (kind: PassageKind, id: string) =>
+    get<Passage>(`/api/passages/${kind}/${encodeURIComponent(id)}`),
   assignments: (ofId?: string) =>
     get<{ assignments: Assignment[]; asOf: string }>(
       '/api/assignments' + (ofId ? `?ofId=${encodeURIComponent(ofId)}` : ''),
