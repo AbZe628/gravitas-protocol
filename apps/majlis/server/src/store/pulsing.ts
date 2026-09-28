@@ -16,14 +16,18 @@ import type { Pulse } from '../services/pulse.js';
  * ── the reader list is the part that has to be right ──────────────────────
  *
  * Classification is inverted on purpose. A method is a reader only if it is
- * named here; everything else is treated as a write. Get that wrong in one
- * direction and a client re-reads a list it already had — nothing is lost. Get
- * it wrong in the other and a member sits looking at a stale screen. So the
- * default is the harmless mistake.
+ * named here; everything else is treated as a write. Get it wrong one way and
+ * a member sits looking at a stale screen. Get it wrong the other way and the
+ * bell rings for a read — which was believed to be the harmless mistake, and
+ * is not: a screen that re-reads when the bell rings, reading something that
+ * rings it, reads itself for ever. `assignments` was left off this list, the
+ * arrival queue reads assignments, and the queue sat on *Loading…* sending
+ * the same request as fast as the browser could.
  *
- * `pulsing.test.ts` walks the interface and asserts every method is either in
- * this list or reached by the wrapper, so a method added later cannot slip
- * past by being neither.
+ * `pulse.test.ts` checks that every method is in this list or reached by the
+ * wrapper, which a misfiled reader passes. `reading-is-quiet.test.ts` is the
+ * one that holds: it calls every GET the application registers and fails if
+ * any of them asked the store for something not on this list.
  */
 const READERS: ReadonlySet<string> = new Set([
   'institutions', 'institution',
@@ -47,6 +51,8 @@ const READERS: ReadonlySet<string> = new Set([
   'adoptions', 'adoption',
   'exchanges', 'exchange',
   'settings',
+  'assignments',
+  'assistantLog',
 ]);
 
 export function isReader(name: string): boolean {

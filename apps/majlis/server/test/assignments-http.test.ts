@@ -73,12 +73,15 @@ const place = (who: string, body: Record<string, unknown>) =>
     .set('Authorization', as(who))
     .send({ ofKind: 'breach', ofId: FRESH, ...body });
 
-const stepsOf = async (id: string) => {
+const passageOf = async (id: string) => {
   const res = await request(app).get(`/api/incidents/${id}/passage`).set('Authorization', as('member-b'));
   expect(res.status).toBe(200);
-  return (res.body.groups as { steps: { key: string; whose: string; whoName?: string }[] }[]).flatMap(
-    (g) => g.steps,
-  );
+  return {
+    holder: res.body.holder as { to: string } | null,
+    steps: (res.body.groups as { steps: { key: string; whose: string; whoName?: string }[] }[]).flatMap(
+      (g) => g.steps,
+    ),
+  };
 };
 
 describe('the four acts', () => {
@@ -87,12 +90,11 @@ describe('the four acts', () => {
     expect(res.status).toBe(201);
     expect(res.body.how).toBe('taken');
 
-    const steps = await stepsOf(FRESH);
-    expect(steps.find((s) => s.key === 'determine')?.whoName).toBe('member-b');
-    // The institution's plan is not the member's to hold, whoever took the breach.
-    for (const s of steps.filter((x) => x.whose === 'institution')) {
-      expect(s.whoName, s.key).toBeUndefined();
-    }
+    const passage = await passageOf(FRESH);
+    expect(passage.holder?.to).toBe('member-b');
+    // No step of a breach carries the name: the finding is every signatory's,
+    // and the plan is the institution's.
+    for (const s of passage.steps) expect(s.whoName, s.key).toBeUndefined();
   });
 
   it('refuses a colleague taking it out of the holder’s hands', async () => {
@@ -116,7 +118,7 @@ describe('the four acts', () => {
     expect(back.status).toBe(201);
     expect(back.body.how).toBe('released');
 
-    expect((await stepsOf(FRESH)).some((s) => s.whoName)).toBe(false);
+    expect((await passageOf(FRESH)).holder).toBeNull();
 
     // And the whole of it is still in the record, in order.
     const record = await request(app)
@@ -137,7 +139,7 @@ describe('the four acts', () => {
     const row = (res.body.rows ?? res.body).find(
       (r: { kind: string; id: string }) => r.kind === 'breach' && r.id === FRESH,
     );
-    expect(row?.whoName).toBe('member-b');
+    expect(row?.holder).toBe('member-b');
   });
 });
 
@@ -204,12 +206,20 @@ describe('what cannot be placed', () => {
     expect(done.body.error).toBe('not_placeable');
   });
 
-  it('places a signatory’s own step only with a signatory', async () => {
-    const adv = await place('member-a', { stepKey: 'determine', to: 'advisor-1' });
-    expect(adv.status).toBe(400);
-    expect(adv.body.error).toBe('not_a_signatory');
+  it('refuses a signatory’s step on its own — each signatory does it for themselves', async () => {
+    const res = await place('member-a', { stepKey: 'determine', to: 'member-b' });
+    expect(res.status).toBe(400);
+    expect(res.body.error).toBe('not_placeable');
 
-    // Carrying the whole breach, though, an advisory member may.
+    // Carrying the whole breach, though, anybody on this side may — an advisory member too.
     expect((await place('member-a', { to: 'advisor-1' })).status).toBe(201);
+  });
+
+  it('refuses taking on what has nothing left for the board, but lets a holder let go of it', async () => {
+    const closed = 'incident-2025-11-03';
+    const res = await place('member-b', { ofId: closed, to: 'member-b' });
+    expect(res.status).toBe(400);
+    expect(res.body.error).toBe('nothing_to_hold');
+    expect((await place('member-b', { ofId: closed, to: null })).status).toBe(201);
   });
 });

@@ -155,6 +155,24 @@ export interface Passage {
   waiting: { days: number; since: string; on: Whose; note: Say } | null;
   /** Said where the work is finished, in place of a next act. */
   settled: Say | null;
+  /**
+   * Who is carrying the whole of it, where anybody is, and who said so.
+   *
+   * Absent from every reading and written on by `withAssignments`, so the
+   * readings never know. It is what a screen needs to offer *take this* or
+   * *put it back* without working out from the record itself who holds it —
+   * which would be a second place deciding, the fault this grammar exists to
+   * remove.
+   */
+  holder?: { to: string; by: string; at: string } | null;
+  /**
+   * Whether there is anything left here a person on this board could hold:
+   * a step of the board's or a signatory's still to be done. Written by
+   * `withAssignments` from the same rule the route refuses on, so a screen
+   * offering *take this* offers it exactly where taking it would mean
+   * something.
+   */
+  holdable?: boolean;
 }
 
 export const DAY = 86_400_000;

@@ -1,6 +1,7 @@
 import type { Board, Incident, Matter, Rule, Structure, Submission } from '../types.js';
 import { standingOf } from './submission.js';
 import { buildPassage, say, type Say, type Whose } from './passage.js';
+import type { Passage } from './passage-shape.js';
 import { buildIncidentPassage } from './passage-incident.js';
 import { withAssignments, type Assignment } from './assignment.js';
 import { buildQuestionPassage } from './passage-question.js';
@@ -17,18 +18,25 @@ import { buildUndertakingPassage } from './passage-undertaking.js';
  * it and open it, and the page it opens says what is wrong in its own words.
  */
 function nextOn(
-  read: () => { next: { act: Say; whose: Whose; whoName?: string } | null },
-): { next: Say | null; whose: Whose | null; whoName?: string } {
+  read: () => Passage,
+): { next: Say | null; whose: Whose | null; whoName?: string; holder?: string } {
   try {
-    const p = read();
-    return {
-      next: p.next?.act ?? null,
-      whose: p.next?.whose ?? null,
-      whoName: p.next?.whoName,
-    };
+    return fromPassage(read());
   } catch {
     return { next: null, whose: null };
   }
+}
+
+/** What a row carries from its passage — one place, so no kind can drop a field. */
+function fromPassage(
+  p: Passage,
+): { next: Say | null; whose: Whose | null; whoName?: string; holder?: string } {
+  return {
+    next: p.next?.act ?? null,
+    whose: p.next?.whose ?? null,
+    whoName: p.next?.whoName,
+    holder: p.holder?.to ?? undefined,
+  };
 }
 import { reviewStatus } from './review.js';
 import { overdue as undertakingOverdue, type Undertaking } from './undertaking.js';
@@ -106,6 +114,14 @@ export interface QueueRow {
    * step; never invented from the role.
    */
   whoName?: string;
+  /**
+   * Who is carrying the whole of it, where anybody is.
+   *
+   * Not the same as `whoName`. A matter at the vote is every signatory's step
+   * — nobody's name goes on it — and it is still being carried by the member
+   * who took it on, whose list it belongs on.
+   */
+  holder?: string;
   /** How long it has stood here. Days, floored — never rounded up. */
   days: number;
   /** True where a clock has already run out. */
@@ -197,18 +213,14 @@ export function buildQueue(input: QueueInput): QueueRow[] {
      * is and how long it has waited, which is enough to find it and open it,
      * and the page it opens will say what is wrong in its own words.
      */
-    let next: Say | null = null;
-    let whose: Whose | null = null;
-    let whoName: string | undefined;
+    let read: ReturnType<typeof fromPassage> = { next: null, whose: null };
     let days = daysSince(m.openedAt, now);
     try {
       const shape = m.structureId
         ? (input.structures.find((s) => s.id === m.structureId) ?? null)
         : null;
       const passage = withAssignments(buildPassage(board, m, shape, now), input.assignments);
-      next = passage.next?.act ?? null;
-      whose = passage.next?.whose ?? null;
-      whoName = passage.next?.whoName;
+      read = fromPassage(passage);
       days = passage.waiting?.days ?? days;
     } catch {
       // Left as it stands: the row without its next act.
@@ -220,9 +232,7 @@ export function buildQueue(input: QueueInput): QueueRow[] {
       to: `/matters/${m.id}`,
       title: m.title,
       phase: 'deciding',
-      next,
-      whose,
-      whoName,
+      ...read,
       days,
       overdue: false,
     });
@@ -282,10 +292,8 @@ export function buildQueue(input: QueueInput): QueueRow[] {
    * step belonging to the board, and so does one whose date has arrived.
    */
   for (const rule of input.rules) {
-    const { next, whose, whoName } = nextOn(() =>
-      withAssignments(buildReviewPassage(rule, now), input.assignments),
-    );
-    if (!next) continue;
+    const read = nextOn(() => withAssignments(buildReviewPassage(rule, now), input.assignments));
+    if (!read.next) continue;
 
     const status = reviewStatus(rule, now);
     rows.push({
@@ -294,9 +302,7 @@ export function buildQueue(input: QueueInput): QueueRow[] {
       to: '/rules',
       title: rule.title,
       phase: 'inforce',
-      next,
-      whose,
-      whoName,
+      ...read,
       /*
        * Days past the date where there is one. A ruling with no interval is
        * not late — nothing was ever promised — so it waits at zero and takes
@@ -323,14 +329,9 @@ export function buildQueue(input: QueueInput): QueueRow[] {
      * Wrapped for the same reason the matter above is: this is the arrival
      * screen, and one malformed record must not take every other row with it.
      */
-    let next: Say | null = null;
-    let whose: Whose | null = null;
-    let whoName: string | undefined;
+    let read: ReturnType<typeof fromPassage> = { next: null, whose: null };
     try {
-      const passage = withAssignments(buildIncidentPassage(i, now), input.assignments);
-      next = passage.next?.act ?? null;
-      whose = passage.next?.whose ?? null;
-      whoName = passage.next?.whoName;
+      read = fromPassage(withAssignments(buildIncidentPassage(i, now), input.assignments));
     } catch {
       // Left as it stands: the row without its next act.
     }
@@ -344,9 +345,7 @@ export function buildQueue(input: QueueInput): QueueRow[] {
       to: `/incidents/${i.id}`,
       title: i.title,
       phase: 'checked',
-      next,
-      whose,
-      whoName,
+      ...read,
       days: daysSince(i.reportedAt, now),
       /*
        * The thirty days run from the board finding an event actual, not from

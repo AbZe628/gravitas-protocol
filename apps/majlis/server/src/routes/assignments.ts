@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { Router } from 'express';
 import { z } from 'zod';
 import { structures } from '../data/structures.js';
-import { howOf, heldBy, mayAssign, placeable, type Assignment } from '../services/assignment.js';
+import { howOf, heldBy, mayAssign, onOurSide, placeable, type Assignment } from '../services/assignment.js';
 import { buildPassage } from '../services/passage.js';
 import { buildIncidentPassage } from '../services/passage-incident.js';
 import { buildQuestionPassage } from '../services/passage-question.js';
@@ -193,7 +193,7 @@ export function assignmentRoutes(
 
       /*
        * The step, where one is named: it has to be a step this thing has, and
-       * one a person on this board can hold.
+       * one a person on this board can hold — see `placeable`.
        */
       const step = stepKey
         ? (passage.groups.flatMap((g) => g.steps).find((s) => s.key === stepKey) ?? null)
@@ -206,26 +206,27 @@ export function assignmentRoutes(
         res.status(400).json({
           error: 'not_placeable',
           message:
-            step.state === 'open' || step.state === 'ahead'
-              ? 'That step is not the board’s to place: it belongs to the institution, or to a clock.'
-              : 'That step is already behind it. Who was asked to do it changes nothing now.',
+            step.state !== 'open' && step.state !== 'ahead'
+              ? 'That step is already behind it. Who was asked to do it changes nothing now.'
+              : step.whose === 'signatory'
+                ? 'Each signatory does that for themselves, so it is nobody’s to hold. Place the whole of it instead.'
+                : 'That step is not the board’s to place: it belongs to the institution, or to a clock.',
         });
         return;
       }
 
       /*
-       * A signatory's step, named on its own, goes to a signatory. Carrying a
-       * whole matter to its finding can be anybody's work; being the one who
-       * determines it cannot, and a name on that step would say otherwise.
+       * The whole of it, where there is nothing left on this side to carry:
+       * a matter in its waiting period, a breach waiting only on the bank.
+       * Taking that would be taking a clock. Putting it back is always
+       * allowed: a holder must be able to let go of something that is over.
        */
-      if (step?.whose === 'signatory' && to !== null) {
-        if (roleOf(to) !== 'signatory') {
-          res.status(400).json({
-            error: 'not_a_signatory',
-            message: 'That step is a signatory’s own act. It can be placed with a signatory.',
-          });
-          return;
-        }
+      if (!step && to !== null && !passage.groups.some((g) => g.steps.some(onOurSide))) {
+        res.status(400).json({
+          error: 'nothing_to_hold',
+          message: 'Nothing here is left for the board to do, so there is nothing to take on.',
+        });
+        return;
       }
 
       const assignments = await store.assignments(board.id);

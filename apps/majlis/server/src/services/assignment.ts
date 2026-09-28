@@ -1,4 +1,4 @@
-import type { PassageKind, Passage, Step, Whose } from './passage-shape.js';
+import type { PassageKind, Passage, Step } from './passage-shape.js';
 
 /**
  * Who is actually doing a thing, as opposed to whose kind of thing it is.
@@ -88,18 +88,43 @@ export function howOf(a: Assignment, previous: Assignment | null): HowAssigned {
 }
 
 /**
- * The kinds of step a person on this board can hold.
- *
- * The board's own steps, and a signatory's. Not the institution's or its
- * liaison's — those are the other side of the table, and this board naming who
- * does them would be minuting a commitment the bank never made. Not the clock's
- * or the software's, which nobody does.
+ * Whether a step is still to be done.
  */
-export const PLACEABLE: readonly Whose[] = ['board', 'signatory'];
+const ahead = (step: Pick<Step, 'state'>): boolean => step.state === 'open' || step.state === 'ahead';
 
-/** Whether a step can carry a person's name at all. */
+/**
+ * Whether a step can carry one person's name.
+ *
+ * **The board's own steps, and only those.** They are work one member does on
+ * the board's behalf — answering the conditions, drawing up the reasons — and
+ * *who is doing it* is a real question with one answer.
+ *
+ * Not a signatory's. Voting, concurring, determining are each signatory's own
+ * act: every one of them does it for themselves, and nobody does it for the
+ * rest. A name on such a step says it is that person's, and the screen that
+ * asks what needs you reads it that way — so the first version of this, which
+ * named signatory steps, took the vote off every other signatory's list the
+ * moment one of them took the matter on. Whoever carries it is on the passage
+ * as its `holder`; the step stays every signatory's.
+ *
+ * Not the institution's or its liaison's — those are the other side of the
+ * table, and this board naming who does them would be minuting a commitment
+ * the bank never made. Not the clock's or the software's, which nobody does.
+ */
 export function placeable(step: Pick<Step, 'whose' | 'state'>): boolean {
-  return PLACEABLE.includes(step.whose) && (step.state === 'open' || step.state === 'ahead');
+  return step.whose === 'board' && ahead(step);
+}
+
+/**
+ * Whether a step is one a person on this board might carry the thing towards:
+ * the board's or a signatory's, still to be done.
+ *
+ * Wider than `placeable`. A breach has no step of the board's own — every step
+ * on this side of it is the signatories' — and it is still something one
+ * member takes on and carries to a finding.
+ */
+export function onOurSide(step: Pick<Step, 'whose' | 'state'>): boolean {
+  return (step.whose === 'board' || step.whose === 'signatory') && ahead(step);
 }
 
 /**
@@ -109,16 +134,12 @@ export function placeable(step: Pick<Step, 'whose' | 'state'>): boolean {
  * nobody means the step went back to the room.
  *
  * A step with no entry of its own falls back to whoever holds the whole thing
- * — **but only a step on this side of the table**, the board's or a
- * signatory's. Whoever took a matter or a breach on is the one carrying it to
- * a finding, and that includes the finding. They do not hold the
- * institution's filing: a member who took a matter on was listed as the one
- * holding up the bank's plan, which is the wrong person in the column that
- * says who is holding it up — the same fault the undertaking row once had.
- *
- * Every step of a breach that is not the institution's is a signatory's, so
- * a rule covering only the board's own steps would have made a breach
- * something nobody could take at all.
+ * — **but only a step of the board's own**, for the reason `placeable` gives.
+ * The holder of a matter does not hold the institution's filing: a member who
+ * took a matter on was listed as the one holding up the bank's plan, which is
+ * the wrong person in the column that says who is holding it up — the same
+ * fault the undertaking row once had. Nor the vote, which is every
+ * signatory's.
  *
  * Pass null for the step to ask who holds the whole thing.
  */
@@ -141,7 +162,7 @@ export function heldBy(
   // a step handed back to the room is back with the room, not back with
   // whoever holds the rest.
   const standing =
-    step === null ? onWhole : (onStep ?? (PLACEABLE.includes(step.whose) ? onWhole : null));
+    step === null ? onWhole : (onStep ?? (step.whose === 'board' ? onWhole : null));
   return standing && standing.to !== null ? standing : null;
 }
 
@@ -169,8 +190,12 @@ export function withAssignments(p: Passage, assignments: readonly Assignment[]):
 
   const groups = p.groups.map((g) => ({ ...g, steps: g.steps.map(name) }));
   const next = p.next ? name(p.next) : null;
+  const whole = heldBy(assignments, p.of.kind, p.of.id, null);
+  const holder = whole?.to ? { to: whole.to, by: whole.by, at: whole.at } : null;
 
-  return { ...p, groups, next };
+  const holdable = p.groups.some((g) => g.steps.some(onOurSide));
+
+  return { ...p, groups, next, holder, holdable };
 }
 
 /** Whose desk anything on this board is currently on, for one person. */

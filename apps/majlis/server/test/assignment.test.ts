@@ -72,11 +72,11 @@ describe('what stands for a step', () => {
     expect(heldBy(record, 'matter', 'm', boardStep('other'))?.to).toBe('member-a');
   });
 
-  it('falls back to the holder of the whole only on this side of the table', () => {
+  it('falls back to the holder of the whole only on the board’s own steps', () => {
     const record = [placed({ ofKind: 'matter', ofId: 'm', to: 'member-a' })];
     expect(heldBy(record, 'matter', 'm', { key: 's', whose: 'board' })?.to).toBe('member-a');
-    expect(heldBy(record, 'matter', 'm', { key: 's', whose: 'signatory' })?.to).toBe('member-a');
-    for (const whose of ['institution', 'liaison', 'clock', 'software'] as const) {
+    // A signatory's step is every signatory's: see the next block.
+    for (const whose of ['signatory', 'institution', 'liaison', 'clock', 'software'] as const) {
       expect(heldBy(record, 'matter', 'm', { key: 's', whose }), whose).toBeNull();
     }
   });
@@ -167,10 +167,7 @@ describe('a name on a passage', () => {
           if (s.whoName) {
             // A name the reading already carried stays: nobody moves who gave a promise.
             expect(after.whoName, s.key).toBe(s.whoName);
-          } else if (
-            (s.whose === 'board' || s.whose === 'signatory') &&
-            (s.state === 'open' || s.state === 'ahead')
-          ) {
+          } else if (s.whose === 'board' && (s.state === 'open' || s.state === 'ahead')) {
             expect(after.whoName, s.key).toBe('member-z');
           } else {
             expect(after.whoName, `${s.key} (${s.whose}, ${s.state})`).toBeUndefined();
@@ -184,9 +181,8 @@ describe('a name on a passage', () => {
     const found = all
       .map(({ kind, id, read }) => ({ kind, id, p: read() }))
       .flatMap(({ kind, id, p }) => steps(p).map((s) => ({ kind, id, s })))
-      .find(({ s }) => s.whose === 'signatory' && (s.state === 'open' || s.state === 'ahead'));
-    expect(found, 'no open signatory step anywhere in the seed').toBeTruthy();
-    // (A signatory's step, because that is where handing one piece on matters.)
+      .find(({ s }) => s.whose === 'board' && (s.state === 'open' || s.state === 'ahead'));
+    expect(found, 'no open board step anywhere in the seed').toBeTruthy();
     const { kind, id, s } = found!;
 
     const read = all.find((x) => x.kind === kind && x.id === id)!.read;
@@ -195,6 +191,92 @@ describe('a name on a passage', () => {
       placed({ ofKind: kind, ofId: id, stepKey: s.key, to: 'member-y' }),
     ]);
     expect(steps(named).find((x) => x.key === s.key)?.whoName).toBe('member-y');
+  });
+
+  it('never names a signatory’s step, even one placed on its own — it is every signatory’s', () => {
+    /*
+     * The fault: a name on the vote took it off every other signatory's list
+     * of what needs them, the moment one member took the matter on.
+     */
+    const found = all
+      .map(({ kind, id, read }) => ({ kind, id, p: read() }))
+      .flatMap(({ kind, id, p }) => steps(p).map((s) => ({ kind, id, s })))
+      .find(({ s }) => s.whose === 'signatory' && (s.state === 'open' || s.state === 'ahead'));
+    expect(found, 'no open signatory step anywhere in the seed').toBeTruthy();
+    const { kind, id, s } = found!;
+
+    const read = all.find((x) => x.kind === kind && x.id === id)!.read;
+    const named = withAssignments(read(), [
+      placed({ ofKind: kind, ofId: id, to: 'member-z' }),
+      placed({ ofKind: kind, ofId: id, stepKey: s.key, to: 'member-y' }),
+    ]);
+    expect(steps(named).find((x) => x.key === s.key)?.whoName).toBeUndefined();
+    // And the thing is still being carried, by whoever took the whole of it.
+    expect(named.holder?.to).toBe('member-z');
+  });
+});
+
+describe('who carries the whole of it', () => {
+  it('is written on the passage, and gone once it is put back', () => {
+    const { kind, id, read } = every()[0];
+    const took = placed({ ofKind: kind, ofId: id, to: 'member-b', by: 'member-b' });
+    expect(withAssignments(read(), [took]).holder).toEqual({ to: 'member-b', by: 'member-b', at: took.at });
+
+    const back = placed({ ofKind: kind, ofId: id, to: null, by: 'member-b' });
+    expect(withAssignments(read(), [took, back]).holder).toBeNull();
+
+    // A step of it handed on is not the whole of it.
+    const piece = placed({ ofKind: kind, ofId: id, stepKey: 'anything', to: 'member-c' });
+    expect(withAssignments(read(), [piece]).holder).toBeNull();
+  });
+});
+
+describe('whether there is anything to hold', () => {
+  const all = every();
+  const read = (p: Passage) => withAssignments(p, []).holdable;
+
+  it('is yes while a step on this side is still to be done, and no once none is', () => {
+    const answers = all.map(({ read: r }) => {
+      const p = r();
+      const expected = steps(p).some(
+        (s) => (s.whose === 'board' || s.whose === 'signatory') && (s.state === 'open' || s.state === 'ahead'),
+      );
+      expect(read(p), `${p.of.kind} ${p.of.id}`).toBe(expected);
+      return expected;
+    });
+    // Both answers occur in the seed, or this proves nothing.
+    expect(answers).toContain(true);
+    expect(answers).toContain(false);
+  });
+
+  it('is no while something is still next, where what is next is a clock’s', () => {
+    /*
+     * A matter in its waiting period: the board has decided, the clock is
+     * running, and the document is the software's. Something is next and
+     * nobody on the board can do it — *take this* there would be taking
+     * nothing.
+     */
+    const s = (key: string, whose: Step['whose'], state: Step['state']): Step => ({
+      key,
+      act: { key: 'x' },
+      whose,
+      state,
+      at: null,
+      standing: null,
+      enforced: false,
+      why: { key: 'x' },
+    });
+    const clock = s('timelock', 'clock', 'open');
+    const p: Passage = {
+      of: { kind: 'matter', id: 'm' },
+      groups: [
+        { key: 'deciding', order: 'sequence', steps: [s('positions', 'signatory', 'done'), clock, s('fatwa', 'software', 'ahead')] },
+      ],
+      next: clock,
+      waiting: null,
+      settled: null,
+    };
+    expect(read(p)).toBe(false);
   });
 });
 
@@ -227,10 +309,8 @@ describe('the queue names whoever the passage names', () => {
     undertaking: 'undertaking',
   };
 
-  it('has a row of every kind whose next step is on the board’s side, or this proves nothing', () => {
-    const kinds = new Set(
-      rows.filter((r) => r.whose === 'board' || r.whose === 'signatory').map((r) => r.kind),
-    );
+  it('has rows of every kind, or this proves nothing', () => {
+    const kinds = new Set(rows.map((r) => r.kind));
     expect([...kinds].sort()).toEqual(['breach', 'matter', 'question', 'review', 'undertaking']);
   });
 
@@ -241,10 +321,15 @@ describe('the queue names whoever the passage names', () => {
       for (const r of mine) {
         const source = everyone.find((x) => x.kind === toPassageKind[kind] && x.id === r.id)!;
         const passage = withAssignments(source.read(), assignments);
-        expect(r.whoName, `${kind} ${r.id}`).toBe(passage.next?.whoName);
+        expect(r.whoName, `${kind} ${r.id} step`).toBe(passage.next?.whoName);
+        expect(r.holder, `${kind} ${r.id} holder`).toBe(passage.holder?.to);
       }
-      // And the name is really there somewhere, rather than absent on both sides.
-      expect(mine.some((r) => r.whoName), `no ${kind} row names anybody`).toBe(true);
+      // And the holder is really there, rather than absent on both sides.
+      expect(mine.some((r) => r.holder === 'member-z'), `no ${kind} row carries its holder`).toBe(true);
     });
   }
+
+  it('names somebody on a step somewhere, or the step comparison proves nothing', () => {
+    expect(rows.some((r) => r.whoName === 'member-z')).toBe(true);
+  });
 });
