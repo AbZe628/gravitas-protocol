@@ -64,8 +64,17 @@ const structure = (n: number): Structure =>
     conditions: Array.from({ length: n }, (_, i) => ({ id: `c${i}`, requirement: 'x' })),
   }) as unknown as Structure;
 
+/**
+ * Every step of every half, which is the whole passage.
+ *
+ * Through the groups rather than through two named fields: a passage carries
+ * whatever halves its kind of work has, and a matter's two are only one kind's
+ * two. See `passage-shape.ts`.
+ */
+const all = (p: ReturnType<typeof buildPassage>) => p.groups.flatMap((g) => g.steps);
+
 const step = (p: ReturnType<typeof buildPassage>, key: string) =>
-  [...p.shaping, ...p.deciding].find((s) => s.key === key)!;
+  all(p).find((s) => s.key === key)!;
 
 describe('a step is done when the thing is in the record', () => {
   it('reads the mechanism as undone while it is empty, and done once written', () => {
@@ -132,7 +141,7 @@ describe('it never says the question is ready to be decided', () => {
 
   it('marks only deliberation as enforced, because it is the only thing refused', () => {
     const p = buildPassage(board, matter(), null, NOW);
-    const enforced = [...p.shaping, ...p.deciding].filter((s) => s.enforced).map((s) => s.key);
+    const enforced = all(p).filter((s) => s.enforced).map((s) => s.key);
 
     // Everything else is the board's to skip. Presenting a convention as a
     // locked gate would turn guidance into administration.
@@ -165,7 +174,7 @@ describe('the one next act', () => {
 
   it('names whose act it is, on every step', () => {
     const p = buildPassage(board, matter(), null, NOW);
-    for (const s of [...p.shaping, ...p.deciding]) {
+    for (const s of all(p)) {
       expect(['board', 'signatory', 'liaison', 'institution', 'software', 'clock']).toContain(s.whose);
     }
   });
@@ -324,7 +333,7 @@ describe('a settled matter has no outstanding acts', () => {
 
   it('marks nothing as enforced once the matter is settled', () => {
     const p = buildPassage(board, decided(), null, NOW);
-    expect([...p.shaping, ...p.deciding].some((s) => s.enforced)).toBe(false);
+    expect(all(p).some((s) => s.enforced)).toBe(false);
   });
 
   it('leaves what was actually done reading as done', () => {
@@ -368,7 +377,7 @@ describe('every sentence the spine can reach has words behind it', () => {
     it(`says something in English for ${what}`, () => {
       const unknown: string[] = [];
 
-      for (const s of [...p.shaping, ...p.deciding]) {
+      for (const s of all(p)) {
         for (const said of [s.act, s.standing, s.why]) {
           if (!known(said)) unknown.push(said?.key ?? '(none)');
         }
@@ -387,7 +396,7 @@ describe('every sentence the spine can reach has words behind it', () => {
      * seventy-four routes and report itself green.
      */
     it(`has steps to check for ${what}`, () => {
-      expect(p.shaping.length + p.deciding.length).toBeGreaterThanOrEqual(12);
+      expect(all(p).length).toBeGreaterThanOrEqual(12);
     });
   }
 });

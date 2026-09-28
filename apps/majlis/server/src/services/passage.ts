@@ -50,139 +50,44 @@
  */
 
 import { quorumFor, tally } from './lifecycle.js';
+import {
+  asPast,
+  daysSince,
+  grammarFor,
+  nextOf as pickNext,
+  say,
+  type Group,
+  type Passage,
+  type Say,
+  type Step,
+  type Whose,
+} from './passage-shape.js';
 import type { Board, Matter, Structure } from '../types.js';
 
-/** Where a step stands. `ahead` means its turn has not come. */
-export type StepState = 'done' | 'open' | 'ahead' | 'skipped' | 'not_applicable';
-
 /**
- * Whose act it is.
- *
- * Named on every step, because the commonest way a matter stalls is that
- * everyone believes it is with somebody else.
+ * A matter's steps live under `step.`, which is where they have always lived.
+ * A breach's live under `breach.step.`; see `grammarFor`, which explains why
+ * the two may not share.
  */
-export type Whose = 'board' | 'signatory' | 'liaison' | 'institution' | 'software' | 'clock';
+const { ahead, done, notApplicable, open } = grammarFor('step');
 
-/**
- * A sentence this file wants said, and what to put in its gaps.
- *
- * ── why these are not words ───────────────────────────────────────────────
- *
- * They were. Every act, every reason and every sentence about what stands in
- * the way was written here in English and rendered exactly as written — about
- * sixty-three of them, and the queue's own acts besides. The application is in
- * three languages, and this is the one text that tells a member what to do: so
- * the chrome was in Arabic and the work was in English, on the screen a board
- * opens first. Nobody noticed because everybody testing it reads English.
- *
- * The server says **which** sentence and **with what figures**. What the
- * sentence is in is the reader's business and the interface's.
+/*
+ * Re-exported because the grammar used to live here and half the application
+ * imports it from this address. The words are one set for every kind of work
+ * now; see passage-shape.ts.
  */
-export interface Say {
-  /** The i18n key, looked up on the other side. */
-  key: string;
-  /** Substituted into `{name}` gaps, where a sentence counts something. */
-  vars?: Record<string, string | number>;
-}
+export {
+  say,
+  type Group,
+  type Order,
+  type Passage,
+  type PassageKind,
+  type Say,
+  type Step,
+  type StepState,
+  type Whose,
+} from './passage-shape.js';
 
-export const say = (key: string, vars?: Record<string, string | number>): Say =>
-  vars ? { key, vars } : { key };
-
-export interface Step {
-  key: string;
-  /** The act, as a sentence the interface says in the reader's language. */
-  act: Say;
-  whose: Whose;
-  state: StepState;
-  /** When it was done, where that can be said. Null otherwise. */
-  at: string | null;
-  /**
-   * What is in the way, or null.
-   *
-   * Present on an open step whether or not the system would refuse — the
-   * distinction is carried by `enforced`, not by hiding one of them.
-   */
-  standing: Say | null;
-  /** Whether the system actually refuses to go on without this. */
-  enforced: boolean;
-  /** What the step is for. Shown where a scholar asks why it exists. */
-  why: Say;
-}
-
-export interface Passage {
-  matterId: string;
-  /** Putting the question in shape. A set; order is the work's, not ours. */
-  shaping: Step[];
-  /** Deciding. A sequence, and the lifecycle refuses to reorder it. */
-  deciding: Step[];
-  /**
-   * The one act to do next, or null where nothing is outstanding.
-   *
-   * The single most useful field here. A scholar opening a matter wants one
-   * sentence: what now, and is it mine.
-   */
-  next: Step | null;
-  /** How long the question has been here, and on whom it now waits. */
-  waiting: { days: number; since: string; on: Whose; note: Say } | null;
-  /** Said where the matter is finished, in place of a next act. */
-  settled: Say | null;
-}
-
-const DAY = 86_400_000;
-
-const daysSince = (iso: string, now: string): number =>
-  Math.max(0, Math.floor((Date.parse(now) - Date.parse(iso)) / DAY));
-
-/**
- * The act and the reason follow from the step's own name, always.
- *
- * `conditions` is `step.conditions.act` and `step.conditions.why`, and there
- * is no way to give a step an act belonging to another. Written out by hand
- * the pair drifted: the same act appeared with two wordings on two screens,
- * which is how a board ends up asking which of them the software meant.
- */
-const actOf = (key: string): Say => say(`step.${key}.act`);
-const whyOf = (key: string): Say => say(`step.${key}.why`);
-
-/** A step that is done, with the moment it became so where that is knowable. */
-const done = (key: string, whose: Whose, at: string | null = null): Step => ({
-  key,
-  act: actOf(key),
-  whose,
-  state: 'done',
-  at,
-  standing: null,
-  enforced: false,
-  why: whyOf(key),
-});
-
-const open = (
-  key: string,
-  whose: Whose,
-  standing: Say,
-  enforced = false,
-): Step => ({
-  key,
-  act: actOf(key),
-  whose,
-  state: 'open',
-  at: null,
-  standing,
-  enforced,
-  why: whyOf(key),
-});
-
-/** A step whose turn has not come, with the one sentence saying what it waits on. */
-const ahead = (key: string, whose: Whose, standing: Say): Step => ({
-  key,
-  act: actOf(key),
-  whose,
-  state: 'ahead',
-  at: null,
-  standing,
-  enforced: false,
-  why: whyOf(key),
-});
 
 /**
  * Putting the question in shape.
@@ -221,16 +126,7 @@ function shapingOf(matter: Matter, structure: Structure | null): Step[] {
   // Conditions only exist once a shape has been chosen, so this is genuinely
   // not applicable rather than merely undone.
   if (!structure) {
-    steps.push({
-      key: 'conditions',
-      act: actOf('conditions'),
-      whose: 'board',
-      state: 'not_applicable',
-      at: null,
-      standing: say('step.conditions.noShape'),
-      enforced: false,
-      why: whyOf('conditions'),
-    });
+    steps.push(notApplicable('conditions', 'board', say('step.conditions.noShape')));
   } else {
     const total = structure.conditions.length;
     /*
@@ -397,16 +293,7 @@ function decidingOf(
           : ahead('timelock', 'clock', say('step.timelock.ahead')),
     );
   } else {
-    steps.push({
-      key: 'timelock',
-      act: actOf('timelock'),
-      whose: 'clock',
-      state: 'not_applicable',
-      at: null,
-      standing: say('step.timelock.restricting'),
-      enforced: false,
-      why: whyOf('timelock'),
-    });
+    steps.push(notApplicable('timelock', 'clock', say('step.timelock.restricting')));
   }
 
   // ── the document ──────────────────────────────────────────────────────
@@ -441,33 +328,6 @@ function waitingOn(matter: Matter, next: Step | null): Whose {
   return next?.whose ?? 'board';
 }
 
-/**
- * A settled matter has no outstanding acts.
- *
- * Found on the screen rather than in a test. An in-force ruling was showing its
- * first step as open and marked required, with the sentence saying nothing had
- * been said on the matter yet — which reads as a job for whoever is looking.
- * Its moment has gone; nobody is going to deliberate on a question that was
- * decided in March.
- *
- * It is not simply hidden, because the fact underneath it is worth having: this
- * board brought a permission into force with nothing on the record behind it.
- * So the step is reported as **skipped** — the past tense of open — and says
- * plainly that it did not happen and the matter went ahead anyway. A spine that
- * quietly tidied that away would be improving the record, which is the one
- * thing this application exists to make impossible.
- */
-function asPast(step: Step): Step {
-  if (step.state === 'done' || step.state === 'not_applicable') return step;
-  return {
-    ...step,
-    state: 'skipped',
-    // Never enforced in the past tense. Nothing is being refused any more.
-    enforced: false,
-    standing: say('step.notDone'),
-  };
-}
-
 export function buildPassage(
   board: Board,
   matter: Matter,
@@ -492,25 +352,31 @@ export function buildPassage(
   );
 
   /*
-   * The next act, and deciding comes first.
-   *
-   * A matter mid-vote whose mechanism was never written down has two
-   * outstanding things, and the vote is the one in front of the board. Putting
-   * the shaping step first would send a member back to paperwork while a
-   * colleague waits on their position — and the shaping steps stay visible
-   * beside it either way, so nothing is hidden by the choice.
+   * Putting the question in shape is a set: a member reads a source and it
+   * changes the terms, a liaison answers and it changes the mechanism, and
+   * numbering those would invent a sequence nobody follows. Deciding genuinely
+   * waits on itself, and the lifecycle refuses to reorder it.
    */
-  const next = settledNote
-    ? null
-    : deciding.find((s) => s.state === 'open') ?? shaping.find((s) => s.state === 'open') ?? null;
+  const groups: Group[] = [
+    { key: 'shaping', order: 'set', steps: shaping },
+    { key: 'deciding', order: 'sequence', steps: deciding },
+  ];
+
+  /*
+   * Searched deciding first, which is why the groups go in reversed: the vote
+   * is what is in front of the board, and a matter mid-vote whose mechanism
+   * was never written down should not send a member back to paperwork while a
+   * colleague waits on their position. Both halves stay visible either way, so
+   * nothing is hidden by the choice — only the one sentence at the top changes.
+   */
+  const next = settledNote ? null : pickNext([groups[1], groups[0]]);
 
   const arrived = matter.arrivedAt ?? matter.openedAt;
   const days = daysSince(arrived, now);
 
   return {
-    matterId: matter.id,
-    shaping,
-    deciding,
+    of: { kind: 'matter', id: matter.id },
+    groups,
     next,
     waiting: settledNote
       ? null

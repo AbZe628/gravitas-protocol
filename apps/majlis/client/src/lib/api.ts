@@ -1318,13 +1318,39 @@ export interface PassageStep {
   why: Say;
 }
 
+/**
+ * Whether the steps of a group wait on each other.
+ *
+ * Decides whether the interface numbers them. Putting a question into shape
+ * happens in whatever order the work happens, so numbering those would invent
+ * a sequence nobody follows; deciding genuinely waits on itself.
+ */
+export type StepOrder = 'set' | 'sequence';
+
+/**
+ * One half of a passage.
+ *
+ * Groups rather than two fixed fields, because the two halves are not the same
+ * two halves for every kind of work. A matter has *putting the question in
+ * shape* and *deciding*. A breach has *what happened* and *putting it right*.
+ * Two fields named after a matter's phases would have meant every other kind
+ * pretending to have them.
+ *
+ * `key` names the group and the sentence under it: `passage.group.<key>` and
+ * `passage.group.<key>.hint`.
+ */
+export interface PassageGroup {
+  key: string;
+  order: StepOrder;
+  steps: PassageStep[];
+}
+
+export type PassageKind = 'matter' | 'breach' | 'question' | 'undertaking' | 'review';
+
 export interface Passage {
-  matterId: string;
-  /** A set. The order is the work's, not ours. */
-  shaping: PassageStep[];
-  /** A sequence. The lifecycle refuses to reorder it. */
-  deciding: PassageStep[];
-  /** The one act to do next, or null where the matter is settled. */
+  of: { kind: PassageKind; id: string };
+  groups: PassageGroup[];
+  /** The one act to do next, or null where the work is finished. */
   next: PassageStep | null;
   waiting: { days: number; since: string; on: Whose; note: Say } | null;
   settled: Say | null;
@@ -2075,6 +2101,14 @@ export const oversight = {
 
   incidents: () => get<IncidentList>('/api/incidents'),
   incident: (id: string) => get<Incident>(`/api/incidents/${id}`),
+
+  /**
+   * Where a breach stands, and what the next act is.
+   *
+   * The same reading the arrival queue uses. This screen used to work it out
+   * itself, in nine steps written out by hand.
+   */
+  incidentPassage: (id: string) => get<Passage>(`/api/incidents/${id}/passage`),
 
   /**
    * What the institution owes, and what it still has to do.

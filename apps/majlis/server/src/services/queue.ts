@@ -1,6 +1,7 @@
 import type { Board, Incident, Matter, Rule, Structure, Submission } from '../types.js';
 import { standingOf } from './submission.js';
 import { buildPassage, say, type Say, type Whose } from './passage.js';
+import { buildIncidentPassage } from './passage-incident.js';
 import { reviewsDue } from './review.js';
 import { overdue as undertakingOverdue, type Undertaking } from './undertaking.js';
 
@@ -90,24 +91,6 @@ function daysSince(iso: string, now: string): number {
 
 /** A matter that is finished is not waiting on anybody. */
 const SETTLED: readonly Matter['status'][] = ['in_force', 'withdrawn', 'rejected', 'lapsed'];
-
-/**
- * What follows a reported breach, and whose it is.
- *
- * Three of the eight steps belong to the institution rather than to the
- * board, and saying so is most of the value of this row: the commonest way a
- * breach stalls is that each side believes it is with the other.
- */
-const BREACH_NEXT: Record<Incident['stage'], { act: Say; whose: Whose } | null> = {
-  reported: { act: say('snc.step.determine'), whose: 'board' },
-  determined: { act: say('snc.step.plan'), whose: 'institution' },
-  plan_filed: { act: say('snc.step.endorse'), whose: 'board' },
-  endorsed: { act: say('snc.step.directors'), whose: 'institution' },
-  approved: { act: say('snc.step.regulator'), whose: 'institution' },
-  submitted: { act: say('snc.step.close'), whose: 'board' },
-  not_actual: null,
-  closed: null,
-};
 
 export interface QueueInput {
   board: Board;
@@ -255,16 +238,41 @@ export function buildQueue(input: QueueInput): QueueRow[] {
 
   // ── checked ─────────────────────────────────────────────────────────────
   for (const i of input.incidents) {
-    const step = BREACH_NEXT[i.stage];
-    if (!step) continue;
+    /*
+     * The same reading the breach's own screen uses.
+     *
+     * This was a hand table here of six stages mapped to acts and owners — a
+     * third copy of the grammar, and the shortest of the three. It knew
+     * nothing of two steps the breach screen knew about: that the activity has
+     * to stop, and that purification has to be paid. So a breach could sit in
+     * this list saying *close it once purification is recorded* while the
+     * breach's own screen was waiting on the bank to pay, and a breach whose
+     * activity had never stopped read here as ordinary progress.
+     *
+     * Wrapped for the same reason the matter above is: this is the arrival
+     * screen, and one malformed record must not take every other row with it.
+     */
+    let next: Say | null = null;
+    let whose: Whose | null = null;
+    try {
+      const passage = buildIncidentPassage(i, now);
+      next = passage.next?.act ?? null;
+      whose = passage.next?.whose ?? null;
+    } catch {
+      // Left as it stands: the row without its next act.
+    }
+
+    // Settled either way — dismissed or closed — is not waiting on anybody.
+    if (i.stage === 'not_actual' || i.stage === 'closed') continue;
+
     rows.push({
       kind: 'breach',
       id: i.id,
       to: `/incidents/${i.id}`,
       title: i.title,
       phase: 'checked',
-      next: step.act,
-      whose: step.whose,
+      next,
+      whose,
       days: daysSince(i.reportedAt, now),
       /*
        * The thirty days run from the board finding an event actual, not from

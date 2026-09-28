@@ -40,6 +40,7 @@ import {
   returnPlan,
   stopActivities,
 } from '../services/incident.js';
+import { buildIncidentPassage } from '../services/passage-incident.js';
 import type { Store } from '../store/index.js';
 import type { Incident } from '../types.js';
 import { badRequest, handle, identityOf, requireRole } from './http.js';
@@ -165,6 +166,32 @@ export function incidentRoutes(store: Store, now: () => string = () => new Date(
         clock: rectificationClock(incident, now()),
         plan: currentPlan(incident),
       });
+    }),
+  );
+
+  /**
+   * Where this breach stands, and what the next act is.
+   *
+   * The same reading the arrival queue uses, so the sentence a member sees in
+   * the list is the sentence they see when they open it. It was not the same
+   * before: this screen kept nine steps written out in the component and the
+   * queue kept six in a table, and the two the screen had — that the activity
+   * must stop, and that what was earned must be paid away — were the two that
+   * cost money while a breach read as ordinary progress.
+   *
+   * It says what is in the record and what is not. It does not say a plan is
+   * good enough to endorse or that enough has been purified; those are the
+   * board's rulings.
+   */
+  router.get(
+    '/incidents/:id/passage',
+    handle(async (req, res) => {
+      const incident = await store.incident(req.params.id);
+      if (!incident) {
+        res.status(404).json({ error: 'not_found', message: 'No such incident.' });
+        return;
+      }
+      res.json(buildIncidentPassage(incident, now()));
     }),
   );
 

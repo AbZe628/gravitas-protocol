@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { useParams } from 'react-router-dom';
-import { oversight, type Incident } from '../lib/api.js';
+import { oversight, type Incident, type Passage, type PassageStep } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { DateText, ErrorText, Loading, Tag } from '../components/ui.js';
 import { ClockLine } from './Incidents.js';
@@ -30,16 +30,31 @@ import AfterAct from '../components/AfterAct.js';
  * shown in the server's own words rather than replaced with an apology.
  */
 
-type Owner = 'board' | 'institution' | 'directors' | 'system';
-
-interface Step {
-  n: number;
-  owner: Owner;
-  label: string;
-  done: boolean;
-  current: boolean;
+/**
+ * What a step of a breach is worked on with.
+ *
+ * Not what state it is in, whose it is or what it is called — those are the
+ * record's, and `services/passage-incident.ts` reads them. This file used to
+ * decide all three, in nine entries with `current: i.stage === 'reported'`
+ * written out by hand, which made it the third place in the application that
+ * claimed to know what follows what. It disagreed with the other two about
+ * two steps and about who owns three more.
+ *
+ * What is left here is the part that genuinely belongs to a screen: the panel
+ * a person does the step in, and the control that performs it. Matched to the
+ * step by key.
+ */
+interface Panel {
+  key: string;
   detail?: ReactNode;
   action?: ReactNode;
+}
+
+/** One line of the sequence: a step of the reading, and the panel for it. */
+interface Row {
+  key: string;
+  /** Null only where the reading did not arrive. */
+  step: PassageStep | null;
 }
 
 function Reason({
@@ -116,9 +131,10 @@ function Reason({
 
 export default function IncidentDetail() {
   const { id = '' } = useParams();
-  const { t } = useI18n();
+  const { t, say } = useI18n();
   const { identity } = useIdentity();
   const [incident, setIncident] = useState<Incident | null>(null);
+  const [passage, setPassage] = useState<Passage | null>(null);
   const [failed, setFailed] = useState(false);
   const [refusal, setRefusal] = useState<string | null>(null);
   /** Whether this breach has ever rendered. See the note on `load` below. */
@@ -179,8 +195,25 @@ export default function IncidentDetail() {
    * what is on screen exactly where it is, and the act's own sentence is
    * what the reader sees.
    */
-  const load = () =>
-    oversight
+  const load = () => {
+    /*
+     * Where this breach stands, decided on the server.
+     *
+     * Fetched beside the record rather than worked out from it. This screen
+     * used to decide which step was current from `i.stage`, in nine lines
+     * written out by hand — and the arrival queue decided the same thing from
+     * its own table of six, so the two could say different things about the
+     * same breach on the same day.
+     *
+     * Not fatal when it does not come: the panels below are still readable,
+     * and a sequence invented here is what the disagreement was made of.
+     */
+    void oversight
+      .incidentPassage(id)
+      .then((p) => setPassage(Array.isArray(p?.groups) ? p : null))
+      .catch(() => setPassage(null));
+
+    return oversight
       .incident(id)
       /*
        * Every list this screen walks, checked before it is set. A 200 with the
@@ -198,6 +231,7 @@ export default function IncidentDetail() {
       .catch(() => {
         if (!shown.current) setFailed(true);
       });
+  };
 
   useEffect(() => {
     void load();
@@ -223,16 +257,9 @@ export default function IncidentDetail() {
     }
   }
 
-  const mine = (o: Owner) =>
-    o === 'board' ? t('snc.owner.board') : o === 'institution' ? t('snc.owner.institution') : o === 'directors' ? t('snc.owner.directors') : t('snc.owner.system');
-
-  const steps: Step[] = [
+  const panels: Panel[] = [
     {
-      n: 1,
-      owner: 'institution',
-      label: t('snc.step.reported'),
-      done: true,
-      current: false,
+      key: 'reported',
       detail: (
         <>
           {i.reportedBy} · <DateText iso={i.reportedAt} />
@@ -240,11 +267,7 @@ export default function IncidentDetail() {
       ),
     },
     {
-      n: 2,
-      owner: 'board',
-      label: t('snc.step.determine'),
-      done: i.actual !== null,
-      current: i.stage === 'reported',
+      key: 'determine',
       detail:
         i.concurrences.length > 0 ? (
           <ul className="space-y-1.5">
@@ -275,11 +298,7 @@ export default function IncidentDetail() {
         ) : undefined,
     },
     {
-      n: 3,
-      owner: 'board',
-      label: t('snc.step.stop'),
-      done: i.stopped.length > 0,
-      current: determined && i.stopped.length === 0,
+      key: 'stop',
       detail:
         i.stopped.length > 0 ? (
           <ul className="list-disc ps-4">
@@ -298,11 +317,7 @@ export default function IncidentDetail() {
         ) : undefined,
     },
     {
-      n: 4,
-      owner: 'institution',
-      label: t('snc.step.plan'),
-      done: plan !== null,
-      current: i.stage === 'determined',
+      key: 'plan',
       detail: plan ? (
         <ol className="list-decimal space-y-1 ps-4">
           {plan.steps.map((s, k) => (
@@ -350,11 +365,7 @@ export default function IncidentDetail() {
         ) : undefined,
     },
     {
-      n: 5,
-      owner: 'board',
-      label: t('snc.step.endorse'),
-      done: Boolean(plan?.endorsedAt),
-      current: i.stage === 'plan_filed',
+      key: 'endorse',
       detail: plan?.endorsedBy.length ? (
         <span>{plan.endorsedBy.join(', ')}</span>
       ) : (
@@ -373,11 +384,7 @@ export default function IncidentDetail() {
         ) : undefined,
     },
     {
-      n: 6,
-      owner: 'directors',
-      label: t('snc.step.directors'),
-      done: i.directorsApprovedAt !== null,
-      current: i.stage === 'endorsed',
+      key: 'directors',
       detail: i.directorsApprovedAt ? <DateText iso={i.directorsApprovedAt} /> : <span className="text-muted">—</span>,
       action:
         i.stage === 'endorsed' && clerk ? (
@@ -387,11 +394,7 @@ export default function IncidentDetail() {
         ) : undefined,
     },
     {
-      n: 7,
-      owner: 'institution',
-      label: t('snc.step.regulator'),
-      done: i.submittedToRegulatorAt !== null,
-      current: i.stage === 'approved',
+      key: 'regulator',
       detail: i.submittedToRegulatorAt ? (
         <DateText iso={i.submittedToRegulatorAt} />
       ) : (
@@ -405,11 +408,7 @@ export default function IncidentDetail() {
         ) : undefined,
     },
     {
-      n: 8,
-      owner: 'board',
-      label: t('snc.step.purify'),
-      done: Boolean(i.purification?.paidAt),
-      current: determined && !i.purification,
+      key: 'purify',
       detail: i.purification ? (
         <>
           <span className="tabular-nums">
@@ -494,11 +493,7 @@ export default function IncidentDetail() {
       ),
     },
     {
-      n: 9,
-      owner: 'board',
-      label: t('snc.step.close'),
-      done: i.stage === 'closed',
-      current: i.stage === 'submitted' || i.stage === 'not_actual',
+      key: 'close',
       detail: i.closedAt ? <DateText iso={i.closedAt} /> : <span className="text-muted">—</span>,
       action:
         (i.stage === 'submitted' || i.stage === 'not_actual') && board ? (
@@ -524,6 +519,45 @@ export default function IncidentDetail() {
    * breach different from a matter: from the moment the board finds the event
    * actual, thirty days run that the institution is judged on.
    */
+  /**
+   * The sequence to draw, and what each row of it is.
+   *
+   * One shape for both cases, so the list below has no branch in it. When the
+   * reading has arrived these are its halves, named by it, with a step behind
+   * every row. When it has not, there is one unnamed half and the panels stand
+   * on their own — a member can still read the report, the concurrences and
+   * the plan, and what they lose is the claim about where the breach stands.
+   *
+   * Losing that claim is the right failure. It is exactly the claim this
+   * screen used to make for itself, and the reason the queue and this page
+   * could describe one breach two ways.
+   */
+  const halves: { key: string; heading: string; hint: string | null; rows: Row[] }[] = passage
+    ? passage.groups.map((g) => ({
+        key: g.key,
+        heading: t(`passage.group.${g.key}`),
+        hint: t(`passage.group.${g.key}.hint`),
+        rows: g.steps.map((s) => ({ key: s.key, step: s })),
+      }))
+    : [
+        {
+          key: 'all',
+          heading: t('snc.sequence'),
+          hint: null,
+          /*
+           * Named, though nothing is claimed about them.
+           *
+           * The first version of this fallback drew nine unlabelled panels,
+           * which is a worse screen than the one it replaced. A step's name is
+           * not a judgement about the record — `breach.step.plan.act` is *file
+           * a rectification plan* whatever state the breach is in — so the
+           * names stay. What goes is the tick, the highlight and the owner,
+           * which are claims, and which this file may no longer make.
+           */
+          rows: panels.map((p) => ({ key: p.key, step: null })),
+        },
+      ];
+
   const windows = (
     <>
       {/*
@@ -771,37 +805,77 @@ export default function IncidentDetail() {
         </div>
       )}
 
-      <h2 className="mb-3 text-label font-bold uppercase tracking-caps text-muted">
-        {t('snc.sequence')}
-      </h2>
+      {/*
+        The sequence, as the record reads it.
 
-      <ol className="space-y-4">
-        {steps.map((s) => (
-          <li
-            key={s.n}
-            className={
-              'grid grid-cols-[28px_1fr] gap-3 rounded-card px-5 py-4 ' +
-              (s.current
-                ? 'bg-lapistint shadow-pick'
-                : s.done
-                  ? 'bg-raised shadow-card'
-                  : 'bg-raised/60 opacity-70 shadow-ring')
-            }
-          >
-            <div className="pt-0.5 font-mono text-note text-muted tabular-nums">
-              {s.done ? '✓' : String(s.n).padStart(2, '0')}
-            </div>
-            <div>
-              <div className="mb-1 flex flex-wrap items-baseline gap-2">
-                <span className="text-body font-medium">{s.label}</span>
-                <span className="text-label font-bold uppercase tracking-caps text-muted">{mine(s.owner)}</span>
-              </div>
-              <div className="text-ui leading-relaxed">{s.detail}</div>
-              {s.action && <div className="mt-2.5">{s.action}</div>}
-            </div>
-          </li>
-        ))}
-      </ol>
+        The halves are the server's and so are their names: a breach has *what
+        happened* and *putting it right*, which are not a matter's two halves
+        and were never going to be. The number beside a step is its place in
+        its own half, so a reader counting is counting the thing in front of
+        them rather than a running total across a screen.
+
+        Where the reading has not arrived the panels are still drawn, unnumbered
+        and in one list. A member can still read the report, the concurrences
+        and the plan; what they lose is the claim about where it stands, which
+        is the one thing this screen must not invent.
+      */}
+      {halves.map((half) => (
+        <div key={half.key} className="mb-6">
+          <h2 className="mb-1 text-label font-bold uppercase tracking-caps text-muted">
+            {half.heading}
+          </h2>
+          {half.hint && (
+            <p className="mb-3 max-w-[62ch] text-note leading-relaxed text-muted">{half.hint}</p>
+          )}
+
+          <ol className="space-y-4">
+            {half.rows.map((row, n) => {
+              const panel = panels.find((p) => p.key === row.key);
+              const current = row.step?.state === 'open';
+              const did = row.step?.state === 'done';
+
+              return (
+                <li
+                  key={row.key}
+                  className={
+                    'grid grid-cols-[28px_1fr] gap-3 rounded-card px-5 py-4 ' +
+                    (current
+                      ? 'bg-lapistint shadow-pick'
+                      : did
+                        ? 'bg-raised shadow-card'
+                        : 'bg-raised/60 opacity-70 shadow-ring')
+                  }
+                >
+                  <div className="pt-0.5 font-mono text-note text-muted tabular-nums">
+                    {did ? '✓' : String(n + 1).padStart(2, '0')}
+                  </div>
+                  <div>
+                    <div className="mb-1 flex flex-wrap items-baseline gap-2">
+                      <span className="text-body font-medium">
+                        {row.step ? say(row.step.act) : t(`breach.step.${row.key}.act`)}
+                      </span>
+                      {/* Whose it is, which only the reading can say. */}
+                      {row.step && (
+                        <span className="text-label font-bold uppercase tracking-caps text-muted">
+                          {t(`passage.whose.${row.step.whose}`)}
+                        </span>
+                      )}
+                    </div>
+                    {/* What is in the way, in the record's own words. */}
+                    {current && row.step?.standing && (
+                      <p className="mb-1.5 text-note leading-relaxed text-muted">
+                        {say(row.step.standing)}
+                      </p>
+                    )}
+                    <div className="text-ui leading-relaxed">{panel?.detail}</div>
+                    {panel?.action && <div className="mt-2.5">{panel.action}</div>}
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
+        </div>
+      ))}
     </div>
   );
 }

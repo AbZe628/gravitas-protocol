@@ -77,9 +77,36 @@ function incident(id: string, stage: Incident['stage'], reportedAt: string): Inc
     actual: stage === 'reported' ? null : true,
     determinedAt: stage === 'reported' ? null : reportedAt,
     concurrences: [],
-    plans: [],
+    /*
+     * The record as it would actually be at this stage, rather than the few
+     * fields the old table happened to read.
+     *
+     * The queue used to answer this from `stage` alone, so a fixture carrying
+     * nothing but a stage was enough to test it. The reading answers from what
+     * is in the record — a step is done when the thing is there — so a fixture
+     * that leaves everything out is a breach where nothing has been done, and
+     * a test built on one would have been asserting against a record no
+     * institution could produce.
+     */
+    stopped: stage === 'reported' ? [] : ['the activity'],
+    plans:
+      stage === 'plan_filed' || stage === 'endorsed' || stage === 'approved' || stage === 'submitted'
+        ? [
+            {
+              filedBy: 'liaison-1',
+              filedAt: reportedAt,
+              steps: ['put it right'],
+              completeBy: reportedAt,
+              endorsedBy: [],
+              endorsedAt: stage === 'plan_filed' ? null : reportedAt,
+            },
+          ]
+        : [],
+    directorsApprovedAt: stage === 'approved' || stage === 'submitted' ? reportedAt : null,
+    submittedToRegulatorAt: stage === 'submitted' ? reportedAt : null,
     purification: null,
     closedAt: null,
+    sources: [],
   } as unknown as Incident;
 }
 
@@ -137,7 +164,10 @@ describe('what is waiting, and whose it is', () => {
     });
 
     const whose = Object.fromEntries(rows.map((r) => [r.id, r.whose]));
-    expect(whose.a, 'determining whether it is actual is the board’s').toBe('board');
+    // A signatory, not the board at large: `/incidents/:id/concurrence` takes
+    // a signatory's credential, because the finding is what the threshold is
+    // counted from.
+    expect(whose.a, 'determining whether it is actual is a signatory’s').toBe('signatory');
     expect(whose.b, 'filing a plan is the institution’s').toBe('institution');
     expect(whose.c, 'putting it to the Directors is the institution’s').toBe('institution');
     expect(whose.d, 'filing with the regulator is the institution’s').toBe('institution');

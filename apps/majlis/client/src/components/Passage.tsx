@@ -104,7 +104,7 @@ export default function Passage({ matterId }: { matterId: string }) {
        * an older server, a proxy's error page — as well as against a failed
        * request, because only one of the two arrives in `catch`.
        */
-      .then((p) => live && Array.isArray(p?.shaping) && Array.isArray(p?.deciding) && setPassage(p))
+      .then((p) => live && Array.isArray(p?.groups) && setPassage(p))
       .catch(() => undefined);
     return () => {
       live = false;
@@ -177,34 +177,39 @@ export default function Passage({ matterId }: { matterId: string }) {
 
       {open && (
         <div className="mt-5 grid gap-7 border-t border-line pt-5 sm:grid-cols-2">
-          <div>
-            <div className="mb-1 text-label font-bold uppercase tracking-caps text-muted">
-              {t('passage.shaping')}
-            </div>
-            {/* Unnumbered on purpose: the order is the work's, not ours. */}
-            <p className="mb-2.5 text-note leading-relaxed text-muted">
-              {t('passage.shaping.hint')}
-            </p>
-            <ul>
-              {passage.shaping.map((s) => (
-                <Step key={s.key} step={s} />
-              ))}
-            </ul>
-          </div>
+          {/*
+            Whatever halves this kind of work has, named by the server.
 
-          <div>
-            <div className="mb-1 text-label font-bold uppercase tracking-caps text-muted">
-              {t('passage.deciding')}
+            These were two hard-coded columns, "putting the question in shape"
+            and "deciding" — a matter's phases, in a component that is now also
+            the only place a breach's nine steps are drawn. A breach has
+            neither of those halves, and drawing its steps under a matter's
+            headings would have been the component telling the reader something
+            the record never said.
+
+            Numbered only where the steps genuinely wait on each other. The
+            shaping of a question happens in whatever order the work happens,
+            and numbering it would invent a sequence nobody follows.
+          */}
+          {passage.groups.map((group) => (
+            <div key={group.key}>
+              <div className="mb-1 text-label font-bold uppercase tracking-caps text-muted">
+                {t(`passage.group.${group.key}`)}
+              </div>
+              <p className="mb-2.5 text-note leading-relaxed text-muted">
+                {t(`passage.group.${group.key}.hint`)}
+              </p>
+              <ul>
+                {group.steps.map((s, i) => (
+                  <Step
+                    key={s.key}
+                    step={s}
+                    ordinal={group.order === 'sequence' ? i + 1 : undefined}
+                  />
+                ))}
+              </ul>
             </div>
-            <p className="mb-2.5 text-note leading-relaxed text-muted">
-              {t('passage.deciding.hint')}
-            </p>
-            <ul>
-              {passage.deciding.map((s, i) => (
-                <Step key={s.key} step={s} ordinal={i + 1} />
-              ))}
-            </ul>
-          </div>
+          ))}
         </div>
       )}
     </div>

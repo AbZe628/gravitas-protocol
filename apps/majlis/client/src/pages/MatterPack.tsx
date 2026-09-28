@@ -164,7 +164,7 @@ export default function MatterPack() {
      */
     oversight
       .passage(id)
-      .then((p) => setPassage(Array.isArray(p?.shaping) && Array.isArray(p?.deciding) ? p : null))
+      .then((p) => setPassage(Array.isArray(p?.groups) ? p : null))
       .catch(() => setPassage(null));
   }
 

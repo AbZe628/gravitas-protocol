@@ -4,6 +4,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import IncidentDetail from './pages/IncidentDetail.js';
 import { I18nProvider } from './lib/i18n.js';
+import { buildIncidentPassage } from '../../server/src/services/passage-incident.js';
 
 /**
  * The nine steps, and whose each one is.
@@ -54,6 +55,18 @@ function stub(who: { role: string; office: string | null }, data = incident()) {
 
       if (url.includes('/api/attention')) {
         return json({ scholarId: 'member-a', role: who.role, office: who.office, outstanding: 0, overdue: 0, items: [] });
+      }
+      /*
+       * Where the breach stands, built by the function the server uses.
+       *
+       * Not a fixture. This screen no longer decides which step is current or
+       * whose it is — `services/passage-incident.ts` does, and the arrival
+       * queue reads the same answer — so a hand-written passage here would be
+       * testing the screen against a fourth opinion, which is the shape of the
+       * fault this replaced.
+       */
+      if (url.includes('/passage')) {
+        return json(buildIncidentPassage(data as never, '2026-09-20T00:00:00Z'));
       }
       return json(data);
     }),
