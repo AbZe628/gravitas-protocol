@@ -178,6 +178,19 @@ export interface RuleParameter {
   };
 }
 
+/**
+ * One time the board said how often a ruling comes back.
+ *
+ * `everyMonths` of null is the board saying it does not come back on a clock,
+ * which is a decision and reads differently from never having been asked.
+ */
+export interface ReviewInterval {
+  everyMonths: number | null;
+  by: string;
+  at: string;
+  reason: string;
+}
+
 export interface Rule {
   id: string;
   boardId: string;
@@ -205,6 +218,27 @@ export interface Rule {
    * unscheduled rather than quietly given a default nobody chose.
    */
   reviewEveryMonths?: number;
+  /**
+   * Every time the board said how often this comes back, in order.
+   *
+   * ── why a list and not the field above on its own ─────────────────────
+   *
+   * `reviewEveryMonths` was set once, when the rule took effect, and nothing
+   * could ever change it: no route wrote a rule at all, so a ruling with no
+   * interval said *nothing will bring this back before the board* and there
+   * was no way to answer it. The step was open, it sat in every signatory's
+   * queue, and it could not be done.
+   *
+   * The record keeps every setting rather than the last one, like every other
+   * thing here: what stands is the last entry, and what was decided before is
+   * still readable with who decided it and why. A board that shortens an
+   * interval after a near miss has said something, and a field overwritten in
+   * place says nothing.
+   *
+   * `reviewEveryMonths` above is what stands — the last entry's figure — so
+   * everything that reads it goes on reading it.
+   */
+  reviewIntervals?: ReviewInterval[];
   /**
    * When the board last looked at it, whatever it concluded. Absent until the
    * first review, after which the interval runs from here rather than from

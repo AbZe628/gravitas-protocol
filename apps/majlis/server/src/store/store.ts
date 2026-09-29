@@ -114,6 +114,20 @@ export interface Store {
    */
   updateBoard(id: string, change: (current: Board) => Board): Promise<Board>;
 
+  /**
+   * Change a ruling in force, the same way.
+   *
+   * Nothing wrote a rule at all until now, and it showed: a ruling with no
+   * review interval said *nothing will bring this back before the board* on
+   * every screen, the passage put it in every signatory's queue as an open
+   * step, and there was no route on earth that could answer it.
+   *
+   * What a rule *says* is still not changed here. Amending a standard is a
+   * matter and a vote, not a field; this carries the board's own housekeeping
+   * about it — how often it comes back, and that it was looked at.
+   */
+  updateRule(id: string, change: (current: Rule) => Rule): Promise<Rule>;
+
   // ── reported non-compliance ────────────────────────────────────────────
   //
   // Kept apart from matters because it is not one. A matter is a proposal to

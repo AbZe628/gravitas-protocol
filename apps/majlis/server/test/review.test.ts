@@ -7,6 +7,7 @@ import {
   reviewStatus,
   reviewsDue,
   scheduleReview,
+  setReviewInterval,
 } from '../src/services/review.js';
 
 const T0 = '2026-01-31T09:00:00.000Z';
@@ -152,5 +153,83 @@ describe('setting and recording', () => {
     const after = reviewStatus(confirmed, '2026-08-02T09:00:00.000Z');
     expect(after.state).toBe('scheduled');
     expect(after.dueAt).toBe('2027-02-01T09:00:00.000Z');
+  });
+});
+
+/**
+ * The board saying how often a ruling comes back.
+ *
+ * ── the step that arrived and could not be done ───────────────────────────
+ *
+ * A ruling in force with no interval already said *nothing will bring this
+ * back before the board*, and the passage already carried that as an open step
+ * of the board's own, in every signatory's queue. Nothing in the application
+ * wrote a rule — no route, and no method on the store — so the one piece of
+ * work the clock creates by itself was the one piece nobody could do.
+ *
+ * ── and never, which it refused to let anybody say ────────────────────────
+ *
+ * The refusal below says a five-year interval is not a schedule and that a
+ * board meaning *never* should say so. There was no way to say so. It is an
+ * entry like any other now, and the ruling reads as one the board decided does
+ * not come back on a clock — which is not the same as one nobody has answered.
+ */
+describe('how often a ruling comes back', () => {
+  const inForce = (over: Partial<Rule> = {}): Rule =>
+    ({ ...rule(), inForceFrom: '2026-01-01T00:00:00.000Z', supersededBy: null, ...over }) as Rule;
+  const NOW = '2026-09-29T00:00:00.000Z';
+  const said = (everyMonths: number | null) => ({
+    everyMonths,
+    by: 'member-a',
+    at: '2026-09-29T09:00:00.000Z',
+    reason: 'The ratio it rests on is reported quarterly.',
+  });
+
+  it('keeps every time it was said, and stands on the last', () => {
+    const once = setReviewInterval(inForce(), said(12));
+    const twice = setReviewInterval(once, { ...said(3), reason: 'After the near miss in August.' });
+
+    expect(twice.reviewEveryMonths).toBe(3);
+    expect(twice.reviewIntervals).toHaveLength(2);
+    // The first is still readable, with who said it and why.
+    expect(twice.reviewIntervals?.[0]).toMatchObject({ everyMonths: 12, by: 'member-a' });
+    expect(twice.reviewIntervals?.[1].reason).toContain('near miss');
+  });
+
+  it('lets the board say it does not come back on a clock, and reads that as a decision', () => {
+    const before = reviewStatus(inForce(), NOW);
+    expect(before.state, 'the seed rule is already answered, so this proves nothing').toBe(
+      'unscheduled',
+    );
+    expect(before.note).toContain('Nothing will bring this back');
+
+    const after = reviewStatus(setReviewInterval(inForce(), said(null)), NOW);
+    expect(after.state).toBe('no_clock');
+    expect(after.note).toContain('does not come back on a clock');
+    expect(after.note).not.toContain('Nothing will bring this back');
+  });
+
+  it('comes off the clock again when the board says so', () => {
+    const scheduled = setReviewInterval(inForce(), said(6));
+    expect(reviewStatus(scheduled, NOW).state).toBe('due');
+
+    const off = setReviewInterval(scheduled, { ...said(null), reason: 'The structure is settled.' });
+    expect(off.reviewEveryMonths).toBeUndefined();
+    expect(reviewStatus(off, NOW).state).toBe('no_clock');
+    expect(off.reviewIntervals).toHaveLength(2);
+  });
+
+  it('refuses what is not an interval, and writes nothing when it does', () => {
+    for (const bad of [0, -1, 2.5, 61]) {
+      expect(() => setReviewInterval(inForce(), said(bad))).toThrow(BadInterval);
+    }
+    // Nothing half-written: the rule handed in is untouched either way.
+    const r = inForce();
+    try {
+      setReviewInterval(r, said(0));
+    } catch {
+      /* expected */
+    }
+    expect(r.reviewIntervals).toBeUndefined();
   });
 });

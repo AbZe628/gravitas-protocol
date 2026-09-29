@@ -310,6 +310,19 @@ export class FileStore implements Store {
     });
   }
 
+  async updateRule(id: string, change: (current: Rule) => Rule): Promise<Rule> {
+    return this.serialise(() => {
+      const index = this.doc.rules.findIndex((r) => r.id === id);
+      if (index === -1) throw new NotFound('Rule', id);
+
+      // Against a copy and before persist(), so a refusal writes nothing.
+      const next = change(copy(this.doc.rules[index]));
+      this.doc.rules[index] = copy(next);
+      this.persist();
+      return copy(next);
+    });
+  }
+
   async rules(boardId?: string): Promise<Rule[]> {
     return copy(boardId ? this.doc.rules.filter((r) => r.boardId === boardId) : this.doc.rules);
   }

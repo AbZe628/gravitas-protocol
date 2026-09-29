@@ -121,6 +121,21 @@ export class TenantStore implements Store {
     return (await this.owns(rule.boardId)) ? rule : null;
   }
 
+  async updateRule(id: string, change: (current: Rule) => Rule): Promise<Rule> {
+    const rule = await this.inner.rule(id);
+    // Indistinguishable from a ruling that does not exist, deliberately.
+    if (!rule || !(await this.owns(rule.boardId))) throw new NotFound('rule', id);
+
+    return this.inner.updateRule(id, (current) => {
+      const next = change(current);
+      // A change may not move a ruling to another board, and so out of reach.
+      if (next.boardId !== current.boardId) {
+        throw new OutsideInstitution('move a ruling to', next.boardId);
+      }
+      return next;
+    });
+  }
+
   async matters(boardId?: string): Promise<Matter[]> {
     if (boardId && !(await this.owns(boardId))) return [];
     const mine = await this.ownBoardIds();

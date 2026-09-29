@@ -85,7 +85,7 @@ import { ReadingOff, ReadingUnavailable, type Reading } from '../services/readin
 import { structures } from '../data/structures.js';
 import { recognise } from '../services/recognise.js';
 import { buildManual, renderManual } from '../services/manual.js';
-import { reviewStatus, reviewsDue } from '../services/review.js';
+import { reviewStatus, reviewsDue, setReviewInterval } from '../services/review.js';
 import { assess, crossings, type Assessment, type Figures } from '../services/screening.js';
 import { search, type SearchFilters } from '../services/search.js';
 import { relatedTo } from '../services/precedent.js';
@@ -165,6 +165,16 @@ const voteSchema = z.object({
 });
 
 const objectSchema = z.object({ reason: reasonSchema });
+
+/*
+ * Null is a decision and reads as one: the board saying this does not come
+ * back on a clock. The service refuses nought, a negative, and anything past
+ * five years — a long wait is not how *never* is said.
+ */
+const intervalSchema = z.object({
+  everyMonths: z.number().int().nullable(),
+  reason: reasonSchema,
+});
 
 /*
  * A pasted contract.
@@ -1707,6 +1717,50 @@ export function governanceRoutes(
         unscheduled: due.filter((r) => r.state === 'unscheduled').length,
         items: due,
       });
+    }),
+  );
+
+  /**
+   * How often a ruling comes back — or that it does not.
+   *
+   * ── the step that could not be done ─────────────────────────────────────
+   *
+   * A ruling in force with no interval already said *nothing will bring this
+   * back before the board*, and the passage already carried that as an open
+   * step of the board's own, in every signatory's queue. Nothing in the whole
+   * application wrote a rule, so the one piece of work the clock creates by
+   * itself was the one piece nobody could do. Found by opening the ruling and
+   * looking for the button.
+   *
+   * ── a signatory, and a reason ───────────────────────────────────────────
+   *
+   * A signatory's credential, because it is the board saying when it will look
+   * at its own ruling again, and a reason because the next board will want to
+   * know why six months and not two. Appended, never written over: what stands
+   * is the last entry.
+   *
+   * It does not touch what the ruling says. Amending a standard is a matter
+   * and a vote; nothing becomes binding by a button here.
+   */
+  router.post(
+    '/rules/:id/interval',
+    handle(async (req, res) => {
+      const who = identityOf(req);
+      if (!requireRole(res, mayVote(who.role), 'say how often a ruling comes back', who.role)) return;
+
+      const parsed = intervalSchema.safeParse(req.body);
+      if (!parsed.success) return badRequest(res, parsed.error.issues);
+
+      const at = now();
+      const updated = await store.updateRule(req.params.id, (current) =>
+        setReviewInterval(current, {
+          everyMonths: parsed.data.everyMonths,
+          by: who.scholarId,
+          at,
+          reason: parsed.data.reason,
+        }),
+      );
+      res.json({ rule: updated, review: reviewStatus(updated, at) });
     }),
   );
 

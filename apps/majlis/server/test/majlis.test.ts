@@ -498,6 +498,16 @@ describe('api', () => {
       'PUT /api/matters/:id/parameters',
       'PUT /api/matters/:id/structure',
       'POST /api/matters/:id/findings',
+
+      /*
+       * How often a ruling comes back, said by the board.
+       *
+       * The first route in the application that writes a rule at all. It
+       * does not touch what the ruling says — amending a standard is a
+       * matter and a vote — only the board's own housekeeping about when it
+       * will look again, appended with a name, a date and a reason.
+       */
+      'POST /api/rules/:id/interval',
       'POST /api/matters/:id/implementation',
 
       // What a matter is asked and what it rests on.

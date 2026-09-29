@@ -1077,7 +1077,14 @@ export interface PaceResponse {
 
 // ── periodic review ───────────────────────────────────────────────────────
 
-export type ReviewState = 'scheduled' | 'due' | 'unscheduled' | 'not_applicable';
+/**
+ * Where a ruling stands on coming back.
+ *
+ * `unscheduled` is nobody having answered; `no_clock` is the board having
+ * answered that it does not come back on a date. They looked identical from
+ * outside, which meant a board was shown its own decision as a gap.
+ */
+export type ReviewState = 'scheduled' | 'due' | 'unscheduled' | 'no_clock' | 'not_applicable';
 
 export interface ReviewStatus {
   ruleId: string;
@@ -2053,6 +2060,17 @@ export interface Manual {
 export const oversight = {
   pace: () => get<PaceResponse>('/api/pace'),
   reviews: () => get<ReviewsResponse>('/api/reviews'),
+
+  /**
+   * Where one ruling stands on coming back, whatever state it is in.
+   *
+   * `reviews()` answers a different question — which rulings need attention —
+   * and carries only the due and the unanswered. A ruling's own page read that
+   * list, found itself absent and said *no review scheduled*: a board that had
+   * set six months was told, on the ruling's own page, that nothing would
+   * bring it back.
+   */
+  reviewOf: (ruleId: string) => get<ReviewStatus>(`/api/rules/${ruleId}/review`),
   calendar: () => get<Calendar>('/api/calendar'),
   settings: () => get<Settings>('/api/settings'),
 
@@ -2255,6 +2273,18 @@ export const oversight = {
    * the moment the matter carried.
    */
   dayToDay: (ruleId: string) => get<DayToDay>(`/api/rules/${ruleId}/day-to-day`),
+
+  /**
+   * How often a ruling comes back, said by the board.
+   *
+   * `everyMonths` of null is the board saying it does not come back on a
+   * clock, which is a decision and not the same as never having been asked.
+   */
+  setReviewInterval: (
+    ruleId: string,
+    said: { everyMonths: number | null; reason: string },
+    sending: Sending = {},
+  ) => send<{ rule: Rule; review: ReviewStatus }>(`/api/rules/${ruleId}/interval`, said, 'POST', sending),
 
   /**
    * What this board already decided about a question of this shape.

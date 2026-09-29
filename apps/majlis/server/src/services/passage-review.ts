@@ -8,7 +8,7 @@ import {
   type Step,
 } from './passage-shape.js';
 import type { Rule } from '../types.js';
-import { reviewStatus } from './review.js';
+import { reviewStatus, standingInterval } from './review.js';
 
 /**
  * The passage a ruling in force makes between reviews.
@@ -62,13 +62,24 @@ function stepsOf(rule: Rule, now: string): Step[] {
   }
 
   /*
-   * The interval. Open where there is none, which is the case `reviewStatus`
-   * describes as nothing bringing this back before the board.
+   * The interval. Open where nobody has answered — which is what
+   * `reviewStatus` describes as nothing bringing this back before the board.
+   *
+   * Answered covers two cases, and only one of them has a figure. A board that
+   * has said this ruling does not come back on a clock has done the work, and
+   * the step read as open on their answer for as long as it stood: the same
+   * state as never having been asked, in the same queue, saying the same
+   * sentence back to the people who had already replied to it.
    */
+  const answered = status.state === 'no_clock';
   steps.push(
-    status.everyMonths === null
+    status.everyMonths === null && !answered
       ? open('interval', 'board', say('review.step.interval.standing'))
-      : done('interval', 'board', rule.inForceFrom ?? null),
+      : done(
+          'interval',
+          'board',
+          answered ? (standingInterval(rule)?.at ?? null) : (rule.inForceFrom ?? null),
+        ),
   );
 
   /*
@@ -77,7 +88,9 @@ function stepsOf(rule: Rule, now: string): Step[] {
    * Counted rather than judged: how many days until, or how many past. The
    * figure is in the record and the board decides what it means.
    */
-  if (status.everyMonths === null) {
+  if (answered) {
+    steps.push(notApplicable('due', 'clock', say('review.step.interval.said')));
+  } else if (status.everyMonths === null) {
     steps.push(ahead('due', 'clock', say('review.step.due.noInterval')));
   } else if (status.state === 'due') {
     steps.push(
@@ -103,6 +116,11 @@ function stepsOf(rule: Rule, now: string): Step[] {
    * would put the whole register in everybody's queue at once, which is the
    * same as putting nothing there.
    */
+  if (answered) {
+    steps.push(notApplicable('look', 'board', say('review.step.interval.said')));
+    return steps;
+  }
+
   steps.push(
     status.state === 'due'
       ? open(

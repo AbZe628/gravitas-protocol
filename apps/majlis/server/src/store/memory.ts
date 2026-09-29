@@ -151,6 +151,17 @@ export class MemoryStore implements Store {
     return copy(this._rules.find((r) => r.id === id) ?? null);
   }
 
+  async updateRule(id: string, change: (current: Rule) => Rule): Promise<Rule> {
+    const index = this._rules.findIndex((r) => r.id === id);
+    if (index === -1) throw new NotFound('Rule', id);
+
+    // Against a copy, like a board: a change that throws part-way cannot leave
+    // a half-written ruling behind.
+    const next = change(copy(this._rules[index]));
+    this._rules[index] = copy(next);
+    return copy(next);
+  }
+
   async matters(boardId?: string): Promise<Matter[]> {
     const all = [...this._matters.values()];
     return copy(boardId ? all.filter((m) => m.boardId === boardId) : all);

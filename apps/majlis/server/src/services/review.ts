@@ -19,7 +19,7 @@
  * than the problem it solves.
  */
 
-import type { Rule } from '../types.js';
+import type { ReviewInterval, Rule } from '../types.js';
 
 const DAY = 86_400_000;
 
@@ -60,8 +60,18 @@ export type ReviewState =
   | 'scheduled'
   /** Due now or overdue. */
   | 'due'
-  /** In force with no interval set. Nothing will ever raise it. */
+  /** In force with no interval set, and nobody asked. Nothing will ever raise it. */
   | 'unscheduled'
+  /**
+   * In force, and the board has said it does not come back on a clock.
+   *
+   * Not the same as `unscheduled`, and the difference is the whole point: one
+   * is a gap nobody has answered, the other is an answer. A board that has
+   * decided a ruling on a settled structure needs no timetable has done the
+   * work, and a screen that went on telling them nothing will bring it back
+   * would be reporting their own decision to them as a failing.
+   */
+  | 'no_clock'
   /** Not in force, superseded, or otherwise not the board's to review. */
   | 'not_applicable';
 
@@ -108,13 +118,22 @@ export function reviewStatus(rule: Rule, now: string): ReviewStatus {
   }
 
   if (!rule.reviewEveryMonths || rule.reviewEveryMonths <= 0) {
+    /*
+     * Asked and answered, or never asked. The record keeps every time the
+     * board said how often this comes back; where the last of those says no
+     * clock, that is a decision and reads as one.
+     */
+    const said = standingInterval(rule);
     return {
       ...base,
-      state: 'unscheduled',
+      state: said && said.everyMonths === null ? 'no_clock' : 'unscheduled',
       countingFrom: rule.lastReviewedAt ?? rule.inForceFrom,
       note:
-        'In force with no review interval. Nothing will bring this back to the board, ' +
-        'which is how a ruling comes to describe something that has changed.',
+        said && said.everyMonths === null
+          ? 'The board has said this does not come back on a clock. It stands until ' +
+            'something brings it back.'
+          : 'In force with no review interval. Nothing will bring this back to the board, ' +
+            'which is how a ruling comes to describe something that has changed.',
     };
   }
 
@@ -178,18 +197,66 @@ export class BadInterval extends Error {
 }
 
 export function scheduleReview(rule: Rule, everyMonths: number): Rule {
-  if (!Number.isInteger(everyMonths) || everyMonths <= 0) {
-    throw new BadInterval(
-      `A review interval is a whole number of months, greater than zero. Got ${everyMonths}.`,
-    );
+  return setReviewInterval(rule, { everyMonths, by: '', at: '', reason: '' });
+}
+
+/** What the board last said about how often this comes back, if anything. */
+export function standingInterval(rule: Rule): ReviewInterval | null {
+  const said = rule.reviewIntervals ?? [];
+  return said.length > 0 ? said[said.length - 1] : null;
+}
+
+/**
+ * The board says how often a ruling comes back — or that it does not.
+ *
+ * ── the step that could not be done ───────────────────────────────────────
+ *
+ * A ruling with no interval already said *nothing will bring this back before
+ * the board*, and the passage already put that in every signatory's queue as
+ * an open step of the board's own. Nothing wrote a rule anywhere in the
+ * application, so the step arrived and could not be answered: the one piece of
+ * work the clock creates by itself was the one piece nobody could do.
+ *
+ * ── null, because the board must be able to mean it ───────────────────────
+ *
+ * The refusal below says a five-year interval is not a schedule and that a
+ * board meaning *never* should say so. It had no way to. Saying it is an
+ * entry like any other, with a name, a date and a reason, and it reads as a
+ * decision rather than as the gap it looks identical to from outside.
+ *
+ * Appended, never written over. A board that shortens an interval after a near
+ * miss has said something, and the entry before it is part of how the board
+ * came to be where it is.
+ */
+export function setReviewInterval(
+  rule: Rule,
+  said: { everyMonths: number | null; by: string; at: string; reason: string },
+): Rule {
+  const { everyMonths } = said;
+
+  if (everyMonths !== null) {
+    if (!Number.isInteger(everyMonths) || everyMonths <= 0) {
+      throw new BadInterval(
+        `A review interval is a whole number of months, greater than zero. Got ${everyMonths}.`,
+      );
+    }
+    if (everyMonths > 60) {
+      throw new BadInterval(
+        'A review interval longer than five years is not a schedule. If the board means ' +
+          'never, that should be said rather than encoded as a long wait.',
+      );
+    }
   }
-  if (everyMonths > 60) {
-    throw new BadInterval(
-      'A review interval longer than five years is not a schedule. If the board means ' +
-        'never, that should be said rather than encoded as a long wait.',
-    );
-  }
-  return { ...rule, reviewEveryMonths: everyMonths };
+
+  // Only a real act is kept. `scheduleReview` above is the old two-argument
+  // form, which several tests use to build a scheduled rule and which says
+  // nothing about who decided.
+  const entry = said.by ? [...(rule.reviewIntervals ?? []), { ...said }] : rule.reviewIntervals;
+
+  const next: Rule = { ...rule, reviewIntervals: entry };
+  if (everyMonths === null) delete next.reviewEveryMonths;
+  else next.reviewEveryMonths = everyMonths;
+  return next;
 }
 
 /**
