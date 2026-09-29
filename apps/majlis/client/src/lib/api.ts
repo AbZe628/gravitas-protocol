@@ -1340,6 +1340,16 @@ export interface PassageStep {
   heard?: string[];
   /** Who it still waits on, where that can be named. Scholar ids, for the screen to name. */
   waitingOn?: string[];
+  /**
+   * Who was given this one step, and who placed it with them.
+   *
+   * Not `who`, which is whoever the step is with for any reason at all: on an
+   * undertaking that is the member who gave the promise, and a control reading
+   * it would offer to put a promise back to the board.
+   */
+  holder?: { to: string; by: string; at: string } | null;
+  /** Whether this step is one somebody on this board could take on at all. */
+  holdable?: boolean;
 }
 
 /**

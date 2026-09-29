@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { oversight, type Passage } from '../lib/api.js';
+import { oversight, type Passage, type PassageStep } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { useIdentity } from '../lib/identity.js';
 import { nameOf, placeableMembers, useMembers } from '../lib/members.js';
@@ -30,11 +30,26 @@ import { Button } from './Button';
  */
 export default function Holding({
   passage,
+  step = null,
   onChanged,
   loud = false,
   ruled = true,
 }: {
   passage: Passage;
+  /**
+   * One step of it, instead of the whole thing.
+   *
+   * Work is placed with a person a step at a time as often as all at once: the
+   * member who reads a contract is rarely the one who answers the regulator,
+   * and a board that could only hand over the whole breach had to choose
+   * between the two. The server has taken a step key since the route was
+   * written; nothing asked for it.
+   *
+   * Who holds a step is the step's own holder, which the server wrote, and
+   * never its `who` — that is whoever the step is with for any reason, and on
+   * an undertaking it is the member who gave the promise.
+   */
+  step?: PassageStep | null;
   /** Called after the record changed, so the screen reads the passage again. */
   onChanged: () => void;
   /** On the lapis card, where the quiet colours would vanish. */
@@ -63,9 +78,9 @@ export default function Holding({
    * says why.
    */
   const [shown, setShown] = useState<{ to: string | null; by: string } | null>(null);
-  useEffect(() => setShown(null), [passage]);
+  useEffect(() => setShown(null), [passage, step?.key]);
 
-  if (!passage.holdable) return null;
+  if (!(step ? step.holdable : passage.holdable)) return null;
 
   const me = identity?.scholarId ?? null;
   const sits =
@@ -74,7 +89,8 @@ export default function Holding({
     (members ?? []).some((m) => m.scholarId === me);
   const office = identity?.office === 'chair' || identity?.office === 'secretary';
 
-  const held = shown ? (shown.to === null ? null : { to: shown.to, by: shown.by }) : (passage.holder ?? null);
+  const standing = step ? (step.holder ?? null) : (passage.holder ?? null);
+  const held = shown ? (shown.to === null ? null : { to: shown.to, by: shown.by }) : standing;
   const holder = held?.to ?? null;
   const mine = holder !== null && holder === me;
   const free = holder === null;
@@ -89,7 +105,12 @@ export default function Holding({
     setRefused(null);
     if (me !== null) setShown({ to: target, by: me });
     try {
-      await oversight.assign({ ofKind: passage.of.kind, ofId: passage.of.id, to: target });
+      await oversight.assign({
+        ofKind: passage.of.kind,
+        ofId: passage.of.id,
+        stepKey: step?.key ?? null,
+        to: target,
+      });
       setTo('');
       onChanged();
     } catch (e) {
@@ -106,6 +127,14 @@ export default function Holding({
     'rounded-xl px-3 py-1.5 text-ui font-medium ' +
     (loud ? 'bg-white/15 text-white hover:bg-white/25' : 'bg-raised text-lapis shadow-ring');
 
+  /*
+   * Three of the sentences say *this* and have to say which this. The rest —
+   * place with, hand on, yourself — read the same either way, and a second set
+   * of them would be more strings to keep in three languages for no difference
+   * a reader could see.
+   */
+  const word = (key: string) => t(step ? `hold.step.${key}` : `hold.${key}`);
+
   const who = holder === null ? null : mine ? t('hold.withYou') : nameOf(members, holder);
   const placedBy =
     held && held.by !== held.to ? t('hold.placedBy', { name: nameOf(members, held.by) }) : null;
@@ -114,7 +143,7 @@ export default function Holding({
     <div className={ruled ? 'mt-4 border-t pt-3 ' + (loud ? 'border-white/20' : 'border-line') : ''}>
       <p className={'text-ui ' + quiet}>
         {who === null ? (
-          t('hold.nobody')
+          word('nobody')
         ) : (
           <>
             <span className={'font-semibold ' + strong}>{mine ? who : t('hold.with', { name: who })}</span>
@@ -127,17 +156,17 @@ export default function Holding({
         <div className="mt-2 flex flex-wrap items-center gap-2">
           {free && (
             <Button type="button" busy={busy} onClick={() => write(me)} className={secondary}>
-              {t('hold.take')}
+              {word('take')}
             </Button>
           )}
 
           {colleagues.length > 0 && (
             <span className="inline-flex flex-wrap items-center gap-2">
-              <label className="sr-only" htmlFor={`hold-to-${passage.of.id}`}>
+              <label className="sr-only" htmlFor={`hold-to-${passage.of.id}-${step?.key ?? 'all'}`}>
                 {t(free || office ? 'hold.placeWith' : 'hold.handOnTo')}
               </label>
               <select
-                id={`hold-to-${passage.of.id}`}
+                id={`hold-to-${passage.of.id}-${step?.key ?? 'all'}`}
                 value={to}
                 onChange={(e) => setTo(e.target.value)}
                 className="min-h-[36px] rounded-xl bg-ink px-3 py-1.5 text-ui text-paper shadow-ring"
@@ -160,14 +189,14 @@ export default function Holding({
 
           {!free && (mine || office) && (
             <Button type="button" busy={busy} onClick={() => write(null)} className={secondary}>
-              {t('hold.putBack')}
+              {word('putBack')}
             </Button>
           )}
         </div>
       )}
 
       {/* With a colleague, and not the chair: whom to ask, instead of a button that would be refused. */}
-      {sits && !mayMove && <p className={'mt-1 text-note ' + quiet}>{t('hold.askThem')}</p>}
+      {sits && !mayMove && <p className={'mt-1 text-note ' + quiet}>{word('askThem')}</p>}
 
       {refused && (
         <p role="alert" className={'mt-2 text-note ' + (loud ? 'text-white' : 'text-breach')}>

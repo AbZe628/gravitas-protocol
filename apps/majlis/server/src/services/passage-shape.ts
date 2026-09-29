@@ -132,6 +132,28 @@ export interface Step {
    * sentence read *waiting on member-c, member-d, member-e*.
    */
   waitingOn?: string[];
+  /**
+   * Who is carrying this one step, where somebody has been given it, and who
+   * placed it with them.
+   *
+   * Separate from `who`, which is the person the step is *with* whatever the
+   * reason: an undertaking's `account` step carries the member who gave the
+   * promise, and nobody placed that with them. A control built on `who` would
+   * have offered *put it back to the board* on a promise, which is not a thing
+   * that can be put back.
+   *
+   * Written by `withAssignments`, never by a reading, for the same reason
+   * `Passage.holder` is: where a step is held is not a fact about the record.
+   */
+  holder?: { to: string; by: string; at: string } | null;
+  /**
+   * Whether this step is one a member of this board could take on at all.
+   *
+   * The whole thing has the same field for the same reason. A control that
+   * cannot be honoured is absent, not disabled: *take this step* on the bank's
+   * own filing would be a button the server refuses, offered on every breach.
+   */
+  holdable?: boolean;
 }
 
 /**

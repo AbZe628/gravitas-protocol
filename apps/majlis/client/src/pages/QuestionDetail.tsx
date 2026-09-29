@@ -376,7 +376,10 @@ export default function QuestionDetail() {
         ]}
         documentLabel={t('queue.theirWords')}
         document={theirWords}
-        holding={passage.holdable && !settled ? <Holding passage={passage} onChanged={load} /> : undefined}
+        holding={settled ? undefined : (step) => <Holding passage={passage} step={step} onChanged={load} />}
+        holdingAll={
+          passage.holdable && !settled ? <Holding passage={passage} onChanged={load} /> : undefined
+        }
         notice={notice}
         moved={moved}
       />

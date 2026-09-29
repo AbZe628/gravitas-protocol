@@ -223,3 +223,67 @@ describe('what cannot be placed', () => {
     expect((await place('member-b', { ofId: closed, to: null })).status).toBe(201);
   });
 });
+
+/**
+ * What the screen offers is exactly what the route accepts.
+ *
+ * ── the fault this holds shut ─────────────────────────────────────────────
+ *
+ * Each step of a passage now says whether it can be placed with somebody, and
+ * the screen draws a control only where it says yes. That field was written
+ * the wider way — every step on this side of the table — and the route allows
+ * a narrower set: a breach has no step of the board's own, so *take this step*
+ * appeared on every one of them and the server answered *each signatory does
+ * that for themselves, so it is nobody's to hold*.
+ *
+ * A control that cannot be honoured is absent, not disabled, and the only way
+ * to be sure of that is to ask the route. So this walks every step of every
+ * kind, offers it, and holds the two answers against each other.
+ */
+describe('a step the passage says can be placed, and one it does not', () => {
+  const kinds = [
+    { ofKind: 'breach', ofId: FRESH, at: '/api/incidents/' + FRESH + '/passage' },
+    { ofKind: 'matter', ofId: 'matter-2026-07-03', at: '/api/matters/matter-2026-07-03/passage' },
+    { ofKind: 'question', ofId: 'submission-2026-08-25', at: '/api/passages/question/submission-2026-08-25' },
+    { ofKind: 'undertaking', ofId: 'undertaking-2026-08-20-a', at: '/api/passages/undertaking/undertaking-2026-08-20-a' },
+    { ofKind: 'review', ofId: 'rule-tangible-ratio', at: '/api/passages/review/rule-tangible-ratio' },
+  ];
+
+  it('agrees with the route on every step of every kind', async () => {
+    let offered = 0;
+    let withheld = 0;
+
+    for (const { ofKind, ofId, at } of kinds) {
+      const read = await request(app).get(at).set('Authorization', as('member-b'));
+      expect(read.status, at).toBe(200);
+      const steps = (read.body.groups as { steps: { key: string; holdable?: boolean }[] }[]).flatMap(
+        (g) => g.steps,
+      );
+      expect(steps.length, at + ' has no steps').toBeGreaterThan(0);
+
+      for (const step of steps) {
+        const res = await request(app)
+          .post('/api/assignments')
+          .set('Authorization', as('member-b'))
+          .send({ ofKind, ofId, stepKey: step.key, to: 'member-b' });
+
+        if (step.holdable) {
+          offered++;
+          expect(res.status, ofKind + ' ' + step.key + ' is offered and was refused: ' + JSON.stringify(res.body)).toBe(201);
+          // Put it back, so the next step of the same thing starts clean.
+          await request(app)
+            .post('/api/assignments')
+            .set('Authorization', as('member-b'))
+            .send({ ofKind, ofId, stepKey: step.key, to: null });
+        } else {
+          withheld++;
+          expect(res.status, ofKind + ' ' + step.key + ' is not offered and was accepted').not.toBe(201);
+        }
+      }
+    }
+
+    // Both halves were exercised: all-yes or all-no would prove nothing.
+    expect(offered, 'no step anywhere was offered').toBeGreaterThan(0);
+    expect(withheld, 'every step was offered, so the refusing half was never reached').toBeGreaterThan(0);
+  });
+});

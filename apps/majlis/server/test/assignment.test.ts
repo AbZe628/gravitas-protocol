@@ -216,6 +216,93 @@ describe('a name on a passage', () => {
   });
 });
 
+/*
+ * Who carries one step, which is not the same question as who the step is
+ * with.
+ *
+ * who is whoever the step is with for any reason at all, and an
+ * undertaking's own reading puts the member who gave the promise on it. A
+ * control built on that would have offered *put it back to the board* on a
+ * promise nobody placed. So the step carries a holder as well, which is only
+ * ever an assignment, and says whether it is a step a member of this board
+ * could take on at all.
+ */
+describe('who carries one step of it', () => {
+  const all = every();
+
+  it('says of every step whether it could be taken on at all', () => {
+    let ourStepsSeen = 0;
+    for (const { kind, id, read } of all) {
+      for (const s of steps(withAssignments(read(), []))) {
+        /*
+         * The board's own, and not a signatory's. A step every signatory does
+         * for themselves is nobody's to hold, and the route says so in those
+         * words; written the wider way here, the screen offered *take this
+         * step* on every step of a breach and the server refused each one.
+         */
+        const undone = s.state === 'open' || s.state === 'ahead';
+        const ours = s.whose === 'board' && undone;
+        if (ours) ourStepsSeen++;
+        expect(s.holdable, kind + ' ' + id + ' ' + s.key).toBe(ours);
+      }
+    }
+    expect(ourStepsSeen, 'no step anywhere could be taken on, so this proves nothing').toBeGreaterThan(0);
+  });
+
+  it('writes a holder on the step somebody was given, and on no other', () => {
+    const found = all
+      .map(({ kind, id, read }) => ({ kind, id, p: read() }))
+      .flatMap(({ kind, id, p }) => steps(p).map((s) => ({ kind, id, s })))
+      .find(({ s }) => s.whose === 'board' && (s.state === 'open' || s.state === 'ahead'));
+    expect(found, 'no open board step anywhere in the seed').toBeTruthy();
+    const { kind, id, s } = found!;
+
+    const read = all.find((x) => x.kind === kind && x.id === id)!.read;
+    const one = placed({ ofKind: kind, ofId: id, stepKey: s.key, to: 'member-y' });
+    const named = withAssignments(read(), [one]);
+
+    const mine = steps(named).find((x) => x.key === s.key)!;
+    expect(mine.holder).toEqual({ to: 'member-y', by: one.by, at: one.at });
+    for (const other of steps(named)) {
+      if (other.key === s.key) continue;
+      expect(other.holder ?? null, other.key).toBeNull();
+    }
+    // And the whole of it is with nobody: a step is not the thing.
+    expect(named.holder).toBeNull();
+  });
+
+  it('leaves a promise unheld, however the step is named', () => {
+    /*
+     * The undertaking's own reading puts the member who gave it on the step
+     * where they account for it. Nobody placed that with them, and the control
+     * must not read it as something to hand on or put back.
+     */
+    const u = all.find((x) => x.kind === 'undertaking')!;
+    const named = withAssignments(u.read(), []);
+    const promised = steps(named).filter((s) => s.who);
+    expect(promised.length, 'the undertaking names nobody, so this proves nothing').toBeGreaterThan(0);
+    for (const s of promised) expect(s.holder ?? null, s.key).toBeNull();
+  });
+
+  it('lets a step go back to the room while the whole of it stays placed', () => {
+    const found = all
+      .map(({ kind, id, read }) => ({ kind, id, p: read() }))
+      .flatMap(({ kind, id, p }) => steps(p).map((s) => ({ kind, id, s })))
+      .find(({ s }) => s.whose === 'board' && (s.state === 'open' || s.state === 'ahead'))!;
+    const { kind, id, s } = found;
+    const read = all.find((x) => x.kind === kind && x.id === id)!.read;
+
+    const named = withAssignments(read(), [
+      placed({ ofKind: kind, ofId: id, to: 'member-z' }),
+      placed({ ofKind: kind, ofId: id, stepKey: s.key, to: 'member-y' }),
+      placed({ ofKind: kind, ofId: id, stepKey: s.key, to: null, by: 'member-y' }),
+    ]);
+
+    expect(steps(named).find((x) => x.key === s.key)?.holder ?? null).toBeNull();
+    expect(named.holder?.to).toBe('member-z');
+  });
+});
+
 describe('who carries the whole of it', () => {
   it('is written on the passage, and gone once it is put back', () => {
     const { kind, id, read } = every()[0];

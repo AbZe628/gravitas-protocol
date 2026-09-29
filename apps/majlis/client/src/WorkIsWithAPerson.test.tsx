@@ -207,6 +207,127 @@ describe('the window, on a step placed with somebody', () => {
   });
 });
 
+/**
+ * The same control, placing one step instead of the whole thing.
+ *
+ * ── why a step at all ─────────────────────────────────────────────────────
+ *
+ * The route has taken a step key since it was written and nothing ever sent
+ * one, so a board could hand over a breach but not the answer to the
+ * regulator inside it. The member who reads the contract is rarely the member
+ * who writes to the regulator, and handing over the whole of it to arrange
+ * that moved four other steps with it.
+ *
+ * ── what it must not read ─────────────────────────────────────────────────
+ *
+ * Not the step's `who`. That is whoever the step is with for any reason at
+ * all, and an undertaking's reading puts the member who gave the promise on
+ * it. A control reading that would have offered *put this step back to the
+ * board* on a promise nobody placed.
+ */
+describe('the control, on one step', () => {
+  const whole = (holder: string | null): Passage => ({
+    of: { kind: 'breach', id: 'b1' },
+    groups: [],
+    next: null,
+    waiting: null,
+    settled: null,
+    holder: holder ? { to: holder, by: holder, at: '2026-09-20T00:00:00Z' } : null,
+    holdable: true,
+  });
+
+  const aStep = (over: Partial<PassageStep> = {}): PassageStep =>
+    ({
+      key: 'regulator',
+      act: { key: 'breach.step.regulator.act' },
+      whose: 'signatory',
+      state: 'open',
+      at: null,
+      standing: null,
+      enforced: false,
+      why: { key: 'breach.step.regulator.why' },
+      holdable: true,
+      holder: null,
+      ...over,
+    }) as PassageStep;
+
+  const draw = async (
+    who: Partial<Identity> & { scholarId: string },
+    step: PassageStep,
+    passage: Passage = whole(null),
+  ) => {
+    wire(who);
+    const onChanged = vi.fn();
+    const r = render(
+      <I18nProvider>
+        <Holding passage={passage} step={step} onChanged={onChanged} />
+      </I18nProvider>,
+    );
+    await waitFor(() => expect(r.container.textContent).not.toBe(''));
+    await new Promise((ok) => setTimeout(ok, 0));
+    return { ...r, onChanged };
+  };
+
+  it('writes the step key, and says which this is', async () => {
+    const { container, onChanged } = await draw({ scholarId: 'member-c' }, aStep());
+    expect(container.textContent).toContain('Nobody has taken this step yet.');
+
+    fireEvent.click(await screen.findByRole('button', { name: /take this step/i }));
+    await waitFor(() => expect(onChanged).toHaveBeenCalled());
+    expect(posted).toEqual([
+      { ofKind: 'breach', ofId: 'b1', stepKey: 'regulator', to: 'member-c' },
+    ]);
+  });
+
+  it('reads the step’s own holder, not the holder of the whole', async () => {
+    const { container } = await draw(
+      { scholarId: 'member-c' },
+      aStep({ holder: { to: 'member-b', by: 'member-a', at: '2026-09-20T00:00:00Z' } }),
+      // Somebody else holds the whole of it. That is not who holds this step.
+      whole('member-c'),
+    );
+    await waitFor(() => expect(container.textContent).toContain('Bilal Rahman'));
+    expect(container.textContent).toContain('Amina Chair');
+    // With a colleague and not the chair: nothing to press, and whom to ask.
+    expect(within(container).queryAllByRole('button')).toHaveLength(0);
+    expect(container.textContent).toContain('Ask them to hand this step on');
+  });
+
+  it('puts a step back without touching the rest', async () => {
+    const { onChanged } = await draw(
+      { scholarId: 'member-c' },
+      aStep({ holder: { to: 'member-c', by: 'member-c', at: '2026-09-20T00:00:00Z' } }),
+      whole('member-a'),
+    );
+    fireEvent.click(await screen.findByRole('button', { name: /put this step back/i }));
+    await waitFor(() => expect(onChanged).toHaveBeenCalled());
+    expect(posted).toEqual([{ ofKind: 'breach', ofId: 'b1', stepKey: 'regulator', to: null }]);
+  });
+
+  /*
+   * A control that cannot be honoured is absent, not disabled. The bank's own
+   * filing is not a step anybody on this board can be given.
+   */
+  it('draws nothing on a step nobody here could take', async () => {
+    // Rendered without the helper above, which waits for something to appear.
+    wire({ scholarId: 'member-c' });
+    const { container } = render(
+      <I18nProvider>
+        <Holding passage={whole(null)} step={aStep({ holdable: false })} onChanged={() => undefined} />
+      </I18nProvider>,
+    );
+    await new Promise((ok) => setTimeout(ok, 0));
+    expect(container.textContent).toBe('');
+    // And the same step, holdable, does draw — or this passes by never looking.
+    const other = render(
+      <I18nProvider>
+        <Holding passage={whole(null)} step={aStep()} onChanged={() => undefined} />
+      </I18nProvider>,
+    );
+    await waitFor(() => expect(other.container.textContent).not.toBe(''));
+  });
+});
+
 describe('the control', () => {
   const p = (holder: string | null, holdable = true): Passage => ({
     of: { kind: 'breach', id: 'b1' },
@@ -236,7 +357,7 @@ describe('the control', () => {
     const { onChanged } = await draw({ scholarId: 'member-c' }, p(null));
     fireEvent.click(await screen.findByRole('button', { name: /take this on/i }));
     await waitFor(() => expect(onChanged).toHaveBeenCalled());
-    expect(posted).toEqual([{ ofKind: 'breach', ofId: 'b1', to: 'member-c' }]);
+    expect(posted).toEqual([{ ofKind: 'breach', ofId: 'b1', stepKey: null, to: 'member-c' }]);
   });
 
   it('offers nothing to press on work in a colleague’s hands, and says whom to ask', async () => {
@@ -401,7 +522,7 @@ describe('a question, in its own window', () => {
   it('offers taking it up, and writes it for the question', async () => {
     open(null);
     fireEvent.click(await screen.findByRole('button', { name: /take this on/i }));
-    await waitFor(() => expect(posted).toEqual([{ ofKind: 'question', ofId: 'sub-1', to: 'member-c' }]));
+    await waitFor(() => expect(posted).toEqual([{ ofKind: 'question', ofId: 'sub-1', stepKey: null, to: 'member-c' }]));
   });
 
   it('says whom it is with, by name, and who placed it there', async () => {
@@ -468,7 +589,7 @@ describe('a ruling, on its own page', () => {
   it('offers taking the review on, where there is something to bring back', async () => {
     open(true);
     fireEvent.click(await screen.findByRole('button', { name: /take this on/i }));
-    await waitFor(() => expect(posted).toEqual([{ ofKind: 'review', ofId: 'rule-1', to: 'member-c' }]));
+    await waitFor(() => expect(posted).toEqual([{ ofKind: 'review', ofId: 'rule-1', stepKey: null, to: 'member-c' }]));
   });
 
   it('offers nothing where the server says there is nothing to hold', async () => {

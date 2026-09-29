@@ -208,7 +208,8 @@ export default function RuleDetail() {
           ]}
           documentLabel={t('rule.statement')}
           document={<p>{rule.statement}</p>}
-          holding={<Holding passage={passage} onChanged={readPassage} />}
+          holding={(step) => <Holding passage={passage} step={step} onChanged={readPassage} />}
+          holdingAll={<Holding passage={passage} onChanged={readPassage} />}
         />
         <section aria-label={t('rule.statement')}>{theRest}</section>
       </div>

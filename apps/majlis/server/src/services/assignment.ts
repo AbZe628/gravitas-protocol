@@ -181,12 +181,36 @@ export function heldBy(
  */
 export function withAssignments(p: Passage, assignments: readonly Assignment[]): Passage {
   const name = (s: Step): Step => {
+    /*
+     * Where the step itself can be carried, and by whom.
+     *
+     * `holder` is only ever an assignment — what somebody placed with somebody
+     * — while `who` is whoever the step is with for any reason at all. They
+     * are the same person on a step that was placed, and different on an
+     * undertaking, whose `account` step names the member who gave the promise.
+     * The control that moves work reads `holder`, so it never offers to put a
+     * promise back to the board.
+     */
+    /*
+     * `placeable` and not `onOurSide`, because this is what the route allows.
+     *
+     * Written the wider way first, and the screen then offered *take this
+     * step* on a breach — where every step on this side is a signatory's —
+     * and the server answered *each signatory does that for themselves, so it
+     * is nobody's to hold*. A control that cannot be honoured is absent, not
+     * disabled, and the only way to be sure is to say the same word the route
+     * says. Found by placing one live and reading the refusal.
+     */
+    const step: Step = { ...s, holdable: placeable(s) };
+    const held = heldBy(assignments, p.of.kind, p.of.id, s);
+    const holder = held?.to ? { to: held.to, by: held.by, at: held.at } : null;
+    const placed = placeable(s) ? holder : null;
+
     // A name already on the step wins: an undertaking names the person who
     // gave it, and no assignment moves who made a promise.
-    if (s.who || !placeable(s)) return s;
-    const held = heldBy(assignments, p.of.kind, p.of.id, s);
-    if (!held?.to) return s;
-    return { ...s, who: held.to };
+    if (s.who || !placeable(s)) return { ...step, holder: placed };
+    if (!holder) return { ...step, holder: null };
+    return { ...step, holder: placed, who: holder.to };
   };
 
   const groups = p.groups.map((g) => ({ ...g, steps: g.steps.map(name) }));

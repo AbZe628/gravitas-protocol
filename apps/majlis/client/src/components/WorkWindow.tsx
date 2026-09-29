@@ -85,6 +85,7 @@ export default function WorkWindow({
   document,
   documentLabel,
   holding,
+  holdingAll,
   notice,
   moved,
 }: {
@@ -97,8 +98,25 @@ export default function WorkWindow({
   /** The thing itself: the report, the question, the undertaking's words. */
   document?: ReactNode;
   documentLabel?: string;
-  /** Who is carrying the whole of it, and taking it on. */
-  holding?: ReactNode;
+  /**
+   * Who is carrying the step the window is on, and taking it on.
+   *
+   * A function of the step rather than a node, because the control has to know
+   * which step it is placing: the screens passed a node built from the passage
+   * alone, so the only thing that could be handed to a colleague was the whole
+   * of it. A member who read the contract still had to hand over the answer to
+   * the regulator with it.
+   */
+  holding?: (step: PassageStep) => ReactNode;
+  /**
+   * Who is carrying the whole of it.
+   *
+   * Beside the facts rather than beside the step, because that is what it is
+   * about: the thing, not the act in front of you. Both were the same control
+   * once and it placed the whole of it wherever it was pressed, so a member
+   * standing on one step handed over five.
+   */
+  holdingAll?: ReactNode;
   /** What the last act did, or what refused it — above the step, so it survives the step changing. */
   notice?: ReactNode;
   /**
@@ -189,7 +207,7 @@ export default function WorkWindow({
 
   /* Beside the work: the few facts that say what this is, and the thing itself. */
   const beside =
-    (facts && facts.length > 0) || document ? (
+    (facts && facts.length > 0) || document || holdingAll ? (
       <div>
         {facts && facts.length > 0 && (
           <dl className="mb-5 grid grid-cols-[auto,1fr] gap-x-4 gap-y-2 text-ui">
@@ -211,6 +229,7 @@ export default function WorkWindow({
             <div className="font-read text-body leading-relaxed text-paper">{document}</div>
           </>
         )}
+        {holdingAll}
       </div>
     ) : undefined;
 
@@ -260,7 +279,7 @@ export default function WorkWindow({
         </p>
       )}
 
-      {following && passage.next && holding && <div className="mt-4">{holding}</div>}
+      {following && passage.next && holding && <div className="mt-4">{holding(step)}</div>}
 
       {panel?.detail && <div className="mt-4 max-w-[68ch] text-ui leading-relaxed text-paper">{panel.detail}</div>}
 

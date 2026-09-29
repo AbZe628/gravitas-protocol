@@ -910,8 +910,9 @@ export default function IncidentDetail() {
           ]}
           documentLabel={t('snc.whatHappened')}
           document={<p>{i.report}</p>}
-          holding={
-            passage.holdable ? <Holding passage={passage} onChanged={load} ruled={false} /> : undefined
+          holding={(step) => <Holding passage={passage} step={step} onChanged={load} ruled={false} />}
+          holdingAll={
+            passage.holdable ? <Holding passage={passage} onChanged={load} /> : undefined
           }
           notice={notice}
           moved={moved}
