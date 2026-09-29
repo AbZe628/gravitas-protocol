@@ -6,6 +6,11 @@ ekranima — planira se po obećanjima.
 
 Oznake: ✅ gotovo · ◐ u radu · ⬜ nije počelo
 
+**Stanje 29. 9. 2026** (radna grana s commitom `efe47fd`, nije na `main`):
+P1, P2, P0 i P3 iz [PRIJEDLOZI-UI.md](PRIJEDLOZI-UI.md) su gotovi — tačka 8
+(radni prozor) i T1–T4 iz tačke 9 time zatvoreni. Detalji, nađeni kvarovi i
+svaki sljedeći korak: [NASTAVAK.md](NASTAVAK.md).
+
 ---
 
 ## Nalaz koji sve drži
@@ -42,9 +47,11 @@ bude jedna, svaki ekran se sam od sebe počne ponašati isto.
 - ✅ usput — `passage.ts` je govorio *otvori glasanje* i kad ruta vraća 400 jer
   uvjeti nisu odgovoreni. Dvije vlasti, i glasnija je bila ona koja nije
   pročitala pravila.
-- ◐ **L2** — `MatterPack` čita passage, ali crta **jedan** korak. Cijeli spisak
+- ✅ **L2** — `MatterPack` čita passage, ali crta **jedan** korak. Cijeli spisak
   od trinaest koraka i dalje postoji samo u `Passage.tsx`, koju koristi jedino
-  `/classic/matters/:id`. Ostatak ovog koraka.
+  `/classic/matters/:id`. *(Zatvoreno u `efe47fd`: jedan ekran predmeta,
+  `MatterPack`, `MatterDetail` i `Passage.tsx` obrisani, stare adrese
+  preusmjeravaju.)*
 
 ---
 
@@ -83,7 +90,12 @@ nešto što nije predmet.
   - ✅ bankin desk ne vidi ko u odboru drži šta (`visibleTo`), ni tuđa pitanja
   - ✅ desk dobija samo red svojih pitanja; zvono deska ne čita red odbora
   - ⬜ dodjela **jednog koraka** (ne cijele stvari) postoji na serveru, nema je u
-    sučelju
+    sučelju (`stepKey` u `routes/assignments.ts`)
+  - ✅ korak koji svako radi za sebe (glasanje, nalaz) nosi `heard`/`waitingOn`;
+    glas koji si dao više nije *tvoj* u redu; prozor u rukama kolege kaže čiji
+    je umjesto da nudi čin *(`efe47fd`)*
+  - ⬜ isto za **odobravanje plana** na prekršaju — nudi *Endorse* onome ko je
+    već odobrio i crta id-jeve (NASTAVAK §3 A)
   - ⬜ arapski i urdu za `hold.*` — moji, nepregledani
 
 ## 3 · Sat stvara posao ◐
@@ -125,7 +137,12 @@ nešto što nije predmet.
   mjesto. Zato ispitivanja djeluju nakalemljeno — jer jesu, lanac je prekinut na
   dva mjesta.
 
-## 8 · Radni prozor kao jedini oblik predmeta ⬜
+## 8 · Radni prozor kao jedini oblik predmeta ✅
+
+*Zatvoreno u `cb1751f` (lista pored rada) i `efe47fd` (`WorkWindow` za
+prekršaj, pitanje, obavezu i reviziju; predmet jedan ekran). Ostaje: prolaz
+na 390 px za današnje izmjene, i *na koga glasanje čeka* na ekranu predmeta
+(NASTAVAK §3 B, H). Stavka registra i dalje nema svoj tok (tačka 7).*
 
 - **Aplikacija je građena oko imenica, a ne oko posla.** Šesnaest
   ekrana-imenica: pitanja, predmeti, odluke, registar, biblioteka, provjera
@@ -145,7 +162,11 @@ nešto što nije predmet.
   uvijek.
 - **Poslije čina — sljedeći korak, nikad povratak na popis.**
 
-## 9 · Telefon ⬜
+## 9 · Telefon ◐
+
+*T1–T4 zatvoreni u `22c10a8`. Traka činova na telefonu stoji na tabovima
+(`efe47fd`). Ostaje O1, O2, baner jezika (329 px na urduu), urdu tabovi u dva
+reda — NASTAVAK §3 C–F.*
 
 Ide poslije prozora, ne prije. Znači da telefon ostaje ružan još neko vrijeme —
 ispravno, jer se svaka od ovih mjera mjeri na ekranu koji će se ionako
@@ -169,7 +190,11 @@ prepraviti kad prozor postane jedan.
 - Red na telefonu: jedna linija, jedan broj, chevron. Čin kao dugme pune širine
   iznad kartica.
 
-## 10 · Stol ⬜
+## 10 · Stol ◐
+
+*U `cb1751f`: jezik je skinut s trake (bira se na stranici člana), paleta i
+član su sažeti ispod 1280 px, traka (rail) ustupa mjesto stupcu liste. Polica
+alata desno i dalje stalno jede širinu.*
 
 - **O3** — tri okvira oko posla: jarbol lijevo, polica alata desno, gornja traka.
   Polica je otvarač panela koji stalno jede širinu. Jezik stoji na svakom ekranu
@@ -221,3 +246,4 @@ Zadnje, kad struktura stoji.
   da padne. Nula kojoj to nije napravljeno ne vrijedi ništa.
 - Priručnik PDF — snimke su stare.
 - Push na GitHub — **svaki put pitati.**
+- Probne skripte i `vite.probe*.mjs` nikad u repo; recept je u NASTAVAK §5.

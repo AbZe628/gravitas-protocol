@@ -23,17 +23,17 @@ Majlis danas (✅ ima · ◐ djelimično · ⬜ nema):
 
 | osobina aplikacije | Majlis danas |
 |---|---|
-| **Bočna traka → lista → detalj** (split view): odabir reda otvara detalj *pored* liste, lista ostaje. Apple: na iPadu split view umjesto tab bara; sidebar za područja, lista za stvari, detalj za odabranu stvar. | ⬜ red odvodi na novu stranicu, lista nestaje |
+| **Bočna traka → lista → detalj** (split view): odabir reda otvara detalj *pored* liste, lista ostaje. Apple: na iPadu split view umjesto tab bara; sidebar za područja, lista za stvari, detalj za odabranu stvar. | ✅ `cb1751f` — na stolu lista ostaje u stupcu, odabrani red osvijetljen, `j`/`k` |
 | **Okvir stoji, mijenja se samo sadržaj**, s prelazom (push, slide) koji kaže kuda si otišao. | ◐ jedna stranica bez ponovnog učitavanja, ali bez ikakvog prelaza |
-| **Nazad vraća tačno gdje si bio** — skrol, odabir, filter. | ⬜ ništa u kodu ne vraća poziciju skrola |
+| **Nazad vraća tačno gdje si bio** — skrol, odabir, filter. | ✅ `cb1751f` — skrol po stavci historije, lista kako je ostavljena, red zasvijetli |
 | **Sporedni zadatak u ploči (sheet)** uz trenutni kontekst, s hvataljkom i dvije visine — ne nova stranica. | ◐ prozori za činove postoje; ploče odozdo ne |
-| **Činovi su dugmad na stalnom mjestu** (alatna traka gore, traka dolje na telefonu) — nikad podvučen tekst. | ⬜ 74 mjesta u kodu s podvlakom (`underline`); dio su činovi — *Do not take it up*, *Look at this again*, *Reply* |
-| **Liste kao u Postavkama:** grupisane, uvučene linije, strelica na svemu što vodi dalje, odabrani red ostaje istaknut dok je njegov detalj otvoren. | ◐ jedna površina s linijama ✅, strelice ⬜, istaknut odabir ⬜ |
+| **Činovi su dugmad na stalnom mjestu** (alatna traka gore, traka dolje na telefonu) — nikad podvučen tekst. | ✅ `cb1751f` — nijedan čin nije podvučen (`ActsAreButtons.test.ts`); na telefonu traka činova stoji na tabovima (`efe47fd`) |
+| **Liste kao u Postavkama:** grupisane, uvučene linije, strelica na svemu što vodi dalje, odabrani red ostaje istaknut dok je njegov detalj otvoren. | ✅ linije, strelica na redu, istaknut odabir dok je detalj otvoren |
 | **Radnje na samom redu:** prevlačenje na telefonu, desni klik ili dugi pritisak za meni. | ⬜ |
 | **Veliki naslov koji se pri skrolu skupi u traku.** | ⬜ (tačka 12) |
-| **Sistemski font za sučelje** (SF / system-ui); serif samo za tekst koji se čita. | ⬜ Manrope za sučelje, serif (Newsreader) i za naslove u redu (T4) |
-| **Trenutni odziv:** čin se vidi odmah, kostur umjesto *Loading…*, nikad prazan ekran. | ⬜ činovi čekaju server pa ponovo čitaju sve |
-| **Tastatura:** ⌘K, strelice, Enter, Esc. | ◐ ⌘K ✅, 1–9 na redu ✅, strelice ⬜ |
+| **Sistemski font za sučelje** (SF / system-ui); serif samo za tekst koji se čita. | ✅ `22c10a8` — sistemski font za sučelje, serif samo za tekst koji se čita |
+| **Trenutni odziv:** čin se vidi odmah, kostur umjesto *Loading…*, nikad prazan ekran. | ◐ `ef8df0b` — kostur umjesto *Loading…*, *uzmi* i *Met — next* odmah; ostali činovi još čekaju server |
+| **Tastatura:** ⌘K, strelice, Enter, Esc. | ✅ ⌘K, 1–9 na redu, `j`/`k` i strelice, Enter, Esc |
 | **Instalira se kao aplikacija:** ikona, bez trake preglednika, radi bez mreže. | ⬜ ikone postoje, `manifest.json` ne postoji |
 | **Jedna naglašena boja**, sve ostalo neutralno. | ◐ lapis vodi, ali u redu je pet boja faza |
 | **Ništa se ne gubi:** otkucan tekst, odabir, filter. | ◐ nacrti po koraku u predmetu ✅, drugdje ne |
@@ -43,6 +43,12 @@ posao se otvori desno — i kad telefon to isto uradi kao guranje ekrana s
 nazadom koji vraća tačno gdje si bio — Majlis prestaje biti skup stranica.
 Sve ostalo iz tabele su pravila koja taj okvir drže dosljednim. Zato je to
 **P0** ispod.
+
+---
+
+**Stanje 29. 9. 2026:** P0, P1, P2 i P3 su urađeni (radna grana s commitom
+`efe47fd`, nije na `main`). Šta je tačno napravljeno, šta
+je nađeno uživo i svaki sljedeći korak: [NASTAVAK.md](NASTAVAK.md).
 
 ---
 
