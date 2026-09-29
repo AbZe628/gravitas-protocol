@@ -186,6 +186,28 @@ Zadnje mjerenje: klijent **527/527** testova (62 datoteke), server
 
 ## 3 · Nađeno, a nije popravljeno — redom kojim bih radio
 
+**A, B i H su zatvoreni 29.09.2026** (`f9ca210`, `4e10abb`, `65e8f4e`) — opisi
+ostaju dolje zato što objašnjavaju *zašto*, a ne zato što se još radi.
+
+Iz A je ispala pometnja koju vrijedi zapamtiti: kad je straža `EveryoneIsNamed`
+proširena da vidi liste ljudi (`.join` i listu predanu kao dijete), našla je
+još dva mjesta s istim kvarom — glasanje (*not yet recorded: member-c,…*, i
+njegov vlastiti test je tražio taj niz, pa je kvar imao test koji ga je držao)
+i kalendar, na stranici i u kanalu prema vanjskom kalendaru. Potpisivanje
+dokumenta je već bilo ispravno.
+
+H je bio provjera, ne izmjena: pet zaslona × en/ar/ur na 390 px — nigdje
+bočnog skrola, najmanji tekst 12 px (en) / 13,44 (ar) / 13,8 (ur), nigdje
+sirovog id-ja, nigdje engleskog kroz prijevod, konzola čista na svježem
+jastučiću. Prošetane i radnje: prvi glas i promjena mišljenja na nalazu,
+glasanje na kojem si glasao stoji pod *Everyone* a ne pod *Yours*, pitanje →
+*Open the matter* → novi predmet, obaveza imenuje *Board Member B*, posao
+položen kod kolege čita *With Board Member B · placed by Board Member A*.
+Traka činova sjeda točno na fiksni `nav` (razmak 0).
+
+Ostaje na telefonu ono što je ionako svoja stavka: C (baner), D (gornja
+traka), E (urdu tabovi), F (traka činova u dva reda).
+
 **A · Odobravanje plana na prekršaju — isti kvar kao nalaz (prvo ovo).**
 Nađeno čitanjem koda, nije još viđeno u pregledniku.
 - `client/src/pages/IncidentDetail.tsx`, panel `endorse` (oko reda 412):
