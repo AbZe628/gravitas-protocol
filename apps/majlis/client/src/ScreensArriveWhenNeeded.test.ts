@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { readdirSync, readFileSync, statSync } from 'node:fs';
-import { join, relative, resolve } from 'node:path';
+import { join, relative, resolve, sep } from 'node:path';
 import * as screens from './screens.js';
 
 /**
@@ -29,7 +29,15 @@ function files(dir: string): string[] {
   });
 }
 
-const sources = files(SRC).map((p) => ({ path: relative(SRC, p), text: readFileSync(p, 'utf8') }));
+/*
+ * One separator, whatever the machine writes. On Windows `relative` answers
+ * `locales\index.ts`, and every lookup below asks for `locales/index.ts` — so
+ * the walk read every file and found none of them.
+ */
+const sources = files(SRC).map((p) => ({
+  path: relative(SRC, p).split(sep).join('/'),
+  text: readFileSync(p, 'utf8'),
+}));
 
 /* `import X from '…/pages/Y.js'` and `export … from`, the forms that make it static. */
 const STATIC_PAGE = /^\s*(?:import|export)\s[^;]*?from\s+['"](?:\.\.?\/)+(?:[\w/]*\/)?pages\/[\w-]+(?:\.js)?['"]/m;
@@ -38,6 +46,13 @@ describe('what arrives first', () => {
   it('reads the source it claims to', () => {
     expect(sources.length).toBeGreaterThan(150);
     expect(sources.some((s) => s.path === 'screens.ts')).toBe(true);
+    /*
+     * A file in a folder, not only one at the top. `screens.ts` sits in the
+     * root and so carries no separator at all — it matched on a machine where
+     * every nested lookup was already failing, and the file reported itself
+     * green while the check below had nothing to read.
+     */
+    expect(sources.some((s) => s.path === 'locales/index.ts')).toBe(true);
   });
 
   /*

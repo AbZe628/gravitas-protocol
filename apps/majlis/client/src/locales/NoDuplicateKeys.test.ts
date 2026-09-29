@@ -37,12 +37,18 @@ import { resolve } from 'node:path';
  *
  * One file per language, since a reader is sent only their own (see
  * `loadLang` in ./index.ts). Each file holds one block.
+ *
+ * Cut on either ending. Checked out on Windows these files carry a return
+ * before every newline, and a walk that cut on the newline alone left that
+ * return on the end of each line: the closing brace never matched, the block
+ * was never found, and all three languages reported nought keys. Green on one
+ * machine and red on another, over a fault in neither.
  */
 const LANGS = ['en', 'ar', 'ur'] as const;
 
 /** Where the language's block starts and ends in its own file, found rather than assumed. */
 function block(lang: string): { lang: string; lines: string[]; from: number; to: number } {
-  const lines = readFileSync(resolve(process.cwd(), `src/locales/${lang}.ts`), 'utf8').split('\n');
+  const lines = readFileSync(resolve(process.cwd(), `src/locales/${lang}.ts`), 'utf8').split(/\r?\n/);
   const from = lines.findIndex((line) => new RegExp(`^const ${lang}: Dict = \\{`).test(line));
   const to = lines.findIndex((line, i) => i > from && line === '};');
   return { lang, lines, from, to };

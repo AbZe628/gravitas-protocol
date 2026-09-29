@@ -176,5 +176,13 @@ describe('reading the record never rings the bell', () => {
       .filter(([method]) => !isReader(method))
       .map(([method, paths]) => `${method} ← ${[...paths].slice(0, 3).join(', ')}`);
     expect(wrong, 'a GET asked the store for something the bell counts as a write').toEqual([]);
-  });
+    /*
+     * Its own budget, because the default one is not a claim about this test.
+     * It walks every GET the application registers - some seventy round trips,
+     * one after another - and takes about three seconds on its own. Under the
+     * whole suite it went past five and the run reported a failure that was
+     * nothing but a loaded machine. A measure that answers differently
+     * depending on what else is running is not measuring what it names.
+     */
+  }, 60_000);
 });
