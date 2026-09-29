@@ -42,8 +42,8 @@ interface Opens {
 const OPENS: readonly Opens[] = [
   { detail: /^\/matters\/[^/]+$/, lists: ['/', '/record', '/rules'] },
   { detail: /^\/incidents\/[^/]+$/, lists: ['/', '/incidents'] },
-  { detail: /^\/questions\/[^/]+$/, lists: ['/'] },
-  { detail: /^\/undertakings\/[^/]+$/, lists: ['/'] },
+  { detail: /^\/questions\/[^/]+$/, lists: ['/', '/questions'] },
+  { detail: /^\/undertakings\/[^/]+$/, lists: ['/', '/undertakings'] },
   { detail: /^\/rules\/[^/]+$/, lists: ['/rules', '/record', '/'] },
   { detail: /^\/register\/[^/]+$/, lists: ['/register'] },
   { detail: /^\/library\/[^/]+$/, lists: ['/library'] },
@@ -140,6 +140,8 @@ export const LIST_TITLES: Readonly<Record<string, string>> = {
   '/incidents': 'rail.events',
   '/register': 'rail.register',
   '/library': 'rail.library',
+  '/questions': 'queue.title',
+  '/undertakings': 'und.title',
 };
 
 /**

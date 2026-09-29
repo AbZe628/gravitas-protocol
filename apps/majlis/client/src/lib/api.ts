@@ -873,6 +873,8 @@ export interface QueueRow {
    * still being carried by whoever took the matter on.
    */
   holder?: string;
+  /** Who has already said theirs on the next step, where each of several says theirs. */
+  heard?: string[];
   /** Whole days it has stood here. */
   days: number;
   overdue: boolean;
@@ -1330,6 +1332,14 @@ export interface PassageStep {
    * undertaking, or whoever the step was placed with. A scholar id.
    */
   who?: string;
+  /**
+   * Who has already said theirs, on a step each of several says theirs on —
+   * a vote, a finding on a breach. Scholar ids. The step stays open for the
+   * others; it is not open to these.
+   */
+  heard?: string[];
+  /** Who it still waits on, where that can be named. Scholar ids, for the screen to name. */
+  waitingOn?: string[];
 }
 
 /**

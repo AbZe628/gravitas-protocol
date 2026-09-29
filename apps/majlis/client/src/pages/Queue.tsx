@@ -308,9 +308,14 @@ export default function Queue() {
    * signatories is every signatory's. Everything else — the institution, its
    * liaison, a clock — is somebody else's, which is worth knowing and is not
    * yours to do.
+   *
+   * And a step you have already said yours on is not yours, however long it
+   * stays open for the others: a cast vote sat here under *yours* as a vote
+   * to cast, fifty-five days old, for the member who had cast it.
    */
   const mine = (r: QueueRow) => {
     const me = identity?.scholarId;
+    if (me && r.heard?.includes(me)) return false;
     if (r.who) return r.who === me;
     if (r.holder && r.holder === me && (r.whose === 'board' || r.whose === 'signatory')) return true;
     if (r.whose === 'board') return true;

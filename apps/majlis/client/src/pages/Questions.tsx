@@ -1,29 +1,15 @@
-import { useEffect, useRef, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import {
-  oversight,
-  theWayIn,
-  type Delivery,
-  type Notice,
-  type Passage,
-  type Submission,
-} from '../lib/api.js';
+import { useEffect, useState } from 'react';
+import { oversight, theWayIn, type Passage, type Submission } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
-import TheDraftThatCame from '../components/TheDraftThatCame.js';
-import Fold from '../components/Fold.js';
 import { useIdentity, mayDeliberate, maySubmit } from '../lib/identity.js';
-import { MainAct, Card, Quiet, State } from '../components/kit.js';
+import { MainAct, State } from '../components/kit.js';
 import { Chip } from '../components/shapes.js';
-import Act from '../components/Act.js';
-import AfterAct from '../components/AfterAct.js';
-import TheNotice from '../components/TheNotice.js';
 import { Gaps, Nothing, PageHead } from '../components/page.js';
-import { Field } from '../components/field.js';
+import { Sheet, Line, Mark, Figure, type Column } from '../components/sheet.js';
 import { ErrorText, Loading } from '../components/ui.js';
 import { useStillThere } from '../lib/stillThere.js';
-import { Button } from '../components/Button';
+import { nameOf, useMembers } from '../lib/members.js';
 import Person from '../components/Person.js';
-import Holding from '../components/Holding.js';
 
 /**
  * What the institution has asked, and what the board did about it.
@@ -42,10 +28,8 @@ import Holding from '../components/Holding.js';
  * anything from is the board refusing to answer and refusing to say why.
  */
 
-const field = 'w-full rounded-xl bg-raised shadow-ring p-2.5 text-body leading-relaxed outline-none';
-const label = 'mb-1 block text-note text-muted';
 
-function span(hours: number, t: (k: string) => string): string {
+export function span(hours: number, t: (k: string) => string): string {
   if (hours < 48) return `${hours} ${t('attention.hours')}`;
   return `${Math.floor(hours / 24)} ${t('attention.days')}`;
 }
@@ -58,306 +42,48 @@ function span(hours: number, t: (k: string) => string): string {
  * one says how long it took to answer, and a same-day answer says that in
  * words — the figure is not the point once the number is small.
  */
-function clock(s: Submission, t: (k: string) => string): string {
+export function clock(s: Submission, t: (k: string) => string): string {
   if (s.standing === 'waiting') return `${span(s.waitedHours, t)} ${t('queue.waited')}`;
   if (s.waitedHours < 24) return t('queue.answeredSame');
   return `${t('queue.answeredIn')} ${span(s.waitedHours, t)}`;
 }
 
-function One({
-  s,
-  passage,
-  onDone,
-}: {
-  s: Submission;
-  /** Its reading, for who is taking it up. Absent where it did not come. */
-  passage?: Passage;
-  onDone: (notice?: { notice: Notice; delivery: Delivery }) => void;
-}) {
+/*
+  Each question, one line. Its words, its acts and where it stands are its own
+  window now, at its own address (see QuestionDetail.tsx) — the list is a list.
+*/
+const COLS = (t: (k: string) => string): readonly Column[] => [
+  { head: t('col.what'), width: 'minmax(0,2.4fr)', phone: 'lead' },
+  { head: t('queue.askedBy'), width: 'minmax(0,1.2fr)', phone: 'under' },
+  { head: t('col.stage'), width: '8rem', phone: 'under' },
+  { head: t('col.days'), width: '9rem', end: true, phone: 'trailing' },
+];
+
+function Row({ s, passage }: { s: Submission; passage?: Passage }) {
   const { t } = useI18n();
-  /*
-    The one the arrival screen named.
-
-    A row there says *take this up* and names the question. It handed over
-    the whole list, and a member arriving from it had to read down until they
-    recognised the one they had pressed — the same thing the undertakings did
-    until their rows carried the id. This scrolls to it once and leaves it lit.
-  */
-  const named = useLocation().hash.slice(1) === s.id;
-  const here = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (named && here.current) here.current.scrollIntoView({ block: 'center' });
-  }, [named]);
-  const [act, setAct] = useState<'none' | 'open' | 'decline'>('none');
-  const [title, setTitle] = useState('');
-  const [proposal, setProposal] = useState('');
-  const [direction, setDirection] = useState<'permit' | 'restrict'>('permit');
-  /**
-   * What the last act did, held by the card rather than by the window.
-   *
-   * Opening a question changes its standing, and the card redraws into its
-   * settled shape the moment the list comes back. Anything the window was
-   * about to say would go with it, so the card keeps the answer.
-   */
-  const [justDid, setJustDid] = useState<{
-    did: string;
-    means: string;
-    next: readonly { label: string; to?: string; says?: string }[];
-  } | null>(null);
-
-  const settled = s.standing !== 'waiting';
-  const wasDeclined = s.dispositions.some((d) => d.kind === 'declined');
-
-  async function open() {
-    const res = await theWayIn.open(s.id, { title, proposal, direction });
-    onDone({ notice: res.notice, delivery: res.delivery });
-  }
-
-  async function decline(why: string) {
-    await theWayIn.decline(s.id, why);
-    onDone();
-  }
-
+  const members = useMembers();
+  const holder = passage?.holder?.to;
   return (
-    <div id={s.id} ref={here}>
-    <Card tone={named ? 'attention' : 'plain'}>
-      <div className="mb-2 flex flex-wrap items-center gap-x-3 gap-y-2">
-        {s.standing === 'waiting' && <State tone="attention">{t('queue.waiting')}</State>}
-        {s.standing === 'opened' && <State tone="settled">{t('queue.opened')}</State>}
-        {s.standing === 'declined' && <State tone="breach">{t('queue.declined')}</State>}
-        {s.standing === 'withdrawn' && <State tone="plain">{t('queue.withdrawn')}</State>}
-
-        <span className="text-note text-muted">
-          {t('queue.asked')} {s.arrivedAt.slice(0, 10)}
-          <span className="mx-1.5 opacity-40">·</span>
-          <span className="tabular-nums">{clock(s, t)}</span>
-        </span>
-      </div>
-
-      <div className="font-display text-sub leading-snug">{s.subject}</div>
-
-      <div className="mt-1 text-note text-muted">
-        <Person id={s.askedBy} />
-        {s.onBehalf && (
-          <>
-            <span className="mx-1.5 opacity-40">·</span>
-            {t('queue.onBehalf')}
-          </>
-        )}
-      </div>
-
-      {/*
-        The institution's own words, marked as theirs. The label matters: a
-        reader has to be able to tell at a glance which sentences the bank
-        wrote and which the board did.
-      */}
-      <div className="mt-3.5">
-        <div className="mb-1 text-label font-bold uppercase tracking-caps text-muted">
-          {t('queue.theirWords')}
-        </div>
-        <p className="max-w-[62ch] font-read text-lead leading-relaxed">{s.question}</p>
-      </div>
-
-      {/*
-        Everything below the question folds.
-
-        The queue printed the background, what the desk was waiting for, the
-        file that came with it and a reading of which of nineteen shapes its
-        words match — for every question, all at once. Three questions came to
-        819 words and the first act sat 1,043 pixels down. A queue is a place
-        to pick something up, not to read it.
-      */}
-      {s.awaiting && (
-        <p className="mt-2.5 max-w-[62ch] text-ui leading-relaxed text-muted">
-          <span className="font-semibold">{t('queue.awaiting')}</span> {s.awaiting}
-        </p>
-      )}
-
-      {(s.background || s.draft) && (
-        <div className="mt-3">
-          <Fold heading={t('queue.moreOnThis')} summary={s.draft ? t('queue.withDraft') : undefined}>
-            {s.background && (
-              <p className="max-w-[62ch] text-ui leading-relaxed text-muted">{s.background}</p>
-            )}
-
-
-
-      {/*
-        The contract, where one came with the question, and the shapes its
-        conditions turn up in. This is the step a scholar could not take: the
-        reader needs a shape named from nineteen before it will read, and
-        nobody can name one without having read the document first.
-      */}
-            {s.draft && <TheDraftThatCame draft={s.draft} submissionId={s.id} />}
-          </Fold>
-        </div>
-      )}
-
-      {/* What was said back, whichever way it went. */}
-      {settled &&
-        s.dispositions
-          .filter((d) => d.reason)
-          .map((d, i) => (
-            <p
-              key={i}
-              className="mt-3 max-w-[62ch] rounded-xl bg-raised px-3.5 py-2.5 text-ui leading-relaxed shadow-ring"
-            >
-              {d.reason}
-            </p>
-          ))}
-
-      {s.matterId && (
-        <p className="mt-3 text-ui">
-          <Link
-            to={`/matters/${s.matterId}`}
-            className="inline-flex min-h-[44px] items-center text-lapis underline underline-offset-2 lg:min-h-0"
-          >
-            {t('queue.seeMatter')}
-          </Link>
-        </p>
-      )}
-
-      {!settled && act === 'none' && (
-        <div className="mt-4 flex flex-wrap items-center gap-4">
-          <MainAct onClick={() => setAct('open')}>{t('queue.open')}</MainAct>
-          <Quiet onClick={() => setAct('decline')}>{t('queue.decline')}</Quiet>
-        </div>
-      )}
-
-      {/*
-        Who is taking it up, and taking it up yourself or giving it to somebody.
-
-        The first thing a chair does with a question is give it to the member
-        who knows that market, and until now nothing on the screen that holds
-        the questions could say so. Beneath the two acts, because deciding what
-        the question becomes is the work and this is only who does it.
-      */}
-      {!settled && passage && <Holding passage={passage} onChanged={() => onDone()} />}
-
-      {/*
-        A decline that is being reconsidered says so. Without it a member would
-        be reopening something the board already turned down without knowing
-        that it had.
-      */}
-      {s.standing === 'declined' && (
-        <div className="mt-4">
-          {act === 'none' ? (
-            <Quiet onClick={() => setAct('open')}>{t('queue.open')}</Quiet>
-          ) : null}
-        </div>
-      )}
-
-      <Act
-        open={act === 'open'}
-        onClose={() => setAct('none')}
-        title={t('queue.open')}
-        does={t('wm.openQ.does')}
-        means={t('wm.openQ.means')}
-        label={t('queue.open')}
-        perform={open}
-        onDone={setJustDid}
-        after={{
-          did: t('wm.openQ.did'),
-          means: t('wm.openQ.didMeans'),
-          next: [
-            { label: t('wm.next.theMatter'), to: '/', says: t('wm.next.theMatterSays') },
-          ],
-        }}
-      >
-        <div>
-          {wasDeclined && (
-            <p className="mb-3 rounded-xl bg-[#F7F0E2] px-3.5 py-2.5 text-note leading-relaxed text-goldink shadow-ringgold">
-              {t('queue.reconsider')}
-            </p>
+    <Line
+      to={`/questions/${s.id}`}
+      columns={COLS(t)}
+      cells={[
+        s.subject,
+        <span className="block truncate text-ui text-muted">
+          <Person id={s.askedBy} />
+          {holder && (
+            <>
+              <span className="mx-1.5 opacity-40">·</span>
+              {nameOf(members, holder)}
+            </>
           )}
-
-          <Field label={t('queue.yourReading')} help={t('queue.yourReadingHelp')} className="mb-3">
-            {(attrs) => (
-              <input
-                {...attrs}
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                className={field}
-              />
-            )}
-          </Field>
-
-          <Field label={t('raise.proposal')} className="mb-3">
-            {(attrs) => (
-              <textarea
-                {...attrs}
-                value={proposal}
-                onChange={(e) => setProposal(e.target.value)}
-                rows={3}
-                className={field + ' resize-y'}
-              />
-            )}
-          </Field>
-
-          {/*
-            A choice between two buttons, not a box to fill in — so the words
-            above it head a group rather than pointing at a single control.
-          */}
-          <div className={label} id="direction-heading">
-            {t('raise.direction')}
-          </div>
-          <div
-            role="group"
-            aria-labelledby="direction-heading"
-            className="mb-3 flex flex-wrap gap-2"
-          >
-            {(['permit', 'restrict'] as const).map((d) => (
-              <Button
-                key={d}
-                type="button"
-                onClick={() => setDirection(d)}
-                className={
-                  'rounded-xl px-4 py-2 text-ui transition-all ' +
-                  (direction === d
-                    ? 'bg-lapistint font-semibold text-lapis shadow-pick'
-                    : 'bg-raised text-sand shadow-ring hover:text-paper')
-                }
-              >
-                {t(`raise.direction.${d}`)}
-              </Button>
-            ))}
-          </div>
-
-        </div>
-      </Act>
-
-      <Act
-        open={act === 'decline'}
-        onClose={() => setAct('none')}
-        title={t('queue.decline')}
-        does={t('wm.declineQ.does')}
-        means={t('wm.declineQ.means')}
-        label={t('queue.decline')}
-        grave
-        reason={{ label: t('queue.declineWhy'), help: t('queue.declineHelp') }}
-        perform={({ reason: why }) => decline(why)}
-        onDone={setJustDid}
-        after={{
-          did: t('wm.declineQ.did'),
-          means: t('wm.declineQ.didMeans'),
-          next: [
-            { label: t('wm.next.theQuestions'), to: '/questions', says: t('wm.next.theQuestionsSays') },
-          ],
-        }}
-      />
-
-      {justDid && (
-        <div className="mt-4">
-          <AfterAct
-            did={justDid.did}
-            means={justDid.means}
-            next={justDid.next}
-            onClose={() => setJustDid(null)}
-          />
-        </div>
-      )}
-    </Card>
-    </div>
+        </span>,
+        <Mark tone={s.standing === 'waiting' ? 'text-goldink' : s.standing === 'declined' ? 'text-breach' : 'text-settled'}>
+          {t(`queue.${s.standing}`)}
+        </Mark>,
+        <Figure tone={s.standing === 'waiting' ? 'text-goldink' : 'text-muted'}>{clock(s, t)}</Figure>,
+      ]}
+    />
   );
 }
 
@@ -374,7 +100,6 @@ export default function Questions({ boardId }: { boardId: string }) {
   const [show, setShow] = useState<'waiting' | 'settled'>('waiting');
   /** A failed refresh keeps a screen that is already there. */
   const there = useStillThere();
-  const [notice, setNotice] = useState<{ notice: Notice; delivery: Delivery } | null>(null);
 
   const load = () => {
     theWayIn
@@ -459,11 +184,6 @@ export default function Questions({ boardId }: { boardId: string }) {
         }
       />
 
-      {notice && (
-        <div className="mb-6">
-          <TheNotice notice={notice.notice} delivery={notice.delivery} />
-        </div>
-      )}
 
       {/*
         Two headings became two chips.
@@ -490,30 +210,22 @@ export default function Questions({ boardId }: { boardId: string }) {
         open.length === 0 ? (
           <Nothing>{t('queue.none')}</Nothing>
         ) : (
-          <div className="space-y-3">
+          <Sheet columns={COLS(t)}>
             {open.map((s) => (
-              <One
-                key={s.id}
-                s={s}
-                passage={passages.get(s.id)}
-                onDone={(n) => {
-                  if (n) setNotice(n);
-                  load();
-                }}
-              />
+              <Row key={s.id} s={s} passage={passages.get(s.id)} />
             ))}
-          </div>
+          </Sheet>
         )
       ) : (
         <>
           <p className="mb-3.5 max-w-[62ch] text-ui leading-relaxed text-muted">
             {t('queue.settledNote')}
           </p>
-          <div className="space-y-3">
+          <Sheet columns={COLS(t)}>
             {settled.map((s) => (
-              <One key={s.id} s={s} onDone={load} />
+              <Row key={s.id} s={s} />
             ))}
-          </div>
+          </Sheet>
         </>
       )}
 

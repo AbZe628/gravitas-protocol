@@ -288,9 +288,7 @@ const WORK_AREA = [
 function atWorkArea(path: string): boolean {
   return (
     WORK_AREA.includes(path) ||
-    path.startsWith('/matters/') ||
-    path.startsWith('/classic/matters/') ||
-    path.startsWith('/dossier/matters/')
+    path.startsWith('/matters/')
   );
 }
 
@@ -329,6 +327,29 @@ function Avatar({ id }: { id?: string }) {
  */
 function TabBar() {
   const { t } = useI18n();
+  /*
+   * How tall the bar is, as `--foot` on the page.
+   *
+   * The work pane leaves this much room at its foot, and a window's act bar
+   * holds itself just above it. Written as a figure it was wrong in two
+   * languages out of three: an Urdu label wraps to a second line, the bar
+   * grew from 63 to 94 pixels, and the act bar a phone holds above it sat
+   * under it. Measured instead, as the bar actually is.
+   */
+  const foot = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const el = foot.current;
+    if (!el || typeof ResizeObserver === 'undefined') return;
+    const root = document.documentElement;
+    const note = () => root.style.setProperty('--foot', `${el.offsetHeight}px`);
+    note();
+    const seen = new ResizeObserver(note);
+    seen.observe(el);
+    return () => {
+      seen.disconnect();
+      root.style.removeProperty('--foot');
+    };
+  }, []);
   const { identity } = useIdentity();
   const path = useLocation().pathname;
   const desk = isInstitution(identity?.role);
@@ -475,6 +496,7 @@ function TabBar() {
 
   return (
     <nav
+      ref={foot}
       aria-label={t('shell.menu')}
       className="fixed inset-x-0 bottom-0 z-40 flex items-start bg-raised/85 px-1.5 pt-2.5 shadow-[0_-0.5px_0_rgba(25,23,19,0.09)] backdrop-blur-xl lg:hidden"
       style={{ paddingBottom: 'calc(0.5rem + env(safe-area-inset-bottom))' }}
@@ -1262,7 +1284,7 @@ function Frame({ children }: { children: React.ReactNode }) {
              * it the frame grows and the document scrolls again.
              */
             'min-h-0 flex-1 overflow-y-auto overscroll-contain ' +
-            'w-full px-4 py-4 pb-[calc(6.5rem+env(safe-area-inset-bottom))] sm:px-6 lg:pb-12 ' +
+            'w-full px-4 py-4 pb-[calc(var(--foot,4rem)+2.5rem)] sm:px-6 lg:pb-12 ' +
             (atWorkArea(path) ? '' : 'mx-auto max-w-reading sm:px-8')
           }
           style={{ animation: 'shellFade 220ms ease-out' }}

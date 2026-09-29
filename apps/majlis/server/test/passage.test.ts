@@ -276,7 +276,40 @@ describe('the vote does not close itself', () => {
       reasoning: [{ scholarId: 'm-a', position: 'for', reason: 'r', at: '1' }],
     } as unknown as Partial<Matter>);
 
-    expect(words(step(buildPassage(board, partial, null, NOW), 'positions').standing)).toContain('Waiting on');
+    const positions = step(buildPassage(board, partial, null, NOW), 'positions');
+    // Named beside the sentence, by id, for the screen to turn into people.
+    expect(positions.waitingOn).toEqual(['m-b', 'm-c']);
+    // The sentence counts; it does not name. It named by id, and read *waiting on m-b, m-c*.
+    expect(words(positions.standing)).toBe('1 recorded, 3 needed.');
+    expect(JSON.stringify(positions.standing)).not.toMatch(/m-[a-z]/);
+  });
+
+  /*
+   * A cast vote is the voter's no longer. Read without this, the vote stayed
+   * every signatory's while it was open, and *what needs you* listed it as a
+   * vote to cast for the member who had cast it.
+   */
+  it('says who has cast theirs, counted the way the tally counts', () => {
+    const partial = matter({
+      status: 'voting',
+      deliberation: [{ id: 'd', scholarId: 'm-a', body: 'x', at: '1', replyTo: null, liaisonAnswer: false }],
+      reasoning: [
+        { scholarId: 'm-a', position: 'for', reason: 'r', at: '1' },
+        // Released: cast on a question that has since changed, so not cast on this one.
+        { scholarId: 'm-b', position: 'for', reason: 'r', at: '1', releasedAt: '2' },
+        // Not a signatory: in the record, out of the arithmetic, and not a vote cast.
+        { scholarId: 'adv-1', position: 'against', reason: 'r', at: '1' },
+      ],
+    } as unknown as Partial<Matter>);
+
+    // An advisory member sits on the board and has written; they cast no vote.
+    const seated = {
+      ...board,
+      members: [...board.members, { id: 'adv-1', name: 'D', signatory: false, title: 'Adviser', office: null }],
+    } as unknown as Board;
+    const positions = step(buildPassage(seated, partial, null, NOW), 'positions');
+    expect(positions.heard).toEqual(['m-a']);
+    expect(positions.waitingOn).toEqual(['m-b', 'm-c']);
   });
 });
 

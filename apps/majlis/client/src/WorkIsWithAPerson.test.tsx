@@ -2,16 +2,17 @@ import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
 import { render, screen, waitFor, fireEvent, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Queue from './pages/Queue.js';
-import Questions from './pages/Questions.js';
+import QuestionDetail from './pages/QuestionDetail.js';
+import { buildQuestionPassage } from '../../server/src/services/passage-question.js';
 import RuleDetail from './pages/RuleDetail.js';
 import { Route, Routes } from 'react-router-dom';
 import Holding from './components/Holding.js';
 import Person, { initialsOf } from './components/Person.js';
-import { whatToDoNow } from './components/NextAct.js';
+import WorkWindow from './components/WorkWindow.js';
 import { I18nProvider } from './lib/i18n.js';
 import { forgetIdentity, type Identity } from './lib/identity.js';
 import { forgetMembers } from './lib/members.js';
-import type { Matter, Passage, PassageStep, QueueRow } from './lib/api.js';
+import type { Passage, PassageStep, QueueRow } from './lib/api.js';
 
 /**
  * Work placed with a person, as the screens show it.
@@ -119,9 +120,25 @@ describe('the queue', () => {
     expect(screen.getByText('The board’s')).toBeTruthy();
     expect(screen.queryByText('Placed with Bilal')).toBeNull();
   });
+
+  it('keeps a vote you have cast off your list, while it is open for the others', async () => {
+    wire({ scholarId: 'member-c' }, [
+      row({ id: 'cast', title: 'Voted on already', whose: 'signatory', next: { key: 'step.positions.act' }, heard: ['member-a', 'member-c'] }),
+      row({ id: 'uncast', title: 'Not voted on yet', whose: 'signatory', next: { key: 'step.positions.act' }, heard: ['member-a'] }),
+    ]);
+    render(
+      <I18nProvider>
+        <MemoryRouter>
+          <Queue />
+        </MemoryRouter>
+      </I18nProvider>,
+    );
+    await waitFor(() => expect(screen.getByText('Not voted on yet')).toBeTruthy());
+    expect(screen.queryByText('Voted on already')).toBeNull();
+  });
 });
 
-describe('the card that says what now', () => {
+describe('the window, on a step placed with somebody', () => {
   const step = (over: Partial<PassageStep>): PassageStep => ({
     key: 'conditions',
     act: { key: 'step.conditions.act' },
@@ -130,7 +147,7 @@ describe('the card that says what now', () => {
     at: null,
     standing: null,
     enforced: false,
-    why: { key: 'x' },
+    why: { key: 'step.conditions.why' },
     ...over,
   });
   const passage = (next: PassageStep): Passage => ({
@@ -140,27 +157,53 @@ describe('the card that says what now', () => {
     waiting: null,
     settled: null,
   });
-  const input = (next: PassageStep, scholarId: string) => ({
-    passage: passage(next),
-    matter: { status: 'deliberation', reasoning: [] } as unknown as Matter,
-    identity: { scholarId, role: 'signatory', office: null } as Identity,
-    doc: null,
-    t: (k: string) => k,
-    say: (s: { key: string } | null | undefined) => s?.key ?? '',
-    go: () => undefined,
+  /* The page offers the act to anybody the route would let press it; the window decides whether it is theirs now. */
+  const offered = [{ key: 'conditions', action: <button type="button">Answer the condition</button> }];
+  const draw = (next: PassageStep, me: string, panels = offered) => {
+    wire({ scholarId: me });
+    return render(
+      <I18nProvider>
+        <MemoryRouter>
+          <WorkWindow passage={passage(next)} title="A matter" panels={panels} />
+        </MemoryRouter>
+      </I18nProvider>,
+    );
+  };
+
+  it('is quiet, and names the colleague, on a step placed with somebody else', async () => {
+    draw(step({ who: 'member-b' }), 'member-c');
+    const bar = screen.getByRole('toolbar');
+    await waitFor(() => expect(bar.textContent).toContain('With Bilal Rahman'));
+    expect(within(bar).queryByRole('button', { name: 'Answer the condition' })).toBeNull();
   });
 
-  it('is quiet, and names the colleague, on a step placed with somebody else', () => {
-    const doing = whatToDoNow(input(step({ who: 'member-b' }), 'member-c'))!;
-    expect(doing.tone).toBe('waiting');
-    expect(doing.act).toBeUndefined();
-    expect(doing.who).toBe('member-b');
+  it('still offers the act to the person it was placed with', async () => {
+    draw(step({ who: 'member-c' }), 'member-c');
+    const bar = screen.getByRole('toolbar');
+    await waitFor(() => expect(within(bar).getByRole('button', { name: 'Answer the condition' })).toBeInTheDocument());
   });
 
-  it('still says do this to the person it was placed with', () => {
-    const doing = whatToDoNow(input(step({ who: 'member-c' }), 'member-c'))!;
-    expect(doing.tone).toBe('act');
-    expect(doing.act).toBeTruthy();
+  it('says whom a vote still waits on by name, never by id', async () => {
+    const { container } = draw(
+      step({
+        key: 'positions',
+        whose: 'signatory',
+        act: { key: 'step.positions.act' },
+        standing: { key: 'step.positions.standing', vars: { recorded: 1, needed: 2 } },
+        heard: ['member-a'],
+        waitingOn: ['member-b', 'member-c'],
+      }),
+      'member-c',
+    );
+    await waitFor(() => expect(container.textContent).toContain('Waiting on Bilal Rahman, Căsim Ode.'));
+    expect(container.textContent).not.toMatch(/member-[a-z]/);
+  });
+
+  it('tells a member who has said theirs that it waits on the others', async () => {
+    draw(step({ whose: 'signatory', heard: ['member-c'] }), 'member-c', []);
+    await waitFor(() =>
+      expect(screen.getByRole('toolbar').textContent).toContain('You have said yours. It waits on the others.'),
+    );
   });
 });
 
@@ -299,7 +342,7 @@ describe('a person, drawn', () => {
   });
 });
 
-describe('a question, on the screen that holds the questions', () => {
+describe('a question, in its own window', () => {
   const question = {
     id: 'sub-1',
     boardId: 'demo-board',
@@ -314,22 +357,20 @@ describe('a question, on the screen that holds the questions', () => {
     background: '',
     awaiting: '',
     attachments: [],
+    draft: null,
     dispositions: [],
     standing: 'waiting',
     matterId: null,
     waitedHours: 145,
   };
+  /* Built by the function the server uses, so the window is read against the real reading. */
   const passage = (holder: string | null) => ({
-    of: { kind: 'question', id: 'sub-1' },
-    groups: [],
-    next: null,
-    waiting: null,
-    settled: null,
+    ...buildQuestionPassage(question as never, '2026-09-20T00:00:00Z'),
     holder: holder ? { to: holder, by: 'member-a', at: '2026-09-02T00:00:00Z' } : null,
     holdable: true,
   });
 
-  const open = (holder: string | null, at = '/questions') => {
+  const open = (holder: string | null) => {
     posted = [];
     vi.stubGlobal(
       'fetch',
@@ -341,15 +382,17 @@ describe('a question, on the screen that holds the questions', () => {
         }
         if (url.includes('/api/attention')) return json({ scholarId: 'member-c', role: 'signatory', office: null, items: [] });
         if (url.includes('/api/settings')) return json({ members: MEMBERS });
-        if (url.includes('/api/passages/question')) return json({ asOf: '', passages: [passage(holder)] });
-        if (url.includes('/api/submissions')) return json({ submissions: [question], waiting: ['sub-1'] });
+        if (url.includes('/api/passages/question/sub-1')) return json(passage(holder));
+        if (url.includes('/api/submissions/sub-1')) return json({ submission: question });
         return json({});
       }),
     );
     return render(
       <I18nProvider>
-        <MemoryRouter initialEntries={[at]}>
-          <Questions boardId="demo-board" />
+        <MemoryRouter initialEntries={['/questions/sub-1']}>
+          <Routes>
+            <Route path="/questions/:id" element={<QuestionDetail />} />
+          </Routes>
         </MemoryRouter>
       </I18nProvider>,
     );
@@ -368,27 +411,12 @@ describe('a question, on the screen that holds the questions', () => {
     expect(screen.queryByRole('button', { name: /take this on/i })).toBeNull();
   });
 
-  it('opens on the one the arrival screen named, lit, and scrolls to it', async () => {
-    // jsdom draws nothing and has no scrolling; the browser's own call is recorded instead.
-    const scrolled: Element[] = [];
-    Element.prototype.scrollIntoView = function (this: Element) {
-      scrolled.push(this);
-    };
-    try {
-      const { container } = open(null, '/questions#sub-1');
-      await screen.findByRole('button', { name: /take this on/i });
-      // The card itself, not anything inside it: the waiting chip wears the same ring.
-      expect(container.querySelector('#sub-1 > .shadow-ringgold')).not.toBeNull();
-      expect(scrolled.map((e) => e.id)).toContain('sub-1');
-    } finally {
-      delete (Element.prototype as { scrollIntoView?: unknown }).scrollIntoView;
-    }
-  });
-
-  it('is not lit when the address names another', async () => {
-    const { container } = open(null, '/questions#sub-2');
-    await screen.findByRole('button', { name: /take this on/i });
-    expect(container.querySelector('#sub-1 > .shadow-ringgold')).toBeNull();
+  it('puts the one act where every window puts it, and names the step it is', async () => {
+    open(null);
+    const bar = await screen.findByRole('toolbar');
+    expect(within(bar).getByRole('button', { name: /take it up as a matter/i })).toBeInTheDocument();
+    expect(within(bar).getByRole('button', { name: /do not take it up/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /take it up as a matter, or say why not/i })).toBeInTheDocument();
   });
 });
 

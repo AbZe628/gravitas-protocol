@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { useParams } from 'react-router-dom';
 import { oversight, type Incident, type Passage, type PassageStep } from '../lib/api.js';
-import { nameOf, useMembers } from '../lib/members.js';
 import Holding from '../components/Holding.js';
+import WorkWindow from '../components/WorkWindow.js';
 import { useI18n } from '../lib/i18n.js';
 import { DateText, ErrorText, Loading, Tag } from '../components/ui.js';
 import { ClockLine } from './Incidents.js';
@@ -134,18 +134,18 @@ function Reason({
 
 export default function IncidentDetail() {
   const { id = '' } = useParams();
-  const { t, say } = useI18n();
+  const { t } = useI18n();
   const { identity } = useIdentity();
-  const members = useMembers();
   const [incident, setIncident] = useState<Incident | null>(null);
   const [passage, setPassage] = useState<Passage | null>(null);
   const [failed, setFailed] = useState(false);
-  const [refusal, setRefusal] = useState<string | null>(null);
   /** Whether this breach has ever rendered. See the note on `load` below. */
   const shown = useRef(false);
 
   /** Which act has its window open. Null when none has. */
   const [acting, setActing] = useState<string | null>(null);
+  /** How many acts have landed here — the window moves to what is next on each. */
+  const [moved, setMoved] = useState(0);
   /**
    * What the last act did, held by the screen.
    *
@@ -250,26 +250,55 @@ export default function IncidentDetail() {
   const plan = i.plan ?? null;
   const determined = i.actual === true;
 
-  /** Every action goes through here so a refusal is shown, never swallowed. */
-  async function act(fn: () => Promise<Incident>) {
-    setRefusal(null);
+  /**
+   * Every action goes through here, and a refusal goes back to the act.
+   *
+   * It was caught here and set on the screen instead — so the act was told
+   * it had worked. Measured: a member who had already said *a breach* said it
+   * again, the route refused, and the screen showed *recorded as a breach,
+   * the thirty days are running* in green with the refusal in red under it.
+   * The act's own window is where a refusal belongs: it stays open, with the
+   * words the member typed, and nothing says it happened.
+   */
+  async function settle(fn: () => Promise<Incident>): Promise<Incident> {
     try {
-      setIncident(await fn());
-    } catch (e) {
-      setRefusal(e instanceof Error ? e.message : String(e));
+      const now = await fn();
+      setIncident(now);
+      setMoved((n) => n + 1);
       await load();
+      return now;
+    } catch (e) {
+      await load();
+      throw e;
     }
   }
+  /* An act whose window says what `after` says: it answers nothing of its own. */
+  async function act(fn: () => Promise<Incident>): Promise<void> {
+    await settle(fn);
+  }
+
+  /*
+   * A position is a finding only once enough have taken it. Until then it is
+   * one member's view on the record, and nothing runs from it.
+   */
+  const heardOnly = (actual: boolean) => ({
+    did: t(actual ? 'sw.concurYes.heard' : 'sw.concurNo.heard'),
+    means: t('sw.concur.heardMeans'),
+    next: [{ label: t('win.next.backToQueue'), to: '/', says: t('win.next.backToQueueSays') }],
+  });
+  const concurring = (actual: boolean) => async ({ reason }: { reason: string }) => {
+    const now = await settle(() => oversight.concur(id, actual, reason));
+    return now.stage === 'reported' ? heardOnly(actual) : undefined;
+  };
+
+  /* Where this member stands on it, by their latest view — the one the threshold counts. */
+  const mine = identity
+    ? [...i.concurrences].reverse().find((c) => c.scholarId === identity.scholarId)
+    : undefined;
 
   const panels: Panel[] = [
-    {
-      key: 'reported',
-      detail: (
-        <>
-          <Person id={i.reportedBy} /> · <DateText iso={i.reportedAt} />
-        </>
-      ),
-    },
+    /* Who reported it and when is already the step's own line in the record. */
+    { key: 'reported' },
     {
       key: 'determine',
       detail:
@@ -290,7 +319,18 @@ export default function IncidentDetail() {
           <span className="text-muted">{t('snc.noPositions')}</span>
         ),
       action:
-        i.stage === 'reported' && board ? (
+        i.stage === 'reported' && board && mine ? (
+          /*
+           * Said already. The same position again is refused, so it is not
+           * offered; changing their mind is, and the record keeps both.
+           */
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+            <span className="text-ui text-muted">{t(mine.actual ? 'snc.youSaidBreach' : 'snc.youSaidNot')}</span>
+            <Button tone="quiet" size="sm" onClick={() => setActing(mine.actual ? 'concurNo' : 'concurYes')}>
+              {t(mine.actual ? 'snc.changeToNot' : 'snc.changeToBreach')}
+            </Button>
+          </div>
+        ) : i.stage === 'reported' && board ? (
           <div className="flex flex-wrap gap-2">
             <Button tone="grave" size="sm" onClick={() => setActing('concurYes')}>
               {t('snc.recordBreach')}
@@ -389,7 +429,7 @@ export default function IncidentDetail() {
     },
     {
       key: 'directors',
-      detail: i.directorsApprovedAt ? <DateText iso={i.directorsApprovedAt} /> : <span className="text-muted">—</span>,
+      detail: i.directorsApprovedAt ? <DateText iso={i.directorsApprovedAt} /> : undefined,
       action:
         i.stage === 'endorsed' && clerk ? (
           <Button tone="quiet" size="sm" onClick={() => setActing('directors')}>
@@ -399,11 +439,7 @@ export default function IncidentDetail() {
     },
     {
       key: 'regulator',
-      detail: i.submittedToRegulatorAt ? (
-        <DateText iso={i.submittedToRegulatorAt} />
-      ) : (
-        <span className="text-muted">—</span>
-      ),
+      detail: i.submittedToRegulatorAt ? <DateText iso={i.submittedToRegulatorAt} /> : undefined,
       action:
         i.stage === 'approved' && clerk ? (
           <Button tone="quiet" size="sm" onClick={() => setActing('submission')}>
@@ -498,7 +534,7 @@ export default function IncidentDetail() {
     },
     {
       key: 'close',
-      detail: i.closedAt ? <DateText iso={i.closedAt} /> : <span className="text-muted">—</span>,
+      detail: i.closedAt ? <DateText iso={i.closedAt} /> : undefined,
       action:
         (i.stage === 'submitted' || i.stage === 'not_actual') && board ? (
           <Button tone="quiet" size="sm" onClick={() => setActing('close')}>
@@ -586,6 +622,8 @@ export default function IncidentDetail() {
         label={zadatak?.title ?? ''}
         perform={async () => {
           await zadatak?.run();
+          setMoved((n) => n + 1);
+          await load();
         }}
         onDone={setJustDid}
         after={zadatak?.after}
@@ -600,7 +638,7 @@ export default function IncidentDetail() {
         label={t('snc.recordBreach')}
         grave
         reason={{ label: t('sw.concurYes.reason'), help: t('sw.concurYes.reasonHelp') }}
-        perform={async ({ reason }) => act(() => oversight.concur(id, true, reason))}
+        perform={concurring(true)}
         onDone={setJustDid}
         after={{
           did: t('sw.concurYes.did'),
@@ -620,7 +658,7 @@ export default function IncidentDetail() {
         means={t('sw.concurNo.means')}
         label={t('snc.recordNoBreach')}
         reason={{ label: t('sw.concurNo.reason'), help: t('sw.concurNo.reasonHelp') }}
-        perform={async ({ reason }) => act(() => oversight.concur(id, false, reason))}
+        perform={concurring(false)}
         onDone={setJustDid}
         after={{
           did: t('sw.concurNo.did'),
@@ -760,22 +798,104 @@ export default function IncidentDetail() {
     </>
   );
 
+  /*
+   * What the last act did and what the clock says — above
+   * the step, because an act changes the stage and the step it was pressed
+   * on is no longer the one on the screen.
+   */
+  const notice =
+    justDid || i.clock ? (
+      <div className="space-y-3">
+        {justDid && (
+          <AfterAct
+            did={justDid.did}
+            means={justDid.means}
+            next={justDid.next}
+            onClose={() => setJustDid(null)}
+          />
+        )}
+        {i.clock && (
+          <p
+            className={
+              'rounded-card px-4 py-3 text-ui leading-relaxed ' +
+              (i.clock.overdue ? 'bg-breachtint text-breach shadow-ringbreach' : 'bg-ink/60 text-sand')
+            }
+          >
+            {i.clock.note}
+          </p>
+        )}
+      </div>
+    ) : undefined;
+
+  /*
+   * The breach, as one window.
+   *
+   * It was nine cards down a column, each with its own button and the
+   * current one tinted — a page to scroll, with the act somewhere down it.
+   * It is the window every piece of work is now: the two halves across the
+   * top, the step the breach is at in the middle with whose it is and what
+   * stands in its way, the report beside it, and the act in the bar.
+   */
+  if (passage) {
+    return (
+      <>
+        {windows}
+        <WorkWindow
+          passage={passage}
+          title={i.title}
+          chips={
+            <>
+              <Tag tone={i.clock?.overdue ? 'warn' : i.stage === 'closed' ? 'ok' : undefined}>
+                {t(`snc.stage.${i.stage}`)}
+              </Tag>
+              <ClockLine incident={i} />
+            </>
+          }
+          panels={panels}
+          facts={[
+            { label: t('snc.reference'), value: <span className="font-mono">{i.reference}</span> },
+            {
+              label: t('snc.reported'),
+              value: (
+                <>
+                  <Person id={i.reportedBy} /> · <DateText iso={i.reportedAt} />
+                </>
+              ),
+            },
+            ...(i.purification && !i.purification.paidAt
+              ? [
+                  {
+                    label: t('col.owed'),
+                    value: (
+                      <span className="font-mono text-goldink">
+                        {i.purification.amount} {i.purification.currency}
+                      </span>
+                    ),
+                  },
+                ]
+              : []),
+            ...(plan?.completeBy
+              ? [{ label: t('snc.planDueBy'), value: <DateText iso={plan.completeBy} /> }]
+              : []),
+          ]}
+          documentLabel={t('snc.whatHappened')}
+          document={<p>{i.report}</p>}
+          holding={
+            passage.holdable ? <Holding passage={passage} onChanged={load} ruled={false} /> : undefined
+          }
+          notice={notice}
+          moved={moved}
+        />
+      </>
+    );
+  }
+
+  /*
+   * Where the reading has not arrived, the panels on their own — named, in
+   * order, with nothing claimed about where the breach stands. See `halves`.
+   */
   return (
     <div>
-      {/*
-        What the last act did, above the ladder.
-
-        Above it on purpose: an act changes the stage, the stage redraws the
-        ladder, and a sentence rendered inside a step would go with it.
-      */}
-      {justDid && (
-        <AfterAct
-          did={justDid.did}
-          means={justDid.means}
-          next={justDid.next}
-          onClose={() => setJustDid(null)}
-        />
-      )}
       {windows}
 
       <div className="mb-1 font-mono text-note text-muted">{i.reference}</div>
@@ -788,105 +908,28 @@ export default function IncidentDetail() {
         <ClockLine incident={i} />
       </div>
 
-      {i.clock && (
-        <p
-          className={
-            'mb-5 rounded-card px-5 py-4 text-ui leading-relaxed ' +
-            (i.clock.overdue
-              ? 'bg-breachtint text-breach shadow-ringbreach'
-              : 'bg-raised/60 text-muted shadow-ring')
-          }
-        >
-          {i.clock.note}
-        </p>
-      )}
+      {notice && <div className="mb-5">{notice}</div>}
 
       <p className="mb-6 text-lead leading-relaxed">{i.report}</p>
-
-      {refusal && (
-        <div className="mb-5 rounded-card shadow-ringbreach bg-breachtint px-4 py-3 text-ui leading-relaxed text-breach">
-          {refusal}
-        </div>
-      )}
-
-      {/*
-        The sequence, as the record reads it.
-
-        The halves are the server's and so are their names: a breach has *what
-        happened* and *putting it right*, which are not a matter's two halves
-        and were never going to be. The number beside a step is its place in
-        its own half, so a reader counting is counting the thing in front of
-        them rather than a running total across a screen.
-
-        Where the reading has not arrived the panels are still drawn, unnumbered
-        and in one list. A member can still read the report, the concurrences
-        and the plan; what they lose is the claim about where it stands, which
-        is the one thing this screen must not invent.
-      */}
-      {/*
-        Who is carrying this breach to its finding, and taking it on.
-
-        A breach has no step of the board's own — every step on this side of
-        it is the signatories', and each does those for themselves — so no
-        name goes on any step below. The breach itself is still something one
-        member takes on and chases, and this is where that is said.
-      */}
-      {passage?.holdable && (
-        <div className="mb-6 rounded-card bg-raised px-5 py-4 shadow-card">
-          <Holding passage={passage} onChanged={load} ruled={false} />
-        </div>
-      )}
 
       {halves.map((half) => (
         <div key={half.key} className="mb-6">
           <h2 className="mb-1 text-label font-bold uppercase tracking-caps text-muted">
             {half.heading}
           </h2>
-          {half.hint && (
-            <p className="mb-3 max-w-[62ch] text-note leading-relaxed text-muted">{half.hint}</p>
-          )}
-
           <ol className="space-y-4">
             {half.rows.map((row, n) => {
               const panel = panels.find((p) => p.key === row.key);
-              const current = row.step?.state === 'open';
-              const did = row.step?.state === 'done';
-
               return (
                 <li
                   key={row.key}
-                  className={
-                    'grid grid-cols-[28px_1fr] gap-3 rounded-card px-5 py-4 ' +
-                    (current
-                      ? 'bg-lapistint shadow-pick'
-                      : did
-                        ? 'bg-raised shadow-card'
-                        : 'bg-raised/60 opacity-70 shadow-ring')
-                  }
+                  className="grid grid-cols-[28px_1fr] gap-3 rounded-card bg-raised px-5 py-4 shadow-card"
                 >
                   <div className="pt-0.5 font-mono text-note text-muted tabular-nums">
-                    {did ? '✓' : String(n + 1).padStart(2, '0')}
+                    {String(n + 1).padStart(2, '0')}
                   </div>
                   <div>
-                    <div className="mb-1 flex flex-wrap items-baseline gap-2">
-                      <span className="text-body font-medium">
-                        {row.step ? say(row.step.act) : t(`breach.step.${row.key}.act`)}
-                      </span>
-                      {/* Whose it is, which only the reading can say. */}
-                      {row.step && (
-                        <span className="text-label font-bold uppercase tracking-caps text-muted">
-                          {row.step.who
-                            ? nameOf(members, row.step.who)
-                            : t(`passage.whose.${row.step.whose}`)}
-                        </span>
-                      )}
-                    </div>
-                    {/* What is in the way, in the record's own words. */}
-                    {current && row.step?.standing && (
-                      <p className="mb-1.5 text-note leading-relaxed text-muted">
-                        {say(row.step.standing)}
-                      </p>
-                    )}
+                    <div className="mb-1 text-body font-medium">{t(`breach.step.${row.key}.act`)}</div>
                     <div className="text-ui leading-relaxed">{panel?.detail}</div>
                     {panel?.action && <div className="mt-2.5">{panel.action}</div>}
                   </div>

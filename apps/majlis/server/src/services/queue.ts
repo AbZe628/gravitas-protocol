@@ -17,9 +17,9 @@ import { buildUndertakingPassage } from './passage-undertaking.js';
  * says what the thing is and how long it has waited, which is enough to find
  * it and open it, and the page it opens says what is wrong in its own words.
  */
-function nextOn(
-  read: () => Passage,
-): { next: Say | null; whose: Whose | null; who?: string; holder?: string } {
+type FromPassage = { next: Say | null; whose: Whose | null; who?: string; holder?: string; heard?: string[] };
+
+function nextOn(read: () => Passage): FromPassage {
   try {
     return fromPassage(read());
   } catch {
@@ -28,14 +28,13 @@ function nextOn(
 }
 
 /** What a row carries from its passage — one place, so no kind can drop a field. */
-function fromPassage(
-  p: Passage,
-): { next: Say | null; whose: Whose | null; who?: string; holder?: string } {
+function fromPassage(p: Passage): FromPassage {
   return {
     next: p.next?.act ?? null,
     whose: p.next?.whose ?? null,
     who: p.next?.who,
     holder: p.holder?.to ?? undefined,
+    heard: p.next?.heard,
   };
 }
 import { reviewStatus } from './review.js';
@@ -122,6 +121,12 @@ export interface QueueRow {
    * who took it on, whose list it belongs on.
    */
   holder?: string;
+  /**
+   * Who has already said theirs on the next step, where each of several says
+   * theirs — off the passage, as `who` is. A cast vote is not the voter's work
+   * any more, however long the vote stays open for the others.
+   */
+  heard?: string[];
   /** How long it has stood here. Days, floored — never rounded up. */
   days: number;
   /** True where a clock has already run out. */
@@ -185,7 +190,7 @@ export function buildQueue(input: QueueInput): QueueRow[] {
        * The one it names, not only the list it is on — as the undertakings'
        * rows do. The list opens on it, which is where taking it up is offered.
        */
-      to: `/questions#${s.id}`,
+      to: `/questions/${s.id}`,
       title: s.subject,
       phase: 'asked',
       ...nextOn(() => withAssignments(buildQuestionPassage(s, now), input.assignments)),
@@ -256,7 +261,7 @@ export function buildQueue(input: QueueInput): QueueRow[] {
        * here and opens on it. It is still the list, which is right: what
        * else was undertaken at that sitting is the context for closing this.
        */
-      to: `/undertakings#${u.id}`,
+      to: `/undertakings/${u.id}`,
       title: u.what,
       phase: 'deciding',
       /*

@@ -99,18 +99,24 @@ function renderMatter() {
   return render(
     <I18nProvider>
       {/*
-        The classic path, deliberately.
-
-        `/matters/:id` now shows one act at a time — the question, then the
-        position, then what happened — and these hold the page that shows
-        everything at once. That page is unchanged and still reachable, and
-        testing it here is what proves the guided screen removed nothing.
+        The classic address, deliberately: it leads to the one screen a matter
+        has now. These held the page that showed everything at once, and
+        running them through the old address against the window is what proves
+        the window removed nothing when the page went.
       */}
       <MemoryRouter initialEntries={['/classic/matters/m1']}>
         <App />
       </MemoryRouter>
     </I18nProvider>,
   );
+}
+
+/*
+ * What was said is a pane beside the work in the matter's window, as a member
+ * finds it: the tab is pressed, and then the thread is there.
+ */
+async function openWhatWasSaid() {
+  fireEvent.click(await screen.findByRole('tab', { name: /what was said/i }));
 }
 
 beforeEach(() => posted.splice(0));
@@ -129,6 +135,7 @@ describe('the deliberation reads as a thread', () => {
       }),
     });
     renderMatter();
+    await openWhatWasSaid();
 
     const question = await screen.findByText(/Does the wrapper hold/);
     const answer = await screen.findByText(/It holds the underlying/);
@@ -146,6 +153,7 @@ describe('the deliberation reads as a thread', () => {
       }),
     });
     renderMatter();
+    await openWhatWasSaid();
     expect(await screen.findByText('An orphaned reply.')).toBeInTheDocument();
   });
 });
@@ -166,6 +174,7 @@ describe('the interface does not offer what would be refused', () => {
   it('an advisory member may speak and not vote', async () => {
     stub({ role: 'advisory', matter: matter({ status: 'voting' }) });
     renderMatter();
+    await openWhatWasSaid();
 
     await waitFor(() => expect(screen.getByText('Add to the deliberation')).toBeInTheDocument());
     expect(screen.queryByText('Record my position')).toBeNull();
@@ -322,6 +331,7 @@ describe('what the interface sends', () => {
       }),
     });
     renderMatter();
+    await openWhatWasSaid();
 
     fireEvent.click(await screen.findByText('Reply'));
     const boxes = document.querySelectorAll('textarea');

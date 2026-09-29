@@ -1127,7 +1127,7 @@ export function governanceRoutes(
 
       const at = now();
       const updated = await changeMatter(store, req, res, req.params.id, (matter) => {
-        const { matter: returned, released } = returnToDeliberation(
+        const { matter: returned, released, reason } = returnToDeliberation(
           board,
           matter,
           { scholarId: who.scholarId, reason: parsed.data.reason },
@@ -1138,7 +1138,7 @@ export function governanceRoutes(
           id: `d-${at.replace(/[^0-9]/g, '').slice(0, 14)}-${Math.random().toString(36).slice(2, 8)}`,
           scholarId: who.scholarId,
           body:
-            parsed.data.reason +
+            reason +
             (released > 0
               ? `\n\n(The vote was returned to deliberation. ${released} position${released === 1 ? '' : 's'} released.)`
               : ''),

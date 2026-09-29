@@ -138,16 +138,26 @@ function establishingOf(i: Incident): Step[] {
   // Always done. The passage of a breach begins with there being one.
   steps.push(done('reported', 'institution', i.reportedAt));
 
+  /*
+   * Who has taken a position, once each: a member may change their mind, and
+   * the threshold counts only the latest, so the count of positions is the
+   * count of members and not of rows. It was the rows, and a member who
+   * changed their view read as two people.
+   */
+  const heard = [...new Set(concurrencesIn(i).map((c) => c.scholarId))];
   steps.push(
     i.actual !== null
       ? done('determine', 'signatory', i.determinedAt)
-      : open(
-          'determine',
-          'signatory',
-          concurrencesIn(i).length > 0
-            ? say('breach.step.determine.standingSome', { said: concurrencesIn(i).length })
-            : say('breach.step.determine.standingNone'),
-        ),
+      : {
+          ...open(
+            'determine',
+            'signatory',
+            heard.length > 0
+              ? say('breach.step.determine.standingSome', { said: heard.length })
+              : say('breach.step.determine.standingNone'),
+          ),
+          ...(heard.length > 0 ? { heard } : {}),
+        },
   );
 
   /*

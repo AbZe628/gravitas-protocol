@@ -38,7 +38,7 @@ interface Sheet {
 
 /** True on a matter, where a step's own keys apply. */
 function atAStep(path: string): boolean {
-  return path.startsWith('/matters/') || path.startsWith('/classic/matters/');
+  return path.startsWith('/matters/');
 }
 
 /** True where a list of rows is the screen. */

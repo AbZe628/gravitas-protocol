@@ -30,7 +30,16 @@ import RaiseAMatter from './RaiseAMatter.js';
  * screens now share. Four copies of one act is how an application ends up
  * with four wordings for one thing.
  */
-export default function ReconsiderThis({ rule, canOpen }: { rule: Rule; canOpen: boolean }) {
+export default function ReconsiderThis({
+  rule,
+  canOpen,
+  asAct = false,
+}: {
+  rule: Rule;
+  canOpen: boolean;
+  /** As the act of the review's window: see RaiseAMatter. */
+  asAct?: boolean;
+}) {
   const { t } = useI18n();
 
   return (
@@ -45,6 +54,7 @@ export default function ReconsiderThis({ rule, canOpen }: { rule: Rule; canOpen:
       label={t('reconsider.doIt')}
       note={t('reconsider.evenIfNothingChanges')}
       canOpen={canOpen}
+      asAct={asAct}
     />
   );
 }

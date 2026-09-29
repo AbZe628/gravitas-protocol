@@ -10,6 +10,7 @@ import WhatItMeans from '../components/WhatItMeans.js';
 import { Nothing } from '../components/page.js';
 import { ActionPanel, Facts, RecordPage } from '../components/shapes.js';
 import { DateText, ErrorText, Loading, Section, Sources, Tag } from '../components/ui.js';
+import WorkWindow, { type WorkPanel } from '../components/WorkWindow.js';
 
 /**
  * One ruling in force.
@@ -118,33 +119,24 @@ export default function RuleDetail() {
     </>
   );
 
-  return (
-    <RecordPage
-      phase="inforce"
-      title={rule.title}
-      states={
-        <>
-          <Tag tone="gold">
-            {t('rule.version')} {rule.version}
-          </Tag>
-          {rule.parameterHashVerified ? (
-            <Tag tone="ok">{t('rule.hashOk')}</Tag>
-          ) : (
-            <Tag tone="warn">{t('rule.hashBad')}</Tag>
-          )}
-          {review?.overdue ? <Tag tone="warn">{t('review.overdue')}</Tag> : null}
-          {unscheduled ? <Tag tone="warn">{t('review.unscheduled')}</Tag> : null}
-        </>
-      }
-      aside={aside}
-    >
-      {/* The board's own words, set the way the board's words are set. */}
-      <Section title={t('rule.statement')}>
-        <p className="max-w-[62ch] font-read text-sub leading-relaxed text-paper">
-          {rule.statement}
-        </p>
-      </Section>
+  const states = (
+    <>
+      <Tag tone="gold">
+        {t('rule.version')} {rule.version}
+      </Tag>
+      {rule.parameterHashVerified ? (
+        <Tag tone="ok">{t('rule.hashOk')}</Tag>
+      ) : (
+        <Tag tone="warn">{t('rule.hashBad')}</Tag>
+      )}
+      {review?.overdue ? <Tag tone="warn">{t('review.overdue')}</Tag> : null}
+      {unscheduled ? <Tag tone="warn">{t('review.unscheduled')}</Tag> : null}
+    </>
+  );
 
+  /* The ruling's own text, after its statement: the six answers, the fingerprint, what it rests on. */
+  const theRest = (
+    <>
       {/*
         The terms are not listed here first.
 
@@ -171,6 +163,73 @@ export default function RuleDetail() {
       </p>
 
       <Sources sources={rule.sources} />
+    </>
+  );
+
+  /*
+   * A ruling that is waiting on the board is work, and is drawn as work.
+   *
+   * Its review has come round, or nothing will ever bring it back: the queue
+   * opens it for that, and what a member arriving from there needs first is
+   * the window every piece of work is — where the review stands, whose it is,
+   * the one act — with the ruling itself beside it and its text underneath.
+   * A ruling nobody is waiting on is a record to read, and keeps the record's
+   * page: a window with nothing to do in it would be a frame around a document.
+   */
+  const reviewing = passage !== null && passage.next !== null && passage.next.whose !== 'clock';
+  if (reviewing && passage) {
+    const panels: WorkPanel[] = [
+      {
+        key: 'interval',
+        action: unscheduled ? <ReconsiderThis rule={rule} canOpen={canOpen} asAct /> : undefined,
+      },
+      {
+        key: 'due',
+        detail: review?.dueAt ? <DateText iso={review.dueAt} /> : undefined,
+        summary: review?.dueAt ? <DateText iso={review.dueAt} /> : undefined,
+      },
+      {
+        key: 'look',
+        detail: <p className="max-w-[62ch] text-ui leading-relaxed text-sand">{next}</p>,
+        action: dueNow ? <ReconsiderThis rule={rule} canOpen={canOpen} asAct /> : undefined,
+      },
+    ];
+    return (
+      <div className="space-y-8">
+        <WorkWindow
+          passage={passage}
+          title={rule.title}
+          chips={states}
+          panels={panels}
+          facts={[
+            { label: t('rule.version'), value: rule.version },
+            { label: t('rule.inForceFrom'), value: rule.inForceFrom ? <DateText iso={rule.inForceFrom} /> : '—' },
+            { label: t('review.next'), value: review?.dueAt ? <DateText iso={review.dueAt} /> : t('review.unscheduled') },
+          ]}
+          documentLabel={t('rule.statement')}
+          document={<p>{rule.statement}</p>}
+          holding={<Holding passage={passage} onChanged={readPassage} />}
+        />
+        <section aria-label={t('rule.statement')}>{theRest}</section>
+      </div>
+    );
+  }
+
+  return (
+    <RecordPage
+      phase="inforce"
+      title={rule.title}
+      states={states}
+      aside={aside}
+    >
+      {/* The board's own words, set the way the board's words are set. */}
+      <Section title={t('rule.statement')}>
+        <p className="max-w-[62ch] font-read text-sub leading-relaxed text-paper">
+          {rule.statement}
+        </p>
+      </Section>
+
+      {theRest}
     </RecordPage>
   );
 }

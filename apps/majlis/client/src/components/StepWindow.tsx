@@ -45,6 +45,14 @@ export interface Step {
   /** Answered, open, or still to do. Decides how it is drawn. */
   state: 'done' | 'here' | 'todo' | 'contested';
   onOpen: () => void;
+  /**
+   * The half of the work this step opens, named once before its first step —
+   * *what happened*, *putting it right*. A strip of nine numbers is a count;
+   * the same nine under two names is where in the work the member stands.
+   */
+  group?: string;
+  /** What the step is, for the pointer and the screen reader. Its number otherwise. */
+  label?: string;
 }
 
 export default function StepWindow({
@@ -161,7 +169,12 @@ export default function StepWindow({
    * padding, which is the status bar's room), so the window is the rest.
    */
   return (
-    <div ref={root} className="flex flex-col overflow-hidden rounded-sheet bg-raised shadow-card lg:h-[calc(100dvh-8.25rem)] lg:min-h-[560px]">
+    /*
+      `overflow-clip` below a desk rather than `hidden`: it rounds the corners
+      the same, and it is not a scroll container, so the act bar inside it
+      can hold to the foot of the screen.
+    */
+    <div ref={root} className="flex flex-col overflow-clip rounded-sheet bg-raised shadow-card lg:h-[calc(100dvh-8.25rem)] lg:min-h-[560px] lg:overflow-hidden">
       {/* ── the title bar ─────────────────────────────────────────────── */}
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-line px-5 py-3.5 sm:px-6">
         {/*
@@ -169,7 +182,7 @@ export default function StepWindow({
           with them and was cut to its first letter — *T…* — which is to say
           the one screen about a matter did not say which matter.
         */}
-        <h1 className="min-w-0 basis-full font-display text-sub leading-tight tracking-title text-paper lg:flex-1 lg:basis-0 lg:truncate">
+        <h1 className="min-w-0 basis-full font-display text-sub leading-tight tracking-title text-paper lg:line-clamp-2 lg:min-w-[40%] lg:flex-1 lg:basis-0">
           {title}
         </h1>
         {chips}
@@ -178,13 +191,19 @@ export default function StepWindow({
       {/* ── the strip: where in the run this is ───────────────────────── */}
       {steps.length > 0 && (
         <div className="flex items-center gap-1 overflow-x-auto border-b border-line bg-ink/40 px-5 py-2.5 sm:px-6">
-          {steps.map((s) => (
+          {steps.map((s, i) => (
+            <span key={s.id} className="contents">
+            {s.group && (
+              <span className={(i === 0 ? '' : 'ms-3 ') + 'me-1 shrink-0 whitespace-nowrap text-label font-bold uppercase tracking-caps text-muted'}>
+                {s.group}
+              </span>
+            )}
             <Button
-              key={s.id}
               type="button"
               onClick={s.onOpen}
               aria-current={s.state === 'here' ? 'step' : undefined}
-              title={`${t('win.step')} ${s.ordinal}`}
+              aria-label={s.label}
+              title={s.label ?? `${t('win.step')} ${s.ordinal}`}
               className={
                 /* 44 on a phone, 28 on a desk: a step is a target before
                    it is a mark, and the strip scrolls either way. */
@@ -200,6 +219,7 @@ export default function StepWindow({
             >
               {s.ordinal}
             </Button>
+            </span>
           ))}
         </div>
       )}
@@ -302,15 +322,36 @@ export default function StepWindow({
         for this same law and used by nothing. It is gone. Two definitions
         of one rule drift apart and then there are two to repair.
       */}
-      <div className="border-t border-line bg-ink/40">
+      {/*
+        On a phone the bar holds to the foot of the screen, above the tabs,
+        the way a phone keeps its toolbar: the window is a column to scroll
+        there, and the act was at the end of it — under the fold, below the
+        guidance, on the screen that exists to have it pressed.
+
+        Where it holds is the pane's own foot: the pane leaves the tab bar's
+        measured height (`--foot`) and 2.5rem more at its foot, and a
+        sticky edge is measured from inside that padding — so -2.5rem puts
+        the bar exactly on top of the tabs, in every language, whatever
+        height they wrap to. Held at a fixed 63 pixels it sat 167 above the
+        bottom, over the window's own title.
+      */}
+      {/* Nothing left to do draws no bar: an empty bar is a place to look for an act that is not there. */}
+      {(acts || consequences) && (
+      <div className="sticky -bottom-10 z-10 border-t border-line bg-ink/95 backdrop-blur-xl lg:static lg:bg-ink/40 lg:backdrop-blur-none">
         {consequences && (
           <div className="px-5 pt-3 sm:px-6">{consequences}</div>
         )}
         {/* The guide no longer floats over this, so the bar keeps its own width. */}
-        <div className="flex flex-wrap items-center justify-end gap-2 px-5 py-3 sm:px-6">
+        {/* Named, so what the member may do here can be found — and counted — as one place. */}
+        <div
+          role="toolbar"
+          aria-label={t('win.acts')}
+          className="flex flex-wrap items-center justify-end gap-2 px-5 py-3 sm:px-6"
+        >
           {acts}
         </div>
       </div>
+      )}
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { governance } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { Field, HEADING } from './field.js';
 import { Button } from './Button';
+import SlideOver from './SlideOver.js';
 
 /**
  * Open a matter about the thing you are looking at.
@@ -43,6 +44,7 @@ export default function RaiseAMatter({
   label,
   note,
   canOpen,
+  asAct = false,
 }: {
   boardId: string;
   /** The draft the fields open with. The member's to change. */
@@ -55,6 +57,12 @@ export default function RaiseAMatter({
   /** One line under the fields, where the caller has something to add. */
   note?: string;
   canOpen: boolean;
+  /**
+   * Drawn as the act of a window: a filled button in its bar, with the form
+   * in a panel beside the work rather than unfolding in place — a form that
+   * opened inside the act bar would open in forty pixels.
+   */
+  asAct?: boolean;
 }) {
   const { t } = useI18n();
   const navigate = useNavigate();
@@ -79,7 +87,7 @@ export default function RaiseAMatter({
     navigate(`/matters/${made.id}`);
   }
 
-  if (!open) {
+  if (!open && !asAct) {
     return (
       <Button
         tone="plain"
@@ -92,7 +100,7 @@ export default function RaiseAMatter({
     );
   }
 
-  return (
+  const form = (
     <div className="mt-3 rounded-card bg-ink px-4 py-4 shadow-ring">
       <p className="mb-3 max-w-[58ch] text-ui leading-relaxed text-muted">{t('raise.lead')}</p>
 
@@ -159,4 +167,19 @@ export default function RaiseAMatter({
       {note && <p className="mt-3 max-w-[58ch] text-note leading-relaxed text-muted">{note}</p>}
     </div>
   );
+
+  if (asAct) {
+    return (
+      <>
+        <Button type="button" tone="act" size="md" onClick={() => setOpen(true)}>
+          {label}
+        </Button>
+        <SlideOver open={open} title={label} onClose={() => setOpen(false)}>
+          {form}
+        </SlideOver>
+      </>
+    );
+  }
+
+  return form;
 }

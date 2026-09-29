@@ -41,7 +41,7 @@ import { overdue, type Undertaking } from './undertaking.js';
  * not a boolean.
  */
 
-const { ahead, done, notApplicable, open } = grammarFor('undertaking.step');
+const { done, notApplicable, open } = grammarFor('undertaking.step');
 
 function stepsOf(u: Undertaking, now: string): Step[] {
   const steps: Step[] = [];

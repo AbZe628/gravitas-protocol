@@ -184,6 +184,31 @@ describe('the words themselves, without a server', () => {
     expect(notice.body).toContain('  · One');
     expect(notice.body).toContain('  · Two');
   });
+
+  /*
+   * Who acted, by name. The routes pass a scholar id, and the notice said
+   * *member-a opened a matter for the board's deliberation* — to be copied
+   * out and sent to people who have never seen that string.
+   */
+  it('names who called the sitting and who opened the matter, never by id', () => {
+    const seated = {
+      id: 'b1',
+      name: 'A board',
+      members: [{ id: 's1', name: 'Amina Chair' }, { id: 's2', name: 'Bilal Rahman' }],
+    } as never;
+    const sitting = compose(seated, {
+      kind: 'meeting_convened',
+      meetingId: 'm1',
+      at: '2027-03-04T09:00:00.000Z',
+      agenda: [],
+      convenedBy: 's1',
+    });
+    const opened = compose(seated, { kind: 'matter_opened', matterId: 'x', title: 'A question', openedBy: 's2' });
+
+    expect(sitting.body).toContain('Amina Chair has called a sitting');
+    expect(opened.body).toContain('Bilal Rahman opened a matter');
+    expect(sitting.body + opened.body).not.toMatch(/\bs[12]\b/);
+  });
 });
 
 describe('a relay that is wired and broken', () => {

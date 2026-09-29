@@ -114,6 +114,24 @@ export interface Step {
    * holding it up, on the screen everybody opens first.
    */
   who?: string;
+  /**
+   * Who has already said theirs, on a step each of several says theirs on —
+   * scholar ids, and only on such a step while it is open.
+   *
+   * A vote and a finding on a breach are one step, open until enough have
+   * spoken, and every signatory's. Read without this, the step was every
+   * signatory's still after one of them had spoken: *what needs you* listed
+   * the vote as theirs to cast when it was cast, and the breach offered the
+   * member who had just said *a breach* the same button again, which the
+   * route refuses. The step is open; it is not open to them.
+   */
+  heard?: string[];
+  /**
+   * Who it still waits on, where that can be named — scholar ids, turned into
+   * names by the screen. It was written into the sentence instead, and the
+   * sentence read *waiting on member-c, member-d, member-e*.
+   */
+  waitingOn?: string[];
 }
 
 /**

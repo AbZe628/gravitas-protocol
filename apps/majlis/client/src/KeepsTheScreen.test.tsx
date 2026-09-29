@@ -1,8 +1,9 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import App from './App.js';
 import { I18nProvider } from './lib/i18n.js';
+import { buildQuestionPassage } from '../../server/src/services/passage-question.js';
 
 /**
  * A failed refresh does not take away a screen that is already there.
@@ -97,6 +98,10 @@ function wireThatDiesAfterTheAct() {
 
       if (url.includes('/api/attention'))
         return json({ scholarId: 'member-a', role: 'signatory', office: null, items: [] });
+      if (url.includes('/api/passages/question/'))
+        return json(buildQuestionPassage(WAITING as never, '2026-07-20T00:00:00Z'));
+      if (url.includes('/api/submissions/'))
+        return json({ submission: WAITING });
       if (url.includes('/api/submissions'))
         return json({ submissions: [WAITING], waiting: [WAITING.id] });
       return json({});
@@ -110,23 +115,28 @@ describe('a refresh that cannot reach the board keeps the screen', () => {
     vi.unstubAllGlobals();
   });
 
-  it('the queue is still the queue after the refresh behind an act fails', async () => {
+  /*
+   * On the question's own window, which is where declining it is done now.
+   * The claim is the same one: the act lands, the refresh behind it cannot
+   * reach the board, and what was on the screen is still on the screen.
+   */
+  it('the question is still the question after the refresh behind an act fails', async () => {
     const refused = wireThatDiesAfterTheAct();
 
     render(
       <I18nProvider>
-        <MemoryRouter initialEntries={['/questions']}>
+        <MemoryRouter initialEntries={['/questions/sub-1']}>
           <App />
         </MemoryRouter>
       </I18nProvider>,
     );
 
     // It rendered, with the question on it.
-    const subject = await screen.findByText(WAITING.subject, {}, { timeout: 4000 });
+    const subject = await screen.findByRole('heading', { name: WAITING.subject }, { timeout: 4000 });
     expect(subject).toBeTruthy();
 
     // Decline the question. The act goes through; the refresh behind it does not.
-    fireEvent.click(await screen.findByRole('button', { name: /do not take it up/i }));
+    fireEvent.click(await screen.findByRole('button', { name: /^do not take it up$/i }));
 
     /*
      * Found by name, and not allowed to be missing. An earlier version of this
@@ -139,7 +149,8 @@ describe('a refresh that cannot reach the board keeps the screen', () => {
     });
     fireEvent.change(reason, { target: { value: 'A reason, so the act is allowed.' } });
 
-    const press = screen.getByRole('button', { name: /^do not take it up$/i });
+    // The window's own press, not the bar's: the act is done inside the window it opened.
+    const press = within(screen.getByRole('dialog')).getByRole('button', { name: /^do not take it up$/i });
     expect((press as HTMLButtonElement).disabled).toBe(false);
     fireEvent.click(press);
 
@@ -158,7 +169,7 @@ describe('a refresh that cannot reach the board keeps the screen', () => {
      * load." and the question, the queue and the refusal all disappeared.
      */
     await waitFor(() => {
-      expect(screen.queryByText(WAITING.subject)).toBeTruthy();
+      expect(screen.queryByRole('heading', { name: WAITING.subject })).toBeTruthy();
     });
     expect(screen.queryByText(/could not load/i)).toBeNull();
   });

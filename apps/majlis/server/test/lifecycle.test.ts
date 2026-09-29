@@ -703,3 +703,18 @@ describe('the hash fixes the terms when the vote opens', () => {
     expect(second).not.toBe(first);
   });
 });
+
+describe('returning a vote to deliberation', () => {
+  /*
+   * The reason was checked and then dropped: the route wrote the raw one into
+   * the thread, so what the record said was never what had been agreed to.
+   * It is handed back now, as it was checked, and that is what gets written.
+   */
+  it('hands back the reason as it was checked, for the thread to carry', () => {
+    const voting = openVoting(matter({ status: 'deliberation', deliberation: [said()] }));
+    const out = returnToDeliberation(board, voting, { scholarId: 's1', reason: `   ${REASON}   ` }, T0);
+    expect(out.reason).toBe(REASON);
+    expect(out.matter.status).toBe('deliberation');
+  });
+});
+

@@ -57,12 +57,11 @@ export const IOwe = screen(() => import('./pages/IOwe.js'));
 export const IncidentDetail = screen(() => import('./pages/IncidentDetail.js'));
 export const Incidents = screen(() => import('./pages/Incidents.js'));
 export const Library = screen(() => import('./pages/Library.js'));
-export const MatterDetail = screen(() => import('./pages/MatterDetail.js'));
 export const MatterFlow = screen(() => import('./pages/MatterFlow.js'));
-export const MatterPack = screen(() => import('./pages/MatterPack.js'));
 export const MayDeal = screen(() => import('./pages/MayDeal.js'));
 export const Meetings = screen(() => import('./pages/Meetings.js'));
 export const Questions = screen(() => import('./pages/Questions.js'));
+export const QuestionDetail = screen(() => import('./pages/QuestionDetail.js'));
 export const Queue = screen(() => import('./pages/Queue.js'));
 export const Record = screen(() => import('./pages/Record.js'));
 export const Register = screen(() => import('./pages/Register.js'));
@@ -72,6 +71,7 @@ export const Search = screen(() => import('./pages/Search.js'));
 export const Settings = screen(() => import('./pages/Settings.js'));
 export const StructureDetail = screen(() => import('./pages/StructureDetail.js'));
 export const Undertakings = screen(() => import('./pages/Undertakings.js'));
+export const UndertakingDetail = screen(() => import('./pages/UndertakingDetail.js'));
 export const WhatStands = screen(() => import('./pages/WhatStands.js'));
 
 /**
@@ -79,8 +79,8 @@ export const WhatStands = screen(() => import('./pages/WhatStands.js'));
  * most often goes to next from the queue first.
  */
 export const EVERY_SCREEN: readonly { preload: () => Promise<unknown> }[] = [
-  Queue, MatterFlow, IncidentDetail, Questions, RuleDetail, Undertakings, Meetings, Incidents,
+  Queue, MatterFlow, IncidentDetail, QuestionDetail, UndertakingDetail, Questions, RuleDetail, Undertakings, Meetings, Incidents,
   WhatStands, Register, AssetDetail, Library, StructureDetail, Calculations, Figure, Calendar,
   BoardBook, Examinations, Ask, CheckAContract, Search, Settings, Briefings, BriefingDetail,
-  Assistant, MatterPack, MatterDetail, Dashboard, Guided, Rules, Record, MayDeal, BindsMe, IOwe,
+  Assistant, Dashboard, Guided, Rules, Record, MayDeal, BindsMe, IOwe,
 ];

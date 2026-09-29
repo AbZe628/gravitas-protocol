@@ -68,11 +68,20 @@ export interface ActProps {
    */
   reason?: { label: string; help?: string; required?: boolean };
 
-  /** The act itself. Given the reason, the version and the key it must carry. */
+  /**
+   * The act itself. Given the reason, the version and the key it must carry.
+   *
+   * It may answer with what it did, where that is only known once the server
+   * has answered — and then that is what is said, not `after`. One signatory
+   * saying *a breach* is a finding when enough have said it and a view on the
+   * record when they have not, and the window said *recorded as a breach, the
+   * thirty days are running* to the first of three, with no finding made and
+   * no clock started.
+   */
   perform: (said: {
     reason: string;
     sending: { version?: string; once?: string };
-  }) => Promise<void>;
+  }) => Promise<void | { did: string; means: string; next: readonly Next[] }>;
 
   /** The copy of the record the member was looking at, where there is one. */
   version?: string | null;
@@ -120,6 +129,8 @@ export default function Act({
   const [busy, setBusy] = useState(false);
   const [refused, setRefused] = useState<string | null>(null);
   const [done, setDone] = useState(false);
+  /* What the act answered, where it said something other than `after`. */
+  const [told, setTold] = useState<typeof after>(undefined);
 
   /*
    * One key for this press, kept across every retry of it. Minted when the
@@ -137,10 +148,11 @@ export default function Act({
     setBusy(true);
     setRefused(null);
     try {
-      await perform({
+      const answered = await perform({
         reason: said.trim(),
         sending: { version: version ?? undefined, once: press.current ?? undefined },
       });
+      const shown = answered || after;
       press.current = null;
       setSaid('');
       /*
@@ -148,10 +160,11 @@ export default function Act({
        * An act that changes the status takes this component down with the
        * panel it sits in, so it cannot be the one to show what follows.
        */
-      if (after && onDone) {
-        onDone(after);
+      if (shown && onDone) {
+        onDone(shown);
         onClose();
-      } else if (after) {
+      } else if (shown) {
+        setTold(shown);
         setDone(true);
       } else {
         onClose();
@@ -168,14 +181,16 @@ export default function Act({
     }
   }, [after, busy, onClose, onDone, perform, ready, said, version]);
 
-  if (done && after) {
+  const saying = told ?? after;
+  if (done && saying) {
     return (
       <AfterAct
-        did={after.did}
-        means={after.means}
-        next={after.next}
+        did={saying.did}
+        means={saying.means}
+        next={saying.next}
         onClose={() => {
           setDone(false);
+          setTold(undefined);
           onClose();
         }}
       />

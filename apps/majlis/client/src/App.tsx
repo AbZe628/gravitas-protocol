@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { Navigate, Route, createRoutesFromChildren, useRoutes, type RouteObject } from 'react-router-dom';
+import { Navigate, Route, createRoutesFromChildren, useParams, useRoutes, type RouteObject } from 'react-router-dom';
 import {
   Ask,
   AssetDetail,
@@ -19,11 +19,10 @@ import {
   IncidentDetail,
   Incidents,
   Library,
-  MatterDetail,
   MatterFlow,
-  MatterPack,
   MayDeal,
   Meetings,
+  QuestionDetail,
   Questions,
   Queue,
   Record,
@@ -33,6 +32,7 @@ import {
   Search,
   Settings,
   StructureDetail,
+  UndertakingDetail,
   Undertakings,
   WhatStands,
 } from './screens.js';
@@ -73,6 +73,12 @@ import { useIdentity, isInstitution } from './lib/identity.js';
  * has bookmarked should not stop existing, and because if the queue turns out
  * to be the wrong idea the old arrival is one line away.
  */
+/** An old address for a matter, answered by the one screen a matter has. */
+function ToTheMatter() {
+  const { id = '' } = useParams();
+  return <Navigate to={`/matters/${id}`} replace />;
+}
+
 function Arrival() {
   const { identity } = useIdentity();
   return isInstitution(identity?.role) ? <Ask boardId="demo-board" /> : <Queue />;
@@ -112,23 +118,22 @@ const ROUTES: RouteObject[] = createRoutesFromChildren(
       Neither is a cut-down version of the other.
     */}
     <Route path="/questions" element={<Questions boardId="demo-board" />} />
+    <Route path="/questions/:id" element={<QuestionDetail />} />
     <Route path="/examinations" element={<Examinations boardId="demo-board" />} />
     <Route path="/ask" element={<Ask boardId="demo-board" />} />
 
     {/*
-      One matter, one act. `MatterDetail` puts twelve sections on a page
-      and a scholar scrolls past all of them to reach the thing they came
-      to do. Every section still exists, unchanged, at the classic path —
-      what changed is that they no longer compete with the act.
-    */}
-    {/*
-      A question, answered a step at a time, ending in a vote and a
-      document. The dossier it replaces is at /classic/matters/:id,
-      unchanged and one link away from the foot of the flow.
+      One matter, one screen.
+
+      There were three: this window, a dossier at /dossier/matters/:id and
+      the classic page at /classic/matters/:id — and a control written into
+      one of them was on one of them. What only the other two had is in the
+      window now, in its file (see TheFile.tsx), and the two addresses lead
+      here, so a bookmark or a link in an old paper still arrives.
     */}
     <Route path="/matters/:id" element={<MatterFlow />} />
-    <Route path="/dossier/matters/:id" element={<MatterPack />} />
-    <Route path="/classic/matters/:id" element={<MatterDetail />} />
+    <Route path="/dossier/matters/:id" element={<ToTheMatter />} />
+    <Route path="/classic/matters/:id" element={<ToTheMatter />} />
     <Route path="/classic" element={<Dashboard />} />
     <Route path="/register" element={<Register />} />
     <Route path="/register/:id" element={<AssetDetail />} />
@@ -177,6 +182,7 @@ const ROUTES: RouteObject[] = createRoutesFromChildren(
       screen at all until now.
     */}
     <Route path="/undertakings" element={<Undertakings />} />
+    <Route path="/undertakings/:id" element={<UndertakingDetail />} />
     <Route path="/incidents" element={<Incidents />} />
     <Route path="/incidents/:id" element={<IncidentDetail />} />
     <Route path="/briefings" element={<Briefings />} />

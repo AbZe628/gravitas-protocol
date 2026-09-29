@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useI18n } from '../lib/i18n.js';
 import { LIST_TITLES } from '../lib/split.js';
 import { useLineKeys } from '../lib/lineKeys.js';
-import { Incidents, Library, Queue, Register, WhatStands } from '../screens.js';
+import { Incidents, Library, Questions, Queue, Register, Undertakings, WhatStands } from '../screens.js';
 import { Button } from './Button';
 import { InTheColumn } from './sheet.js';
 import { Loading } from './ui.js';
@@ -20,6 +20,11 @@ import { Loading } from './ui.js';
  * Nothing here re-reads what the list reads or re-draws what it draws. A
  * list added to the column is a line in `SCREEN` and a line in `OPENS`.
  */
+/** The board's questions, as the route draws them. */
+function QuestionsHere() {
+  return <Questions boardId="demo-board" />;
+}
+
 const SCREEN: Readonly<Record<string, ComponentType>> = {
   '/': Queue,
   '/record': WhatStands,
@@ -27,6 +32,8 @@ const SCREEN: Readonly<Record<string, ComponentType>> = {
   '/incidents': Incidents,
   '/register': Register,
   '/library': Library,
+  '/questions': QuestionsHere,
+  '/undertakings': Undertakings,
 };
 
 export default function ListColumn({

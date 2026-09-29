@@ -242,19 +242,19 @@ function decidingOf(
 
   if (matter.status === 'voting') {
     const recorded = counted.for + counted.against + counted.abstain;
-    steps.push(
-      open(
-        'positions',
-        'signatory',
-        counted.outstanding.length > 0
-          ? say('step.positions.standingWaiting', {
-              recorded,
-              needed: counted.required,
-              who: counted.outstanding.join(', '),
-            })
-          : say('step.positions.standing', { recorded, needed: counted.required }),
-      ),
-    );
+    /*
+     * Who has cast theirs, counted the way the tally counts: a signatory whose
+     * position was not released. Everyone else seated to vote is who it still
+     * waits on — named by the screen, not by this sentence.
+     */
+    const heard = board.members
+      .filter((m) => m.signatory && !counted.outstanding.includes(m.id))
+      .map((m) => m.id);
+    steps.push({
+      ...open('positions', 'signatory', say('step.positions.standing', { recorded, needed: counted.required })),
+      ...(heard.length > 0 ? { heard } : {}),
+      ...(counted.outstanding.length > 0 ? { waitingOn: [...counted.outstanding] } : {}),
+    });
   } else if (voteOpened) {
     steps.push(done('positions', 'signatory'));
   } else {

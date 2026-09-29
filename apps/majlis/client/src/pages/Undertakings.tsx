@@ -1,15 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
-import Act from '../components/Act.js';
-import AfterAct from '../components/AfterAct.js';
-import { Link, useLocation } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import { oversight, type Undertaking } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
-import { useIdentity, mayKeepMinutes } from '../lib/identity.js';
 import { Loading, ErrorText } from '../components/ui.js';
 import { State } from '../components/kit.js';
 import { Division, Gaps, Nothing, PageHead } from '../components/page.js';
 import { useStillThere } from '../lib/stillThere.js';
-import { Button } from '../components/Button';
+import { Sheet, Line, Mark, Figure, type Column } from '../components/sheet.js';
 
 /**
  * What was undertaken, and what became of it.
@@ -38,172 +34,42 @@ function day(iso: string): string {
   return Number.isNaN(d.getTime()) ? iso : d.toISOString().slice(0, 10);
 }
 
-/** What an act did, as the page holds it. */
-type WhatFollowed = {
-  did: string;
-  means: string;
-  next: readonly { label: string; to?: string; says?: string }[];
-};
 
-function One({
-  row,
-  mine,
-  canKeep,
-  onChanged,
-  onDid,
-}: {
-  row: { undertaking: Undertaking; whoName: string; overdue: boolean };
-  mine: boolean;
-  canKeep: boolean;
-  onChanged: () => void;
-  /*
-   * Handed up rather than kept here. Closing an undertaking moves it from the
-   * open list to the closed one — two different maps in two different places
-   * in the tree — so React takes this row down and builds a new one. Anything
-   * this row was holding goes with it.
-   */
-  onDid: (what: WhatFollowed) => void;
-}) {
+/*
+  Each undertaking, one line. What it says, who gave it and the account that
+  closes it are its own window now (UndertakingDetail.tsx).
+*/
+const COLS = (t: (k: string) => string): readonly Column[] => [
+  { head: t('col.what'), width: 'minmax(0,2.6fr)', phone: 'lead' },
+  { head: t('und.who'), width: 'minmax(0,1fr)', phone: 'under' },
+  { head: t('col.stage'), width: '8rem', phone: 'under' },
+  { head: t('und.due'), width: '6.5rem', end: true, phone: 'trailing' },
+];
+
+function Row({ row }: { row: { undertaking: Undertaking; whoName: string; overdue: boolean } }) {
   const { t } = useI18n();
   const u = row.undertaking;
-
-  const [open, setOpen] = useState(false);
-  const [state, setState] = useState<'done' | 'dropped'>('done');
-  const [said, setSaid] = useState('');
-
-  /*
-   * Theirs to close, or the secretary's. Anybody else closing it would be
-   * writing an account of work they did not do, under a name not theirs.
-   */
-  const mayClose = u.state === 'open' && (mine || canKeep);
-
-  async function close() {
-    await oversight.closeUndertaking(u.id, state, said);
-    setSaid('');
-    onChanged();
-  }
-
-  /*
-    The one the queue named, found and marked.
-
-    A row on the arrival screen says *say what happened, and close it* and
-    names the undertaking it means. Until now it could only hand over the
-    whole list, and a member arriving from it had to read down until they
-    recognised the sentence they had just pressed. The address carries the
-    id; this scrolls to it once and leaves it lit.
-  */
-  const nazvan = useLocation().hash.slice(1) === u.id;
-  const ovdje = useRef<HTMLLIElement>(null);
-  useEffect(() => {
-    if (nazvan && ovdje.current) ovdje.current.scrollIntoView({ block: 'center' });
-  }, [nazvan]);
-
   return (
-    <li
-      id={u.id}
-      ref={ovdje}
-      className={
-        'rounded-card px-5 py-4 shadow-ring ' +
-        (nazvan ? 'bg-lapistint shadow-ringlapis' : 'bg-raised/60')
-      }
-    >
-      <div className="flex flex-wrap items-center gap-2.5">
-        <State tone={u.state === 'open' ? (row.overdue ? 'breach' : 'attention') : 'plain'}>
+    <Line
+      to={`/undertakings/${u.id}`}
+      columns={COLS(t)}
+      tone={row.overdue ? 'breach' : 'plain'}
+      cells={[
+        u.what,
+        <span className="block truncate text-ui text-muted">{row.whoName}</span>,
+        <Mark tone={u.state === 'open' ? (row.overdue ? 'text-breach' : 'text-goldink') : 'text-muted'}>
           {t(row.overdue ? 'und.overdue' : `book.state.${u.state}`)}
-        </State>
-        <span className="text-body font-semibold">{row.whoName}</span>
-        {u.dueAt ? (
-          <span className="font-mono text-note text-muted">{day(u.dueAt)}</span>
-        ) : (
-          <span className="text-note text-muted">{t('book.noDate')}</span>
-        )}
-        <Link
-          to={`/meetings/${u.meetingId}/book`}
-          className="ms-auto inline-flex min-h-[44px] items-center text-note text-muted hover:text-paper lg:min-h-0"
-        >
-          {t('und.fromSitting')}
-        </Link>
-      </div>
-
-      <p className="mt-2 max-w-[62ch] text-body leading-relaxed">{u.what}</p>
-
-      {u.outcome && (
-        <p className="mt-2 max-w-[62ch] border-s-2 border-line ps-3 text-ui leading-relaxed text-muted">
-          {u.outcome.said}
-        </p>
-      )}
-
-      {mayClose && !open && (
-        <Button
-          tone="plain"
-          type="button"
-          onClick={() => setOpen(true)}
-          className="mt-3 inline-flex min-h-[44px] items-center text-ui font-semibold lg:min-h-0 lg:py-1"
-        >
-          {t('und.closeIt')}
-        </Button>
-      )}
-
-      <Act
-        open={open}
-        onClose={() => setOpen(false)}
-        title={t('und.closeIt')}
-        does={t('wm.closeUnd.does')}
-        means={t('wm.closeUnd.means')}
-        label={t('und.record')}
-        perform={close}
-        onDone={onDid}
-        after={{
-          did: t('wm.closeUnd.did'),
-          means: t('wm.closeUnd.didMeans'),
-          next: [{ label: t('wm.next.undertakings'), says: t('wm.next.undertakingsSays') }],
-        }}
-      >
-        <div>
-          <div className="mb-2 flex gap-2">
-            {(['done', 'dropped'] as const).map((s) => (
-              <Button
-                key={s}
-                type="button"
-                onClick={() => setState(s)}
-                className={
-                  'rounded-card px-4 py-2 text-ui shadow-ring ' +
-                  (state === s ? 'bg-raised font-semibold text-paper' : 'text-muted')
-                }
-              >
-                {t(`book.state.${s}`)}
-              </Button>
-            ))}
-          </div>
-
-          <textarea
-            value={said}
-            onChange={(e) => setSaid(e.target.value)}
-            rows={3}
-            placeholder={t('und.whatHappened')}
-            aria-label={t('und.whatHappened')}
-            className="w-full rounded-card bg-ink px-4 py-3 text-body leading-relaxed text-paper shadow-ring outline-none placeholder:text-muted"
-          />
-        </div>
-      </Act>
-
-    </li>
+        </Mark>,
+        <Figure tone={row.overdue ? 'text-breach' : 'text-muted'}>{u.dueAt ? day(u.dueAt) : '—'}</Figure>,
+      ]}
+    />
   );
 }
 
 export default function Undertakings() {
   const { t } = useI18n();
-  const { identity } = useIdentity();
   const [data, setData] = useState<Awaited<ReturnType<typeof oversight.undertakings>> | null>(null);
   const [failed, setFailed] = useState(false);
-  /**
-   * What the last act did, held here rather than on the row that did it.
-   *
-   * A closed undertaking leaves the open list and appears in the closed one,
-   * which is a different place in the tree: the row that performed the act is
-   * gone by the time there is anything to say about it.
-   */
-  const [justDid, setJustDid] = useState<WhatFollowed | null>(null);
   /** A failed refresh keeps a screen that is already there. */
   const there = useStillThere();
 
@@ -224,7 +90,6 @@ export default function Undertakings() {
   const rows = data.undertakings ?? [];
   const open = rows.filter((r) => r.undertaking.state === 'open');
   const closed = rows.filter((r) => r.undertaking.state !== 'open');
-  const canKeep = mayKeepMinutes(identity?.role, identity?.office);
 
   /*
    * What this list cannot tell you. An undertaking with no date the board set
@@ -239,17 +104,6 @@ export default function Undertakings() {
 
   return (
     <article>
-      {justDid && (
-        <div className="mb-5">
-          <AfterAct
-            did={justDid.did}
-            means={justDid.means}
-            next={justDid.next}
-            onClose={() => setJustDid(null)}
-          />
-        </div>
-      )}
-
       <PageHead
         phase="deciding"
         title={t('und.title')}
@@ -274,35 +128,21 @@ export default function Undertakings() {
         {open.length === 0 ? (
           <Nothing>{t('und.noneOpen')}</Nothing>
         ) : (
-          <ul className="space-y-2.5">
+          <Sheet columns={COLS(t)}>
             {open.map((r) => (
-              <One
-                key={r.undertaking.id}
-                row={r}
-                mine={r.undertaking.who === identity?.scholarId}
-                canKeep={canKeep}
-                onChanged={load}
-                onDid={setJustDid}
-              />
+              <Row key={r.undertaking.id} row={r} />
             ))}
-          </ul>
+          </Sheet>
         )}
       </Division>
 
       {closed.length > 0 && (
         <Division heading={t('und.closedHere')} note={t('und.closedNote')}>
-          <ul className="space-y-2.5">
+          <Sheet columns={COLS(t)}>
             {closed.map((r) => (
-              <One
-                key={r.undertaking.id}
-                row={r}
-                mine={r.undertaking.who === identity?.scholarId}
-                canKeep={canKeep}
-                onChanged={load}
-                onDid={setJustDid}
-              />
+              <Row key={r.undertaking.id} row={r} />
             ))}
-          </ul>
+          </Sheet>
         </Division>
       )}
 

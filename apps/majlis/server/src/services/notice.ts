@@ -139,6 +139,13 @@ export interface Notifier {
  */
 export function compose(board: Board, event: NoticeEvent): Notice {
   const everyone = board.members.map((m) => m.id);
+  /*
+   * A member by name. The routes hand over who acted as a scholar id, which is
+   * right for the record and wrong for a sentence a person reads: the notice
+   * said *member-a opened a matter for the board's deliberation*. The id only
+   * where the board does not know them, because somebody did act.
+   */
+  const named = (id: string) => board.members.find((m) => m.id === id)?.name || id;
 
   if (event.kind === 'submission_arrived') {
     const s = event.submission;
@@ -159,7 +166,7 @@ export function compose(board: Board, event: NoticeEvent): Notice {
     return {
       subject: `Opened for deliberation: ${event.title}`,
       body:
-        `${event.openedBy} opened a matter for the board’s deliberation.\n\n` +
+        `${named(event.openedBy)} opened a matter for the board’s deliberation.\n\n` +
         `${event.title}\n\n` +
         `Nothing is decided by opening it. What it needs now is what the board says about it.`,
       concerns: everyone,
@@ -188,7 +195,7 @@ export function compose(board: Board, event: NoticeEvent): Notice {
     return {
       subject: `${board.name} will sit on ${event.at.slice(0, 10)}`,
       body:
-        `${event.convenedBy} has called a sitting of the board.\n\n` +
+        `${named(event.convenedBy)} has called a sitting of the board.\n\n` +
         `${when}\n\n` +
         (event.agenda.length > 0
           ? `Before the board:\n${event.agenda.map((item) => `  · ${item}`).join('\n')}\n`

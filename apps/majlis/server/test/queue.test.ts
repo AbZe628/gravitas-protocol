@@ -293,3 +293,30 @@ describe('the queue and the matter never disagree', () => {
     });
   }
 });
+
+/*
+ * The row carries who has already said theirs, off the passage as `who` is,
+ * so *what needs you* can leave a cast vote off the voter's list while it
+ * stays open for everybody else.
+ */
+describe('a step you have said yours on', () => {
+  it('carries who has spoken on a breach, and on a vote', () => {
+    const spoken = {
+      ...incident('heard', 'reported', '2026-09-01T00:00:00Z'),
+      concurrences: [{ scholarId: 'member-a', actual: true, reason: 'r', at: '2026-09-02T00:00:00Z' }],
+    } as Incident;
+    const signatory = BOARD.members.find((m) => m.signatory)!;
+    const voting = {
+      ...matter('vote', 'voting', '2026-09-01T00:00:00Z'),
+      // Spoken on, so the vote is what it waits on and not the deliberation before it.
+      deliberation: [{ id: 'd', scholarId: signatory.id, body: 'x', at: '2026-09-01T12:00:00Z', replyTo: null, liaisonAnswer: false }],
+      reasoning: [{ scholarId: signatory.id, position: 'for', reason: 'r', at: '2026-09-02T00:00:00Z' }],
+    } as unknown as Matter;
+
+    const rows = buildQueue({ board: BOARD, ...EMPTY, submissions: [], matters: [voting], incidents: [spoken] });
+    expect(rows.find((r) => r.id === 'heard')?.heard).toEqual(['member-a']);
+    const vote = rows.find((r) => r.id === 'vote');
+    expect(vote?.next?.key).toBe('step.positions.act');
+    expect(vote?.heard).toEqual([signatory.id]);
+  });
+});

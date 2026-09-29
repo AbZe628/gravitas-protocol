@@ -1,8 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import Questions from './pages/Questions.js';
+import QuestionDetail from './pages/QuestionDetail.js';
 import { I18nProvider } from './lib/i18n.js';
+import { buildQuestionPassage } from '../../server/src/services/passage-question.js';
 
 /**
  * The queue, and the two things it must not let a board do quietly.
@@ -31,6 +33,7 @@ const submission = (over: Record<string, unknown> = {}) => ({
   background: '',
   awaiting: 'Sign the collateral agreement, which is otherwise ready.',
   attachments: [],
+  draft: null,
   dispositions: [],
   standing: 'waiting',
   matterId: null,
@@ -61,17 +64,55 @@ const show = () =>
     </I18nProvider>,
   );
 
+/**
+ * One question, in its own window, read the way the server reads it.
+ *
+ * The passage is built by the function the server uses, so the window is
+ * tested against the real reading rather than a fixture's opinion of it.
+ */
+function stubOne(one: unknown) {
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(async (url: string) => {
+      const u = String(url);
+      const json = (b: unknown) => new Response(JSON.stringify(b), { headers: { 'content-type': 'application/json' } });
+      if (u.includes('/api/attention')) return json({ scholarId: 'member-a', role: 'signatory', items: [] });
+      if (u.includes('/api/passages/question/')) return json(buildQuestionPassage(one as never, '2026-09-20T00:00:00Z'));
+      if (u.includes('/api/submissions/')) return json({ submission: one });
+      return json({});
+    }),
+  );
+}
+
+const showOne = () =>
+  render(
+    <I18nProvider>
+      <MemoryRouter initialEntries={['/questions/sub-1']}>
+        <Routes>
+          <Route path="/questions/:id" element={<QuestionDetail />} />
+        </Routes>
+      </MemoryRouter>
+    </I18nProvider>,
+  );
+
 beforeEach(() => vi.restoreAllMocks());
 afterEach(() => vi.unstubAllGlobals());
 
 describe('the queue', () => {
   it('shows the institution’s own words, marked as theirs', async () => {
-    stub({ submissions: [submission()], waiting: ['sub-1'] });
-    show();
+    stubOne(submission());
+    showOne();
 
     await waitFor(() => expect(screen.getByText(/burns on redemption/)).toBeInTheDocument());
     expect(screen.getByText(/As they put it/i)).toBeInTheDocument();
-    expect(screen.getByText(/Layla Haddad, Treasury/)).toBeInTheDocument();
+    expect(screen.getAllByText(/Layla Haddad, Treasury/).length).toBeGreaterThan(0);
+  });
+
+  it('draws each question as one line that opens its own window', async () => {
+    stub({ submissions: [submission()], waiting: ['sub-1'] });
+    show();
+    const line = await screen.findByRole('link', { name: 'Wrapped sukuk for the treasury desk' });
+    expect(line.getAttribute('href')).toBe('/questions/sub-1');
   });
 
   it('says how long it has been waiting, from when they asked', async () => {
@@ -108,16 +149,16 @@ describe('the queue', () => {
   });
 
   it('says when a member entered it for somebody else', async () => {
-    stub({ submissions: [submission({ onBehalf: true })], waiting: ['sub-1'] });
-    show();
+    stubOne(submission({ onBehalf: true }));
+    showOne();
     await waitFor(() =>
-      expect(screen.getByText(/Entered by a member on their behalf/i)).toBeInTheDocument(),
+      expect(screen.getAllByText(/Entered by a member on their behalf/i).length).toBeGreaterThan(0),
     );
   });
 
   it('shows what they are waiting to do, without calling it a deadline', async () => {
-    stub({ submissions: [submission()], waiting: ['sub-1'] });
-    show();
+    stubOne(submission());
+    showOne();
     await waitFor(() => expect(screen.getByText(/collateral agreement/)).toBeInTheDocument());
     expect(document.body.textContent).not.toMatch(/deadline|due by/i);
   });
@@ -127,11 +168,10 @@ describe('the queue', () => {
    * line would make the two the same string by accident.
    */
   it('does not offer the institution’s subject as the board’s wording', async () => {
-    stub({ submissions: [submission()], waiting: ['sub-1'] });
-    show();
+    stubOne(submission());
+    showOne();
 
-    await waitFor(() => expect(screen.getByText(/Take it up as a matter/i)).toBeInTheDocument());
-    fireEvent.click(screen.getByText(/Take it up as a matter/i));
+    fireEvent.click(await screen.findByRole('button', { name: /^Take it up as a matter$/i }));
 
     const inputs = document.querySelectorAll('input');
     for (const input of inputs) {
@@ -141,46 +181,35 @@ describe('the queue', () => {
   });
 
   it('says a decline is being reconsidered before it is reopened', async () => {
-    stub({
-      submissions: [
-        submission({
-          standing: 'declined',
-          dispositions: [
-            {
-              kind: 'declined',
-              at: '2026-09-03T08:00:00.000Z',
-              by: 'member-a',
-              reason: 'Come back with the audit of the mint and burn.',
-            },
-          ],
-        }),
-      ],
-      waiting: [],
-    });
-    show();
+    stubOne(
+      submission({
+        standing: 'declined',
+        dispositions: [
+          {
+            kind: 'declined',
+            at: '2026-09-03T08:00:00.000Z',
+            by: 'member-a',
+            reason: 'Come back with the audit of the mint and burn.',
+          },
+        ],
+      }),
+    );
+    showOne();
 
-    /*
-     * The queue opens on what is waiting. Everything already dealt with is
-     * behind its own chip, counted, one press away — so a test about a
-     * declined question has to go where a member would go.
-     */
-    await waitFor(() => expect(screen.getByText(/Already dealt with/i)).toBeInTheDocument());
-    fireEvent.click(screen.getByText(/Already dealt with/i));
-
-    await waitFor(() => expect(screen.getByText(/audit of the mint and burn/)).toBeInTheDocument());
-    fireEvent.click(screen.getByText(/Take it up as a matter/i));
+    await waitFor(() => expect(screen.getAllByText(/audit of the mint and burn/).length).toBeGreaterThan(0));
+    fireEvent.click(screen.getByRole('button', { name: /^Take it up as a matter$/i }));
     expect(screen.getByText(/declined once/i)).toBeInTheDocument();
   });
 
   it('will not let a decline be recorded with no reason', async () => {
-    stub({ submissions: [submission()], waiting: ['sub-1'] });
-    show();
+    stubOne(submission());
+    showOne();
 
-    await waitFor(() => expect(screen.getByText(/Do not take it up/i)).toBeInTheDocument());
-    fireEvent.click(screen.getByText(/Do not take it up/i));
+    fireEvent.click(await screen.findByRole('button', { name: /^Do not take it up$/i }));
 
-    const button = screen.getAllByText(/Do not take it up/i).find((el) => el.closest('button'));
-    expect(button?.closest('button')).toBeDisabled();
+    // The press inside the window it opened, which has no reason yet.
+    const press = within(screen.getByRole('dialog')).getByRole('button', { name: /^Do not take it up$/i });
+    expect(press).toBeDisabled();
   });
 
   it('says so when nothing has been put to the board', async () => {
@@ -191,11 +220,58 @@ describe('the queue', () => {
     );
   });
 
+  it('says it could not read one question rather than drawing a broken window', async () => {
+    stubOne('not a question');
+    showOne();
+    await waitFor(() => expect(screen.getByRole('alert')).toBeInTheDocument());
+  });
+
   it('survives a response of the wrong shape rather than crashing the page', async () => {
     stub({ submissions: 'not an array' });
     show();
     await waitFor(() =>
       expect(screen.getByText(/Nothing has been put to the board/i)).toBeInTheDocument(),
     );
+  });
+});
+
+/*
+ * Taking a question up is the first step of the matter it becomes, so what
+ * follows is that matter, at its address. The link was named *go to what needs
+ * you* and pointed at the matter — a label for one place on a link to another.
+ */
+describe('a question taken up', () => {
+  it('leads to the matter it became, and says so', async () => {
+    const one = submission();
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url: string, init?: RequestInit) => {
+        const u = String(url);
+        const json = (b: unknown) => new Response(JSON.stringify(b), { headers: { 'content-type': 'application/json' } });
+        if (u.includes('/api/attention')) return json({ scholarId: 'member-a', role: 'signatory', items: [] });
+        if (init?.method === 'POST' && u.includes('/api/submissions/sub-1/open')) {
+          return json({
+            submission: { ...one, standing: 'opened', matterId: 'matter-9' },
+            matter: { id: 'matter-9' },
+            notice: { subject: 's', body: 'b', concerns: [] },
+            delivery: { sent: false, via: 'none', reason: 'none' },
+          });
+        }
+        if (u.includes('/api/passages/question/')) return json(buildQuestionPassage(one as never, '2026-09-20T00:00:00Z'));
+        if (u.includes('/api/submissions/')) return json({ submission: one });
+        return json({});
+      }),
+    );
+    showOne();
+
+    fireEvent.click(await screen.findByRole('button', { name: /^Take it up as a matter$/i }));
+    const dialog = screen.getByRole('dialog');
+    fireEvent.change(within(dialog).getByLabelText(/as the board puts it/i), { target: { value: 'Whether the wrapped form may be held' } });
+    fireEvent.change(within(dialog).getAllByRole('textbox')[1], { target: { value: 'The board is asked whether the wrapper changes what is held.' } });
+    fireEvent.click(within(dialog).getAllByRole('button', { name: /^Take it up as a matter$/i }).pop()!);
+
+    const link = await screen.findByRole('link', { name: /Open the matter/ });
+    expect(link.getAttribute('href')).toBe('/matters/matter-9');
+    expect(screen.queryByRole('link', { name: /Go to what needs you/ })).toBeNull();
   });
 });

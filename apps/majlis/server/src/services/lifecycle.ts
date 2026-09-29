@@ -493,9 +493,15 @@ export function returnToDeliberation(
   matter: Matter,
   by: { scholarId: string; reason: string },
   at: string
-): { matter: Matter; released: number } {
+): { matter: Matter; released: number; reason: string } {
   requireStatus(matter, ['voting']);
   requireSignatory(board, by.scholarId);
+  /*
+   * Handed back, so what goes into the thread is the reason that was checked
+   * rather than whatever arrived. It was checked here and then dropped, and
+   * the route wrote the raw one: the two could differ, and the one on the
+   * record was never the one this function had agreed to.
+   */
   const reason = requireReason(by.reason, 'Returning a matter to deliberation');
 
   const released = matter.reasoning.filter((r) => !r.releasedAt).length;
@@ -512,6 +518,7 @@ export function returnToDeliberation(
       proposedRule: { ...matter.proposedRule, parameterHash: '' },
     },
     released,
+    reason,
   };
 }
 

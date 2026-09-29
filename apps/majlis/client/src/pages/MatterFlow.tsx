@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link, useParams, useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import {
   aKeyForThisPress,
   api,
@@ -19,7 +19,6 @@ import { ErrorText, Loading } from '../components/ui.js';
 import { State, toneForStatus } from '../components/kit.js';
 import ItMoved from '../components/ItMoved.js';
 import AfterAct from '../components/AfterAct.js';
-import { DocumentLink } from '../components/Documents.js';
 import TheNotice from '../components/TheNotice.js';
 import StepWindow, { type Step } from '../components/StepWindow.js';
 import Holding from '../components/Holding.js';
@@ -37,6 +36,10 @@ import { Button } from '../components/Button';
 import Act from '../components/Act.js';
 import { Picker } from '../components/Checklist.js';
 import Person from '../components/Person.js';
+import TheFile from '../components/TheFile.js';
+import WhereItEnds from '../components/WhereItEnds.js';
+import TellTheBank from '../components/TellTheBank.js';
+import Precedent from '../components/Precedent.js';
 
 /**
  * A question, worked one step at a time, inside a window.
@@ -702,6 +705,17 @@ function lastSaid(
      * reaches it, nothing records it — so every restriction lapses and the
      * calendar counts down to a deadline against a thing nobody can do.
      */
+    /*
+     * What this board has already ruled on a question like this one. A
+     * member answering a condition should have it beside the step, not at
+     * the foot of a page they would not open: consistency across its own
+     * rulings is one of the five things a board is held to.
+     */
+    {
+      id: 'precedent',
+      label: t('flow.panePrecedent'),
+      body: <Precedent matterId={matter.id} />,
+    },
     {
       id: 'cannot',
       label: t('flow.paneCannot'),
@@ -835,12 +849,14 @@ function lastSaid(
         heading={t('flow.decided')}
         asidePanes={panes}
         acts={
-          <Link
-            to={`/dossier/matters/${matter.id}`}
-            className="rounded-xl bg-raised px-4 py-2 text-ui font-semibold text-lapis shadow-ring"
-          >
-            {t('flow.everythingElse')}
-          </Link>
+          /*
+            Telling the bank is the half of the task that follows the
+            decision, and the act this window has left. It was on the dossier,
+            one screen away from the decision it reports.
+          */
+          matter.status === 'in_force' || matter.status === 'rejected' ? (
+            <TellTheBank kind={matter.status === 'rejected' ? 'refusal' : 'ruling'} id={matter.id} />
+          ) : undefined
         }
       >
         {gapPanel}
@@ -875,35 +891,49 @@ function lastSaid(
           </div>
         )}
 
-        {matter.status === 'in_force' && (
-          <section className="mb-6">
-            <div className="mb-3 text-label font-bold uppercase tracking-caps text-muted">
-              {t('flow.papers')}
-            </div>
-            <div className="space-y-2.5">
-              <DocumentLink
-                href={oversight.hrefs.fatwa(matter.id)}
-                label={t('doc.fatwa')}
-                note={t('doc.fatwaNote')}
-                emphasis
-              />
-              {/*
-                Clauses only where the matter was judged against a shape.
-                With no shape there is nothing to draft from, and a link
-                that leads to an empty paper is a link that lied.
-              */}
-              {conditions.length > 0 && (
-                <DocumentLink
-                  href={oversight.hrefs.contract(matter.id)}
-                  label={t('doc.contract')}
-                  note={t('doc.contractNote')}
-                />
-              )}
-            </div>
-          </section>
+        {/*
+          The waiting period, while it runs: where it stands, that any one
+          signatory can still halt it, and — once it has run — the act that
+          brings it into force. The classic page carried this beside every
+          decided matter and this window did not, so a permission in its
+          forty-eight hours could not be objected to or brought into force
+          from the one screen a matter has. Found when the old page went.
+        */}
+        {matter.status === 'timelock' && (
+          <div className="mb-6">
+            <VotePanel
+              matter={matter}
+              role={identity?.role}
+              scholarId={identity?.scholarId}
+              onChanged={(m) => {
+                setMatter(m);
+                load();
+              }}
+              onDid={setJustDid}
+              onTold={setTold}
+            />
+          </div>
         )}
 
+        {/*
+          What the ruling becomes, and its papers — the document assembled
+          from the record, and whether anything reads the terms. It stood on
+          the classic page and not here, so the window a decision was taken in
+          did not say what the decision now is.
+        */}
+        <div className="mb-6">
+          <WhereItEnds matter={matter} />
+        </div>
+
         <SignTheDocument matter={matter} />
+
+        <TheFile
+          matter={matter}
+          onChanged={(m) => {
+            setMatter(m);
+            load();
+          }}
+        />
       </StepWindow>
     );
   }
@@ -935,6 +965,13 @@ function lastSaid(
           list={list}
           assistantOn={health?.assistantKind !== 'off' && health?.assistantKind !== undefined}
           onStart={() => goTo(firstOpen?.condition.id ?? VOTE)}
+        />
+        <TheFile
+          matter={matter}
+          onChanged={(m) => {
+            setMatter(m);
+            load();
+          }}
         />
       </StepWindow>
     );

@@ -3,8 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { I18nProvider } from './lib/i18n.js';
 
-import MatterPack from './pages/MatterPack.js';
-import MatterDetail from './pages/MatterDetail.js';
+import MatterFlow from './pages/MatterFlow.js';
 import Settings from './pages/Settings.js';
 import BoardBook from './pages/BoardBook.js';
 import Examinations from './pages/Examinations.js';
@@ -102,19 +101,16 @@ function at(path: string, pattern: string, element: React.ReactNode) {
 }
 
 const SCREENS = [
+  /*
+   * One matter screen where there were three. The pack and the older view
+   * are addresses that lead here now; what they alone showed is in its file.
+   */
   {
-    name: 'the matter pack',
+    name: 'the matter',
     path: '/matters/matter-2026-08-11',
     pattern: '/matters/:id',
-    element: <MatterPack />,
-    shows: () => screen.findByText(matterJson.title),
-  },
-  {
-    name: 'the older matter view',
-    path: '/classic/matters/matter-2026-08-11',
-    pattern: '/classic/matters/:id',
-    element: <MatterDetail />,
-    shows: () => screen.findByText(matterJson.title),
+    element: <MatterFlow />,
+    shows: () => screen.findByRole('heading', { name: matterJson.title }),
   },
   {
     name: 'the board',

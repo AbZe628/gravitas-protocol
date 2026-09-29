@@ -67,7 +67,7 @@ describe('a breach waits on the board before it waits on anybody', () => {
       NOW,
     );
 
-    expect(words(step(p, 'determine').standing)).toContain('2 have said');
+    expect(words(step(p, 'determine').standing)).toContain('Positions taken so far: 2.');
     // And never that it is ready: that is the board's finding, not a count.
     expect(words(step(p, 'determine').standing)).not.toContain('ready');
   });
@@ -411,5 +411,38 @@ describe('purification changes hands, and only it does', () => {
 
     expect(step(p, 'purify').whose).toBe('institution');
     expect(words(step(p, 'purify').standing)).toContain('nothing records it paid');
+  });
+});
+
+/*
+ * A finding takes enough signatories, and a member may change their mind while
+ * it is short: the threshold counts each member's latest view, so the step has
+ * to count members. It counted rows, and a member who changed their view read
+ * as two people who had spoken.
+ */
+describe('who has spoken on the finding', () => {
+  const reported = (concurrences: Incident['concurrences']) =>
+    breach({ stage: 'reported', actual: null, determinedAt: null, concurrences });
+  const at = '2026-09-10T00:00:00Z';
+
+  it('names each member who has taken a position once, however often they changed it', () => {
+    const p = buildIncidentPassage(
+      reported([
+        { scholarId: 'member-a', actual: true, reason: 'r', at },
+        { scholarId: 'member-a', actual: false, reason: 'r', at },
+        { scholarId: 'member-b', actual: true, reason: 'r', at },
+      ]),
+      NOW,
+    );
+    const determine = step(p, 'determine');
+    expect(determine.heard).toEqual(['member-a', 'member-b']);
+    expect(words(determine.standing)).toContain('2');
+    expect(words(determine.standing)).not.toContain('3');
+  });
+
+  it('names nobody before anybody has spoken, and nobody once it is found', () => {
+    expect(step(buildIncidentPassage(reported([]), NOW), 'determine').heard).toBeUndefined();
+    const found = breach({ stage: 'determined', actual: true, determinedAt: at, concurrences: [{ scholarId: 'member-a', actual: true, reason: 'r', at }] });
+    expect(step(buildIncidentPassage(found, NOW), 'determine').heard).toBeUndefined();
   });
 });
