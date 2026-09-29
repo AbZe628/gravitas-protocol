@@ -446,3 +446,51 @@ describe('who has spoken on the finding', () => {
     expect(step(buildIncidentPassage(found, NOW), 'determine').heard).toBeUndefined();
   });
 });
+
+/*
+ * And the same on the plan.
+ *
+ * Endorsing takes enough signatories too, and the second endorsement from one
+ * member is refused — *that member has already endorsed this plan*. The step
+ * said nothing about who had answered, so a member who had endorsed still
+ * found it waiting on them: in their queue, on the screen, and behind a sheet
+ * explaining an act that was going to be turned away.
+ */
+describe('who has answered the plan', () => {
+  const at = '2026-09-10T00:00:00Z';
+  const filed = (endorsedBy: string[], endorsedAt: string | null = null) =>
+    breach({
+      stage: endorsedAt ? 'endorsed' : 'plan_filed',
+      actual: true,
+      determinedAt: at,
+      stopped: ['the activity'],
+      plans: [{ filedBy: 'liaison-1', filedAt: at, steps: ['put it right'], completeBy: at, endorsedBy, endorsedAt }],
+    });
+
+  it('names each signatory who has endorsed, and says how many', () => {
+    const endorse = step(buildIncidentPassage(filed(['member-a', 'member-b']), NOW), 'endorse');
+    expect(endorse.state).toBe('open');
+    expect(endorse.heard).toEqual(['member-a', 'member-b']);
+    expect(words(endorse.standing)).toContain('2');
+  });
+
+  it('names nobody before anybody has endorsed, and nobody once the board has its number', () => {
+    expect(step(buildIncidentPassage(filed([]), NOW), 'endorse').heard).toBeUndefined();
+    const enough = step(buildIncidentPassage(filed(['member-a', 'member-b'], at), NOW), 'endorse');
+    expect(enough.state).toBe('done');
+    expect(enough.heard).toBeUndefined();
+  });
+
+  /*
+   * A plan whose record is missing the list altogether. The queue reads every
+   * breach on the board, and one record it cannot read used to take the whole
+   * screen with it.
+   */
+  it('reads a plan with no list of endorsements at all', () => {
+    const bare = filed([]);
+    delete (bare.plans[0] as { endorsedBy?: string[] }).endorsedBy;
+    const endorse = step(buildIncidentPassage(bare, NOW), 'endorse');
+    expect(endorse.state).toBe('open');
+    expect(endorse.heard).toBeUndefined();
+  });
+});

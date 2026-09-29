@@ -1,4 +1,5 @@
 import { forgetIdentity } from './lib/identity.js';
+import { forgetMembers } from './lib/members.js';
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { render, screen, waitFor, within, fireEvent } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
@@ -323,5 +324,102 @@ describe('an act that has nothing of its own to say', () => {
     fireEvent.click(within(dialog).getAllByRole('button', { name: /^Record what stops$/ }).pop()!);
 
     await waitFor(() => expect(screen.getByText(en['sw.stop.did'])).toBeInTheDocument());
+  });
+});
+
+/**
+ * The plan, and the member who has already answered it.
+ *
+ * Endorsing takes enough signatories and is once each: the second from one
+ * member is refused with *that member has already endorsed this plan*. The
+ * screen offered it to anybody on the board, so a member who had endorsed met
+ * the button again, walked through the sheet that explains the act, and was
+ * turned away by the server in a sentence written for a programmer.
+ *
+ * And the list of who had endorsed was drawn as the record files them —
+ * `member-a, member-b` — on a screen where every other line names people.
+ */
+describe('the plan a member has already endorsed', () => {
+  const planned = (endorsedBy: string[]) => {
+    const plan = {
+      filedBy: 'liaison-1',
+      filedAt: day(3),
+      steps: ['Change the posting rule.'],
+      completeBy: day(-20),
+      endorsedBy,
+      endorsedAt: null,
+    };
+    return incident({ stage: 'plan_filed', plans: [plan], plan });
+  };
+
+  it('says they endorsed it instead of offering the act again', async () => {
+    stub({ role: 'signatory', office: null }, planned(['member-a']));
+    show();
+
+    await waitFor(() => expect(screen.getByText(en['snc.youEndorsed'])).toBeInTheDocument());
+    expect(screen.queryByRole('button', { name: /^Endorse$/ })).toBeNull();
+    /*
+     * Sending it back stays. A member may endorse and think better of the plan
+     * before the board reaches its number, and that is not the same act.
+     */
+    expect(screen.getByRole('button', { name: /^Send it back$/ })).toBeInTheDocument();
+  });
+
+  it('still offers it to a signatory who has not', async () => {
+    forgetIdentity();
+    stub({ role: 'signatory', office: null }, planned(['member-b']));
+    show();
+
+    await waitFor(() => expect(screen.getByRole('button', { name: /^Endorse$/ })).toBeInTheDocument());
+    expect(screen.queryByText(en['snc.youEndorsed'])).toBeNull();
+  });
+
+  it('names whoever has endorsed, and files nobody under their key', async () => {
+    forgetIdentity();
+    forgetMembers();
+    const data = planned(['member-a', 'member-b']);
+    /*
+     * Its own stub, because this is the one test here that needs the board's
+     * own list: `Person` reads it from `/api/settings`, and without it a name
+     * falls back to the id — which is the very thing being asserted against,
+     * so the test would have passed on the fault it was written for.
+     */
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: RequestInfo | URL) => {
+        const url = String(input);
+        const json = (b: unknown) =>
+          new Response(JSON.stringify(b), { status: 200, headers: { 'Content-Type': 'application/json' } });
+        if (url.includes('/api/settings')) {
+          return json({
+            members: [
+              { scholarId: 'member-a', name: 'Amina Chair', title: '', signatory: true, role: 'signatory', office: 'chair' },
+              { scholarId: 'member-b', name: 'Bilal Rahman', title: '', signatory: true, role: 'signatory', office: null },
+            ],
+          });
+        }
+        if (url.includes('/api/attention')) {
+          return json({ scholarId: 'member-c', role: 'observer', office: null, outstanding: 0, overdue: 0, items: [] });
+        }
+        if (url.includes('/passage')) return json(buildIncidentPassage(data as never, '2026-09-20T00:00:00Z'));
+        return json(data);
+      }),
+    );
+    show();
+
+    /*
+     * Bilal Rahman is the proof. He endorsed and took no position on the
+     * finding, so the endorsement panel is the only place on this screen his
+     * name can come from — where Amina Chair also appears in the positions
+     * above, which is why she is not the one asserted on.
+     *
+     * Each as its own node: joined into one string the names would be a single
+     * text node and neither of these would match.
+     */
+    await waitFor(() => expect(screen.getByText('Bilal Rahman')).toBeInTheDocument());
+    expect(screen.getAllByText('Amina Chair').length).toBeGreaterThan(0);
+    // And no key reached the screen, which is what a reader would notice.
+    expect(screen.queryByText(/member-a/)).toBeNull();
+    expect(screen.queryByText(/member-b/)).toBeNull();
   });
 });

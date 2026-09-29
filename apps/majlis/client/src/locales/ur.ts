@@ -2252,6 +2252,8 @@ const ur: Dict = {
   "breach.step.plan.standingAgain": "{sent} منصوبے جمع ہوئے اور واپس گئے۔ فیصلے کو {days} دن۔",
   "breach.step.endorse.ahead": "منصوبے کا منتظر۔",
   "breach.step.endorse.standing": "منصوبہ جمع ہے اور بورڈ نے جواب نہیں دیا۔",
+  "breach.step.endorse.standingSome": "اب تک توثیقات: {said}۔ بورڈ کی مقررہ تعداد ابھی پوری نہیں ہوئی۔",
+  "snc.youEndorsed": "آپ نے اس منصوبے کی توثیق کر دی ہے۔",
   "breach.step.directors.ahead": "بورڈ کی توثیق کا منتظر۔",
   "breach.step.directors.standing": "توثیق ہو چکی، ڈائریکٹرز تک ابھی نہیں گیا۔",
   "breach.step.regulator.ahead": "ڈائریکٹرز کا منتظر۔",

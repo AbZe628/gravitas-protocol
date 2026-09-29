@@ -39,13 +39,34 @@ const PERSON = ['scholarId', 'by', 'recordedBy', 'reportedBy', 'decidedBy', 'ask
  * id under that name is `who` now. See `Step.who` in services/passage-shape.ts.
  */
 
+/**
+ * The fields that hold several people at once.
+ *
+ * A list of ids joined into a string is a person drawn by key just as much as
+ * a single one is, and it read past this file untouched: the endorsement panel
+ * on a breach drew `plan.endorsedBy.join(', ')` and put `member-a, member-b`
+ * on the screen beside lines that named everybody properly. This file said in
+ * its own preamble that a person held in a variable of some other name is past
+ * it; a list going through `.join` was past it too, and unlike that one it did
+ * not have to be.
+ */
+const PEOPLE = ['endorsedBy', 'heard'];
+
 const chain = String.raw`[A-Za-z_$][\w$]*(?:\??\.[A-Za-z_$][\w$]*)*\??\.`;
 const field = `(?:${PERSON.join('|')})`;
+const many = `(?:${PEOPLE.join('|')})`;
 
 /** `{x.by}`, `{x?.scholarId ?? …}`, `{x.who || …}` — a person as a child, not a prop. */
 const AS_CHILD = new RegExp(String.raw`(?<!(?:=\s*|\$))\{\s*(${chain}${field})\s*(?:\}|\?\?|\|\|)`, 'g');
 /** `${x.who}` or `${x.by ?? '—'}` inside a template — which, on these screens, is drawn. */
 const IN_TEMPLATE = new RegExp(String.raw`\$\{\s*(${chain}${field})\s*(?:\}|\?\?|\|\|)`, 'g');
+/** `{plan.endorsedBy.join(', ')}` — a list of people flattened into one string. */
+const JOINED = new RegExp(String.raw`(?<!=\s*)\{\s*(${chain}${many})\.join\(`, 'g');
+/** `{row.heard}` — a list of people handed straight to the renderer. */
+const LIST_AS_CHILD = new RegExp(
+  String.raw`(?<!(?:=\s*|\$))\{\s*(${chain}${many})\s*(?:\}|\?\?|\|\|)`,
+  'g',
+);
 
 /**
  * The ids drawn on purpose, each with its reason.
@@ -84,7 +105,7 @@ const TEMPLATE_PROP = /[A-Za-z-]+=\{\s*`[^`]*`\s*\}/g;
 function drawn(source: string): string[] {
   source = source.replace(TEMPLATE_PROP, '');
   const found: string[] = [];
-  for (const re of [AS_CHILD, IN_TEMPLATE]) {
+  for (const re of [AS_CHILD, IN_TEMPLATE, JOINED, LIST_AS_CHILD]) {
     re.lastIndex = 0;
     for (let m = re.exec(source); m; m = re.exec(source)) found.push(m[1]);
   }
@@ -99,7 +120,12 @@ describe('a person is drawn by name', () => {
     expect(drawn("{t('recorded.by')} {c.recordedBy} · {c.source}")).toEqual(['c.recordedBy']);
     expect(drawn("{theirs ? `${t('moved.theirs')} · ${theirs.who}` : x}")).toEqual(['theirs.who']);
     expect(drawn("`${t('read.confirmedBy')} ${identity?.scholarId ?? '—'} `")).toEqual(['identity?.scholarId']);
+    // A list of people, flattened or handed over whole. Both were on a screen.
+    expect(drawn("<span>{plan.endorsedBy.join(', ')}</span>")).toEqual(['plan.endorsedBy']);
+    expect(drawn('<span>{row.heard}</span>')).toEqual(['row.heard']);
     // And these are not drawn.
+    expect(drawn('<Endorsed by={plan.endorsedBy} />')).toEqual([]);
+    expect(drawn('{plan.endorsedBy.map((who) => <Person key={who} id={who} />)}')).toEqual([]);
     expect(drawn('<li key={a.scholarId}>')).toEqual([]);
     expect(drawn('<Avatar id={identity?.scholarId} />')).toEqual([]);
     expect(drawn('<li key={`${s.scholarId}-${s.at}-${i}`}>')).toEqual([]);

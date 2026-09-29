@@ -240,11 +240,34 @@ function puttingRightOf(i: Incident, now: string): Step[] {
     );
   }
 
+  /*
+   * Who has endorsed already, for the same reason the finding carries it.
+   *
+   * Endorsing is once each and cannot be taken back — the second is refused
+   * with *that member has already endorsed this plan*. Without this the step
+   * stood open for everybody, so a member who had endorsed still found it in
+   * their queue, still met the button, and learnt they were not wanted only
+   * after walking through the sheet that explains the act.
+   *
+   * Once each, like the positions: a name written twice would make the board
+   * look larger than it is on the one figure a reader counts against the
+   * threshold.
+   */
+  const endorsedSoFar = [...new Set(plan?.endorsedBy ?? [])];
   steps.push(
     endorsed
       ? done('endorse', 'signatory', plan?.endorsedAt ?? null)
       : plan
-        ? open('endorse', 'signatory', say('breach.step.endorse.standing'))
+        ? {
+            ...open(
+              'endorse',
+              'signatory',
+              endorsedSoFar.length > 0
+                ? say('breach.step.endorse.standingSome', { said: endorsedSoFar.length })
+                : say('breach.step.endorse.standing'),
+            ),
+            ...(endorsedSoFar.length > 0 ? { heard: endorsedSoFar } : {}),
+          }
         : ahead('endorse', 'signatory', say('breach.step.endorse.ahead')),
   );
 

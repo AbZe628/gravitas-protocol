@@ -2240,6 +2240,8 @@ const ar: Dict = {
   "breach.step.plan.standingAgain": "قُدِّمت {sent} خطط ورُدَّت. ومضى {days} يوماً على الحكم.",
   "breach.step.endorse.ahead": "ينتظر خطة.",
   "breach.step.endorse.standing": "خطة مقدَّمة ولم يجب عنها المجلس.",
+  "breach.step.endorse.standingSome": "الاعتمادات حتى الآن: {said}. ولم يبلغ المجلس عدده بعد.",
+  "snc.youEndorsed": "لقد اعتمدت هذه الخطة.",
   "breach.step.directors.ahead": "ينتظر اعتماد المجلس للخطة.",
   "breach.step.directors.standing": "مُعتمدة، ولم تُرفع بعد إلى مجلس الإدارة.",
   "breach.step.regulator.ahead": "ينتظر مجلس الإدارة.",

@@ -2041,6 +2041,8 @@ const en: Dict = {
   "breach.step.plan.standingAgain": "{sent} plans have been filed and sent back. {days} days since the finding.",
   "breach.step.endorse.ahead": "Waits on a plan.",
   "breach.step.endorse.standing": "A plan is filed and the board has not answered it.",
+  "breach.step.endorse.standingSome": "Endorsements so far: {said}. The board has not reached its number.",
+  "snc.youEndorsed": "You endorsed this plan.",
   "breach.step.directors.ahead": "Waits on the board endorsing the plan.",
   "breach.step.directors.standing": "Endorsed, and not yet put to the Board of Directors.",
   "breach.step.regulator.ahead": "Waits on the Directors.",

@@ -296,6 +296,9 @@ export default function IncidentDetail() {
     ? [...i.concurrences].reverse().find((c) => c.scholarId === identity.scholarId)
     : undefined;
 
+  /* Whether this member has already answered the plan that stands. */
+  const endorsedByMe = Boolean(identity && plan?.endorsedBy.includes(identity.scholarId));
+
   const panels: Panel[] = [
     /* Who reported it and when is already the step's own line in the record. */
     { key: 'reported' },
@@ -410,13 +413,40 @@ export default function IncidentDetail() {
     },
     {
       key: 'endorse',
+      /*
+       * Names, not identifiers. This drew `endorsedBy.join(', ')`, so the one
+       * line on the screen that says who answered the plan read `member-a,
+       * member-b` while every other line beside it named people. The guard
+       * that looks for bare identifiers cannot see through a `.join`.
+       */
       detail: plan?.endorsedBy.length ? (
-        <span>{plan.endorsedBy.join(', ')}</span>
+        <span>
+          {plan.endorsedBy.map((who, k) => (
+            <span key={who}>
+              {k > 0 ? <span className="mx-1.5 opacity-40">·</span> : null}
+              <Person id={who} />
+            </span>
+          ))}
+        </span>
       ) : (
         <span className="text-muted">{t('snc.notEndorsed')}</span>
       ),
       action:
-        i.stage === 'plan_filed' && board ? (
+        i.stage === 'plan_filed' && board && endorsedByMe ? (
+          /*
+           * Endorsed already. Unlike a position on the finding this cannot be
+           * changed — the record keeps one endorsement per member and the
+           * second is refused — so the act is not offered. Sending the plan
+           * back still is: a member may endorse and then think better of the
+           * plan before the board reaches its number.
+           */
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+            <span className="text-ui text-muted">{t('snc.youEndorsed')}</span>
+            <Button tone="grave" size="sm" onClick={() => setActing('returnPlan')}>
+              {t('snc.returnPlan')}
+            </Button>
+          </div>
+        ) : i.stage === 'plan_filed' && board ? (
           <div className="flex flex-wrap gap-2">
             <Button tone="act" size="sm" onClick={() => setActing('endorse')}>
               {t('snc.endorse')}
