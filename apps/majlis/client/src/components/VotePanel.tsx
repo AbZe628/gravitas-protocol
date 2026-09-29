@@ -8,6 +8,7 @@ import Dictate from './Dictate.js';
 import { Card } from './ui.js';
 import { Field } from './field.js';
 import { Button } from './Button';
+import Person from './Person.js';
 
 /**
  * Where the vote stands, and what this member can still do about it.
@@ -264,9 +265,21 @@ export default function VotePanel({
             </span>
           </div>
 
+          {/*
+            * Names. This joined the ids, so the line that says whom a vote is
+            * waiting on read *member-c, member-d, member-e* — the one place on
+            * the screen where knowing who it is has a use, and the one place
+            * that did not say.
+            */}
           {tally.outstanding.length > 0 && (
             <p className="mt-3 border-t border-line pt-3 text-ui leading-relaxed text-muted">
-              {t('vote.outstanding')}: {tally.outstanding.join(', ')}
+              {t('vote.outstanding')}:{' '}
+              {tally.outstanding.map((who, k) => (
+                <span key={who}>
+                  {k > 0 ? <span className="mx-1.5 opacity-40">·</span> : null}
+                  <Person id={who} />
+                </span>
+              ))}
             </p>
           )}
         </div>

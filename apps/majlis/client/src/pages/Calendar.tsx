@@ -6,6 +6,7 @@ import { useIdentity } from '../lib/identity.js';
 import { Division, Gaps, Nothing } from '../components/page.js';
 import { ListPage, Row, Rows } from '../components/shapes.js';
 import { MainAct } from '../components/kit.js';
+import Person from '../components/Person.js';
 import { DateText, ErrorText, Loading } from '../components/ui.js';
 import FollowInYourCalendar from '../components/FollowInYourCalendar.js';
 
@@ -72,7 +73,13 @@ function entryRow(entry: CalendarEntry, t: (k: string) => string) {
           {entry.note}
           {entry.waitingOn.length > 0 && (
             <span className="mt-0.5 block text-note">
-              {t('cal.notYetFrom')} {entry.waitingOn.join(', ')}
+              {t('cal.notYetFrom')}{' '}
+              {entry.waitingOn.map((who, k) => (
+                <span key={who}>
+                  {k > 0 ? <span className="mx-1.5 opacity-40">·</span> : null}
+                  <Person id={who} />
+                </span>
+              ))}
             </span>
           )}
         </>

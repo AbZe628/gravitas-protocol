@@ -84,6 +84,22 @@ function stub(setup: Setup = {}) {
           items: [],
         });
       }
+      /*
+       * The board's own list, because `Person` resolves a name from it. Without
+       * this branch every name on the screen falls back to the scholar id, and a
+       * test asserting that ids are gone would pass on the fault it was written
+       * for.
+       */
+      if (url.includes('/api/settings')) {
+        return json({
+          members: [
+            { scholarId: 'member-a', name: 'Amina Chair', title: '', signatory: true, role: 'signatory', office: 'chair' },
+            { scholarId: 'member-b', name: 'Bilal Rahman', title: '', signatory: true, role: 'signatory', office: null },
+            { scholarId: 'member-c', name: 'Casim Ode', title: '', signatory: true, role: 'signatory', office: null },
+            { scholarId: 'member-d', name: 'Dilara Sen', title: '', signatory: true, role: 'signatory', office: null },
+          ],
+        });
+      }
       if (url.includes('/tally')) {
         return json(setup.tally ?? { for: 1, against: 0, abstain: 0, required: 3, met: false, outstanding: ['member-b'] });
       }
@@ -244,7 +260,15 @@ describe('where the vote stands', () => {
     expect(await screen.findByText('2')).toBeInTheDocument();
     expect(screen.getByText('of 3')).toBeInTheDocument();
     expect(screen.getByText('Threshold not met')).toBeInTheDocument();
-    expect(screen.getByText(/member-c, member-d/)).toBeInTheDocument();
+    /*
+     * Names, each its own element. This asked for the string
+     * `member-c, member-d`, so it held the fault in place: the one line on this
+     * screen where knowing who it is has a use said the keys the record files
+     * them under.
+     */
+    expect(screen.getByText('Casim Ode')).toBeInTheDocument();
+    expect(screen.getByText('Dilara Sen')).toBeInTheDocument();
+    expect(screen.queryByText(/member-[a-e]/)).toBeNull();
   });
 
   it('a running timelock says one signatory can still halt it', async () => {

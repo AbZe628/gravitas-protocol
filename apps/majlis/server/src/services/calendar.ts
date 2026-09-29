@@ -64,6 +64,16 @@ export interface CalendarEntry {
    * delay that exists on purpose.
    */
   waitingOn: string[];
+  /**
+   * The same people, by name, for the feed.
+   *
+   * The application resolves an id against the board's own list and draws a
+   * name; a calendar in Outlook has no such list, and the feed said *not yet
+   * recorded from: member-c, member-d, member-e* to whoever subscribed. So the
+   * name is settled here, where the board is in hand, the way a step carries
+   * `whoName` for the same reason.
+   */
+  waitingOnNames: string[];
 }
 
 export interface Calendar {
@@ -80,6 +90,11 @@ function yetToVote(board: Board, matter: Matter): string[] {
     .filter((m) => m.signatory)
     .filter((m) => !matter.reasoning.some((r) => r.scholarId === m.id && !r.releasedAt))
     .map((m) => m.id);
+}
+
+/** The same people, by name, from the board’s own list. */
+function namesOf(board: Board, ids: readonly string[]): string[] {
+  return ids.map((id) => board.members.find((m) => m.id === id)?.name ?? id);
 }
 
 const past = (at: string, now: string) => new Date(at).getTime() < new Date(now).getTime();
@@ -116,7 +131,7 @@ export function buildCalendar(params: {
         subject: matter.id,
         overdue: false,
         // Nobody is holding this up. It is time passing on purpose.
-        waitingOn: [],
+        waitingOn: [], waitingOnNames: [],
         note:
           'The timelock ends. Until then any signatory may object and halt the change; ' +
           'after it, the change can be brought into force.',
@@ -136,6 +151,7 @@ export function buildCalendar(params: {
           subject: matter.id,
           overdue: past(due, now),
           waitingOn: yetToVote(board, matter),
+          waitingOnNames: namesOf(board, yetToVote(board, matter)),
           note:
             `In force on the reduced quorum. It needs ${needed} in favour to be ratified and has ` +
             `${counts.for}. If the window closes first it lapses and must be proposed again.`,
@@ -154,7 +170,7 @@ export function buildCalendar(params: {
       title: incident.title,
       subject: incident.reference,
       overdue: clock.overdue,
-      waitingOn: [],
+      waitingOn: [], waitingOnNames: [],
       note: clock.note,
     });
   }
@@ -169,7 +185,7 @@ export function buildCalendar(params: {
       title: rule.title,
       subject: rule.id,
       overdue: review.overdue,
-      waitingOn: [],
+      waitingOn: [], waitingOnNames: [],
       note: review.note,
     });
   }
@@ -199,7 +215,7 @@ export function buildCalendar(params: {
       title: board.name,
       subject: board.id,
       overdue: c.overdue,
-      waitingOn: [],
+      waitingOn: [], waitingOnNames: [],
       note: c.nextConvenedAt
         ? `${c.note} A meeting is already convened for ${c.nextConvenedAt.slice(0, 10)}.`
         : `${c.note} No meeting is convened.`,
@@ -309,7 +325,9 @@ export function toICalendar(calendar: Calendar, host: string): string {
     const summary = `${HEADING[e.kind]}: ${e.title}`;
     const description = [
       e.note,
-      e.waitingOn.length ? `Not yet recorded from: ${e.waitingOn.join(', ')}` : '',
+      // Names, never the keys the record files them under: nothing on the
+      // other side of this feed can turn one back into a person.
+      e.waitingOnNames.length ? `Not yet recorded from: ${e.waitingOnNames.join(', ')}` : '',
       `Reference: ${e.subject}`,
     ]
       .filter(Boolean)

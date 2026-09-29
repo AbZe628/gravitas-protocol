@@ -134,6 +134,67 @@ describe('what it cannot put on a calendar', () => {
   });
 });
 
+/*
+ * The people a date waits on, on a screen and in a subscription.
+ *
+ * Both said *member-c, member-d, member-e* — the keys the record files them
+ * under. On the screen the application can turn one back into a person; in an
+ * imported calendar nothing can, so the name is settled on the server.
+ */
+describe('who a date is waiting on', () => {
+  const ratifying = () =>
+    build({
+      matters: [
+        matter({
+          status: 'in_force',
+          direction: 'restrict',
+          inForceAt: at(-1),
+          reasoning: [{ scholarId: 's1', position: 'for', reason: 'r', at: at(-1) }],
+        }),
+      ],
+    });
+
+  it('has a date that waits on somebody, or this proves nothing', () => {
+    const e = ratifying().entries.find((x) => x.kind === 'ratification_due');
+    expect(e, 'no entry waits on anybody').toBeTruthy();
+    expect(e!.waitingOn.length).toBeGreaterThan(0);
+  });
+
+  it('carries the ids for the application and the names for the feed', () => {
+    const e = ratifying().entries.find((x) => x.kind === 'ratification_due')!;
+    expect(e.waitingOn).toEqual(['s2', 's3']);
+    expect(e.waitingOnNames).toEqual(['Two', 'Three']);
+  });
+
+  it('writes no identifier into a subscribed calendar', () => {
+    /*
+     * Unfolded first. A description longer than seventy-five octets is
+     * continued on the next line with a leading space, so the sentence this
+     * is about is split in the file, and a plain toContain would miss it
+     * whichever way the names were written.
+     */
+    const ics = toICalendar(ratifying(), 'majlis.test').replace(/\r\n /g, '');
+    expect(ics).toContain('Not yet recorded from: Two\\, Three');
+    expect(ics, 'a scholar id reached a calendar nothing can resolve it in').not.toMatch(
+      /\bs[123]\b/,
+    );
+  });
+
+  /* Somebody no longer on the board: the id is drawn rather than a blank,
+   * because a blank would read as nobody, which is the one thing that is
+   * false. */
+  it('falls back to the id where the board does not know them', () => {
+    const c = buildCalendar({
+      boards: [{ ...board, members: [board.members[0]] }],
+      matters: [],
+      rules: [],
+      incidents: [],
+      now: NOW,
+    });
+    expect(c.entries.every((e) => Array.isArray(e.waitingOnNames))).toBe(true);
+  });
+});
+
 describe('the feed a scholar subscribes to', () => {
   const feed = (over = {}) => toICalendar(build(over), 'majlis.test');
 

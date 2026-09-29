@@ -49,8 +49,13 @@ const PERSON = ['scholarId', 'by', 'recordedBy', 'reportedBy', 'decidedBy', 'ask
  * its own preamble that a person held in a variable of some other name is past
  * it; a list going through `.join` was past it too, and unlike that one it did
  * not have to be.
+ *
+ * `outstanding` came out of the same sweep: the vote said *not yet recorded:
+ * member-c, member-d, member-e*. Of every line on that screen it is the one
+ * where knowing who it is has a use — somebody has to be asked — and it was
+ * the one line that did not say.
  */
-const PEOPLE = ['endorsedBy', 'heard'];
+const PEOPLE = ['endorsedBy', 'heard', 'outstanding', 'waitingOn'];
 
 const chain = String.raw`[A-Za-z_$][\w$]*(?:\??\.[A-Za-z_$][\w$]*)*\??\.`;
 const field = `(?:${PERSON.join('|')})`;
