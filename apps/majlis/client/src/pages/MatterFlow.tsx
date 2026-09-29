@@ -30,6 +30,7 @@ import Evidence from '../components/Evidence.js';
 import { useHealth } from '../lib/health.js';
 import Dialog from '../components/Dialog.js';
 import VotePanel from '../components/VotePanel.js';
+import { useStanding } from '../lib/standing.js';
 import SignTheDocument from '../components/SignTheDocument.js';
 import { useStillThere } from '../lib/stillThere.js';
 import { Button } from '../components/Button';
@@ -129,6 +130,13 @@ export default function MatterFlow() {
    * only the passage says.
    */
   const [passage, setPassage] = useState<Passage | null>(null);
+  /*
+   * The passage says where a step stands and whom it waits on. This window
+   * asks; it does not work either out. The breach window has read it from the
+   * start and this one did not, which is how a vote could wait fifty-five days
+   * on three signatories without the matter's own screen saying so.
+   */
+  const standing = useStanding();
   const [failed, setFailed] = useState(false);
   const there = useStillThere();
 
@@ -1029,6 +1037,7 @@ function lastSaid(
       chips={chips}
       steps={strip}
       heading={`${t('win.step')} ${n} ${t('win.of')} ${conditions.length}`}
+      standing={standing(passage?.next)}
       asidePanes={panes}
       /*
        * What each button in the bar will cause, before it is pressed.

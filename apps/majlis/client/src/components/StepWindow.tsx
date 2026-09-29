@@ -60,6 +60,7 @@ export default function StepWindow({
   chips,
   steps,
   heading,
+  standing,
   children,
   aside,
   asidePanes,
@@ -71,6 +72,15 @@ export default function StepWindow({
   steps: readonly Step[];
   /** What this step is, in the strip's own words: "Step 2 of 6". */
   heading: string;
+  /**
+   * Where the step stands, and whom it waits on — the passage's own sentence.
+   *
+   * The breach window has said this from the beginning and the matter window
+   * never did: a vote could sit for fifty-five days with three signatories
+   * who had not spoken, and the one screen a matter has said nothing about
+   * either fact. Somebody has to be asked, and the screen has to name them.
+   */
+  standing?: string;
   children: ReactNode;
   aside?: ReactNode;
   /**
@@ -242,6 +252,9 @@ export default function StepWindow({
           <div className="mb-3 text-label font-bold uppercase tracking-caps text-muted">
             {heading}
           </div>
+          {standing ? (
+            <p className="mb-4 max-w-[76ch] text-ui leading-relaxed text-muted">{standing}</p>
+          ) : null}
           {children}
         </div>
 
