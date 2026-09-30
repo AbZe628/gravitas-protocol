@@ -250,6 +250,7 @@ export function Line({
   onPress,
   columns,
   cells,
+  act,
   tone,
 }: {
   /** Where the line opens. The link is the title and covers the line. */
@@ -264,6 +265,24 @@ export function Line({
   columns: readonly Column[];
   /** One per column, in order. The first is the one the link is put on. */
   cells: readonly ReactNode[];
+  /**
+   * One press that belongs to this line, done without leaving the list.
+   *
+   * ── why it needs its own slot ─────────────────────────────────────────
+   *
+   * The link over a line is stretched across the whole of it — `after:inset-0`
+   * — so that a press anywhere opens it. Anything interactive placed in a cell
+   * is under that sheet and cannot be pressed at all: it looks like a button,
+   * takes focus from the keyboard, and does nothing to a pointer. Found by
+   * putting *take it* in a cell and pressing it.
+   *
+   * So the act is raised above the sheet, and it is one act. A line carries
+   * one press; anything that needs a choice or a reason belongs on the record
+   * the line opens.
+   *
+   * The caller supplies a column for it, like every other cell.
+   */
+  act?: ReactNode;
   /** A line that is past its date, or otherwise marked. */
   tone?: 'plain' | 'breach';
 }) {
@@ -371,6 +390,20 @@ export function Line({
               ))}
             </div>
           )}
+
+          {/*
+            The act gets a line of its own, and takes it from neither of the
+            other two.
+
+            Beside the title it cut every title on the screen — *Interbank
+            liquidity…*, *Charging for a late inst…*. Moved to the end of the
+            line under it, it cut the act instead: *Take i… · Board Member A*,
+            which is the one sentence on the row saying what to do. A phone has
+            vertical room and not horizontal, and a control is not a fact, so
+            it stops sharing a line with them. Only rows that offer one get the
+            line. Found by reading the list at 375, twice.
+          */}
+          {act && <div className="relative z-[1] mt-1.5 flex justify-end">{act}</div>}
         </div>
         {/* What opens something else says so, as every list on the device does. */}
         {(to !== undefined || onPress) && <Chevron />}
@@ -391,6 +424,7 @@ export function Line({
           {i === lead ? opener(cell, false) : cell}
         </div>
       ))}
+      {act && <div className="relative z-[1] min-w-0 text-end">{act}</div>}
     </li>
   );
 }

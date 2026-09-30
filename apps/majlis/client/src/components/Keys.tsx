@@ -71,6 +71,15 @@ function sheetsFor(path: string, t: (k: string) => string): Sheet[] {
         { press: 'j k', does: t('keys.rows') },
         { press: '↑ ↓', does: t('keys.rowsOnALine') },
         { press: '↵', does: t('keys.openRow') },
+        /*
+          Only where a row can actually be taken on.
+
+          The sheet promises what the screen does, and a key listed on every
+          list would be a promise the other lists cannot keep — which is the
+          fault this file was written to end (*a promise on the sheet the
+          screen did not keep*).
+        */
+        ...(path === '/' ? [{ press: 't', does: t('keys.take') }] : []),
       ],
     });
   }

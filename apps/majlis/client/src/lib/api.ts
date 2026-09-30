@@ -937,6 +937,15 @@ export interface QueueRow {
   holder?: string;
   /** Who has already said theirs on the next step, where each of several says theirs. */
   heard?: string[];
+  /**
+   * Whether anybody on this board could carry this at all.
+   *
+   * The passage has said so since it was written; the row never carried it,
+   * so the queue could not offer *take it on* without guessing — and a guess
+   * would have put the control on every breach waiting on the bank’s own
+   * filing, where the route refuses it.
+   */
+  holdable?: boolean;
   /** Whole days it has stood here. */
   days: number;
   overdue: boolean;

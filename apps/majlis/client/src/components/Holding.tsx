@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { oversight, type Passage, type PassageStep } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { useIdentity } from '../lib/identity.js';
-import { nameOf, placeableMembers, useMembers } from '../lib/members.js';
+import { nameOf, useMembers } from '../lib/members.js';
+import { holdingOf } from '../lib/holding.js';
 import { Button } from './Button';
 
 /**
@@ -80,24 +81,23 @@ export default function Holding({
   const [shown, setShown] = useState<{ to: string | null; by: string } | null>(null);
   useEffect(() => setShown(null), [passage, step?.key]);
 
-  if (!(step ? step.holdable : passage.holdable)) return null;
-
-  const me = identity?.scholarId ?? null;
-  const sits =
-    me !== null &&
-    (identity?.role === 'signatory' || identity?.role === 'advisory') &&
-    (members ?? []).some((m) => m.scholarId === me);
-  const office = identity?.office === 'chair' || identity?.office === 'secretary';
-
   const standing = step ? (step.holder ?? null) : (passage.holder ?? null);
   const held = shown ? (shown.to === null ? null : { to: shown.to, by: shown.by }) : standing;
-  const holder = held?.to ?? null;
-  const mine = holder !== null && holder === me;
-  const free = holder === null;
 
-  /* The same three cases `mayAssign` names, in the same order. */
-  const mayMove = sits && (office || free || mine);
-  const colleagues = placeableMembers(members).filter((m) => m.scholarId !== holder);
+  /*
+   * The same three cases `mayAssign` names, read by the one function the
+   * queue's rows read. Written out here as well, the row and this panel could
+   * disagree about whether a member may take something on — which is the fault
+   * the whole grammar exists to remove.
+   */
+  const can = holdingOf({
+    holdable: step ? step.holdable : passage.holdable,
+    holder: held?.to ?? null,
+    identity,
+    members,
+  });
+  if (!can) return null;
+  const { holder, mine, free, mayMove, colleagues, office, sits, me } = can;
 
   async function write(target: string | null) {
     if (busy) return;

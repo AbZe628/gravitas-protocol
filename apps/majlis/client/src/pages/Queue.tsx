@@ -1,7 +1,7 @@
 import { useContext, useEffect, useRef, useState } from 'react';
 import { useRevision } from '../lib/pulse.js';
 import { useNavigate } from 'react-router-dom';
-import { governance, type QueueRow } from '../lib/api.js';
+import { governance, oversight, type QueueRow } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { ListPage } from '../components/shapes.js';
 import { Sheet, Line, Mark, Figure, InTheColumn, type Column } from '../components/sheet.js';
@@ -11,6 +11,7 @@ import { useStillThere } from '../lib/stillThere.js';
 import { useIdentity } from '../lib/identity.js';
 import { keep, kept } from '../lib/kept.js';
 import { nameOf, useMembers } from '../lib/members.js';
+import { holdingOf } from '../lib/holding.js';
 import type { QueuePhase } from '../lib/api.js';
 import { Button } from '../components/Button';
 
@@ -101,6 +102,14 @@ const COLS = (t: (k: string) => string): readonly Column[] => [
   { head: t('col.next'), width: 'minmax(0,1.9fr)', phone: 'under' },
   { head: t('col.with'), width: '8rem', phone: 'under' },
   { head: t('col.days'), width: '4.5rem', end: true, phone: 'trailing' },
+  /*
+   * The act's own column, unheaded.
+   *
+   * A heading over it would be a word repeated down every row that carries a
+   * button and a blank over every row that does not. What the button says is
+   * the heading.
+   */
+  { head: '', width: '6.5rem', end: true, phone: 'hide' },
 ];
 
 /**
@@ -112,7 +121,94 @@ const COLS = (t: (k: string) => string): readonly Column[] => [
  * thing a member came to do is that everything under WITH can be read in one
  * sweep, and everything under DAYS compared without reading a word.
  */
-function Row({ row, n }: { row: QueueRow; n?: number }) {
+/**
+ * The one press a row carries: take it on, or hand it back to the board.
+ *
+ * ── what a member had to do instead ───────────────────────────────────────
+ *
+ * Nine rows saying what needs them, and taking one on meant opening it,
+ * finding the panel beside the work and pressing there — then coming back for
+ * the next. Triage is the one thing this screen is for and it was the one
+ * thing that could not be done on it.
+ *
+ * ── one press, and only one ───────────────────────────────────────────────
+ *
+ * Taking something on and handing it back need nothing typed and nothing
+ * chosen, so they belong on the row. Placing it with a named colleague needs a
+ * choice, and putting it off needs a reason: both belong on the record the row
+ * opens. A row carries one press.
+ *
+ * ── and only where the server would allow it ──────────────────────────────
+ *
+ * `holdingOf` is the same reading the panel makes, from the same rule the
+ * route refuses on. A breach waiting on the bank's own filing is not holdable
+ * and carries no button at all — a control that cannot be honoured is absent,
+ * not disabled.
+ */
+function RowAct({
+  row,
+  onMove,
+}: {
+  row: QueueRow;
+  onMove: (row: QueueRow, to: string | null) => void;
+}) {
+  const { t } = useI18n();
+  const { identity } = useIdentity();
+  const members = useMembers();
+
+  const can = holdingOf({
+    holdable: row.holdable,
+    holder: row.holder ?? null,
+    identity,
+    members,
+  });
+  if (!can || !can.mayMove) return null;
+
+  /*
+   * Handing back what a colleague holds is the chair's and the secretary's.
+   *
+   * Written as *free or mine*, this row offered the chair nothing on work in a
+   * colleague's hands while the panel beside that same work offered *put it
+   * back* — the row and the panel disagreeing about the same rule, which is
+   * the fault `holdingOf` exists to prevent. `mayMove` already carries the
+   * office; reading it again here was the second opinion.
+   */
+  const take = can.free;
+
+  return (
+    <Button
+      type="button"
+      /*
+        Which row it is, for anyone not seeing it.
+
+        Nine buttons all reading *Take it*: tabbing through them, or reading
+        them aloud, gave the same two words nine times with nothing saying
+        which line each belonged to. The line says it to the eye by being
+        beside it, and that is not something the machine can see.
+      */
+      aria-label={t(take ? 'needs.takeThis' : 'needs.handBackThis', { what: row.title })}
+      onClick={() => onMove(row, take ? can.me : null)}
+      className={
+        'inline-flex min-h-[44px] items-center rounded-xl px-3 py-1.5 text-note font-medium transition-all lg:min-h-0 ' +
+        (take
+          ? 'bg-raised text-lapis shadow-ring hover:bg-lapistint'
+          : 'text-muted hover:text-paper')
+      }
+    >
+      {t(take ? 'needs.take' : 'needs.handBack')}
+    </Button>
+  );
+}
+
+function Row({
+  row,
+  n,
+  onMove,
+}: {
+  row: QueueRow;
+  n?: number;
+  onMove: (row: QueueRow, to: string | null) => void;
+}) {
   const { t, say } = useI18n();
   const members = useMembers();
 
@@ -177,6 +273,7 @@ function Row({ row, n }: { row: QueueRow; n?: number }) {
         </span>,
         <Figure tone={row.overdue ? 'text-breach' : 'text-muted'}>{row.days}</Figure>,
       ]}
+      act={<RowAct row={row} onMove={onMove} />}
     />
   );
 }
@@ -184,6 +281,8 @@ function Row({ row, n }: { row: QueueRow; n?: number }) {
 export default function Queue() {
   const { t } = useI18n();
   const { identity } = useIdentity();
+  /** The board's own list, for the rule about who may carry what. */
+  const seated = useMembers();
   const last = kept<LastRead>('queue.read');
   const had = last && last.who === identity?.scholarId ? last : null;
   const [rows, setRows] = useState<QueueRow[] | null>(had?.rows ?? null);
@@ -215,6 +314,25 @@ export default function Queue() {
   const [failed, setFailed] = useState(false);
   /** A failed refresh keeps a screen that is already there. */
   const there = useStillThere();
+  /**
+   * Read again after the member moved something, without waiting for a pulse.
+   *
+   * The queue re-reads whenever the record moves, and the record moving is
+   * something this screen can now cause. Without this the row a member had
+   * just taken on went on saying *take it* until the next pulse arrived.
+   */
+  const [again, setAgain] = useState(0);
+  /**
+   * What the member just did, drawn before the server has answered.
+   *
+   * The button is offered only where the server's own rule allows the act, so
+   * the result is not in doubt: the new holder is drawn at once and the read
+   * that follows replaces it. A refusal puts the row back as it was and says
+   * so — silently keeping the optimistic answer would leave the list claiming
+   * a member holds something they do not.
+   */
+  const [moved, setMoved] = useState<Record<string, string | null>>({});
+  const [refused, setRefused] = useState<string | null>(null);
 
   /*
    * The queue re-reads itself whenever the record moves.
@@ -236,6 +354,14 @@ export default function Queue() {
    * what was there when it was bound.
    */
   const onScreen = useRef<QueueRow[]>([]);
+  /**
+   * And the act, for the same reason.
+   *
+   * The handler is bound once and this is rebuilt on every render, so a
+   * handler that closed over the first one would write from a stale reading of
+   * what has already been moved.
+   */
+  const onScreenTake = useRef<(row: QueueRow) => void>(() => {});
 
   useEffect(() => {
     if (column) return;
@@ -254,6 +380,27 @@ export default function Queue() {
        * screen does.
        */
       if (document.querySelector('[role="dialog"]')) return;
+
+      /*
+       * Take on the row the member is standing on.
+       *
+       * The line the keyboard is on is the focused one — `j` and `k` move
+       * focus between the lines and the line lights from that — so there is no
+       * second cursor to keep in step with the first. Read from the page for
+       * the same reason the digits are.
+       *
+       * It does exactly what the button does, from the same rule: where the
+       * row carries no act, this does nothing rather than reaching past it.
+       */
+      if (e.key === 't' && !e.shiftKey) {
+        const lines = [...document.querySelectorAll<HTMLAnchorElement>('a[data-line]')];
+        const at = lines.indexOf(document.activeElement as HTMLAnchorElement);
+        const standing = at === -1 ? undefined : onScreen.current[at];
+        if (!standing) return;
+        e.preventDefault();
+        onScreenTake.current(standing);
+        return;
+      }
 
       const n = Number(e.key);
       if (!Number.isInteger(n) || n < 1 || n > 9) return;
@@ -287,10 +434,28 @@ export default function Queue() {
     };
     /* `there` is a stable handle; re-reading is driven by the count alone. */
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [revision]);
+  }, [revision, again]);
 
   if (failed) return <ErrorText />;
   if (!rows) return <Loading />;
+
+  const keyOf = (r: QueueRow) => r.kind + ':' + r.id;
+
+  async function move(row: QueueRow, to: string | null) {
+    const at = keyOf(row);
+    setRefused(null);
+    setMoved((m) => ({ ...m, [at]: to }));
+    try {
+      await oversight.assign({ ofKind: row.kind, ofId: row.id, to });
+      setAgain((n) => n + 1);
+    } catch (e) {
+      setMoved((m) => {
+        const { [at]: _gone, ...rest } = m;
+        return rest;
+      });
+      setRefused(e instanceof Error && e.message ? e.message : t('hold.failed'));
+    }
+  }
 
   /**
    * Whether this row's next step is this member's own.
@@ -323,10 +488,38 @@ export default function Queue() {
     return false;
   };
 
-  const mineCount = rows.filter(mine).length;
-  const byOwner = onlyMine ? rows.filter(mine) : rows;
+  /*
+   * With what the member has just done to it, before the server has said so.
+   *
+   * Applied before the filters rather than at the row, because taking
+   * something on changes which list it belongs to: a row taken on under
+   * *everyone* has to move into *yours* at once, and one handed back has to
+   * leave. Drawn from the row that arrives next, so this lasts one read.
+   */
+  const asMoved = (r: QueueRow): QueueRow =>
+    keyOf(r) in moved ? { ...r, holder: moved[keyOf(r)] ?? undefined } : r;
+
+  const all = rows.map(asMoved);
+  const mineCount = all.filter(mine).length;
+  const byOwner = onlyMine ? all.filter(mine) : all;
   const shown = only === null ? byOwner : byOwner.filter((r) => r.phase === only);
   onScreen.current = shown;
+  /**
+   * What `t` does, decided from the same rule the button is drawn from.
+   *
+   * Taking on only: handing something back is a different act, and a key that
+   * did one thing on some rows and the opposite on others would be a key
+   * nobody could press without reading the row first.
+   */
+  onScreenTake.current = (row) => {
+    const can = holdingOf({
+      holdable: row.holdable,
+      holder: row.holder ?? null,
+      identity,
+      members: seated,
+    });
+    if (can?.mayMove && can.free && can.me) void move(row, can.me);
+  };
   const countOf = (p: QueuePhase) => byOwner.filter((r) => r.phase === p).length;
 
   /*
@@ -342,7 +535,7 @@ export default function Queue() {
   */
   const counts = (
     <div className="text-ui text-muted">
-          <span className="font-mono tabular-nums text-paper">{rows.length}</span>{' '}
+          <span className="font-mono tabular-nums text-paper">{all.length}</span>{' '}
           {t('needs.waiting')}
           {overdue > 0 && (
             <>
@@ -364,7 +557,7 @@ export default function Queue() {
           filters to the same list, and this application does not draw
           controls that cannot change anything.
         */}
-        {mineCount > 0 && mineCount < rows.length && (
+        {mineCount > 0 && mineCount < all.length && (
           /*
             A recess with the chosen one raised out of it, not a round chip.
 
@@ -395,7 +588,7 @@ export default function Queue() {
               >
                 {t(k ? 'needs.mine' : 'needs.everyone')}
                 <span className="ms-1.5 font-mono tabular-nums text-muted">
-                  {k ? mineCount : rows.length}
+                  {k ? mineCount : all.length}
                 </span>
               </Button>
             ))}
@@ -450,6 +643,22 @@ export default function Queue() {
 
   return (
     <ListPage title={t('needs.title')} says="" live={counts} filters={filters} limits={t('needs.limits')}>
+      {/*
+        A refusal, said on the screen the act was pressed on.
+
+        The button is only drawn where the rule allows the act, so this should
+        not happen — and when it does, the member is owed the server's own
+        words rather than a row that quietly snaps back.
+      */}
+      {refused && (
+        <p
+          role="alert"
+          className="mb-4 max-w-[62ch] rounded-xl bg-breachtint px-3.5 py-2.5 text-ui text-breach shadow-ringbreach"
+        >
+          {refused}
+        </p>
+      )}
+
       {shown.length === 0 ? (
         /*
           Three different emptinesses, and they are not the same claim.
@@ -462,7 +671,7 @@ export default function Queue() {
         */
         <Nothing>
           {t(
-            rows.length === 0
+            all.length === 0
               ? 'queue.nothing'
               : only === null && onlyMine
                 ? 'needs.noneMine'
@@ -472,7 +681,7 @@ export default function Queue() {
       ) : (
         <Sheet columns={COLS(t)}>
           {shown.map((r, i) => (
-            <Row key={r.kind + r.id} row={r} n={column ? undefined : i + 1} />
+            <Row key={keyOf(r)} row={r} n={column ? undefined : i + 1} onMove={move} />
           ))}
         </Sheet>
       )}

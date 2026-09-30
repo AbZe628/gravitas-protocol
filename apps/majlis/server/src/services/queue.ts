@@ -17,7 +17,15 @@ import { buildUndertakingPassage } from './passage-undertaking.js';
  * says what the thing is and how long it has waited, which is enough to find
  * it and open it, and the page it opens says what is wrong in its own words.
  */
-type FromPassage = { next: Say | null; whose: Whose | null; who?: string; holder?: string; heard?: string[] };
+/**
+ * What a row takes from its passage, named off the row itself.
+ *
+ * Written out by hand, it was a second list of the same fields: adding
+ * `holdable` to the row left this one behind and the field never arrived.
+ * Taken off `QueueRow`, a field added there has to be filled here or the
+ * compiler says so.
+ */
+type FromPassage = Pick<QueueRow, 'next' | 'whose' | 'who' | 'holder' | 'heard' | 'holdable'>;
 
 function nextOn(read: () => Passage): FromPassage {
   try {
@@ -35,6 +43,7 @@ function fromPassage(p: Passage): FromPassage {
     who: p.next?.who,
     holder: p.holder?.to ?? undefined,
     heard: p.next?.heard,
+    holdable: p.holdable,
   };
 }
 import { reviewStatus } from './review.js';
@@ -127,6 +136,16 @@ export interface QueueRow {
    * any more, however long the vote stays open for the others.
    */
   heard?: string[];
+  /**
+   * Whether anybody on this board could carry this at all.
+   *
+   * The passage has said so since it was written and the row never carried it,
+   * so the queue could not offer *take it on* without guessing — and guessing
+   * would have put the control on every breach waiting on the bank's own
+   * filing, where the route refuses it. A control that cannot be honoured is
+   * absent, not disabled, and this is the field that says which.
+   */
+  holdable?: boolean;
   /** How long it has stood here. Days, floored — never rounded up. */
   days: number;
   /** True where a clock has already run out. */

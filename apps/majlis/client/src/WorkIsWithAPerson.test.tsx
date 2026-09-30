@@ -138,6 +138,188 @@ describe('the queue', () => {
   });
 });
 
+/**
+ * Taking it on without leaving the list.
+ *
+ * ── what a member had to do instead ───────────────────────────────────────
+ *
+ * Nine rows saying what needs them, and taking one on meant opening it,
+ * finding the panel beside the work, pressing there, and coming back for the
+ * next. Triage is the one thing this screen is for and it was the one thing
+ * that could not be done on it.
+ *
+ * ── and the rule is the panel's, not a second one ─────────────────────────
+ *
+ * Written out twice, the row and the panel could disagree about whether a
+ * member may take something on. Both read `holdingOf`, which states the rule
+ * the route refuses on.
+ */
+describe('the act on the row', () => {
+  const show = () =>
+    render(
+      <I18nProvider>
+        <MemoryRouter>
+          <Queue />
+        </MemoryRouter>
+      </I18nProvider>,
+    );
+
+  it('offers taking on what nobody holds, and writes it against that row', async () => {
+    wire({ scholarId: 'member-b' }, [row({ title: 'Nobody has this', holdable: true })]);
+    show();
+
+    const take = await screen.findByRole('button', { name: /Take it on: Nobody has this/ });
+    fireEvent.click(take);
+    await waitFor(() => expect(posted).toHaveLength(1));
+    expect(posted[0]).toEqual({ ofKind: 'matter', ofId: 'm1', to: 'member-b' });
+  });
+
+  it('offers handing back what you hold, and puts it back to the room', async () => {
+    wire({ scholarId: 'member-b' }, [row({ title: 'Yours', holdable: true, holder: 'member-b' })]);
+    show();
+
+    fireEvent.click(await screen.findByRole('button', { name: /Hand it back to the board: Yours/ }));
+    await waitFor(() => expect(posted).toHaveLength(1));
+    expect(posted[0]).toEqual({ ofKind: 'matter', ofId: 'm1', to: null });
+  });
+
+  /*
+   * A control that cannot be honoured is absent, not disabled. Taking work out
+   * of a colleague's hands is not something one member does to another
+   * quietly, and the route refuses it.
+   */
+  it('draws nothing on work in a colleague’s hands', async () => {
+    wire({ scholarId: 'member-b' }, [
+      row({ title: 'With Căsim', holdable: true, holder: 'member-c', whose: 'board' }),
+    ]);
+    show();
+    await screen.findByText('With Căsim');
+    expect(screen.queryByRole('button', { name: /Take it on/ })).toBeNull();
+    expect(screen.queryByRole('button', { name: /Hand it back/ })).toBeNull();
+  });
+
+  /*
+   * The chair may move work out of anybody's hands: that is what the office
+   * is, and the route allows it. The row has to agree with the panel.
+   */
+  it('lets the chair hand back what a colleague holds', async () => {
+    wire({ scholarId: 'member-a', office: 'chair' }, [
+      row({ title: 'With Căsim', holdable: true, holder: 'member-c' }),
+    ]);
+    show();
+    fireEvent.click(await screen.findByRole('button', { name: /Hand it back to the board/ }));
+    await waitFor(() => expect(posted).toHaveLength(1));
+    expect(posted[0]).toEqual({ ofKind: 'matter', ofId: 'm1', to: null });
+  });
+
+  /*
+   * The passage has always said whether anything here could be carried at all.
+   * Without it the row would have offered *take it on* by guessing, which puts
+   * the control on work the route refuses.
+   */
+  it('draws nothing where nothing can be held', async () => {
+    wire({ scholarId: 'member-b' }, [row({ title: 'Not holdable', holdable: false })]);
+    show();
+    await screen.findByText('Not holdable');
+    expect(screen.queryByRole('button', { name: /Take it on/ })).toBeNull();
+  });
+
+  /* The bank's own people sit on the other side of the table. */
+  it('draws nothing for the institution’s liaison', async () => {
+    wire({ scholarId: 'liaison-1', role: 'liaison' }, [row({ title: 'A matter', holdable: true })]);
+    show();
+    await screen.findByText('A matter');
+    expect(screen.queryByRole('button', { name: /Take it on/ })).toBeNull();
+  });
+
+  /*
+   * Nine buttons all reading *Take it*: tabbing through them, or reading them
+   * aloud, gave the same two words nine times with nothing saying which line
+   * each belonged to.
+   */
+  it('says which row each act belongs to', async () => {
+    wire({ scholarId: 'member-b' }, [
+      row({ id: 'one', title: 'The first', holdable: true }),
+      row({ id: 'two', title: 'The second', holdable: true }),
+    ]);
+    show();
+    await screen.findByRole('button', { name: /Take it on: The first/ });
+    expect(screen.getByRole('button', { name: /Take it on: The second/ })).toBeTruthy();
+  });
+
+  /*
+   * Taking something on moves it between the two lists, and the row has to
+   * move with it before the server has answered — otherwise the member presses
+   * *take it* under *everyone* and watches nothing happen.
+   */
+  it('moves the row into your own list the moment you take it', async () => {
+    /*
+     * An advisory member, so the free row is not already theirs.
+     *
+     * Written with a signatory, every row was on *yours* before the press —
+     * the whose-filter is not drawn at all when everything is already yours —
+     * and the test passed without the row having moved anywhere.
+     */
+    wire({ scholarId: 'advisor-1', role: 'advisory' }, [
+      row({ id: 'mine', title: 'Already yours', who: 'advisor-1' }),
+      row({ id: 'free', title: 'Nobody has this', whose: 'signatory', holdable: true }),
+      /*
+       * A third, in somebody else's hands, so the whose-filter is still
+       * drawn after the press. With two rows everything became theirs, the
+       * filter stopped being offered at all, and the assertion could not be
+       * made either way.
+       */
+      row({ id: 'theirs', title: 'With Căsim', who: 'member-c' }),
+    ]);
+    show();
+
+    // Opens on *yours*, which the free signatory step is not part of.
+    await screen.findByText('Already yours');
+    fireEvent.click(screen.getByRole('button', { name: /Everyone/ }));
+    fireEvent.click(await screen.findByRole('button', { name: /Take it on: Nobody has this/ }));
+
+    fireEvent.click(screen.getByRole('button', { name: /Yours/ }));
+    await waitFor(() => expect(screen.getByText('Nobody has this')).toBeTruthy());
+  });
+
+  /*
+   * The button is drawn only where the rule allows the act, so a refusal
+   * should not happen — and when it does the member is owed the server's own
+   * words rather than a row that quietly snaps back.
+   */
+  it('puts the row back, and says why, when the server refuses', async () => {
+    wire({ scholarId: 'member-b' }, [row({ title: 'Nobody has this', holdable: true })]);
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
+        const url = String(input);
+        if (init?.method === 'POST' && url.includes('/api/assignments')) {
+          return Promise.resolve(
+            new Response(JSON.stringify({ message: 'Not yours to place.' }), { status: 403 }),
+          );
+        }
+        if (url.includes('/api/attention'))
+          return json({ scholarId: 'member-b', role: 'signatory', office: null, items: [] });
+        if (url.includes('/api/settings')) return json({ members: MEMBERS });
+        if (url.includes('/api/queue'))
+          return json({
+            asOf: '2026-09-20T00:00:00Z',
+            rows: [row({ title: 'Nobody has this', holdable: true })],
+            waiting: 1,
+            overdue: 0,
+          });
+        return json({});
+      }),
+    );
+    show();
+
+    fireEvent.click(await screen.findByRole('button', { name: /Take it on: Nobody has this/ }));
+    await screen.findByRole('alert');
+    // And the act is offered again, rather than the row claiming to be held.
+    expect(screen.getByRole('button', { name: /Take it on: Nobody has this/ })).toBeTruthy();
+  });
+});
+
 describe('the window, on a step placed with somebody', () => {
   const step = (over: Partial<PassageStep>): PassageStep => ({
     key: 'conditions',
