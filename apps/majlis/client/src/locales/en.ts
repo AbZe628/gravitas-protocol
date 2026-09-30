@@ -2052,6 +2052,23 @@ const en: Dict = {
   "agree.means": "Nothing is blocked. What changes is that the record can tell a board that waited from a board that did not.",
   "agree.did": "The period is on the record.",
   "agree.didMeans": "The vote is exactly where it was. Anybody who could close it before can close it now.",
+
+  // ── the chain of what replaced what ─────────────────────────────────
+  //
+  // The register page has always promised this sentence. Nothing in the
+  // application had ever replaced anything, so there was no chain to draw.
+  "chain.title": "What replaced what",
+  "chain.superseded": "Replaced — no longer in force",
+  "review.settled.superseded": "Replaced. The ruling that took its place carries the review from here.",
+  "chain.replaces": "Replaces",
+  "chain.replacedBy": "Replaced by",
+  "chain.restedOn": "What rested on this version",
+  "chain.restedOnLead": "Recorded while this version stood. Whether any of it has to be done again is the board\u2019s to say; this only lists what is affected.",
+  "chain.nothingRested": "Nothing was recorded against this version.",
+  "chain.kind.examination": "Examination",
+  "chain.kind.undertaking": "Undertaking",
+  "chain.kind.matter": "Matter",
+  "chain.sameTerms": "against the terms that were replaced",
   "meet.agendaMore": "Anything else, one item per line",
   "press.neverChased": "Nothing has been asked about it.",
   "press.chased": "Asked {times} times.",

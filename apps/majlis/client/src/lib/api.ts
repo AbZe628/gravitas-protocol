@@ -9,6 +9,16 @@ export interface Rule {
   parameterHashVerified?: boolean;
   version: number;
   inForceFrom: string | null;
+  /**
+   * The ruling that replaced this one, and the one this replaced.
+   *
+   * The server has sent both since the type was written, and the client type
+   * did not carry them — so the register page could say *the chain of what
+   * replaced what is drawn, not implied* while no screen could have drawn it
+   * even had there been a chain. There was none: no route wrote a rule.
+   */
+  supersededBy?: string | null;
+  supersedes?: string | null;
   sources: SourceRef[];
 }
 
@@ -128,6 +138,15 @@ export interface Matter extends MatterSummary {
    * recorded before it existed, which means nobody asked.
    */
   wantsTheRoom?: RoomCall[];
+  /**
+   * The ruling in force this matter would replace.
+   *
+   * There was no way to say it and no way for a ruling to be replaced at all:
+   * nothing ever wrote a rule, so a matter brought into force left its ruling
+   * inside itself and never reached *in force today*. The register page says
+   * *the chain of what replaced what is drawn, not implied* over no chain.
+   */
+  amends?: string;
   /**
    * Who may be named in this deliberation.
    *
@@ -2217,6 +2236,28 @@ export const oversight = {
    */
   seekAgreement: (matterId: string, said: { until: string; reason: string }, sending: Sending = {}) =>
     send<Matter>(`/api/matters/${matterId}/agreement`, said, 'POST', sending),
+
+  /**
+   * Say which ruling in force this matter would replace, or that it replaces none.
+   *
+   * Fixed once a vote opens: what a ruling replaces is part of what the board
+   * is voting on, and a matter that changed its target mid-vote would be a
+   * different question asked under the same positions.
+   */
+  setAmends: (matterId: string, amends: string | null, sending: Sending = {}) =>
+    send<Matter>(`/api/matters/${matterId}/amends`, { amends }, 'PUT', sending),
+
+  /**
+   * What rested on a ruling: examinations run under it, promises still owed,
+   * and the matters that set out to change it.
+   *
+   * Facts only. Whether an examination against replaced terms has to be run
+   * again is the board's to say, and nothing here carries a verdict field.
+   */
+  restedOn: (ruleId: string) => get<RestedOn>(`/api/rules/${ruleId}/rested-on`),
+
+  /** One ruling, for a screen holding an id that needs to read as a title. */
+  ruleNamed: (id: string) => get<Rule>(`/api/rules/${id}`),
   meeting: (id: string) => get<MeetingRow>(`/api/meetings/${id}`),
   convene: (input: { boardId: string; at: string; joinUrl?: string | null; agenda: AgendaItem[] }) =>
     /*
@@ -3049,6 +3090,19 @@ export interface Cadence {
  * the link between an agenda item and the matter where the decision lives
  * worked in the demonstration data and in nothing the application made.
  */
+export interface RestedOn {
+  ruleId: string;
+  supersededBy: string | null;
+  items: {
+    kind: 'examination' | 'undertaking' | 'matter';
+    id: string;
+    title: string;
+    at: string;
+    /** Whether it was recorded against the exact terms that were replaced. */
+    againstTheseTerms: boolean | null;
+  }[];
+}
+
 export interface Waiting {
   matterId: string;
   title: string;

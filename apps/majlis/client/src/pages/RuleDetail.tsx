@@ -11,6 +11,7 @@ import WhatItMeans from '../components/WhatItMeans.js';
 import { Nothing } from '../components/page.js';
 import { ActionPanel, Facts, RecordPage } from '../components/shapes.js';
 import { DateText, ErrorText, Loading, Section, Sources, Tag } from '../components/ui.js';
+import TheChain from '../components/TheChain.js';
 import WorkWindow, { type WorkPanel } from '../components/WorkWindow.js';
 
 /**
@@ -100,6 +101,17 @@ export default function RuleDetail() {
     <DateText iso={review.dueAt} />
   ) : noClock ? (
     t('review.notOnAClock')
+  ) : /*
+       Replaced, which is not the same as unanswered.
+
+       A ruling no longer in force read *no review scheduled* beside its facts
+       — the sentence for one nobody has decided about, on one the board has
+       already moved past. `review.ts` has said *superseded; the ruling that
+       replaced it carries the review* since it was written, and the page fell
+       through to the wrong one of three.
+     */
+  rule.supersededBy ? (
+    t('chain.superseded')
   ) : (
     t('review.unscheduled')
   );
@@ -111,11 +123,22 @@ export default function RuleDetail() {
   const maySayInterval = identity?.role === 'signatory';
   const dueNow = Boolean(review?.overdue) || review?.state === 'due';
 
-  const next = unscheduled
-    ? t('review.unscheduledNote')
-    : dueNow
-      ? t('rule.nextDue')
-      : t('rule.nextStands');
+  /*
+   * A replaced ruling does not stand, and nothing is due on it.
+
+   * The three sentences here were written when nothing in the application
+   * could replace a ruling, so *this stands, nothing is waiting on the board*
+   * was true of every record that could exist. It is now printed two inches
+   * under a chip reading **replaced — no longer in force**, on a ruling the
+   * board replaced the same afternoon. Found by replacing one and reading it.
+   */
+  const next = rule.supersededBy
+    ? t('review.settled.superseded')
+    : unscheduled
+      ? t('review.unscheduledNote')
+      : dueNow
+        ? t('rule.nextDue')
+        : t('rule.nextStands');
 
   const aside = (
     <>
@@ -168,14 +191,33 @@ export default function RuleDetail() {
       ) : (
         <Tag tone="warn">{t('rule.hashBad')}</Tag>
       )}
-      {review?.overdue ? <Tag tone="warn">{t('review.overdue')}</Tag> : null}
-      {unscheduled ? <Tag tone="warn">{t('review.unscheduled')}</Tag> : null}
+      {/*
+        Replaced, said at the top where the status is read.
+
+        The page carried *version 3* and *in force* on a ruling that had been
+        replaced, and said *replaced by* further down — the header and the
+        section under it disagreeing about whether the thing still stands.
+        Found by replacing a ruling and reading its page.
+      */}
+      {rule.supersededBy ? <Tag tone="warn">{t('chain.superseded')}</Tag> : null}
+      {review?.overdue && !rule.supersededBy ? <Tag tone="warn">{t('review.overdue')}</Tag> : null}
+      {unscheduled && !rule.supersededBy ? <Tag tone="warn">{t('review.unscheduled')}</Tag> : null}
     </>
   );
 
   /* The ruling's own text, after its statement: the six answers, the fingerprint, what it rests on. */
   const theRest = (
     <>
+      {/*
+        What replaced what, and what rested on the version that went.
+
+        The register page has always said *the chain of what replaced what is
+        drawn, not implied*, and nothing in the application had ever replaced
+        anything: no route wrote a rule, and `supersededBy` was read in five
+        services and set by none. Drawn only where there is a chain.
+      */}
+      <TheChain rule={rule} />
+
       {/*
         The terms are not listed here first.
 

@@ -474,6 +474,30 @@ export interface Matter {
    */
   seekingAgreement?: SeekingAgreement[];
 
+  /**
+   * The ruling in force this matter would replace.
+   *
+   * ── what there was before ─────────────────────────────────────────────────
+   *
+   * No way to say it, and no way for a ruling to be replaced at all. Nothing
+   * in the application ever wrote a rule: the register was the seed and only
+   * the seed, so a matter the board carried and brought into force left its
+   * ruling inside itself and never reached *in force today*. The same screen
+   * said both things two tabs apart — the restoration window listed as **in
+   * force** under *what we decided*, and **3 in force** beside it, without it.
+   *
+   * And `supersededBy` was read by five services and written by none. Two
+   * seeded rulings claim version 3 and version 2 with no predecessor in
+   * existence, and the register page says *the chain of what replaced what is
+   * drawn, not implied* over no chain at all.
+   *
+   * Set while the matter is being drafted or deliberated, and fixed once a
+   * vote opens: what a ruling replaces is part of what the board is voting on,
+   * and a matter that changed its target mid-vote would be a different
+   * question asked under the same positions.
+   */
+  amends?: string;
+
   /** What is proposed, in ordinary language. */
   proposal: string;
   /** What is expressly NOT being decided. Prevents narrow approvals being

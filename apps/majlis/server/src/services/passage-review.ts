@@ -166,7 +166,16 @@ export function buildReviewPassage(rule: Rule, now: string): Passage {
             : say('review.waiting.sinceInForce', { days }),
         }
       : null,
-    // A ruling in force is never settled. It stands until something changes it.
-    settled: null,
+    /*
+     * A ruling in force is never settled: it stands until something changes it.
+     *
+     * Something now can. Nothing had ever replaced a ruling — no route wrote
+     * one and `supersededBy` was set nowhere — so the comment was true of
+     * every record that could exist, and the screen said *this stands.
+     * Nothing is waiting on the board* over a ruling the board had replaced
+     * the same afternoon, two inches under a chip reading **replaced — no
+     * longer in force**. Found by replacing one and reading its page.
+     */
+    settled: rule.supersededBy ? say('review.settled.superseded') : null,
   };
 }

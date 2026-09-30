@@ -128,6 +128,27 @@ export interface Store {
    */
   updateRule(id: string, change: (current: Rule) => Rule): Promise<Rule>;
 
+  /**
+   * Write a ruling the board has brought into force into the register.
+   *
+   * ── the gap this closes ────────────────────────────────────────────────
+   *
+   * Nothing ever added a rule. The register was the seed and only the seed,
+   * so a matter the board carried, waited out the timelock on and brought
+   * into force left its ruling inside the matter and nowhere else. The
+   * application said both things at once, two tabs apart: *what we decided*
+   * listed the restoration window as **in force**, and *in force today* said
+   * **3 in force** and did not include it.
+   *
+   * And `supersededBy` was read by five services — the annual report's count
+   * at year end, the manual's split into current and superseded,
+   * `review.ts`, `export.ts`, `dossier.ts` — and written by none of them.
+   * Two seeded rulings claim to be version 3 and version 2 with no
+   * predecessor anywhere. The page says *the chain of what replaced what is
+   * drawn, not implied*, and there was no chain to draw.
+   */
+  createRule(rule: Rule): Promise<Rule>;
+
   // ── reported non-compliance ────────────────────────────────────────────
   //
   // Kept apart from matters because it is not one. A matter is a proposal to

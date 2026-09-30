@@ -151,6 +151,14 @@ export class MemoryStore implements Store {
     return copy(this._rules.find((r) => r.id === id) ?? null);
   }
 
+  async createRule(rule: Rule): Promise<Rule> {
+    if (this._rules.some((r) => r.id === rule.id)) {
+      throw new Error(`A ruling is already registered under "${rule.id}".`);
+    }
+    this._rules.push(copy(rule));
+    return copy(rule);
+  }
+
   async updateRule(id: string, change: (current: Rule) => Rule): Promise<Rule> {
     const index = this._rules.findIndex((r) => r.id === id);
     if (index === -1) throw new NotFound('Rule', id);

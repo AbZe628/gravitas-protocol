@@ -1,5 +1,5 @@
 import type {
-  Asset, Board, Institution, Matter, Briefing, Rule, Incident, Meeting } from '../types.js';
+  Asset, Board, Institution, Matter, Briefing, Rule, RuleParameter, Incident, Meeting } from '../types.js';
 import { hashParameters } from '../services/hash.js';
 
 /**
@@ -277,6 +277,24 @@ const proposedRatioRule = rule(
  * this ruling requires, which is exactly the condition that goes unnoticed
  * until an audit.
  */
+/** Lifted out so the ruling's own hash is computed from the terms it carries. */
+const poolParameters: RuleParameter[] = [
+  {
+    key: 'minTangibleRatioBps',
+    value: '5100',
+    unit: 'basis points',
+    meaning: 'Tangible assets and usufructs must be at least 51.00% of pool value.',
+    watches: { kind: 'tangible', bound: 'minimum' },
+  },
+  {
+    key: 'onBreach',
+    value: 'block_secondary_market_trades',
+    meaning:
+      'While the proportion is below the threshold, secondary transfers at market price do ' +
+      'not execute. Redemption at net asset value is unaffected.',
+  },
+];
+
 export const poolRuling: Matter = {
   id: 'matter-2026-04-02',
   boardId: 'demo-board',
@@ -400,23 +418,17 @@ export const poolRuling: Matter = {
     statement:
       'Units may be traded at market price only while tangible assets and usufructs are the ' +
       'majority of the value of the pool.',
-    parameters: [
-      {
-        key: 'minTangibleRatioBps',
-        value: '5100',
-        unit: 'basis points',
-        meaning: 'Tangible assets and usufructs must be at least 51.00% of pool value.',
-        watches: { kind: 'tangible', bound: 'minimum' },
-      },
-      {
-        key: 'onBreach',
-        value: 'block_secondary_market_trades',
-        meaning:
-          'While the proportion is below the threshold, secondary transfers at market price do ' +
-          'not execute. Redemption at net asset value is unaffected.',
-      },
-    ],
-    parameterHash: '',
+    parameters: poolParameters,
+    /*
+     * Computed, not blank.
+     *
+     * It was the empty string, so the one ruling this board actually carried
+     * reported its operative terms as unverified in its own written document
+     * — `verifyParameters` is exactly what a scholar compares against a filed
+     * copy, and it had nothing to compare. Found when the register entry this
+     * matter now writes was checked against the same rule as every other.
+     */
+    parameterHash: hashParameters(poolParameters),
     version: 1,
     inForceFrom: '2026-04-02T00:00:00Z',
     reviewEveryMonths: 6,
@@ -470,6 +482,31 @@ export const poolRuling: Matter = {
     },
   ],
 };
+
+/*
+ * The ruling `poolRuling` made, in the register where it belongs.
+ *
+ * ── the chain was broken at its first link ────────────────────────────────
+ *
+ * Both seeded examinations record `ruleId: 'rule-pool-trading'` — the rule as
+ * it stood, so that a later version cannot change what was tested. That rule
+ * was nowhere: it existed only inside the matter that proposed it, because
+ * nothing in the application ever wrote a ruling into the register. So the
+ * demonstration board shipped with two examinations against a ruling a reader
+ * could not open, and *in force today* did not list a ruling the same screen
+ * called in force one tab away.
+ *
+ * Pushed rather than written out again, so the register and the matter cannot
+ * drift into saying two different things about one ruling. `poolRuling` is
+ * declared above; matters carried into force from here on write their own
+ * entry, and this is the one that predates the code that does it.
+ */
+rules.push({
+  ...poolRuling.proposedRule,
+  inForceFrom: poolRuling.inForceAt,
+  supersededBy: null,
+  supersedes: null,
+});
 
 export const matters: Matter[] = [
   poolRuling,

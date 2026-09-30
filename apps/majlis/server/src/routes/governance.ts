@@ -32,6 +32,7 @@ import { z } from 'zod';
 import { mayAskForTheRoom, mayDeliberate, mayOpenMatter, mayVote } from '../auth/members.js';
 import { callForTheRoom } from '../services/meeting.js';
 import { seekAgreementUntil, standingOn } from '../services/consensus.js';
+import { entersTheRegister, whatRestedOn, NotRegistrable } from '../services/ruling-register.js';
 import {
   Refused,
   bringIntoForce,
@@ -97,7 +98,7 @@ import { buildQueue } from '../services/queue.js';
 import { buildInheritance, checklistStanding } from '../services/inherit.js';
 import type { Store } from '../store/index.js';
 import { compose, NoticeOff, type Notifier } from '../services/notice.js';
-import type { Deliberation, Matter, SourceKind, Structure } from '../types.js';
+import type { Deliberation, Matter, Rule, SourceKind, Structure } from '../types.js';
 import { PART_KINDS, SOURCE_KINDS } from '../types.js';
 
 /**
@@ -157,6 +158,8 @@ const openSchema = z.object({
 });
 
 const roomSchema = z.object({ wanted: z.boolean(), reason: z.string().min(1).max(20_000) });
+const amendsSchema = z.object({ amends: z.string().max(120).nullable() });
+
 const agreementSchema = z.object({
   until: z.string().min(4).max(40),
   reason: z.string().min(1).max(20_000),
@@ -350,6 +353,52 @@ function challengeOf(clientDataJSON: string): string {
     return typeof parsed.challenge === 'string' ? parsed.challenge : '';
   } catch {
     return '';
+  }
+}
+
+/**
+ * Write a ruling into the register once the board has brought it into force.
+ *
+ * ── both doors, or neither ────────────────────────────────────────────────
+ *
+ * A restriction is a ruling the moment the vote closes; a permit becomes one
+ * when its timelock ends. Two routes, two moments — and a register written
+ * from one of them would hold every permit this board ever made and not one
+ * restriction, which is worse than holding none, because the gap would look
+ * like a board that never restricted anything.
+ *
+ * It never fails the act. The board decided; the decision stands whether or
+ * not the bookkeeping behind it succeeded, and a route that returned an error
+ * here would tell a chair their ruling had not carried when it had. What it
+ * does instead is say so in the reply, beside the matter.
+ */
+async function intoTheRegister(
+  store: Store,
+  matter: Matter,
+  at: string,
+): Promise<{ registered: Rule | null; replaced: string | null; note: string | null }> {
+  try {
+    const entry = entersTheRegister(matter, await store.rules(matter.boardId), at);
+    if (!entry) return { registered: null, replaced: null, note: null };
+
+    const registered = await store.createRule(entry.rule);
+    if (entry.replaces) {
+      await store.updateRule(entry.replaces.id, (current) => ({
+        ...current,
+        supersededBy: entry.rule.id,
+      }));
+    }
+    return { registered, replaced: entry.replaces?.id ?? null, note: null };
+  } catch (e) {
+    return {
+      registered: null,
+      replaced: null,
+      note:
+        e instanceof NotRegistrable
+          ? e.message
+          : 'The ruling stands. It could not be written into the register of what is in force; ' +
+            'this needs a person to look at it.',
+    };
   }
 }
 
@@ -1445,7 +1494,16 @@ export function governanceRoutes(
           : null;
       const delivery = notice ? await notifier.deliver(notice, now()) : null;
 
-      res.json({ ...updated, outcome, notice, delivery });
+      /*
+       * Into the register, where the ruling actually took force.
+       *
+       * A restriction stands from this moment, so this is where its entry is
+       * written. A permit is written at the other door, when its timelock
+       * ends — see `/force`.
+       */
+      const register = outcome === 'in_force' ? await intoTheRegister(store, updated, now()) : null;
+
+      res.json({ ...updated, outcome, notice, delivery, register });
     }),
   );
 
@@ -1501,7 +1559,80 @@ export function governanceRoutes(
       });
       const delivery = await notifier.deliver(notice, now());
 
-      res.json({ ...updated, notice, delivery });
+      // The same register entry as at the other door. A permit becomes a
+      // ruling here, and a register written only from `/close` would hold
+      // every restriction this board made and not one permit.
+      const register = await intoTheRegister(store, updated, now());
+
+      res.json({ ...updated, notice, delivery, register });
+    }),
+  );
+
+  /**
+   * Say which ruling in force this matter would replace, or that it replaces none.
+   *
+   * ── why it is fixed once a vote opens ─────────────────────────────────────
+   *
+   * What a ruling replaces is part of what the board is voting on. A matter
+   * that changed its target mid-vote would be a different question asked under
+   * the same positions, and the members who had already voted would have voted
+   * on something else.
+   */
+  router.put(
+    '/matters/:id/amends',
+    handle(async (req, res) => {
+      const who = identityOf(req);
+      if (!requireRole(res, mayDeliberate(who.role), 'say what a matter amends', who.role)) return;
+
+      const parsed = amendsSchema.safeParse(req.body);
+      if (!parsed.success) return badRequest(res, parsed.error.issues);
+
+      const updated = await changeMatter(store, req, res, req.params.id, (matter) => {
+        if (!['draft', 'deliberation'].includes(matter.status)) {
+          throw new Refused(
+            'wrong_status',
+            `This matter is ${matter.status}. What a ruling replaces is part of what the board ` +
+              'votes on, so it is settled before the vote opens.',
+          );
+        }
+        if (parsed.data.amends === null) {
+          const { amends: _dropped, ...rest } = matter;
+          return rest as typeof matter;
+        }
+        return { ...matter, amends: parsed.data.amends };
+      });
+
+      if (updated) res.json(updated);
+    }),
+  );
+
+  /**
+   * What rested on a ruling: examinations run under it, promises still owed
+   * under it, and the matters that set out to change it.
+   *
+   * Put in front of the board when a ruling is replaced, because amending a
+   * standard changes what the institution is measured by. It says what is
+   * affected and nothing about whether any of it is now wrong — that is the
+   * board's to say, and an examination against replaced terms is reported as
+   * exactly that.
+   */
+  router.get(
+    '/rules/:id/rested-on',
+    handle(async (req, res) => {
+      const rule = await store.rule(req.params.id);
+      if (!rule) {
+        res.status(404).json({ error: 'not_found', message: 'No such ruling.' });
+        return;
+      }
+      res.json({
+        ruleId: rule.id,
+        supersededBy: rule.supersededBy,
+        items: whatRestedOn(rule, {
+          examinations: await store.examinations(rule.boardId),
+          undertakings: await store.undertakings(rule.boardId),
+          matters: await store.matters(rule.boardId),
+        }),
+      });
     }),
   );
 

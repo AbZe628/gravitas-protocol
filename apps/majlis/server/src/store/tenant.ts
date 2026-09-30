@@ -121,6 +121,13 @@ export class TenantStore implements Store {
     return (await this.owns(rule.boardId)) ? rule : null;
   }
 
+  async createRule(rule: Rule): Promise<Rule> {
+    // A ruling may only be registered against a board this institution owns,
+    // for the same reason it may not be moved to another one afterwards.
+    if (!(await this.owns(rule.boardId))) throw new OutsideInstitution('register a ruling on', rule.boardId);
+    return this.inner.createRule(rule);
+  }
+
   async updateRule(id: string, change: (current: Rule) => Rule): Promise<Rule> {
     const rule = await this.inner.rule(id);
     // Indistinguishable from a ruling that does not exist, deliberately.

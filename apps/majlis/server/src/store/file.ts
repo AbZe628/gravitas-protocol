@@ -310,6 +310,17 @@ export class FileStore implements Store {
     });
   }
 
+  async createRule(rule: Rule): Promise<Rule> {
+    return this.serialise(() => {
+      if (this.doc.rules.some((r) => r.id === rule.id)) {
+        throw new Error(`A ruling is already registered under "${rule.id}".`);
+      }
+      this.doc.rules.push(copy(rule));
+      this.persist();
+      return copy(rule);
+    });
+  }
+
   async updateRule(id: string, change: (current: Rule) => Rule): Promise<Rule> {
     return this.serialise(() => {
       const index = this.doc.rules.findIndex((r) => r.id === id);

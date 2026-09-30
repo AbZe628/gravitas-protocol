@@ -512,6 +512,7 @@ describe('api', () => {
 
       // What a matter is asked and what it rests on.
       'POST /api/matters/:id/agreement',
+  'PUT /api/matters/:id/amends',
   'POST /api/matters/:id/asked',
       'POST /api/matters/:id/asked/:questionId/answer',
       'POST /api/matters/:id/sources',
