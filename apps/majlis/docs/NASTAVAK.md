@@ -319,11 +319,55 @@ ijedne rečenice.
 - Pazi: `test/reading-is-quiet.test.ts` — nijedno čitanje ne smije pisati.
   Provjereno: prolazi.
 
-### 4.4 · RED 5 + P5 — sam ili u sobi, konsenzus (IFSB-10)
-- Svaka stvar se može označiti *treba sobu* → dnevni red sjednice se sam složi.
-- Glasanje prvo pokazuje konsenzus (*4 od 5 saglasna, jedan nije odgovorio* —
-  `heard`/`waitingOn` već postoje), odbor postavlja razuman rok, poslije
-  kojeg većina; zapis kaže da je odluka većinska jer konsenzusa nije bilo.
+### 4.4 · RED 5 + P5 — sam ili u sobi, konsenzus (IFSB-10) ✅ (30. 9. 2026)
+
+**RED 5 — `25769d5`.** Predsjedavajući je dnevni red kucao u okvir, jednu
+stavku po redu, napamet. Predmeti koji bi dobili sjednicu bili su oni kojih
+se tog dana sjetio, a član koji je smatrao da se nešto ne može riješiti
+pisanim putem nije imao gdje to reći u zapisu.
+
+Gore od toga: **otipkani red je gubio vezu.** `AgendaItem` nosi `matterId`
+otkad je napisan, ruta odbija onaj koji nije pred ovim odborom, a ekran svaku
+takvu stavku crta kao vezu — a forma je od svakog reda pravila `{ item }` i
+nikad `matterId`. Ta veza je radila u demo podacima i ni u čemu što je
+aplikacija sama napravila. Nađeno pritiskom na *convene a meeting*.
+
+- Traženje sobe je stav s razlogom, kao svaki drugi ovdje, i **ne saziva
+  ništa** — predsjedavajući saziva. Razlog je obavezan: to je ono što ostatak
+  odbora čita prije sjednice.
+- Dodaje se, ne mijenja, pa se čita i zašto je nešto skinuto s reda. Svaki
+  član se broji jednom koliko god puta promijenio mišljenje.
+- Odborovi ljudi smiju. Ne veza s bankom — banka koja može stavljati tačke na
+  odborov dnevni red određuje odborov posao. Savjetodavni član smije.
+- Ništa nije unaprijed označeno; predmet koji je već na sazvanoj sjednici to
+  kaže umjesto da ispadne s liste.
+
+**P5 — `85552cb`.** Glasanje je pisalo *2 of 2 · Threshold met* i ispod toga
+*Close the vote*, na odboru od pet gdje troje nije reklo ništa. Pisana presuda
+je bila jednako slijepa: za, protiv, suzdržani, traženi i zabilježeni kvorum —
+i nijedan način da se vidi da tri potpisnika nikad nisu odgovorila.
+
+- Novo čitanje `services/consensus.ts`: **saglasnost** (svi rekli, svi za) ili
+  **većina**. Ne odbija ništa — kvorum je odborov i fiksiran kad je pitanje
+  postavljeno.
+- **Šutnja nije protivljenje.** Zasebno stanje, i imenovano imenima, ne brojem:
+  presuda kojoj se troje nije htjelo pridružiti i presuda koju troje nikad nije
+  vidjelo nisu ista stvar.
+- Odbor može dati rok do datuma. I on ne zaustavlja ništa; stavlja datum na
+  namjeru, da *odlučeno drugi dan* i *odlučeno poslije dvije sedmice traženja*
+  prestanu biti isti zapis.
+- Presuda sad kaže **Decided by agreement** ili **Decided by majority**, s
+  imenima onih koji nisu odgovorili.
+
+Nađeno čitanjem izlaza: presuda je pisala *2 signatories recorded no position:
+member-d, member-e* — ključevi iz konfiguracije u zapečaćenom dokumentu, jer je
+crtač imena tražio među potpisima, a ko nije glasao nije ni u jednom potpisu.
+
+I još dva na istom prolazu: ekran sjednica je crtao *Not accounted for:
+member-a, member-b…* ispod istih sedam ljudi imenom (stražar za imena držao je
+ručnu listu polja i to polje nije bilo u njoj — sad glasno trune); a
+predsjedavajući koji je otkucao 14:00 dobio je obavijest za slanje koja piše
+13:00 bez ijedne oznake zone.
 
 ### 4.5 · RED 6 + 7 — izmjena uvjeta otvara reviziju; lanac
 - Amandman: nabrojati sve presuđeno po zamijenjenoj verziji i to staviti
