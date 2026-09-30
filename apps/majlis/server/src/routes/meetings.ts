@@ -38,6 +38,7 @@ import {
   recordAttendance,
   stateOf,
   unaccountedFor,
+  waitingForTheRoom,
   writeMinute,
   type ConveneInput,
 } from '../services/meeting.js';
@@ -119,6 +120,17 @@ export function meetingRoutes(
           })),
         attendance: attendanceAcross(meetings, board),
         cadence: cadence(meetings, board.id, at),
+        /*
+         * What is waiting for a room, so the form that convenes one is not an
+         * empty box.
+         *
+         * Served here rather than from its own route because the screen that
+         * needs it is this one, and a second call would mean the agenda
+         * arrived after the form the chair is already typing into.
+         *
+         * It proposes and does not convene: the chair takes what they take.
+         */
+        waiting: waitingForTheRoom(await store.matters(board.id), meetings, board.id, at),
       });
     }),
   );

@@ -36,7 +36,7 @@
  */
 
 import { Refused } from './lifecycle.js';
-import type { AgendaItem, Attendance, Board, Meeting } from '../types.js';
+import type { AgendaItem, Attendance, Board, Matter, MatterStatus, Meeting, RoomCall } from '../types.js';
 
 export type MeetingRefusal =
   | 'already_closed'
@@ -45,7 +45,11 @@ export type MeetingRefusal =
   | 'not_on_this_board'
   | 'no_such_matter'
   | 'nothing_recorded'
-  | 'not_yet_held';
+  | 'not_yet_held'
+  | 'already_settled'
+  | 'no_reason_given'
+  | 'already_asked'
+  | 'not_asked';
 
 function refuse(code: MeetingRefusal, message: string): never {
   throw new Refused(code as never, message);
@@ -53,6 +57,12 @@ function refuse(code: MeetingRefusal, message: string): never {
 
 /** Long enough that "met" is not a minute. */
 const MIN_MINUTE_CHARS = 40;
+
+/** Long enough that "needs discussion" is not a reason. */
+const MIN_REASON_CHARS = 20;
+
+/** The statuses where nothing is left to take into a room. */
+const SETTLED_STATUSES: readonly MatterStatus[] = ['in_force', 'rejected', 'withdrawn', 'lapsed'];
 
 export interface ConveneInput {
   boardId: string;
@@ -249,6 +259,148 @@ export function nextConvened(meetings: Meeting[], boardId: string, now: string):
     .filter((m) => m.boardId === boardId && !m.closedAt && m.at >= now)
     .sort((a, b) => a.at.localeCompare(b.at));
   return ahead[0] ?? null;
+}
+
+// ── what needs the room ───────────────────────────────────────────────────
+
+/**
+ * The ask that stands on a matter, or null where none does.
+ *
+ * The last entry, as everywhere else here: a member who asked and then
+ * thought better of it added a second, and what stands is what they said
+ * last. Never the count of entries — a member who changed their mind twice
+ * would otherwise read as three people wanting a sitting.
+ */
+export function roomCallOn(matter: Matter): RoomCall | null {
+  const calls = matter.wantsTheRoom ?? [];
+  const last = calls.length > 0 ? calls[calls.length - 1] : null;
+  return last?.wanted ? last : null;
+}
+
+/** Everyone who has asked and not taken it back, once each, in the order they asked. */
+export function askedForTheRoom(matter: Matter): string[] {
+  const standing = new Map<string, boolean>();
+  for (const c of matter.wantsTheRoom ?? []) standing.set(c.by, c.wanted);
+  return [...standing.entries()].filter(([, wanted]) => wanted).map(([who]) => who);
+}
+
+/**
+ * Say that a matter needs the board in a room, or take that back.
+ *
+ * ── it does not convene anything ──────────────────────────────────────────
+ *
+ * Asking for the room is not calling a meeting. The chair convenes, and what
+ * this writes down is that somebody on the board believes this one cannot be
+ * settled in writing — which is a position, with a reason, like every other
+ * position here. A system where any member could put a date in everyone's
+ * calendar would not be a board.
+ *
+ * ── and the reason is not optional ────────────────────────────────────────
+ *
+ * *Needs discussion* on its own is the agenda item nobody prepares for. The
+ * sentence a member writes here is what the rest of the board reads before
+ * the sitting, and is the whole difference between an agenda and a list of
+ * titles.
+ */
+export function callForTheRoom(
+  matter: Matter,
+  said: { wanted: boolean; by: string; reason: string },
+  at: string,
+): Matter {
+  if (SETTLED_STATUSES.includes(matter.status)) {
+    refuse(
+      'already_settled',
+      'This matter is settled. A sitting cannot reopen it — that takes a fresh matter, ' +
+        'which is what makes the first decision still readable.',
+    );
+  }
+
+  const why = (said.reason ?? '').trim();
+  if (why.length < MIN_REASON_CHARS) {
+    refuse(
+      'no_reason_given',
+      `Asking for the room needs a written reason of at least ${MIN_REASON_CHARS} characters. ` +
+        'It is what the board reads before the sitting.',
+    );
+  }
+
+  const calls = matter.wantsTheRoom ?? [];
+  const standing = calls.filter((c) => c.by === said.by).pop() ?? null;
+  const asked = standing?.wanted === true;
+
+  if (said.wanted && asked) {
+    refuse('already_asked', 'You have already asked for this to be taken in a room.');
+  }
+  if (!said.wanted && !asked) {
+    refuse('not_asked', 'You have not asked for this to be taken in a room, so there is nothing to withdraw.');
+  }
+
+  return {
+    ...matter,
+    wantsTheRoom: [...calls, { wanted: said.wanted, by: said.by, at, reason: why }],
+  };
+}
+
+/** A matter waiting for a room, and what a board needs to see beside it. */
+export interface Waiting {
+  matterId: string;
+  title: string;
+  status: string;
+  /** Everyone whose ask stands, for the screen to name. Never a count. */
+  asked: string[];
+  /** Why the last of them asked. */
+  reason: string;
+  since: string;
+  /** Where it is already on a sitting still to be held. */
+  convenedFor: string | null;
+}
+
+/**
+ * The agenda that assembles itself: what is waiting for a room, and where.
+ *
+ * ── what it will not do ───────────────────────────────────────────────────
+ *
+ * It proposes; it does not convene, and it does not order the sitting. The
+ * chair takes what they take. A list that quietly became the agenda would be
+ * this file setting the board's business, and a matter nobody asked about
+ * would then have to be argued off a machine's list rather than onto a
+ * chair's.
+ *
+ * ── and it says what is already down ──────────────────────────────────────
+ *
+ * A matter already on a convened sitting still to be held carries that date
+ * rather than dropping out. Dropping it would let a chair convene twice for
+ * the same thing and see nothing amiss; carrying the date lets them see it
+ * and decide.
+ */
+export function waitingForTheRoom(
+  matters: readonly Matter[],
+  meetings: readonly Meeting[],
+  boardId: string,
+  now: string,
+): Waiting[] {
+  const ahead = meetings.filter((m) => m.boardId === boardId && !m.closedAt && m.at >= now);
+  const downFor = new Map<string, string>();
+  for (const m of ahead) {
+    for (const item of m.agenda) {
+      if (item.matterId && !downFor.has(item.matterId)) downFor.set(item.matterId, m.at);
+    }
+  }
+
+  return matters
+    .filter((m) => m.boardId === boardId)
+    .map((m) => ({ matter: m, call: roomCallOn(m) }))
+    .filter((x): x is { matter: Matter; call: RoomCall } => x.call !== null)
+    .sort((a, b) => a.call.at.localeCompare(b.call.at))
+    .map(({ matter, call }) => ({
+      matterId: matter.id,
+      title: matter.title,
+      status: matter.status,
+      asked: askedForTheRoom(matter),
+      reason: call.reason,
+      since: call.at,
+      convenedFor: downFor.get(matter.id) ?? null,
+    }));
 }
 
 /**

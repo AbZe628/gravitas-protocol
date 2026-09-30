@@ -191,7 +191,21 @@ export function compose(board: Board, event: NoticeEvent): Notice {
   }
 
   if (event.kind === 'meeting_convened') {
-    const when = event.at.replace('T', ' ').slice(0, 16);
+    /*
+     * The hour, with the zone it is in.
+     *
+     * The record holds an instant, which is right, and this printed it raw:
+     * a chair in Sarajevo typed 14:00 into the form, pressed convene, and the
+     * notice they were about to send read *2026-11-12 13:00* with nothing
+     * beside it. Found by convening a sitting and reading the words the
+     * screen offered to copy.
+     *
+     * Said as UTC rather than converted. This process has no idea what zone
+     * the board sits in, and a converted hour would be this file guessing at
+     * one — which is worse than an hour that says which it is, on a board
+     * whose members are routinely in three countries.
+     */
+    const when = event.at.replace('T', ' ').slice(0, 16) + ' UTC';
     return {
       subject: `${board.name} will sit on ${event.at.slice(0, 10)}`,
       body:

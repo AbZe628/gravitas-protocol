@@ -430,6 +430,23 @@ export function mayConvene(office?: Office): boolean {
 }
 
 /**
+ * Who may say a matter needs the board in a room.
+ *
+ * The board's own people. Not the liaison: they are the institution's person
+ * here, and a bank that could put items on the board's agenda would be
+ * setting the board's business. A liaison with something urgent already has a
+ * door — a submission, which the board disposes of itself.
+ *
+ * An advisory member may, although they do not vote. Saying *this one cannot
+ * be settled in writing* is a view about how the board should work, not a
+ * vote on the answer, and an advisory member who could not say it would be an
+ * adviser nobody had to hear.
+ */
+export function mayAskForTheRoom(role: Role): boolean {
+  return role === 'signatory' || role === 'advisory';
+}
+
+/**
  * Who may press the institution on a step the institution owes.
  *
  * A signatory, or the secretary. Wider than most acts here on purpose:

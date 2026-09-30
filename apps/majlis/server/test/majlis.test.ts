@@ -521,7 +521,8 @@ describe('api', () => {
       'POST /api/matters/:id/reading',
 
       // Signing the written decision, and asking to sign it with a device.
-      'POST /api/matters/:id/sign',
+      'POST /api/matters/:id/room',
+  'POST /api/matters/:id/sign',
       'POST /api/matters/:id/sign/request',
 
       // Reported non-compliance, and what follows a finding.

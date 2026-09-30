@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import {
   api,
   oversight,
+  type AgendaItem,
   type Attendance,
   type Board,
   type Delivery,
@@ -330,7 +331,13 @@ function MeetingCard({
             */}
             {row.unaccountedFor.length > 0 && (
               <p className="mt-1.5 text-note leading-relaxed text-muted">
-                {t('meet.unaccounted')}: {row.unaccountedFor.join(', ')}
+                {t('meet.unaccounted')}:{' '}
+                {row.unaccountedFor.map((who, k) => (
+                  <span key={who}>
+                    {k > 0 ? <span className="mx-1.5 opacity-40">·</span> : null}
+                    <Person id={who} />
+                  </span>
+                ))}
               </p>
             )}
           </div>
@@ -446,6 +453,15 @@ export default function Meetings() {
   const [at, setAt] = useState('');
   const [joinUrl, setJoinUrl] = useState('');
   const [agenda, setAgenda] = useState('');
+  /**
+   * The waiting matters the chair is taking into this sitting.
+   *
+   * Nothing is ticked to begin with. A list that arrived pre-selected would be
+   * this screen setting the board's business — the agenda proposes, the chair
+   * convenes — and a chair who pressed without reading would convene around
+   * items nobody chose.
+   */
+  const [taking, setTaking] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   const load = () =>
@@ -497,11 +513,28 @@ export default function Meetings() {
    * One item per line. A board writing an agenda is writing a list, and a
    * form with an "add item" button for each line is a form nobody finishes.
    */
-  const agendaItems = agenda
-    .split('\n')
-    .map((line) => line.trim())
-    .filter((line) => line !== '')
-    .map((item) => ({ item }));
+  const waiting = data?.waiting ?? [];
+
+  /*
+   * The picked matters first, each carrying the id of the matter it is about.
+   *
+   * `AgendaItem` has had `matterId` since it was written, the convene route
+   * refuses one that is not before this board, and the agenda draws each item
+   * that has one as a link to it — and this form built `{ item }` from typed
+   * lines and never set it. So the link between an agenda item and the matter
+   * where the decision actually lives worked in the seeded meetings and in
+   * nothing the application itself had ever made.
+   */
+  const agendaItems: AgendaItem[] = [
+    ...waiting
+      .filter((w) => taking.includes(w.matterId))
+      .map((w) => ({ matterId: w.matterId, item: w.title })),
+    ...agenda
+      .split('\n')
+      .map((line) => line.trim())
+      .filter((line) => line !== '')
+      .map((item) => ({ item })),
+  ];
 
   /*
    * What the sitting still needs, in the order the form asks for it. These
@@ -647,9 +680,68 @@ export default function Meetings() {
             />
           </label>
 
+          {/*
+            What the board has said needs a room, ready to be taken.
+
+            The agenda that assembles itself. Each line carries the matter it
+            is about, so the sitting links back to where the decision lives —
+            which is what the record has always been shaped for and what this
+            form never sent.
+
+            Why each one was asked for, in the member's own words, because that
+            is what the rest of the board reads before the sitting: an agenda of
+            bare titles is a list nobody prepares for.
+          */}
+          {waiting.length > 0 && (
+            <div className="mb-3">
+              <span className="mb-1.5 block text-label font-bold uppercase tracking-caps text-muted">
+                {t('room.waiting')}
+              </span>
+              <ul className="space-y-2">
+                {waiting.map((w) => (
+                  <li key={w.matterId}>
+                    <label className="flex gap-2.5">
+                      <input
+                        type="checkbox"
+                        className="mt-1 h-4 w-4 shrink-0"
+                        checked={taking.includes(w.matterId)}
+                        onChange={(e) =>
+                          setTaking((was) =>
+                            e.target.checked ? [...was, w.matterId] : was.filter((x) => x !== w.matterId),
+                          )
+                        }
+                      />
+                      <span className="min-w-0">
+                        <span className="block text-ui leading-snug text-paper">{w.title}</span>
+                        <span className="block text-note leading-relaxed text-muted">
+                          {t('room.askedBy')}{' '}
+                          {w.asked.map((who, k) => (
+                            <span key={who}>
+                              {k > 0 ? <span className="mx-1 opacity-40">·</span> : null}
+                              <Person id={who} />
+                            </span>
+                          ))}
+                          {' · '}
+                          {w.reason}
+                        </span>
+                        {/* Already down for a sitting: said, not hidden, or a
+                            chair convenes twice for the same thing. */}
+                        {w.convenedFor && (
+                          <span className="block text-note leading-relaxed text-breach">
+                            {t('room.alreadyDown')} <DateText iso={w.convenedFor} />
+                          </span>
+                        )}
+                      </span>
+                    </label>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           <label className="mb-2.5 block">
             <span className="mb-1 block text-label font-bold uppercase tracking-caps text-muted">
-              {t('meet.agenda')}
+              {t(waiting.length > 0 ? 'meet.agendaMore' : 'meet.agenda')}
             </span>
             <textarea
               value={agenda}

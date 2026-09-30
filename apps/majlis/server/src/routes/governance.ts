@@ -29,7 +29,8 @@ import {
   type Expected,
 } from '../auth/passkeys.js';
 import { z } from 'zod';
-import { mayDeliberate, mayOpenMatter, mayVote } from '../auth/members.js';
+import { mayAskForTheRoom, mayDeliberate, mayOpenMatter, mayVote } from '../auth/members.js';
+import { callForTheRoom } from '../services/meeting.js';
 import {
   Refused,
   bringIntoForce,
@@ -153,6 +154,8 @@ const openSchema = z.object({
    */
   assetIds: z.array(z.string().min(1).max(120)).max(20).default([]),
 });
+
+const roomSchema = z.object({ wanted: z.boolean(), reason: z.string().min(1).max(20_000) });
 
 const saySchema = z.object({
   body: z.string().min(1).max(20_000),
@@ -552,6 +555,42 @@ export function governanceRoutes(
       };
 
       res.status(201).json(await store.createMatter(matter));
+    }),
+  );
+
+  /**
+   * Say that this one needs the board in a room, or take that back.
+   *
+   * ── it does not convene ───────────────────────────────────────────────────
+   *
+   * The chair convenes. What this records is that somebody on the board
+   * believes this cannot be settled in writing, with the reason the rest of
+   * them will read before the sitting — a position, like every other position
+   * here, and not a date in anybody's calendar.
+   *
+   * ── who may, and who may not ─────────────────────────────────────────────
+   *
+   * The board's own people: a signatory or an advisory member. Not the
+   * liaison, who is the institution's person here — a bank that could put
+   * items on the board's agenda would be setting the board's business, and the
+   * liaison already has a door of their own for raising a question.
+   */
+  router.post(
+    '/matters/:id/room',
+    handle(async (req, res) => {
+      const who = identityOf(req);
+      if (!requireRole(res, mayAskForTheRoom(who.role), 'ask for a matter to be taken in a room', who.role)) {
+        return;
+      }
+
+      const parsed = roomSchema.safeParse(req.body);
+      if (!parsed.success) return badRequest(res, parsed.error.issues);
+
+      const at = now();
+      const updated = await changeMatter(store, req, res, req.params.id, (matter) =>
+        callForTheRoom(matter, { ...parsed.data, by: who.scholarId }, at),
+      );
+      if (updated) res.json(updated);
     }),
   );
 

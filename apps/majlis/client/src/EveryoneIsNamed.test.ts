@@ -54,8 +54,24 @@ const PERSON = ['scholarId', 'by', 'recordedBy', 'reportedBy', 'decidedBy', 'ask
  * member-c, member-d, member-e*. Of every line on that screen it is the one
  * where knowing who it is has a use — somebody has to be asked — and it was
  * the one line that did not say.
+ *
+ * ── this list is where the guard is weakest ───────────────────────────────
+ *
+ * It is kept by hand, so it watches the lists somebody remembered to add and
+ * is silent about the rest. `unaccountedFor` proved it: the meetings screen
+ * drew *Not accounted for, and not assumed absent: member-a, member-b,
+ * member-c…* directly beneath the same seven people listed by name, through a
+ * `.join` this file already knew how to see — and the field was not in this
+ * list, so nothing looked. Found by opening the screen.
+ *
+ * There is no honest way to derive the list from the types: a `string[]` named
+ * `sources` and one named `asked` look identical to a scanner. So the list
+ * stays by hand and `every name here is a field somebody draws` below makes it
+ * rot loudly instead of quietly — a name that no longer appears anywhere is a
+ * field that was renamed, and a renamed field is exactly how this stops
+ * watching.
  */
-const PEOPLE = ['endorsedBy', 'heard', 'outstanding', 'waitingOn'];
+const PEOPLE = ['asked', 'endorsedBy', 'heard', 'outstanding', 'unaccountedFor', 'waitingOn'];
 
 const chain = String.raw`[A-Za-z_$][\w$]*(?:\??\.[A-Za-z_$][\w$]*)*\??\.`;
 const field = `(?:${PERSON.join('|')})`;
@@ -154,6 +170,25 @@ describe('a person is drawn by name', () => {
       .map((x) => `${x.file}: ${x.hits.join(', ')}`);
 
     expect(wrong).toEqual([]);
+  });
+
+  /*
+   * The hand-kept list, kept honest.
+   *
+   * `PEOPLE` watches the lists somebody remembered to add, and a field that
+   * is renamed simply stops being watched — silently, which is the only way
+   * this guard can fail. So every name in it has to be a field some screen
+   * actually reads. `unaccountedFor` was drawn through a `.join` this file
+   * already knew how to see, on a screen it already walked, and was missed
+   * only because the name was not in the list.
+   */
+  it('watches only fields that exist, so a rename fails here and not silently', () => {
+    const root = join(__dirname);
+    const sources = screens(root).map((f) => readFileSync(f, 'utf8'));
+    for (const name of PEOPLE) {
+      const used = sources.some((src) => src.includes('.' + name));
+      expect(used, `no screen reads "${name}" any more; it was renamed or dropped`).toBe(true);
+    }
   });
 
   it('still sees every exception, or an exception hides nothing', () => {

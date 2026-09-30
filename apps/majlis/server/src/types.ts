@@ -430,6 +430,30 @@ export interface Matter {
    */
   settledAt?: string;
 
+  /**
+   * Who has said this needs the board in a room, and who has taken that back.
+   *
+   * ── why a matter carries this and a meeting does not ──────────────────────
+   *
+   * The chair typed the agenda into a box, one item to a line, from memory.
+   * Nothing in the application knew which matters wanted a sitting, so the
+   * ones that got one were the ones the chair happened to think of on the day
+   * — and a member who believed something could not be settled in writing had
+   * nowhere to say so except by asking the chair outside the record.
+   *
+   * Worse, the typed line lost the link. `AgendaItem` carries a `matterId`
+   * and `convene` refuses one that is not before this board, and the seeded
+   * meetings have them — but the form built `{ item }` from each line and
+   * never a `matterId`, so no agenda item the application itself ever made
+   * carried one. The link worked in the demonstration data and nowhere else.
+   *
+   * Append-only, like every other list here. A member who asks and then
+   * thinks better of it adds a second entry; what stands is the last, and why
+   * a matter came off the agenda is as much a part of the record as why it
+   * went on.
+   */
+  wantsTheRoom?: RoomCall[];
+
   /** What is proposed, in ordinary language. */
   proposal: string;
   /** What is expressly NOT being decided. Prevents narrow approvals being
@@ -946,6 +970,21 @@ export interface AgendaItem {
   /** Set where the item is a matter already before the board. */
   matterId?: string;
   item: string;
+}
+
+/**
+ * One member asking for the board to sit on a matter, or taking that back.
+ *
+ * `wanted` rather than two lists, because taking it back is the same kind of
+ * act as asking and belongs in the same order. A reason either way: the next
+ * board reads *why was this discussed in a room* and *why was it taken off*
+ * from the same place.
+ */
+export interface RoomCall {
+  wanted: boolean;
+  by: string;
+  at: string;
+  reason: string;
 }
 
 export interface Attendance {

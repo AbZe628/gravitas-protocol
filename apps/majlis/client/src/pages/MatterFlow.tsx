@@ -22,6 +22,7 @@ import AfterAct from '../components/AfterAct.js';
 import TheNotice from '../components/TheNotice.js';
 import StepWindow, { type Step } from '../components/StepWindow.js';
 import Holding from '../components/Holding.js';
+import NeedsTheRoom from '../components/NeedsTheRoom.js';
 import TheCalculator from '../components/TheCalculator.js';
 import AskTheBank from '../components/AskTheBank.js';
 import WhatTheySent from '../components/WhatTheySent.js';
@@ -594,6 +595,17 @@ function lastSaid(
           <Holding passage={passage} onChanged={load} ruled={false} />
         </div>
       )}
+
+      {/*
+        Whether this one can be settled in writing at all.
+
+        Beside who is carrying it, because it is the same kind of question
+        about the whole matter rather than about the step in front of you.
+        There was nowhere to say it: the chair typed the agenda from memory,
+        so a member who wanted the board in a room asked outside the record or
+        did not ask.
+      */}
+      <NeedsTheRoom matter={matter} onSaid={load} />
       <div className="mb-1.5 text-label font-bold uppercase tracking-caps text-muted">
         {t('flow.theQuestion')}
       </div>

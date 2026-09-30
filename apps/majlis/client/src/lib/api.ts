@@ -111,8 +111,23 @@ export interface Reasoning {
   releasedAt?: string | null;
 }
 
+/** One member asking for the board to sit on a matter, or taking that back. */
+export interface RoomCall {
+  wanted: boolean;
+  by: string;
+  at: string;
+  reason: string;
+}
+
 export interface Matter extends MatterSummary {
   boardId: string;
+  /**
+   * Who has said this needs the board in a room, and who has taken it back.
+   *
+   * Append-only; what stands is each member's last entry. Absent on matters
+   * recorded before it existed, which means nobody asked.
+   */
+  wantsTheRoom?: RoomCall[];
   /**
    * Who may be named in this deliberation.
    *
@@ -2153,6 +2168,16 @@ export const oversight = {
     send<Extraction>(`/api/matters/${matterId}/sources/${sourceId}/extract`, { fields }),
 
   meetings: () => get<Meetings>('/api/meetings'),
+
+  /**
+   * Say a matter needs the board in a room, or take that back.
+   *
+   * It convenes nothing. The chair convenes; this records that somebody on
+   * the board believes this one cannot be settled in writing, and why — which
+   * is what the rest of them read before the sitting.
+   */
+  askForTheRoom: (matterId: string, said: { wanted: boolean; reason: string }, sending: Sending = {}) =>
+    send<Matter>(`/api/matters/${matterId}/room`, said, 'POST', sending),
   meeting: (id: string) => get<MeetingRow>(`/api/meetings/${id}`),
   convene: (input: { boardId: string; at: string; joinUrl?: string | null; agenda: AgendaItem[] }) =>
     /*
@@ -2977,11 +3002,34 @@ export interface Cadence {
   note: string;
 }
 
+/**
+ * A matter somebody has said needs the board in a room.
+ *
+ * The agenda that assembles itself. The chair typed one into a box, one item
+ * to a line, from memory — and the typed line never carried a `matterId`, so
+ * the link between an agenda item and the matter where the decision lives
+ * worked in the demonstration data and in nothing the application made.
+ */
+export interface Waiting {
+  matterId: string;
+  title: string;
+  status: string;
+  /** Everyone whose ask stands, for the screen to name. Never a count. */
+  asked: string[];
+  /** Why the last of them asked. */
+  reason: string;
+  since: string;
+  /** Where it is already down for a sitting still to be held. */
+  convenedFor: string | null;
+}
+
 export interface Meetings {
   boardId: string;
   meetings: MeetingRow[];
   attendance: AttendanceSummary[];
   cadence: Cadence;
+  /** What is waiting for a room. It proposes; the chair convenes. */
+  waiting: Waiting[];
 }
 
 // ── drift ─────────────────────────────────────────────────────────────────

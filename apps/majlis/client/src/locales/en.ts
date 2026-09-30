@@ -2010,6 +2010,28 @@ const en: Dict = {
   // not appear to; what it can do is ask, again, and on the record.
   "press.standing": "{days} days on this step.",
   "press.standingOne": "One day on this step.",
+
+  // ── what needs the board in a room ──────────────────────────────────
+  //
+  // Asking is a position, with a reason, like every other position here.
+  // The chair convenes; this only says the board was asked.
+  "room.nobody": "Nobody has said this needs the board in a room.",
+  "room.asked": "Asked for in a room by",
+  "room.ask": "This needs the room",
+  "room.withdraw": "Take that back",
+  "room.why": "Why it cannot be settled in writing",
+  "room.whyHelp": "This is what the rest of the board reads before the sitting. An agenda of bare titles is a list nobody prepares for.",
+  "room.ask.does": "Records that you believe this one needs the board in a room, in these words.",
+  "room.ask.means": "It convenes nothing. The chair convenes; what this does is put the matter, and your reason, in front of whoever does.",
+  "room.ask.did": "Your ask is on the record, and the matter is waiting for a room.",
+  "room.withdraw.does": "Records that you no longer think this one needs the board in a room.",
+  "room.withdraw.means": "Your earlier ask stays in the record with this beside it. Why a matter came off the agenda is as much a part of it as why it went on.",
+  "room.withdraw.did": "Taken back, and both are on the record.",
+  "room.didMeans": "Nothing about the matter itself has moved. What changed is what the board knows about how it should be taken.",
+  "room.waiting": "Waiting for a room",
+  "room.askedBy": "Asked by",
+  "room.alreadyDown": "Already down for",
+  "meet.agendaMore": "Anything else, one item per line",
   "press.neverChased": "Nothing has been asked about it.",
   "press.chased": "Asked {times} times.",
   "press.chasedOnce": "Asked once.",
