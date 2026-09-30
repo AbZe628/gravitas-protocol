@@ -1,5 +1,8 @@
 import type { AdoptedStructure, Computation, Examination, Submission } from '../types.js';
 import { structureById } from './structures.js';
+import { poolParameters } from './seed.js';
+import { hashParameters } from '../services/hash.js';
+import { TERM } from '../services/examination.js';
 import type { Undertaking } from '../services/undertaking.js';
 import type { Annotation } from '../services/annotation.js';
 import type { Committee, Referral } from '../services/committee.js';
@@ -484,13 +487,27 @@ export const computations: Computation[] = [
  * everything held reads as a formality and teaches a reader nothing about what
  * the screen is for.
  */
+/*
+ * The terms as they stood, computed from the terms themselves.
+ *
+ * Both of these were written with an empty hash, so both reported themselves
+ * as examinations against terms the board had since amended — on a board that
+ * had never amended anything. The sentence *the board has amended the terms
+ * since this was examined* appeared under every examination that existed.
+ *
+ * Computed rather than typed for the same reason the ruling's own hash is:
+ * a figure copied by hand is a figure that goes stale the first time somebody
+ * edits the terms above it.
+ */
+const POOL_TERMS = hashParameters(poolParameters);
+
 export const examinations: Examination[] = [
   {
     id: 'examination-2026-07-31',
     boardId: BOARD,
     matterId: 'matter-2026-04-02',
     ruleId: 'rule-pool-trading',
-    parameterHash: '',
+    parameterHash: POOL_TERMS,
     from: '2026-04-01',
     to: '2026-06-30',
     howChosen:
@@ -502,7 +519,17 @@ export const examinations: Examination[] = [
     recordedAt: '2026-07-31T16:30:00Z',
     findings: [
       {
-        against: 'minTangibleRatioBps',
+        /*
+         * `term:` is the shape, and these were written without it.
+         *
+         * `record` refuses a finding in any other shape and the form that
+         * records one hands out exactly this, so the demonstration board
+         * shipped two examinations in a shape the application would not
+         * accept — and the one reader that resolved the bare form made them
+         * look right while the reader that did not counted both terms among
+         * what was never examined.
+         */
+        against: TERM + 'minTangibleRatioBps',
         held: 'exceptions',
         exceptions: 3,
         note:
@@ -510,7 +537,7 @@ export const examinations: Examination[] = [
           'reports the pricing feed was two days stale. The transfers were not reversed.',
       },
       {
-        against: 'onBreach',
+        against: TERM + 'onBreach',
         held: 'held',
         exceptions: 0,
         note:
@@ -524,7 +551,7 @@ export const examinations: Examination[] = [
     boardId: BOARD,
     matterId: 'matter-2026-04-02',
     ruleId: 'rule-pool-trading',
-    parameterHash: '',
+    parameterHash: POOL_TERMS,
     from: '2026-01-01',
     to: '2026-03-31',
     howChosen: 'Every secondary transfer in the quarter.',
@@ -534,7 +561,7 @@ export const examinations: Examination[] = [
     recordedAt: '2026-04-30T11:00:00Z',
     findings: [
       {
-        against: 'minTangibleRatioBps',
+        against: TERM + 'minTangibleRatioBps',
         held: 'held',
         exceptions: 0,
         note: 'The ratio stayed above the minimum throughout the quarter.',

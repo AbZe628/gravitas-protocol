@@ -2256,6 +2256,9 @@ export const oversight = {
    */
   restedOn: (ruleId: string) => get<RestedOn>(`/api/rules/${ruleId}/rested-on`),
 
+  /** What the ruling asks, and what the examinations found about each of it. */
+  chain: (ruleId: string) => get<Chain>(`/api/rules/${ruleId}/chain`),
+
   /** One ruling, for a screen holding an id that needs to read as a title. */
   ruleNamed: (id: string) => get<Rule>(`/api/rules/${id}`),
   meeting: (id: string) => get<MeetingRow>(`/api/meetings/${id}`),
@@ -3101,6 +3104,54 @@ export interface RestedOn {
     /** Whether it was recorded against the exact terms that were replaced. */
     againstTheseTerms: boolean | null;
   }[];
+}
+
+/** What one examination found about one thing the ruling asks. */
+export interface Looked {
+  examinationId: string;
+  from: string;
+  to: string;
+  recordedAt: string;
+  /** `not_examined` never reaches here: it is not a look. */
+  held: 'held' | 'exceptions';
+  exceptions: number;
+  /** The examiner's words. Never generated and never summarised. */
+  note: string;
+  /** Whether the terms were the ones that stand today. */
+  againstTheseTerms: boolean;
+}
+
+/** One thing the ruling asks, and everything the record holds about it. */
+export interface ChainLink {
+  against: string;
+  kind: 'condition' | 'term';
+  /** What is asked, in the board's own words. */
+  asks: string;
+  why: string | null;
+  /** What the institution must produce to show it. Null on an operative term. */
+  shownBy: 'document' | 'sequence' | 'figure' | 'undertaking' | null;
+  lastLooked: Looked | null;
+  timesLooked: number;
+  exceptions: number;
+}
+
+/**
+ * From the ruling to the evidence about it.
+ *
+ * The chain the application is for — the board rules, the ruling sets a
+ * condition, the condition is something the institution has to do, its own
+ * review looks at whether it did, and the board reads what was found. Rulings
+ * were on one screen, the register on a second and the examinations on a
+ * third, and nothing joined them.
+ */
+export interface Chain {
+  ruleId: string;
+  matterId: string | null;
+  links: ChainLink[];
+  /** How many of them nobody has ever examined. */
+  neverLooked: number;
+  exceptions: number;
+  examinations: number;
 }
 
 export interface Waiting {

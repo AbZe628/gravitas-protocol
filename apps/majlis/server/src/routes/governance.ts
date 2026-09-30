@@ -33,6 +33,7 @@ import { mayAskForTheRoom, mayDeliberate, mayOpenMatter, mayVote } from '../auth
 import { callForTheRoom } from '../services/meeting.js';
 import { seekAgreementUntil, standingOn } from '../services/consensus.js';
 import { entersTheRegister, whatRestedOn, NotRegistrable } from '../services/ruling-register.js';
+import { matterBehind, theChain } from '../services/the-chain.js';
 import {
   Refused,
   bringIntoForce,
@@ -1632,6 +1633,57 @@ export function governanceRoutes(
           undertakings: await store.undertakings(rule.boardId),
           matters: await store.matters(rule.boardId),
         }),
+      });
+    }),
+  );
+
+  /**
+   * From this ruling to the evidence about it.
+   *
+   * Everything the ruling asks — the conditions the board judged it against and
+   * the operative terms it set — with what the institution has to produce to
+   * show each one, and what the examinations found. A condition nobody has ever
+   * examined is a row with nothing in it rather than a row that is missing,
+   * because the silence is the half a board cannot otherwise see.
+   *
+   * Open to observers, like the rest of the register. An auditor who can read
+   * the ruling and not the evidence about it is being shown half the record.
+   */
+  router.get(
+    '/rules/:id/chain',
+    handle(async (req, res) => {
+      const rule = await store.rule(req.params.id);
+      if (!rule) {
+        res.status(404).json({ error: 'not_found', message: 'No such ruling.' });
+        return;
+      }
+
+      /*
+       * The conditions are the board's own, through the matter and its adoption.
+       *
+       * A rule carries its terms and not its conditions: those belong to the
+       * shape, and which shape is named on the matter. Where no matter carries
+       * this ruling — a seeded register, an import — there are no conditions to
+       * show and the terms stand alone, which is a real answer.
+       */
+      const matters = await store.matters(rule.boardId);
+      const matter = matterBehind(rule, matters);
+      const shipped = matter?.structureId ? structureById(matter.structureId) : undefined;
+      const adoptions = matter?.structureId ? await store.adoptions(rule.boardId) : [];
+      const adoption =
+        standingAdoptions(adoptions).find((a) => a.structureId === matter?.structureId) ?? null;
+      const conditions =
+        adoption && adoption.conditions.length > 0
+          ? adoption.conditions
+          : (shipped?.conditions ?? []);
+
+      res.json({
+        ...theChain(rule, {
+          conditions,
+          terms: rule.parameters,
+          examinations: await store.examinations(rule.boardId),
+        }),
+        matterId: matter?.id ?? null,
       });
     }),
   );

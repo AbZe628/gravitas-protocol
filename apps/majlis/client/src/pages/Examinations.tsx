@@ -47,7 +47,7 @@ function One({ e, canReport }: { e: Examination; canReport: boolean }) {
           <State tone="settled">{t('exam.noExceptions')}</State>
         ) : (
           <State tone="breach">
-            {e.exceptions} {t('exam.exceptions')}
+            {e.exceptions} {t(e.exceptions === 1 ? 'exam.exception' : 'exam.exceptions')}
           </State>
         )}
         <span className="text-note text-muted">
@@ -92,12 +92,33 @@ function One({ e, canReport }: { e: Examination; canReport: boolean }) {
         <p className="max-w-[62ch] text-ui leading-relaxed">{e.howChosen}</p>
       </div>
 
-      {e.findings.filter((f) => f.held === 'exceptions').length > 0 && (
+      {/*
+        Everything it reached, not only what it found against.
+
+        This drew the findings with exceptions and nothing else, so an
+        examination of 366 of 366 transactions where the ratio held throughout
+        showed no finding at all: a card reading *no exceptions found* over
+        *not examined · 7* and nothing in between, which reads as an
+        examination that looked at nothing. What held is the other half of what
+        an examination says, and it is the half that answers *has anybody
+        checked this*.
+
+        `not_examined` is still not drawn. It says nothing was looked at, and
+        the block below names it with the rest of what was never reached.
+      */}
+      {e.findings.filter((f) => f.held !== 'not_examined').length > 0 && (
         <ul className="mt-3 space-y-2">
           {e.findings
-            .filter((f) => f.held === 'exceptions')
+            .filter((f) => f.held !== 'not_examined')
             .map((f, i) => (
-              <li key={i} className="rounded-xl bg-breachtint px-3.5 py-2.5 shadow-ringbreach">
+              <li
+                key={i}
+                className={
+                  f.held === 'exceptions'
+                    ? 'rounded-xl bg-breachtint px-3.5 py-2.5 shadow-ringbreach'
+                    : 'rounded-xl bg-raised/60 px-3.5 py-2.5 shadow-ring'
+                }
+              >
                 {/*
                   What the board wrote, not what the parameter is called.
 
@@ -110,13 +131,22 @@ function One({ e, canReport }: { e: Examination; canReport: boolean }) {
                   the examination does not.
                 */}
                 <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                  <span className="max-w-[54ch] text-ui font-semibold leading-snug text-breach">
+                  <span
+                    className={
+                      'max-w-[54ch] text-ui leading-snug ' +
+                      (f.held === 'exceptions' ? 'font-semibold text-breach' : 'text-paper')
+                    }
+                  >
                     {f.inWords ?? f.against.replace(/^term:/, '')}
                   </span>
-                  <span className="shrink-0 text-note text-breach">
-                    <span className="font-mono tabular-nums">{f.exceptions}</span>{' '}
-                    {t('exam.exceptions')}
-                  </span>
+                  {f.held === 'exceptions' ? (
+                    <span className="shrink-0 text-note text-breach">
+                      <span className="font-mono tabular-nums">{f.exceptions}</span>{' '}
+                      {t(f.exceptions === 1 ? 'exam.exception' : 'exam.exceptions')}
+                    </span>
+                  ) : (
+                    <span className="shrink-0 text-note text-muted">{t('exam.finding.held')}</span>
+                  )}
                 </div>
                 {f.inWords && (
                   <div className="mt-1 font-mono text-label text-muted">

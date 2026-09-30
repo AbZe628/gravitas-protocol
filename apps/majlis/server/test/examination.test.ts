@@ -5,6 +5,7 @@ import {
   coverageOf,
   coveringYear,
   exceptionsIn,
+  inWords,
   notExamined,
   record,
   type RecordInput,
@@ -223,14 +224,49 @@ describe('coverage, which is only knowable sometimes', () => {
 });
 
 describe('what was not examined', () => {
+  const TENOR = { key: 'maxTenorMonths', meaning: 'The deferred period does not exceed 24 months.' };
+
   it('names every condition and term the examination did not reach', () => {
     const e = made();
     const conditions = structureById('murabaha')!.conditions;
-    const missing = notExamined(e, conditions, ['maxTenorMonths']);
+    const missing = notExamined(e, conditions, [TENOR]);
 
     // One condition was answered; everything else in the shape was not.
     expect(missing.length).toBe(conditions.length - 1 + 1);
-    expect(missing).toContain('maxTenorMonths');
+  });
+
+  /*
+   * In the board's words, not the machine's.
+   *
+   * This listed the term's key among the conditions' sentences, so the one
+   * place that tells a board what an examination did not reach named half of
+   * it in the board's language and half in a developer's.
+   */
+  it('names an unexamined term by what it says, never by its key', () => {
+    const missing = notExamined(made(), structureById('murabaha')!.conditions, [TENOR]);
+    expect(missing).toContain(TENOR.meaning);
+    expect(missing).not.toContain(TENOR.key);
+  });
+
+  /*
+   * The shape a finding is actually recorded in.
+   *
+   * `record` refuses anything else and the form hands out exactly this, so a
+   * term answered with the prefix must count as answered. Written without it
+   * here, this passed while reporting the term as never examined.
+   */
+  it('counts a term answered in the shape findings are recorded in', () => {
+    const e = made({
+      findings: [
+        {
+          against: TERM + TENOR.key,
+          held: 'held',
+          exceptions: 0,
+          note: 'The longest deferred period in the sample was 18 months.',
+        },
+      ],
+    });
+    expect(notExamined(e, [], [TENOR])).toEqual([]);
   });
 
   it('counts an explicit not_examined as unexamined, not as answered', () => {
@@ -241,6 +277,43 @@ describe('what was not examined', () => {
     });
     const conditions = structureById('murabaha')!.conditions;
     expect(notExamined(e, conditions, []).length).toBe(conditions.length);
+  });
+});
+
+/**
+ * One resolver, because two of them disagreed.
+ *
+ * The screen turns what a finding is against into the board's own sentence.
+ * That reader looked a term up without the `term:` prefix while the coverage
+ * reader looked it up with one, so no examination could be right in both: the
+ * seeded ones printed the sentence and then named the terms they had just
+ * reported on as never examined, and the ones the application records count
+ * correctly and print `minTangibleRatioBps` where the sentence belongs.
+ */
+describe('what a finding is against, in words', () => {
+  const TENOR = { key: 'maxTenorMonths', meaning: 'The deferred period does not exceed 24 months.' };
+  const conditions = structureById('murabaha')!.conditions;
+
+  it('gives the board’s sentence for a term recorded the way the form records it', () => {
+    expect(inWords(TERM + TENOR.key, [TENOR], conditions)).toBe(TENOR.meaning);
+  });
+
+  it('gives the condition’s requirement for a condition', () => {
+    const c = conditions[0];
+    expect(inWords(c.id, [TENOR], conditions)).toBe(c.requirement);
+  });
+
+  /*
+   * Not tolerant, deliberately. A reader that accepted a key with the prefix
+   * and without it is exactly what let the two readers drift apart unnoticed.
+   */
+  it('does not answer for a term written without the prefix', () => {
+    expect(inWords(TENOR.key, [TENOR], conditions)).toBeNull();
+  });
+
+  it('answers with nothing for a name this ruling does not carry', () => {
+    expect(inWords(TERM + 'nothingLikeThis', [TENOR], conditions)).toBeNull();
+    expect(inWords('no-such-condition', [TENOR], conditions)).toBeNull();
   });
 });
 

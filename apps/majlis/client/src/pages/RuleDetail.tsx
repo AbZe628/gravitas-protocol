@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { api, oversight, type Passage, type ReviewStatus, type Rule } from '../lib/api.js';
+import { api, oversight, type Chain, type Passage, type ReviewStatus, type Rule } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { mayDeliberate, useIdentity } from '../lib/identity.js';
 import ReconsiderThis from '../components/ReconsiderThis.js';
@@ -12,6 +12,7 @@ import { Nothing } from '../components/page.js';
 import { ActionPanel, Facts, RecordPage } from '../components/shapes.js';
 import { DateText, ErrorText, Loading, Section, Sources, Tag } from '../components/ui.js';
 import TheChain from '../components/TheChain.js';
+import TheEvidence from '../components/TheEvidence.js';
 import WorkWindow, { type WorkPanel } from '../components/WorkWindow.js';
 
 /**
@@ -41,6 +42,14 @@ export default function RuleDetail() {
   const [review, setReview] = useState<ReviewStatus | undefined>(undefined);
   /** The review's reading, for who is carrying it. Not required; without it nothing is offered. */
   const [passage, setPassage] = useState<Passage | null>(null);
+  /**
+   * What the ruling asks and what was found about it.
+   *
+   * Read here rather than inside the section that draws it, because the panel
+   * needs the same answer: it said *this stands, nothing is waiting on the
+   * board* over a ruling carrying three recorded exceptions.
+   */
+  const [chain, setChain] = useState<Chain | null>(null);
   const [failed, setFailed] = useState(false);
 
   const readPassage = () =>
@@ -79,6 +88,10 @@ export default function RuleDetail() {
     // A failure here takes nothing off the page: the ruling renders without
     // its review state rather than the page refusing to load.
     void readReview();
+    oversight
+      .chain(id)
+      .then((c) => setChain(Array.isArray(c?.links) ? c : null))
+      .catch(() => setChain(null));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
@@ -132,13 +145,30 @@ export default function RuleDetail() {
    * under a chip reading **replaced — no longer in force**, on a ruling the
    * board replaced the same afternoon. Found by replacing one and reading it.
    */
+  /*
+   * And a ruling with exceptions recorded against it does not read as quiet.
+   *
+   * *This stands. Nothing is waiting on the board.* was printed on the pool
+   * ruling with three transfers at 50.4% listed an inch below it, found by an
+   * examination and sitting in the record. The sentence was written when no
+   * screen joined a ruling to the evidence about it, so nothing on this page
+   * could contradict it.
+   *
+   * It says what was found and stops. Whether the exceptions are still
+   * outstanding, and what they mean, is the board's — this has no field for
+   * either and reaches for neither.
+   */
+  const found = chain && chain.exceptions > 0;
+
   const next = rule.supersededBy
     ? t('review.settled.superseded')
     : unscheduled
       ? t('review.unscheduledNote')
       : dueNow
         ? t('rule.nextDue')
-        : t('rule.nextStands');
+        : found
+          ? t('rule.nextFound', { n: chain.exceptions })
+          : t('rule.nextStands');
 
   const aside = (
     <>
@@ -233,6 +263,17 @@ export default function RuleDetail() {
         setting.
       */}
       <WhatItMeans ruleId={rule.id} />
+
+      {/*
+        Whether it held.
+
+        The six answers above are all mechanism — how it is measured, when it
+        is checked, what happens if it fails — and said nothing about the fact
+        that it did fail. Three transfers executed at 50.4% in June, found by
+        an examination, in the record, and invisible on the page for the rule
+        they breached.
+      */}
+      <TheEvidence chain={chain} />
 
       {/*
         The fingerprint is what a later reader checks the terms against, so it

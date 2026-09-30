@@ -23,6 +23,7 @@ import {
   TERM,
   coverageOf,
   exceptionsIn,
+  inWords,
   notExamined,
   record,
 } from '../services/examination.js';
@@ -67,7 +68,6 @@ async function withDerived(store: Store, e: Examination) {
 
   const conditions =
     adoption && adoption.conditions.length > 0 ? adoption.conditions : (shipped?.conditions ?? []);
-  const termKeys = (matter?.proposedRule.parameters ?? []).map((p) => p.key);
 
   /*
    * What each finding is *against*, in words.
@@ -91,12 +91,11 @@ async function withDerived(store: Store, e: Examination) {
    * parameter it was recorded against needs the identifier, and a reader needs
    * the sentence; they are different jobs.
    */
-  const terms = new Map((matter?.proposedRule.parameters ?? []).map((p) => [p.key, p.meaning]));
-  const byCondition = new Map(conditions.map((c) => [c.id, c.requirement]));
+  const terms = matter?.proposedRule.parameters ?? [];
 
   const findings = e.findings.map((f) => ({
     ...f,
-    inWords: terms.get(f.against) ?? byCondition.get(f.against) ?? null,
+    inWords: inWords(f.against, terms, conditions),
   }));
 
   return {
@@ -105,7 +104,7 @@ async function withDerived(store: Store, e: Examination) {
     coverage: coverageOf(e),
     exceptions: exceptionsIn(e),
     /** Named rather than omitted: silence about a condition is not a pass. */
-    notExamined: notExamined(e, conditions, termKeys),
+    notExamined: notExamined(e, conditions, terms),
     matterTitle: matter?.title ?? null,
     /**
      * Whether the terms have moved since this was examined.

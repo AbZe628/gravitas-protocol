@@ -50,6 +50,45 @@ export const MIN_HOW_CHOSEN = 15;
 /** The prefix that marks a finding against an operative term rather than a condition. */
 export const TERM = 'term:';
 
+/**
+ * What a finding was recorded against, in the board's own words.
+ *
+ * ── two readers of one field, and never both right ────────────────────────
+ *
+ * A finding stores what it is against: a condition's id, or `term:<key>` for
+ * an operative term. `record` enforces that shape and `/matters/:id/examinable`
+ * hands the form exactly those values, so every examination the application
+ * itself can produce carries the prefix.
+ *
+ * Two places read the field and they disagreed about it. The one that turns it
+ * into a sentence looked the key up **without** the prefix; the one that works
+ * out what was not examined looked it up **with** it. So no examination could
+ * be right in both: the seeded ones, written bare, printed the sentence and
+ * then named the two terms they had just reported findings on as *not
+ * examined*; the ones the application records, written with the prefix, count
+ * correctly and print `minTangibleRatioBps` where the board's own sentence
+ * belongs — on a screen whose whole purpose is that the board reads what it
+ * wrote rather than what a developer called it.
+ *
+ * Found by recording one through the application and reading it beside a
+ * seeded one, two cards apart on the same screen.
+ *
+ * There is one resolver now, and `notExamined` is written against it, so the
+ * two cannot drift apart again. It is deliberately not tolerant of the bare
+ * form: a reader that accepted both is what let the disagreement live.
+ */
+export function inWords(
+  against: string,
+  terms: readonly { key: string; meaning: string }[],
+  conditions: readonly Pick<StructureCondition, 'id' | 'requirement'>[],
+): string | null {
+  if (against.startsWith(TERM)) {
+    const key = against.slice(TERM.length);
+    return terms.find((p) => p.key === key)?.meaning ?? null;
+  }
+  return conditions.find((c) => c.id === against)?.requirement ?? null;
+}
+
 export interface Coverage {
   examined: number;
   /** Null where the institution did not say how many there were. */
@@ -86,16 +125,34 @@ export function exceptionsIn(examination: Examination): number {
 export function notExamined(
   examination: Examination,
   conditions: StructureCondition[],
-  termKeys: string[],
+  terms: readonly { key: string; meaning: string }[],
 ): string[] {
-  const answered = new Set(
-    examination.findings.filter((f) => f.held !== 'not_examined').map((f) => f.against),
-  );
+  const answered = looked(examination);
 
   const missing: string[] = [];
   for (const c of conditions) if (!answered.has(c.id)) missing.push(c.requirement);
-  for (const key of termKeys) if (!answered.has(TERM + key)) missing.push(key);
+  /*
+   * The term's meaning, not its key.
+   *
+   * This listed `minTangibleRatioBps` among the sentences, so the one place
+   * that tells a board what an examination did not reach named half of it in
+   * the board's words and half in the machine's.
+   */
+  for (const p of terms) if (!answered.has(TERM + p.key)) missing.push(p.meaning);
   return missing;
+}
+
+/**
+ * What an examination actually reached.
+ *
+ * `not_examined` is a finding that says nothing was looked at, so it does not
+ * count as having looked — which is the whole reason the field has three values
+ * and not two.
+ */
+export function looked(examination: Examination): Set<string> {
+  return new Set(
+    examination.findings.filter((f) => f.held !== 'not_examined').map((f) => f.against),
+  );
 }
 
 export interface RecordInput {

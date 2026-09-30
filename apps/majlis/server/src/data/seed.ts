@@ -278,7 +278,7 @@ const proposedRatioRule = rule(
  * until an audit.
  */
 /** Lifted out so the ruling's own hash is computed from the terms it carries. */
-const poolParameters: RuleParameter[] = [
+export const poolParameters: RuleParameter[] = [
   {
     key: 'minTangibleRatioBps',
     value: '5100',
