@@ -577,6 +577,13 @@ describe('api', () => {
        * on and putting back are all this one route; see routes/assignments.ts.
        */
       'POST /api/assignments',
+      /*
+       * A member saying they will come back to something on a named day.
+       * Not a snooze: it carries a name, a day and a reason, and the board
+       * reads all three. Taking it back is a second entry through the same
+       * route; see services/putting-off.ts.
+       */
+      'POST /api/put-off',
       'POST /api/referrals/:id/withdraw',
       'POST /api/undertakings',
       'POST /api/undertakings/:id/close',

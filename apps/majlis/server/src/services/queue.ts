@@ -1,3 +1,4 @@
+import type { PutOff } from './putting-off.js';
 import type { Board, Incident, Matter, Rule, Structure, Submission } from '../types.js';
 import { standingOf } from './submission.js';
 import { buildPassage, say, type Say, type Whose } from './passage.js';
@@ -150,6 +151,19 @@ export interface QueueRow {
   days: number;
   /** True where a clock has already run out. */
   overdue: boolean;
+  /**
+   * Who has set this aside, until when, and why.
+   *
+   * Every standing one, whoever wrote it — not only the reader's own. A set-
+   * aside here is a position like any other and the board reads it: a row
+   * nobody has touched in two months, with three members having each put it
+   * off twice, is telling a chair something no count of days can.
+   *
+   * Absent where nobody has. It changes nothing else on the row: not the
+   * days, not `overdue`, not whether it is waiting. A member who sets aside
+   * something already overdue has set aside something already overdue.
+   */
+  putOff?: { by: string; until: string; reason: string }[];
 }
 
 const DAY = 86_400_000;
@@ -190,6 +204,15 @@ export interface QueueInput {
    * place that could disagree with the passages about who holds a step.
    */
   assignments: readonly Assignment[];
+  /**
+   * What members have set aside, and until when.
+   *
+   * Passed in already narrowed to what stands, for the same reason the
+   * assignments are: this file decides ordering and nothing else, and a second
+   * place that worked out which entry stands would be a second place that
+   * could disagree with the route.
+   */
+  putOffs?: readonly PutOff[];
   now: string;
 }
 
@@ -392,9 +415,31 @@ export function buildQueue(input: QueueInput): QueueRow[] {
   }
 
   /*
+   * What has been set aside, written onto the rows it was written about.
+   *
+   * Done here at the end rather than in each of the five loops: a field added
+   * to the row and forgotten in one of them would be a kind that silently
+   * never showed what the board had set aside.
+   */
+  const aside = new Map<string, QueueRow['putOff']>();
+  for (const p of input.putOffs ?? []) {
+    const at = `${p.ofKind}:${p.ofId}`;
+    if (p.until === null) continue;
+    aside.set(at, [...(aside.get(at) ?? []), { by: p.by, until: p.until, reason: p.reason }]);
+  }
+  for (const r of rows) {
+    const on = aside.get(`${r.kind}:${r.id}`);
+    if (on) r.putOff = on;
+  }
+
+  /*
    * Overdue first, then longest-waiting. Within a tie, the order is whatever
    * the record gave, which is stable — an order that shuffled between loads
    * would make a member lose their place in the one list they read every day.
+   *
+   * What a member has set aside is **not** sorted differently. Where it goes
+   * on the screen is the screen's, and a row that quietly sank down the list
+   * would be this file deciding what the board looks at.
    */
   return rows.sort((a, b) => {
     if (a.overdue !== b.overdue) return a.overdue ? -1 : 1;

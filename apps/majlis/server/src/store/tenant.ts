@@ -1,3 +1,4 @@
+import type { PutOff } from '../services/putting-off.js';
 import type {
   AdoptedStructure,
   AssistantExchange,
@@ -427,6 +428,21 @@ export class TenantStore implements Store {
       throw new Error('That board belongs to another tenant.');
     }
     return this.inner.assign(assignment);
+  }
+
+  /* Scoped through the board, exactly as the assignments are. */
+  async putOffs(boardId?: string): Promise<PutOff[]> {
+    if (boardId && !(await this.owns(boardId))) return [];
+    const mine = await this.ownBoardIds();
+    const all = await this.inner.putOffs(boardId);
+    return all.filter((p) => mine.has(p.boardId));
+  }
+
+  async setAside(entry: PutOff): Promise<PutOff> {
+    if (!(await this.owns(entry.boardId))) {
+      throw new Error('That board belongs to another tenant.');
+    }
+    return this.inner.setAside(entry);
   }
 
   /*

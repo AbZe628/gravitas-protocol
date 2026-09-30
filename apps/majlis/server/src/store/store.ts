@@ -21,6 +21,7 @@
  * so they drop straight in.
  */
 
+import type { PutOff } from '../services/putting-off.js';
 import type {
   AdoptedStructure,
   Asset,
@@ -346,6 +347,19 @@ export interface Store {
    * could be improved after the fact.
    */
   assign(assignment: Assignment): Promise<Assignment>;
+
+  /**
+   * Every set-aside ever written on this board, in the order it was written.
+   *
+   * Never filtered to the ones that stand, for the same reason as the
+   * assignments: what stands is derived, and *who kept setting this aside, and
+   * how many times* is the question a chair asks about a row that has not
+   * moved in two months.
+   */
+  putOffs(boardId?: string): Promise<PutOff[]>;
+
+  /** Append one. Taking something back is a new entry, never a deletion. */
+  setAside(putOff: PutOff): Promise<PutOff>;
 
   // ── some of the board, looking at something first ─────────────────────
 

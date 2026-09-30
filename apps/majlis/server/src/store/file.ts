@@ -29,6 +29,7 @@
  * something with automatic backups. Nothing above this file changes.
  */
 
+import type { PutOff } from '../services/putting-off.js';
 import { appendFileSync, mkdirSync, readFileSync, renameSync, writeFileSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import type {
@@ -114,6 +115,7 @@ interface Document {
   /** What somebody undertook to do at a sitting, and what became of it. */
   undertakings?: Undertaking[];
   assignments?: Assignment[];
+  putOffs?: PutOff[];
   annotations?: Annotation[];
   committees?: Committee[];
   referrals?: Referral[];
@@ -209,6 +211,7 @@ export class FileStore implements Store {
       loaded.devices ??= [];
       loaded.undertakings ??= [];
       loaded.assignments ??= [];
+      loaded.putOffs ??= [];
       loaded.annotations ??= [];
       loaded.committees ??= [];
       loaded.referrals ??= [];
@@ -595,6 +598,20 @@ export class FileStore implements Store {
       this.doc.assignments.push(copy(assignment));
       this.persist();
       return copy(assignment);
+    });
+  }
+
+  async putOffs(boardId?: string): Promise<PutOff[]> {
+    const all = this.doc.putOffs ?? [];
+    return copy(boardId === undefined ? all : all.filter((p) => p.boardId === boardId));
+  }
+
+  async setAside(entry: PutOff): Promise<PutOff> {
+    return this.serialise(() => {
+      this.doc.putOffs ??= [];
+      this.doc.putOffs.push(copy(entry));
+      this.persist();
+      return copy(entry);
     });
   }
 

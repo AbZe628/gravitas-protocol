@@ -96,6 +96,7 @@ import { relatedTo } from '../services/precedent.js';
 import { buildPassage } from '../services/passage.js';
 import { visibleTo, withAssignments } from '../services/assignment.js';
 import { buildQueue } from '../services/queue.js';
+import { setAsideNow } from '../services/putting-off.js';
 import { buildInheritance, checklistStanding } from '../services/inherit.js';
 import type { Store } from '../store/index.js';
 import { compose, NoticeOff, type Notifier } from '../services/notice.js';
@@ -1907,6 +1908,11 @@ export function governanceRoutes(
         undertakings: desk ? [] : undertakings,
         structures,
         assignments: visibleTo(who.role, assignments),
+        /*
+         * Not to a bank desk. What the board has set aside, and why, is the
+         * board's own record — the same fence the assignments are behind.
+         */
+        putOffs: desk ? [] : setAsideNow(await store.putOffs(board.id), at),
         now: at,
       });
 

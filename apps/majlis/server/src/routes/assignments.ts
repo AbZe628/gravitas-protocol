@@ -2,6 +2,12 @@ import { randomUUID } from 'node:crypto';
 import { Router } from 'express';
 import { z } from 'zod';
 import { howOf, heldBy, mayAssign, onOurSide, placeable, type Assignment } from '../services/assignment.js';
+import {
+  Refused as PutOffRefused,
+  putOff,
+  setAsideNow,
+  takingBack,
+} from '../services/putting-off.js';
 import type { PassageKind } from '../services/passage-shape.js';
 import type { Members, Role } from '../auth/members.js';
 import type { Store } from '../store/index.js';
@@ -45,6 +51,19 @@ import { badRequest, handle, identityOf } from './http.js';
  */
 
 const OF_KINDS = ['matter', 'breach', 'question', 'undertaking', 'review'] as const;
+
+/**
+ * Setting something aside until a named day.
+ *
+ * `until` null is taking it back, and carries no reason: a member picking
+ * something up again owes the board nothing beyond the fact that they did.
+ */
+const settingAside = z.object({
+  ofKind: z.enum(OF_KINDS),
+  ofId: z.string().min(1),
+  until: z.string().datetime().nullable(),
+  reason: z.string().max(2000).default(''),
+});
 
 const placing = z.object({
   ofKind: z.enum(OF_KINDS),
@@ -115,6 +134,115 @@ export function assignmentRoutes(
         assignments: ofId ? all.filter((a) => a.ofId === ofId) : all,
         asOf: now(),
       });
+    }),
+  );
+
+  /**
+   * Everything standing about what has been set aside, and until when.
+   *
+   * Open to the board, and to observers, for the same reason the assignments
+   * are: a member deciding not to look at something this week is the board's
+   * business and not private. Not to the institution.
+   */
+  router.get(
+    '/put-off',
+    handle(async (req, res) => {
+      if (identityOf(req).role === 'institution') {
+        res.status(403).json({
+          error: 'forbidden',
+          message: 'What the board has set aside is the board’s own record.',
+        });
+        return;
+      }
+      const board = await theBoard();
+      if (!board) {
+        res.status(404).json({ error: 'not_found', message: 'No such board.' });
+        return;
+      }
+      res.json({ putOffs: setAsideNow(await store.putOffs(board.id), now()), asOf: now() });
+    }),
+  );
+
+  /**
+   * Set something aside until a day, or pick it up again.
+   *
+   * ── it is a position, not a snooze ────────────────────────────────────
+   *
+   * The obvious shape — hide this row from me until Tuesday — was refused: in
+   * a record whose rule is that what is written is the board's and permanent,
+   * a member could push something out of sight and nobody would know it had
+   * been pushed. So this is written like every other position, with a name, a
+   * day and a reason, and the board reads all three. What it does is move the
+   * row off the top of that member's own list and off nobody else's.
+   *
+   * ── and it changes nothing about what is waiting ──────────────────────
+   *
+   * Not the count, not the days, not whether a clock has run out. A member who
+   * sets aside something already overdue has set aside something already
+   * overdue.
+   */
+  router.post(
+    '/put-off',
+    handle(async (req, res) => {
+      const who = identityOf(req);
+      const parsed = settingAside.safeParse(req.body);
+      if (!parsed.success) {
+        badRequest(res, parsed.error);
+        return;
+      }
+
+      const board = await theBoard();
+      if (!board) {
+        res.status(404).json({ error: 'not_found', message: 'No such board.' });
+        return;
+      }
+
+      /*
+       * Whoever sits on this side of the table, and nobody else. The bank's
+       * liaison deciding what the board looks at this week would be the
+       * institution arranging the board's attention.
+       */
+      if (!sits(board, who.scholarId, roleOf(who.scholarId))) {
+        res.status(403).json({
+          error: 'forbidden',
+          message: 'Only somebody who sits on this board can set its work aside.',
+        });
+        return;
+      }
+
+      const { ofKind, ofId, until, reason } = parsed.data;
+
+      const passage = await passageOf(store, board, ofKind, ofId, now());
+      if (!passage) {
+        res.status(404).json({ error: 'not_found', message: 'There is no such thing on this board.' });
+        return;
+      }
+
+      const at = now();
+      const held = await store.putOffs(board.id);
+      try {
+        if (until === null) takingBack(held, ofKind, ofId, who.scholarId);
+        const entry = putOff({
+          id: randomUUID(),
+          boardId: board.id,
+          ofKind,
+          ofId,
+          until,
+          reason,
+          by: who.scholarId,
+          at,
+        });
+        res.status(201).json({ putOff: await store.setAside(entry) });
+      } catch (e) {
+        if (e instanceof PutOffRefused) {
+          res.status(e.reason === 'nothing_to_take_back' ? 409 : 400).json({
+            error: e.reason,
+            message: e.message,
+          });
+          return;
+        }
+        throw e;
+      }
     }),
   );
 

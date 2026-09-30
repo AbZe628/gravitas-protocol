@@ -10,6 +10,7 @@ import Holding from './components/Holding.js';
 import Person, { initialsOf } from './components/Person.js';
 import WorkWindow from './components/WorkWindow.js';
 import { I18nProvider } from './lib/i18n.js';
+import en from './locales/en.js';
 import { forgetIdentity, type Identity } from './lib/identity.js';
 import { forgetMembers } from './lib/members.js';
 import type { Passage, PassageStep, QueueRow } from './lib/api.js';
@@ -57,11 +58,25 @@ function wire(me: Partial<Identity> & { scholarId: string }, rows: QueueRow[] = 
         posted.push(JSON.parse(String(init.body)));
         return json({ assignment: {}, how: 'taken' });
       }
+      if (init?.method === 'POST' && url.includes('/api/put-off')) {
+        posted.push(JSON.parse(String(init.body)));
+        return json({ putOff: {} });
+      }
       if (url.includes('/api/attention'))
         return json({ role: 'signatory', office: null, items: [], ...me });
       if (url.includes('/api/settings')) return json({ members: MEMBERS });
       if (url.includes('/api/queue'))
-        return json({ asOf: '2026-09-20T00:00:00Z', rows, waiting: rows.length, overdue: 0 });
+        /*
+         * The overdue count off the rows, as the server's is. Fixed at nought,
+         * no test could tell a screen that kept the figure from one that quietly
+         * dropped a set-aside row out of it.
+         */
+        return json({
+          asOf: '2026-09-20T00:00:00Z',
+          rows,
+          waiting: rows.length,
+          overdue: rows.filter((r) => r.overdue).length,
+        });
       return json({});
     }),
   );
@@ -317,6 +332,160 @@ describe('the act on the row', () => {
     await screen.findByRole('alert');
     // And the act is offered again, rather than the row claiming to be held.
     expect(screen.getByRole('button', { name: /Take it on: Nobody has this/ })).toBeTruthy();
+  });
+});
+
+/**
+ * Coming back to something on a named day.
+ *
+ * ── the shape this is not ─────────────────────────────────────────────────
+ *
+ * *Remind me on Tuesday*, hidden from everybody else, was put to the board's
+ * owner and refused in that shape: in a record whose rule is that what is
+ * written is the board's and permanent, a member could otherwise push
+ * something out of sight and nobody would know it had been pushed.
+ *
+ * So it carries a name, a day and a reason, the board reads all three, and it
+ * changes one member's own list and nothing else. The count of what is
+ * waiting and how many are past their date are what they were.
+ */
+describe('setting a row aside', () => {
+  const show = () =>
+    render(
+      <I18nProvider>
+        <MemoryRouter>
+          <Queue />
+        </MemoryRouter>
+      </I18nProvider>,
+    );
+
+  const later = '2027-01-20T00:00:00.000Z';
+  const because = 'Waiting on the desk to come back with the pricing feed.';
+
+  it('takes it off your own list, and says how many are behind the chip', async () => {
+    wire({ scholarId: 'member-b' }, [
+      row({ id: 'plain', title: 'Still here' }),
+      row({ id: 'aside', title: 'Put off', putOff: [{ by: 'member-b', until: later, reason: because }] }),
+    ]);
+    show();
+
+    await screen.findByText('Still here');
+    expect(screen.queryByText('Put off')).toBeNull();
+
+    const chip = screen.getByRole('button', { name: /Set aside/ });
+    fireEvent.click(chip);
+    await waitFor(() => expect(screen.getByText('Put off')).toBeTruthy());
+  });
+
+  /*
+   * A colleague stepping back from something says nothing about whether this
+   * member should look at it. A list that thinned out because somebody else
+   * was busy would be the screen deciding what the board attends to.
+   */
+  it('leaves it on everybody else’s list, and says who stepped back', async () => {
+    wire({ scholarId: 'member-c' }, [
+      row({ id: 'aside', title: 'Put off by Bilal', putOff: [{ by: 'member-b', until: later, reason: because }] }),
+    ]);
+    show();
+
+    await screen.findByText('Put off by Bilal');
+    expect(screen.queryByRole('button', { name: /Set aside/ })).toBeNull();
+    expect(screen.getByText(en['needs.othersPutOff'].replace('{n}', '1'))).toBeTruthy();
+  });
+
+  /*
+   * The figure this product is sold on. A set-aside that quieted the count
+   * would be a way to make the board's own pace measure lie.
+   */
+  it('changes nothing about what is waiting or what is past its date', async () => {
+    wire({ scholarId: 'member-b' }, [
+      row({ id: 'plain', title: 'Still here' }),
+      row({ id: 'aside', title: 'Put off', overdue: true, putOff: [{ by: 'member-b', until: later, reason: because }] }),
+    ]);
+    show();
+    await screen.findByText('Still here');
+
+    /*
+     * Both figures, read off the line that carries them rather than by asking
+     * the page whether the character 2 appears anywhere on it — which it does,
+     * on a chip, in a date, and in the days column.
+     */
+    const waiting = screen.getByText(en['needs.waiting']).closest('div')!;
+    expect(waiting.textContent).toContain(`2 ${en['needs.waiting']}`);
+    expect(waiting.textContent).toContain(`1 ${en['needs.overdue']}`);
+
+    // And the row itself is off the list, which is the whole of what changed.
+    expect(screen.queryByText('Put off')).toBeNull();
+  });
+
+  it('writes the day and the reason, and reads it back on the row', async () => {
+    wire({ scholarId: 'member-b' }, [row({ id: 'plain', title: 'A matter' })]);
+    show();
+
+    // Right-click, which is also what the Menu key sends.
+    fireEvent.contextMenu(await screen.findByText('A matter'));
+
+    fireEvent.change(await screen.findByLabelText(en['row.until']), {
+      target: { value: '2027-01-20' },
+    });
+    fireEvent.change(screen.getByLabelText(en['row.why']), { target: { value: because } });
+    fireEvent.click(screen.getByRole('button', { name: en['row.setAside'] }));
+
+    await waitFor(() => expect(posted).toHaveLength(1));
+    expect(posted[0]).toMatchObject({ ofKind: 'matter', ofId: 'plain', reason: because });
+    expect(String((posted[0] as { until: string }).until)).toContain('2027-01-20');
+  });
+
+  /*
+   * Said before it is done, because it is not what a member expects: every
+   * other application's *remind me later* is private, and one who found out
+   * afterwards that the board reads it would rightly feel tricked.
+   */
+  it('says the board will read it, before the member writes anything', async () => {
+    wire({ scholarId: 'member-b' }, [row({ id: 'plain', title: 'A matter' })]);
+    show();
+    fireEvent.contextMenu(await screen.findByText('A matter'));
+    expect(await screen.findByText(en['row.putOffMeans'])).toBeTruthy();
+  });
+
+  /* A control that cannot be honoured is absent: the route refuses both. */
+  it('offers nothing to set aside until there is a day and a reason', async () => {
+    wire({ scholarId: 'member-b' }, [row({ id: 'plain', title: 'A matter' })]);
+    show();
+    fireEvent.contextMenu(await screen.findByText('A matter'));
+
+    await screen.findByLabelText(en['row.until']);
+    expect(screen.queryByRole('button', { name: en['row.setAside'] })).toBeNull();
+
+    fireEvent.change(screen.getByLabelText(en['row.until']), { target: { value: '2027-01-20' } });
+    expect(screen.queryByRole('button', { name: en['row.setAside'] })).toBeNull();
+
+    fireEvent.change(screen.getByLabelText(en['row.why']), { target: { value: because } });
+    expect(screen.getByRole('button', { name: en['row.setAside'] })).toBeTruthy();
+  });
+
+  it('picks it back up, and asks for no reason to do it', async () => {
+    wire({ scholarId: 'member-b' }, [
+      row({ id: 'aside', title: 'Put off', putOff: [{ by: 'member-b', until: later, reason: because }] }),
+    ]);
+    show();
+
+    fireEvent.click(await screen.findByRole('button', { name: /Set aside/ }));
+    fireEvent.contextMenu(await screen.findByText('Put off'));
+    fireEvent.click(await screen.findByRole('button', { name: en['row.pickUp'] }));
+
+    await waitFor(() => expect(posted).toHaveLength(1));
+    expect(posted[0]).toEqual({ ofKind: 'matter', ofId: 'aside', until: null, reason: '' });
+  });
+
+  /* What a colleague wrote, read in the window where the acts are. */
+  it('shows a colleague’s reason where the member can read it', async () => {
+    wire({ scholarId: 'member-c' }, [
+      row({ id: 'aside', title: 'Put off by Bilal', putOff: [{ by: 'member-b', until: later, reason: because }] }),
+    ]);
+    show();
+    fireEvent.contextMenu(await screen.findByText('Put off by Bilal'));
+    expect(await screen.findByText(because, { exact: false })).toBeTruthy();
   });
 });
 

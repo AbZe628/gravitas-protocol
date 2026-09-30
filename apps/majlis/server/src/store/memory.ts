@@ -11,6 +11,7 @@
  * accident, and the bug that produces surfaces far away from the cause.
  */
 
+import type { PutOff } from '../services/putting-off.js';
 import type {
   AdoptedStructure,
   Asset,
@@ -59,6 +60,7 @@ export interface MemorySeed {
   examinations?: Examination[];
   undertakings?: Undertaking[];
   assignments?: Assignment[];
+  putOffs?: PutOff[];
   annotations?: Annotation[];
   committees?: Committee[];
   referrals?: Referral[];
@@ -92,6 +94,8 @@ export class MemoryStore implements Store {
   private readonly _undertakings: Map<string, Undertaking>;
   /* A list and not a map: assignments are appended and the order is the record. */
   private readonly _assignments: Assignment[];
+  /* Appended, like the assignments, and for the same reason. */
+  private readonly _putOffs: PutOff[];
   private readonly _annotations: Map<string, Annotation>;
   private readonly _committees: Map<string, Committee>;
   private readonly _referrals: Map<string, Referral>;
@@ -122,6 +126,7 @@ export class MemoryStore implements Store {
     this._examinations = new Map((seed.examinations ?? []).map((x) => [x.id, copy(x)]));
     this._undertakings = new Map((seed.undertakings ?? []).map((u) => [u.id, copy(u)]));
     this._assignments = (seed.assignments ?? []).map((a) => copy(a));
+    this._putOffs = (seed.putOffs ?? []).map((p) => copy(p));
     this._annotations = new Map((seed.annotations ?? []).map((a) => [a.id, copy(a)]));
     this._committees = new Map((seed.committees ?? []).map((c) => [c.id, copy(c)]));
     this._referrals = new Map((seed.referrals ?? []).map((r) => [r.id, copy(r)]));
@@ -385,6 +390,17 @@ export class MemoryStore implements Store {
   async assign(assignment: Assignment): Promise<Assignment> {
     this._assignments.push(copy(assignment));
     return copy(assignment);
+  }
+
+  async putOffs(boardId?: string): Promise<PutOff[]> {
+    return copy(
+      boardId === undefined ? this._putOffs : this._putOffs.filter((p) => p.boardId === boardId),
+    );
+  }
+
+  async setAside(entry: PutOff): Promise<PutOff> {
+    this._putOffs.push(copy(entry));
+    return copy(entry);
   }
 
   async undertakings(boardId?: string): Promise<Undertaking[]> {

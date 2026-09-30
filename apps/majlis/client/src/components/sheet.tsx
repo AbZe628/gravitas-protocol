@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigationType } from 'react-router-dom';
 import { Button } from './Button';
-import { createContext, useContext, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useLayoutEffect, useRef, useState, type ReactNode, type TouchEvent } from 'react';
 import { Chevron } from './ui.js';
 import { wasJustOpened, rememberOpened } from '../lib/split.js';
 
@@ -251,6 +251,7 @@ export function Line({
   columns,
   cells,
   act,
+  onMenu,
   tone,
 }: {
   /** Where the line opens. The link is the title and covers the line. */
@@ -283,6 +284,15 @@ export function Line({
    * The caller supplies a column for it, like every other cell.
    */
   act?: ReactNode;
+  /**
+   * Everything else this line can do, asked for the way a list is asked.
+   *
+   * Right-click, the Menu key (which a browser sends here as the same event,
+   * so the keyboard gets it for nothing), and a long press on a phone. What
+   * opens is the caller's, and in this application it is a window that says
+   * what each act does rather than a strip of four words.
+   */
+  onMenu?: () => void;
   /** A line that is past its date, or otherwise marked. */
   tone?: 'plain' | 'breach';
 }) {
@@ -337,6 +347,48 @@ export function Line({
     );
   };
 
+  /**
+   * A long press is the phone's right-click.
+   *
+   * Held for half a second without the finger wandering: a press that moved is
+   * the list being scrolled, which is what a finger on a list is usually
+   * doing, and opening a window under a scroll would make the list unusable.
+   * The timer is cleared on move and on lift.
+   */
+  const held = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const from = useRef<{ x: number; y: number } | null>(null);
+  const stopHolding = () => {
+    if (held.current) clearTimeout(held.current);
+    held.current = null;
+    from.current = null;
+  };
+  const longPress = onMenu
+    ? {
+        onContextMenu: (e: { preventDefault: () => void }) => {
+          e.preventDefault();
+          onMenu();
+        },
+        onTouchStart: (e: TouchEvent) => {
+          const touch = e.touches[0];
+          from.current = { x: touch.clientX, y: touch.clientY };
+          held.current = setTimeout(() => {
+            stopHolding();
+            onMenu();
+          }, 500);
+        },
+        onTouchMove: (e: TouchEvent) => {
+          const touch = e.touches[0];
+          const start = from.current;
+          if (!start) return;
+          if (Math.abs(touch.clientX - start.x) > 8 || Math.abs(touch.clientY - start.y) > 8) {
+            stopHolding();
+          }
+        },
+        onTouchEnd: stopHolding,
+        onTouchCancel: stopHolding,
+      }
+    : {};
+
   /* The line the keyboard is on, lit the way the pointer lights it. */
   const onIt =
     '[&:has(a:focus-visible)]:bg-lapistint/60 [&:has(a:focus-visible)]:ring-2 [&:has(a:focus-visible)]:ring-inset [&:has(a:focus-visible)]:ring-lapis/50 ';
@@ -358,7 +410,7 @@ export function Line({
   */
   if (!wide) {
     return (
-      <li className={'relative flex items-center gap-3 py-3 pe-4 ps-5 ' + mark}>
+      <li {...longPress} className={'relative flex items-center gap-3 py-3 pe-4 ps-5 ' + mark}>
         <div className="min-w-0 flex-1">
           <div className="flex items-baseline gap-3">
             <div className="min-w-0 flex-1">{opener(cells[lead], true)}</div>
@@ -413,6 +465,7 @@ export function Line({
 
   return (
     <li
+      {...longPress}
       style={{ ['--cols' as string]: template(columns) }}
       className={
         'relative grid min-h-[44px] items-center gap-x-4 px-5 py-2.5 [grid-template-columns:var(--cols)] ' +

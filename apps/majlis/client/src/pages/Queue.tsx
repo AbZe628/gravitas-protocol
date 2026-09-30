@@ -12,6 +12,7 @@ import { useIdentity } from '../lib/identity.js';
 import { keep, kept } from '../lib/kept.js';
 import { nameOf, useMembers } from '../lib/members.js';
 import { holdingOf } from '../lib/holding.js';
+import OnThisRow from '../components/OnThisRow.js';
 import type { QueuePhase } from '../lib/api.js';
 import { Button } from '../components/Button';
 
@@ -204,10 +205,15 @@ function Row({
   row,
   n,
   onMove,
+  onMenu,
+  mePutOff,
 }: {
   row: QueueRow;
   n?: number;
   onMove: (row: QueueRow, to: string | null) => void;
+  onMenu: () => void;
+  /** Whether this reader is one of the members who set it aside. */
+  mePutOff: boolean;
 }) {
   const { t, say } = useI18n();
   const members = useMembers();
@@ -232,6 +238,7 @@ function Row({
       to={row.to}
       columns={COLS(t)}
       tone={row.overdue ? 'breach' : 'plain'}
+      onMenu={onMenu}
       cells={[
         <span className="flex min-w-0 items-baseline gap-2">
           {/*
@@ -267,6 +274,21 @@ function Row({
         */
         <span className="block truncate text-ui text-paper">
           {row.next ? say(row.next) : <span className="text-muted">{t('needs.nothingToDo')}</span>}
+          {/*
+            Who has stepped back from it, said on the row.
+
+            The half that makes setting aside a record rather than a snooze: a
+            row nobody has touched in two months, with three members having
+            each put it off, is telling a chair something no count of days can.
+            The reader's own is said by the chip above, not twice here.
+          */}
+          {(row.putOff?.length ?? 0) > (mePutOff ? 1 : 0) && (
+            <span className="ms-2 text-note text-goldink">
+              {t('needs.othersPutOff', {
+                n: (row.putOff?.length ?? 0) - (mePutOff ? 1 : 0),
+              })}
+            </span>
+          )}
         </span>,
         <span className="block truncate text-ui text-muted">
           {whom}
@@ -333,6 +355,15 @@ export default function Queue() {
    */
   const [moved, setMoved] = useState<Record<string, string | null>>({});
   const [refused, setRefused] = useState<string | null>(null);
+  /**
+   * The row whose other acts are open, and whether the set-aside ones are shown.
+   *
+   * Two separate things. A row a member has set aside is not gone — it is
+   * behind a chip with its own count, like every other narrowing on this
+   * screen — and *set aside* is a third answer to *whose*, not a fourth stage.
+   */
+  const [menuFor, setMenuFor] = useState<QueueRow | null>(null);
+  const [showAside, setShowAside] = useState(false);
 
   /*
    * The queue re-reads itself whenever the record moves.
@@ -500,8 +531,28 @@ export default function Queue() {
     keyOf(r) in moved ? { ...r, holder: moved[keyOf(r)] ?? undefined } : r;
 
   const all = rows.map(asMoved);
-  const mineCount = all.filter(mine).length;
-  const byOwner = onlyMine ? all.filter(mine) : all;
+
+  /**
+   * What this member has set aside until a later day.
+   *
+   * Their own only. Another member stepping back from something says nothing
+   * about whether this one should look at it, and a list that thinned out
+   * because a colleague was busy would be the screen deciding what the board
+   * attends to.
+   */
+  const setAside = (r: QueueRow) => (r.putOff ?? []).some((p) => p.by === identity?.scholarId);
+  const asideCount = all.filter(setAside).length;
+
+  /*
+   * Off the list by default, and never off the count.
+   *
+   * The figure at the top still says how many are waiting and how many are
+   * past their date, because they are. What a member has decided to come back
+   * to on Tuesday is still waiting on the board on Tuesday.
+   */
+  const onTheList = showAside ? all : all.filter((r) => !setAside(r));
+  const mineCount = onTheList.filter(mine).length;
+  const byOwner = onlyMine ? onTheList.filter(mine) : onTheList;
   const shown = only === null ? byOwner : byOwner.filter((r) => r.phase === only);
   onScreen.current = shown;
   /**
@@ -521,6 +572,7 @@ export default function Queue() {
     if (can?.mayMove && can.free && can.me) void move(row, can.me);
   };
   const countOf = (p: QueuePhase) => byOwner.filter((r) => r.phase === p).length;
+  const isMine = (r: QueueRow) => (r.putOff ?? []).some((p) => p.by === identity?.scholarId);
 
   /*
     The same head as every other list.
@@ -557,7 +609,7 @@ export default function Queue() {
           filters to the same list, and this application does not draw
           controls that cannot change anything.
         */}
-        {mineCount > 0 && mineCount < all.length && (
+        {mineCount > 0 && mineCount < onTheList.length && (
           /*
             A recess with the chosen one raised out of it, not a round chip.
 
@@ -588,7 +640,7 @@ export default function Queue() {
               >
                 {t(k ? 'needs.mine' : 'needs.everyone')}
                 <span className="ms-1.5 font-mono tabular-nums text-muted">
-                  {k ? mineCount : all.length}
+                  {k ? mineCount : onTheList.length}
                 </span>
               </Button>
             ))}
@@ -603,6 +655,30 @@ export default function Queue() {
           the one that is on does nothing, correctly — and looked, to anyone
           not seeing the colour, like a control that does nothing at all.
         */}
+      {/*
+        What this member set aside, behind a chip with its own count.
+
+        Not hidden and not deleted: it is one press away with the number on it,
+        which is the same treatment every other narrowing on this screen gets.
+        Absent where nothing is set aside — a chip reading nought is a control
+        that cannot change anything.
+      */}
+      {asideCount > 0 && (
+        <Button
+          type="button"
+          aria-pressed={showAside}
+          onClick={() => setShowAside(!showAside)}
+          className={
+            'inline-flex min-h-[44px] items-center rounded-full px-4 py-1.5 text-note transition-all lg:min-h-0 ' +
+            (showAside
+              ? 'bg-[#F7F0E2] font-semibold text-goldink shadow-ringgold'
+              : 'bg-raised text-sand shadow-ring hover:text-paper')
+          }
+        >
+          {t('needs.setAside')}
+          <span className="ms-1.5 font-mono tabular-nums text-muted">{asideCount}</span>
+        </Button>
+      )}
         <Button
           type="button"
           aria-pressed={only === null}
@@ -681,7 +757,14 @@ export default function Queue() {
       ) : (
         <Sheet columns={COLS(t)}>
           {shown.map((r, i) => (
-            <Row key={keyOf(r)} row={r} n={column ? undefined : i + 1} onMove={move} />
+            <Row
+              key={keyOf(r)}
+              row={r}
+              n={column ? undefined : i + 1}
+              onMove={move}
+              onMenu={() => setMenuFor(r)}
+              mePutOff={isMine(r)}
+            />
           ))}
         </Sheet>
       )}
@@ -696,6 +779,20 @@ export default function Queue() {
         what to do next. Occasional things go after the work, not in front
         of it.
       */}
+      {/*
+        Everything else this row can do. Reached by right-click, by the Menu
+        key, and by a long press on a phone — a window rather than a strip of
+        four words, because every act here says what it does before it does it.
+      */}
+      {menuFor && (
+        <OnThisRow
+          row={menuFor}
+          open={true}
+          onClose={() => setMenuFor(null)}
+          onChanged={() => setAgain((n) => n + 1)}
+        />
+      )}
+
       <nav aria-label={t('needs.allQuestions')} className="mt-6">
         <Rows
           items={[

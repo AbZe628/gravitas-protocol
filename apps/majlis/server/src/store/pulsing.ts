@@ -52,6 +52,7 @@ const READERS: ReadonlySet<string> = new Set([
   'exchanges', 'exchange',
   'settings',
   'assignments',
+  'putOffs',
   'assistantLog',
 ]);
 

@@ -949,6 +949,20 @@ export interface QueueRow {
   /** Whole days it has stood here. */
   days: number;
   overdue: boolean;
+  /**
+   * Who has set this aside, until when, and why.
+   *
+   * Every standing one, whoever wrote it. Setting something aside is a
+   * position like any other here and the board reads it — the alternative
+   * shape, a private snooze, was put to the board's owner and refused: in a
+   * record whose rule is that what is written is the board's and permanent, a
+   * member could otherwise push something out of sight and nobody would know
+   * it had been pushed.
+   *
+   * It changes nothing else on the row. Not the days, not `overdue`, not
+   * whether it is waiting.
+   */
+  putOff?: { by: string; until: string; reason: string }[];
 }
 
 export interface Queue {
@@ -2332,6 +2346,15 @@ export const oversight = {
    */
   assign: (body: { ofKind: PassageKind; ofId: string; to: string | null; stepKey?: string | null }) =>
     post<{ assignment: Assignment; how: HowAssigned }>('/api/assignments', body),
+
+  /**
+   * Set something aside until a named day, or pick it up again.
+   *
+   * `until` null picks it up, and carries no reason: a member coming back to
+   * something owes the board nothing beyond the fact that they did.
+   */
+  putOff: (body: { ofKind: PassageKind; ofId: string; until: string | null; reason: string }) =>
+    post<{ putOff: { by: string; until: string | null; reason: string } }>('/api/put-off', body),
   /**
    * The passage of every one of a kind, at once, so a list does not ask per
    * card. The same reading the queue makes, through the same assignments.
