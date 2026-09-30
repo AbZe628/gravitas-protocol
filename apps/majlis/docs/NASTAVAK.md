@@ -5,8 +5,8 @@ reda koda. Red posla je u [RED.md](RED.md), prijedlozi u
 [PRIJEDLOZI-UI.md](PRIJEDLOZI-UI.md). Ovdje je stanje, ono što se ne vidi iz
 koda, i svaki sljedeći korak.
 
-**Zadnje stanje (29. 9. 2026):** sve je na **radnoj grani** — onoj na kojoj
-je ova stranica — pet commitova iznad `origin/main` (`692022e`). **Na
+**Zadnje stanje (30. 9. 2026):** sve je na **radnoj grani** — onoj na kojoj
+je ova stranica — devetnaest commitova iznad `origin/main` (`692022e`). **Na
 `main` nije ništa pushano** — to je vlasnikova odluka.
 
 | commit | šta |
@@ -17,9 +17,10 @@ je ova stranica — pet commitova iznad `origin/main` (`692022e`). **Na
 | `efe47fd` | P3 — jedan radni prozor za svaku vrstu posla; korak zna ko je već rekao svoje |
 | (ovaj) | ova stranica, RED i PRIJEDLOZI ažurirani |
 
-Zadnje mjerenje: klijent **527/527** testova (62 datoteke), server
-**1994/1994** (94 datoteke), `tsc -b` čist na obje strane, početni paket
-**149,6 kB** gzip od dozvoljenih 165 kB.
+Zadnje mjerenje (30. 9. 2026, ovaj vrh): klijent **559/559** testova (66
+datoteka), server **2069/2069** (99 datoteka), `tsc --noEmit` čist na obje
+strane, početni paket **151,6 kB** gzip od dozvoljenih 165 kB. Brojevi su
+mjereni, ne prepisani — provjeri ih prije nego se na njih pozoveš.
 
 ---
 
@@ -370,10 +371,60 @@ predsjedavajući koji je otkucao 14:00 dobio je obavijest za slanje koja piše
 13:00 bez ijedne oznake zone.
 
 ### 4.5 · RED 6 + 7 — izmjena uvjeta otvara reviziju; lanac
-- Amandman: nabrojati sve presuđeno po zamijenjenoj verziji i to staviti
-  pred odbor (čista logika).
-- Lanac odluka → uvjet → obaveza banke → dokaz → odbor vidi; spojiti registar
-  i ispitivanja na odluke.
+
+**RED 6 — `cb8a704`** (prva polovica, 30. 9. 2026). Dokument je tražio
+amandman koji nabraja šta je presuđeno po zamijenjenoj verziji. Mjerenje je
+pokazalo da amandman ne postoji — i da ispod njega ne postoji ni ono na čemu
+bi stajao.
+
+**Ništa u aplikaciji nikad nije upisalo odluku u registar.** Registar je bio
+sjeme i samo sjeme. Isti zaslon je, dvije kartice jednu od druge, govorio
+obje stvari: *what we decided* je navodio restoration window kao **IN FORCE**,
+a *in force today* je pisao **3 in force** i nije ga sadržavao. Odborova
+vlastita odluka nije stizala do popisa onoga što stoji.
+
+**I ništa nikad nije zamijenjeno.** `supersededBy` čita **pet** servisa —
+godišnji izvještaj broji odluke na snazi po njemu, priručnik dijeli trenutne
+od zamijenjenih, `review.ts`, `export.ts`, `dossier.ts` — a **nijedan ga ne
+piše.** Dvije odluke iz sjemena tvrde da su v3 i v2 bez ijednog prethodnika.
+Stranica registra piše, svojim riječima, *„the chain of what replaced what is
+drawn, not implied"* — nad lancem kojeg nema. Svaka grana na toj zastavici
+bila je nedostižna.
+
+**Lanac je bio prekinut i na prvoj karici.** Oba ispitivanja iz sjemena
+bilježe `ruleId: 'rule-pool-trading'` — *odluku kakva je stajala, da kasnija
+verzija ne može promijeniti šta je testirano* — a te odluke nije bilo nigdje.
+Njen hash parametara bio je prazan niz, pa je jedina odluka koju je ovaj
+odbor stvarno donio u vlastitom pisanom dokumentu prijavljivala svoje uvjete
+kao **neprovjerene**.
+
+- Predmet može reći koju odluku mijenja (`PUT /matters/:id/amends`),
+  **fiksirano čim glasanje krene** — šta odluka zamjenjuje je dio onoga o
+  čemu se glasa, ne bilješka uz njega.
+- Kad prođe, nova verzija se upisuje jedan iznad zamijenjene, **oba kraja
+  lanca** se postave (`supersedes` i `supersededBy`), i pred odbor se stavlja
+  sve što je počivalo na staroj (`GET /rules/:id/rested-on`).
+- **Računa; ne zaključuje** — ispitivanje po zamijenjenim uvjetima prijavljeno
+  je kao upravo to. Treba li ga ponoviti je odborovo, i za to nema polja.
+- **Oba vrata, ili nijedna.** Zabrana je odluka čim glasanje zatvori; dozvola
+  tek kad istekne vremenska brava. Registar pisan s jednih držao bi svaku
+  dozvolu i nijednu zabranu. Upis nikad ne obara sam čin.
+
+Četiri kvara nađena tek zamjenom odluke i čitanjem stranice: crtao je ključ
+umjesto naslova (*Replaced by rule-matter-20260930173714-sex2hi*); zaglavlje
+je i dalje pisalo *version 3 · in force* dok je odjeljak ispod pisao *replaced
+by*; uz činjenice je stajalo *no review scheduled*; a uz činove *„This stands.
+Nothing is waiting on the board."* — rečenica istinita za svaki zapis koji je
+dotad mogao postojati.
+
+Prošao sam cijeli put uživo — otvaranje, rasprava, glasanje, zatvaranje — i
+registar je vratio `version: 4, supersedes: rule-tangible-ratio`. Osam
+stražara razbijeno namjerno; jedan je prolazio s obrisanim pravilom jer
+životni ciklus odbije drugo zatvaranje **prije** registra, pa nikad nije ni
+stigao do onoga što mjeri — prebačen je na izravno čitanje.
+
+**Ostaje (RED 7):** lanac odluka → uvjet → obaveza banke → dokaz → odbor
+vidi; spojiti registar i ispitivanja na odluke.
 
 ### 4.6 · P4 + P6 — trijaža u redu i obavijesti
 - Činovi na samom redu (uzmi / daj, `t` = uzmi), meni na desni klik,
