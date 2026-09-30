@@ -123,14 +123,26 @@ nešto što nije predmet.
   Posljedica: dnevni red se kuca rukom umjesto da bude ono što se nakupilo kao
   „ovo traži sobu".
 
-## 6 · Izmjena uvjeta otvara reviziju presuđenog ⬜
+## 6 · Izmjena uvjeta otvara reviziju presuđenog ✅
+
+*Zatvoreno u `cb8a704`. Odluka koja stupi na snagu ulazi u registar, može
+zamijeniti postojeću, i pred odbor se stavlja sve što je počivalo na
+zamijenjenoj verziji (`services/ruling-register.ts`, `GET
+/rules/:id/rested-on`). Prije toga ništa u aplikaciji nikad nije upisalo
+odluku u registar, i ništa nikad nije bilo zamijenjeno.*
 
 - **L10** — amandman ispravno nadomješta i čuva staru verziju, ali odbor se ne
   obavijesti što je sve presuđeno po verziji koju je upravo zamijenio. To je
   stvarna noćna mora odbora — *što smo sve presudili po pravilu koje smo jučer
   promijenili* — i to je čista logika, nula sučelja.
 
-## 7 · Lanac odluka → uvjet → obaveza → dokaz ⬜
+## 7 · Lanac odluka → uvjet → obaveza → dokaz ✅
+
+*Zatvoreno u `9e5f0cd`. Presuda nosi svaki uvjet i svaku stavku, ono što banka
+mora predočiti za svaki, i šta su ispitivanja našla — uključujući koliko ih
+nikad niko nije ispitao (`services/the-chain.ts`, `GET /rules/:id/chain`).
+Usput: nalaz protiv stavke nije se mogao pročitati odborovim riječima ni u
+jednom obliku, jer su se dva čitača razilazila oko `term:` prefiksa.*
 
 - **L14** — trebalo bi: odluka → uvjet → stvar koju banka mora raditi → dokaz da
   radi → odbor to vidi. Sada su odluke ovdje, registar tamo, ispitivanja treće

@@ -6,7 +6,7 @@ reda koda. Red posla je u [RED.md](RED.md), prijedlozi u
 koda, i svaki sljedeći korak.
 
 **Zadnje stanje (30. 9. 2026):** sve je na **radnoj grani** — onoj na kojoj
-je ova stranica — devetnaest commitova iznad `origin/main` (`692022e`). **Na
+je ova stranica — dvadeset jedan commit iznad `origin/main` (`692022e`). **Na
 `main` nije ništa pushano** — to je vlasnikova odluka.
 
 | commit | šta |
@@ -17,9 +17,9 @@ je ova stranica — devetnaest commitova iznad `origin/main` (`692022e`). **Na
 | `efe47fd` | P3 — jedan radni prozor za svaku vrstu posla; korak zna ko je već rekao svoje |
 | (ovaj) | ova stranica, RED i PRIJEDLOZI ažurirani |
 
-Zadnje mjerenje (30. 9. 2026, ovaj vrh): klijent **559/559** testova (66
-datoteka), server **2069/2069** (99 datoteka), `tsc --noEmit` čist na obje
-strane, početni paket **151,6 kB** gzip od dozvoljenih 165 kB. Brojevi su
+Zadnje mjerenje (30. 9. 2026, ovaj vrh): klijent **570/570** testova (67
+datoteka), server **2091/2091** (100 datoteka), `tsc --noEmit` čist na obje
+strane, početni paket **151,9 kB** gzip od dozvoljenih 165 kB. Brojevi su
 mjereni, ne prepisani — provjeri ih prije nego se na njih pozoveš.
 
 ---
@@ -370,9 +370,9 @@ ručnu listu polja i to polje nije bilo u njoj — sad glasno trune); a
 predsjedavajući koji je otkucao 14:00 dobio je obavijest za slanje koja piše
 13:00 bez ijedne oznake zone.
 
-### 4.5 · RED 6 + 7 — izmjena uvjeta otvara reviziju; lanac
+### 4.5 · RED 6 + 7 — izmjena uvjeta otvara reviziju; lanac ✅ (30. 9. 2026)
 
-**RED 6 — `cb8a704`** (prva polovica, 30. 9. 2026). Dokument je tražio
+**RED 6 — `cb8a704`** (prva polovica). Dokument je tražio
 amandman koji nabraja šta je presuđeno po zamijenjenoj verziji. Mjerenje je
 pokazalo da amandman ne postoji — i da ispod njega ne postoji ni ono na čemu
 bi stajao.
@@ -423,8 +423,48 @@ stražara razbijeno namjerno; jedan je prolazio s obrisanim pravilom jer
 životni ciklus odbije drugo zatvaranje **prije** registra, pa nikad nije ni
 stigao do onoga što mjeri — prebačen je na izravno čitanje.
 
-**Ostaje (RED 7):** lanac odluka → uvjet → obaveza banke → dokaz → odbor
-vidi; spojiti registar i ispitivanja na odluke.
+**RED 7 — `9e5f0cd`** (druga polovica). Linija zbog koje ova aplikacija
+postoji je lanac: odbor presudi, presuda postavi uvjet, uvjet je nešto što
+banka mora raditi, bankina vlastita revizija pogleda je li radila, i odbor
+pročita šta je nađeno. Odluke su bile na jednom ekranu, registar na drugom,
+ispitivanja na trećem. Ispitivanja su djelovala nakalemljeno jer je lanac
+među njima bio presječen.
+
+Otvori presudu o bazenu prije ovoga. Odgovara na šest pitanja — šta je
+odlučeno, kako se mjeri, mijenja li se, kad se provjerava, šta ako padne, ko
+se obavijesti. Sve mehanika, sve tačno, i **nijedna riječ o tome da jeste
+pala**: tri prijenosa izvršena na 50,4% u junu, nađena ispitivanjem, u zapisu,
+i nevidljiva na stranici pravila koje su prekršili. Ispod toga je pisalo
+*„This stands. Nothing is waiting on the board."*
+
+- Presuda sad nosi sve što traži — uvjete po kojima ju je odbor prosuđivao i
+  operativne stavke koje je postavio — uz **ono što banka mora predočiti** za
+  svaki (dokument, redoslijed, broj, obavezu) i uz ono što su ispitivanja
+  našla (`GET /rules/:id/chain`, `services/the-chain.ts`).
+- **Broji; ne zaključuje.** Nema prošao, pao, ocjene ni semafora. Izuzeci se
+  broje i nose ispitivačeve riječi; šta znače je odborovo.
+- **Vrijedna polovica je šutnja.** Šest od osam stvari koje presuda o bazenu
+  traži **nikad niko nije ispitao**, i svaka je red s ničim u sebi umjesto
+  reda kojeg nema. Red koji se tiho ne crta čita se kao red koji je u redu.
+
+**I nalaz se nije mogao pročitati odborovim riječima.** Nalaz nosi ono protiv
+čega je zapisan — id uvjeta, ili `term:<key>` — i **dva čitača su se
+razilazila oko prefiksa.** Onaj koji od toga pravi rečenicu tražio je stavku
+*bez* prefiksa; onaj koji računa šta nije ispitano tražio ju je *s* njim. Ni
+jedno ispitivanje nije moglo biti tačno u oba. Oba oblika su bila u proizvodu
+istovremeno: ona iz sjemena su ispisala rečenicu pa su **ista dva pojma o
+kojima su upravo prijavila nalaz** navela kao *not examined*; a ona koja
+aplikacija zapisuje broje tačno i ispisuju `minTangibleRatioBps` tamo gdje
+stoji odborova vlastita rečenica. Nađeno zapisivanjem jednog kroz aplikaciju i
+čitanjem pored onog iz sjemena, dvije kartice na istom ekranu. Sad je jedan
+čitač, i sjeme je prešlo u oblik koji ruta jedina i prihvata.
+
+Još tri s istog prolaza: ispitivanja iz sjemena nosila su prazan hash stavki,
+pa je **svako ispitivanje u proizvodu** prijavljivalo sebe kao dokaz o uvjetima
+koje je odbor otad izmijenio — na odboru koji nikad ništa nije izmijenio; ekran
+ispitivanja crtao je samo nalaze s izuzecima, pa je ispitivanje 366 od 366
+transakcija gdje je omjer držao **pokazivalo nijedan nalaz**; a nalaz od tačno
+jednog pisao je *1 exceptions* — jedino brojanje u aplikaciji bez jednine.
 
 ### 4.6 · P4 + P6 — trijaža u redu i obavijesti
 - Činovi na samom redu (uzmi / daj, `t` = uzmi), meni na desni klik,
