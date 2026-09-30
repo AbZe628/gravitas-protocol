@@ -278,14 +278,46 @@ AbZe628 → **pitaj za push**.
   onome kome je dat), uživo s dva člana.
 - Plus §3 G za `hold.*`.
 
-### 4.3 · RED 3 + 4 — sat stvara posao; požurnica i eskalacija
-- Danas `sweep.ts` samo obara/uvodi odluke; dospjela revizija se izračuna pri
-  čitanju i ne padne nikome u red. Treba: kad rok istekne ili revizija
-  dospije, nastane stavka koja nekome pripada (kroz prolaz, ne ručna tablica).
-- *Kod institucije* 44 dana i ništa: dodati čin *požuri* (zapis da je
-  požureno, ko i kad), a poslije N dana *eskaliraj predsjedniku*. Sve kroz
-  prolaz, s `why`.
+### 4.3 · RED 3 + 4 — sat stvara posao; požurnica i eskalacija ✅ (30. 9. 2026)
+
+**RED 3 — `c5a4f6f`.** Tvrdnja je bila da sat ne stvara posao. Mjerenje je
+pokazalo da **stvara**: tri odluke bez intervala već su stajale u redu kao
+otvoren korak odbora. Pravi kvar je bio gori — taj posao se nije mogao
+obaviti. Nijedna ruta nije pisala odluku i `store` nije imao metodu za to;
+jedini gumb na koraku bio je *pogledaj ponovo*, koji otvara predmet i
+odgovara na drugo pitanje. Sada: `updateRule` u sva četiri skladišta,
+`POST /api/rules/:id/interval`, `ReviewInterval` kao **lista** (odbor koji
+skrati rok poslije bliskog promašaja je nešto rekao), i četvrto stanje
+`no_clock` — *ne na sat* je odgovor, ne praznina. Dvije stvari nađene tek
+uživo: stranica je status čitala jednom pri otvaranju, a *next review* je
+dolazio iz liste pažnje, koja nosi samo dospjelo — pa je uredna odluka na
+vlastitoj stranici pisala *no review scheduled*.
+
+**RED 4 — `2a5de32`.** Mjereno na `incident-2026-08-14`: 47 dana, plan
+odobren, 33 dana ništa nije otišlo Upravi, 41 280 AED nenaplaćeno. Ekran je
+nudio *Take this on* i *Place with…* — dodjelu bankine prijave članu odbora —
+i rečenicu **„Waiting on the institution. Nothing here is yours to press."**
+Ta rečenica je bila kvar: požurnica je jedino što **jeste** odborovo kad je
+posao bankin.
+
+- `Press` u zapisu (`step, kind, by, at, reason`), dodaje se, ne mijenja.
+- `POST /api/incidents/:id/press` — smije li se korak požuriti čita se **iz
+  prolaza**, unutar transakcije, i predaje servisu. Jedan odgovor na *je li
+  otvoren i čiji je*, ne druga kopija u ruti.
+- *Eskaliraj* je predsjednikovo i odbija se na koraku koji niko nije požurio
+  (eskalirati što se nikad nije tražilo nije eskalacija) i drugi put.
+- Korak nosi **svoje** dane, ne predmetove: 33 otkad je odbor odobrio, a ne
+  47 od prijave — u kojih 13 je odborovo vlastito vijećanje.
+- Ništa se ne šalje. Majlis sastavlja, ne šalje, kao i kod kalendara.
+
+Tri kvara nađena tek hodanjem: kontrola se crtala samo na *sljedećem* koraku,
+pa je pročišćavanje — otvoreno, 41 280 duga — nudilo ništa; citat ispod
+*eskalirano* bio je iz požurnice, ne iz eskalacije; a gašenje rečenice po
+koraku umjesto po kontroli ostavilo je promatrača s praznom trakom i bez
+ijedne rečenice.
+
 - Pazi: `test/reading-is-quiet.test.ts` — nijedno čitanje ne smije pisati.
+  Provjereno: prolazi.
 
 ### 4.4 · RED 5 + P5 — sam ili u sobi, konsenzus (IFSB-10)
 - Svaka stvar se može označiti *treba sobu* → dnevni red sjednice se sam složi.
