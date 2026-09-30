@@ -683,6 +683,15 @@ export interface Incident {
   submittedToRegulatorAt: string | null;
   purification: Purification | null;
 
+  /**
+   * Every time the board pressed the institution, in order, and every raising.
+   *
+   * Optional because a record written before this existed has none, and an
+   * absent list means nobody pressed — which is a true thing to say and
+   * exactly what an older store looks like.
+   */
+  presses?: Press[];
+
   closedAt: string | null;
   sources: SourceRef[];
 }
@@ -712,6 +721,37 @@ export interface Concurrence {
   /** Compulsory either way. "Not a breach" needs a reason as much as "breach" does. */
   reason: string;
   at: string;
+}
+
+/**
+ * The board pressing the institution on a step that is the institution's.
+ *
+ * ── why this is a record and not a message ────────────────────────────────
+ *
+ * A breach sat forty-seven days with the bank, thirty-four of them on one
+ * step, and the screen said *waiting on the institution — nothing here is
+ * yours to press*. That sentence is the fault. Pressing is precisely what is
+ * the board's when the work is the bank's: it is the only thing a Shariah
+ * board can do about a step it does not own. The one control offered was
+ * *take this on*, which would have put a board member's name on the bank's
+ * own filing.
+ *
+ * Majlis does not send. It records that the board pressed — who, when, and
+ * why — and hands the words over. What reaches the bank goes by whatever the
+ * board already uses; what is auditable is that the board did not let it sit.
+ *
+ * `raise` is the same act at the chair's level, and is refused on a step
+ * nobody has chased: raising something that was never asked for is not
+ * raising it.
+ */
+export interface Press {
+  /** The step of the breach this is about — an `IncidentStepKey`. */
+  step: string;
+  kind: 'chase' | 'raise';
+  by: string;
+  at: string;
+  /** Compulsory. The next board reads this to know what was already tried. */
+  reason: string;
 }
 
 export interface RectificationPlan {

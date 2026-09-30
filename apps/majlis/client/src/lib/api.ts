@@ -1357,6 +1357,25 @@ export interface PassageStep {
   holder?: { to: string; by: string; at: string } | null;
   /** Whether this step is one somebody on this board could take on at all. */
   holdable?: boolean;
+  /**
+   * What the board may do about a step it does not own, and what it has done.
+   *
+   * Only on an open step whose act is the institution's. `holdable` answers
+   * *could somebody here carry this*, and on the bank's own filing it is
+   * false — which left the screen saying *nothing here is yours to press* on
+   * a breach stuck thirty-four days, with *take this on* as the only control.
+   *
+   * `days` is this step's own age. The file was forty-seven days old and said
+   * so, but thirteen of those were the board's own.
+   */
+  pressing?: {
+    may: boolean;
+    mayRaise: boolean;
+    since: string | null;
+    days: number | null;
+    chases: { by: string; at: string; reason: string }[];
+    raised: { by: string; at: string; reason: string } | null;
+  };
 }
 
 /**
@@ -2237,6 +2256,18 @@ export const oversight = {
   endorsePlan: (id: string) => send<Incident>(`/api/incidents/${id}/plan/endorse`),
   returnPlan: (id: string, reason: string) =>
     send<Incident>(`/api/incidents/${id}/plan/return`, { reason }),
+  /**
+   * Record that the board pressed the institution, or that the chair raised it.
+   *
+   * Nothing is sent anywhere. What this writes down is that the board asked,
+   * who asked, when, and in what words — so a year later the file answers
+   * *was this ever chased* with something other than a shrug.
+   */
+  press: (
+    id: string,
+    said: { step: string; kind: 'chase' | 'raise'; reason: string },
+    sending: Sending = {},
+  ) => send<Incident>(`/api/incidents/${id}/press`, said, 'POST', sending),
   directors: (id: string) => send<Incident>(`/api/incidents/${id}/directors`),
   submission: (id: string) => send<Incident>(`/api/incidents/${id}/submission`),
   prescribe: (id: string, p: { amount: string; currency: string; destination: string }) =>

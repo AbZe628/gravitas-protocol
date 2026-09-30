@@ -24,7 +24,13 @@
 
 import { Router } from 'express';
 import { z } from 'zod';
-import { mayDeliberate, mayRecordInstitutionAct, mayVote } from '../auth/members.js';
+import {
+  mayDeliberate,
+  mayPress,
+  mayRaise,
+  mayRecordInstitutionAct,
+  mayVote,
+} from '../auth/members.js';
 import {
   close,
   concur,
@@ -33,6 +39,7 @@ import {
   endorsePlan,
   fileRectificationPlan,
   prescribePurification,
+  press,
   recordDirectorsApproval,
   recordPurificationPaid,
   recordRegulatorSubmission,
@@ -56,6 +63,11 @@ const reportSchema = z.object({
 });
 
 const concurSchema = z.object({ actual: z.boolean(), reason: reasonSchema });
+const pressSchema = z.object({
+  step: z.string().min(1).max(40),
+  kind: z.enum(['chase', 'raise']),
+  reason: reasonSchema,
+});
 const stoppedSchema = z.object({ activities: z.array(z.string().min(1).max(500)).min(1).max(100) });
 
 const planSchema = z.object({
@@ -264,6 +276,55 @@ export function incidentRoutes(store: Store, now: () => string = () => new Date(
         await store.updateIncident(req.params.id, (current) =>
           endorsePlan(board, current, who.scholarId, at),
         ),
+      );
+    }),
+  );
+
+  /**
+   * Press the institution on a step that is theirs, or raise it to the chair.
+   *
+   * ── whose judgement decides ───────────────────────────────────────────────
+   *
+   * Whether the step may be pressed at all is read from the passage, here,
+   * and handed to the service. The route could have asked the stage — it is
+   * two lines shorter — and then there would be two answers in the
+   * application to *is this step open and whose is it*, which is the exact
+   * fault this passage was built to remove. The screen offers *press* from
+   * `step.pressing.may`; this refuses on the same reading of the same record,
+   * so the control is present precisely where it can be honoured.
+   *
+   * Read inside the transaction, from the stored record, and not from the
+   * passage the client had when it drew the button: a step the institution
+   * completed in the meantime is no longer pressable, and the board should
+   * learn that rather than write a chase about work already done.
+   */
+  router.post(
+    '/incidents/:id/press',
+    handle(async (req, res) => {
+      const who = identityOf(req);
+
+      const parsed = pressSchema.safeParse(req.body);
+      if (!parsed.success) return badRequest(res, parsed.error.issues);
+
+      const raising = parsed.data.kind === 'raise';
+      const allowed = raising ? mayRaise(who.office) : mayPress(who.role, who.office);
+      const what = raising ? 'raise a step to the chair' : 'press the institution';
+      if (!requireRole(res, allowed, what, who.role)) return;
+
+      const at = now();
+      res.json(
+        await store.updateIncident(req.params.id, (current) => {
+          const step = buildIncidentPassage(current, at)
+            .groups.flatMap((g) => g.steps)
+            .find((s) => s.key === parsed.data.step);
+
+          return press(
+            current,
+            { ...parsed.data, by: who.scholarId },
+            at,
+            { open: step?.state === 'open', whose: step?.whose ?? '' },
+          );
+        }),
       );
     }),
   );

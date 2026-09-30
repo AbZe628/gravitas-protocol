@@ -430,6 +430,36 @@ export function mayConvene(office?: Office): boolean {
 }
 
 /**
+ * Who may press the institution on a step the institution owes.
+ *
+ * A signatory, or the secretary. Wider than most acts here on purpose:
+ * chasing changes nothing about the record of the breach itself — it records
+ * that the board did not let it sit — and a board where only one person may
+ * ask the bank where its filing is will be a board where nobody asks. An
+ * advisory member may not, because they do not carry the board's voice
+ * outward; a liaison may not, because the liaison is the institution's person
+ * here and would be chasing themselves.
+ */
+export function mayPress(role: Role, office?: Office): boolean {
+  return role === 'signatory' || office === 'secretary';
+}
+
+/**
+ * Who may raise a step to the chair's level.
+ *
+ * The chair, and only the chair. Not a matter of seniority: raising it means
+ * the chair takes it up, and a system that let anyone record that the chair
+ * had done so would be putting words in the chair's mouth in the one place a
+ * regulator later reads them.
+ *
+ * A board with no chair configured cannot raise anything here, and the screen
+ * says so rather than offering a control the server refuses.
+ */
+export function mayRaise(office?: Office): boolean {
+  return office === 'chair';
+}
+
+/**
  * Who keeps the minute.
  *
  * The chair, who convened the meeting, or the secretary, whose office this

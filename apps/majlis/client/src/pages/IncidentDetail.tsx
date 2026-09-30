@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { useParams } from 'react-router-dom';
 import { oversight, type Incident, type Passage, type PassageStep } from '../lib/api.js';
 import Holding from '../components/Holding.js';
+import Pressing from '../components/Pressing.js';
 import WorkWindow from '../components/WorkWindow.js';
 import { useI18n } from '../lib/i18n.js';
 import { DateText, ErrorText, Loading, Tag } from '../components/ui.js';
@@ -911,6 +912,16 @@ export default function IncidentDetail() {
           documentLabel={t('snc.whatHappened')}
           document={<p>{i.report}</p>}
           holding={(step) => <Holding passage={passage} step={step} onChanged={load} ruled={false} />}
+          /*
+           * The one act a board has on a step that is the bank's.
+           *
+           * Beside `holding` and not inside it: holding asks who here is
+           * carrying this, and on the Directors' own approval nobody can be.
+           * The screen drew *nobody has taken this on yet* and *take this on*
+           * beneath a breach thirty-four days stuck, and then said nothing
+           * here was the board's to press.
+           */
+          pressing={(step) => <Pressing incidentId={id} step={step} onPressed={load} />}
           holdingAll={
             passage.holdable ? <Holding passage={passage} onChanged={load} /> : undefined
           }

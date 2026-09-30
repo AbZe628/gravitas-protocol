@@ -117,6 +117,7 @@ const SETTLED: Record<string, Say> = {
 const stoppedIn = (i: Incident) => i.stopped ?? [];
 const plansIn = (i: Incident) => i.plans ?? [];
 const concurrencesIn = (i: Incident) => i.concurrences ?? [];
+const pressesIn = (i: Incident) => i.presses ?? [];
 
 /** The plan that stands, which is the last one filed. */
 function standingPlan(i: Incident) {
@@ -329,6 +330,65 @@ function puttingRightOf(i: Incident, now: string): Step[] {
 }
 
 /**
+ * When each step's own turn came.
+ *
+ * Not the same as when the file arrived. A breach is forty-seven days old and
+ * says so, but the board spent four of those determining and nine more getting
+ * to an endorsement, and neither is the institution's delay. The number a
+ * board presses on is the one that starts when the step became the
+ * institution's to do — which is, in every case, when the step before it
+ * closed.
+ */
+function turnCameAt(i: Incident, key: IncidentStepKey): string | null {
+  switch (key) {
+    case 'plan':
+      return i.determinedAt;
+    case 'directors':
+      return standingPlan(i)?.endorsedAt ?? null;
+    case 'regulator':
+      return i.directorsApprovedAt;
+    case 'purify':
+      return i.purification?.prescribedAt ?? null;
+    default:
+      return null;
+  }
+}
+
+/**
+ * What the board may do about a step it does not own, and what it has done.
+ *
+ * Written onto open steps whose act belongs to the institution, and onto no
+ * others: pressing the bank about the board's own endorsement would be the
+ * board writing to the bank about itself.
+ *
+ * Raising is refused until somebody has chased, and refused twice. Both are
+ * said here rather than only in the route, so the control is absent where the
+ * server would refuse it instead of present and then rejected.
+ */
+function pressingOn(i: Incident, step: Step, now: string): Step {
+  if (step.state !== 'open' || step.whose !== 'institution') return step;
+
+  const mine = pressesIn(i).filter((p) => p.step === step.key);
+  const chases = mine.filter((p) => p.kind === 'chase').map(({ by, at, reason }) => ({ by, at, reason }));
+  const raisedPress = mine.find((p) => p.kind === 'raise') ?? null;
+  const raised = raisedPress ? { by: raisedPress.by, at: raisedPress.at, reason: raisedPress.reason } : null;
+
+  const since = turnCameAt(i, step.key as IncidentStepKey);
+
+  return {
+    ...step,
+    pressing: {
+      may: true,
+      mayRaise: chases.length > 0 && !raised,
+      since,
+      days: since ? daysSince(since, now) : null,
+      chases,
+      raised,
+    },
+  };
+}
+
+/**
  * Where a breach now waits.
  *
  * Not who is at fault. A breach whose plan is with the Board of Directors
@@ -342,7 +402,12 @@ export function buildIncidentPassage(incident: Incident, now: string): Passage {
   const settledNote = SETTLED[incident.stage] ?? null;
 
   const establishing = establishingOf(incident).map((s) => (settledNote ? asPast(s) : s));
-  const puttingRight = puttingRightOf(incident, now).map((s) => (settledNote ? asPast(s) : s));
+  const puttingRight = puttingRightOf(incident, now)
+    .map((s) => (settledNote ? asPast(s) : s))
+    // After `asPast`, so a closed breach carries no pressing at all: there is
+    // nothing left to press, and a settled file offering *chase them* would be
+    // the application asking a board to chase a bank that has finished.
+    .map((s) => pressingOn(incident, s, now));
 
   const groups: Group[] = [
     { key: 'establishing', order: 'sequence', steps: establishing },

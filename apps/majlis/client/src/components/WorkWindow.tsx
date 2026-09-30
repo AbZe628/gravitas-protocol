@@ -3,6 +3,7 @@ import type { Passage, PassageStep } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { nameOf, useMembers } from '../lib/members.js';
 import { useIdentity } from '../lib/identity.js';
+import { mayPress } from './Pressing.js';
 import { useStanding } from '../lib/standing.js';
 import { DateText } from './ui.js';
 import StepWindow, { type Step } from './StepWindow.js';
@@ -85,6 +86,7 @@ export default function WorkWindow({
   document,
   documentLabel,
   holding,
+  pressing,
   holdingAll,
   notice,
   moved,
@@ -109,6 +111,17 @@ export default function WorkWindow({
    */
   holding?: (step: PassageStep) => ReactNode;
   /**
+   * Pressing the institution on a step the board does not own.
+   *
+   * Separate from `holding` and not a case of it. Holding asks *who here is
+   * carrying this*, and on the bank's own filing nobody can be — so a breach
+   * stuck thirty-four days with the Directors drew *nobody has taken this on
+   * yet*, *take this on*, and then *nothing here is yours to press*. Taking on
+   * the bank's filing is not a thing. Pressing the bank is, and it is the one
+   * act a board has on a step it does not own.
+   */
+  pressing?: (step: PassageStep) => ReactNode;
+  /**
    * Who is carrying the whole of it.
    *
    * Beside the facts rather than beside the step, because that is what it is
@@ -128,7 +141,8 @@ export default function WorkWindow({
   const { t, say } = useI18n();
   const members = useMembers();
   const standing = useStanding();
-  const me = useIdentity().identity?.scholarId;
+  const identity = useIdentity().identity;
+  const me = identity?.scholarId;
   const steps = passage.groups.flatMap((g) => g.steps.map((s) => ({ step: s, group: g.key })));
 
   /* Null follows the work; a key is a step the member opened to read. */
@@ -163,6 +177,17 @@ export default function WorkWindow({
   const open = step.state === 'open';
   const elsewhere = open && step.who && step.who !== me ? step.who : null;
   const spoke = open && !!me && (step.heard ?? []).includes(me);
+  /*
+   * The pressing block, drawn once and looked at twice.
+   *
+   * It comes back null where this member may not press — an observer, an
+   * advisory member — and the sentence below has to follow that and not the
+   * step. Suppressed on `step.pressing.may` alone, an observer on the bank's
+   * step was left with an empty act bar and no sentence at all: nothing to do
+   * and nothing saying why.
+   */
+  const press = pressing && mayPress(step, identity) ? pressing(step) : null;
+
   const bar = elsewhere ? (
     <>
       <span className="text-ui text-muted">{t('work.withSomebody', { who: nameOf(members, elsewhere) })}</span>
@@ -172,7 +197,13 @@ export default function WorkWindow({
     panel?.action ??
     (spoke ? (
       <span className="text-ui text-muted">{t('work.heardYou')}</span>
-    ) : passage.next ? (
+    ) : passage.next && !press ? (
+      /*
+       * Silent where pressing is offered, because the two would contradict
+       * each other on the same screen: *no act on this step is the board’s*
+       * sat directly beneath *press the institution*. Something here is
+       * theirs — it is drawn in the body, beside how long the step has stood.
+       */
       <span className="text-ui text-muted">{t('work.notYours', { whose: whose(step) })}</span>
     ) : null)
   );
@@ -280,6 +311,27 @@ export default function WorkWindow({
       )}
 
       {following && passage.next && holding && <div className="mt-4">{holding(step)}</div>}
+
+      {/*
+        Pressing the institution, beside what is holding the step up.
+
+        In the body with `holding` and not in the act bar, because it is the
+        same shape of thing: a line of record — how long this has stood, who
+        asked last and in what words — and the one or two acts that line
+        allows. The bar carries the act of the step itself, and on a step that
+        is the bank's there is none for this board.
+
+        On whatever step is open, and not only on the one that is next.
+        Holding is gated on `following` because taking on work out of turn is
+        odd; pressing is not. Purification runs beside the plan and is open at
+        the same time as the Directors' approval, so a member who opened
+        *purification* — forty-one thousand outstanding, nothing recorded paid
+        — found no way to ask about it at all, while the same breach offered
+        one on the step before. Whether a step can be pressed is the server's
+        answer, and asking it a second time here is the second place deciding
+        that this grammar exists to remove.
+      */}
+      {press}
 
       {panel?.detail && <div className="mt-4 max-w-[68ch] text-ui leading-relaxed text-paper">{panel.detail}</div>}
 

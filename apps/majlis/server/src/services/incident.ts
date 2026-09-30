@@ -36,6 +36,7 @@ import type {
   Concurrence,
   Incident,
   IncidentStage,
+  Press,
   Purification,
   RectificationPlan,
 } from '../types.js';
@@ -66,7 +67,10 @@ export type IncidentRefusal =
   | 'not_submitted'
   | 'purification_outstanding'
   | 'nothing_prescribed'
-  | 'already_paid';
+  | 'already_paid'
+  | 'not_pressable'
+  | 'not_chased_yet'
+  | 'already_raised';
 
 function refuse(code: IncidentRefusal, message: string): never {
   throw new Refused(code as never, message);
@@ -468,6 +472,83 @@ export function close(incident: Incident, at: string): Incident {
     );
   }
   return { ...incident, stage: 'closed', closedAt: at };
+}
+
+// ── pressing the institution ──────────────────────────────────────────────
+
+/**
+ * Record that the board pressed the institution on a step that is theirs.
+ *
+ * ── what this is for ──────────────────────────────────────────────────────
+ *
+ * The commonest way a breach dies is that it stops being anybody's. A step
+ * belongs to the bank, the board can see it has stood for a month, and the
+ * only honest thing a board can do about it — press — was the one thing the
+ * application had no word for. Forty-seven days on the screen, thirty-four of
+ * them on one step, and the single control offered was *take this on*, which
+ * would have put a scholar's name on the bank's own filing.
+ *
+ * ── it does not send anything ─────────────────────────────────────────────
+ *
+ * Majlis composes and does not send, here as with the calendar and the
+ * notices. What this writes down is that the board pressed, who pressed, when,
+ * and in what words — so that a year later the file answers *was this chased*
+ * with something other than a shrug. How the words reached the bank is the
+ * board's own business and always was.
+ *
+ * ── whether it may be pressed is not decided here ─────────────────────────
+ *
+ * The caller passes the step as the reading of the record gives it. Whether a
+ * step is open, and whose act it is, is answered in exactly one place — the
+ * passage — and a second copy of that judgement living in this file is the
+ * fault that put nine breach steps in a component and six in the queue, each
+ * disagreeing with the other about where the same breach stood.
+ */
+export function press(
+  incident: Incident,
+  said: { step: string; kind: 'chase' | 'raise'; by: string; reason: string },
+  at: string,
+  stepStands: { open: boolean; whose: string },
+): Incident {
+  if (!stepStands.open || stepStands.whose !== 'institution') {
+    refuse(
+      'not_pressable',
+      'That step is not one the institution owes. A board presses the bank about the bank’s ' +
+        'work; its own it simply does.',
+    );
+  }
+
+  const why = requireReason(
+    said.reason,
+    said.kind === 'raise' ? 'Raising a step to the chair' : 'Pressing the institution',
+  );
+
+  const mine = (incident.presses ?? []).filter((p) => p.step === said.step);
+
+  if (said.kind === 'raise') {
+    /*
+     * Raising what nobody asked for is not raising it.
+     *
+     * Not a delay in days — the board decides when it has waited long enough,
+     * and a threshold written here would be this application deciding on a
+     * board's behalf how patient to be. What it does insist on is the order:
+     * a chair writing to the Directors about a step nobody ever chased is the
+     * board escalating its own silence.
+     */
+    if (!mine.some((p) => p.kind === 'chase')) {
+      refuse(
+        'not_chased_yet',
+        'Nothing has been chased on that step. Raising something the institution was ' +
+          'never asked for is not raising it.',
+      );
+    }
+    if (mine.some((p) => p.kind === 'raise')) {
+      refuse('already_raised', 'That step has already been raised to the chair.');
+    }
+  }
+
+  const entry: Press = { step: said.step, kind: said.kind, by: said.by, at, reason: why };
+  return { ...incident, presses: [...(incident.presses ?? []), entry] };
 }
 
 export interface Disclosure {

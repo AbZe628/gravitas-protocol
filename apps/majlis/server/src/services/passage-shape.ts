@@ -154,6 +154,34 @@ export interface Step {
    * own filing would be a button the server refuses, offered on every breach.
    */
   holdable?: boolean;
+  /**
+   * Where the board has pressed the institution on this step, and where it may.
+   *
+   * Only on a step the board does not own and cannot do. `holdable` answers
+   * *could somebody here carry this*, and on the bank's own filing the answer
+   * is no — which left the screen saying *nothing here is yours to press* on a
+   * breach thirty-four days stuck, with *take this on* as the only control.
+   * Taking on the bank's filing is not a thing; pressing the bank is, and it
+   * is the only thing a board can do about a step it does not own.
+   *
+   * `since` and `days` are this step's own age, not the file's. The file was
+   * forty-seven days old and the number said so, but four of those were the
+   * board determining and nine were the board getting to an endorsement. What
+   * a board presses on is the thirty-four days since it endorsed and nothing
+   * went to the Directors.
+   */
+  pressing?: {
+    /** Whether pressing on this step would mean anything. */
+    may: boolean;
+    /** Whether raising it would: false until somebody has chased, and after a raise. */
+    mayRaise: boolean;
+    /** When this step's own turn came, where the record says. */
+    since: string | null;
+    days: number | null;
+    /** Every chase, in order, and the raising where there is one. */
+    chases: { by: string; at: string; reason: string }[];
+    raised: { by: string; at: string; reason: string } | null;
+  };
 }
 
 /**
