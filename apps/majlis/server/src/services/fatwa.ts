@@ -42,6 +42,7 @@ import {
   type Seal,
   type Signing,
 } from './signature.js';
+import { decidedBy, seekingAgreementUntil } from './consensus.js';
 import { quorumFor, ratificationDeadline } from './lifecycle.js';
 import { Refused } from './lifecycle.js';
 import type {
@@ -186,6 +187,35 @@ export interface Fatwa {
   abstentions: FatwaSignature[];
   quorumRequired: number;
   quorumRecorded: number;
+  /**
+   * Whether the board agreed, or carried it — and who was never heard from.
+   *
+   * ── what a reader could not tell before ─────────────────────────────────
+   *
+   * This document carried those for, those against, those abstaining, the
+   * quorum required and the quorum recorded, and nothing else. On a board of
+   * five that decided with two positions and three members silent, it read
+   * *In favour: two. Quorum required: two.* — a board that agreed.
+   *
+   * IFSB-10 asks a board to seek agreement and, where it decides by a
+   * majority instead, to say so. There was no sentence here that could.
+   *
+   * `silent` is named and not counted, because the difference between a
+   * ruling three members declined to join and one three members never saw is
+   * the whole of what a later reader wants to know.
+   *
+   * Names, resolved here where the board is in hand. The renderer was left to
+   * look them up among the signatures, and a member who never voted is in no
+   * signature block — so the one document a regulator reads said *2
+   * signatories recorded no position: member-d, member-e*, printing the keys
+   * of a configuration file in a sealed ruling. Found by reading the output.
+   */
+  decidedBy: {
+    how: 'consensus' | 'majority';
+    silent: { scholarId: string; name: string; title: string }[];
+  } | null;
+  /** Where the board gave itself a period to agree, and until when. */
+  soughtAgreementUntil: string | null;
 
   /** Every source anyone attached and did not withdraw. */
   evidence: SourceRef[];
@@ -379,6 +409,18 @@ export function assemble(
     abstentions: all.filter((s) => s.position === 'abstain'),
     quorumRequired: quorumFor(board, matter.direction),
     quorumRecorded: standing.filter((r) => r.position === 'for').length,
+    decidedBy: (() => {
+      const said = decidedBy(board, matter, generatedAt);
+      if (!said) return null;
+      return {
+        how: said.how,
+        silent: said.silent.map((id) => {
+          const member = board.members.find((m) => m.id === id);
+          return { scholarId: id, name: member?.name ?? id, title: member?.title ?? '' };
+        }),
+      };
+    })(),
+    soughtAgreementUntil: seekingAgreementUntil(matter),
 
     evidence: matter.sources.filter((s) => !s.withdrawnAt),
 
@@ -429,6 +471,51 @@ function date(iso: string | null): string {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return esc(iso);
   return d.toISOString().slice(0, 10);
+}
+
+/**
+ * How the board reached this, said in a sentence before the names.
+ *
+ * ── the sentence that was missing ─────────────────────────────────────────
+ *
+ * The document listed those for, those against, those abstaining, the quorum
+ * required and the quorum recorded. On a board of five that decided with two
+ * positions and three members never heard from, that reads *In favour: two.
+ * Quorum required: two* — which a reader takes for a board that agreed.
+ *
+ * IFSB-10 asks that a decision taken by a majority say so. This is that
+ * sentence, and it names those who were silent rather than counting them: a
+ * ruling three members declined to join and a ruling three members never saw
+ * are different things, and only the names tell them apart.
+ *
+ * Nothing here is a judgement about the decision. A majority decision is a
+ * perfectly good decision, taken the way boards take them; what would not be
+ * good is a document that could not tell a reader which kind it was.
+ */
+function howDecided(fatwa: Fatwa): string {
+  if (!fatwa.decidedBy) return '';
+
+  const { how, silent } = fatwa.decidedBy;
+  const named = silent.map((s) => esc(s.name));
+
+  const said =
+    how === 'consensus'
+      ? 'Every signatory of this board recorded a position, and all were in favour.'
+      : 'Carried on the recorded quorum, not on the agreement of the whole board.';
+
+  const unheard =
+    silent.length === 0
+      ? ''
+      : ` <strong>${named.length === 1 ? 'One signatory' : `${named.length} signatories`} recorded no position: ${named.join(', ')}.</strong>`;
+
+  const waited = fatwa.soughtAgreementUntil
+    ? ` The board had given itself until ${date(fatwa.soughtAgreementUntil)} to agree.`
+    : '';
+
+  return `    <section>
+      <h2>${how === 'consensus' ? 'Decided by agreement' : 'Decided by majority'}</h2>
+      <p>${said}${unheard}${waited}</p>
+    </section>`;
 }
 
 function block(signatures: FatwaSignature[], heading: string): string {
@@ -703,6 +790,7 @@ ${fatwa.implementationSteps.map((s) => `        <li>${esc(s)}</li>`).join('\n')}
 ${parameters}
     </section>
 
+${howDecided(fatwa)}
 ${block(fatwa.signatures, 'In favour')}
 ${block(fatwa.dissent, 'Against')}
 ${block(fatwa.abstentions, 'Abstained')}

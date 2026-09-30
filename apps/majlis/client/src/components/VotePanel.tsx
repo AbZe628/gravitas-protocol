@@ -1,11 +1,18 @@
 import { useEffect, useState } from 'react';
-import { governance, type Delivery, type Matter, type Notice, type Tally } from '../lib/api.js';
+import {
+  governance,
+  oversight,
+  type Delivery,
+  type Matter,
+  type Notice,
+  type Tally,
+} from '../lib/api.js';
 import { useRevision } from '../lib/pulse.js';
 import Act from './Act.js';
 import AfterAct from './AfterAct.js';
 import { useI18n } from '../lib/i18n.js';
 import Dictate from './Dictate.js';
-import { Card } from './ui.js';
+import { Card, DateText } from './ui.js';
 import { Field } from './field.js';
 import { Button } from './Button';
 import Person from './Person.js';
@@ -107,6 +114,8 @@ export default function VotePanel({
   const [reopening, setReopening] = useState(false);
   /** Which of the five acts has its window open. Null when none has. */
   const [acting, setActing] = useState<string | null>(null);
+  /** The date the board is giving itself to agree. Empty until they pick one. */
+  const [until, setUntil] = useState('');
 
   /*
    * Mirrors the server exactly: `matter.deliberation.length === 0`.
@@ -280,6 +289,39 @@ export default function VotePanel({
                   <Person id={who} />
                 </span>
               ))}
+            </p>
+          )}
+
+          {/*
+            Whether this is the board agreeing, or the board carrying it.
+
+            Every figure above is true and together they read as finished. *2
+            of 2* is the count against the threshold and not against the
+            board; *threshold met* is the headline; and *close the vote* used
+            to sit beneath it as the obvious next act, on a board of five
+            where three members had said nothing at all.
+
+            IFSB-10 asks a board to seek agreement and to say so where it
+            decides by a majority instead. This is that sentence, said where
+            the act is offered rather than discovered afterwards in the
+            written ruling — and it refuses nothing. The threshold is the
+            board's and was fixed when the question was put.
+          */}
+          {tally.standing && (
+            <p
+              className={
+                'mt-3 border-t border-line pt-3 text-ui leading-relaxed ' +
+                (tally.standing.state === 'consensus' ? 'text-settled' : 'text-sand')
+              }
+            >
+              {t(`vote.standing.${tally.standing.state}`)}
+              {tally.standing.seekingUntil && (
+                <>
+                  {' '}
+                  {t(tally.standing.periodPast ? 'vote.sought.past' : 'vote.sought.until')}{' '}
+                  <DateText iso={tally.standing.seekingUntil} />
+                </>
+              )}
             </p>
           )}
         </div>
@@ -575,6 +617,18 @@ export default function VotePanel({
         {matter.status === 'voting' && signatory && !tallyLost &&
           button(t('action.close'), () => setActing('closeVoting'))}
 
+        {/*
+          Offered only where the board has not agreed and has set no period.
+
+          Not beside a vote everyone has already joined, where a date to wait
+          until would be a date to wait for nothing; and not a second time,
+          because the standing period is already said above the act bar and
+          extending it is the same control reached from there.
+        */}
+        {matter.status === 'voting' && signatory && tally?.standing &&
+          tally.standing.state !== 'consensus' && !tally.standing.seekingUntil &&
+          button(t('agree.set'), () => { setUntil(''); setActing('seekAgreement'); })}
+
         {matter.status === 'voting' && signatory && !reopening &&
           button(t('reopen.title'), () => { setReason(''); setReopening(true); })}
 
@@ -587,6 +641,48 @@ export default function VotePanel({
         {['draft', 'deliberation', 'voting', 'timelock'].includes(matter.status) && deliberator &&
           button(t('action.withdraw'), () => setActing('withdraw'), 'warn')}
       </div>
+
+      <Act
+        open={acting === 'seekAgreement'}
+        onClose={() => setActing(null)}
+        title={t('agree.set')}
+        does={t('agree.does')}
+        means={t('agree.means')}
+        label={t('agree.set')}
+        reason={{ label: t('agree.why'), help: t('agree.whyHelp'), required: true }}
+        perform={async ({ reason, sending }) => {
+          /*
+           * Midday, not midnight.
+           *
+           * A date box gives a day, and a day turned into an instant at 00:00
+           * is the moment the day begins — so "until the fourteenth" would run
+           * out the evening of the thirteenth for anybody east of the server.
+           * Midday is the one hour in the day that lands on the right date in
+           * every zone a board sits in.
+           */
+          onChanged(
+            await oversight.seekAgreement(
+              matter.id,
+              { until: new Date(until + 'T12:00:00Z').toISOString(), reason },
+              sending,
+            ),
+          );
+          setActing(null);
+        }}
+        after={{ did: t('agree.did'), means: t('agree.didMeans'), next: [] }}
+      >
+        <Field label={t('agree.until')} help={t('agree.untilHelp')}>
+          {(attrs) => (
+            <input
+              {...attrs}
+              type="date"
+              value={until}
+              onChange={(e) => setUntil(e.target.value)}
+              className="rounded-card bg-raised px-4 py-2.5 text-body text-paper shadow-ring outline-none"
+            />
+          )}
+        </Field>
+      </Act>
 
       {/*
         ── the five acts that used to happen in silence ──────────────────────

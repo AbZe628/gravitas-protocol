@@ -2031,6 +2031,27 @@ const en: Dict = {
   "room.waiting": "Waiting for a room",
   "room.askedBy": "Asked by",
   "room.alreadyDown": "Already down for",
+
+  // ── agreement, and deciding without it ──────────────────────────────
+  //
+  // The counts answer "is the threshold met". These answer "is this the
+  // board agreeing, or the board carrying it" — which is what IFSB-10 asks
+  // a record to be able to say, and what nothing here could say.
+  "vote.standing.consensus": "Every signatory has recorded a position, and all are in favour.",
+  "vote.standing.majority": "Enough are in favour to carry it, but not the whole board. Closing now decides it by majority.",
+  "vote.standing.divided": "The board is not agreed, and not enough are in favour to carry it.",
+  "vote.standing.not_yet": "Nobody has recorded a position against, and not enough have spoken to carry it.",
+  "vote.sought.until": "The board is seeking agreement until",
+  "vote.sought.past": "The board sought agreement until",
+  "agree.set": "Give it until a date",
+  "agree.until": "Until",
+  "agree.untilHelp": "The date the board will seek agreement to. It stops nothing: the threshold is yours and was fixed when the question was put.",
+  "agree.why": "Why this long",
+  "agree.whyHelp": "Read beside how long you actually waited. \u201cUntil the next sitting\u201d and \u201cuntil the desk reports back\u201d are different reasons.",
+  "agree.does": "Records that the board is giving itself until this date to agree before carrying it on the quorum.",
+  "agree.means": "Nothing is blocked. What changes is that the record can tell a board that waited from a board that did not.",
+  "agree.did": "The period is on the record.",
+  "agree.didMeans": "The vote is exactly where it was. Anybody who could close it before can close it now.",
   "meet.agendaMore": "Anything else, one item per line",
   "press.neverChased": "Nothing has been asked about it.",
   "press.chased": "Asked {times} times.",

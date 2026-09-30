@@ -537,6 +537,34 @@ export interface Tally {
   required: number;
   met: boolean;
   outstanding: string[];
+  /**
+   * Whether this is the board agreeing, or the board carrying it.
+   *
+   * The counts above answer a different question. *2 of 2 · threshold met* on
+   * a board of five with three members never heard from is every figure true
+   * and the whole reading as finished. IFSB-10 asks a board to seek agreement
+   * and to say so where it decides by a majority instead; there was no word
+   * for either in this application.
+   *
+   * Optional, because a server that predates it sends the counts alone and a
+   * screen that refused to draw them would be worse than one that draws the
+   * counts without the sentence.
+   */
+  standing?: Standing;
+}
+
+export interface Standing {
+  state: 'consensus' | 'majority' | 'divided' | 'not_yet';
+  everybodySpoke: boolean;
+  for: string[];
+  against: string[];
+  abstained: string[];
+  /** Signatories with no standing position. Named, never counted. */
+  silent: string[];
+  required: number;
+  /** Where the board gave itself a period to agree, and until when. */
+  seekingUntil: string | null;
+  periodPast: boolean;
 }
 
 export type AttentionKind =
@@ -2178,6 +2206,17 @@ export const oversight = {
    */
   askForTheRoom: (matterId: string, said: { wanted: boolean; reason: string }, sending: Sending = {}) =>
     send<Matter>(`/api/matters/${matterId}/room`, said, 'POST', sending),
+
+  /**
+   * Give the board until a date to agree, rather than carrying it now.
+   *
+   * It gates nothing: the threshold is the board's and was fixed when the
+   * question was put. What it does is put a date on the intention, so that
+   * *carried on the second day* and *carried after a fortnight of asking*
+   * stop being the same entry in the record.
+   */
+  seekAgreement: (matterId: string, said: { until: string; reason: string }, sending: Sending = {}) =>
+    send<Matter>(`/api/matters/${matterId}/agreement`, said, 'POST', sending),
   meeting: (id: string) => get<MeetingRow>(`/api/meetings/${id}`),
   convene: (input: { boardId: string; at: string; joinUrl?: string | null; agenda: AgendaItem[] }) =>
     /*

@@ -454,6 +454,26 @@ export interface Matter {
    */
   wantsTheRoom?: RoomCall[];
 
+  /**
+   * The period the board gave itself to reach agreement before carrying it.
+   *
+   * IFSB-10 asks a board to seek agreement and, where it decides by a majority
+   * instead, to say so. The application had neither half: the vote read *2 of
+   * 2 · threshold met* with three signatories never heard from, and offered
+   * *close the vote* underneath.
+   *
+   * It gates nothing. The threshold is the board's and was fixed when the
+   * question was put, and a period that could stop a board closing on its own
+   * quorum would be this record governing. What it does is put a date on the
+   * intention, so *we carried it on the second day* and *we waited a fortnight
+   * and three of them never answered* are different things in the record
+   * rather than the same one.
+   *
+   * Append-only. A board that extends the period has said two things, and how
+   * long they waited before carrying it is what the next board asks.
+   */
+  seekingAgreement?: SeekingAgreement[];
+
   /** What is proposed, in ordinary language. */
   proposal: string;
   /** What is expressly NOT being decided. Prevents narrow approvals being
@@ -982,6 +1002,15 @@ export interface AgendaItem {
  */
 export interface RoomCall {
   wanted: boolean;
+  by: string;
+  at: string;
+  reason: string;
+}
+
+/** A board giving itself until a date to agree, rather than carrying it now. */
+export interface SeekingAgreement {
+  /** The date the board set. After it, the record says they waited this long. */
+  until: string;
   by: string;
   at: string;
   reason: string;

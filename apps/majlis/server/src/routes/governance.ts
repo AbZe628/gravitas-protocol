@@ -31,6 +31,7 @@ import {
 import { z } from 'zod';
 import { mayAskForTheRoom, mayDeliberate, mayOpenMatter, mayVote } from '../auth/members.js';
 import { callForTheRoom } from '../services/meeting.js';
+import { seekAgreementUntil, standingOn } from '../services/consensus.js';
 import {
   Refused,
   bringIntoForce,
@@ -156,6 +157,10 @@ const openSchema = z.object({
 });
 
 const roomSchema = z.object({ wanted: z.boolean(), reason: z.string().min(1).max(20_000) });
+const agreementSchema = z.object({
+  until: z.string().min(4).max(40),
+  reason: z.string().min(1).max(20_000),
+});
 
 const saySchema = z.object({
   body: z.string().min(1).max(20_000),
@@ -555,6 +560,38 @@ export function governanceRoutes(
       };
 
       res.status(201).json(await store.createMatter(matter));
+    }),
+  );
+
+  /**
+   * Give the board until a date to agree, rather than carrying it now.
+   *
+   * ── it gates nothing ──────────────────────────────────────────────────────
+   *
+   * The threshold is the board's and was fixed when the question was put. A
+   * period that could stop a board closing on its own quorum would be this
+   * route governing, and a chair who needed to carry something urgently would
+   * find the application in the way of a decision it has no business having a
+   * view about.
+   *
+   * What it does is put a date on the intention, so that *carried on the
+   * second day with three members never heard from* and *carried after a
+   * fortnight of asking* stop being the same entry in the record.
+   */
+  router.post(
+    '/matters/:id/agreement',
+    handle(async (req, res) => {
+      const who = identityOf(req);
+      if (!requireRole(res, mayVote(who.role), 'set a period to seek agreement', who.role)) return;
+
+      const parsed = agreementSchema.safeParse(req.body);
+      if (!parsed.success) return badRequest(res, parsed.error.issues);
+
+      const at = now();
+      const updated = await changeMatter(store, req, res, req.params.id, (matter) =>
+        seekAgreementUntil(matter, { ...parsed.data, by: who.scholarId }, at),
+      );
+      if (updated) res.json(updated);
     }),
   );
 
@@ -2911,7 +2948,17 @@ export function governanceRoutes(
         res.status(404).json({ error: 'not_found', message: 'No such board.' });
         return;
       }
-      res.json(tally(board, matter));
+      /*
+       * Both, because they answer different questions and the screen needs
+       * both in one place.
+       *
+       * The tally counts against the threshold: *2 of 2, threshold met*. It
+       * says nothing about the board, and on a board of five with two
+       * positions recorded it reads as finished. What the members are for is
+       * the second half — who agreed, who dissented, and who has not been
+       * heard from at all — and until now the application had no word for it.
+       */
+      res.json({ ...tally(board, matter), standing: standingOn(board, matter, now()) });
     }),
   );
 
