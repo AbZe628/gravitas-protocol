@@ -27,12 +27,82 @@
  */
 
 import type { Board, Submission } from '../types.js';
+import type { QueueRow } from './queue.js';
 
 export type NoticeKind = 'none' | 'smtp';
+
+/**
+ * Where this installation is, so a link in a message can be followed.
+ *
+ * A notice is read in a mail client, and a bare `/matters/m-2026-07-03` is
+ * not a thing anybody can open from one. The address is the installation’s and
+ * this process is not told it unless somebody sets `MAJLIS_ORIGIN` — the same
+ * setting the device registration needs, and for the same reason: the Host
+ * header a caller happens to send is whatever the caller chose.
+ *
+ * Absent is a real answer. The notice then carries the path and says the
+ * installation has not been told its own address, rather than printing a
+ * guess that lands nowhere or a link to localhost.
+ */
+export type Where = string | null;
+
+/**
+ * How much of a row may travel in a notice.
+ *
+ * ── the rule, and it is not a preference ──────────────────────────
+ *
+ * A notice leaves this application and goes through whatever mail system a
+ * bank happens to run. The title of a waiting thing is the substance: *Profit
+ * paid on a deposit before the underlying settled*, *A wakala deployment
+ * outside the approved categories*. Put in a subject line, that is the
+ * institution’s compliance position in somebody’s inbox, forwarded, searched
+ * and backed up outside the record.
+ *
+ * So a summary carries **the count, what kind of act each one wants, and where
+ * to open it**, and nothing else. Which is enough: a member who reads *three
+ * things are waiting on you* opens the application, and the application is
+ * where the substance lives and is already behind a credential.
+ *
+ * It also carries **nothing about who holds what**. A board whose members can
+ * be approached one at a time about work in their hands is not independent in
+ * the way the bank is paying for, and a notice naming holders would put that
+ * outside the fence `visibleTo` keeps inside it.
+ */
+export interface WaitingLine {
+  /** Where it opens. An address, which is not substance. */
+  to: string;
+  /** What kind of thing it is. Never its title. */
+  kind: QueueRow['kind'];
+  /** Whether a clock has run out on it. */
+  overdue: boolean;
+  /** Whole days it has waited. */
+  days: number;
+}
 
 /** What happened that a member would want to know about. */
 export type NoticeEvent =
   | { kind: 'submission_arrived'; submission: Submission }
+  /**
+   * What is waiting on one member, for somebody who has not opened this in a
+   * week.
+   *
+   * The gap it closes is the one `attention.ts` names in its own header: Majlis
+   * answers *what needs you* perfectly well and only to somebody already
+   * looking at it. A question from the institution can sit for a week because
+   * nobody happened to open the application, and the board's pace figure — the
+   * one this product is sold on — carries every one of those days.
+   *
+   * `lines` carries no titles; see `WaitingLine`.
+   */
+  | { kind: 'waiting_on_you'; scholarId: string; lines: WaitingLine[]; at: Where }
+  /**
+   * Work placed with a named member, told to that member.
+   *
+   * Placing work with somebody who is not in the room is otherwise a thing
+   * that happens entirely without them: the record says they are carrying it
+   * and the first they hear of it is the next time they open the application.
+   */
+  | { kind: 'placed_with_you'; scholarId: string; by: string; ofKind: QueueRow['kind']; to: string; at: Where }
   | { kind: 'matter_opened'; matterId: string; title: string; openedBy: string }
   | { kind: 'vote_opened'; matterId: string; title: string; closesAt: string | null }
   /**
@@ -137,6 +207,39 @@ export interface Notifier {
  * thing that leaks. It says that something is waiting and where to see it; the
  * record stays in the record.
  */
+/**
+ * Said rather than guessed.
+ *
+ * An installation that has not been told its own address gets the path and
+ * this sentence. A link to localhost in somebody's inbox is worse than no
+ * link, because it looks like one that should work.
+ */
+const NO_ADDRESS =
+  'These are paths within Majlis rather than links: this installation has not been ' +
+  'told its own address (MAJLIS_ORIGIN), so nothing here can write one.';
+
+/**
+ * How long it has stood, in words.
+ *
+ * `0 days` is what the figure says and is not what anybody would write. Three
+ * rulings came due this morning and the summary read *a ruling due to come
+ * back — 0 days*, three times, which is the sort of line a member stops
+ * reading these over.
+ */
+function age(days: number): string {
+  if (days === 0) return 'today';
+  return `${days} ${days === 1 ? 'day' : 'days'}`;
+}
+
+/** What each kind of waiting thing is, for a member reading it in a mailbox. */
+export const KIND_IN_WORDS: Record<QueueRow['kind'], string> = {
+  question: 'A question from the institution',
+  matter: 'A matter before the board',
+  review: 'A ruling due to come back',
+  breach: 'An event to determine',
+  undertaking: 'Something you undertook',
+};
+
 export function compose(board: Board, event: NoticeEvent): Notice {
   const everyone = board.members.map((m) => m.id);
   /*
@@ -220,16 +323,79 @@ export function compose(board: Board, event: NoticeEvent): Notice {
     };
   }
 
-  return {
-    subject: `The vote is open: ${event.title}`,
-    body:
-      `Voting has opened on a matter before ${board.name}.\n\n` +
-      `${event.title}\n\n` +
-      (event.closesAt ? `The timelock ends ${event.closesAt.slice(0, 10)}.\n\n` : '') +
-      `The operative terms are fixed as of now, and a position recorded from here ` +
-      `is recorded against them. A position needs a reason.`,
-    concerns: everyone,
-  };
+  if (event.kind === 'waiting_on_you') {
+    /*
+     * Kinds and clocks, never titles. See `WaitingLine`: the title of a
+     * waiting thing is the institution's compliance position, and a summary
+     * that carried it would put that in an inbox, forwarded and searched
+     * outside the record.
+     */
+    const late = event.lines.filter((l) => l.overdue).length;
+    const oldest = event.lines.reduce((n, l) => Math.max(n, l.days), 0);
+
+    return {
+      subject:
+        event.lines.length === 1
+          ? `One thing is waiting on you at ${board.name}`
+          : `${event.lines.length} things are waiting on you at ${board.name}`,
+      body:
+        `This is what stands with you now.\n\n` +
+        event.lines
+          .map(
+            (l) =>
+              `  · ${KIND_IN_WORDS[l.kind]} — ${age(l.days)}` +
+              `${l.overdue ? ', past its date' : ''}\n    ${(event.at ?? '') + l.to}`,
+          )
+          .join('\n') +
+        `\n\n` +
+        (late > 0
+          ? `${late === 1 ? 'One of them is' : `${late} of them are`} past the date the board set.\n`
+          : '') +
+        (oldest > 0 ? `The longest has waited ${oldest} days.\n` : '') +
+        (event.at === null ? `\n${NO_ADDRESS}\n` : '') +
+        `\nWhat each one is, and everything about it, is in Majlis. This says ` +
+        `only that something stands with you and where to open it: what the ` +
+        `board is looking at is not a thing to put in a mail system.`,
+      concerns: [event.scholarId],
+    };
+  }
+
+  if (event.kind === 'placed_with_you') {
+    return {
+      subject: `${named(event.by)} has placed work with you`,
+      body:
+        `${named(event.by)} has placed something with you at ${board.name}.\n\n` +
+        `  · ${KIND_IN_WORDS[event.ofKind]}\n    ${(event.at ?? '') + event.to}\n\n` +
+        (event.at === null ? `${NO_ADDRESS}\n\n` : '') +
+        `Nothing about it has been decided by placing it, and it is still ` +
+        `whatever it was. What changed is whose it is.`,
+      concerns: [event.scholarId],
+    };
+  }
+
+  if (event.kind === 'vote_opened') {
+    return {
+      subject: `The vote is open: ${event.title}`,
+      body:
+        `Voting has opened on a matter before ${board.name}.\n\n` +
+        `${event.title}\n\n` +
+        (event.closesAt ? `The timelock ends ${event.closesAt.slice(0, 10)}.\n\n` : '') +
+        `The operative terms are fixed as of now, and a position recorded from here ` +
+        `is recorded against them. A position needs a reason.`,
+      concerns: everyone,
+    };
+  }
+
+  /*
+   * A kind nobody wrote words for.
+   *
+   * The vote's notice used to be the fall-through, so a new kind added to
+   * `NoticeEvent` and not given a branch here would have been sent as a vote
+   * notice about an undefined matter — composed, delivered, and wrong, with
+   * nothing failing anywhere. The compiler refuses the assignment instead.
+   */
+  const unwritten: never = event;
+  throw new Error(`No words are written for a notice of kind ${(unwritten as { kind: string }).kind}.`);
 }
 
 // ── the adapters ──────────────────────────────────────────────────────────

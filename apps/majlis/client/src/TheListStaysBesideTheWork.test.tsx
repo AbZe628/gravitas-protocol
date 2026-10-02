@@ -9,6 +9,7 @@ import { listFor, rememberList } from './lib/split.js';
 import { useLineKeys } from './lib/lineKeys.js';
 import { useRef } from 'react';
 import type { QueueRow } from './lib/api.js';
+import { isYours } from '../../server/src/services/yours.js';
 
 /**
  * A list, kept beside the thing opened from it.
@@ -54,7 +55,22 @@ function wire(rows: QueueRow[]) {
       const url = String(input);
       if (url.includes('/api/attention')) return json({ role: 'signatory', office: null, items: [], scholarId: 'member-a' });
       if (url.includes('/api/settings')) return json({ members: [] });
-      if (url.includes('/api/queue')) return json({ asOf: '2026-09-20T00:00:00Z', rows, waiting: rows.length, overdue: 0 });
+      if (url.includes('/api/queue'))
+        /*
+         * `yours` through the server's own rule. The screen reads whose a row
+         * is rather than working it out, so a fixture that left it out would
+         * draw an empty list under *yours* and prove nothing about anything
+         * else on the screen.
+         */
+        return json({
+          asOf: '2026-09-20T00:00:00Z',
+          rows: rows.map((r) => ({
+            ...r,
+            yours: isYours(r, { scholarId: 'member-a', role: 'signatory' }),
+          })),
+          waiting: rows.length,
+          overdue: 0,
+        });
       return json({});
     }),
   );

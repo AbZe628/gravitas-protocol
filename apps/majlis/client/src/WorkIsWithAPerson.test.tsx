@@ -4,6 +4,7 @@ import { MemoryRouter } from 'react-router-dom';
 import Queue from './pages/Queue.js';
 import QuestionDetail from './pages/QuestionDetail.js';
 import { buildQuestionPassage } from '../../server/src/services/passage-question.js';
+import { isYours } from '../../server/src/services/yours.js';
 import RuleDetail from './pages/RuleDetail.js';
 import { Route, Routes } from 'react-router-dom';
 import Holding from './components/Holding.js';
@@ -55,7 +56,22 @@ function wire(me: Partial<Identity> & { scholarId: string }, rows: QueueRow[] = 
     vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
       const url = String(input);
       if (init?.method === 'POST' && url.includes('/api/assignments')) {
-        posted.push(JSON.parse(String(init.body)));
+        const sent = JSON.parse(String(init.body));
+        posted.push(sent);
+        /*
+         * And the record moves, so the next read is not the one before.
+         *
+         * A frozen fixture answered every read with the rows the test started
+         * with, which made *taking something on puts it on your list* a
+         * question nothing could answer: the screen asks for the queue again
+         * the moment the server accepts, and got back the row unheld.
+         *
+         * Only the holder. Whether the next step then carries a name is the
+         * passage's business and the server's, not the assignment's.
+         */
+        for (const r of rows) {
+          if (r.kind === sent.ofKind && r.id === sent.ofId) r.holder = sent.to ?? undefined;
+        }
         return json({ assignment: {}, how: 'taken' });
       }
       if (init?.method === 'POST' && url.includes('/api/put-off')) {
@@ -70,10 +86,22 @@ function wire(me: Partial<Identity> & { scholarId: string }, rows: QueueRow[] = 
          * The overdue count off the rows, as the server's is. Fixed at nought,
          * no test could tell a screen that kept the figure from one that quietly
          * dropped a set-aside row out of it.
+         *
+         * And `yours` through the server's own rule, as the server marks it.
+         * Whose a row is stopped being decided in this component: the screen
+         * reads what the row says now, so a fixture that wrote the answer by
+         * hand would be asserting against whatever the fixture felt like, and
+         * one that left it out would put nothing on anybody's list.
          */
         return json({
           asOf: '2026-09-20T00:00:00Z',
-          rows,
+          rows: rows.map((r) => ({
+            ...r,
+            yours: isYours(r, {
+              scholarId: me.scholarId,
+              role: (me.role ?? 'signatory') as never,
+            }),
+          })),
           waiting: rows.length,
           overdue: rows.filter((r) => r.overdue).length,
         });
@@ -319,7 +347,7 @@ describe('the act on the row', () => {
         if (url.includes('/api/queue'))
           return json({
             asOf: '2026-09-20T00:00:00Z',
-            rows: [row({ title: 'Nobody has this', holdable: true })],
+            rows: [row({ title: 'Nobody has this', holdable: true, yours: true })],
             waiting: 1,
             overdue: 0,
           });

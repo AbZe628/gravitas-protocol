@@ -1,7 +1,9 @@
 import type { PutOff } from './putting-off.js';
+import { isYours } from './yours.js';
+import type { Role } from '../auth/members.js';
 import type { Board, Incident, Matter, Rule, Structure, Submission } from '../types.js';
 import { standingOf } from './submission.js';
-import { buildPassage, say, type Say, type Whose } from './passage.js';
+import { buildPassage, type Say, type Whose } from './passage.js';
 import type { Passage } from './passage-shape.js';
 import { buildIncidentPassage } from './passage-incident.js';
 import { withAssignments, type Assignment } from './assignment.js';
@@ -164,6 +166,36 @@ export interface QueueRow {
    * something already overdue has set aside something already overdue.
    */
   putOff?: { by: string; until: string; reason: string }[];
+  /**
+   * Whether this is the reader's own to do.
+   *
+   * Decided here rather than on the screen. The rule lived in one component,
+   * so *what needs you* — the claim the whole application is arranged around —
+   * could only be answered by a browser with the list open, and a summary sent
+   * to somebody who has not opened it in a week had to work it out a second
+   * time. See `services/yours.ts`.
+   *
+   * Absent where nobody is reading as a member of this board.
+   */
+  yours?: boolean;
+}
+
+/**
+ * Where one of these opens.
+ *
+ * Written out at each of the five places a row is built, and then a sixth time
+ * by a notice that needed to link to one. One list, so a screen that moves
+ * cannot leave a link pointing at nothing.
+ */
+export function addressOf(kind: QueueKind, id: string): string {
+  const where: Record<QueueKind, string> = {
+    question: 'questions',
+    matter: 'matters',
+    review: 'rules',
+    breach: 'incidents',
+    undertaking: 'undertakings',
+  };
+  return `/${where[kind]}/${id}`;
 }
 
 const DAY = 86_400_000;
@@ -213,6 +245,13 @@ export interface QueueInput {
    * could disagree with the route.
    */
   putOffs?: readonly PutOff[];
+  /**
+   * Who is asking, so each row can say whether it is theirs.
+   *
+   * Absent for a reader who is nobody in particular — an observer, or the
+   * bank's own desk — and then no row claims to be anybody's.
+   */
+  reader?: { scholarId: string | null; role: Role | null };
   now: string;
 }
 
@@ -232,7 +271,7 @@ export function buildQueue(input: QueueInput): QueueRow[] {
        * The one it names, not only the list it is on — as the undertakings'
        * rows do. The list opens on it, which is where taking it up is offered.
        */
-      to: `/questions/${s.id}`,
+      to: addressOf('question', s.id),
       title: s.subject,
       phase: 'asked',
       ...nextOn(() => withAssignments(buildQuestionPassage(s, now), input.assignments)),
@@ -280,7 +319,7 @@ export function buildQueue(input: QueueInput): QueueRow[] {
     rows.push({
       kind: 'matter',
       id: m.id,
-      to: `/matters/${m.id}`,
+      to: addressOf('matter', m.id),
       title: m.title,
       phase: 'deciding',
       ...read,
@@ -303,7 +342,7 @@ export function buildQueue(input: QueueInput): QueueRow[] {
        * here and opens on it. It is still the list, which is right: what
        * else was undertaken at that sitting is the context for closing this.
        */
-      to: `/undertakings/${u.id}`,
+      to: addressOf('undertaking', u.id),
       title: u.what,
       phase: 'deciding',
       /*
@@ -356,7 +395,7 @@ export function buildQueue(input: QueueInput): QueueRow[] {
        * just left; the ruling's own page is where that act and taking it on
        * both are.
        */
-      to: `/rules/${rule.id}`,
+      to: addressOf('review', rule.id),
       title: rule.title,
       phase: 'inforce',
       ...read,
@@ -399,7 +438,7 @@ export function buildQueue(input: QueueInput): QueueRow[] {
     rows.push({
       kind: 'breach',
       id: i.id,
-      to: `/incidents/${i.id}`,
+      to: addressOf('breach', i.id),
       title: i.title,
       phase: 'checked',
       ...read,
@@ -430,6 +469,14 @@ export function buildQueue(input: QueueInput): QueueRow[] {
   for (const r of rows) {
     const on = aside.get(`${r.kind}:${r.id}`);
     if (on) r.putOff = on;
+  }
+
+  /*
+   * Whose each one is, at the end and in one place, for the same reason as
+   * above: a field written into five loops is a field one of them will forget.
+   */
+  if (input.reader) {
+    for (const r of rows) r.yours = isYours(r, input.reader);
   }
 
   /*

@@ -544,11 +544,22 @@ describe('reviews and screening, over HTTP', () => {
       .set('Authorization', as('member-a'))
       .expect(200);
 
-    // The seed predates review intervals, so every rule in force is
-    // unscheduled — which the list says rather than reporting all clear.
-    expect(res.body.unscheduled).toBeGreaterThan(0);
-    expect(res.body.items.every((i: { state: string }) => i.state === 'unscheduled')).toBe(true);
-    expect(res.body.items[0].note).toContain('Nothing will bring this back');
+/*
+     * Most of the seed predates review intervals, so most rules in force are
+     * unscheduled — which the list says rather than reporting all clear.
+     *
+     * *Every* item, this asserted, and that was true until the one seeded rule
+     * that does carry an interval came due: the measure was reading the
+     * calendar as much as the code, and broke one morning with nothing having
+     * changed. What it is actually for is that a rule nothing will ever raise
+     * is reported rather than passed over, so that is what it says now.
+     */
+    const items = res.body.items as { state: string; note: string }[];
+    const nothingRaises = items.filter((i) => i.state === 'unscheduled');
+
+    expect(res.body.unscheduled).toBe(nothingRaises.length);
+    expect(nothingRaises.length).toBeGreaterThan(0);
+    for (const i of nothingRaises) expect(i.note).toContain('Nothing will bring this back');
   });
 
   it('says where one rule stands, and 404s for one that is not there', async () => {

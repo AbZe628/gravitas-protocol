@@ -45,7 +45,22 @@ export type EntryKind =
    * The one deadline with a regulatory floor behind it, and the last of the
    * six clocks to get anything to count from.
    */
-  | 'meeting_due';
+  | 'meeting_due'
+  /**
+   * A sitting the chair has actually called.
+   *
+   * The one entry a board calendar is for, and the one that was not in it.
+   * The feed carried *the board is due to meet by 20 February* — a cadence
+   * deadline four months out — while a sitting convened for the fifteenth of
+   * this month appeared nowhere, mentioned only in the prose of the cadence
+   * entry's note. Found by convening one and reading the feed.
+   *
+   * It is the only kind with an hour. Every other entry is a deadline, and a
+   * deadline is a day rather than a moment; a sitting is an appointment, and
+   * an appointment shown as a whole day is one nobody can be reminded of an
+   * hour before.
+   */
+  | 'meeting_convened';
 
 export interface CalendarEntry {
   /** Stable across regenerations, so a subscribed calendar updates rather than duplicates. */
@@ -190,6 +205,48 @@ export function buildCalendar(params: {
     });
   }
 
+  /*
+   * Every sitting the chair has called, as an appointment.
+   *
+   * Before the cadence entry rather than after it, because they answer
+   * different questions: one is *when must we meet by*, the other is *when are
+   * we meeting*. A board reading the second in prose inside the first was
+   * being told the thing it came for as a footnote.
+   *
+   * Only ones still to come. A sitting that has happened is in the minute.
+   */
+  for (const m of params.meetings ?? []) {
+    if (m.closedAt) continue;
+    if (Date.parse(m.at) < Date.parse(now)) continue;
+    const board = boards.find((b) => b.id === m.boardId);
+    if (!board) continue;
+
+    entries.push({
+      id: `sitting:${m.id}`,
+      kind: 'meeting_convened',
+      at: m.at,
+      title: board.name,
+      subject: m.id,
+      overdue: false,
+      waitingOn: [],
+      waitingOnNames: [],
+      /*
+       * The agenda, in the feed and not in a mail digest.
+       *
+       * Two channels and two standards, deliberately. This feed is reached
+       * with a bearer secret the member chose to create and can revoke; a mail
+       * summary travels through whatever system the bank happens to run, is
+       * forwarded and searched and backed up, and carries no titles at all for
+       * that reason. What a board is sitting on is what a board's own calendar
+       * is for.
+       */
+      note:
+        m.agenda.length > 0
+          ? `Before the board:\n${m.agenda.map((a) => `  · ${a.item}`).join('\n')}`
+          : 'No agenda has been set.',
+    });
+  }
+
   entries.sort((a, b) => a.at.localeCompare(b.at));
 
   /**
@@ -298,6 +355,7 @@ const HEADING: Record<EntryKind, string> = {
   rectification_due: 'Rectification plan due',
   review_due: 'Review due',
   meeting_due: 'The board is due to meet',
+  meeting_convened: 'The board sits',
 };
 
 /**
@@ -323,6 +381,8 @@ export function toICalendar(calendar: Calendar, host: string): string {
 
   for (const e of calendar.entries) {
     const summary = `${HEADING[e.kind]}: ${e.title}`;
+    /* An appointment keeps its hour; a deadline is a day. */
+    const appointment = e.kind === 'meeting_convened';
     const description = [
       e.note,
       // Names, never the keys the record files them under: nothing on the
@@ -338,12 +398,31 @@ export function toICalendar(calendar: Calendar, host: string): string {
       fold(`UID:${e.id}@${host}`),
       `DTSTAMP:${stamp(calendar.asOf)}`,
       // Whole-day, and DTEND is exclusive per the specification.
-      `DTSTART;VALUE=DATE:${dateOnly(e.at)}`,
-      `DTEND;VALUE=DATE:${nextDay(e.at)}`,
+      ...(appointment
+        ? [`DTSTART:${stamp(e.at)}`, `DURATION:PT2H`]
+        : [`DTSTART;VALUE=DATE:${dateOnly(e.at)}`, `DTEND;VALUE=DATE:${nextDay(e.at)}`]),
       fold(`SUMMARY:${escapeText(summary)}`),
       fold(`DESCRIPTION:${escapeText(description)}`),
-      'TRANSP:TRANSPARENT',
-      e.overdue ? 'STATUS:CONFIRMED' : 'STATUS:TENTATIVE',
+      appointment ? 'TRANSP:OPAQUE' : 'TRANSP:TRANSPARENT',
+      appointment || e.overdue ? 'STATUS:CONFIRMED' : 'STATUS:TENTATIVE',
+      /*
+       * A day's notice before a sitting, set on the member's own device.
+       *
+       * This application has no clock of its own — nothing in it runs unless
+       * somebody asks it something — so a reminder it promised to send would
+       * be a promise it could not keep. The calendar the member already
+       * subscribed to has one, and it rings whether or not this process is
+       * even running.
+       */
+      ...(appointment
+        ? [
+            'BEGIN:VALARM',
+            'ACTION:DISPLAY',
+            'TRIGGER:-PT24H',
+            fold(`DESCRIPTION:${escapeText(summary)}`),
+            'END:VALARM',
+          ]
+        : []),
       'END:VEVENT',
     );
   }

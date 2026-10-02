@@ -78,6 +78,23 @@ describe('where one rule stands', () => {
     expect(late.note).toContain('30 days ago');
   });
 
+  /*
+   * Read on the morning after one came due: *Review was due 1 days ago*. The
+   * figure was right and the sentence is not one anybody would write, and a
+   * board reading its own record in bad English stops trusting the rest of it.
+   *
+   * Both sides, because a rule that said *day* for everything would read just
+   * as wrong a week later.
+   */
+  it('says one day, and two days', () => {
+    const r = rule({ reviewEveryMonths: 6 });
+    expect(reviewStatus(r, '2026-07-16T09:00:00.000Z').note).toContain('1 day ago');
+    expect(reviewStatus(r, '2026-07-17T09:00:00.000Z').note).toContain('2 days ago');
+    /* And the same on the way up to it. */
+    expect(reviewStatus(r, '2026-07-14T09:00:00.000Z').note).toContain('in 1 day,');
+    expect(reviewStatus(r, '2026-07-13T09:00:00.000Z').note).toContain('in 2 days,');
+  });
+
   it('says plainly that an overdue rule is still in force', () => {
     const late = reviewStatus(rule({ reviewEveryMonths: 6 }), '2027-01-01T09:00:00.000Z');
     expect(late.note).toContain('remains in force');

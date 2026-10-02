@@ -81,7 +81,10 @@ export default function TheNotice({ notice, delivery }: { notice: Notice; delive
         </Button>
         <span className="text-note text-muted">
           {t('notice.concerns')}{' '}
-          <span className="tabular-nums">{notice.concerns.length}</span> {t('notice.members')}
+          <span className="tabular-nums">{notice.concerns.length}</span>{' '}
+          {/* One member is not ‘members’. A summary of what is waiting on one
+              person concerns exactly one, every time. */}
+          {t(notice.concerns.length === 1 ? 'notice.member' : 'notice.members')}
         </span>
       </div>
     </div>

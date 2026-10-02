@@ -156,11 +156,23 @@ export function reviewStatus(rule: Rule, now: string): ReviewStatus {
     // Whole days in the sentence, for the reason set out in incident.ts: a
     // countdown expressed to a tenth reads as a measurement.
     note: overdue
-      ? `Review was due ${Math.round(Math.abs(days))} days ago. The rule remains in force; what is missing is the board looking at it.`
+      ? `Review was due ${plainly(Math.abs(days))} ago. The rule remains in force; what is missing is the board looking at it.`
       : due
         ? `Review is due today, ${rule.reviewEveryMonths} months from ${since}.`
-        : `Next review in ${Math.round(days)} days, ${rule.reviewEveryMonths} months from ${since}.`,
+        : `Next review in ${plainly(days)}, ${rule.reviewEveryMonths} months from ${since}.`,
   };
+}
+
+/**
+ * Whole days, and one of them is a day.
+ *
+ * Read on the morning after: *Review was due 1 days ago*. The figure is right
+ * and the sentence is not something anybody would write, and a board reading
+ * its own record in bad English stops trusting the rest of it.
+ */
+function plainly(days: number): string {
+  const n = Math.round(days);
+  return `${n} ${n === 1 ? 'day' : 'days'}`;
 }
 
 /**

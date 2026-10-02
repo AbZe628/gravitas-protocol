@@ -100,6 +100,7 @@ import { setAsideNow } from '../services/putting-off.js';
 import { buildInheritance, checklistStanding } from '../services/inherit.js';
 import type { Store } from '../store/index.js';
 import { compose, NoticeOff, type Notifier } from '../services/notice.js';
+import { whereWeAre } from '../services/where.js';
 import type { Deliberation, Matter, Rule, SourceKind, Structure } from '../types.js';
 import { PART_KINDS, SOURCE_KINDS } from '../types.js';
 
@@ -1861,11 +1862,35 @@ export function governanceRoutes(
    * Open to observers. Seeing what is waiting is reading, and an observer who
    * cannot see the board's backlog cannot audit it.
    */
-  router.get(
-    '/queue',
-    handle(async (req, res) => {
-      const at = now();
-      const [boards, submissions, matters, rules, incidents, undertakings, assignments] = await Promise.all([
+  /**
+   * The queue as one reader sees it.
+   *
+   * Lifted out because a second route needs the same answer. A summary of what
+   * is waiting on a member, assembled from its own reads, would be a second
+   * place deciding what is waiting and whose it is — and it would disagree
+   * with the screen the first time either changed, which is the fault the
+   * queue itself was written to end.
+   *
+   * Null where the record holds no board at all: nothing is waiting, which is
+   * true, and is not an error.
+   */
+  /*
+   * A bank desk is answered with its own questions and nothing else.
+   *
+   * This answered a desk with the board's whole queue: every matter and
+   * breach, every undertaking with the member who gave it, and the questions
+   * of every other desk at the same bank — though `/submissions` has always
+   * fenced a desk to the questions it recorded, because two desks at one bank
+   * should not share a queue. Found by asking with a desk's credential.
+   *
+   * Three fences, and they all live here now: its own questions only, no
+   * assignments, and nothing about what the board has set aside — which is the
+   * board's own record, like who is carrying what. None of a desk's rows is
+   * anybody on the board's to do, so none of them is marked as anybody's.
+   */
+  async function queueFor(who: ReturnType<typeof identityOf>, at: string) {
+    const [boards, submissions, matters, rules, incidents, undertakings, assignments] =
+      await Promise.all([
         store.boards(),
         store.submissions(),
         store.matters(),
@@ -1875,31 +1900,13 @@ export function governanceRoutes(
         store.assignments(),
       ]);
 
-      /*
-       * One board per installation, and the store is already scoped to one
-       * institution. Where the record somehow holds none, the queue is empty
-       * rather than an error: nothing is waiting, which is true.
-       */
-      const board = boards[0];
-      if (!board) {
-        res.json({ asOf: at, rows: [], waiting: 0, overdue: 0 });
-        return;
-      }
+    const board = boards[0];
+    if (!board) return null;
 
-      /*
-       * A bank desk is answered with its own questions and nothing else.
-       *
-       * This answered a desk with the board's whole queue: every matter and
-       * breach, every undertaking with the member who gave it, and the
-       * questions of every other desk at the same bank — though
-       * `/submissions` has always fenced a desk to the questions it recorded,
-       * because two desks at one bank should not share a queue. Found by
-       * asking with a desk's credential. The same test as there, so the two
-       * cannot come apart.
-       */
-      const who = identityOf(req);
-      const desk = who.role === 'institution';
-      const rows = buildQueue({
+    const desk = who.role === 'institution';
+    return {
+      board,
+      rows: buildQueue({
         board,
         submissions: desk ? submissions.filter((s) => s.recordedBy === who.scholarId) : submissions,
         matters: desk ? [] : matters,
@@ -1908,14 +1915,122 @@ export function governanceRoutes(
         undertakings: desk ? [] : undertakings,
         structures,
         assignments: visibleTo(who.role, assignments),
-        /*
-         * Not to a bank desk. What the board has set aside, and why, is the
-         * board's own record — the same fence the assignments are behind.
-         */
         putOffs: desk ? [] : setAsideNow(await store.putOffs(board.id), at),
+        reader: desk ? undefined : { scholarId: who.scholarId, role: who.role ?? null },
         now: at,
-      });
+      }),
+    };
+  }
 
+  /**
+   * What is waiting on one member, in words they can be sent.
+   *
+   * ── the gap ───────────────────────────────────────────────────────────
+   *
+   * Majlis answers *what needs you* perfectly well, and only to somebody
+   * already looking at it. A question from the institution can sit for a week
+   * because nobody happened to open the application, and the board's pace
+   * figure — the one this product is sold on — carries every one of those days.
+   *
+   * ── what it carries, and what it must not ─────────────────────────────
+   *
+   * Counts, kinds, clocks and addresses. No titles: the title of a waiting
+   * thing is the institution's compliance position, and a summary going
+   * through whatever mail system a bank happens to run would put that in an
+   * inbox, forwarded and searched outside the record. See `WaitingLine`.
+   *
+   * ── and it composes rather than sends ─────────────────────────────────
+   *
+   * A GET sends nothing, and this application has no clock of its own: nothing
+   * in it runs unless somebody asks it something. What makes the summary
+   * actually arrive is `POST`, which a scheduler outside this process calls —
+   * and where no channel is wired, that too composes and says plainly that it
+   * sent nothing.
+   */
+  const composeWaiting = async (who: ReturnType<typeof identityOf>, at: string) => {
+    if (who.role === 'institution') return null;
+    const read = await queueFor(who, at);
+    if (!read) return null;
+
+    /*
+     * Not what this member has already said they will come back to.
+     *
+     * Setting something aside is a position with a day and a reason on it,
+     * and a summary that listed it anyway would be the application arguing
+     * with the member about a decision they had just recorded — which is the
+     * fastest way to teach a board to stop reading these. It is still waiting,
+     * it is still in the count on the screen, and it is still every other
+     * member's to see. It is not news to the one who set it aside.
+     *
+     * Only their own. A colleague stepping back from something says nothing
+     * about whether this member should be told about it.
+     */
+    const mine = read.rows.filter(
+      (r) => r.yours && !(r.putOff ?? []).some((o) => o.by === who.scholarId),
+    );
+    if (mine.length === 0) return null;
+
+    return compose(read.board, {
+      kind: 'waiting_on_you',
+      scholarId: who.scholarId,
+      lines: mine.map((r) => ({ to: r.to, kind: r.kind, overdue: r.overdue, days: r.days })),
+      at: whereWeAre(),
+    });
+  };
+
+  router.get(
+    '/notices/waiting',
+    handle(async (req, res) => {
+      const at = now();
+      const who = identityOf(req);
+      const notice = await composeWaiting(who, at);
+      res.json({
+        asOf: at,
+        notice,
+        /* What would happen if it were sent, said before anybody presses. */
+        channel: notifier.kind,
+      });
+    }),
+  );
+
+  /**
+   * Send it.
+   *
+   * A member may ask for their own and nobody else's: a route that let one
+   * member post a summary to another would be a way to mail somebody about
+   * work they are carrying, from inside a record that is careful about who is
+   * told what.
+   */
+  router.post(
+    '/notices/waiting',
+    handle(async (req, res) => {
+      const at = now();
+      const who = identityOf(req);
+      const notice = await composeWaiting(who, at);
+      if (!notice) {
+        res.json({ asOf: at, notice: null, delivery: null });
+        return;
+      }
+      res.json({ asOf: at, notice, delivery: await notifier.deliver(notice, at) });
+    }),
+  );
+
+  router.get(
+    '/queue',
+    handle(async (req, res) => {
+      const at = now();
+      /*
+       * One board per installation, and the store is already scoped to one
+       * institution. Where the record somehow holds none, the queue is empty
+       * rather than an error: nothing is waiting, which is true.
+       */
+      const read = await queueFor(identityOf(req), at);
+      if (!read) {
+        res.json({ asOf: at, rows: [], waiting: 0, overdue: 0 });
+        return;
+      }
+
+      const rows = read.rows;
       res.json({
         asOf: at,
         rows,

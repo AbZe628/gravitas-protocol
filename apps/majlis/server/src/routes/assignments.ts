@@ -8,6 +8,9 @@ import {
   setAsideNow,
   takingBack,
 } from '../services/putting-off.js';
+import { compose, notifierFromEnv } from '../services/notice.js';
+import { addressOf } from '../services/queue.js';
+import { whereWeAre } from '../services/where.js';
 import type { PassageKind } from '../services/passage-shape.js';
 import type { Members, Role } from '../auth/members.js';
 import type { Store } from '../store/index.js';
@@ -356,7 +359,41 @@ export function assignmentRoutes(
       };
 
       const written = await store.assign(assignment);
-      res.status(201).json({ assignment: written, how: howOf(written, standing) });
+
+      /*
+       * Told to the person it was placed with, where that is somebody else.
+       *
+       * Placing work with a colleague is otherwise a thing that happens
+       * entirely without them: the record says they are carrying it and the
+       * first they hear of it is the next time they open the application.
+       *
+       * Not on taking it on yourself, and not on putting it back to the room —
+       * a notice telling somebody what they have just done is noise, and it is
+       * the fastest way to teach a board to stop reading these.
+       *
+       * Composed either way, and sent only where a channel is wired. The
+       * screen says which, in words: a board that believed its members had
+       * been told when nobody had would be worse off than one that knows it
+       * has to pick up a phone.
+       */
+      const told =
+        to !== null && to !== who.scholarId
+          ? compose(board, {
+              kind: 'placed_with_you',
+              scholarId: to,
+              by: who.scholarId,
+              ofKind,
+              to: addressOf(ofKind, ofId),
+              at: whereWeAre(),
+            })
+          : null;
+      const delivery = told ? await notifierFromEnv().deliver(told, now()) : null;
+
+      res.status(201).json({
+        assignment: written,
+        how: howOf(written, standing),
+        ...(told ? { notice: told, delivery } : {}),
+      });
     }),
   );
 

@@ -584,6 +584,13 @@ describe('api', () => {
        * route; see services/putting-off.ts.
        */
       'POST /api/put-off',
+      /*
+       * Send a member their own summary of what is waiting on them. It
+       * writes nothing to the record; it is a POST because it sends, and a
+       * GET that sent mail would be a reading that is not quiet. A member
+       * may ask for their own and nobody else’s.
+       */
+      'POST /api/notices/waiting',
       'POST /api/referrals/:id/withdraw',
       'POST /api/undertakings',
       'POST /api/undertakings/:id/close',

@@ -963,6 +963,21 @@ export interface QueueRow {
    * whether it is waiting.
    */
   putOff?: { by: string; until: string; reason: string }[];
+  /**
+   * Whether this is the reader's own to do.
+   *
+   * Read here, never worked out here. This rule used to live in the queue
+   * component, which meant *what needs you* — the claim the whole application
+   * is arranged around — could only be answered by a browser with the list
+   * open: nothing on the server could say it, so a summary sent to somebody
+   * who had not opened Majlis in a week had to decide it a second time and
+   * would have disagreed the first time either changed. It is
+   * `services/yours.ts` now, once.
+   *
+   * Absent where nobody is reading as a member of this board — an observer, or
+   * a bank desk, for whom none of these is anybody on the board's to do.
+   */
+  yours?: boolean;
 }
 
 export interface Queue {
@@ -984,6 +999,35 @@ export const governance = {
    * knowing which five.
    */
   queue: () => get<Queue>('/api/queue'),
+
+  /**
+   * What would be sent to this member about what is waiting on them.
+   *
+   * Composed, never sent: a GET that posted mail would send a summary every
+   * time somebody opened a screen. `channel` is what would carry it if it were
+   * sent, said before anybody presses anything — on most installations that is
+   * `none`, and a member needs to know that before they rely on being told.
+   *
+   * Null where nothing is waiting on them, which is the ordinary good case.
+   */
+  waiting: () => get<{ asOf: string; notice: Notice | null; channel: 'none' | 'smtp' }>(
+    '/api/notices/waiting',
+  ),
+
+  /**
+   * Send it, now, to the member asking.
+   *
+   * Their own and nobody else's: the route takes no recipient. What makes
+   * these arrive without anybody asking is a scheduler outside this process
+   * calling the same route — this application has no clock of its own, and a
+   * reminder it promised to send on a Tuesday would be a promise it could not
+   * keep.
+   */
+  sendWaiting: () =>
+    send<{ asOf: string; notice: Notice | null; delivery: Delivery | null }>(
+      '/api/notices/waiting',
+      {},
+    ),
 
   /** Search the record. A query of only filters is valid. */
   search: (query: SearchQuery) => {
@@ -2708,7 +2752,21 @@ export type EntryKind =
   | 'rectification_due'
   | 'review_due'
   /** The sixth clock, and the last to get anything to count from. */
-  | 'meeting_due';
+  | 'meeting_due'
+  /**
+   * A sitting the chair has actually called.
+   *
+   * The one entry a board calendar is for, and the one that was not in it:
+   * the feed carried *the board is due to meet by 20 February* while a sitting
+   * convened for the fifteenth of this month appeared nowhere, mentioned only
+   * in the prose of that deadline's note.
+   *
+   * It is the only kind with an hour on it. The row here shows the day, like
+   * every other row and like the sittings screen; the hour travels in the
+   * subscribed feed, where a member's own calendar shows it in a member's own
+   * time zone rather than in this application's.
+   */
+  | 'meeting_convened';
 
 export interface CalendarEntry {
   id: string;

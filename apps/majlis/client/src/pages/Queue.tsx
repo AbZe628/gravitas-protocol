@@ -13,6 +13,7 @@ import { keep, kept } from '../lib/kept.js';
 import { nameOf, useMembers } from '../lib/members.js';
 import { holdingOf } from '../lib/holding.js';
 import OnThisRow from '../components/OnThisRow.js';
+import WhatWouldBeSent from '../components/WhatWouldBeSent.js';
 import type { QueuePhase } from '../lib/api.js';
 import { Button } from '../components/Button';
 
@@ -344,6 +345,8 @@ export default function Queue() {
    * just taken on went on saying *take it* until the next pulse arrived.
    */
   const [again, setAgain] = useState(0);
+  /** Whether the member is reading what would be sent to them. */
+  const [peek, setPeek] = useState(false);
   /**
    * What the member just did, drawn before the server has answered.
    *
@@ -491,33 +494,30 @@ export default function Queue() {
   /**
    * Whether this row's next step is this member's own.
    *
-   * The screen is called *what needs you* and ten rows answered it, three of
-   * which were waiting on the institution or on another member. Both belong
-   * on the list — a board wants to see that the desk has been sitting on
-   * something for forty-four days — but a member arriving to find out what is
-   * theirs had to read the owner off every row and do the filtering by eye.
+   * ── it is read, not worked out ────────────────────────────────────────
    *
-   * Named on the row, so the rule here is only a reading of what the row
-   * already says: a step with somebody's name on it is theirs and nobody
-   * else's; a step on this side of the table of something you carry is yours;
-   * a step that is the board's is every member's, and a step reserved to the
-   * signatories is every signatory's. Everything else — the institution, its
-   * liaison, a clock — is somebody else's, which is worth knowing and is not
-   * yours to do.
+   * The rule itself used to be here, nine lines of it, and that was the whole
+   * problem: this screen is called *what needs you*, which is the claim the
+   * application is arranged around, and nothing outside this component could
+   * answer it. A summary sent to somebody who had not opened Majlis in a week
+   * had to decide the same question a second time, and the two would have
+   * disagreed the first time either changed.
    *
-   * And a step you have already said yours on is not yours, however long it
-   * stays open for the others: a cast vote sat here under *yours* as a vote
-   * to cast, fifty-five days old, for the member who had cast it.
+   * It is `services/yours.ts` on the server now, and the row carries the
+   * answer. The rule is unchanged — a step with somebody's name on it is
+   * theirs and nobody else's; a step on this side of the table of something
+   * you carry is yours; the board's is every member's and a signatory step is
+   * every signatory's; and a step you have already said yours on stops being
+   * yours — it is simply said in one place.
+   *
+   * ── and the moment after a member takes something on ──────────────────
+   *
+   * Taking something on can move a row into *yours*, and this does not say so
+   * until the queue is read again — which `move` asks for the moment the
+   * server accepts, without waiting for a pulse. One round trip, rather than a
+   * second copy of the rule here to cover it.
    */
-  const mine = (r: QueueRow) => {
-    const me = identity?.scholarId;
-    if (me && r.heard?.includes(me)) return false;
-    if (r.who) return r.who === me;
-    if (r.holder && r.holder === me && (r.whose === 'board' || r.whose === 'signatory')) return true;
-    if (r.whose === 'board') return true;
-    if (r.whose === 'signatory') return identity?.role === 'signatory';
-    return false;
-  };
+  const mine = (r: QueueRow) => r.yours === true;
 
   /*
    * With what the member has just done to it, before the server has said so.
@@ -801,6 +801,32 @@ export default function Queue() {
           ]}
         />
       </nav>
+
+      {/*
+        What a member would be told without having opened this.
+
+        Below the work, because it is not work. It is here at all because a
+        board is being asked to trust that a summary carrying its queue through
+        a bank's mail system gives nothing away, and that is not a thing to
+        take on assurance — the words are shown in full, and so is whether
+        anything is actually sent.
+
+        Only where something is standing with this member. A control that opens
+        a window saying *there is nothing to send* is a control that cannot
+        change anything.
+      */}
+      {mineCount > 0 && (
+        <div className="mt-4">
+          <Button
+            type="button"
+            onClick={() => setPeek(true)}
+            className="inline-flex min-h-[44px] items-center rounded-full bg-raised px-4 py-1.5 text-note text-sand shadow-ring transition-all hover:text-paper lg:min-h-0"
+          >
+            {t('waiting.whatWouldBeSent')}
+          </Button>
+        </div>
+      )}
+      <WhatWouldBeSent open={peek} onClose={() => setPeek(false)} />
     </ListPage>
   );
 }
