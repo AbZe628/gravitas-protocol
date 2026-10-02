@@ -82,6 +82,13 @@ nešto što nije predmet.
   - ✅ predmet (`MatterFlow`, bočna ploča) i prekršaj: *uzmi / predaj / vrati
     sobi*, uživo provjereno na 390 i 1440 px, s dva člana u dva prozora
   - ✅ red: ime umjesto `member-a`; *moje* čita držaoca
+  - ✅ čin na samom redu, bez otvaranja: jedan pritisak (*uzmi* / *vrati
+    odboru*, a predsjedavajućem i tajniku i ono što kolega drži), `t` s
+    tastature; ostali činovi u prozoru na desni klik, Menu i dugi pritisak *(`7ca09f3`, `0fa6b0c`)*
+  - ✅ **čije je nešto više se ne pogađa ni u pregledniku**: pravilo je jednom,
+    na serveru (`services/yours.ts`), red nosi `yours`, ekran ga čita — prije
+    ovog ništa izvan otvorene liste nije moglo odgovoriti na pitanje oko kojeg
+    je aplikacija složena *(`c1e6d66`)*
   - ✅ imena umjesto id-a na sva 24 mjesta (gornja traka, avatar, rasprava,
     glasovi, sjednice, prekršaj…); `whoName` koji je nosio id preimenovan u `who`
   - ✅ pitanje i revizija: kontrola na kartici pitanja i na stranici odluke;
@@ -108,6 +115,15 @@ nešto što nije predmet.
 - ✅ **L11** — odluka bez intervala revizije: `reviewStatus` to već imenuje
   riječima „ništa je neće vratiti pred odbor", i tu stane. Nije sat koji radi
   krivo, nego sat kojeg nema.
+- ◐ **ono što se izračuna sad barem izlazi van.** Sažetak *9 stvari čeka tebe*
+  s vezom na tačan korak, i *dodijeljeno tebi* kad posao stave kod tebe:
+  sastavljeni uvijek, poslani gdje je kanal spojen, i ekran kaže koje od toga
+  *(`c1e6d66`)*. Sat i dalje nije naš — GET sastavlja i ne šalje, a što ih
+  nosi samo od sebe je raspoređivač izvan ovog procesa koji zove istu rutu.
+- ✅ sjednica koju je predsjedavajući sazvao sad je u kalendaru kao sastanak, sa
+  svojim satom i s alarmom 24 h prije na članovom uređaju. Feed je do sad nosio
+  samo rok *do 20. februara*, a sjednicu za 15. ovog mjeseca nigdje osim kao
+  rečenicu u bilješci tog roka *(`c1e6d66`)*.
 
 ## 4 · Požurnica i eskalacija umjesto slijepe ulice ⬜
 

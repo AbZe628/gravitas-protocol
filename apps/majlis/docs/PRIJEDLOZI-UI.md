@@ -146,14 +146,17 @@ Svaki: **šta · zašto · kako u Majlisu · kako se dokazuje**.
 - **Dokaz:** isti prolaz daje isti prozor za svih pet vrsta (test po vrsti);
   uživo 390/1440 za svaku vrstu.
 
-### P4 · „Šta te čeka" kao trijaža
+### P4 · „Šta te čeka" kao trijaža ✅ *(`7ca09f3`, `0fa6b0c`)*
 - **Šta:** u okviru iz P0 — činovi na samom redu, bez otvaranja: *uzmi*,
   *daj* (prevlačenje na telefonu, meni na desni klik); tastatura `j`/`k`,
   `Enter`, `t` (uzmi); broj „tvojih" po osobi.
 - **Zašto:** Superhuman / Linear — trijaža bez napuštanja mjesta; NN/g
   predvidiva mjesta.
-- **Za razgovor:** lično *podsjeti me u utorak* — sakriva stvar samo meni,
-  nikad odboru. Korisno, ali je nova vrsta zapisa; treba tvoja odluka.
+- **Odlučeno:** privatno *podsjeti me u utorak* je odbijeno. U zapisu čije je
+  pravilo da je napisano odborovo i trajno, član bi mogao nešto gurnuti van
+  vida i niko ne bi znao da je gurnuto. Nosi ime, dan i razlog, odbor ga čita,
+  i **ne mijenja ništa o tome šta čeka** — ni broj, ni dane, ni rok.
+- **Odlučeno:** prevlačenja na telefonu nema zasad.
 
 ### P5 · Između sjednica i na sjednici, uz konsenzus (tačka 5 + IFSB-10)
 - **Šta:** svaka stvar se može označiti *treba sobu* — dnevni red se sam
@@ -164,7 +167,7 @@ Svaki: **šta · zašto · kako u Majlisu · kako se dokazuje**.
 - **Zašto:** IFSB-10 to izričito traži. Opšti portali za odbore to ne rade —
   ovo je razlika koju banka odmah prepozna kao „napravljeno za nas".
 
-### P6 · Obavijesti koje vraćaju ljude
+### P6 · Obavijesti koje vraćaju ljude ◐ *(`c1e6d66`)*
 - **Šta:** e-mail / push sažetak „3 stvari čekaju tebe", svaka s vezom na
   **tačan korak**; podsjetnik 24 h prije sjednice; *dodijeljeno tebi*;
   *promijenjeno otkad si vidio*.
@@ -172,6 +175,13 @@ Svaki: **šta · zašto · kako u Majlisu · kako se dokazuje**.
   aplikaciji (i kalendar).
 - **Pazi:** povjerljivost — sažetak nosi samo ono što odbor dozvoli; ništa
   bankino, ništa što bi otkrilo ko drži šta (vidi `visibleTo`).
+- **Urađeno:** sažetak *čeka te 9 stvari* s vezom na tačan korak,
+  *dodijeljeno tebi*, i sjednica u kalendaru s alarmom 24 h prije — na
+  članovom uređaju, jer Majlis nema vlastiti sat. Nosi broj, vrstu, sat i
+  adresu; nijedan naslov i ništa o tome ko šta drži. Ekran *Šta bi ti bilo
+  poslano* pokazuje riječi u cijelosti i kaže je li išta poslano.
+- **Ostaje:** *promijenjeno otkad si vidio* — još nije; i raspoređivač izvan
+  ovog procesa koji zove `POST /api/notices/waiting`, jer GET ne šalje ništa.
 
 ### P7 · Manje trake oko posla (tačke 9, 10, 12)
 - **Šta:** telefon — jedna traka od 56 px (ime ekrana i jedna radnja), veliki

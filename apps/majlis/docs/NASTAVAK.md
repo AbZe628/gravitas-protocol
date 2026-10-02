@@ -5,9 +5,11 @@ reda koda. Red posla je u [RED.md](RED.md), prijedlozi u
 [PRIJEDLOZI-UI.md](PRIJEDLOZI-UI.md). Ovdje je stanje, ono što se ne vidi iz
 koda, i svaki sljedeći korak.
 
-**Zadnje stanje (30. 9. 2026):** sve je na **radnoj grani** — onoj na kojoj
-je ova stranica — dvadeset jedan commit iznad `origin/main` (`692022e`). **Na
-`main` nije ništa pushano** — to je vlasnikova odluka.
+**Zadnje stanje (2. 10. 2026):** sve je na **radnoj grani** — onoj na kojoj
+je ova stranica — dvadeset četiri commita iznad `origin/main` (`692022e`). **Na
+`main` nije ništa pushano** — to je vlasnikova odluka. Zadnja tri commita
+(`7ca09f3`, `0fa6b0c`, `c1e6d66`) **nisu pushana ni na radnu granu** — pitaj
+prije nego što išta ode na GitHub.
 
 | commit | šta |
 |---|---|
@@ -15,39 +17,49 @@ je ova stranica — dvadeset jedan commit iznad `origin/main` (`692022e`). **Na
 | `22c10a8` | P2 — čitljivost: ljestvica za telefon, kontrast, sistemski font, bez Google fontova |
 | `cb1751f` | P0 — lista ostaje pored otvorenog; nijedan čin nije podvučena riječ |
 | `efe47fd` | P3 — jedan radni prozor za svaku vrstu posla; korak zna ko je već rekao svoje |
+| `9e5f0cd` | RED 7 — odluka nosi dokaz o sebi, uvjet po uvjet |
+| `ac9c747` | §4.5 zatvoren u ovoj stranici |
+| `7ca09f3` | P4a — red se može uzeti bez otvaranja liste |
+| `0fa6b0c` | P4b — član može reći da se vraća na nešto, i odbor to čita |
+| `c1e6d66` | P6 — članu se kaže šta ga čeka, bez otvaranja Majlisa |
 | (ovaj) | ova stranica, RED i PRIJEDLOZI ažurirani |
 
-Zadnje mjerenje (30. 9. 2026, ovaj vrh): klijent **570/570** testova (67
-datoteka), server **2091/2091** (100 datoteka), `tsc --noEmit` čist na obje
-strane, početni paket **151,9 kB** gzip od dozvoljenih 165 kB. Brojevi su
-mjereni, ne prepisani — provjeri ih prije nego se na njih pozoveš.
+Zadnje mjerenje (2. 10. 2026, ovaj vrh): klijent **593/593** testova (68
+datoteka), server **2146/2146** (102 datoteke), `tsc --noEmit` čist na obje
+strane, početni paket **156,8 kB** gzip od dozvoljenih 165 kB (145,7 kB
+skripta + 11,1 kB stil, oboje izmjereno `gzip -c` nad onim što `index.html`
+zaista učitava). Brojevi su mjereni, ne prepisani — provjeri ih prije nego se
+na njih pozoveš.
 
 ---
 
 ## 0 · Prvih petnaest minuta sutra
 
-1. **Grana.** Radna grana je ona koja nosi commit `efe47fd`:
+1. **Grana.** Radna grana je ona koja nosi commit `efe47fd`. Pazi: tri
+   commita na vrhu (`7ca09f3`, `0fa6b0c`, `c1e6d66`) postoje samo lokalno —
+   `origin` ih još nema, pa ih `git branch -r` neće vidjeti.
    ```
    git fetch origin
    git branch -r --contains efe47fd     # ime radne grane
    git checkout <to ime>
-   git log --oneline -6                 # vrh: commit s ovom stranicom, ispod efe47fd
+   git log --oneline -10                # vrh: commit s ovom stranicom
    ```
 2. **Zavisnosti i testovi** (Node 20 ili 22):
    ```
    cd apps/majlis
    npm ci
-   (cd server && npx vitest run)     # 1994
-   (cd client && npx vitest run)     # 527
+   (cd server && npx vitest run)     # 2146
+   (cd client && npx vitest run)     # 593
    (cd client && npx tsc -b) && (cd server && npx tsc --noEmit -p .)
    (cd client && npm run build)      # budžet: pada iznad 165 kB
    ```
    Ako brojevi nisu isti — stani i nađi zašto prije bilo čega drugog.
 3. **Probni server i preglednik** — vidi §5. Bez toga se ne radi ništa
    vizualno: *testovi nisu dokaz*.
-4. **Prvi posao** je §3, stavka A (odobravanje plana na prekršaju) — isti kvar
-   koji je jučer popravljen za nalaz, na drugom mjestu, nađen čitanjem koda i
-   ostavljen jer je sesija stala.
+4. **Prvi posao** je §4.7 (P7 + RED 9/10/12). §4.6 je zatvoren; što je od njega
+   svjesno ostalo stoji u §4.6 i u PRIJEDLOZI P6 (*promijenjeno otkad si
+   vidio*, i raspoređivač izvan procesa koji zove `POST /api/notices/waiting`,
+   jer GET ništa ne šalje).
 
 ---
 
@@ -466,13 +478,63 @@ ispitivanja crtao je samo nalaze s izuzecima, pa je ispitivanje 366 od 366
 transakcija gdje je omjer držao **pokazivalo nijedan nalaz**; a nalaz od tačno
 jednog pisao je *1 exceptions* — jedino brojanje u aplikaciji bez jednine.
 
-### 4.6 · P4 + P6 — trijaža u redu i obavijesti
-- Činovi na samom redu (uzmi / daj, `t` = uzmi), meni na desni klik,
-  prevlačenje na telefonu. *Podsjeti me* — nova vrsta zapisa, **pitati
-  vlasnika** prije.
-- Obavijesti: sažetak *3 stvari čekaju tebe* s vezom na tačan korak;
-  podsjetnik 24 h prije sjednice; *dodijeljeno tebi*. Povjerljivost: ništa
-  bankino, ništa o tome ko drži šta (`visibleTo`).
+### 4.6 · P4 + P6 — trijaža u redu i obavijesti ✅ (1.–2. 10. 2026)
+
+**P4a — `7ca09f3`.** Red se može uzeti bez otvaranja: jedan pritisak po redu
+(*uzmi* / *vrati odboru*, a predsjedavajućem i tajniku i ono što kolega drži),
+`t` s tastature na redu na kojem stojiš. Pravilo je panelovo, čita ga jedna
+funkcija (`lib/holding.ts`) — i to je odmah uhvatilo neslaganje: napisano kao
+*slobodno ili moje*, red je predsjedavajućem nudio ništa nad poslom u kolegovim
+rukama dok je panel uz isti taj posao nudio *vrati*.
+
+Tri kvara nađena pritiskom, ne testom: veza preko reda rastegnuta je preko
+cijelog reda pa je dugme u ćeliji **ispod nje i ne može se pritisnuti**; devet
+dugmadi *Take it* čitaču ekrana daje devet puta iste dvije riječi; i na
+telefonu je čin prvo sjekao svaki naslov, pa — premješten ispod — sjekao sam
+čin (*Take i… · Board Member A*). Čin na telefonu ima vlastiti red.
+
+**P4b — `0fa6b0c`.** *Podsjeti me* je stavljeno vlasniku i odbijeno u obliku
+privatne odgode: u zapisu čije je pravilo da je napisano odborovo i trajno,
+član bi inače mogao nešto gurnuti van vida i niko ne bi znao da je gurnuto. Pa
+nosi ime, dan i razlog, i **ne mijenja ništa o tome šta čeka** — brojka i dalje
+piše *13 waiting · 2 past its date*. Ostali činovi reda su u prozoru koji
+otvara desni klik, tipka Menu i dugi pritisak; dugi pritisak koji se pomakne je
+listanje. Prevlačenja nema — vlasnik je tako odlučio.
+
+**P6 — `c1e6d66`.** Sažetak *9 stvari čeka tebe* s vezom na tačan korak,
+*dodijeljeno tebi*, i sjednica u kalendaru s alarmom 24 h prije.
+
+Rupa se nije dala zatvoriti tamo gdje je pravilo stajalo. **Čije je nešto
+odlučivalo se u pregledniku**, u jednoj komponenti, pa ništa na serveru nije
+moglo odgovoriti na pitanje oko kojeg je cijela aplikacija složena — i svako
+drugo mjesto kojem treba odgovor izvelo bi ga drugi put i razišlo se prvi put
+kad se jedno promijeni. `services/yours.ts` je to pravilo, jednom; red nosi
+odgovor, ekran ga čita.
+
+Sažetak nosi broj, vrstu, sat i adresu — **nijedan naslov**, jer je naslov
+bankina pozicija a poruka ide kroz bankin mail, i **ništa o tome ko šta drži**,
+jer odbor čije se članove može obilaziti jednog po jednog nije nezavisan onako
+kako banka plaća. GET sastavlja i ne šalje; POST šalje, onome ko traži i nikom
+drugom. Što je član odložio izlazi iz **njegovog** sažetka i ostaje u svačijem
+drugom, i u brojci.
+
+**Sjednice nije bilo u kalendaru.** Feed je nosio *odbor se mora sastati do
+20. februara* — rok četiri mjeseca daleko — a sjednica sazvana za 15. ovog
+mjeseca nije postojala nigdje osim kao rečenica u bilješci tog roka. Sad je
+sastanak, s pravim satom i s alarmom na članovom uređaju: ova aplikacija nema
+vlastiti sat, pa bi podsjetnik koji obeća poslati bio obećanje koje ne može
+održati.
+
+Osamnaest mjera, svaka slomljena namjerno da se vidi kako pada. Što su
+uhvatile, a zeleni paket nije: `compose()` je propadao u glasanje, pa bi nova
+vrsta obavijesti bez svoje grane bila poslana kao obavijest o glasanju o
+nepostojećem predmetu — sastavljena, isporučena i pogrešna, bez ijednog pada;
+*a ruling due to come back — 0 days*, tri puta, ujutro kad su tri dospjela;
+*Review was due 1 days ago* sutradan; *It concerns 1 members*; mjera za
+držaoca nije gledala ništa, jer dodjela stavlja ime na sljedeći korak pa red
+izlazi sa svačije tuđe liste i sažetak koji je skenirala nije ni imao držanog
+reda; i mjera koja je tvrdila da je svako posijano pravilo *unscheduled*
+pukla je jednog jutra bez ijedne izmjene, jer je čitala kalendar koliko i kod.
 
 ### 4.7 · P7 + RED 9/10/12 — manje krom, Apple pravila
 §3 C, D, E, F; polica alata u ⌘K; jedna naglašena boja; veliki naslov koji se
