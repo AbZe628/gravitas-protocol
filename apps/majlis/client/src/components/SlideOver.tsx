@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { useI18n } from '../lib/i18n.js';
 import { Button } from './Button';
 
@@ -28,6 +28,21 @@ import { Button } from './Button';
  *
  * Full height against the edge, its own header and foot. Nothing inside it
  * moves the page behind it.
+ *
+ * ── and on a phone it comes up from the foot ──────────────────────────────
+ *
+ * Measured at 375 × 812: it arrived as 375 × 812 at the origin — the whole
+ * screen, covering what the member was reading, with the calculations taking
+ * the top third and five hundred pixels of nothing under them. A panel that
+ * is the screen is a screen, and a member who opened one to look something up
+ * had lost the thing they opened it from.
+ *
+ * It comes up from the foot now, at two heights: enough to work in, and
+ * nearly the whole screen for the one that needs it, with what you were
+ * reading still above it. The height is changed by pressing the grip, not by
+ * dragging it — the board's owner was asked about gestures on a phone and
+ * said not for now, and a press is the one way that works for somebody
+ * driving this from a keyboard anyway.
  */
 
 export default function SlideOver({
@@ -71,10 +86,20 @@ export default function SlideOver({
     };
   }, [open, onClose]);
 
+  /*
+   * Which of the two heights, on a phone. Reset every time it opens: the
+   * height a member wanted for the contract library is not a decision about
+   * the next thing they open.
+   */
+  const [tall, setTall] = useState(false);
+  useEffect(() => {
+    if (open) setTall(false);
+  }, [open]);
+
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end">
+    <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-stretch sm:justify-end">
       <Button
         type="button"
         aria-label={t('common.cancel')}
@@ -88,9 +113,31 @@ export default function SlideOver({
         aria-modal="true"
         aria-label={title}
         tabIndex={-1}
-        className="relative flex h-full w-full max-w-[720px] flex-col overflow-hidden bg-raised shadow-card outline-none"
+        className={
+          'relative flex w-full max-w-[720px] flex-col overflow-hidden bg-raised shadow-card outline-none ' +
+          'rounded-t-[20px] transition-[height] duration-200 sm:h-full sm:rounded-none ' +
+          (tall ? 'h-[92svh]' : 'h-[62svh]')
+        }
       >
-        <div className="flex items-start gap-4 border-b border-line px-5 py-3.5 sm:px-6">
+        {/*
+          The grip, and it is a control rather than a decoration.
+
+          It says the sheet has another height and gives the member it with
+          one press. Hidden from a reader of the screen only in the sense that
+          the bar itself is: the button it sits in is named, and what it does
+          is said in words.
+        */}
+        <Button
+          type="button"
+          onClick={() => setTall(!tall)}
+          aria-expanded={tall}
+          aria-label={t(tall ? 'sheet.lower' : 'sheet.raise')}
+          className="grid w-full shrink-0 place-items-center py-2.5 sm:hidden"
+        >
+          <span aria-hidden="true" className="block h-[5px] w-10 rounded-full bg-line" />
+        </Button>
+
+        <div className="flex items-start gap-4 border-b border-line px-5 pb-3.5 pt-1 sm:px-6 sm:pt-3.5">
           <div className="min-w-0 flex-1">
             <h2 className="font-display text-sub leading-tight tracking-title text-paper">
               {title}

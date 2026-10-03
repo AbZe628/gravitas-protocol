@@ -653,6 +653,8 @@ const en: Dict = {
   "dictate.noBrowser": "Speaking it is turned on, but this browser has no recogniser. Typing is the only way here.",
   "lang.notReady": "The Arabic and the Urdu have not been reviewed.",
   "lang.notReadyClose": "Close this notice",
+  "sheet.raise": "Make this taller",
+  "sheet.lower": "Make this shorter",
   "shell.language": "Language",
   "lang.notReadyBody": "Every sentence is translated, and every language does the same things. What is missing is a reading by somebody who works in these languages and in this field, so treat the wording as a draft and tell us where it is wrong.",
   "read.open": "Read the figures from a document",
