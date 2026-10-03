@@ -5,6 +5,7 @@ import { I18nProvider } from './lib/i18n.js';
 import { forgetKept } from './lib/kept.js';
 import Shell from './components/Shell.js';
 import { PageHead } from './components/page.js';
+import { KINDS, LABEL } from './components/Tools.js';
 import en from './locales/en.js';
 import ar from './locales/ar.js';
 import ur from './locales/ur.js';
@@ -135,6 +136,38 @@ describe('the phone’s masthead', () => {
     await standingAt('/');
     const row = screen.getByRole('navigation', { name: en['shell.thisGroup'] }).parentElement!;
     expect(within(row).getByRole('button', { name: en['tools.title'] })).toBeInTheDocument();
+  });
+});
+
+// ── and the desk's own standing frame ─────────────────────────────────────
+
+describe('the shelf of calculations', () => {
+  /*
+   * It stood to the right of the work on every screen: a hundred pixels of a
+   * 1622-pixel window, permanently, for seven calculators a member opens now
+   * and then — and the arrival drawing has no shelf in it.
+   */
+  it('does not stand beside the work', async () => {
+    await standingAt('/');
+    expect(screen.queryByRole('navigation', { name: en['tools.title'] })).toBeNull();
+  });
+
+  /*
+   * And this is the half that makes that one mean anything: taking a thing
+   * away is only right if what it did is still done. All seven are in the
+   * palette, named, without anybody having to type — and the wide bar opens
+   * the palette with a press, so it is not a keyboard-only way in.
+   */
+  it('is in the palette instead, all seven of it, without typing', async () => {
+    await standingAt('/');
+
+    fireEvent.click(screen.getAllByRole('button', { name: en['palette.title'] })[0]);
+    const palette = await screen.findByRole('dialog', { name: en['palette.title'] });
+
+    /* Every one of the seven, by the name the step that opens it uses. */
+    for (const kind of KINDS) {
+      expect(within(palette).getByText(en[LABEL[kind]]), kind).toBeInTheDocument();
+    }
   });
 });
 

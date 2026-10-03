@@ -18,7 +18,6 @@ import {
 } from '../lib/spine.js';
 import NotYourScreen from './NotYourScreen.js';
 import Tools, { type Kind } from './Tools.js';
-import ToolShelf from './ToolShelf.js';
 import Palette from './Palette.js';
 import Bell from './Bell.js';
 import Guide, { OpenTheGuide } from './Guide.js';
@@ -1403,19 +1402,23 @@ function Frame({ children }: { children: React.ReactNode }) {
         </main>
 
         {/*
-          The shelf is the desk's. A phone gets one button for it.
+          ── the shelf is not here any more ──────────────────────────────
 
-          Seven names across the top of a phone is a whole bar of frame,
-          on every screen, for tools a member opens now and then — and
-          the panel it opens is the same panel the button opens. The
-          shelf keeps its place beside the work where there is room for
-          it, which is what the drawing shows.
+          It stood to the right of the work on every screen: a hundred
+          pixels of a 1622-pixel window, permanently, for seven calculators
+          a member opens now and then. Measured on the arrival screen, the
+          work had 1262 of it; the rail took 260 and the shelf took the
+          rest. And the arrival drawing has no shelf in it — the comment
+          that used to stand here said it did.
+
+          Three ways in remain and all of them are the same panel. The
+          palette, which the wide bar names and a press opens as well as
+          ⌘K; the button at the end of the group row on a phone; and the
+          step itself, which opens the one it needs with the figures
+          already in it — which is where a calculation belongs, and the
+          owner's instruction that took the calculators off the rail in
+          the first place.
         */}
-        {!desk && (
-          <div className="hidden lg:block">
-            <ToolShelf at={tools ? toolAt : undefined} onOpen={openTool} />
-          </div>
-        )}
         </div>
 
         <StatusBar beside={beside !== null} />
