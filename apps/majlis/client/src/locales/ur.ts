@@ -887,6 +887,7 @@ const ur: Dict = {
   "vote.released": "آزاد کر دیا گیا",
   "vote.releasedNote": "یہ موقف معاملہ دوبارہ بحث میں جانے سے پہلے درج ہوا تھا۔ اب یہ شمار نہیں ہوتا۔",
   "lang.notReady": "عربی اور اردو کا جائزہ ابھی نہیں لیا گیا۔",
+  "lang.notReadyClose": "یہ اطلاع بند کریں",
   "shell.language": "زبان",
   "lang.notReadyBody": "ہر جملہ ترجمہ ہو چکا ہے، اور ہر زبان میں وہی کام ہو سکتے ہیں۔ کمی صرف اس شخص کی پڑھت کی ہے جو ان زبانوں میں اور اسی میدان میں کام کرتا ہو، سو الفاظ کو مسودہ سمجھیں اور بتائیں کہاں غلط ہیں۔",
   "read.open": "دستاویز سے اعداد پڑھیں",
@@ -1631,7 +1632,13 @@ const ur: Dict = {
   "rail.record.note": "ہر طے شدہ بات، بند ہو یا کھلی",
   "rail.search": "تلاش",
   "rail.search.note": "پورے ریکارڈ میں ایک ساتھ",
-  "rail.hold": "جو ہمارے پاس ہے",
+  /*
+    A tab, not a sentence. "جو ہمارے پاس ہے" is a clause, and at 375 pixels it
+    broke over two lines in the bar at the foot — 94 pixels of tab bar against
+    63 in English, on every screen. Shorter, and the same thing: what is in
+    the board’s keeping.
+  */
+  "rail.hold": "ہماری تحویل",
   "rail.register": "رجسٹر",
   "rail.register.note": "وہ آلات جو یہ بینک رکھتا ہے",
   "rail.library": "معاہدوں کی لائبریری",

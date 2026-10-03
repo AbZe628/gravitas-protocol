@@ -4,7 +4,7 @@ import { useI18n } from '../lib/i18n.js';
 import { isInstitution, useIdentity } from '../lib/identity.js';
 import { journeyFor } from '../lib/journey.js';
 import { DESK_DOORS, DOORS, isDeskRoute, type AnyPhase } from '../lib/spine.js';
-import { InTheColumn } from './sheet.js';
+import { InTheColumn, NamedAbove } from './sheet.js';
 
 /**
  * One shape for every page.
@@ -158,6 +158,23 @@ export function PageHead({
     are late — because that is what a member glances at between two rows.
   */
   const column = useContext(InTheColumn);
+  /*
+    Said once on a phone, not three times.
+
+    The group row above names the screen you are standing on, and where it
+    uses the same word this heading does, the heading is the frame repeating
+    itself: lit in the row, set in 30-point type under it, lit a third time
+    in the tab bar at the foot. It stays in the document for anyone reading
+    the screen aloud — a screen with no heading at all is a worse fault than
+    a heading said twice — and it stops taking the sixty-five pixels.
+
+    Only on a phone, and only where the words match. A desk has room for the
+    heading and draws no such row, and a screen whose own name differs from
+    the row's word is not repeating anything.
+  */
+  const above = useContext(NamedAbove);
+  const twice = typeof title === 'string' && above !== null && above === title;
+
   if (column) return live ? <div className="mb-3 flex flex-wrap items-center gap-2.5">{live}</div> : null;
 
   return (
@@ -169,7 +186,10 @@ export function PageHead({
       <div className="flex flex-wrap items-start justify-between gap-x-8 gap-y-3">
         <div className="min-w-0">
           <h1
-            className="max-w-[28ch] font-display text-head leading-tight tracking-display text-paper"
+            className={
+              'max-w-[28ch] font-display text-head leading-tight tracking-display text-paper ' +
+              (twice ? 'sr-only sm:not-sr-only' : '')
+            }
             style={{ textWrap: 'balance' }}
           >
             {title}

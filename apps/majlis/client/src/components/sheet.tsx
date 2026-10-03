@@ -15,6 +15,21 @@ import { wasJustOpened, rememberOpened } from '../lib/split.js';
 export const InTheColumn = createContext(false);
 
 /**
+ * The name the frame has already said, directly above the page.
+ *
+ * On a phone the group row names the screen you are standing on, in the same
+ * words its own heading uses — so `What needs you` was on screen three times
+ * at once: lit in the row, set in 30-point type under it, and lit again in
+ * the tab bar at the foot. Sixty-five pixels of a 812-pixel screen to repeat
+ * what the line above had just said.
+ *
+ * Null where the row is not drawn, and the label where it is. A page whose
+ * heading differs from the row's word keeps its heading: `Events` in the row
+ * and *What went wrong* as the screen is not a repetition, it is two things.
+ */
+export const NamedAbove = createContext<string | null>(null);
+
+/**
  * A list with columns, which is what an application shows and a page does not.
  *
  * ── what was here, and why it read as a page ──────────────────────────────

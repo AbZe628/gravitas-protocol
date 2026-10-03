@@ -26,6 +26,8 @@ import Keys from './Keys.js';
 import Announcement from './Announcement.js';
 import { NewsProvider } from '../lib/news.js';
 import { Button } from './Button';
+import { NamedAbove } from './sheet.js';
+import ADraftTranslation from './ADraftTranslation.js';
 import Person, { initialsOf, useNameOf } from './Person.js';
 import ListColumn from './ListColumn.js';
 import { LIST_TITLES, cameFrom, listFor, notePath, rememberList, rememberOpened, useDeskWide } from '../lib/split.js';
@@ -805,6 +807,25 @@ function Frame({ children }: { children: React.ReactNode }) {
             return g ? g.items : [];
           })();
 
+  /**
+   * The word the group row has already said, for the page under it.
+   *
+   * The same longest match the row itself lights by, so the two cannot
+   * disagree about which destination a member is standing on — and null
+   * where the row is not drawn at all, because then nothing has been said.
+   *
+   * See `NamedAbove`: a heading that repeats this is the frame saying the
+   * screen's name three times on a 375-pixel screen.
+   */
+  const namedAbove: string | null =
+    siblings.length > 1
+      ? (siblings
+          .filter((d) =>
+            d.end ? path === d.to : path === d.to || path.startsWith(d.to.replace(/\/$/, '') + '/'),
+          )
+          .sort((a, b) => b.to.length - a.to.length)[0]?.label ?? null)
+      : null;
+
   const rail = (
     <div className="flex h-full flex-col">
       <Link to="/" className="mb-8 flex items-center gap-3 px-3">
@@ -1009,111 +1030,25 @@ function Frame({ children }: { children: React.ReactNode }) {
               </Link>
             )}
             {/*
-              The tools, on a phone: one button, not a bar of seven.
+              Search is not here any more.
 
-              It opens the same panel the shelf opens on a desk — the
-              seven are inside it, named, at a size a thumb can hit. On
-              the shelf they were 83×26, which is under half the height a
-              finger needs, and they cost a whole row of the screen on
-              every page whether or not anybody wanted a calculator.
+              Four round controls at a size a thumb can hit are 176 of the 375
+              pixels a phone has, which is why the board's own name read
+              *Demonstration B…* — and the one a member knows it by is the
+              name, not the application's. Search is a destination of *what
+              stands*, in the group row directly below this, where the rail
+              has always kept it and where `APhoneCarriesTheWholeRail` counts
+              it. It was in two places and one of them cost the masthead.
+
+              What is left is the two that belong to no screen: putting
+              something to the board, and the member themselves.
             */}
-            {!desk && (
-              <Button
-                type="button"
-                onClick={() => setTools(true)}
-                aria-label={t('tools.title')}
-                className="grid h-11 w-11 place-items-center rounded-full text-muted transition-colors hover:bg-raised/60 hover:text-paper lg:hidden"
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <path d="M4 7h10M4 12h16M4 17h7" />
-                  <circle cx="18" cy="7" r="2" />
-                  <circle cx="15" cy="17" r="2" />
-                </svg>
-              </Button>
-            )}
-            <Link
-              to="/search"
-              aria-label={t('besides.search')}
-              className="grid h-11 w-11 place-items-center rounded-full text-muted transition-colors hover:bg-raised/60 hover:text-paper"
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
-                <circle cx="11" cy="11" r="7" />
-                <path d="M20 20l-3.5-3.5" />
-              </svg>
-            </Link>
             <Link to="/settings" aria-label={t('besides.board')}>
               <Avatar id={identity?.scholarId} />
             </Link>
           </div>
         </header>
 
-        {/*
-          The rest of the group you are standing in, on a phone.
-
-          ── the gap this closes ──────────────────────────────────────
-
-          The tab bar carries one destination per rail group — the three
-          the drawing names — and a member who taps one lands on that
-          group's main screen with the group's other destinations gone.
-          Measured on a phone: four of the eight were unreachable from
-          anywhere at all. Put a question, what went wrong, the contract
-          library and the record simply had no way in.
-
-          ── and it is the rail, not a second navigation ──────────────
-
-          The same groups, the same order, the same words. What a member
-          learns at a desk is what they find here; a phone is shown less
-          at once because it is narrower, never less in total. It scrolls
-          sideways rather than wrapping, so the row stays one line high
-          whatever the group holds.
-        */}
-        {/*
-          ── and the language sits at the end of it ───────────────────
-
-          It had a row to itself: three buttons across the full width of
-          the screen, on every page, for a choice a member makes once.
-          Four bars stood between the top of a phone and the first line
-          of work — 184 pixels of 812, and another 61 for the tab bar,
-          so thirty per cent of the screen was frame. It rides at the
-          end of this row now, where it is still on every screen and
-          still the first thing a reader who cannot read English can
-          reach.
-        */}
-        <div className="sticky top-[60px] z-20 flex items-center gap-2 bg-ink/80 px-5 pb-2.5 backdrop-blur-xl lg:hidden">
-        <nav aria-label={t('shell.thisGroup')} className="slides flex min-w-0 flex-1 items-center gap-1.5 overflow-x-auto">
-          {siblings.length > 1 &&
-            siblings.map((d) => (
-              <NavLink
-                key={d.to}
-                to={d.to}
-                end={d.end}
-                className={({ isActive }) =>
-                  'inline-flex min-h-[44px] shrink-0 items-center whitespace-nowrap rounded-lg px-3 py-1.5 text-note transition-all ' +
-                  (isActive
-                    ? 'bg-raised font-semibold text-paper shadow-hairline'
-                    : 'text-muted hover:text-paper')
-                }
-              >
-                {d.label}
-              </NavLink>
-            ))}
-
-        </nav>
-
-          {/*
-            The language is not here any more.
-
-            It was three buttons, then one list, and the list still took a
-            fifth of the row on every screen a member will ever open — for a
-            choice made once, on the first day, and then never again. It is
-            on the settings screen, which is where a phone keeps a thing you
-            set once, and the member's own mark in the masthead opens it.
-
-            Set from nowhere else, it is still the first control a reader who
-            cannot read the screen needs. That is the trade: two presses on
-            the first day against a fifth of a row for the rest of the years.
-          */}
-        </div>
 
         {/* ── the wide bar: where you are, who you are ────────────────── */}
         <header className="sticky top-0 z-30 hidden items-center justify-between gap-4 bg-ink/80 px-5 py-3 shadow-[0_1px_0_rgba(25,23,19,0.055)] backdrop-blur-xl lg:flex">
@@ -1290,6 +1225,117 @@ function Frame({ children }: { children: React.ReactNode }) {
           style={{ animation: 'shellFade 220ms ease-out' }}
         >
           {/*
+            The rest of the group you are standing in, on a phone.
+
+            ── the gap this closes ──────────────────────────────────────
+
+            The tab bar carries one destination per rail group — the three
+            the drawing names — and a member who taps one lands on that
+            group's main screen with the group's other destinations gone.
+            Measured on a phone: four of the eight were unreachable from
+            anywhere at all. Put a question, what went wrong, the contract
+            library and the record simply had no way in.
+
+            ── and it is the rail, not a second navigation ──────────────
+
+            The same groups, the same order, the same words. What a member
+            learns at a desk is what they find here; a phone is shown less
+            at once because it is narrower, never less in total. It scrolls
+            sideways rather than wrapping, so the row stays one line high
+            whatever the group holds.
+          */}
+          {/*
+            ── and the language sits at the end of it ───────────────────
+
+            It had a row to itself: three buttons across the full width of
+            the screen, on every page, for a choice a member makes once.
+            Four bars stood between the top of a phone and the first line
+            of work — 184 pixels of 812, and another 61 for the tab bar,
+            so thirty per cent of the screen was frame. It rides at the
+            end of this row now, where it is still on every screen and
+            still the first thing a reader who cannot read English can
+            reach.
+          */}
+          {/*
+            And it scrolls away with the work.
+
+            Two bars were pinned to the top of every phone screen — the masthead
+            and this — so 112 of 812 pixels were frame on every line a member
+            read, before the screen had said anything. Which group you are
+            standing in is a thing you want on arriving and never again while
+            reading; the masthead is the one that has to stay, because the way
+            back and the way out are on it.
+
+            One bar stays. This one goes up with the first scroll and comes back
+            at the top, which is what a phone does with a title.
+          */}
+          <div className="-mt-1 mb-3 flex items-center gap-2 lg:hidden">
+          <nav aria-label={t('shell.thisGroup')} className="slides flex min-w-0 flex-1 items-center gap-1.5 overflow-x-auto">
+            {siblings.length > 1 &&
+              siblings.map((d) => (
+                <NavLink
+                  key={d.to}
+                  to={d.to}
+                  end={d.end}
+                  className={({ isActive }) =>
+                    'inline-flex min-h-[44px] shrink-0 items-center whitespace-nowrap rounded-lg px-3 py-1.5 text-note transition-all ' +
+                    (isActive
+                      ? 'bg-raised font-semibold text-paper shadow-hairline'
+                      : 'text-muted hover:text-paper')
+                  }
+                >
+                  {d.label}
+                </NavLink>
+              ))}
+
+          </nav>
+
+            {/*
+              The tools, at the end of the group row: one button, not a bar of
+              seven, and not a third thing in the masthead.
+
+              It opens the same panel the shelf opens on a desk — the seven are
+              inside it, named, at a size a thumb can hit. On the shelf they
+              were 83×26, which is under half the height a finger needs, and
+              they cost a whole row of every page whether or not anybody wanted
+              a calculator.
+
+              Here rather than in the masthead because the masthead is the one
+              bar that stays while a member scrolls, and a calculator is not
+              something to hold a bar open for. This row is where the language
+              used to ride, for the same reason.
+            */}
+            {!desk && (
+              <Button
+                type="button"
+                onClick={() => setTools(true)}
+                aria-label={t('tools.title')}
+                className="grid h-11 w-11 shrink-0 place-items-center rounded-full text-muted transition-colors hover:bg-raised/60 hover:text-paper"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M4 7h10M4 12h16M4 17h7" />
+                  <circle cx="18" cy="7" r="2" />
+                  <circle cx="15" cy="17" r="2" />
+                </svg>
+              </Button>
+            )}
+
+            {/*
+              The language is not here any more.
+
+              It was three buttons, then one list, and the list still took a
+              fifth of the row on every screen a member will ever open — for a
+              choice made once, on the first day, and then never again. It is
+              on the settings screen, which is where a phone keeps a thing you
+              set once, and the member's own mark in the masthead opens it.
+
+              Set from nowhere else, it is still the first control a reader who
+              cannot read the screen needs. That is the trade: two presses on
+              the first day against a fifth of a row for the rest of the years.
+            */}
+          </div>
+
+          {/*
             Said once, at the top, and only in the language it is about.
 
             Arabic is 190 keys short of English and Urdu 201. A reader who
@@ -1299,14 +1345,7 @@ function Frame({ children }: { children: React.ReactNode }) {
             looking at, in its own language, before it has to guess — and it
             does not appear in English, where there is nothing to explain.
           */}
-          {dirFor(lang) === 'rtl' && (
-            <div className="mb-8 rounded-sheet bg-raised/70 px-6 py-5 shadow-ring">
-              <div className="font-display text-sub leading-snug">{t('lang.notReady')}</div>
-              <p className="mt-2.5 max-w-[62ch] text-ui leading-loose text-muted">
-                {t('lang.notReadyBody')}
-              </p>
-            </div>
-          )}
+          {dirFor(lang) === 'rtl' && <ADraftTranslation key={lang} lang={lang} />}
 
           {/*
             ── what used to sit here, and why it does not ─────────────────
@@ -1350,7 +1389,7 @@ function Frame({ children }: { children: React.ReactNode }) {
             <NotYourScreen />
           ) : (
             <>
-              {children}
+              <NamedAbove.Provider value={namedAbove}>{children}</NamedAbove.Provider>
 
               {/*
                 What this installation is, at the end of the page.
