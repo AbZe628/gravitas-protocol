@@ -57,7 +57,7 @@ function Row({ row }: { row: { undertaking: Undertaking; whoName: string; overdu
       cells={[
         u.what,
         <span className="block truncate text-ui text-muted">{row.whoName}</span>,
-        <Mark tone={u.state === 'open' ? (row.overdue ? 'text-breach' : 'text-goldink') : 'text-muted'}>
+        <Mark tone={row.overdue ? 'text-breach' : undefined}>
           {t(row.overdue ? 'und.overdue' : `book.state.${u.state}`)}
         </Mark>,
         <Figure tone={row.overdue ? 'text-breach' : 'text-muted'}>{u.dueAt ? day(u.dueAt) : '—'}</Figure>,
@@ -111,7 +111,13 @@ export default function Undertakings() {
         live={
           open.length > 0 ? (
             <>
-              <State tone={data.summary?.overdue ? 'breach' : 'attention'}>
+              {/*
+                Open is not late. Painted red whenever any one of them was
+                overdue, this said *2 still open* in the colour of a breach
+                when one of the two was late and the other was not — and the
+                line beside it already says how many. See `Mark`.
+              */}
+              <State tone="plain">
                 {open.length} {t('und.stillOpen')}
               </State>
               {data.summary?.overdue ? (

@@ -78,9 +78,8 @@ function Row({ s, passage }: { s: Submission; passage?: Passage }) {
             </>
           )}
         </span>,
-        <Mark tone={s.standing === 'waiting' ? 'text-goldink' : s.standing === 'declined' ? 'text-breach' : 'text-settled'}>
-          {t(`queue.${s.standing}`)}
-        </Mark>,
+        /* Waiting, declined and taken up are three outcomes, not three alarms. */
+        <Mark>{t(`queue.${s.standing}`)}</Mark>,
         <Figure tone={s.standing === 'waiting' ? 'text-goldink' : 'text-muted'}>{clock(s, t)}</Figure>,
       ]}
     />

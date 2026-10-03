@@ -502,6 +502,27 @@ export function Line({
  *
  * Small capitals rather than a pill: a column of eleven pills is a column of
  * eleven boxes, and the box is what the eye lands on instead of the word.
+ *
+ * ── and a mark is a word, not a colour ───────────────────────────────────
+ *
+ * Measured on the arrival screen: **four** accent colours in one list —
+ * lapis on *Everything* and *Take it* and *Question*, green on *Review*,
+ * gold on *Matter* and *Undertaking*, red on *past its date* and
+ * *Non-compliance*. Every one of them was painting a word that already said
+ * the same thing, so a column of eleven stages read as a traffic report and
+ * the one thing worth finding by sweeping — what is late — was one colour
+ * among four.
+ *
+ * So: `tone` is for the exception, and the default is neutral.
+ *
+ *   - **red** where a clock has run out, or the record says this may not be
+ *     held. That is the only thing in a list a member should be able to find
+ *     without reading;
+ *   - **lapis** on what a member presses, which is not a mark;
+ *   - everything else neutral, because the word is already there.
+ *
+ * Painting *restricting* red was its own small lie, and it was on three
+ * screens: a board restricting something is the board working, not a fault.
  */
 export function Mark({ tone, children }: { tone?: string; children: ReactNode }) {
   return (

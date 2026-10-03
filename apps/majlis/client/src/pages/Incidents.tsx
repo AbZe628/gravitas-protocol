@@ -272,7 +272,12 @@ export default function Incidents() {
                   saying what happens next.
                 */
                 i.purification && !i.purification.paidAt ? (
-                  <span className="block truncate font-mono text-note text-goldink">
+                  /*
+                    And in no colour: the cell is empty unless something is
+                    owed and unpaid, so its being there is the whole signal.
+                    Gold on top of that was the column saying it twice.
+                  */
+                  <span className="block truncate font-mono text-note text-muted">
                     {`${i.purification.amount} ${i.purification.currency}`}
                   </span>
                 ) : null,

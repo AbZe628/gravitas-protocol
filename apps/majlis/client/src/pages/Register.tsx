@@ -88,7 +88,8 @@ function holdingRow(s: AssetStanding, t: (k: string) => string) {
         <span className="block truncate font-mono text-note text-muted">
           {s.asset.identifiers[0]?.value ?? '—'}
         </span>,
-        <Mark tone={toneFor(s.status) === 'breach' ? 'text-breach' : 'text-settled'}>
+        /* Red stays on the one that means the bank may not hold this. */
+        <Mark tone={toneFor(s.status) === 'breach' ? 'text-breach' : undefined}>
           {t(`reg.status.${s.status}`)}
         </Mark>,
       ]}
@@ -181,15 +182,22 @@ export default function Register() {
               <State tone="plain">
                 {assets.length} {t('reg.live.holdings')}
               </State>
+              {/*
+                A count of what is fine is not news. Green here put three
+                accents in one head — green, gold and the red on *Lapsed*
+                down the list — and the only one worth finding by sweeping
+                is the last. See `Mark`.
+              */}
               {permitted > 0 && (
-                <State tone="settled">
+                <State tone="plain">
                   {permitted} {t('reg.live.permitted')}
                 </State>
               )}
               {data.neverExamined > 0 && (
                 <Link
                   to="/examinations"
-                  className="text-ui text-goldink underline decoration-gold/30 underline-offset-4 transition-colors hover:text-paper"
+                  /* A way to somewhere, in the colour every other way here is. */
+                  className="text-ui text-lapis underline decoration-lapis/30 underline-offset-4 transition-colors hover:text-paper"
                 >
                   {data.neverExamined} {t('spine.checked.count')}
                 </Link>

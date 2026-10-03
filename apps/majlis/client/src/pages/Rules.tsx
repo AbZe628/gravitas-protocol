@@ -110,7 +110,12 @@ export default function Rules({ embedded = false }: { embedded?: boolean }) {
                 */
                 <Figure>{r.version}</Figure>,
                 <Figure>{r.inForceFrom ? <DateText iso={r.inForceFrom} /> : '—'}</Figure>,
-                <Mark tone={reviewTone(review) === 'attention' ? 'text-goldink' : 'text-muted'}>
+                /*
+                  Red on a review that has run out of time, or that nothing
+                  will ever bring back — which is the same fault with no
+                  clock on it. Due today is not late, and reads as the word.
+                */
+                <Mark tone={reviewTone(review) === 'breach' ? 'text-breach' : undefined}>
                   {reviewWord(review, t)}
                 </Mark>,
               ]}

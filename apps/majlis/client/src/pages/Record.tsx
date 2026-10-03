@@ -66,12 +66,8 @@ function Decided({ matters, lost }: { matters: MatterSummary[] | null; lost: boo
               columns={DECIDED_COLS(t)}
               cells={[
                 m.title,
-                <Mark tone={m.direction === 'restrict' ? 'text-breach' : 'text-settled'}>
-                  {t(`matter.direction.${m.direction}`)}
-                </Mark>,
-                <Mark tone={m.status === 'in_force' ? 'text-settled' : 'text-muted'}>
-                  {t(`matter.status.${m.status}`)}
-                </Mark>,
+                <Mark>{t(`matter.direction.${m.direction}`)}</Mark>,
+                <Mark>{t(`matter.status.${m.status}`)}</Mark>,
                 <Figure>{m.openedAt.slice(0, 10)}</Figure>,
               ]}
             />

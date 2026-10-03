@@ -172,10 +172,9 @@ export default function Dashboard() {
               columns={OPEN_COLS(t)}
               cells={[
                 m.title,
-                <Mark tone={m.direction === 'restrict' ? 'text-breach' : 'text-settled'}>
-                  {t(`matter.direction.${m.direction}`)}
-                </Mark>,
-                <Mark tone="text-goldink">{t(`matter.status.${m.status}`)}</Mark>,
+                /* A board restricting something is the board working, not a fault. */
+                <Mark>{t(`matter.direction.${m.direction}`)}</Mark>,
+                <Mark>{t(`matter.status.${m.status}`)}</Mark>,
                 <span className="block truncate text-note text-muted">
                   {t(`matter.origin.${m.origin}`)}
                 </span>,
@@ -216,9 +215,7 @@ export default function Dashboard() {
                 columns={SETTLED_COLS(t)}
                 cells={[
                   m.title,
-                  <Mark tone={m.direction === 'restrict' ? 'text-breach' : 'text-settled'}>
-                    {t(`matter.direction.${m.direction}`)}
-                  </Mark>,
+                  <Mark>{t(`matter.direction.${m.direction}`)}</Mark>,
                   <Figure>
                     <DateText iso={m.openedAt} />
                   </Figure>,

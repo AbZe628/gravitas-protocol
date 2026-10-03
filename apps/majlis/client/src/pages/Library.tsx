@@ -9,7 +9,7 @@ import { Division, Nothing } from '../components/page.js';
 import { ListPage } from '../components/shapes.js';
 import { Sheet, Line, Mark, Figure, type Column } from '../components/sheet.js';
 import { ErrorText, Loading } from '../components/ui.js';
-import { Quiet, type Tone } from '../components/kit.js';
+import { Quiet } from '../components/kit.js';
 import { useStillThere } from '../lib/stillThere.js';
 
 /**
@@ -43,13 +43,10 @@ import { useStillThere } from '../lib/stillThere.js';
 /*
  * A shape nobody has touched is an absence, not an alarm — the same reading
  * the register takes of a holding never put to the board. Only a shape this
- * board ruled against is a refusal.
+ * board ruled against is a refusal, and the word says so: *Declined*,
+ * *Adopted*, *Amended*, *Draft* are four outcomes, and this list used to
+ * paint three of them in two colours. See `Mark`.
  */
-function toneFor(held: HeldStructure): Tone {
-  if (held.declined) return 'breach';
-  if (held.source === 'draft') return 'plain';
-  return 'settled';
-}
 
 /** Untouched first: it is the state most shapes are in and the one worth acting on. */
 const ORDER: HeldStructure['source'][] = ['draft', 'amended', 'adopted'];
@@ -179,9 +176,7 @@ export default function Library() {
                   <span className="block truncate text-note text-muted">
                     {h.adoption?.basis ?? ''}
                   </span>,
-                  <Mark tone={toneFor(h) === 'settled' ? 'text-settled' : 'text-muted'}>
-                    {t(h.declined ? 'adopt.declined' : `adopt.${h.source}`)}
-                  </Mark>,
+                  <Mark>{t(h.declined ? 'adopt.declined' : `adopt.${h.source}`)}</Mark>,
                 ]}
               />
             ))}

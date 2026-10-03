@@ -84,14 +84,14 @@ interface Narrowed {
 }
 const narrowed = (): Narrowed => kept<Narrowed>('queue.narrowed') ?? { onlyMine: true, only: null };
 
-/** The stage's own colour, from the vocabulary the doors already use. */
-const TONE: Record<QueuePhase, string> = {
-  asked: 'text-lapis',
-  deciding: 'text-goldink',
-  inforce: 'text-settled',
-  checked: 'text-breach',
-};
+/*
+  The stage had a colour of its own, one per door, and it is neutral now.
 
+  Four accents stood in this one list and all four were saying a second time
+  what the word under them already said. What is late is still red — the row
+  is tinted and the words PAST ITS DATE sit directly under the stage — and
+  that is the one thing worth finding here without reading. See `Mark`.
+*/
 /*
   On a phone: what it is, how long it has stood there, and one quiet line
   saying what to do and whose it is. The stage is dropped there — the kind
@@ -260,7 +260,7 @@ function Row({
           <span className="truncate">{row.title}</span>
         </span>,
         <span className="block truncate">
-          <Mark tone={TONE[row.phase]}>{t(`needs.kind.${row.kind}`)}</Mark>
+          <Mark>{t(`needs.kind.${row.kind}`)}</Mark>
           {row.overdue && (
             <span className="mt-0.5 block text-label font-bold uppercase tracking-caps text-breach">
               {t('needs.overdue')}
