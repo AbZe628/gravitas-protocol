@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
-import { render, screen, fireEvent, within } from '@testing-library/react';
+import { act, render, screen, fireEvent, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { I18nProvider } from './lib/i18n.js';
 import { forgetKept } from './lib/kept.js';
@@ -205,6 +205,74 @@ describe('the screen’s name', () => {
 
     const heading = screen.getByRole('heading', { level: 1, name: en['rail.needsYou'] });
     expect(heading.className).not.toContain('sr-only');
+  });
+});
+
+// ── and the bar picks the name up when the heading goes ───────────────────
+
+/**
+ * jsdom has no IntersectionObserver, and the frame checks for one before it
+ * watches anything — so the stub is what makes this testable at all. It keeps
+ * the callback so a test can say *the heading has gone up past the bar* and
+ * then *it is back*, which is the whole behaviour.
+ */
+function watchingTheHeading() {
+  const calls: ((entries: { isIntersecting: boolean }[]) => void)[] = [];
+  class Fake {
+    constructor(fn: (e: { isIntersecting: boolean }[]) => void) {
+      calls.push(fn);
+    }
+    observe() {}
+    disconnect() {}
+    unobserve() {}
+    takeRecords() {
+      return [];
+    }
+  }
+  vi.stubGlobal('IntersectionObserver', Fake);
+  return {
+    gone: () => act(() => calls.forEach((fn) => fn([{ isIntersecting: false }]))),
+    back: () => act(() => calls.forEach((fn) => fn([{ isIntersecting: true }]))),
+    watchers: () => calls.length,
+  };
+}
+
+describe('the screen’s name, once its heading has scrolled off', () => {
+  /*
+   * Measured five hundred pixels into a matter at 375 × 812: the heading
+   * *Suspension of leveraged index instruments* was 344 pixels above the fold
+   * and the only words at the top of the screen were the name of the list the
+   * member came from.
+   */
+  it('is picked up by the bar', async () => {
+    const scroll = watchingTheHeading();
+    await standingAt('/meetings', <PageHead title="Meetings" says="" />);
+
+    const bar = theMasthead();
+    expect(scroll.watchers(), 'nothing is watching the heading').toBeGreaterThan(0);
+    expect(within(bar).queryByText('Meetings')).toBeNull();
+
+    scroll.gone();
+    expect(within(bar).getByText('Meetings')).toBeInTheDocument();
+
+    /* And given back, or the bar would name a screen the member has left. */
+    scroll.back();
+    expect(within(bar).queryByText('Meetings')).toBeNull();
+  });
+
+  /*
+   * The half that keeps it honest: a heading the screen hides because the row
+   * above has already said it must not come back in the bar, or the frame
+   * would be saying the same word twice over again — which is the thing the
+   * hiding was for.
+   */
+  it('is not picked up where the row above has already said it', async () => {
+    const scroll = watchingTheHeading();
+    await standingAt('/', <PageHead title={en['rail.needsYou']} says="" />);
+
+    scroll.gone();
+    const bar = theMasthead();
+    expect(within(bar).queryByText(en['rail.needsYou'])).toBeNull();
   });
 });
 

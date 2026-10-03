@@ -816,6 +816,62 @@ function Frame({ children }: { children: React.ReactNode }) {
    * See `NamedAbove`: a heading that repeats this is the frame saying the
    * screen's name three times on a 375-pixel screen.
    */
+  /**
+   * The screen's own name, once its heading has gone up past the bar.
+   *
+   * ── what was measured ──────────────────────────────────────────────
+   *
+   * Five hundred pixels into a matter at 375 × 812: the heading
+   * *Suspension of leveraged index instruments* was 344 pixels above the
+   * fold, and the only words at the top of the screen were *What needs
+   * you* — the name of the list the member came from. A member deep in a
+   * window had nothing on screen saying what they were in.
+   *
+   * ── and it is read, not threaded ───────────────────────────────────
+   *
+   * From the heading the page already draws, rather than from a prop every
+   * screen would have to remember to pass — twenty-odd screens, and the
+   * one that forgot would be the one nobody noticed. A heading the page
+   * hides because the row above already said it (see `NamedAbove`) is not
+   * taken: the bar would then be repeating the row a third time.
+   */
+  const [collapsed, setCollapsed] = useState<string | null>(null);
+  useEffect(() => {
+    const scroller = work.current;
+    if (!scroller || typeof IntersectionObserver === 'undefined') return;
+
+    let watching: HTMLHeadingElement | null = null;
+    let seen: IntersectionObserver | null = null;
+
+    const attach = () => {
+      const h1 = scroller.querySelector('h1');
+      if (h1 === watching) return;
+      seen?.disconnect();
+      watching = h1;
+      setCollapsed(null);
+      /* A heading the screen hides is one the frame above has already said. */
+      if (!h1 || h1.className.includes('sr-only')) return;
+      seen = new IntersectionObserver(
+        ([entry]) => {
+          const words = (h1.textContent ?? '').trim();
+          setCollapsed(entry.isIntersecting || !words ? null : words);
+        },
+        { root: scroller, threshold: 0 },
+      );
+      seen.observe(h1);
+    };
+
+    attach();
+    /* The heading arrives when the screen's own reading does, not before. */
+    const grew = new MutationObserver(attach);
+    grew.observe(scroller, { childList: true, subtree: true });
+
+    return () => {
+      grew.disconnect();
+      seen?.disconnect();
+    };
+  }, [path]);
+
   const namedAbove: string | null =
     siblings.length > 1
       ? (siblings
@@ -963,13 +1019,40 @@ function Frame({ children }: { children: React.ReactNode }) {
               <svg width="10" height="17" viewBox="0 0 8 13" aria-hidden="true" className="shrink-0 rtl:-scale-x-100">
                 <path d="M6.5 1.5 1.5 6.5 6.5 11.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
-              <span className="truncate text-body">{t(LIST_TITLES[listHere] ?? 'needs.title')}</span>
+              {/*
+                The way back keeps its chevron and its name for anyone
+                reading the screen aloud; the words give way to what the
+                member is actually in, once that has scrolled off.
+              */}
+              <span className="truncate text-body">
+                {collapsed ?? t(LIST_TITLES[listHere] ?? 'needs.title')}
+              </span>
             </Button>
           ) : (
           <Link to="/" className="flex min-w-0 items-center gap-2.5">
             <Mark />
             <div className="min-w-0">
-              {boardName ? (
+              {collapsed ? (
+                /*
+                  Which screen, over whose board.
+
+                  The group row names the screen and scrolls away with the
+                  work, so a member reading the fourth screenful of the
+                  sittings had nothing on screen saying what they were
+                  reading. The board's name is the line that gives way: a
+                  member knows whose installation they opened, and does not
+                  always know which of eight screens they are four pages
+                  into.
+                */
+                <>
+                  <div className="truncate font-display text-sub leading-none tracking-title">
+                    {collapsed}
+                  </div>
+                  <div className="mt-1.5 truncate text-label uppercase tracking-caps leading-none text-muted">
+                    {boardName ?? t('app.name')}
+                  </div>
+                </>
+              ) : boardName ? (
                 <>
                   <div className="truncate font-display text-sub leading-none tracking-title">
                     {boardName}
