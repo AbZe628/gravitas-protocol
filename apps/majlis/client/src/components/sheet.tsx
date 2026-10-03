@@ -256,7 +256,18 @@ export function Sheet({
       </div>
       )}
 
-      <ul className="[&>li+li]:border-t [&>li+li]:border-line">{children}</ul>
+      {/*
+        The line between two rows starts where the words start.
+        
+        Drawn across the whole width it cuts the list into bands, and the
+        eye reads the bands rather than the rows — which is the opposite of
+        what a separator is for. Inset to the text, it reads as one list
+        with rows in it. It is laid on the row rather than given to its
+        border so the inset follows the reading direction on its own.
+      */}
+      <ul className="[&>li+li]:before:absolute [&>li+li]:before:inset-x-0 [&>li+li]:before:top-0 [&>li+li]:before:ms-5 [&>li+li]:before:h-px [&>li+li]:before:bg-line [&>li+li]:before:content-['']">
+        {children}
+      </ul>
     </div>
     </Fits.Provider>
   );

@@ -31,6 +31,12 @@ import { Line, Sheet, type Column } from './components/sheet.js';
  *
  * `useWide` answers *desk* under a test runner, so what is rendered here is
  * the branch that was missing it.
+ *
+ * ── and what the list says about itself without words ─────────────────────
+ *
+ * The line between two rows belongs here for the same reason. Drawn across
+ * the whole width it cuts a list into bands and the eye reads the bands; inset
+ * to where the words start, it reads as one list with rows in it.
  */
 
 const COLS: readonly Column[] = [
@@ -54,6 +60,23 @@ function draw() {
     </I18nProvider>,
   );
 }
+
+describe('the line between two rows', () => {
+  it('starts where the words start, not at the edge', () => {
+    draw();
+
+    const rows = screen.getByText('A way in').closest('ul')!;
+    /*
+     * Laid on the row rather than given to its border: a border is drawn the
+     * whole width of the box it is on, and `ms-5` on an absolutely placed
+     * line follows the reading direction on its own, which a left inset does
+     * not.
+     */
+    expect(rows.className).toContain('before:ms-5');
+    expect(rows.className).toContain('before:h-px');
+    expect(rows.className).not.toContain('border-t');
+  });
+});
 
 describe('a row that leads further', () => {
   it('carries the mark, whether it opens a screen or a panel', () => {
