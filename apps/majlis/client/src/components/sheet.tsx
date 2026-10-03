@@ -237,7 +237,9 @@ export function Sheet({
       <div
         role="row"
         style={{ ['--cols' as string]: template(columns) }}
-        className="sticky top-0 z-[1] grid gap-4 border-b border-line bg-raised px-5 py-2.5 [grid-template-columns:var(--cols)]"
+        /* The same end padding the rows keep for the chevron, or every column
+           under a heading sits a mark's width to the side of it. */
+        className="sticky top-0 z-[1] grid gap-4 border-b border-line bg-raised py-2.5 pe-9 ps-5 [grid-template-columns:var(--cols)]"
       >
         {columns.map((c, i) => (
           <div
@@ -478,12 +480,29 @@ export function Line({
     );
   }
 
+  /*
+    And at a desk too, where it was not.
+
+    Measured on the arrival screen at 1622 pixels: twelve rows open something
+    and two of them said so. A member reading a list has no way of telling a
+    line that is a fact from one that is a way in except by pointing at it and
+    watching the cursor — which is the one thing a list of fourteen things to
+    do should not need.
+
+    Out of the grid rather than in it: a column of its own would have to be in
+    `columns`, which the heading row is drawn from too, and every list in the
+    application would need a width for a mark that is not a column. Laid on
+    the row's end instead, with the row leaving room for it.
+  */
+  const leadsOn = to !== undefined || onPress;
+
   return (
     <li
       {...longPress}
       style={{ ['--cols' as string]: template(columns) }}
       className={
-        'relative grid min-h-[44px] items-center gap-x-4 px-5 py-2.5 [grid-template-columns:var(--cols)] ' +
+        'relative grid min-h-[44px] items-center gap-x-4 py-2.5 ps-5 [grid-template-columns:var(--cols)] ' +
+        (leadsOn ? 'pe-9 ' : 'pe-5 ') +
         mark
       }
     >
@@ -493,6 +512,9 @@ export function Line({
         </div>
       ))}
       {act && <div className="relative z-[1] min-w-0 text-end">{act}</div>}
+      {leadsOn && (
+        <Chevron className="pointer-events-none absolute inset-y-0 end-3.5 my-auto" />
+      )}
     </li>
   );
 }
