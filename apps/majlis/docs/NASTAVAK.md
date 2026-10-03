@@ -5,10 +5,11 @@ reda koda. Red posla je u [RED.md](RED.md), prijedlozi u
 [PRIJEDLOZI-UI.md](PRIJEDLOZI-UI.md). Ovdje je stanje, ono što se ne vidi iz
 koda, i svaki sljedeći korak.
 
-**Zadnje stanje (3. 10. 2026):** sve je na **radnoj grani** — onoj na kojoj
-je ova stranica — dvadeset šest commita iznad `origin/main` (`692022e`), i sve
-je **pushano na radnu granu**. **Na `main` nije ništa pushano** — to je
-vlasnikova odluka i vrijedi i dalje: pitaj prije nego što išta ode na `main`.
+**Zadnje stanje (3. 10. 2026, druga sesija):** sve je na **radnoj grani** —
+onoj na kojoj je ova stranica — trideset dva commita iznad `origin/main`
+(`692022e`), i sve je **pushano na radnu granu**. **Na `main` nije ništa
+pushano** — to je vlasnikova odluka i vrijedi i dalje: pitaj prije nego što
+išta ode na `main`.
 
 | commit | šta |
 |---|---|
@@ -23,11 +24,16 @@ vlasnikova odluka i vrijedi i dalje: pitaj prije nego što išta ode na `main`.
 | `c1e6d66` | P6 — članu se kaže šta ga čeka, bez otvaranja Majlisa |
 | `ac6fca6` | P7a — telefon troši manje sebe na okvir |
 | `26fa437` | P7b — polica računa više ne stoji pored posla |
+| `15e47a5` | stupac stanja više nije semafor — jedna naglašena boja |
+| `9514acf` | red koji nešto otvara to kaže i na stolu |
+| `5745057` | linija među redovima počinje gdje počinju riječi |
+| `0ab6c20` | panel na telefonu dolazi odozdo, u dvije visine |
+| `ce7c695` | traka preuzme ime ekrana kad naslov ode gore |
 | (ovaj) | ova stranica, RED i PRIJEDLOZI ažurirani |
 
-Zadnje mjerenje (3. 10. 2026, ovaj vrh): klijent **604/604** testova (69
-datoteka), server **2146/2146** (102 datoteke), `tsc --noEmit` čist na obje
-strane, početni paket **152,8 kB** gzip od dozvoljenih 165 kB.
+Zadnje mjerenje (3. 10. 2026, ovaj vrh): klijent **618/618** testova (72
+datoteke), server **2146/2146** (102 datoteke), `tsc --noEmit` čist na obje
+strane, početni paket **153,7 kB** gzip od dozvoljenih 165 kB.
 
 Taj zadnji broj uzmi iz `npm run build` — `scripts/budget.mjs` ga sam ispiše i
 on je taj koji ruši build. Jučer je ovdje pisalo 156,8 kB jer sam ga mjerio
@@ -52,18 +58,18 @@ pozoveš.
    cd apps/majlis
    npm ci
    (cd server && npx vitest run)     # 2146
-   (cd client && npx vitest run)     # 604
+   (cd client && npx vitest run)     # 618
    (cd client && npx tsc -b) && (cd server && npx tsc --noEmit -p .)
    (cd client && npm run build)      # budžet: pada iznad 165 kB
    ```
    Ako brojevi nisu isti — stani i nađi zašto prije bilo čega drugog.
 3. **Probni server i preglednik** — vidi §5. Bez toga se ne radi ništa
    vizualno: *testovi nisu dokaz*.
-4. **Prvi posao** je nastavak §4.7 — **RED 12, stavka „jedna naglašena boja".**
-   Mjera je već uzeta i stoji u §4.7 dolje: četiri naglašene boje u jednom
-   popisu, s izmjerenim vrijednostima i mjestom gdje se crtaju
-   (`components/sheet.tsx`, `Mark`; ton dolazi iz `Queue.tsx`). Nije početo —
-   radno stablo je čisto.
+4. **Prvi posao:** §4.7 je gotov osim dvije stvari koje traže **tvoju odluku
+   prije koda** — traka činova na telefonu (§3 F) i visina reda na telefonu
+   (RED 9). Obje su opisane u §4.7 dolje s mjerom i s razlogom zašto nisu
+   dirane. Ako ne želiš odlučivati sada, sljedeće po planu je **§4.8 (P9 +
+   RED 11 — AI na koraku, kao nacrt)**.
 
 ---
 
@@ -542,6 +548,9 @@ pukla je jednog jutra bez ijedne izmjene, jer je čitala kalendar koliko i kod.
 
 ### 4.7 · P7 + RED 9/10/12 — manje krom, Apple pravila ◐ (3. 10. 2026)
 
+P7 i RED 10 i 12 su zatvoreni. Otvoreno je još dvoje iz RED 9 i §3 F, i oboje
+traži **tvoju odluku prije koda** — stoji na dnu ovog odjeljka.
+
 **P7a — `ac6fca6` (telefon).** Sve mjereno na 375×812, hodanjem po aplikaciji.
 
 - **Dvije trake su bile prikovane** na vrh svakog ekrana — zaglavlje i red
@@ -579,20 +588,44 @@ grupe na telefonu, i sam korak koji otvori onaj koji mu treba.
 što je **u dokumentu** i što je **rečeno dvaput** — a to je bio svaki od ovih
 kvarova; piksele mjerim hodanjem.
 
-#### Što u §4.7 još stoji
+**RED 12 — Apple kao pravila.** Pet stavki, svaka izmjerena prije i poslije.
 
-- **RED 12 · jedna naglašena boja — sljedeći posao.** Izmjereno na redu (`/`,
-  1622 px): **četiri** naglašene boje u jednom popisu — lapis
-  `rgb(22,68,112)` (*Everything*, *Take it*, *Question*), zelena
-  `rgb(44,107,87)` (*Review*), zlatna `rgb(138,101,36)` (*Matter*,
-  *Undertaking*), crvena `rgb(154,56,48)` (*past its date*, *Non-compliance*).
-  Crtaju se kroz `Mark` u `components/sheet.tsx`, ton dolazi iz `Queue.tsx`.
-  Namjera: **stupac faze ide u neutralno** — riječ nosi fazu, boja je samo
-  ponavlja — crvena ostaje za *prošao rok*, lapis za činove i veze. Provjeriti
-  isto na `/rules`, `/incidents`, `/register`, u sva tri jezika.
-- **RED 12 · ostalo:** veliki naslov koji se skuplja u traku pri skrolanju;
-  uvučene linije u grupiranim popisima; chevron na svemu što vodi dalje; ploče
-  odozdo s hvataljkom i dvije visine.
+- **Jedna naglašena boja — `15e47a5`.** Na redu je bilo **četiri** u jednom
+  popisu: lapis (*Everything*, *Take it*, *Question*), zelena (*Review*),
+  zlatna (*Matter*, *Undertaking*), crvena (*past its date*,
+  *Non-compliance*). Svaka je bojila riječ koja je isto već rekla, pa je
+  jedanaest faza čitalo kao signal za sebe, a ono jedino što u popisu vrijedi
+  naći bez čitanja — šta kasni — bilo je jedna boja od četiri. Sad: crveno
+  gdje je sat istekao ili zapis kaže da se ovo ne smije držati, lapis na
+  onome što se pritiska, ostalo neutralno. Izmjereno poslije, po ekranu: red
+  2, registar 2, obaveze i događaji po 1, zapis i biblioteka 0, pitanja 1.
+  Usput su ispale dvije male laži: *restricting* je bilo crveno na tri ekrana
+  (odbor koji nešto ograničava radi svoj posao, to nije kvar), i *2 still
+  open* je uzimalo boju prekršaja čim je jedna od dvije kasnila.
+- **Chevron na svemu što vodi dalje — `9514acf`.** Na stolu: **dvanaest redova
+  nešto otvara, dva su to govorila.** Znak je bio crtan samo u telefonskoj
+  grani reda. Sad je položen na kraj reda, ne u stupac — stupac bi morao biti
+  u `columns`, iz kojih se crta i red zaglavlja, pa bi svaki popis u
+  aplikaciji morao imati širinu za nešto što nije stupac.
+- **Uvučena linija među redovima — `5745057`.** Preko cijele širine siječe
+  popis na trake i oko čita trake; uvučena do riječi, isti popis čita kao
+  jedan popis s redovima.
+- **Ploča odozdo, dvije visine — `0ab6c20`.** Računi otvoreni na 375×812
+  stizali su kao **375×812 na ishodištu**: cijeli ekran, preko onoga što je
+  član čitao, sa sedam računa u gornjoj trećini i petsto piksela ničega
+  ispod. Sad dolazi odozdo (503 px od 812, red i dalje iznad), a hvataljka je
+  diže na 747. **Pritiskom, ne prevlačenjem** — vlasnik je za geste na
+  telefonu rekao *zasad ne*, a pritisak je jedini način koji radi i s
+  tastature. Otvara se na nižoj visini svaki put.
+- **Naslov se skuplja u traku — `ce7c695`.** Petsto piksela unutar predmeta
+  na 375×812: naslov *Suspension of leveraged index instruments* bio je 344
+  px iznad pregiba, a jedine riječi na vrhu ekrana bile su ime liste iz koje
+  je član došao. Sad traka preuzme ime ekrana kad naslov ode gore, i vrati
+  ga kad se vrati. Time je zatvoreno i ono što je `ac6fca6` otvorio: red
+  grupe sad ide gore s poslom, pa na ekranu poput sjednica ništa nije imenovalo
+  ekran nakon prvog skrola.
+
+#### Što u §4.7 još stoji — i traži odluku, ne kod
 - **§3 F · traka činova na telefonu je i dalje dva reda.** Namjerno ostavljeno,
   ne previđeno: tri odgovora na jedan uvjet (*Does not apply* / *Not met* /
   *Met — next*) ne stanu preko 375 px, a popravci koji ih svedu na jedan red

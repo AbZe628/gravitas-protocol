@@ -258,7 +258,12 @@ mehanizam (ugašen bez ključa). Sve ostalo član piše rukom.
 potpisuje, označen kao nacrt, nikad presuda. To je cijelo obećanje proizvoda i
 ono ostaje.
 
-## 12 · Apple, kao pravila a ne kao osjećaj ⬜
+## 12 · Apple, kao pravila a ne kao osjećaj ✅ *(3. 10. 2026)*
+
+*Pet stavki, svaka izmjerena prije i poslije; mjere i brojevi su u
+NASTAVAK §4.7. Commiti: `15e47a5` (jedna boja), `9514acf` (chevron),
+`5745057` (uvučena linija), `0ab6c20` (ploča odozdo, dvije visine),
+`ce7c695` (naslov se skuplja u traku).*
 
 Zadnje, kad struktura stoji.
 
