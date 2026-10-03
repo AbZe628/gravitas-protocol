@@ -193,8 +193,9 @@ na 390 px za današnje izmjene, i *na koga glasanje čeka* na ekranu predmeta
 ## 9 · Telefon ◐
 
 *T1–T4 zatvoreni u `22c10a8`. Traka činova na telefonu stoji na tabovima
-(`efe47fd`). Ostaje O1, O2, baner jezika (329 px na urduu), urdu tabovi u dva
-reda — NASTAVAK §3 C–F.*
+(`efe47fd`). **O1, O2, baner jezika i urdu tabovi zatvoreni u `ac6fca6`** —
+mjere i brojevi su u NASTAVAK §4.7. Ostaje traka činova u dva reda (§3 F,
+namjerno) i visina reda na telefonu — 128 px, 3,8 reda po ekranu od 14.*
 
 Ide poslije prozora, ne prije. Znači da telefon ostaje ružan još neko vrijeme —
 ispravno, jer se svaka od ovih mjera mjeri na ekranu koji će se ionako
@@ -210,23 +211,31 @@ prepraviti kad prozor postane jedan.
   10 px VELIKIM SLOVIMA sa razmakom 0,14em. To je ukras, ne tekst.
 - **T4** — naslov reda je serif (Newsreader) na 15 px — tipografija članka na
   radnoj listi.
-- **O1** — gornja traka ~57 px + traka braće ~54 px + tabovi ~61 px = 175 px od
-  844 (21 %), plus glava ekrana 105–136 px → prvi red posla oko 230 px. Treba
-  jedna traka od 56 px: ime ekrana i jedna radnja.
-- **O2** — četiri okrugla dugmeta gore = 176 px od 390 px širine, zato se ime
-  odbora lomi u dva reda.
+- ✅ **O1** — bile su dvije trake prikovane na vrh, 112 px okvira na svakoj
+  liniji koju član čita. Red grupe je sad unutar okna koje se skrola, pa
+  ostaje jedna. Prvi pokušaj — skinuti `sticky` — nije promijenio ništa, jer
+  je red bio izvan `main`; vidjelo se samo mjerenjem *(`ac6fca6`)*.
+- ✅ **O2** — četiri okrugla dugmeta = 176 od 375 px, zato je ime odbora pisalo
+  *Demonst…*. Pretraga je bila na dva mjesta i otišla je s trake u red grupe,
+  gdje je rail ionako drži; računari na kraj istog reda. Ostaju dva koja ne
+  pripadaju nijednom ekranu *(`ac6fca6`)*.
+- ✅ ime ekrana je bilo rečeno tri puta odjednom — u redu grupe, u 30 px ispod
+  njega, i u traci na dnu. Gdje red već kaže istu riječ, naslov ostaje u
+  dokumentu i prestaje trošiti 65 px *(`ac6fca6`)*.
+- ✅ baner o prijevodu 329 px → 64 px, sklopiv i zapamćen po jeziku; traka na
+  dnu 94 px → 72 px na urduu *(`ac6fca6`)*.
 - Red na telefonu: jedna linija, jedan broj, chevron. Čin kao dugme pune širine
   iznad kartica.
 
-## 10 · Stol ◐
+## 10 · Stol ✅
 
 *U `cb1751f`: jezik je skinut s trake (bira se na stranici člana), paleta i
-član su sažeti ispod 1280 px, traka (rail) ustupa mjesto stupcu liste. Polica
-alata desno i dalje stalno jede širinu.*
+član su sažeti ispod 1280 px, traka (rail) ustupa mjesto stupcu liste.*
 
-- **O3** — tri okvira oko posla: jarbol lijevo, polica alata desno, gornja traka.
-  Polica je otvarač panela koji stalno jede širinu. Jezik stoji na svakom ekranu
-  za izbor koji se pravi jednom.
+- ✅ **O3** — polica računa je jela **100 px od 1622**, trajno, i naslovi u redu
+  su bili rezani da bi stala. Skinuta: paleta imenuje svih sedam prije nego
+  išta otkucaš i otvara se pritiskom, telefon ima dugme na kraju reda grupe, a
+  korak otvara onaj koji mu treba. Posao je dobio 1262 → 1362 px *(`26fa437`)*.
 
 ## 11 · AI tamo gdje posao stane ⬜
 

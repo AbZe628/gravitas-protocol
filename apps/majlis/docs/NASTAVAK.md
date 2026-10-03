@@ -5,11 +5,10 @@ reda koda. Red posla je u [RED.md](RED.md), prijedlozi u
 [PRIJEDLOZI-UI.md](PRIJEDLOZI-UI.md). Ovdje je stanje, ono što se ne vidi iz
 koda, i svaki sljedeći korak.
 
-**Zadnje stanje (2. 10. 2026):** sve je na **radnoj grani** — onoj na kojoj
-je ova stranica — dvadeset četiri commita iznad `origin/main` (`692022e`). **Na
-`main` nije ništa pushano** — to je vlasnikova odluka. Zadnja tri commita
-(`7ca09f3`, `0fa6b0c`, `c1e6d66`) **nisu pushana ni na radnu granu** — pitaj
-prije nego što išta ode na GitHub.
+**Zadnje stanje (3. 10. 2026):** sve je na **radnoj grani** — onoj na kojoj
+je ova stranica — dvadeset šest commita iznad `origin/main` (`692022e`), i sve
+je **pushano na radnu granu**. **Na `main` nije ništa pushano** — to je
+vlasnikova odluka i vrijedi i dalje: pitaj prije nego što išta ode na `main`.
 
 | commit | šta |
 |---|---|
@@ -22,22 +21,26 @@ prije nego što išta ode na GitHub.
 | `7ca09f3` | P4a — red se može uzeti bez otvaranja liste |
 | `0fa6b0c` | P4b — član može reći da se vraća na nešto, i odbor to čita |
 | `c1e6d66` | P6 — članu se kaže šta ga čeka, bez otvaranja Majlisa |
+| `ac6fca6` | P7a — telefon troši manje sebe na okvir |
+| `26fa437` | P7b — polica računa više ne stoji pored posla |
 | (ovaj) | ova stranica, RED i PRIJEDLOZI ažurirani |
 
-Zadnje mjerenje (2. 10. 2026, ovaj vrh): klijent **593/593** testova (68
+Zadnje mjerenje (3. 10. 2026, ovaj vrh): klijent **604/604** testova (69
 datoteka), server **2146/2146** (102 datoteke), `tsc --noEmit` čist na obje
-strane, početni paket **156,8 kB** gzip od dozvoljenih 165 kB (145,7 kB
-skripta + 11,1 kB stil, oboje izmjereno `gzip -c` nad onim što `index.html`
-zaista učitava). Brojevi su mjereni, ne prepisani — provjeri ih prije nego se
-na njih pozoveš.
+strane, početni paket **152,8 kB** gzip od dozvoljenih 165 kB.
+
+Taj zadnji broj uzmi iz `npm run build` — `scripts/budget.mjs` ga sam ispiše i
+on je taj koji ruši build. Jučer je ovdje pisalo 156,8 kB jer sam ga mjerio
+`gzip -c` ručno; to je druga razina kompresije i **nije** mjera koja se
+provodi. Brojevi su mjereni, ne prepisani — provjeri ih prije nego se na njih
+pozoveš.
 
 ---
 
 ## 0 · Prvih petnaest minuta sutra
 
-1. **Grana.** Radna grana je ona koja nosi commit `efe47fd`. Pazi: tri
-   commita na vrhu (`7ca09f3`, `0fa6b0c`, `c1e6d66`) postoje samo lokalno —
-   `origin` ih još nema, pa ih `git branch -r` neće vidjeti.
+1. **Grana.** Radna grana je ona koja nosi commit `efe47fd`, i `origin` je u
+   koraku s njom.
    ```
    git fetch origin
    git branch -r --contains efe47fd     # ime radne grane
@@ -49,17 +52,18 @@ na njih pozoveš.
    cd apps/majlis
    npm ci
    (cd server && npx vitest run)     # 2146
-   (cd client && npx vitest run)     # 593
+   (cd client && npx vitest run)     # 604
    (cd client && npx tsc -b) && (cd server && npx tsc --noEmit -p .)
    (cd client && npm run build)      # budžet: pada iznad 165 kB
    ```
    Ako brojevi nisu isti — stani i nađi zašto prije bilo čega drugog.
 3. **Probni server i preglednik** — vidi §5. Bez toga se ne radi ništa
    vizualno: *testovi nisu dokaz*.
-4. **Prvi posao** je §4.7 (P7 + RED 9/10/12). §4.6 je zatvoren; što je od njega
-   svjesno ostalo stoji u §4.6 i u PRIJEDLOZI P6 (*promijenjeno otkad si
-   vidio*, i raspoređivač izvan procesa koji zove `POST /api/notices/waiting`,
-   jer GET ništa ne šalje).
+4. **Prvi posao** je nastavak §4.7 — **RED 12, stavka „jedna naglašena boja".**
+   Mjera je već uzeta i stoji u §4.7 dolje: četiri naglašene boje u jednom
+   popisu, s izmjerenim vrijednostima i mjestom gdje se crtaju
+   (`components/sheet.tsx`, `Mark`; ton dolazi iz `Queue.tsx`). Nije početo —
+   radno stablo je čisto.
 
 ---
 
@@ -536,9 +540,69 @@ izlazi sa svačije tuđe liste i sažetak koji je skenirala nije ni imao držano
 reda; i mjera koja je tvrdila da je svako posijano pravilo *unscheduled*
 pukla je jednog jutra bez ijedne izmjene, jer je čitala kalendar koliko i kod.
 
-### 4.7 · P7 + RED 9/10/12 — manje krom, Apple pravila
-§3 C, D, E, F; polica alata u ⌘K; jedna naglašena boja; veliki naslov koji se
-skupi u traku; ploče odozdo s hvataljkom.
+### 4.7 · P7 + RED 9/10/12 — manje krom, Apple pravila ◐ (3. 10. 2026)
+
+**P7a — `ac6fca6` (telefon).** Sve mjereno na 375×812, hodanjem po aplikaciji.
+
+- **Dvije trake su bile prikovane** na vrh svakog ekrana — zaglavlje i red
+  grupe u kojoj stojiš — pa je 112 px bilo okvir na svakoj liniji koju član
+  čita. Red grupe pripada dolasku, ne čitanju; sad je **unutar okna koje se
+  skrola**, i ostaje jedna traka. *(Prvi pokušaj — skinuti `sticky` — bio je
+  bez ikakvog učinka: red je bio izvan `main`, pa se ionako nije pomicao. To
+  se vidjelo samo mjerenjem.)*
+- **Četiri okrugla dugmeta** u zaglavlju = 176 od 375 px širine, zato je ime
+  odbora pisalo *Demonst…*. Pretraga je bila na dva mjesta — ona je odredište
+  grupe *šta stoji*, u redu odmah ispod. Računari su otišli na kraj tog reda.
+  Ostaju dva koja ne pripadaju nijednom ekranu: *postavi pitanje* i sam član.
+- **Ime ekrana je bilo na ekranu tri puta** odjednom: upaljeno u redu grupe, u
+  30 px ispod njega, i upaljeno u traci na dnu. Gdje je red već rekao istu
+  riječ, naslov ostaje u dokumentu (čitač ekrana ga i dalje nađe) i prestaje
+  trošiti 65 px. Gdje se ime ekrana razlikuje od riječi u redu, ništa se ne
+  mijenja — to nije ponavljanje.
+- **Baner o prijevodu je bio 329 px** od 812 na urduu, pa je prvi red posla
+  počinjao na 652: ime ekrana, obavijest o formulaciji, i jedan red. Sad je
+  **linija od 64 px** koja se otvori u cijeli pasus ako čitalac hoće i zatvori
+  zauvijek, zapamćeno **po jeziku** — jer ono što važi za urdu ne važi za
+  arapski.
+- **Traka na dnu je bila 94 px na urduu** prema 63 na engleskom, jer je *šta
+  držimo* prevedeno kao rečenica i lomilo se u dva reda. Sad 72.
+
+**P7b — `26fa437` (stol).** Polica računa je stajala desno od posla na svakom
+ekranu: **100 px od 1622**, trajno, za sedam računara koje član otvori tu i
+tamo. Posao je imao 1262 — i naslovi u redu su bili rezani da bi polica stala.
+Crtež dolaska nema policu; komentar koji je tu stajao tvrdio je da ima. Tri
+ulaza ostaju i svi vode u isti panel: paleta (koja svih sedam imenuje prije
+nego išta otkucaš, i otvara se pritiskom, ne samo ⌘K), dugme na kraju reda
+grupe na telefonu, i sam korak koji otvori onaj koji mu treba.
+
+**Osam mjera, svaka slomljena namjerno.** jsdom ne crta piksele, pa one drže
+što je **u dokumentu** i što je **rečeno dvaput** — a to je bio svaki od ovih
+kvarova; piksele mjerim hodanjem.
+
+#### Što u §4.7 još stoji
+
+- **RED 12 · jedna naglašena boja — sljedeći posao.** Izmjereno na redu (`/`,
+  1622 px): **četiri** naglašene boje u jednom popisu — lapis
+  `rgb(22,68,112)` (*Everything*, *Take it*, *Question*), zelena
+  `rgb(44,107,87)` (*Review*), zlatna `rgb(138,101,36)` (*Matter*,
+  *Undertaking*), crvena `rgb(154,56,48)` (*past its date*, *Non-compliance*).
+  Crtaju se kroz `Mark` u `components/sheet.tsx`, ton dolazi iz `Queue.tsx`.
+  Namjera: **stupac faze ide u neutralno** — riječ nosi fazu, boja je samo
+  ponavlja — crvena ostaje za *prošao rok*, lapis za činove i veze. Provjeriti
+  isto na `/rules`, `/incidents`, `/register`, u sva tri jezika.
+- **RED 12 · ostalo:** veliki naslov koji se skuplja u traku pri skrolanju;
+  uvučene linije u grupiranim popisima; chevron na svemu što vodi dalje; ploče
+  odozdo s hvataljkom i dvije visine.
+- **§3 F · traka činova na telefonu je i dalje dva reda.** Namjerno ostavljeno,
+  ne previđeno: tri odgovora na jedan uvjet (*Does not apply* / *Not met* /
+  *Met — next*) ne stanu preko 375 px, a popravci koji ih svedu na jedan red
+  ili režu odgovore ili dva od njih skrivaju iza menija — a to je ono što ova
+  aplikacija ne radi s kontrolom koju može ispuniti. Treba mijenjati prozor, ne
+  traku.
+- **RED 9 · red na telefonu je 128 px** (naslov, pa čin i vlasnik, pa *Take it*
+  u svom redu), što daje **3,8 reda po ekranu** od 14. RED traži jednu liniju,
+  jedan broj i chevron — ali to se sudara s P4a (*red nosi jedan pritisak*).
+  Nije dirano; traži odluku prije koda.
 
 ### 4.8 · P9 + RED 11 — AI na koraku, kao nacrt
 Na uvjetu *nađeno / nejasno / nema* s navedenom rečenicom; označeno kao

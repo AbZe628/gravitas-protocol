@@ -183,11 +183,20 @@ Svaki: **šta · zašto · kako u Majlisu · kako se dokazuje**.
 - **Ostaje:** *promijenjeno otkad si vidio* — još nije; i raspoređivač izvan
   ovog procesa koji zove `POST /api/notices/waiting`, jer GET ne šalje ništa.
 
-### P7 · Manje trake oko posla (tačke 9, 10, 12)
+### P7 · Manje trake oko posla (tačke 9, 10, 12) ◐ *(`ac6fca6`, `26fa437`)*
 - **Šta:** telefon — jedna traka od 56 px (ime ekrana i jedna radnja), veliki
   naslov koji se skupi; stol — polica alata ide u ⌘K paletu (postoji *Go to,
   or open*), ne jede stalnu širinu; jezik se bira jednom, u postavkama.
 - **Zašto:** O1–O3; Apple; NN/g manje nereda bez manje mogućnosti.
+- **Urađeno:** telefon ima jednu prikovanu traku umjesto dvije; dva okrugla
+  dugmeta umjesto četiri; ime ekrana se ne ponavlja; baner jezika je linija od
+  64 px umjesto 329; traka na dnu stane u jedan red i na urduu. Polica alata je
+  skinuta sa stola — paleta (⌘K, i pritiskom) imenuje svih sedam, telefon ima
+  dugme na kraju reda grupe, korak otvara onaj koji mu treba.
+- **Ostaje:** jedna naglašena boja (sada četiri u jednom popisu, izmjereno),
+  veliki naslov koji se skuplja u traku, uvučene linije, chevron na svemu što
+  vodi dalje, ploče odozdo s hvataljkom. Jezik se već bira jednom, u
+  postavkama.
 
 ### P8 · Tri pitanja, isto mjesto, svaki ekran
 - **Šta:** svaki ekran na istom mjestu odgovara: **šta je ovo · šta je
