@@ -1,4 +1,4 @@
-import type { Matter } from '../lib/api.js';
+import type { ContractReading, Matter } from '../lib/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { mayDeliberate, useIdentity } from '../lib/identity.js';
 import Fold from './Fold.js';
@@ -35,9 +35,12 @@ import { DateText, Sources, Tag } from './ui.js';
 export default function TheFile({
   matter,
   onChanged,
+  onRead,
 }: {
   matter: Matter;
   onChanged: (m: Matter) => void;
+  /** The reading of the draft, handed on to the steps it is about. */
+  onRead?: (reading: ContractReading) => void;
 }) {
   const { t } = useI18n();
   const { identity } = useIdentity();
@@ -120,7 +123,11 @@ export default function TheFile({
 
       {/* The contract, read against the shape — and what the committee found in it. */}
       <Fold heading={t('file.contract')}>
-        <ReadTheContract matterId={matter.id} canRead={identity?.role !== 'observer'} />
+        <ReadTheContract
+          matterId={matter.id}
+          canRead={identity?.role !== 'observer'}
+          onRead={onRead}
+        />
       </Fold>
       <Fold heading={t('cttee.heading')}>
         <WhatTheCommitteeFound matterId={matter.id} />

@@ -10,6 +10,7 @@ import {
   type Checklist as ChecklistData,
   type ConditionState,
   type Matter,
+  type ContractReading,
   type Passage,
   type Structure,
 } from '../lib/api.js';
@@ -37,6 +38,7 @@ import { useStillThere } from '../lib/stillThere.js';
 import { Button } from '../components/Button';
 import Act from '../components/Act.js';
 import { Picker } from '../components/Checklist.js';
+import WhatTheDraftSays, { cite } from '../components/WhatTheDraftSays.js';
 import Person from '../components/Person.js';
 import TheFile from '../components/TheFile.js';
 import WhereItEnds from '../components/WhereItEnds.js';
@@ -99,6 +101,19 @@ export default function MatterFlow() {
 
   const [matter, setMatter] = useState<Matter | null>(null);
   const [list, setList] = useState<ChecklistData | null>(null);
+  /**
+   * The draft, read against this matter's conditions.
+   *
+   * Held here because the reading happens in the papers and the conditions it
+   * is about are answered one to a step — the same component, so it survives
+   * the walk from the brief to step four without being stored anywhere.
+   *
+   * And only for the walk. Nothing is kept: a draft pasted in to see what the
+   * board would ask about is not a document of the record, and keeping it
+   * would make it one without anybody deciding that. A page load starts with
+   * none, which is the honest state.
+   */
+  const [draftRead, setDraftRead] = useState<ContractReading | null>(null);
   /** The shape was asked for and did not come — not the same as having none. */
   const [listLost, setListLost] = useState(false);
   /**
@@ -953,6 +968,7 @@ function lastSaid(
             setMatter(m);
             load();
           }}
+          onRead={setDraftRead}
         />
       </StepWindow>
     );
@@ -992,6 +1008,7 @@ function lastSaid(
             setMatter(m);
             load();
           }}
+          onRead={setDraftRead}
         />
       </StepWindow>
     );
@@ -1129,6 +1146,21 @@ function lastSaid(
           <p className="mb-5 max-w-[62ch] text-ui leading-relaxed text-muted">
             {step.condition.why}
           </p>
+
+          {/*
+            Where this one condition is answered in the draft, on the step
+            that asks it — and nothing about whether it is met. See
+            `WhatTheDraftSays`.
+          */}
+          <WhatTheDraftSays
+            reading={draftRead}
+            conditionId={step.condition.id}
+            onQuote={
+              canRule
+                ? (sentence) => setWhy(cite(why, sentence))
+                : undefined
+            }
+          />
 
           {/*
             The tool for this step, inside it.

@@ -59,6 +59,7 @@ export default function ReadTheContract({
   structureId,
   startWith,
   canRead,
+  onRead,
   onItsOwnScreen = false,
 }: {
   /** Read against this matter's shape. */
@@ -71,6 +72,19 @@ export default function ReadTheContract({
    */
   startWith?: { name: string; text: string } | null;
   canRead: boolean;
+  /**
+   * Handed up as well as drawn here.
+   *
+   * The reading is good and it was reachable from one place. The conditions
+   * it is about are answered one to a step, each on a screen of its own, so
+   * a member who read the draft on the way in answered condition four from
+   * memory or went back for it. The step takes the sentence now; see
+   * `WhatTheDraftSays`.
+   *
+   * Nothing is kept by this: whoever takes it holds it for as long as they
+   * are looking at the matter, and a page load starts with none.
+   */
+  onRead?: (reading: ContractReading) => void;
   /**
    * True on the screen a scholar opened in order to read a draft.
    *
@@ -108,11 +122,11 @@ export default function ReadTheContract({
   const readsAgainst = matterId ? null : shape;
 
   async function read() {
-    setReading(
-      matterId
-        ? await oversight.readContract(matterId, text)
-        : await oversight.readAgainstShape(shape, text),
-    );
+    const got = matterId
+      ? await oversight.readContract(matterId, text)
+      : await oversight.readAgainstShape(shape, text);
+    setReading(got);
+    onRead?.(got);
   }
 
   /*
