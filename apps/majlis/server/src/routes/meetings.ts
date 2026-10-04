@@ -30,6 +30,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { mayConvene, mayKeepMinutes } from '../auth/members.js';
+import { undertookIn } from '../services/undertakings-in-a-minute.js';
 import {
   attendanceAcross,
   cadence,
@@ -148,6 +149,54 @@ export function meetingRoutes(
         meeting,
         state: stateOf(meeting, now()),
         unaccountedFor: board ? unaccountedFor(meeting, board) : [],
+      });
+    }),
+  );
+
+  /**
+   * What members undertook, found in the minute that is already written.
+   *
+   * ── the gap ───────────────────────────────────────────────────────────
+   *
+   * A sitting produces a minute, which is prose, and undertakings, which are
+   * the board's own clocks — and the second was typed in again by hand from
+   * the first, by the person who had just finished writing it. What is lost
+   * there is lost silently: an obligation nobody re-typed has no date on it
+   * and nothing that will ever raise it.
+   *
+   * ── and it records nothing ────────────────────────────────────────────
+   *
+   * A GET, because that is what it is: the minute read back with the
+   * sentences that carry a member's name and a commitment picked out. The
+   * secretary edits them, drops them, or minutes them — through the route
+   * that already minutes one, under their own name. No clock of this board
+   * is started by a machine reading prose.
+   *
+   * Whoever may read the sitting may read this. It says nothing the minute
+   * does not already say to the same reader.
+   */
+  router.get(
+    '/meetings/:id/undertook',
+    handle(async (req, res) => {
+      const meeting = await store.meeting(req.params.id);
+      if (!meeting) {
+        res.status(404).json({ error: 'not_found', message: 'No such meeting.' });
+        return;
+      }
+      const board = await store.board(meeting.boardId);
+
+      /*
+       * Against this board's own members and nobody else's. The only names
+       * this can return are ones the board already holds; a line about the
+       * auditor or the treasury desk carries no member and is not offered,
+       * because guessing whose undertaking it is would be the one mistake
+       * worth more than the whole reading.
+       */
+      res.json({
+        meetingId: meeting.id,
+        found: undertookIn(meeting.minute ?? '', board?.members ?? []),
+        /* Said on the face of it, as every reading here says what it is. */
+        readBy: 'words',
       });
     }),
   );

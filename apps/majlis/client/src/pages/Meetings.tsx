@@ -22,6 +22,7 @@ import Act from '../components/Act.js';
 import AfterAct from '../components/AfterAct.js';
 import TheNotice from '../components/TheNotice.js';
 import Person from '../components/Person.js';
+import WhatWasUndertaken from '../components/WhatWasUndertaken.js';
 
 /**
  * Meetings, as a record rather than a room.
@@ -375,6 +376,25 @@ function MeetingCard({
               </p>
             )}
           </div>
+
+          {/*
+            What was undertaken here, under the minute it comes out of.
+
+            Below the minute and above closing, because that is the order it
+            happens in: the account is written, the obligations in it are
+            minuted, and then the board approves the lot. Only while the
+            sitting is open — after it is closed nothing about the sitting
+            changes, and an undertaking is part of it.
+          */}
+          {canKeep && row.state !== 'closed' && (
+            <WhatWasUndertaken
+              boardId={m.boardId}
+              meetingId={m.id}
+              minute={m.minute}
+              canKeep={canKeep}
+              onMinuted={onChanged}
+            />
+          )}
 
           {error && (
             <p className="rounded-xl shadow-ringbreach px-3 py-2 text-ui leading-relaxed text-breach">

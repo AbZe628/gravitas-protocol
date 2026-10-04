@@ -2025,6 +2025,24 @@ export interface Pack {
  * Not a task list. It was minuted, it names a person who was in the room, and
  * it is closed by an account of what happened rather than by a tick.
  */
+/**
+ * A sentence from a minute that reads as somebody undertaking something.
+ *
+ * A draft, and only that: no undertaking exists until a person minutes it
+ * under their own name. `who` is always a member of this board, matched
+ * against its own list — a line about the auditor carries nobody and is not
+ * offered, because guessing whose an undertaking is would be worse than
+ * missing it.
+ */
+export interface Undertook {
+  what: string;
+  who: string;
+  /** Only where the sentence writes one out with a year. Never today. */
+  dueAt?: string;
+  /** Where in the minute it was found. */
+  at: number;
+}
+
 export interface Undertaking {
   id: string;
   boardId: string;
@@ -2659,6 +2677,36 @@ export const oversight = {
       undertakings: { undertaking: Undertaking; whoName: string; overdue: boolean }[];
       summary: { open: number; overdue: number; openWithNoDate: number; done: number; dropped: number };
     }>('/api/undertakings' + (boardId ? `?board=${encodeURIComponent(boardId)}` : '')),
+
+  /**
+   * What a sitting's minute says members undertook.
+   *
+   * Read, never recorded: the minute that is already in the record, with the
+   * sentences that carry a member's name and a commitment picked out. The
+   * board's own clocks are not started by a machine reading prose — a person
+   * minutes each one, under their name, through `minuteUndertaking`.
+   */
+  undertookAt: (meetingId: string) =>
+    get<{ meetingId: string; readBy: 'words'; found: Undertook[] }>(
+      `/api/meetings/${encodeURIComponent(meetingId)}/undertook`,
+    ),
+
+  /**
+   * Minute one.
+   *
+   * The route has always been here and nothing in the interface called it, so
+   * the board's own clocks could be read and closed and never started. Found
+   * by looking for where a secretary records what was undertaken at a sitting
+   * and finding that there is nowhere.
+   */
+  minuteUndertaking: (said: {
+    boardId: string;
+    meetingId: string;
+    what: string;
+    who: string;
+    dueAt?: string;
+    matterId?: string;
+  }) => send<{ undertaking: Undertaking }>('/api/undertakings', said),
 
   /** Close one by saying what happened. A tick would record nothing useful. */
   closeUndertaking: (id: string, state: string, said: string) =>

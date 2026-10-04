@@ -3,6 +3,7 @@ import { render, screen, waitFor, fireEvent, within } from '@testing-library/rea
 import { MemoryRouter } from 'react-router-dom';
 import Meetings from './pages/Meetings.js';
 import { I18nProvider } from './lib/i18n.js';
+import en from './locales/en.js';
 
 /**
  * Meetings, as a record rather than a room.
@@ -298,7 +299,7 @@ describe('who is offered what', () => {
     await waitFor(() => screen.getByRole('button', { name: /Convene a meeting/ }));
     fireEvent.click(screen.getByRole('button', { name: /Convene a meeting/ }));
 
-    fireEvent.change(screen.getByLabelText(/When/i), { target: { value: '2026-09-10T09:00' } });
+    fireEvent.change(screen.getByLabelText(en['meet.when']), { target: { value: '2026-09-10T09:00' } });
     fireEvent.change(screen.getByLabelText(/Agenda, one item per line/i), {
       target: { value: 'The sukuk conditions\n\nThe tangible ratio\n' },
     });
@@ -378,7 +379,7 @@ describe('convening says what it still needs', () => {
 
   it('still refuses on a date alone, which is the half that reached the server', async () => {
     await open();
-    fireEvent.change(screen.getByLabelText(/When/i), { target: { value: '2026-09-10T09:00' } });
+    fireEvent.change(screen.getByLabelText(en['meet.when']), { target: { value: '2026-09-10T09:00' } });
 
     expect(screen.getByRole('button', { name: /Convene it/ })).toBeDisabled();
     expect(screen.queryByText(/Set the day and time/)).not.toBeInTheDocument();
@@ -387,7 +388,7 @@ describe('convening says what it still needs', () => {
 
   it('opens once the sitting has a day and something to sit about', async () => {
     await open();
-    fireEvent.change(screen.getByLabelText(/When/i), { target: { value: '2026-09-10T09:00' } });
+    fireEvent.change(screen.getByLabelText(en['meet.when']), { target: { value: '2026-09-10T09:00' } });
     fireEvent.change(screen.getByLabelText(/Agenda, one item per line/i), {
       target: { value: 'The sukuk conditions' },
     });
@@ -398,7 +399,7 @@ describe('convening says what it still needs', () => {
 
   it('counts blank lines as nothing, like the agenda itself does', async () => {
     await open();
-    fireEvent.change(screen.getByLabelText(/When/i), { target: { value: '2026-09-10T09:00' } });
+    fireEvent.change(screen.getByLabelText(en['meet.when']), { target: { value: '2026-09-10T09:00' } });
     fireEvent.change(screen.getByLabelText(/Agenda, one item per line/i), {
       target: { value: '\n   \n' },
     });
@@ -430,7 +431,7 @@ describe('convening shows what the board would be told', () => {
 
     await waitFor(() => screen.getByRole('button', { name: /Convene a meeting/ }));
     fireEvent.click(screen.getByRole('button', { name: /Convene a meeting/ }));
-    fireEvent.change(screen.getByLabelText(/When/i), { target: { value: '2027-03-04T09:00' } });
+    fireEvent.change(screen.getByLabelText(en['meet.when']), { target: { value: '2027-03-04T09:00' } });
     fireEvent.change(screen.getByLabelText(/Agenda, one item per line/i), {
       target: { value: 'The sukuk conditions' },
     });
