@@ -5,11 +5,10 @@ reda koda. Red posla je u [RED.md](RED.md), prijedlozi u
 [PRIJEDLOZI-UI.md](PRIJEDLOZI-UI.md). Ovdje je stanje, ono što se ne vidi iz
 koda, i svaki sljedeći korak.
 
-**Zadnje stanje (3. 10. 2026, druga sesija):** sve je na **radnoj grani** —
-onoj na kojoj je ova stranica — trideset dva commita iznad `origin/main`
-(`692022e`), i sve je **pushano na radnu granu**. **Na `main` nije ništa
-pushano** — to je vlasnikova odluka i vrijedi i dalje: pitaj prije nego što
-išta ode na `main`.
+**Zadnje stanje (4. 10. 2026):** sve je na **radnoj grani** — onoj na kojoj
+je ova stranica — trideset pet commita iznad `origin/main` (`692022e`), i sve
+je **pushano na radnu granu**. **Na `main` nije ništa pushano** — to je
+vlasnikova odluka i vrijedi i dalje: pitaj prije nego što išta ode na `main`.
 
 | commit | šta |
 |---|---|
@@ -29,11 +28,13 @@ išta ode na `main`.
 | `5745057` | linija među redovima počinje gdje počinju riječi |
 | `0ab6c20` | panel na telefonu dolazi odozdo, u dvije visine |
 | `ce7c695` | traka preuzme ime ekrana kad naslov ode gore |
+| `282a316` | rečenica iz nacrta stoji na koraku o kojem govori |
+| `91e410f` | obaveze sa sjednice se mogu upisati, i zapisnik ih nudi |
 | (ovaj) | ova stranica, RED i PRIJEDLOZI ažurirani |
 
-Zadnje mjerenje (3. 10. 2026, ovaj vrh): klijent **618/618** testova (72
-datoteke), server **2146/2146** (102 datoteke), `tsc --noEmit` čist na obje
-strane, početni paket **153,7 kB** gzip od dozvoljenih 165 kB.
+Zadnje mjerenje (4. 10. 2026, ovaj vrh): klijent **633/633** testova (74
+datoteke), server **2159/2159** (103 datoteke), `tsc --noEmit` čist na obje
+strane, početni paket **154,0 kB** gzip od dozvoljenih 165 kB.
 
 Taj zadnji broj uzmi iz `npm run build` — `scripts/budget.mjs` ga sam ispiše i
 on je taj koji ruši build. Jučer je ovdje pisalo 156,8 kB jer sam ga mjerio
@@ -57,19 +58,19 @@ pozoveš.
    ```
    cd apps/majlis
    npm ci
-   (cd server && npx vitest run)     # 2146
-   (cd client && npx vitest run)     # 618
+   (cd server && npx vitest run)     # 2159
+   (cd client && npx vitest run)     # 633
    (cd client && npx tsc -b) && (cd server && npx tsc --noEmit -p .)
    (cd client && npm run build)      # budžet: pada iznad 165 kB
    ```
    Ako brojevi nisu isti — stani i nađi zašto prije bilo čega drugog.
 3. **Probni server i preglednik** — vidi §5. Bez toga se ne radi ništa
    vizualno: *testovi nisu dokaz*.
-4. **Prvi posao:** §4.7 je gotov osim dvije stvari koje traže **tvoju odluku
-   prije koda** — traka činova na telefonu (§3 F) i visina reda na telefonu
-   (RED 9). Obje su opisane u §4.7 dolje s mjerom i s razlogom zašto nisu
-   dirane. Ako ne želiš odlučivati sada, sljedeće po planu je **§4.8 (P9 +
-   RED 11 — AI na koraku, kao nacrt)**.
+4. **Prvi posao:** nastavak §4.8 — tabela u RED §11 ima devet redova, dva su
+   urađena i dva su već postojala (vidi §4.8 dolje). Prvi neurađen koji bih
+   uzeo: **pred glasanje — sažmi raspravu, ko je šta rekao i gdje se ne
+   slažu**. I dalje stoje dvije stvari iz §4.7 koje traže **tvoju odluku prije
+   koda** — traka činova na telefonu (§3 F) i visina reda na telefonu (RED 9).
 
 ---
 
@@ -637,9 +638,61 @@ kvarova; piksele mjerim hodanjem.
   jedan broj i chevron — ali to se sudara s P4a (*red nosi jedan pritisak*).
   Nije dirano; traži odluku prije koda.
 
-### 4.8 · P9 + RED 11 — AI na koraku, kao nacrt
-Na uvjetu *nađeno / nejasno / nema* s navedenom rečenicom; označeno kao
-nacrt; nikad presuda ni glas. Tabela mjesta u RED §11.
+### 4.8 · P9 + RED 11 — AI na koraku, kao nacrt ◐ (4. 10. 2026)
+
+Granica koja se ne prelazi, i koja je u oba commita ispisana u kodu: **svaki
+ishod je nacrt koji čovjek uređuje i potpisuje, nikad presuda.** Ništa od ovog
+ne upisuje u zapis.
+
+**Rečenica iz nacrta na koraku — `282a316`.** Čitanje nacrta je postojalo i
+dobro je: kaže gdje je svaki uvjet odgovoren u tekstu, citira rečenicu i
+odbija reći *met*. Ali je živjelo u spisu predmeta, a uvjeti se odgovaraju
+jedan po koraku, svaki na svom ekranu — pa je član koji je nacrt pročitao na
+ulazu odgovarao četvrti uvjet po sjećanju, ili se vraćao, nalazio čitanje,
+skrolao do četvrtog reda, čitao rečenicu, vraćao se naprijed i prekucavao je.
+
+Prošetano na živom predmetu s murabaha nacrtom: svih šest uvjeta sad nosi svoje
+čitanje — *Answered* s klauzulom, *Not clear* gdje su riječi raštrkane, *Not
+there* gdje ih nema. **Ništa ne predbira nalaz**: *Answered* nije *met* —
+klauzula može biti prisutna i pogrešna, opovrgnuta tri stranice dalje, ili
+napisana riječima koje ne znače ono što uvjet znači. Jedino što se prenosi je
+citirana rečenica, u *razlog*, gdje je dokaz koji član navodi a ne odgovor koji
+je mašina dala. **Ništa se ne čuva**: nacrt zalijepljen da se vidi šta bi odbor
+pitao nije dokument zapisa, i čuvanje bi ga učinilo time bez ičije odluke.
+
+**Obaveze sa sjednice — `91e410f`.** Ovo je počelo kao čitanje zapisnika a
+našlo veći kvar: **ruta koja upisuje obavezu postoji oduvijek i ništa je u
+sučelju nije zvalo.** Vlastiti satovi odbora su se mogli čitati i zatvarati, a
+nikad pokrenuti — svaka obaveza na svakom ekranu došla je iz sjemena. Forma je
+zato glavna stvar, i stoji bez obzira na čitanje.
+
+Zapisnik se povrh toga čita za ono što već piše. Prošetano uživo, pet rečenica:
+*Board Member C will confirm … by 20 November 2026* → član i dan; *Board Member
+A will circulate … next Tuesday* → član i **nijedan dan**, jer bi zapisnik
+čitan mjesec dana kasnije namjestio taj sat krivo; *Board Member D asked
+whether…* → pitanje, ne obaveza; *The external auditor will reply* → ne imenuje
+nikog iz odbora; *Board Member B and Board Member E will prepare…* → imenuje
+dvojicu, a čija je obaveza odlučuje tajnik. Zatim je jedna uzeta, uređena,
+upisana — i sat odbora je prvi put pokrenut iz sučelja.
+
+**Devetnaest mjera na obje strane, deset namjerno ubačenih kvarova.** Jedan od
+njih je našao kvar u samoj mjeri: pravilo za ubacivanje citata u razlog bilo je
+napisano na mjestu poziva, pa su ekran i test držali dvije kopije i lomljenje
+ekranove nije palo ništa. Sad ima jednog vlasnika.
+
+#### Tabela iz RED §11, gdje stoji
+
+| gdje | stanje |
+|---|---|
+| kad banka pošalje pitanje | ⬜ polje i dalje namjerno kreće prazno |
+| kad se otvori predmet | ✅ postojalo prije — *What the board has already decided about this*, i to na navedenoj vezi a ne na sličnosti |
+| **na svakom uvjetu** | ✅ `282a316` |
+| kad uvjet padne | ✅ postojalo prije — *not met* crta klauzulu koju banka mora dodati |
+| pred glasanje | ⬜ **sljedeće** — sažetak rasprave: ko je šta rekao i gdje se ne slažu |
+| poslije glasanja | ⬜ nacrt odluke iz odgovorenih uvjeta i upisanih razloga |
+| **na zapisniku sjednice** | ✅ `91e410f` |
+| na novom nacrtu | ⬜ provjera protiv odluka koje **stoje**, ne samo protiv oblika |
+| na registru | ⬜ udio se pomjerio ispod praga prije revizije |
 
 ### 4.9 · P10 + P11 + P12
 RTL prolaz kroz svaki ekran na 390 px; hidžretski datum; PWA (`manifest.json`

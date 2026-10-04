@@ -237,7 +237,12 @@ prepraviti kad prozor postane jedan.
   išta otkucaš i otvara se pritiskom, telefon ima dugme na kraju reda grupe, a
   korak otvara onaj koji mu treba. Posao je dobio 1262 → 1362 px *(`26fa437`)*.
 
-## 11 · AI tamo gdje posao stane ⬜
+## 11 · AI tamo gdje posao stane ◐ *(4. 10. 2026)*
+
+*Dva reda tabele urađena (`282a316` uvjet, `91e410f` zapisnik), dva su već
+postojala (presedan, klauzula na *not met*). Mjere, brojevi i šta je uživo
+prošetano: NASTAVAK §4.8. Granica — nacrt, nikad presuda — stoji ispisana u
+kodu oba.*
 
 Postoji: čitanje nacrta protiv oblika (sa navodom rečenice) i asistent za
 mehanizam (ugašen bez ključa). Sve ostalo član piše rukom.
