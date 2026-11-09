@@ -1,0 +1,8 @@
+No files changed, compilation skipped
+warning[arbitrary-send-erc20]: `transferFrom` uses an arbitrary `from`; require it to equal `msg.sender` or `address(this)`
+   ╭▸ mb-sandbox-review/reference/src/DemoSukukManager.sol:39:9
+   │
+39 │         IERC20(token).safeTransferFrom(from, to, amount);
+   │         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ╰ help: ]8;;https://getfoundry.sh/forge/linting/arbitrary-send-erc20\https://getfoundry.sh/forge/linting/arbitrary-send-erc20]8;;\

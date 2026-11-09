@@ -11,406 +11,406 @@ Warning (5667): Unused function parameter. Remove or comment out the variable na
 157 |     function checkSubscriptionCompliance(address subscriber, address subscriptionToken)
     |                                          ^^^^^^^^^^^^^^^^^^
 
-[1m[33mwarning[missing-events-access-control][0m[1m: `isExecutor` is changed without an event but is used for access control[0m
-  [1m[94m ╭▸ [0mcontracts/GravitasPolicyRegistry.sol:79:9
-   [1m[94m│[0m
-[1m[94m79[0m [1m[94m│[0m         isExecutor[executor] = status;
-   [1m[94m│[0m         [1m[33m━━━━━━━━━━━━━━━━━━━━[0m
-   [1m[94m│[0m
-   [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/missing-events-access-control\https://getfoundry.sh/forge/linting/missing-events-access-control]8;;\
+warning[missing-events-access-control]: `isExecutor` is changed without an event but is used for access control
+   ╭▸ contracts/GravitasPolicyRegistry.sol:79:9
+   │
+79 │         isExecutor[executor] = status;
+   │         ━━━━━━━━━━━━━━━━━━━━
+   │
+   ╰ help: ]8;;https://getfoundry.sh/forge/linting/missing-events-access-control\https://getfoundry.sh/forge/linting/missing-events-access-control]8;;\
 
-[1m[33mwarning[reentrancy-no-eth][0m[1m: external call can be reentered before `lastMigrationAt` is updated[0m
-   [1m[94m ╭▸ [0mcontracts/TeleportV2.sol:141:46
-    [1m[94m│[0m
-[1m[94m141[0m [1m[94m│[0m         (uint256 amount0, uint256 amount1) = IUniswapV2PairExtended(pairFrom).burn(address(this));
-    [1m[94m│[0m                                              [1m[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
-    [1m[94m│[0m
-    [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/reentrancy-no-eth\https://getfoundry.sh/forge/linting/reentrancy-no-eth]8;;\
+warning[reentrancy-no-eth]: external call can be reentered before `lastMigrationAt` is updated
+    ╭▸ contracts/TeleportV2.sol:141:46
+    │
+141 │         (uint256 amount0, uint256 amount1) = IUniswapV2PairExtended(pairFrom).burn(address(this));
+    │                                              ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: ]8;;https://getfoundry.sh/forge/linting/reentrancy-no-eth\https://getfoundry.sh/forge/linting/reentrancy-no-eth]8;;\
 
-[1m[33mwarning[reentrancy-no-eth][0m[1m: external call can be reentered before `lastMigrationAt` is updated[0m
-   [1m[94m ╭▸ [0mcontracts/TeleportV2.sol:152:40
-    [1m[94m│[0m
-[1m[94m152[0m [1m[94m│[0m           (,, uint256 liquidityMinted) = IUniswapV2Router02(routerTo)
-    [1m[94m│[0m [1m[33m┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛[0m
-[1m[94m153[0m [1m[94m│[0m [1m[33m┃[0m             .addLiquidity(tokenA, tokenB, amountAOut, amountBOut, amountAMin, amountBMin, recipient, deadline);
-    [1m[94m│[0m [1m[33m┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛[0m
-    [1m[94m│[0m
-    [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/reentrancy-no-eth\https://getfoundry.sh/forge/linting/reentrancy-no-eth]8;;\
+warning[reentrancy-no-eth]: external call can be reentered before `lastMigrationAt` is updated
+    ╭▸ contracts/TeleportV2.sol:152:40
+    │
+152 │           (,, uint256 liquidityMinted) = IUniswapV2Router02(routerTo)
+    │ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+153 │ ┃             .addLiquidity(tokenA, tokenB, amountAOut, amountBOut, amountAMin, amountBMin, recipient, deadline);
+    │ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+    │
+    ╰ help: ]8;;https://getfoundry.sh/forge/linting/reentrancy-no-eth\https://getfoundry.sh/forge/linting/reentrancy-no-eth]8;;\
 
-[1m[33mwarning[block-timestamp][0m[1m: usage of `block.timestamp` in a comparison may be manipulated by validators[0m
-   [1m[94m ╭▸ [0mcontracts/TeleportV2.sol:118:17
-    [1m[94m│[0m
-[1m[94m118[0m [1m[94m│[0m         require(deadline >= block.timestamp, "Teleport: deadline passed");
-    [1m[94m│[0m                 [1m[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
-    [1m[94m│[0m
-    [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/block-timestamp\https://getfoundry.sh/forge/linting/block-timestamp]8;;\
+warning[block-timestamp]: usage of `block.timestamp` in a comparison may be manipulated by validators
+    ╭▸ contracts/TeleportV2.sol:118:17
+    │
+118 │         require(deadline >= block.timestamp, "Teleport: deadline passed");
+    │                 ━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: ]8;;https://getfoundry.sh/forge/linting/block-timestamp\https://getfoundry.sh/forge/linting/block-timestamp]8;;\
 
-[1m[33mwarning[block-timestamp][0m[1m: usage of `block.timestamp` in a comparison may be manipulated by validators[0m
-   [1m[94m ╭▸ [0mcontracts/TeleportV2.sol:136:17
-    [1m[94m│[0m
-[1m[94m136[0m [1m[94m│[0m         require(block.timestamp >= lastMigrationAt[key] + cooldownSeconds, "Teleport: cooldown active");
-    [1m[94m│[0m                 [1m[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
-    [1m[94m│[0m
-    [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/block-timestamp\https://getfoundry.sh/forge/linting/block-timestamp]8;;\
+warning[block-timestamp]: usage of `block.timestamp` in a comparison may be manipulated by validators
+    ╭▸ contracts/TeleportV2.sol:136:17
+    │
+136 │         require(block.timestamp >= lastMigrationAt[key] + cooldownSeconds, "Teleport: cooldown active");
+    │                 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: ]8;;https://getfoundry.sh/forge/linting/block-timestamp\https://getfoundry.sh/forge/linting/block-timestamp]8;;\
 
-[1m[33mwarning[reentrancy-events][0m[1m: event emitted after an external call; reentrancy can reorder or fabricate logs that off-chain consumers rely on[0m
-   [1m[94m ╭▸ [0mcontracts/TeleportV2.sol:160:9
-    [1m[94m│[0m
-[1m[94m160[0m [1m[94m│[0m [1m[33m┏[0m         emit LiquidityMigrated(
-[1m[94m161[0m [1m[94m│[0m [1m[33m┃[0m             msg.sender, factoryFrom, routerTo, pairFrom, tokenA, tokenB, lpAmount, liquidityMinted, recipient
-[1m[94m162[0m [1m[94m│[0m [1m[33m┃[0m         );
-    [1m[94m│[0m [1m[33m┗━━━━━━━━━━┛[0m
-    [1m[94m│[0m
-    [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/reentrancy-events\https://getfoundry.sh/forge/linting/reentrancy-events]8;;\
+warning[reentrancy-events]: event emitted after an external call; reentrancy can reorder or fabricate logs that off-chain consumers rely on
+    ╭▸ contracts/TeleportV2.sol:160:9
+    │
+160 │ ┏         emit LiquidityMigrated(
+161 │ ┃             msg.sender, factoryFrom, routerTo, pairFrom, tokenA, tokenB, lpAmount, liquidityMinted, recipient
+162 │ ┃         );
+    │ ┗━━━━━━━━━━┛
+    │
+    ╰ help: ]8;;https://getfoundry.sh/forge/linting/reentrancy-events\https://getfoundry.sh/forge/linting/reentrancy-events]8;;\
 
-[1m[33mwarning[unused-return][0m[1m: return value of an external call is not used[0m
-   [1m[94m ╭▸ [0mcontracts/TeleportV2.sol:152:40
-    [1m[94m│[0m
-[1m[94m152[0m [1m[94m│[0m           (,, uint256 liquidityMinted) = IUniswapV2Router02(routerTo)
-    [1m[94m│[0m [1m[33m┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛[0m
-[1m[94m153[0m [1m[94m│[0m [1m[33m┃[0m             .addLiquidity(tokenA, tokenB, amountAOut, amountBOut, amountAMin, amountBMin, recipient, deadline);
-    [1m[94m│[0m [1m[33m┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛[0m
-    [1m[94m│[0m
-    [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/unused-return\https://getfoundry.sh/forge/linting/unused-return]8;;\
+warning[unused-return]: return value of an external call is not used
+    ╭▸ contracts/TeleportV2.sol:152:40
+    │
+152 │           (,, uint256 liquidityMinted) = IUniswapV2Router02(routerTo)
+    │ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+153 │ ┃             .addLiquidity(tokenA, tokenB, amountAOut, amountBOut, amountAMin, amountBMin, recipient, deadline);
+    │ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+    │
+    ╰ help: ]8;;https://getfoundry.sh/forge/linting/unused-return\https://getfoundry.sh/forge/linting/unused-return]8;;\
 
-[1m[33mwarning[block-timestamp][0m[1m: usage of `block.timestamp` in a comparison may be manipulated by validators[0m
-   [1m[94m ╭▸ [0mcontracts/TeleportV3.sol:182:17
-    [1m[94m│[0m
-[1m[94m182[0m [1m[94m│[0m         require(params.deadline >= block.timestamp, "TV3: Deadline expired");
-    [1m[94m│[0m                 [1m[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
-    [1m[94m│[0m
-    [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/block-timestamp\https://getfoundry.sh/forge/linting/block-timestamp]8;;\
+warning[block-timestamp]: usage of `block.timestamp` in a comparison may be manipulated by validators
+    ╭▸ contracts/TeleportV3.sol:182:17
+    │
+182 │         require(params.deadline >= block.timestamp, "TV3: Deadline expired");
+    │                 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: ]8;;https://getfoundry.sh/forge/linting/block-timestamp\https://getfoundry.sh/forge/linting/block-timestamp]8;;\
 
-[1m[33mwarning[reentrancy-events][0m[1m: event emitted after an external call; reentrancy can reorder or fabricate logs that off-chain consumers rely on[0m
-   [1m[94m ╭▸ [0mcontracts/TeleportV3.sol:239:9
-    [1m[94m│[0m
-[1m[94m239[0m [1m[94m│[0m         emit LiquidityTeleported(params.tokenId, newTokenId, owner, newLiquidity, params.newFee, params.executeSwap);
-    [1m[94m│[0m         [1m[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
-    [1m[94m│[0m
-    [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/reentrancy-events\https://getfoundry.sh/forge/linting/reentrancy-events]8;;\
+warning[reentrancy-events]: event emitted after an external call; reentrancy can reorder or fabricate logs that off-chain consumers rely on
+    ╭▸ contracts/TeleportV3.sol:239:9
+    │
+239 │         emit LiquidityTeleported(params.tokenId, newTokenId, owner, newLiquidity, params.newFee, params.executeSwap);
+    │         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: ]8;;https://getfoundry.sh/forge/linting/reentrancy-events\https://getfoundry.sh/forge/linting/reentrancy-events]8;;\
 
-[1m[33mwarning[unused-return][0m[1m: return value of an external call is not used[0m
-   [1m[94m ╭▸ [0mcontracts/TeleportV3.sol:195:73
-    [1m[94m│[0m
-[1m[94m195[0m [1m[94m│[0m         (,, address token0, address token1,,,, uint128 liquidity,,,,) = positionManager.positions(params.tokenId);
-    [1m[94m│[0m                                                                         [1m[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
-    [1m[94m│[0m
-    [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/unused-return\https://getfoundry.sh/forge/linting/unused-return]8;;\
+warning[unused-return]: return value of an external call is not used
+    ╭▸ contracts/TeleportV3.sol:195:73
+    │
+195 │         (,, address token0, address token1,,,, uint128 liquidity,,,,) = positionManager.positions(params.tokenId);
+    │                                                                         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: ]8;;https://getfoundry.sh/forge/linting/unused-return\https://getfoundry.sh/forge/linting/unused-return]8;;\
 
-[1m[33mwarning[unused-return][0m[1m: return value of an external call is not used[0m
-   [1m[94m ╭▸ [0mcontracts/TeleportV3.sol:208:9
-    [1m[94m│[0m
-[1m[94m208[0m [1m[94m│[0m [1m[33m┏[0m         positionManager.decreaseLiquidity(
-[1m[94m209[0m [1m[94m│[0m [1m[33m┃[0m             INonfungiblePositionManager.DecreaseLiquidityParams({
-[1m[94m210[0m [1m[94m│[0m [1m[33m┃[0m                 tokenId: params.tokenId,
-[1m[94m211[0m [1m[94m│[0m [1m[33m┃[0m                 liquidity: liquidity,
-    [1m[94m‡[0m [1m[33m┃[0m
-[1m[94m215[0m [1m[94m│[0m [1m[33m┃[0m             })
-[1m[94m216[0m [1m[94m│[0m [1m[33m┃[0m         );
-    [1m[94m│[0m [1m[33m┗━━━━━━━━━┛[0m
-    [1m[94m│[0m
-    [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/unused-return\https://getfoundry.sh/forge/linting/unused-return]8;;\
+warning[unused-return]: return value of an external call is not used
+    ╭▸ contracts/TeleportV3.sol:208:9
+    │
+208 │ ┏         positionManager.decreaseLiquidity(
+209 │ ┃             INonfungiblePositionManager.DecreaseLiquidityParams({
+210 │ ┃                 tokenId: params.tokenId,
+211 │ ┃                 liquidity: liquidity,
+    ‡ ┃
+215 │ ┃             })
+216 │ ┃         );
+    │ ┗━━━━━━━━━┛
+    │
+    ╰ help: ]8;;https://getfoundry.sh/forge/linting/unused-return\https://getfoundry.sh/forge/linting/unused-return]8;;\
 
-[1m[33mwarning[unused-return][0m[1m: return value of an external call is not used[0m
-   [1m[94m ╭▸ [0mcontracts/TeleportV3.sol:337:9
-    [1m[94m│[0m
-[1m[94m337[0m [1m[94m│[0m [1m[33m┏[0m         (tokenId, liquidity,,) = positionManager.mint(
-[1m[94m338[0m [1m[94m│[0m [1m[33m┃[0m             INonfungiblePositionManager.MintParams({
-[1m[94m339[0m [1m[94m│[0m [1m[33m┃[0m                 token0: token0,
-[1m[94m340[0m [1m[94m│[0m [1m[33m┃[0m                 token1: token1,
-    [1m[94m‡[0m [1m[33m┃[0m
-[1m[94m350[0m [1m[94m│[0m [1m[33m┃[0m             })
-[1m[94m351[0m [1m[94m│[0m [1m[33m┃[0m         );
-    [1m[94m│[0m [1m[33m┗━━━━━━━━━┛[0m
-    [1m[94m│[0m
-    [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/unused-return\https://getfoundry.sh/forge/linting/unused-return]8;;\
+warning[unused-return]: return value of an external call is not used
+    ╭▸ contracts/TeleportV3.sol:337:9
+    │
+337 │ ┏         (tokenId, liquidity,,) = positionManager.mint(
+338 │ ┃             INonfungiblePositionManager.MintParams({
+339 │ ┃                 token0: token0,
+340 │ ┃                 token1: token1,
+    ‡ ┃
+350 │ ┃             })
+351 │ ┃         );
+    │ ┗━━━━━━━━━┛
+    │
+    ╰ help: ]8;;https://getfoundry.sh/forge/linting/unused-return\https://getfoundry.sh/forge/linting/unused-return]8;;\
 
-[1m[33mwarning[missing-events-access-control][0m[1m: `balanceOf` is changed without an event but is used for access control[0m
-  [1m[94m ╭▸ [0mcontracts/WETH9.sol:30:9
-   [1m[94m│[0m
-[1m[94m30[0m [1m[94m│[0m         balanceOf[msg.sender] -= wad;
-   [1m[94m│[0m         [1m[33m━━━━━━━━━━━━━━━━━━━━━[0m
-   [1m[94m│[0m
-   [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/missing-events-access-control\https://getfoundry.sh/forge/linting/missing-events-access-control]8;;\
+warning[missing-events-access-control]: `balanceOf` is changed without an event but is used for access control
+   ╭▸ contracts/WETH9.sol:30:9
+   │
+30 │         balanceOf[msg.sender] -= wad;
+   │         ━━━━━━━━━━━━━━━━━━━━━
+   │
+   ╰ help: ]8;;https://getfoundry.sh/forge/linting/missing-events-access-control\https://getfoundry.sh/forge/linting/missing-events-access-control]8;;\
 
-[1m[33mwarning[reentrancy-events][0m[1m: event emitted after an external call; reentrancy can reorder or fabricate logs that off-chain consumers rely on[0m
-  [1m[94m ╭▸ [0mcontracts/mocks/MockUniswapV2Factory.sol:34:9
-   [1m[94m│[0m
-[1m[94m34[0m [1m[94m│[0m         emit PairCreated(token0, token1, pair, allPairs.length);
-   [1m[94m│[0m         [1m[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
-   [1m[94m│[0m
-   [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/reentrancy-events\https://getfoundry.sh/forge/linting/reentrancy-events]8;;\
+warning[reentrancy-events]: event emitted after an external call; reentrancy can reorder or fabricate logs that off-chain consumers rely on
+   ╭▸ contracts/mocks/MockUniswapV2Factory.sol:34:9
+   │
+34 │         emit PairCreated(token0, token1, pair, allPairs.length);
+   │         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ╰ help: ]8;;https://getfoundry.sh/forge/linting/reentrancy-events\https://getfoundry.sh/forge/linting/reentrancy-events]8;;\
 
-[1m[33mwarning[unsafe-typecast][0m[1m: typecast can truncate values[0m
-  [1m[94m ╭▸ [0mcontracts/mocks/MockUniswapV2Pair.sol:46:21
-   [1m[94m│[0m
-[1m[94m46[0m [1m[94m│[0m         reserve0 += uint112(amount0);
-   [1m[94m│[0m                     [1m[33m━━━━━━━━━━━━━━━━[0m
-   [1m[94m│[0m
-   [1m[94m├ [0m[1mnote[0m: consider disabling this lint if you're certain the cast is safe
-   [1m[94m│[0m
-   [1m[94m│[0m       // casting to 'uint112' is safe because [explain why]
-   [1m[94m│[0m       // forge-lint: disable-next-line(unsafe-typecast)
-   [1m[94m│[0m
-   [1m[94m│[0m
-   [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/unsafe-typecast\https://getfoundry.sh/forge/linting/unsafe-typecast]8;;\
+warning[unsafe-typecast]: typecast can truncate values
+   ╭▸ contracts/mocks/MockUniswapV2Pair.sol:46:21
+   │
+46 │         reserve0 += uint112(amount0);
+   │                     ━━━━━━━━━━━━━━━━
+   │
+   ├ note: consider disabling this lint if you're certain the cast is safe
+   │
+   │       // casting to 'uint112' is safe because [explain why]
+   │       // forge-lint: disable-next-line(unsafe-typecast)
+   │
+   │
+   ╰ help: ]8;;https://getfoundry.sh/forge/linting/unsafe-typecast\https://getfoundry.sh/forge/linting/unsafe-typecast]8;;\
 
-[1m[33mwarning[unsafe-typecast][0m[1m: typecast can truncate values[0m
-  [1m[94m ╭▸ [0mcontracts/mocks/MockUniswapV2Pair.sol:47:21
-   [1m[94m│[0m
-[1m[94m47[0m [1m[94m│[0m         reserve1 += uint112(amount1);
-   [1m[94m│[0m                     [1m[33m━━━━━━━━━━━━━━━━[0m
-   [1m[94m│[0m
-   [1m[94m├ [0m[1mnote[0m: consider disabling this lint if you're certain the cast is safe
-   [1m[94m│[0m
-   [1m[94m│[0m       // casting to 'uint112' is safe because [explain why]
-   [1m[94m│[0m       // forge-lint: disable-next-line(unsafe-typecast)
-   [1m[94m│[0m
-   [1m[94m│[0m
-   [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/unsafe-typecast\https://getfoundry.sh/forge/linting/unsafe-typecast]8;;\
+warning[unsafe-typecast]: typecast can truncate values
+   ╭▸ contracts/mocks/MockUniswapV2Pair.sol:47:21
+   │
+47 │         reserve1 += uint112(amount1);
+   │                     ━━━━━━━━━━━━━━━━
+   │
+   ├ note: consider disabling this lint if you're certain the cast is safe
+   │
+   │       // casting to 'uint112' is safe because [explain why]
+   │       // forge-lint: disable-next-line(unsafe-typecast)
+   │
+   │
+   ╰ help: ]8;;https://getfoundry.sh/forge/linting/unsafe-typecast\https://getfoundry.sh/forge/linting/unsafe-typecast]8;;\
 
-[1m[33mwarning[unsafe-typecast][0m[1m: typecast can truncate values[0m
-  [1m[94m ╭▸ [0mcontracts/mocks/MockUniswapV2Pair.sol:73:20
-   [1m[94m│[0m
-[1m[94m73[0m [1m[94m│[0m         reserve0 = uint112(IERC20(token0).balanceOf(address(this)));
-   [1m[94m│[0m                    [1m[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
-   [1m[94m│[0m
-   [1m[94m├ [0m[1mnote[0m: consider disabling this lint if you're certain the cast is safe
-   [1m[94m│[0m
-   [1m[94m│[0m       // casting to 'uint112' is safe because [explain why]
-   [1m[94m│[0m       // forge-lint: disable-next-line(unsafe-typecast)
-   [1m[94m│[0m
-   [1m[94m│[0m
-   [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/unsafe-typecast\https://getfoundry.sh/forge/linting/unsafe-typecast]8;;\
+warning[unsafe-typecast]: typecast can truncate values
+   ╭▸ contracts/mocks/MockUniswapV2Pair.sol:73:20
+   │
+73 │         reserve0 = uint112(IERC20(token0).balanceOf(address(this)));
+   │                    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ├ note: consider disabling this lint if you're certain the cast is safe
+   │
+   │       // casting to 'uint112' is safe because [explain why]
+   │       // forge-lint: disable-next-line(unsafe-typecast)
+   │
+   │
+   ╰ help: ]8;;https://getfoundry.sh/forge/linting/unsafe-typecast\https://getfoundry.sh/forge/linting/unsafe-typecast]8;;\
 
-[1m[33mwarning[unsafe-typecast][0m[1m: typecast can truncate values[0m
-  [1m[94m ╭▸ [0mcontracts/mocks/MockUniswapV2Pair.sol:74:20
-   [1m[94m│[0m
-[1m[94m74[0m [1m[94m│[0m         reserve1 = uint112(IERC20(token1).balanceOf(address(this)));
-   [1m[94m│[0m                    [1m[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
-   [1m[94m│[0m
-   [1m[94m├ [0m[1mnote[0m: consider disabling this lint if you're certain the cast is safe
-   [1m[94m│[0m
-   [1m[94m│[0m       // casting to 'uint112' is safe because [explain why]
-   [1m[94m│[0m       // forge-lint: disable-next-line(unsafe-typecast)
-   [1m[94m│[0m
-   [1m[94m│[0m
-   [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/unsafe-typecast\https://getfoundry.sh/forge/linting/unsafe-typecast]8;;\
+warning[unsafe-typecast]: typecast can truncate values
+   ╭▸ contracts/mocks/MockUniswapV2Pair.sol:74:20
+   │
+74 │         reserve1 = uint112(IERC20(token1).balanceOf(address(this)));
+   │                    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ├ note: consider disabling this lint if you're certain the cast is safe
+   │
+   │       // casting to 'uint112' is safe because [explain why]
+   │       // forge-lint: disable-next-line(unsafe-typecast)
+   │
+   │
+   ╰ help: ]8;;https://getfoundry.sh/forge/linting/unsafe-typecast\https://getfoundry.sh/forge/linting/unsafe-typecast]8;;\
 
-[1m[33mwarning[unsafe-typecast][0m[1m: typecast can truncate values[0m
-  [1m[94m ╭▸ [0mcontracts/mocks/MockUniswapV2Pair.sol:83:37
-   [1m[94m│[0m
-[1m[94m83[0m [1m[94m│[0m         return (reserve0, reserve1, uint32(block.timestamp));
-   [1m[94m│[0m                                     [1m[33m━━━━━━━━━━━━━━━━━━━━━━━[0m
-   [1m[94m│[0m
-   [1m[94m├ [0m[1mnote[0m: consider disabling this lint if you're certain the cast is safe
-   [1m[94m│[0m
-   [1m[94m│[0m       // casting to 'uint32' is safe because [explain why]
-   [1m[94m│[0m       // forge-lint: disable-next-line(unsafe-typecast)
-   [1m[94m│[0m
-   [1m[94m│[0m
-   [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/unsafe-typecast\https://getfoundry.sh/forge/linting/unsafe-typecast]8;;\
+warning[unsafe-typecast]: typecast can truncate values
+   ╭▸ contracts/mocks/MockUniswapV2Pair.sol:83:37
+   │
+83 │         return (reserve0, reserve1, uint32(block.timestamp));
+   │                                     ━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ├ note: consider disabling this lint if you're certain the cast is safe
+   │
+   │       // casting to 'uint32' is safe because [explain why]
+   │       // forge-lint: disable-next-line(unsafe-typecast)
+   │
+   │
+   ╰ help: ]8;;https://getfoundry.sh/forge/linting/unsafe-typecast\https://getfoundry.sh/forge/linting/unsafe-typecast]8;;\
 
-[1m[33mwarning[block-timestamp][0m[1m: usage of `block.timestamp` in a comparison may be manipulated by validators[0m
-  [1m[94m ╭▸ [0mcontracts/mocks/MockUniswapV2Router.sol:38:17
-   [1m[94m│[0m
-[1m[94m38[0m [1m[94m│[0m         require(deadline >= block.timestamp, "MockRouter: expired");
-   [1m[94m│[0m                 [1m[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
-   [1m[94m│[0m
-   [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/block-timestamp\https://getfoundry.sh/forge/linting/block-timestamp]8;;\
+warning[block-timestamp]: usage of `block.timestamp` in a comparison may be manipulated by validators
+   ╭▸ contracts/mocks/MockUniswapV2Router.sol:38:17
+   │
+38 │         require(deadline >= block.timestamp, "MockRouter: expired");
+   │                 ━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ╰ help: ]8;;https://getfoundry.sh/forge/linting/block-timestamp\https://getfoundry.sh/forge/linting/block-timestamp]8;;\
 
-[1m[33mwarning[block-timestamp][0m[1m: usage of `block.timestamp` in a comparison may be manipulated by validators[0m
-  [1m[94m ╭▸ [0mcontracts/mocks/MockUniswapV2Router.sol:76:17
-   [1m[94m│[0m
-[1m[94m76[0m [1m[94m│[0m         require(deadline >= block.timestamp, "MockRouter: expired");
-   [1m[94m│[0m                 [1m[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
-   [1m[94m│[0m
-   [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/block-timestamp\https://getfoundry.sh/forge/linting/block-timestamp]8;;\
+warning[block-timestamp]: usage of `block.timestamp` in a comparison may be manipulated by validators
+   ╭▸ contracts/mocks/MockUniswapV2Router.sol:76:17
+   │
+76 │         require(deadline >= block.timestamp, "MockRouter: expired");
+   │                 ━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ╰ help: ]8;;https://getfoundry.sh/forge/linting/block-timestamp\https://getfoundry.sh/forge/linting/block-timestamp]8;;\
 
-[1m[33mwarning[unsafe-oz-erc721-mint][0m[1m: `ERC721._mint` does not check that the recipient can receive the token; use `_safeMint`[0m
-   [1m[94m ╭▸ [0mcontracts/mocks/MockUniswapV3PositionManager.sol:110:9
-    [1m[94m│[0m
-[1m[94m110[0m [1m[94m│[0m         _mint(params.recipient, tokenId);
-    [1m[94m│[0m         [1m[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
-    [1m[94m│[0m
-    [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/unsafe-oz-erc721-mint\https://getfoundry.sh/forge/linting/unsafe-oz-erc721-mint]8;;\
+warning[unsafe-oz-erc721-mint]: `ERC721._mint` does not check that the recipient can receive the token; use `_safeMint`
+    ╭▸ contracts/mocks/MockUniswapV3PositionManager.sol:110:9
+    │
+110 │         _mint(params.recipient, tokenId);
+    │         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: ]8;;https://getfoundry.sh/forge/linting/unsafe-oz-erc721-mint\https://getfoundry.sh/forge/linting/unsafe-oz-erc721-mint]8;;\
 
-[1m[33mwarning[block-timestamp][0m[1m: usage of `block.timestamp` in a comparison may be manipulated by validators[0m
-  [1m[94m ╭▸ [0mcontracts/mocks/MockUniswapV3PositionManager.sol:73:17
-   [1m[94m│[0m
-[1m[94m73[0m [1m[94m│[0m         require(params.deadline >= block.timestamp, "MockPM: expired");
-   [1m[94m│[0m                 [1m[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
-   [1m[94m│[0m
-   [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/block-timestamp\https://getfoundry.sh/forge/linting/block-timestamp]8;;\
+warning[block-timestamp]: usage of `block.timestamp` in a comparison may be manipulated by validators
+   ╭▸ contracts/mocks/MockUniswapV3PositionManager.sol:73:17
+   │
+73 │         require(params.deadline >= block.timestamp, "MockPM: expired");
+   │                 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ╰ help: ]8;;https://getfoundry.sh/forge/linting/block-timestamp\https://getfoundry.sh/forge/linting/block-timestamp]8;;\
 
-[1m[33mwarning[unsafe-typecast][0m[1m: typecast can truncate values[0m
-  [1m[94m ╭▸ [0mcontracts/mocks/MockUniswapV3PositionManager.sol:87:21
-   [1m[94m│[0m
-[1m[94m87[0m [1m[94m│[0m         liquidity = uint128(_sqrt(amount0 * amount1));
-   [1m[94m│[0m                     [1m[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
-   [1m[94m│[0m
-   [1m[94m├ [0m[1mnote[0m: consider disabling this lint if you're certain the cast is safe
-   [1m[94m│[0m
-   [1m[94m│[0m       // casting to 'uint128' is safe because [explain why]
-   [1m[94m│[0m       // forge-lint: disable-next-line(unsafe-typecast)
-   [1m[94m│[0m
-   [1m[94m│[0m
-   [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/unsafe-typecast\https://getfoundry.sh/forge/linting/unsafe-typecast]8;;\
+warning[unsafe-typecast]: typecast can truncate values
+   ╭▸ contracts/mocks/MockUniswapV3PositionManager.sol:87:21
+   │
+87 │         liquidity = uint128(_sqrt(amount0 * amount1));
+   │                     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ├ note: consider disabling this lint if you're certain the cast is safe
+   │
+   │       // casting to 'uint128' is safe because [explain why]
+   │       // forge-lint: disable-next-line(unsafe-typecast)
+   │
+   │
+   ╰ help: ]8;;https://getfoundry.sh/forge/linting/unsafe-typecast\https://getfoundry.sh/forge/linting/unsafe-typecast]8;;\
 
-[1m[33mwarning[divide-before-multiply][0m[1m: division before multiplication may lose precision[0m
-   [1m[94m ╭▸ [0mcontracts/mocks/MockUniswapV3PositionManager.sol:129:19
-    [1m[94m│[0m
-[1m[94m129[0m [1m[94m│[0m         amount0 = (IERC20(position.token0).balanceOf(address(this)) * liquidityRatio) / 1e18;
-    [1m[94m│[0m                   [1m[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
-    [1m[94m│[0m
-    [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/divide-before-multiply\https://getfoundry.sh/forge/linting/divide-before-multiply]8;;\
+warning[divide-before-multiply]: division before multiplication may lose precision
+    ╭▸ contracts/mocks/MockUniswapV3PositionManager.sol:129:19
+    │
+129 │         amount0 = (IERC20(position.token0).balanceOf(address(this)) * liquidityRatio) / 1e18;
+    │                   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: ]8;;https://getfoundry.sh/forge/linting/divide-before-multiply\https://getfoundry.sh/forge/linting/divide-before-multiply]8;;\
 
-[1m[33mwarning[divide-before-multiply][0m[1m: division before multiplication may lose precision[0m
-   [1m[94m ╭▸ [0mcontracts/mocks/MockUniswapV3PositionManager.sol:130:19
-    [1m[94m│[0m
-[1m[94m130[0m [1m[94m│[0m         amount1 = (IERC20(position.token1).balanceOf(address(this)) * liquidityRatio) / 1e18;
-    [1m[94m│[0m                   [1m[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
-    [1m[94m│[0m
-    [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/divide-before-multiply\https://getfoundry.sh/forge/linting/divide-before-multiply]8;;\
+warning[divide-before-multiply]: division before multiplication may lose precision
+    ╭▸ contracts/mocks/MockUniswapV3PositionManager.sol:130:19
+    │
+130 │         amount1 = (IERC20(position.token1).balanceOf(address(this)) * liquidityRatio) / 1e18;
+    │                   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: ]8;;https://getfoundry.sh/forge/linting/divide-before-multiply\https://getfoundry.sh/forge/linting/divide-before-multiply]8;;\
 
-[1m[33mwarning[block-timestamp][0m[1m: usage of `block.timestamp` in a comparison may be manipulated by validators[0m
-   [1m[94m ╭▸ [0mcontracts/mocks/MockUniswapV3PositionManager.sol:121:17
-    [1m[94m│[0m
-[1m[94m121[0m [1m[94m│[0m         require(params.deadline >= block.timestamp, "MockPM: expired");
-    [1m[94m│[0m                 [1m[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
-    [1m[94m│[0m
-    [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/block-timestamp\https://getfoundry.sh/forge/linting/block-timestamp]8;;\
+warning[block-timestamp]: usage of `block.timestamp` in a comparison may be manipulated by validators
+    ╭▸ contracts/mocks/MockUniswapV3PositionManager.sol:121:17
+    │
+121 │         require(params.deadline >= block.timestamp, "MockPM: expired");
+    │                 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    │
+    ╰ help: ]8;;https://getfoundry.sh/forge/linting/block-timestamp\https://getfoundry.sh/forge/linting/block-timestamp]8;;\
 
-[1m[33mwarning[unsafe-typecast][0m[1m: typecast can truncate values[0m
-   [1m[94m ╭▸ [0mcontracts/mocks/MockUniswapV3PositionManager.sol:136:33
-    [1m[94m│[0m
-[1m[94m136[0m [1m[94m│[0m         position.tokensOwed0 += uint128(amount0);
-    [1m[94m│[0m                                 [1m[33m━━━━━━━━━━━━━━━━[0m
-    [1m[94m│[0m
-    [1m[94m├ [0m[1mnote[0m: consider disabling this lint if you're certain the cast is safe
-    [1m[94m│[0m
-    [1m[94m│[0m       // casting to 'uint128' is safe because [explain why]
-    [1m[94m│[0m       // forge-lint: disable-next-line(unsafe-typecast)
-    [1m[94m│[0m
-    [1m[94m│[0m
-    [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/unsafe-typecast\https://getfoundry.sh/forge/linting/unsafe-typecast]8;;\
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ contracts/mocks/MockUniswapV3PositionManager.sol:136:33
+    │
+136 │         position.tokensOwed0 += uint128(amount0);
+    │                                 ━━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │
+    │       // casting to 'uint128' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │
+    │
+    ╰ help: ]8;;https://getfoundry.sh/forge/linting/unsafe-typecast\https://getfoundry.sh/forge/linting/unsafe-typecast]8;;\
 
-[1m[33mwarning[unsafe-typecast][0m[1m: typecast can truncate values[0m
-   [1m[94m ╭▸ [0mcontracts/mocks/MockUniswapV3PositionManager.sol:137:33
-    [1m[94m│[0m
-[1m[94m137[0m [1m[94m│[0m         position.tokensOwed1 += uint128(amount1);
-    [1m[94m│[0m                                 [1m[33m━━━━━━━━━━━━━━━━[0m
-    [1m[94m│[0m
-    [1m[94m├ [0m[1mnote[0m: consider disabling this lint if you're certain the cast is safe
-    [1m[94m│[0m
-    [1m[94m│[0m       // casting to 'uint128' is safe because [explain why]
-    [1m[94m│[0m       // forge-lint: disable-next-line(unsafe-typecast)
-    [1m[94m│[0m
-    [1m[94m│[0m
-    [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/unsafe-typecast\https://getfoundry.sh/forge/linting/unsafe-typecast]8;;\
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ contracts/mocks/MockUniswapV3PositionManager.sol:137:33
+    │
+137 │         position.tokensOwed1 += uint128(amount1);
+    │                                 ━━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │
+    │       // casting to 'uint128' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │
+    │
+    ╰ help: ]8;;https://getfoundry.sh/forge/linting/unsafe-typecast\https://getfoundry.sh/forge/linting/unsafe-typecast]8;;\
 
-[1m[33mwarning[unsafe-typecast][0m[1m: typecast can truncate values[0m
-   [1m[94m ╭▸ [0mcontracts/mocks/MockUniswapV3PositionManager.sol:151:33
-    [1m[94m│[0m
-[1m[94m151[0m [1m[94m│[0m         position.tokensOwed0 -= uint128(amount0);
-    [1m[94m│[0m                                 [1m[33m━━━━━━━━━━━━━━━━[0m
-    [1m[94m│[0m
-    [1m[94m├ [0m[1mnote[0m: consider disabling this lint if you're certain the cast is safe
-    [1m[94m│[0m
-    [1m[94m│[0m       // casting to 'uint128' is safe because [explain why]
-    [1m[94m│[0m       // forge-lint: disable-next-line(unsafe-typecast)
-    [1m[94m│[0m
-    [1m[94m│[0m
-    [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/unsafe-typecast\https://getfoundry.sh/forge/linting/unsafe-typecast]8;;\
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ contracts/mocks/MockUniswapV3PositionManager.sol:151:33
+    │
+151 │         position.tokensOwed0 -= uint128(amount0);
+    │                                 ━━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │
+    │       // casting to 'uint128' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │
+    │
+    ╰ help: ]8;;https://getfoundry.sh/forge/linting/unsafe-typecast\https://getfoundry.sh/forge/linting/unsafe-typecast]8;;\
 
-[1m[33mwarning[unsafe-typecast][0m[1m: typecast can truncate values[0m
-   [1m[94m ╭▸ [0mcontracts/mocks/MockUniswapV3PositionManager.sol:152:33
-    [1m[94m│[0m
-[1m[94m152[0m [1m[94m│[0m         position.tokensOwed1 -= uint128(amount1);
-    [1m[94m│[0m                                 [1m[33m━━━━━━━━━━━━━━━━[0m
-    [1m[94m│[0m
-    [1m[94m├ [0m[1mnote[0m: consider disabling this lint if you're certain the cast is safe
-    [1m[94m│[0m
-    [1m[94m│[0m       // casting to 'uint128' is safe because [explain why]
-    [1m[94m│[0m       // forge-lint: disable-next-line(unsafe-typecast)
-    [1m[94m│[0m
-    [1m[94m│[0m
-    [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/unsafe-typecast\https://getfoundry.sh/forge/linting/unsafe-typecast]8;;\
+warning[unsafe-typecast]: typecast can truncate values
+    ╭▸ contracts/mocks/MockUniswapV3PositionManager.sol:152:33
+    │
+152 │         position.tokensOwed1 -= uint128(amount1);
+    │                                 ━━━━━━━━━━━━━━━━
+    │
+    ├ note: consider disabling this lint if you're certain the cast is safe
+    │
+    │       // casting to 'uint128' is safe because [explain why]
+    │       // forge-lint: disable-next-line(unsafe-typecast)
+    │
+    │
+    ╰ help: ]8;;https://getfoundry.sh/forge/linting/unsafe-typecast\https://getfoundry.sh/forge/linting/unsafe-typecast]8;;\
 
-[1m[33mwarning[environment-read-across-mutation][0m[1m: `block.timestamp` may be reused across `vm.warp`[0m
-  [1m[94m ╭▸ [0mtest/foundry/TeleportV2FullFlow.t.sol:77:17
-   [1m[94m│[0m
-[1m[94m77[0m [1m[94m│[0m         vm.warp(block.timestamp + 1 hours); // Ensure no cooldown conflicts
-   [1m[94m│[0m         [1m[94m────────[0m[1m[33m━━━━━━━━━━━━━━━[0m[1m[94m───────────[0m [1m[94m`vm.warp` changes this environment here[0m
-   [1m[94m│[0m
-   [1m[94m├ [0m[1mhelp[0m: capture it with `vm.getBlockTimestamp()` instead
-   [1m[94m╰ [0m[1mhelp[0m: https://getfoundry.sh/forge/linting/environment-read-across-mutation
+warning[environment-read-across-mutation]: `block.timestamp` may be reused across `vm.warp`
+   ╭▸ test/foundry/TeleportV2FullFlow.t.sol:77:17
+   │
+77 │         vm.warp(block.timestamp + 1 hours); // Ensure no cooldown conflicts
+   │         ────────━━━━━━━━━━━━━━━─────────── `vm.warp` changes this environment here
+   │
+   ├ help: capture it with `vm.getBlockTimestamp()` instead
+   ╰ help: https://getfoundry.sh/forge/linting/environment-read-across-mutation
 
-[1m[33mwarning[environment-read-across-mutation][0m[1m: `block.timestamp` may be reused across `vm.warp`[0m
-   [1m[94m ╭▸ [0mtest/foundry/TeleportV2FullFlow.t.sol:142:17
-    [1m[94m│[0m
-[1m[94m142[0m [1m[94m│[0m         vm.warp(block.timestamp + 2 hours); // Ensure no cooldown conflicts
-    [1m[94m│[0m         [1m[94m────────[0m[1m[33m━━━━━━━━━━━━━━━[0m[1m[94m───────────[0m [1m[94m`vm.warp` changes this environment here[0m
-    [1m[94m│[0m
-    [1m[94m├ [0m[1mhelp[0m: capture it with `vm.getBlockTimestamp()` instead
-    [1m[94m╰ [0m[1mhelp[0m: https://getfoundry.sh/forge/linting/environment-read-across-mutation
+warning[environment-read-across-mutation]: `block.timestamp` may be reused across `vm.warp`
+    ╭▸ test/foundry/TeleportV2FullFlow.t.sol:142:17
+    │
+142 │         vm.warp(block.timestamp + 2 hours); // Ensure no cooldown conflicts
+    │         ────────━━━━━━━━━━━━━━━─────────── `vm.warp` changes this environment here
+    │
+    ├ help: capture it with `vm.getBlockTimestamp()` instead
+    ╰ help: https://getfoundry.sh/forge/linting/environment-read-across-mutation
 
-[1m[33mwarning[environment-read-across-mutation][0m[1m: `block.timestamp` may be reused across `vm.warp`[0m
-   [1m[94m ╭▸ [0mtest/foundry/TeleportV2FullFlow.t.sol:172:13
-    [1m[94m│[0m
-[1m[94m172[0m [1m[94m│[0m             block.timestamp + 1 hours,
-    [1m[94m│[0m             [1m[33m━━━━━━━━━━━━━━━[0m
-    [1m[94m‡[0m
-[1m[94m192[0m [1m[94m│[0m         vm.warp(block.timestamp + 16 minutes);
-    [1m[94m│[0m         [1m[94m─────────────────────────────────────[0m [1m[94m`vm.warp` changes this environment here[0m
-    [1m[94m│[0m
-    [1m[94m├ [0m[1mhelp[0m: capture it with `vm.getBlockTimestamp()` instead
-    [1m[94m╰ [0m[1mhelp[0m: https://getfoundry.sh/forge/linting/environment-read-across-mutation
+warning[environment-read-across-mutation]: `block.timestamp` may be reused across `vm.warp`
+    ╭▸ test/foundry/TeleportV2FullFlow.t.sol:172:13
+    │
+172 │             block.timestamp + 1 hours,
+    │             ━━━━━━━━━━━━━━━
+    ‡
+192 │         vm.warp(block.timestamp + 16 minutes);
+    │         ───────────────────────────────────── `vm.warp` changes this environment here
+    │
+    ├ help: capture it with `vm.getBlockTimestamp()` instead
+    ╰ help: https://getfoundry.sh/forge/linting/environment-read-across-mutation
 
-[1m[33mwarning[environment-read-across-mutation][0m[1m: `block.timestamp` may be reused across `vm.warp`[0m
-   [1m[94m ╭▸ [0mtest/foundry/TeleportV2FullFlow.t.sol:187:13
-    [1m[94m│[0m
-[1m[94m187[0m [1m[94m│[0m             block.timestamp + 1 hours,
-    [1m[94m│[0m             [1m[33m━━━━━━━━━━━━━━━[0m
-    [1m[94m‡[0m
-[1m[94m192[0m [1m[94m│[0m         vm.warp(block.timestamp + 16 minutes);
-    [1m[94m│[0m         [1m[94m─────────────────────────────────────[0m [1m[94m`vm.warp` changes this environment here[0m
-    [1m[94m│[0m
-    [1m[94m├ [0m[1mhelp[0m: capture it with `vm.getBlockTimestamp()` instead
-    [1m[94m╰ [0m[1mhelp[0m: https://getfoundry.sh/forge/linting/environment-read-across-mutation
+warning[environment-read-across-mutation]: `block.timestamp` may be reused across `vm.warp`
+    ╭▸ test/foundry/TeleportV2FullFlow.t.sol:187:13
+    │
+187 │             block.timestamp + 1 hours,
+    │             ━━━━━━━━━━━━━━━
+    ‡
+192 │         vm.warp(block.timestamp + 16 minutes);
+    │         ───────────────────────────────────── `vm.warp` changes this environment here
+    │
+    ├ help: capture it with `vm.getBlockTimestamp()` instead
+    ╰ help: https://getfoundry.sh/forge/linting/environment-read-across-mutation
 
-[1m[33mwarning[environment-read-across-mutation][0m[1m: `block.timestamp` may be reused across `vm.warp`[0m
-   [1m[94m ╭▸ [0mtest/foundry/TeleportV2FullFlow.t.sol:192:17
-    [1m[94m│[0m
-[1m[94m192[0m [1m[94m│[0m         vm.warp(block.timestamp + 16 minutes);
-    [1m[94m│[0m         [1m[94m────────[0m[1m[33m━━━━━━━━━━━━━━━[0m[1m[94m──────────────[0m [1m[94m`vm.warp` changes this environment here[0m
-    [1m[94m│[0m
-    [1m[94m├ [0m[1mhelp[0m: capture it with `vm.getBlockTimestamp()` instead
-    [1m[94m╰ [0m[1mhelp[0m: https://getfoundry.sh/forge/linting/environment-read-across-mutation
+warning[environment-read-across-mutation]: `block.timestamp` may be reused across `vm.warp`
+    ╭▸ test/foundry/TeleportV2FullFlow.t.sol:192:17
+    │
+192 │         vm.warp(block.timestamp + 16 minutes);
+    │         ────────━━━━━━━━━━━━━━━────────────── `vm.warp` changes this environment here
+    │
+    ├ help: capture it with `vm.getBlockTimestamp()` instead
+    ╰ help: https://getfoundry.sh/forge/linting/environment-read-across-mutation
 
-[1m[33mwarning[environment-read-across-mutation][0m[1m: `block.timestamp` may be reused across `vm.warp`[0m
-   [1m[94m ╭▸ [0mtest/foundry/TeleportV2FullFlow.t.sol:213:17
-    [1m[94m│[0m
-[1m[94m213[0m [1m[94m│[0m         vm.warp(block.timestamp + 3 hours); // Ensure no cooldown conflicts
-    [1m[94m│[0m         [1m[94m────────[0m[1m[33m━━━━━━━━━━━━━━━[0m[1m[94m───────────[0m [1m[94m`vm.warp` changes this environment here[0m
-    [1m[94m│[0m
-    [1m[94m├ [0m[1mhelp[0m: capture it with `vm.getBlockTimestamp()` instead
-    [1m[94m╰ [0m[1mhelp[0m: https://getfoundry.sh/forge/linting/environment-read-across-mutation
+warning[environment-read-across-mutation]: `block.timestamp` may be reused across `vm.warp`
+    ╭▸ test/foundry/TeleportV2FullFlow.t.sol:213:17
+    │
+213 │         vm.warp(block.timestamp + 3 hours); // Ensure no cooldown conflicts
+    │         ────────━━━━━━━━━━━━━━━─────────── `vm.warp` changes this environment here
+    │
+    ├ help: capture it with `vm.getBlockTimestamp()` instead
+    ╰ help: https://getfoundry.sh/forge/linting/environment-read-across-mutation
 
-[1m[33mwarning[environment-read-across-mutation][0m[1m: `block.timestamp` may be reused across `vm.warp`[0m
-   [1m[94m ╭▸ [0mtest/foundry/TeleportV2FullFlow.t.sol:253:17
-    [1m[94m│[0m
-[1m[94m253[0m [1m[94m│[0m         vm.warp(block.timestamp + 4 hours); // Ensure no cooldown conflicts
-    [1m[94m│[0m         [1m[94m────────[0m[1m[33m━━━━━━━━━━━━━━━[0m[1m[94m───────────[0m [1m[94m`vm.warp` changes this environment here[0m
-    [1m[94m│[0m
-    [1m[94m├ [0m[1mhelp[0m: capture it with `vm.getBlockTimestamp()` instead
-    [1m[94m╰ [0m[1mhelp[0m: https://getfoundry.sh/forge/linting/environment-read-across-mutation
+warning[environment-read-across-mutation]: `block.timestamp` may be reused across `vm.warp`
+    ╭▸ test/foundry/TeleportV2FullFlow.t.sol:253:17
+    │
+253 │         vm.warp(block.timestamp + 4 hours); // Ensure no cooldown conflicts
+    │         ────────━━━━━━━━━━━━━━━─────────── `vm.warp` changes this environment here
+    │
+    ├ help: capture it with `vm.getBlockTimestamp()` instead
+    ╰ help: https://getfoundry.sh/forge/linting/environment-read-across-mutation
 
-[1m[33mwarning[environment-read-across-mutation][0m[1m: `block.timestamp` may be reused across `vm.warp`[0m
-   [1m[94m ╭▸ [0mtest/foundry/TeleportV2FullFlow.t.sol:392:17
-    [1m[94m│[0m
-[1m[94m392[0m [1m[94m│[0m         vm.warp(block.timestamp + 5 hours); // Ensure no cooldown conflicts
-    [1m[94m│[0m         [1m[94m────────[0m[1m[33m━━━━━━━━━━━━━━━[0m[1m[94m───────────[0m [1m[94m`vm.warp` changes this environment here[0m
-    [1m[94m│[0m
-    [1m[94m├ [0m[1mhelp[0m: capture it with `vm.getBlockTimestamp()` instead
-    [1m[94m╰ [0m[1mhelp[0m: https://getfoundry.sh/forge/linting/environment-read-across-mutation
+warning[environment-read-across-mutation]: `block.timestamp` may be reused across `vm.warp`
+    ╭▸ test/foundry/TeleportV2FullFlow.t.sol:392:17
+    │
+392 │         vm.warp(block.timestamp + 5 hours); // Ensure no cooldown conflicts
+    │         ────────━━━━━━━━━━━━━━━─────────── `vm.warp` changes this environment here
+    │
+    ├ help: capture it with `vm.getBlockTimestamp()` instead
+    ╰ help: https://getfoundry.sh/forge/linting/environment-read-across-mutation

@@ -1,12 +1,12 @@
 openapi: 3.0.3
 info:
-  title: Gravitas sandbox interface review
+  title: Earlier file-driven mock and direct JSON-RPC interface
   version: 1.0.0-review
   description: |
-    Source-backed review contract for two different interfaces: the local,
-    file-driven HTTP mock and read-only calls to GravitasPolicyRegistry through
-    an Ethereum node's HTTP JSON-RPC endpoint. The mock does not call the registry.
-    No HTTP registry adapter is implemented in the reviewed code.
+    This is the earlier specification for the local file-driven HTTP mock and
+    direct read-only JSON-RPC calls through a node. The mock does not call the
+    registry. The separate registry-backed reference API is described in
+    ../reference/api/openapi.yaml; these two services have different behavior.
 
     This document describes implementation behavior, not a hosted-service or
     deployment verification. All example addresses and identifiers are dummy
@@ -39,7 +39,7 @@ x-contract-reference:
 x-review-limitations:
   - capability: HTTP registry adapter
     x-status: not-implemented
-    evidence: No registry REST adapter is present in the reviewed sources. No planned routes are published here.
+    evidence: This file-driven mock does not expose registry REST routes. The separate reference adapter is documented in ../reference/api/openapi.yaml.
   - capability: HTTP authentication
     x-status: documented-only
     evidence: The mock has no API-key middleware, security scheme, or explicit 401 response.

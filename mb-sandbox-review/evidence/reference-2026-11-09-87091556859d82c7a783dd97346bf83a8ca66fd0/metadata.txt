@@ -1,0 +1,12 @@
+utc_date=2026-11-09
+source_commit=87091556859d82c7a783dd97346bf83a8ca66fd0
+branch=mb-sandbox-review
+foundry=forge Version: 1.9.0
+node=v22.23.4
+root_tests=86_passed_0_failed_0_skipped
+reference_tests=8_passed_0_failed_0_skipped
+api_tests=9_passed_0_failed_0_skipped
+anvil_chain_id=31337
+test_base_commit=87091556859d82c7a783dd97346bf83a8ca66fd0
+test_source_snapshot=source-snapshot.sha256
+test_source_note=review implementation was present in the working tree; the manifest records the source files used for these local checks

@@ -1,0 +1,18 @@
+No files changed, compilation skipped
+
+Ran 8 tests for test/GatedDemoSukuk.t.sol:GatedDemoSukukTest
+[PASS] testFuzz_Scenario07_RefusedTransfersNeverChangeBalances(address,uint256) (runs: 256, μ: 135046, ~: 135076)
+[PASS] testScenario01_ApprovedManagerTransfersAndEmitsPolicyEvidence() (gas: 178521)
+[PASS] testScenario02_UnapprovedAssetRevertsWithoutMovingBalances() (gas: 168516)
+[PASS] testScenario03_UnregisteredManagerRevertsWithExactReason() (gas: 313828)
+[PASS] testScenario04_RevocationAndReapprovalAdvanceTheHashChain() (gas: 403699)
+[PASS] testScenario05_PauseStopsManagerAndDirectTransferAndNoCodeRegistryFails() (gas: 586617)
+[PASS] testScenario06_DirectAndDelegatedRoutesAreGatedButPlainGusdIsNot() (gas: 1039204)
+[PASS] testScenario07_PostDeploymentMintAndBurnAreGated_InitialMintIsTheException() (gas: 261203)
+Suite result: ok. 8 passed; 0 failed; 0 skipped; finished in 26.80ms (33.93ms CPU time)
+
+╭--------------------+--------+--------+---------╮
+| Test Suite         | Passed | Failed | Skipped |
++================================================+
+| GatedDemoSukukTest | 8      | 0      | 0       |
+╰--------------------+--------+--------+---------╯

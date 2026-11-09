@@ -1,0 +1,27 @@
+No files changed, compilation skipped
+Script ran successfully.
+
+## Setting up 1 EVM.
+
+==========================
+
+Chain 31337
+
+Estimated max fee per gas: 2.000000001 gwei
+Estimated base fee per gas: 1 gwei
+Estimated max priority fee per gas: 0.000000001 gwei
+
+Estimated total gas used for script: 3394109
+
+Estimated amount required: 0.006788218003394109 ETH
+
+==========================
+
+
+==========================
+
+ONCHAIN EXECUTION COMPLETE & SUCCESSFUL.
+
+Transactions saved to: /home/ubuntu/gravitas-protocol/mb-sandbox-review/reference/broadcast/DeployReference.s.sol/31337/run-latest.json
+
+Sensitive values saved to: /home/ubuntu/gravitas-protocol/mb-sandbox-review/reference/cache/DeployReference.s.sol/31337/run-latest.json

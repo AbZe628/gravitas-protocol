@@ -1,0 +1,5 @@
+PASS receipt/events same transaction: 0xd45c98188300d453bcb1a4f412098e3bc013a350a33dc66e3230fbb74d71283f
+PASS policy hash chain through version 3: 0x96405a9315fa1a542184d8419512d74374ec2fff1684eaca112f6b36a723033f
+PASS block 11, chain 31337, timestamp 2026-11-09T20:16:54Z
+WROTE /tmp/reference-audit-record-reverified.json
+PASS generated record exactly matches independently re-read receipt and replayed registry history

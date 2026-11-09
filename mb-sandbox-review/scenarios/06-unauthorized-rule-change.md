@@ -1,11 +1,11 @@
-# 06 — Unauthorised policy change
+# Scenario 06 — Unauthorized calls and transfer routes
 
-Only the registry owner can change asset, router or executor lists. `Ownable2Step` ownership transfer takes effect only after the proposed owner accepts. The local probe also checks that a pending owner cannot write before acceptance and that the wrong account cannot accept. Run from the repository root:
+Only the registry owner can change asset, router or executor lists. The root tests exercise those controls. The reference tests also try direct and delegated transfers while the gated asset is unapproved or the registry is paused; both routes are refused. The plain GUSD contrast still transfers because that token never queries the registry.
+
+Run the focused checks:
 
 ```bash
-python3 mb-sandbox-review/scripts/check-local.py
-forge test --match-path test/foundry/PolicyCommitment.t.sol --match-test '^test_OnlyTheOwnerWrites' -vv
-forge test --match-test '^test_Ownable2Step_(TransferRequiresAcceptance|AttackerCannotAccept|OnlyOwnerCanPropose)' -vv
+bash mb-sandbox-review/scripts/run-scenario-6.sh
 ```
 
-Expected: six local `PASS` lines; version and hash remain unchanged after rejected writes; ownership changes only after the proposed owner accepts. The Foundry tests are `test_OnlyTheOwnerWrites`, `test_OnlyTheOwnerWritesToEveryRegister` and the three named `test_Ownable2Step_...` tests. Their multisig-named fixture uses dummy addresses; it is not a real multisignature wallet.
+The reference guard does not change the old token or registry. An issuer would still have to select and secure the token implementation and decide who can pause it, approve assets and register managers.

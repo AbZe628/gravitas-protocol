@@ -1,0 +1,68 @@
+
+> gravitas-registry-reference-api@0.1.0 test
+> node --test test/*.test.mjs
+
+TAP version 13
+# Subtest: allowed asset returns a pinned-block ALLOW and auditable policy fields
+ok 1 - allowed asset returns a pinned-block ALLOW and auditable policy fields
+  ---
+  duration_ms: 78.831688
+  type: 'test'
+  ...
+# Subtest: unapproved asset returns DENY without converting caller context into authority
+ok 2 - unapproved asset returns DENY without converting caller context into authority
+  ---
+  duration_ms: 32.258411
+  type: 'test'
+  ...
+# Subtest: paused registry returns DENY at the same pinned block
+ok 3 - paused registry returns DENY at the same pinned block
+  ---
+  duration_ms: 19.477989
+  type: 'test'
+  ...
+# Subtest: missing or wrong API key returns 401 on protected routes
+ok 4 - missing or wrong API key returns 401 on protected routes
+  ---
+  duration_ms: 8.595858
+  type: 'test'
+  ...
+# Subtest: bad addresses, negative amounts and unknown fields are rejected
+ok 5 - bad addresses, negative amounts and unknown fields are rejected
+  ---
+  duration_ms: 10.643034
+  type: 'test'
+  ...
+# Subtest: unknown route returns 404 after authentication
+ok 6 - unknown route returns 404 after authentication
+  ---
+  duration_ms: 4.368015
+  type: 'test'
+  ...
+# Subtest: stopped RPC returns 503 DENY; restoring the RPC recovers without a cached ALLOW
+ok 7 - stopped RPC returns 503 DENY; restoring the RPC recovers without a cached ALLOW
+  ---
+  duration_ms: 20.146017
+  type: 'test'
+  ...
+# Subtest: slow RPC times out, retries once, and returns 503 DENY
+ok 8 - slow RPC times out, retries once, and returns 503 DENY
+  ---
+  duration_ms: 4010.201626
+  type: 'test'
+  ...
+# Subtest: policy route reads the version and hash live
+ok 9 - policy route reads the version and hash live
+  ---
+  duration_ms: 15.563955
+  type: 'test'
+  ...
+1..9
+# tests 9
+# suites 0
+# pass 9
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4444.500414

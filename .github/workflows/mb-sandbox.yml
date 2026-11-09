@@ -1,0 +1,41 @@
+name: Reference sandbox verification
+
+on:
+  push:
+    branches: [mb-sandbox-review]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      REVIEW_SOURCE_COMMIT: ${{ github.sha }}
+    steps:
+      - name: Checkout source and dependencies
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Start private reference sandbox
+        run: docker compose -f mb-sandbox-review/docker-compose.yml up --build -d
+      - name: Run complete verification
+        run: docker compose -f mb-sandbox-review/docker-compose.yml exec -T sandbox bash /workspace/mb-sandbox-review/reference/scripts/verify-all.sh 2>&1 | tee mb-sandbox-review-ci.log
+      - name: Capture container logs
+        if: always()
+        run: docker compose -f mb-sandbox-review/docker-compose.yml logs --no-color > mb-sandbox-review-container.log || true
+      - name: Stop the sandbox
+        if: always()
+        run: docker compose -f mb-sandbox-review/docker-compose.yml down --volumes || true
+      - name: Upload verification logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mb-sandbox-verification-logs
+          path: |
+            mb-sandbox-review-ci.log
+            mb-sandbox-review-container.log
+          if-no-files-found: warn
+          retention-days: 30

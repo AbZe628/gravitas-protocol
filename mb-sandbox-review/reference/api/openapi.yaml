@@ -1,0 +1,142 @@
+openapi: 3.0.3
+info:
+  title: Registry-backed reference compliance API
+  version: 0.1.0
+  description: >-
+    REFERENCE IMPLEMENTATION, UNAUDITED, FOR EVALUATION, NOT FOR PRODUCTION.
+    Reads the existing GravitasPolicyRegistry at one pinned block. This service
+    does not transfer tokens, check investor eligibility, or create an issuer product.
+servers:
+  - url: http://127.0.0.1:8787
+    description: Local sandbox; container deployments publish only on host loopback.
+security:
+  - ApiKey: []
+tags:
+  - name: Registry reads
+    description: Live read-only decisions from the registry; no transfer is executed.
+paths:
+  /v1/verify:
+    post:
+      tags: [Registry reads]
+      operationId: verifyRegistryAsset
+      summary: Read asset status and policy commitment at one block
+      description: >-
+        The amount and context are validated and logged but do not affect the
+        registry decision. The current registry does not evaluate investors,
+        amount, transfer parties, or instrument terms. RPC failure after two
+        attempts returns HTTP 503 with DENY; no cached ALLOW is used.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyRequest'
+      responses:
+        '200':
+          description: Live read completed; DENY may mean paused or asset not approved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Decision'
+        '400':
+          description: Invalid JSON or body fields.
+        '401':
+          description: Missing or incorrect API key.
+        '413':
+          description: Request exceeds 8192 bytes.
+        '415':
+          description: Content-Type is not application/json.
+        '503':
+          description: Registry RPC unavailable after one retry; decision is DENY.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnavailableDecision'
+  /v1/policy:
+    get:
+      tags: [Registry reads]
+      operationId: getRegistryPolicy
+      summary: Read current registry version and hash
+      responses:
+        '200':
+          description: Current policy data read at one pinned block.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Policy'
+        '401':
+          description: Missing or incorrect API key.
+        '503':
+          description: Registry RPC unavailable after one retry.
+  /health:
+    get:
+      tags: [Registry reads]
+      operationId: health
+      summary: Check that the HTTP process is listening
+      responses:
+        '200':
+          description: HTTP process is available; this does not assert RPC health.
+        '401':
+          description: Missing or incorrect API key.
+components:
+  securitySchemes:
+    ApiKey:
+      type: apiKey
+      in: header
+      name: X-API-Key
+  schemas:
+    VerifyRequest:
+      type: object
+      additionalProperties: false
+      required: [asset, amount, context]
+      properties:
+        asset:
+          type: string
+          pattern: '^0x[0-9a-fA-F]{40}$'
+        amount:
+          type: string
+          pattern: '^(0|[1-9][0-9]*)(\\.[0-9]+)?$'
+          example: '100.00'
+        context:
+          type: object
+          additionalProperties: false
+          required: [channel, requestId]
+          properties:
+            channel:
+              type: string
+              minLength: 1
+              maxLength: 80
+            requestId:
+              type: string
+              minLength: 1
+              maxLength: 128
+    Decision:
+      type: object
+      required: [decision, reasonCode, policyVersion, policyHash, blockNumber, chainId, registry, timestamp, requestId]
+      properties:
+        decision: { type: string, enum: [ALLOW, DENY] }
+        reasonCode: { type: string, enum: [ASSET_APPROVED, ASSET_NOT_APPROVED, REGISTRY_PAUSED] }
+        policyVersion: { type: string, pattern: '^[0-9]+$' }
+        policyHash: { type: string, pattern: '^0x[0-9a-f]{64}$' }
+        blockNumber: { type: string, pattern: '^[0-9]+$' }
+        chainId: { type: string, pattern: '^[0-9]+$' }
+        registry: { type: string, pattern: '^0x[0-9a-f]{40}$' }
+        timestamp: { type: string, format: date-time }
+        requestId: { type: string }
+    UnavailableDecision:
+      type: object
+      required: [decision, reasonCode]
+      properties:
+        decision: { type: string, enum: [DENY] }
+        reasonCode: { type: string, enum: [REGISTRY_UNAVAILABLE] }
+    Policy:
+      type: object
+      required: [policyVersion, policyHash, blockNumber, chainId, registry, timestamp, paused]
+      properties:
+        policyVersion: { type: string, pattern: '^[0-9]+$' }
+        policyHash: { type: string, pattern: '^0x[0-9a-f]{64}$' }
+        blockNumber: { type: string, pattern: '^[0-9]+$' }
+        chainId: { type: string, pattern: '^[0-9]+$' }
+        registry: { type: string, pattern: '^0x[0-9a-f]{40}$' }
+        timestamp: { type: string, format: date-time }
+        paused: { type: boolean }

@@ -1,0 +1,10 @@
+{
+  "utcDate": "2026-11-09",
+  "beforeObservationCommit": "2fbcc41882a3c84dd7efc8defa6768ef0bccf4d8",
+  "afterObservationCommit": "87091556859d82c7a783dd97346bf83a8ca66fd0",
+  "beforeCompiledRuntimeSHA256": "b058d10c887059aafd4e2ec309098ecaece7057f93a33b31b4f5ff6868f1d92f",
+  "afterCompiledRuntimeSHA256": "b058d10c887059aafd4e2ec309098ecaece7057f93a33b31b4f5ff6868f1d92f",
+  "match": true,
+  "compiledRuntimeBytes": 3244,
+  "method": "SHA-256 of deployedBytecode.object from the Foundry artifact; root compiler configuration unchanged"
+}

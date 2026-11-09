@@ -1,0 +1,15 @@
+{
+  "name": "Registry Review Reference Sandbox",
+  "build": {
+    "dockerfile": "../mb-sandbox-review/Dockerfile",
+    "context": ".."
+  },
+  "overrideCommand": true,
+  "postCreateCommand": "cd /workspace/mb-sandbox-review/reference/api && npm ci",
+  "postStartCommand": "nohup bash /workspace/mb-sandbox-review/reference/scripts/start-sandbox.sh >/tmp/mb-reference-sandbox.log 2>&1 &",
+  "forwardPorts": [8545, 8787],
+  "portsAttributes": {
+    "8545": { "label": "Private local Anvil RPC", "visibility": "private", "onAutoForward": "notify" },
+    "8787": { "label": "Private reference API", "visibility": "private", "onAutoForward": "notify" }
+  }
+}

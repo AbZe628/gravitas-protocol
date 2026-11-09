@@ -1,19 +1,13 @@
-# 05 — Paused registry and unavailable HTTP service
+# Scenario 05 — Paused registry or unavailable node
 
-On a fresh version-3 local chain, the guarded registry checks fail while paused; direct GUSD transfer still succeeds because the token never calls the registry. The HTTP mock is a separate file-driven service. Its production outage policy is not implemented. Run the local probes and existing tests from the repository root:
+When the registry is paused, the manager and direct transfers through the gated token revert. The live API returns `DENY / REGISTRY_PAUSED`. A node outage returns HTTP 503 and `DENY / REGISTRY_UNAVAILABLE` after its two-second timeout and one retry. It does not reuse an earlier ALLOW.
 
-```bash
-python3 mb-sandbox-review/scripts/check-local.py
-forge test --match-path test/foundry/PausableTests.t.sol --match-contract '^PausableTests' --match-test '^test_Registry_' -vv
-```
-
-Expected: six local `PASS` lines; the helper tests all five guarded calls, raw getters, direct transfer and restores the snapshot. Foundry selects six existing pause tests, including `test_Registry_VerifyFunctionsRevertWhenPaused` and `test_Registry_PauseHaltsExecutorAuthorizationSystemWide`.
-
-With the mock stopped, this request should fail at the transport layer:
+Run the contract scenario:
 
 ```bash
-curl --max-time 2 \
-  http://127.0.0.1:8787/v1/policies
+bash mb-sandbox-review/scripts/run-scenario-5.sh
 ```
 
-The error is not an `ALLOW` decision and does not prove production transfer handling. Timeout, retries and stale-decision rules remain to be specified and tested.
+The full verifier also pauses the real local registry and checks the API, stops local Anvil, checks the 503 response, restores the saved chain state and checks a fresh ALLOW.
+
+The design trade-off is deliberate: while paused, holders cannot transfer, mint or burn through the gated token. An issuer must choose and test its pause policy. Options include a full freeze or a separately governed emergency exit with narrow, pre-defined conditions. This package chooses the full freeze; it does not implement an emergency path.

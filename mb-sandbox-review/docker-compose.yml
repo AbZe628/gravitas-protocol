@@ -1,0 +1,27 @@
+services:
+  sandbox:
+    build:
+      context: ..
+      dockerfile: mb-sandbox-review/Dockerfile
+    init: true
+    restart: "no"
+    environment:
+      API_HOST: "0.0.0.0"
+      API_PORT: "8787"
+      RPC_URL: "http://127.0.0.1:8545"
+      MB_API_KEY: "${MB_API_KEY:-local-reference-key-only}"
+      ANVIL_MNEMONIC: "test test test test test test test test test test test junk"
+      REVIEW_SOURCE_COMMIT: "${REVIEW_SOURCE_COMMIT:-local-checkout}"
+      AUDIT_LOG_PATH: "/tmp/reference-api-audit.jsonl"
+      ANVIL_STATE_PATH: "/tmp/reference-anvil-state.json"
+    ports:
+      - "127.0.0.1:8545:8545"
+      - "127.0.0.1:8787:8787"
+    command: ["bash", "/workspace/mb-sandbox-review/reference/scripts/start-sandbox.sh"]
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail --silent -H \"X-API-Key: $${MB_API_KEY}\" http://127.0.0.1:8787/health >/dev/null"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 120s
+    stop_grace_period: 15s

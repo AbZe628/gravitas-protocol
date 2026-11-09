@@ -28,9 +28,9 @@ Contract source code is publicly verifiable — anyone can confirm the deployed 
 
 ## Executive Summary
 
-This internal security audit evaluates the Gravitas Protocol smart contracts against institutional-grade security standards. The codebase has been reviewed for common vulnerabilities, access control issues, and Shariah compliance implementation.
+The codebase has been reviewed for common vulnerabilities, access control issues, and Shariah compliance implementation.
 
-**Overall Assessment**: The contracts demonstrate strong security practices suitable for institutional deployment. Minor recommendations have been noted for gas optimization.
+**Overall Assessment**: Minor recommendations have been noted for gas optimization.
 
 ---
 

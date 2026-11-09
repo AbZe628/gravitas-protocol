@@ -1,0 +1,44 @@
+{
+  "recordType": "local Anvil reference transfer; not production evidence",
+  "chainId": "31337",
+  "registry": "0x5fbdb2315678afecb367f032d93f642f64180aa3",
+  "manager": "0xcf7ed3acca5a467e9e704c703e8d87f634fb0fc9",
+  "token": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+  "transactionHash": "0xd45c98188300d453bcb1a4f412098e3bc013a350a33dc66e3230fbb74d71283f",
+  "blockNumber": "11",
+  "timestamp": "2026-11-09T20:16:54Z",
+  "requestId": "0xf9065f8f97893c3de845d32d723867d14df625623ef3b6437d0ddf3ab5c3d25c",
+  "transfer": {
+    "from": "0x70997970c51812dc3a010c7d01b50e0d17dc79c8",
+    "to": "0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc",
+    "amountRaw": "1000000000000000000",
+    "decimals": 18
+  },
+  "policyVersion": "3",
+  "policyHash": "0x96405a9315fa1a542184d8419512d74374ec2fff1684eaca112f6b36a723033f",
+  "sameTransaction": true,
+  "policyUpdates": [
+    {
+      "version": "1",
+      "field": "executor",
+      "subject": "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266",
+      "status": true,
+      "policyHash": "0x0ad11f961ff3a078816f97ae4fa581679bf7c15fc921550685209e6346ed1125"
+    },
+    {
+      "version": "2",
+      "field": "asset",
+      "subject": "0x9fe46736679d2d9a65f0992f2272de9f3c7fa6e0",
+      "status": true,
+      "policyHash": "0xdd2eb9e237a02a7cbb05bb8c6cfcb073cdb2190240e15e56e8329df0d7e04505"
+    },
+    {
+      "version": "3",
+      "field": "executor",
+      "subject": "0xcf7ed3acca5a467e9e704c703e8d87f634fb0fc9",
+      "status": true,
+      "policyHash": "0x96405a9315fa1a542184d8419512d74374ec2fff1684eaca112f6b36a723033f"
+    }
+  ],
+  "validation": "receipt, ERC20 Transfer, TransferChecked, pinned registry getters and ordered PolicyUpdated hash chain verified by verify-audit-record.py"
+}

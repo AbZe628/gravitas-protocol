@@ -1,0 +1,8 @@
+chainId=31337
+policyVersion=3
+apiPolicy={"policyVersion":"3","policyHash":"0x96405a9315fa1a542184d8419512d74374ec2fff1684eaca112f6b36a723033f","blockNumber":"7","chainId":"31337","registry":"0x5fbdb2315678afecb367f032d93f642f64180aa3","timestamp":"2026-11-09T20:10:19.000Z","paused":false}
+apiVerify={"decision":"ALLOW","reasonCode":"ASSET_APPROVED","policyVersion":"3","policyHash":"0x96405a9315fa1a542184d8419512d74374ec2fff1684eaca112f6b36a723033f","blockNumber":"7","chainId":"31337","registry":"0x5fbdb2315678afecb367f032d93f642f64180aa3","timestamp":"2026-11-09T20:10:19.000Z","requestId":"chain-recovered"}
+PASS same local state restored; API recovered ALLOW without cache
+Actual outage request during test returned HTTP 503: {"decision":"DENY","reasonCode":"REGISTRY_UNAVAILABLE"}
+Anvil was restored from /tmp/mb-review-anvil-state.json; same chain ID 31337 and registry state were available again.
+The live API then returned ALLOW for the registered dummy token without using a cached result.

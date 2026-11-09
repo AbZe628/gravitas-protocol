@@ -1,11 +1,11 @@
-# 03 — Prohibited asset or caller
+# Scenario 03 — Unapproved asset or executor
 
-The fresh integration fixture approves one dummy asset and one executor. The combined check rejects an unapproved asset and rejects a request from an unapproved caller. Run from the repository root:
+An unapproved token is refused by the manager with the registry's exact asset-compliance revert. A manager that is not registered as an executor is refused with the exact caller-authorization revert. Both failures leave balances unchanged.
+
+Run the checks:
 
 ```bash
-forge test --match-path test/GravitasSubscriptionIntegration.t.sol --match-test '^test_CheckSubscriptionCompliance_RevertOnNonCompliantAsset' -vv
-forge test --match-path test/GravitasSubscriptionIntegration.t.sol --match-test '^test_CheckSubscriptionCompliance_RevertOnUnauthorizedExecutor' -vv
-forge test --match-path test/GravitasSubscriptionIntegration.t.sol --match-test '^test_Verify(AssetCompliance|ExecutorStatus)' -vv
+bash mb-sandbox-review/scripts/run-scenario-3.sh
 ```
 
-Expected: first case reverts with `GPR: Asset not Shariah-compliant`; second with `GPR: Calling contract not an authorized executor`. Boolean verify functions return `false` for an unapproved entry while unpaused; they do not themselves stop a transfer. The named test functions in `test/GravitasSubscriptionIntegration.t.sol` prove each result. The subscriber parameter is not checked.
+The registry checks its caller, which is the manager contract in this call. The subscriber address is not checked for identity or eligibility. An asset decision is not approval of an investor or instrument.

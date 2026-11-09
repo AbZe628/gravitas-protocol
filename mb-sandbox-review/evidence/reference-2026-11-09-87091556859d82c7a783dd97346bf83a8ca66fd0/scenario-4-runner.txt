@@ -1,0 +1,31 @@
+No files changed, compilation skipped
+
+Ran 18 tests for test/foundry/PolicyCommitment.t.sol:PolicyCommitment
+[PASS] test_ARealChangeStillAdvancesTheRecord() (gas: 153110)
+[PASS] test_ARepeatedWriteEmitsNothing() (gas: 114659)
+[PASS] test_AnObserverCanReplayTheChainFromEvents() (gas: 261044)
+[PASS] test_EachVersionFoldsInTheOneBeforeIt() (gas: 253417)
+[PASS] test_GenesisIsTheDeployerGrant() (gas: 24583)
+[PASS] test_GetPolicyVersionTracksTheChain() (gas: 106083)
+[PASS] test_MovingAnAddressBetweenRegistersChangesTheHash() (gas: 1953530)
+[PASS] test_OnlyTheOwnerWrites() (gas: 33235)
+[PASS] test_OnlyTheOwnerWritesToEveryRegister() (gas: 61059)
+[PASS] test_OrderOfChangesIsPartOfTheCommitment() (gas: 2134398)
+[PASS] test_RevokingWhatWasNeverGrantedIsNotAChange() (gas: 80354)
+[PASS] test_RewritingARouterChangesNothing() (gas: 164799)
+[PASS] test_RewritingAnExecutorChangesNothing() (gas: 138163)
+[PASS] test_RewritingTheSameValueIsNotAPolicyChange() (gas: 165479)
+[PASS] test_SettingSomethingBackToFalseThatWasNeverTrueIsNotAChange() (gas: 42693)
+[PASS] test_TwoDifferentPoliciesDoNotShareAHash() (gas: 1964411)
+[PASS] test_ZeroAddressIsRejectedOnEveryRegister() (gas: 85629)
+[PASS] test_ZeroAddressIsStillRejected() (gas: 82846)
+Suite result: ok. 18 passed; 0 failed; 0 skipped; finished in 2.80ms (11.09ms CPU time)
+
+Ran 1 test suite in 16.90ms (2.80ms CPU time): 18 tests passed, 0 failed, 0 skipped (18 total tests)
+No files changed, compilation skipped
+
+Ran 1 test for test/GatedDemoSukuk.t.sol:GatedDemoSukukTest
+[PASS] testScenario04_RevocationAndReapprovalAdvanceTheHashChain() (gas: 403699)
+Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 1.48ms (396.44µs CPU time)
+
+Ran 1 test suite in 13.51ms (1.48ms CPU time): 1 tests passed, 0 failed, 0 skipped (1 total tests)

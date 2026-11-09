@@ -1,11 +1,11 @@
-# 04 — Policy version and change hash
+# Scenario 04 — Rule change
 
-The registry starts at version 1 after granting executor status to its deployer. A real change advances the version and records a hash that includes the previous hash; a duplicate write changes neither. Pause and unpause do not update the policy lists. Run from the repository root:
+The owner revokes the token, advancing the policy version. The next manager call is refused. The previous version's hash remains unchanged; the new hash is recomputed from the previous hash, the `asset` field, token address and `false`. Re-approval advances the version again rather than rolling back history.
+
+Run the registry and reference checks:
 
 ```bash
-forge test --match-contract '^PolicyCommitment' -vv
-forge test --match-contract '^GravitasSubscriptionIntegrationTest' --match-test '^test_CheckSubscriptionCompliance_Success' -vv
-forge test --match-contract '^PausableTests' --match-test '^test_Registry_PauseUnpause' -vv
+bash mb-sandbox-review/scripts/run-scenario-4.sh
 ```
 
-Expected: all selected tests pass. `test_EachVersionFoldsInTheOneBeforeIt`, `test_RewritingTheSameValueIsNotAPolicyChange` and `test_OrderOfChangesIsPartOfTheCommitment` in `test/foundry/PolicyCommitment.t.sol` check the sequence. `policyHistory` stores change hashes, not the full historical registry state or a board ruling. A replay needs the ordered changes.
+The transfer event reports the version and hash returned by the registry for the same transaction. These values are a policy-history reference, not proof of a legal ruling or an instrument's status.

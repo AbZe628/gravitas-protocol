@@ -1,0 +1,16 @@
+Compiling 41 files with Solc 0.8.24
+Solc 0.8.24 finished in 15.54s
+Compiler run successful with warnings:
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> ../../contracts/GravitasPolicyRegistry.sol:157:42:
+    |
+157 |     function checkSubscriptionCompliance(address subscriber, address subscriptionToken)
+    |                                          ^^^^^^^^^^^^^^^^^^
+
+warning[arbitrary-send-erc20]: `transferFrom` uses an arbitrary `from`; require it to equal `msg.sender` or `address(this)`
+   ╭▸ src/DemoSukukManager.sol:39:9
+   │
+39 │         IERC20(token).safeTransferFrom(from, to, amount);
+   │         ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ╰ help: ]8;;https://getfoundry.sh/forge/linting/arbitrary-send-erc20\https://getfoundry.sh/forge/linting/arbitrary-send-erc20]8;;\

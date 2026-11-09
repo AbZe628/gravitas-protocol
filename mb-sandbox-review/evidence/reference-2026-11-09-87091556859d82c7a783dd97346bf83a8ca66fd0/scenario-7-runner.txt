@@ -1,0 +1,12 @@
+No files changed, compilation skipped
+
+Ran 2 tests for test/GatedDemoSukuk.t.sol:GatedDemoSukukTest
+[PASS] testFuzz_Scenario07_RefusedTransfersNeverChangeBalances(address,uint256) (runs: 256, μ: 135064, ~: 135088)
+[PASS] testScenario07_PostDeploymentMintAndBurnAreGated_InitialMintIsTheException() (gas: 261203)
+Suite result: ok. 2 passed; 0 failed; 0 skipped; finished in 26.73ms (26.03ms CPU time)
+
+Ran 1 test suite in 29.01ms (26.73ms CPU time): 2 tests passed, 0 failed, 0 skipped (2 total tests)
+PASS receipt/events same transaction: 0xd45c98188300d453bcb1a4f412098e3bc013a350a33dc66e3230fbb74d71283f
+PASS policy hash chain through version 3: 0x96405a9315fa1a542184d8419512d74374ec2fff1684eaca112f6b36a723033f
+PASS block 11, chain 31337, timestamp 2026-11-09T20:16:54Z
+WROTE /home/ubuntu/gravitas-protocol/mb-sandbox-review/reference-audit-record.json

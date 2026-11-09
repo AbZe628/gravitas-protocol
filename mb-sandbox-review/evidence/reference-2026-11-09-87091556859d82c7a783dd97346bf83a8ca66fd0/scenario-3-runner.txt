@@ -1,0 +1,16 @@
+No files changed, compilation skipped
+
+Ran 2 tests for test/GravitasSubscriptionIntegration.t.sol:GravitasSubscriptionIntegrationTest
+[PASS] test_CheckSubscriptionCompliance_RevertOnNonCompliantAsset() (gas: 18106)
+[PASS] test_CheckSubscriptionCompliance_RevertOnUnauthorizedExecutor() (gas: 22583)
+Suite result: ok. 2 passed; 0 failed; 0 skipped; finished in 1.04ms (543.63µs CPU time)
+
+Ran 1 test suite in 15.04ms (1.04ms CPU time): 2 tests passed, 0 failed, 0 skipped (2 total tests)
+No files changed, compilation skipped
+
+Ran 2 tests for test/GatedDemoSukuk.t.sol:GatedDemoSukukTest
+[PASS] testScenario02_UnapprovedAssetRevertsWithoutMovingBalances() (gas: 168516)
+[PASS] testScenario03_UnregisteredManagerRevertsWithExactReason() (gas: 313828)
+Suite result: ok. 2 passed; 0 failed; 0 skipped; finished in 1.66ms (833.40µs CPU time)
+
+Ran 1 test suite in 14.15ms (1.66ms CPU time): 2 tests passed, 0 failed, 0 skipped (2 total tests)
