@@ -1,63 +1,39 @@
-# Verification and gaps
+# Verification and review limits
 
-Review date: 9 November 2026. Source reviewed: `692022e1ca34a280f90a198d2455ac3535b3bce2`. This is a focused code and sandbox review, not an independent security audit or certification. No contract source or existing test was changed. All review files are confined to `mb-sandbox-review/` on the branch of that name.
+Review date: 9 November 2026. Reviewed source: `692022e1ca34a280f90a198d2455ac3535b3bce2`. Evidence re-run against branch base `2fbcc41882a3c84dd7efc8defa6768ef0bccf4d8` on the same date. Full command outputs are in `evidence/run-2026-11-09-2fbcc41882a3c84dd7efc8defa6768ef0bccf4d8/`.
 
-## Verified
+## Results rerun
 
-`forge build` succeeded using Foundry 1.9.0 and repository compiler settings: Solidity 0.8.24, optimisation on, 200 runs and intermediate-representation compilation (`via_ir`). It printed the existing unused `subscriber` warning and Foundry lint warnings. `forge test` passed **86 tests in nine suites**, with zero failures and zero skipped tests. The review did not run a new coverage analysis or static security scanner.
+- `forge build`: passed using Foundry 1.9.0 and repository settings (Solidity 0.8.24, optimizer 200 runs, `via_ir`). The unused `subscriber` and lint warnings remain.
+- `forge test`: 86 passed, zero failed, zero skipped, across nine suites.
+- Scenario proof commands: all 14 documented `forge test` filters selected existing tests; 47 test entries passed across those commands, zero failed or skipped. See `scenario-command-results.json` and the per-command output files.
+- Local sandbox: fresh Anvil chain, existing setup script and six local probe groups all passed. They include direct and delegated transfer bypass while rules reject the asset, transfer while paused, failed guarded reads, raw reads, subscriber omission, ownership checks and snapshot restoration. See `setup-local.txt`, `check-local.txt` and `local-results.json`.
+- OpenAPI 3.0.3 validation: passed after validating the final specification. Output: `openapi-validation.txt`.
+- Audit-fixture validation: recomputed the ABI selector, decoded version 3, checked receipt/log/block links and recomputed the version-3 policy hash from the ordered changes. Output: `audit-fixture-validation.txt`.
+- `npm audit --json --prefix integration-kit/mock-server`: exit status 1 because npm reports three findings: one critical, one high and one moderate. The exact advisory output is `npm-audit.json`; the summary is `npm-audit-summary.txt`. This is not an exploitability assessment.
 
-The local helper deployed the existing registry and `MockERC20` to a fresh Anvil chain, created version 3 and passed six groups of probes. Actual transactions confirmed that `transfer` and `transferFrom` can still succeed after the asset is revoked. A direct token transfer also succeeded while the registry was paused. All five guarded registry checks failed under pause. A raw asset getter still returned true. An unregistered subscriber was accepted when the asset and caller were approved. The helper restored its version-3 snapshot.
+## Dated testnet observation
 
-The existing mock ran on loopback. `/v1/policies` answered; an unknown dummy asset returned `DEFAULT-DENY`; an empty request returned HTTP 422. An unknown address plus symbol `USDC`, a prohibited category and a non-numeric string amount returned **ALLOW**, with no API key. This is mock file classification, not registry approval. It is caused by `decide()` using address **or** symbol matching before category checks and `validate()` checking only the amount's string type.
+On 9 November 2026, read-only Arbitrum Sepolia RPC returned chain ID 421614, block 327644577, registry version 1, `paused = false` and owner `0xFba6C221af564Ab90e333AEEf4E427f787911B73`. Runtime bytecode at the documented registry address was 3,244 bytes and matched the local `GravitasPolicyRegistry` build byte for byte, including metadata. Both SHA-256 values were `b058d10c887059aafd4e2ec309098ecaece7057f93a33b31b4f5ff6868f1d92f`. The source's initial version contains the constructor executor grant; no asset approval was recorded. No transaction was sent.
 
-The OpenAPI file was validated as OpenAPI 3.0.3. Its 14 Solidity signatures/selectors and calldata examples were checked against the source. It documents two mock HTTP handlers and node `eth_call`; it does not invent registry REST routes.
+This comparison covers the registry only. TeleportV3 runtime bytecode was not rechecked; its current deployed code is not verified by this package. The stale note in `integration-kit/PROTOCOL-TESTING.md` was replaced with this narrower result. The verification does not establish ownership or code state for every other contract.
 
-## Testnet evidence
+## Confirmed behavior and gaps
 
-Read-only RPC requests at approximately `2026-11-09T14:18:25Z` returned chain 421614, block number 327579707, registry version 1, `paused = false` and owner `0xFba6C221af564Ab90e333AEEf4E427f787911B73`. The documented registry address is `0x6f3bfb896DD9964C9c05dA88692bDf1b1b2C3F23`.
+`GravitasPolicyRegistry.checkSubscriptionCompliance` checks the asset flag and caller's executor status. It accepts but does not read the subscriber. The registry evaluates assets and calling contracts; it does not evaluate investors, amounts or transfer parties.
 
-Its runtime bytecode was **3244 bytes and matched the locally compiled registry exactly, including metadata**. Both SHA-256 hashes were `b058d10c887059aafd4e2ec309098ecaece7057f93a33b31b4f5ff6868f1d92f`. `policyHistory(1)` was `0x687a974ff8f6ad74a4ba4355e5502668cde3e41cb279579d7100251f6a54f43c`, matching the current source's hash of the initial deployer-executor grant. With version 1 and this source, no asset approval has been recorded. These reads are a dated observation, not a promise about future state. No testnet transaction was sent.
+`MockERC20` inherits normal `transfer` and `transferFrom`; neither calls the registry. Fresh-chain transactions reproduced both bypasses with the asset revoked and also reproduced a direct transfer while paused. This dummy token is GUSD, not a sukuk. No real sukuk token or transfer manager is in this package.
 
-`docs/KNOWN-ISSUES.md` says ownership has not moved to the deployed timelock. The observed registry owner is consistent with that statement. This review did not verify timelock roles, multisig signing thresholds, the other contracts' bytecode, or their current owners. Registry bytecode matching does not verify those separate claims.
+All five guarded registry checks revert when paused; existing Foundry tests cover this. Raw mapping getters still return stored values. `TeleportV2` checks the destination router flag. `TeleportV3` uses fixed constructor venues and does not read the registry router list. Engine owners skip the executor-list check in `onlyAuthorized`, but the migration body still makes required guarded asset checks. The V2 owner-only `rescueTokens` function can move ERC-20s held by TeleportV2 and does not consult the registry.
 
-## Security and bypass gaps
+The local HTTP mock reads `integration-kit/policies/sandbox-policies.json`; it is not registry-backed and has no authentication. The existing example client exits on request failure and sends no transfer. A production HTTP transfer client, timeouts, retry rules and stale-decision refusal are not implemented. A paused on-chain check does fail closed in the guarded migration path. Do not infer the same outage behavior for an absent HTTP production service.
 
-**No protected sukuk transfer.** `MockERC20` inherits ordinary ERC-20 `transfer` and `transferFrom`, without a registry call. `TokenA` and `TokenB` are also plain test tokens, not sukuk contracts. Calling the registry first does not make a later token transfer enforce it. Other token or settlement routes outside the migration contracts are outside registry control. T4 must close this in the actual integration.
+The sample audit JSON joins a successful subscription read at block `0x4`, a separate `PolicyUpdated` version/hash, a distinct GUSD `Transfer` at block `0x5`, and node receipt/block responses. It does not bind the check to the transfer. The registry hash commits to changes; it does not contain a ruling text or identifier. The Majlis registry write is not implemented.
 
-**The subscriber is not checked.** `checkSubscriptionCompliance` reads only the token flag and `isExecutor[msg.sender]`. An approved caller can supply any subscriber, including an unregistered dummy address. It checks no amount, destination, investor eligibility or instrument terms. Per-investor logic is explicitly reserved for future use. Do not present these controls as implemented.
+`docs/KNOWN-ISSUES.md`, last checked there on 26 August 2026, says registry ownership has not moved to the timelock, the migration engines use single-step `Ownable`, and engine pause authority waits on the timelock path without a separate pauser role. This review did not independently verify current timelock configuration. The package has not completed an independent security audit. The repository says nothing ships to mainnet before that audit.
 
-**Pause is not a token-wide stop.** The five `verify*`/`check*` functions revert under pause. Raw `isAssetCompliant`, `isRouterAuthorized`, `isExecutor` and version reads remain available. An integration using only raw getters or ignoring errors can bypass the pause. V2 reads the raw router flag but still makes guarded asset calls before moving liquidity. Both migration engines' owners bypass the executor-list condition in `onlyAuthorized`, but they do not bypass the in-body guarded asset checks. Executor revocation alone therefore does not remove an engine owner's execution authority; registry pause and asset rejection still stop that migration path.
+## Limits of this review
 
-**Router-list scope differs.** `TeleportV2.migrateLiquidityV2` checks `isRouterAuthorized(routerTo)`. `TeleportV3.executeAtomicMigration` uses fixed constructor-supplied `positionManager` and `swapRouter` addresses, with no registry router-authorization check. Revoking a router in the registry does not itself change those V3 addresses or add a check. If router revocation is required for that route, the execution contract must enforce it in a future deployment. No contract fix was made here.
+This is a focused source and sandbox review, not a security audit. Testnet values are dated observations. No testnet transaction or hosted endpoint was tested. The mock's npm audit findings are not proof of exploitability. The package does not establish regulator approval, Shariah certification, a completed independent audit or a production service. No asset was approved in the dated registry observation.
 
-**No execution-version binding.** A read-only registry check returns the current version, but emits no check event. Token transfers and migration events do not contain that registry version. A later, separate version lookup cannot reliably prove which version governed an earlier transfer. The sample record exposes this limit rather than filling it with an invented contract field. T6 is required for an atomic transfer/version record.
-
-**Mock trust and outage handling.** The mock trusts caller-supplied identifiers, has no authentication and does not consult the registry. Amount syntax is not validated. Its `onchainRef` is copied metadata, not an on-chain cross-check. It also has no transfer executor or implemented timeout fallback. A real HTTP consumer decides whether an outage blocks execution. The SDK's `ComplianceService.gatedRead` throws on a failed read rather than allowing; some revert messages are broadly labelled as pause. That is a refusal, not a reliable diagnosis of every service fault. There is no verified production HTTP transfer client in this review. T2, T5 and T7 cover these gaps.
-
-`npm audit` on the locked mock dependencies reported **three vulnerabilities: body-parser high, proxy-addr critical, and qs moderate**. This is the package manager's reported dependency risk, not proof that every advisory is exploitable in this configuration. No dependency changes or public deployment were made. Keep the sandbox bound to loopback.
-
-## Could not verify or is absent
-
-There is no implemented sukuk token/transfer manager, per-investor policy engine, registry REST adapter or contract-emitted per-transfer version audit in the reviewed code. The hosted URL and API keys mentioned in the older integration documents were not tested or supplied. No live successful asset migration is demonstrated by this registry's current empty asset list.
-
-A completed independent security audit, external Shariah certification, regulator approval or standards compliance is not established by this review. The repo documents mainnet as not yet deployed; this review did not independently search for every possible deployment. None of those claims appears as an achieved status in this package.
-
-## Every TODO FOR ABDUSAMED
-
-The complete operational instructions and wording are in [sandbox-access.md](sandbox-access.md). The seven owner-supplied tasks are:
-
-- **T1:** arrange the reviewers' tool-equipped computer or an engineer to run the local review.
-- **T2:** supply and test remote HTTP endpoint, authentication and credentials if hosted access is wanted.
-- **T3:** supply verified testnet deployment/RPC, funded non-public wallets and authorised write access if a shared exercise is wanted.
-- **T4:** supply/build the actual dummy sukuk transfer integration and guard every transfer route.
-- **T5:** implement/test fail-closed HTTP outage handling, timeouts, retries and stale-decision policy.
-- **T6:** bind the transfer and returned rule version in one transaction; retain policy-change evidence and map it to the governing approval.
-- **T7:** harden the mock before hosting: dependency review, authentication and identifier/amount validation.
-
-T2–T7 are not prerequisites for the local source review. They are prerequisites for claiming the corresponding remote, enforced-transfer or audit capability.
-
-## Evidence files and source references
-
-`evidence/test-summary.txt`, `evidence/local-results.json` and `evidence/bytecode-comparison.json` preserve the key results. The executable local probes are in `scripts/check-local.py`. Foundry proofs are linked in each scenario.
-
-Enforcement references: `GravitasPolicyRegistry.checkSubscriptionCompliance`, all five guarded checks, `_recordChange`, the three setters; `MockERC20` and inherited `ERC20.transfer`, `transferFrom`, `_update`; `TeleportV2.onlyAuthorized`, `migrateLiquidityV2`; `TeleportV3.onlyAuthorized`, `executeAtomicMigration`, `_executeRebalancingSwap`; `ComplianceService.gatedRead`; mock `validate`, `decide`, `/v1/verify`. Deployment status references: `docs/DEPLOYMENTS.md` and `docs/KNOWN-ISSUES.md`.
+The evidence commands, outputs and dates live in the evidence folder linked from the README. See the six scenario files for each focused test command.

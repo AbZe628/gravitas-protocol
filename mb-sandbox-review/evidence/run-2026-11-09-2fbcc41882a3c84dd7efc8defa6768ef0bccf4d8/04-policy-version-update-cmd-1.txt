@@ -1,0 +1,37 @@
+UTC date: 2026-11-09
+Base commit: 2fbcc41882a3c84dd7efc8defa6768ef0bccf4d8
+Command: forge test --match-contract '^PolicyCommitment' -vv
+Exit code: 0
+
+Compiling 76 files with Solc 0.8.24
+Solc 0.8.24 finished in 25.84s
+Compiler run successful with warnings:
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> contracts/GravitasPolicyRegistry.sol:157:42:
+    |
+157 |     function checkSubscriptionCompliance(address subscriber, address subscriptionToken)
+    |                                          ^^^^^^^^^^^^^^^^^^
+
+
+Ran 18 tests for test/foundry/PolicyCommitment.t.sol:PolicyCommitment
+[PASS] test_ARealChangeStillAdvancesTheRecord() (gas: 153110)
+[PASS] test_ARepeatedWriteEmitsNothing() (gas: 114659)
+[PASS] test_AnObserverCanReplayTheChainFromEvents() (gas: 261044)
+[PASS] test_EachVersionFoldsInTheOneBeforeIt() (gas: 253417)
+[PASS] test_GenesisIsTheDeployerGrant() (gas: 24583)
+[PASS] test_GetPolicyVersionTracksTheChain() (gas: 106083)
+[PASS] test_MovingAnAddressBetweenRegistersChangesTheHash() (gas: 1953530)
+[PASS] test_OnlyTheOwnerWrites() (gas: 33235)
+[PASS] test_OnlyTheOwnerWritesToEveryRegister() (gas: 61059)
+[PASS] test_OrderOfChangesIsPartOfTheCommitment() (gas: 2134398)
+[PASS] test_RevokingWhatWasNeverGrantedIsNotAChange() (gas: 80354)
+[PASS] test_RewritingARouterChangesNothing() (gas: 164799)
+[PASS] test_RewritingAnExecutorChangesNothing() (gas: 138163)
+[PASS] test_RewritingTheSameValueIsNotAPolicyChange() (gas: 165479)
+[PASS] test_SettingSomethingBackToFalseThatWasNeverTrueIsNotAChange() (gas: 42693)
+[PASS] test_TwoDifferentPoliciesDoNotShareAHash() (gas: 1964411)
+[PASS] test_ZeroAddressIsRejectedOnEveryRegister() (gas: 85629)
+[PASS] test_ZeroAddressIsStillRejected() (gas: 82846)
+Suite result: ok. 18 passed; 0 failed; 0 skipped; finished in 3.87ms (9.54ms CPU time)
+
+Ran 1 test suite in 31.06ms (3.87ms CPU time): 18 tests passed, 0 failed, 0 skipped (18 total tests)

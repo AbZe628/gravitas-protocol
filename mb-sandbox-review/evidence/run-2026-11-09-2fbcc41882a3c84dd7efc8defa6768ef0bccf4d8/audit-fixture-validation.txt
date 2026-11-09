@@ -1,0 +1,10 @@
+UTC date: 2026-11-09
+Base commit: 2fbcc41882a3c84dd7efc8defa6768ef0bccf4d8
+Commands: cast sig checkSubscriptionCompliance(address,address); cast keccak + cast abi-encode for each policy-list update; Python receipt/block consistency assertions
+
+PASS selector: 0xdc65a7b5
+PASS eth_call calldata selector
+PASS result decodes to policy version 3
+PASS receipt transaction hash equals Transfer log transaction hash
+PASS transfer receipt block equals eth_getBlockByNumber result
+PASS recomputed ordered policy hash v3: 0x9ed40a743048349cd7d7373b555a582ef208f2b91788b460fa34c66e7fa4fc53

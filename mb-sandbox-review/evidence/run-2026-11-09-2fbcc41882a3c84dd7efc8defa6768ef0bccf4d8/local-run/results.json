@@ -1,0 +1,14 @@
+{
+  "checks": [
+    "1: check returns version 3; unapproved asset reverts; separate dummy transfer succeeds",
+    "2: approved/approved pair true; approved/unknown pair false",
+    "3: unauthorised caller reverts; unregistered subscriber is not checked",
+    "4: duplicate stays v3; revoke creates v4; transfer AND transferFrom bypass failed check",
+    "5: all five guarded checks revert on pause; raw getter true; version unchanged; direct token transfer succeeds",
+    "6: non-owner and pending owner cannot write any register; wrong acceptance fails; correct acceptance changes owner without changing version"
+  ],
+  "directTransferBypassTransactionHash": "0x4ab4fb75b8ef91855a7a6a7c8b17ec4af1c721bb54e8b6aa15bccab666bca5cd",
+  "delegatedTransferBypassTransactionHash": "0x52239803c22ae2f66de433ff96be7a80cf9064af5d4330bd5f718df8d285f48c",
+  "pausedDirectTransferTransactionHash": "0x61f5dcaabd10473896303b46adf8c44447e39e94030996b17b7e2dae7c46ced9",
+  "note": "Local review probes only. No production integration or atomic transfer/version binding exists."
+}

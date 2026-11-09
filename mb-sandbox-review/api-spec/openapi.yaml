@@ -29,9 +29,6 @@ x-review-sources:
   - integration-kit/mock-server/server.js
   - integration-kit/policies/sandbox-policies.json
   - integration-kit/openapi/gravitas-compliance-api.yaml
-  - lib/openzeppelin-contracts/contracts/utils/Pausable.sol
-  - lib/openzeppelin-contracts/contracts/access/Ownable.sol
-  - lib/openzeppelin-contracts/contracts/access/Ownable2Step.sol
 x-contract-reference:
   contract: GravitasPolicyRegistry
   source: contracts/GravitasPolicyRegistry.sol
@@ -338,7 +335,6 @@ paths:
           signature: paused()
           declaration: function paused() public view virtual returns (bool)
           selector: '0x5c975abb'
-          contract-reference: lib/openzeppelin-contracts/contracts/utils/Pausable.sol:67-69
           state-mutability: view
           inputs: []
           outputs: [{type: bool}]
@@ -348,7 +344,6 @@ paths:
           signature: owner()
           declaration: function owner() public view virtual returns (address)
           selector: '0x8da5cb5b'
-          contract-reference: lib/openzeppelin-contracts/contracts/access/Ownable.sol:56-58
           state-mutability: view
           inputs: []
           outputs: [{type: address}]
@@ -358,7 +353,6 @@ paths:
           signature: pendingOwner()
           declaration: function pendingOwner() public view virtual returns (address)
           selector: '0xe30c3978'
-          contract-reference: lib/openzeppelin-contracts/contracts/access/Ownable2Step.sol:33-35
           state-mutability: view
           inputs: []
           outputs: [{type: address}]

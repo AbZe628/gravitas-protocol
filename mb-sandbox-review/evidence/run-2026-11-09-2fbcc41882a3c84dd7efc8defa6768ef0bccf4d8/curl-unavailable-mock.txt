@@ -1,0 +1,14 @@
+UTC date: 2026-11-09
+Base commit: 2fbcc41882a3c84dd7efc8defa6768ef0bccf4d8
+Command block: curl --max-time 2 \
+  http://127.0.0.1:8787/v1/policies
+Expected: connection failure; no ALLOW response
+
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+curl: (7) Failed to connect to 127.0.0.1 port 8787 after 0 ms: Couldn't connect to server
+
+Exit code: 7

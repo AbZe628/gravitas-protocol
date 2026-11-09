@@ -1,0 +1,12 @@
+UTC date: 2026-11-09
+Base commit: 2fbcc41882a3c84dd7efc8defa6768ef0bccf4d8
+Command: source /tmp/mb-sandbox-env.sh && python3 mb-sandbox-review/scripts/check-local.py
+
+PASS 1: check returns version 3; unapproved asset reverts; separate dummy transfer succeeds
+PASS 2: approved/approved pair true; approved/unknown pair false
+PASS 3: unauthorised caller reverts; unregistered subscriber is not checked
+PASS 4: duplicate stays v3; revoke creates v4; transfer AND transferFrom bypass failed check
+PASS 5: all five guarded checks revert on pause; raw getter true; version unchanged; direct token transfer succeeds
+PASS 6: non-owner and pending owner cannot write any register; wrong acceptance fails; correct acceptance changes owner without changing version
+Local evidence: /home/ubuntu/gravitas-protocol/mb-sandbox-review/evidence/run-2026-11-09-2fbcc41882a3c84dd7efc8defa6768ef0bccf4d8/local-run
+Restored local version-3 baseline.

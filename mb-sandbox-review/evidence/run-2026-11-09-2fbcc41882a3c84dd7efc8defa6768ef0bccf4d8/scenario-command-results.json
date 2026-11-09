@@ -1,0 +1,148 @@
+{
+  "utcDate": "2026-11-09",
+  "baseCommit": "2fbcc41882a3c84dd7efc8defa6768ef0bccf4d8",
+  "commandCount": 14,
+  "allCommandsSelectPassingTests": true,
+  "commands": [
+    {
+      "scenario": "01-simulated-sukuk-transfer.md",
+      "command": "forge test --match-path test/GravitasSubscriptionIntegration.t.sol -vv",
+      "exitCode": 0,
+      "selectedSuites": 1,
+      "passed": 6,
+      "failed": 0,
+      "skipped": 0,
+      "output": "01-simulated-sukuk-transfer-cmd-1.txt"
+    },
+    {
+      "scenario": "01-simulated-sukuk-transfer.md",
+      "command": "forge test --match-test 'test_Registry_(VerifyFunctionsRevertWhenPaused|PauseHaltsExecutorAuthorizationSystemWide|OwnerNotLockedOutOfAuthGateByRegistryPause)' -vv",
+      "exitCode": 0,
+      "selectedSuites": 1,
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0,
+      "output": "01-simulated-sukuk-transfer-cmd-2.txt"
+    },
+    {
+      "scenario": "01-simulated-sukuk-transfer.md",
+      "command": "forge test --match-path test/foundry/TeleportFlow.t.sol --match-test '^test_V2_RescueTokens' -vv",
+      "exitCode": 0,
+      "selectedSuites": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "output": "01-simulated-sukuk-transfer-cmd-3.txt"
+    },
+    {
+      "scenario": "02-permitted-pair.md",
+      "command": "forge test --match-path test/GravitasSubscriptionIntegration.t.sol --match-test '^test_VerifyAssetCompliance' -vv",
+      "exitCode": 0,
+      "selectedSuites": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "output": "02-permitted-pair-cmd-1.txt"
+    },
+    {
+      "scenario": "02-permitted-pair.md",
+      "command": "forge test --match-path test/GravitasSubscriptionIntegration.t.sol --match-test '^test_AreTokensCompliant' -vv",
+      "exitCode": 0,
+      "selectedSuites": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "output": "02-permitted-pair-cmd-2.txt"
+    },
+    {
+      "scenario": "03-prohibited-subscription.md",
+      "command": "forge test --match-path test/GravitasSubscriptionIntegration.t.sol --match-test '^test_CheckSubscriptionCompliance_RevertOnNonCompliantAsset' -vv",
+      "exitCode": 0,
+      "selectedSuites": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "output": "03-prohibited-subscription-cmd-1.txt"
+    },
+    {
+      "scenario": "03-prohibited-subscription.md",
+      "command": "forge test --match-path test/GravitasSubscriptionIntegration.t.sol --match-test '^test_CheckSubscriptionCompliance_RevertOnUnauthorizedExecutor' -vv",
+      "exitCode": 0,
+      "selectedSuites": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "output": "03-prohibited-subscription-cmd-2.txt"
+    },
+    {
+      "scenario": "03-prohibited-subscription.md",
+      "command": "forge test --match-path test/GravitasSubscriptionIntegration.t.sol --match-test '^test_Verify(AssetCompliance|ExecutorStatus)' -vv",
+      "exitCode": 0,
+      "selectedSuites": 1,
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0,
+      "output": "03-prohibited-subscription-cmd-3.txt"
+    },
+    {
+      "scenario": "04-policy-version-update.md",
+      "command": "forge test --match-contract '^PolicyCommitment' -vv",
+      "exitCode": 0,
+      "selectedSuites": 1,
+      "passed": 18,
+      "failed": 0,
+      "skipped": 0,
+      "output": "04-policy-version-update-cmd-1.txt"
+    },
+    {
+      "scenario": "04-policy-version-update.md",
+      "command": "forge test --match-contract '^GravitasSubscriptionIntegrationTest' --match-test '^test_CheckSubscriptionCompliance_Success' -vv",
+      "exitCode": 0,
+      "selectedSuites": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "output": "04-policy-version-update-cmd-2.txt"
+    },
+    {
+      "scenario": "04-policy-version-update.md",
+      "command": "forge test --match-contract '^PausableTests' --match-test '^test_Registry_PauseUnpause' -vv",
+      "exitCode": 0,
+      "selectedSuites": 1,
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "output": "04-policy-version-update-cmd-3.txt"
+    },
+    {
+      "scenario": "05-paused-registry.md",
+      "command": "forge test --match-path test/foundry/PausableTests.t.sol --match-contract '^PausableTests' --match-test '^test_Registry_' -vv",
+      "exitCode": 0,
+      "selectedSuites": 1,
+      "passed": 6,
+      "failed": 0,
+      "skipped": 0,
+      "output": "05-paused-registry-cmd-1.txt"
+    },
+    {
+      "scenario": "06-unauthorized-rule-change.md",
+      "command": "forge test --match-path test/foundry/PolicyCommitment.t.sol --match-test '^test_OnlyTheOwnerWrites' -vv",
+      "exitCode": 0,
+      "selectedSuites": 1,
+      "passed": 2,
+      "failed": 0,
+      "skipped": 0,
+      "output": "06-unauthorized-rule-change-cmd-1.txt"
+    },
+    {
+      "scenario": "06-unauthorized-rule-change.md",
+      "command": "forge test --match-test '^test_Ownable2Step_(TransferRequiresAcceptance|AttackerCannotAccept|OnlyOwnerCanPropose)' -vv",
+      "exitCode": 0,
+      "selectedSuites": 1,
+      "passed": 3,
+      "failed": 0,
+      "skipped": 0,
+      "output": "06-unauthorized-rule-change-cmd-2.txt"
+    }
+  ]
+}

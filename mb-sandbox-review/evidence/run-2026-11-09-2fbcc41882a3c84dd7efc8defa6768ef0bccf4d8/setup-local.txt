@@ -1,0 +1,9 @@
+UTC date: 2026-11-09
+Base commit: 2fbcc41882a3c84dd7efc8defa6768ef0bccf4d8
+Command: bash mb-sandbox-review/scripts/setup-local.sh
+
+Registry: 0x5FbDB2315678afecb367f032d93F642f64180aa3
+Dummy asset: 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512
+Policy version: 3
+Environment: /tmp/mb-sandbox-env.sh
+Run: source /tmp/mb-sandbox-env.sh

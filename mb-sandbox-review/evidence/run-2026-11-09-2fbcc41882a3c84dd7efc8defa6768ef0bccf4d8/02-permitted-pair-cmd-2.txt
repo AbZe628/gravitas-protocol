@@ -1,0 +1,20 @@
+UTC date: 2026-11-09
+Base commit: 2fbcc41882a3c84dd7efc8defa6768ef0bccf4d8
+Command: forge test --match-path test/GravitasSubscriptionIntegration.t.sol --match-test '^test_AreTokensCompliant' -vv
+Exit code: 0
+
+Compiling 76 files with Solc 0.8.24
+Solc 0.8.24 finished in 21.94s
+Compiler run successful with warnings:
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> contracts/GravitasPolicyRegistry.sol:157:42:
+    |
+157 |     function checkSubscriptionCompliance(address subscriber, address subscriptionToken)
+    |                                          ^^^^^^^^^^^^^^^^^^
+
+
+Ran 1 test for test/GravitasSubscriptionIntegration.t.sol:GravitasSubscriptionIntegrationTest
+[PASS] test_AreTokensCompliant() (gas: 109137)
+Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 797.66µs (140.05µs CPU time)
+
+Ran 1 test suite in 16.02ms (797.66µs CPU time): 1 tests passed, 0 failed, 0 skipped (1 total tests)

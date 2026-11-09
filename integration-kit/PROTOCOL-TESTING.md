@@ -164,11 +164,12 @@ own signer/multisig.
 | GravitasPolicyRegistry | Arbitrum Sepolia | `0x6f3bfb896DD9964C9c05dA88692bDf1b1b2C3F23` |
 | TeleportV3 | Arbitrum Sepolia | `0x6702C2CE6eD58ca3934eBBd785CaC1De8DCd85B4` |
 
-> **Redeployment note:** these addresses point to the pre-`0.1.2` bytecode. The
-> contracts are being redeployed to Arbitrum Sepolia with the `0.1.2` security
-> hardening; the addresses will be updated here and in the root `README.md` once the
-> new source-verified deployment is live. Re-verify the addresses before an integration
-> run.
+> **Registry check — 9 November 2026:** the runtime at the registry address above
+> matched the repository's locally compiled `GravitasPolicyRegistry` byte for byte,
+> including metadata (3,244 bytes). The on-chain policy version was 1 and the
+> registry was not paused at that read. The TeleportV3 runtime was not compared with
+> local bytecode; its version status is not verified by this check. Recheck both
+> addresses before an integration run. Evidence: `mb-sandbox-review/evidence/run-2026-11-09-2fbcc41882a3c84dd7efc8defa6768ef0bccf4d8/bytecode-comparison.json`.
 
 Both contracts are source-verified — inspect them directly rather than trusting any
 Gravitas-hosted endpoint.

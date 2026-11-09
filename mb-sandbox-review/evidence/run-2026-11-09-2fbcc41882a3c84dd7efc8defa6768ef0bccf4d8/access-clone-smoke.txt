@@ -1,0 +1,9 @@
+UTC date: 2026-11-09
+Base commit: 2fbcc41882a3c84dd7efc8defa6768ef0bccf4d8
+Command block: git clone --branch mb-sandbox-review --recurse-submodules; git submodule update --init --recursive; forge build; forge test
+
+Exit status: 0
+Cloned public branch commit: 2fbcc41882a3c84dd7efc8defa6768ef0bccf4d8
+Build: Compiler run successful (warnings shown in terminal)
+Test suite: 86 passed; 0 failed; 0 skipped across 9 suites.
+The checkout was a temporary local clone; no file was pushed by this smoke check.

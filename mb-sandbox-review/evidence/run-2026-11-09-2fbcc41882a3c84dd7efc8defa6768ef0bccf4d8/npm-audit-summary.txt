@@ -1,0 +1,7 @@
+UTC date: 2026-11-09
+Base commit: 2fbcc41882a3c84dd7efc8defa6768ef0bccf4d8
+Command: npm audit --json --prefix integration-kit/mock-server
+Exit status: 1
+
+Findings: {'info': 0, 'low': 0, 'moderate': 1, 'high': 1, 'critical': 1, 'total': 3}
+Advisory packages: body-parser, proxy-addr, qs

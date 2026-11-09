@@ -1,0 +1,20 @@
+UTC date: 2026-11-09
+Base commit: 2fbcc41882a3c84dd7efc8defa6768ef0bccf4d8
+Command: forge test --match-path test/foundry/TeleportFlow.t.sol --match-test '^test_V2_RescueTokens' -vv
+Exit code: 0
+
+Compiling 76 files with Solc 0.8.24
+Solc 0.8.24 finished in 23.16s
+Compiler run successful with warnings:
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> contracts/GravitasPolicyRegistry.sol:157:42:
+    |
+157 |     function checkSubscriptionCompliance(address subscriber, address subscriptionToken)
+    |                                          ^^^^^^^^^^^^^^^^^^
+
+
+Ran 1 test for test/foundry/TeleportFlow.t.sol:TeleportFlowTests
+[PASS] test_V2_RescueTokens() (gas: 139800)
+Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 1.00ms (152.52µs CPU time)
+
+Ran 1 test suite in 15.62ms (1.00ms CPU time): 1 tests passed, 0 failed, 0 skipped (1 total tests)
