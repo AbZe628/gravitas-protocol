@@ -1,0 +1,8 @@
+tag=mb-review-v2
+tag_matches_release_commit=PASS
+pages=10
+absolute_https_links=37
+link_urls_use_release_tag=PASS
+target_paths_present_in_tagged_tree=37
+hidden_character_count=0
+AI_metadata_matches=0

@@ -20,7 +20,7 @@
 | API package audit | `npm audit` reported zero high and critical findings; raw output is in `evidence/`. |
 | Docker Compose one-command launch | **Not run:** Docker is not installed in this environment, so the image build and Compose start were unavailable. The component checks were run directly on the local machine. |
 | Automated workflow result | **Not confirmed:** the workflow file is present, but a hosted run and artifact have not been verified. |
-| Final PDF | 10 pages; absolute-link and hidden-character validation will be recorded after the release tag is created. |
+| Final PDF | 10 pages; 37 absolute HTTPS links use `mb-review-v2`, every target exists in the tagged tree, and no hidden characters or AI metadata were found. See `evidence/pdf-link-validation.txt`. |
 
 ## Contract comparison
 
