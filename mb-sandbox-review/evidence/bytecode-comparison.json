@@ -1,0 +1,10 @@
+{
+  "reviewedCommit": "692022e1ca34a280f90a198d2455ac3535b3bce2",
+  "testnetAddress": "0x6f3bfb896DD9964C9c05dA88692bDf1b1b2C3F23",
+  "localRuntimeBytes": 3244,
+  "remoteRuntimeBytes": 3244,
+  "fullRuntimeMatches": true,
+  "runtimeWithoutMetadataMatches": true,
+  "localRuntimeSHA256": "b058d10c887059aafd4e2ec309098ecaece7057f93a33b31b4f5ff6868f1d92f",
+  "remoteRuntimeSHA256": "b058d10c887059aafd4e2ec309098ecaece7057f93a33b31b4f5ff6868f1d92f"
+}

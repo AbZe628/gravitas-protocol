@@ -1,0 +1,706 @@
+openapi: 3.0.3
+info:
+  title: Gravitas sandbox interface review
+  version: 1.0.0-review
+  description: |
+    Source-backed review contract for two different interfaces: the local,
+    file-driven HTTP mock and read-only calls to GravitasPolicyRegistry through
+    an Ethereum node's HTTP JSON-RPC endpoint. The mock does not call the registry.
+    No HTTP registry adapter is implemented in the reviewed code.
+
+    This document describes implementation behavior, not a hosted-service or
+    deployment verification. All example addresses and identifiers are dummy
+    values; they do not assert deployed contracts, approved assets, or executors.
+    A local JSON-RPC node and a separately deployed registry are prerequisites
+    for the chain operation. Execution and testnet-bytecode evidence for this
+    package is recorded separately in ../verification.md.
+servers:
+  - url: http://localhost:8787
+    description: Local mock; PORT defaults to 8787 and can be overridden.
+security: []
+tags:
+  - name: File-driven mock
+    description: Express handlers using a policy file loaded once at startup.
+  - name: Registry JSON-RPC
+    description: Read-only EVM calls through a node, not a registry REST adapter.
+x-review-sources:
+  - contracts/GravitasPolicyRegistry.sol
+  - contracts/interfaces/IShariahPolicyChecker.sol
+  - integration-kit/mock-server/server.js
+  - integration-kit/policies/sandbox-policies.json
+  - integration-kit/openapi/gravitas-compliance-api.yaml
+  - lib/openzeppelin-contracts/contracts/utils/Pausable.sol
+  - lib/openzeppelin-contracts/contracts/access/Ownable.sol
+  - lib/openzeppelin-contracts/contracts/access/Ownable2Step.sol
+x-contract-reference:
+  contract: GravitasPolicyRegistry
+  source: contracts/GravitasPolicyRegistry.sol
+  interface: contracts/interfaces/IShariahPolicyChecker.sol
+  compiler-pragma: ^0.8.24
+  deployment: Supply the address in params[0].to. The package verified the documented testnet runtime against the reviewed source; see ../verification.md.
+  distinction: The JSON policy file is not registry state and its version is not currentVersion.
+x-review-limitations:
+  - capability: HTTP registry adapter
+    x-status: not-implemented
+    evidence: No registry REST adapter is present in the reviewed sources. No planned routes are published here.
+  - capability: HTTP authentication
+    x-status: documented-only
+    evidence: The mock has no API-key middleware, security scheme, or explicit 401 response.
+  - capability: Hosted service
+    x-status: unverified
+    evidence: A hosted endpoint mentioned by the old specification is not verified by these sources and is not listed as a server.
+  - capability: Per-investor policy checks
+    x-status: planned
+    evidence: checkSubscriptionCompliance accepts subscriber but never reads it; no KYC or investor-specific eligibility decision is implemented.
+  - capability: Per-transfer policy-version audit
+    x-status: not-implemented
+    evidence: The subscription view returns currentVersion but does not record a transfer or emit an audit event. The mock audit has no registry version or policy hash. Callers must implement persistent version recording themselves.
+paths:
+  /v1/verify:
+    post:
+      tags: [File-driven mock]
+      operationId: verifyMockAsset
+      summary: Classify an asset using the local policy file
+      security: []
+      x-status: implemented
+      x-source: integration-kit/mock-server/server.js:73-101
+      description: |
+        Returns a file-driven ALLOW or DENY; this is not an on-chain compliance
+        check and does not execute, route, or authorize a transfer. The amount,
+        counterparty, and context do not influence the decision.
+
+        Shape failures detected by validate() return 422. A valid classification
+        returns HTTP 200 even for DENY. Invalid JSON, unexpected input types, or
+        file I/O failures can instead reach Express error handling; no stable
+        application JSON error contract for those failures is implemented.
+      x-validation:
+        source: integration-kit/mock-server/server.js:29-36
+        checks:
+          - body is truthy and typeof body is object.
+          - asset is truthy and typeof asset is object.
+          - At least one of asset.address, asset.category, or asset.symbol is JavaScript-truthy.
+          - amount has typeof string; even an empty or nondecimal string passes.
+          - context and context.channel are JavaScript-truthy.
+        not-enforced:
+          - Decimal syntax, amount sign, precision, limits, and nonempty amount.
+          - Address length, hexadecimal syntax, checksum, chain, or ownership.
+          - Asset identifier types, context object type, or channel string type.
+          - Counterparty shape, identity, category allowlist, direction, or requestId uniqueness.
+        schema-scope: The schema describes usable string asset identifiers. The JavaScript guard can also admit nonstring values or arrays; those are not guaranteed usable and can cause runtime errors, not a predictable 422.
+      x-decision-semantics:
+        source: integration-kit/mock-server/server.js:41-70
+        evaluation-order:
+          - Walk all policies and their explicit assets in file order, including inactive policies; return the first match.
+          - If no explicit asset matches, walk only active policies and their category rules in file order; return the first match.
+          - Otherwise return DENY with DEFAULT-DENY.
+        asset-match: Case-insensitive address equality OR exact case-sensitive symbol equality. A matching symbol can override a supplied mismatched address. There is no requirement for both identifiers to agree.
+        inactive-asset-match: DENY; reason is policyId plus the asset reason or Policy inactive; ruleId and policyId are both the policyId.
+        active-asset-match: Return the asset decision and its optional reason. Internal ruleId is null and is omitted from JSON, not returned as null.
+        category-match: Case-insensitive category equality; reason is ruleId followed by the rule reason.
+        default: DENY; reason is DEFAULT-DENY followed by asset not present in the active policy set; ruleId is DEFAULT-DENY and policyId is omitted.
+        ignored-for-decision: [amount, counterparty, context]
+      x-audit-behavior:
+        file: integration-kit/mock-server/audit.log.jsonl
+        mode: Synchronous JSON-line append after classification and before the HTTP 200 response.
+        fields: [ts, requestId, channel, asset, amount, decision, reason]
+        requestId: context.requestId or null; correlation only, with no deduplication or idempotency enforcement.
+        missing: No counterparty, registry policy version, policy commitment, or executed-transfer proof is recorded.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyRequest'
+            example:
+              asset:
+                address: '0x1111111111111111111111111111111111111111'
+                symbol: DUMMY-ASSET
+              amount: '10.00'
+              context:
+                channel: dummy-channel
+                requestId: dummy-request
+      responses:
+        '200':
+          description: File-driven classification; ALLOW and DENY both use this status.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifyResponse'
+        '422':
+          description: A failure explicitly detected by the minimal validate() guard.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+  /v1/policies:
+    get:
+      tags: [File-driven mock]
+      operationId: getMockPolicySet
+      summary: Return the complete policy file loaded at startup
+      security: []
+      x-status: implemented
+      x-source: integration-kit/mock-server/server.js:21-23,103
+      description: |
+        Returns the full parsed sandbox-policies.json object, including inactive
+        policies, optional asset lists, category rules, and the explanatory note.
+        It is not an active-only filter or a registry-state query. Changes to the
+        file require a server restart to be reflected. network and registry are
+        file metadata, not proof of deployment, source verification, or matching
+        whitelist state. The current file contains illustrative asset addresses
+        for a different network than the registry metadata.
+      responses:
+        '200':
+          description: Complete startup-loaded policy set.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PolicySet'
+  /:
+    post:
+      tags: [Registry JSON-RPC]
+      operationId: ethCallRegistry
+      summary: Read implemented registry checks and getters through eth_call
+      servers:
+        - url: http://127.0.0.1:8545
+          description: Conventional local Ethereum JSON-RPC node; not started or implemented by the mock.
+      security: []
+      x-status: implemented
+      x-contract-reference:
+        contract: GravitasPolicyRegistry
+        source: contracts/GravitasPolicyRegistry.sol
+        interface: contracts/interfaces/IShariahPolicyChecker.sol
+      description: |
+        Submit Ethereum JSON-RPC eth_call to a node with a deployed registry.
+        params[0].to is the registry address. params[0].data must contain a
+        four-byte function selector followed by ABI-encoded arguments; a JSON
+        object of Solidity function names or arguments is not accepted as
+        calldata. params[1] chooses the block state. A call does not persist
+        writes or execute a subscription transaction.
+
+        Supply params[0].from explicitly when testing caller-sensitive behavior.
+        For a direct eth_call this address is the registry's msg.sender.
+        checkSubscriptionCompliance checks this caller's executor status, not
+        subscriber's status. Omitting from uses the node's default caller and
+        can produce misleading authorization failures. If a manager contract
+        calls the registry during an actual transaction, the manager contract,
+        not the transaction signer, is msg.sender at the registry. from in an
+        eth_call is simulation input, not a signature or authentication proof.
+
+        Successful result is raw ABI-encoded hexadecimal data. Decode using the
+        exact selected function's output types in x-solidity-functions. A pause
+        or failed require produces a JSON-RPC error, not false, DENY, or a REST
+        authorization status. Error codes, revert-data placement, and HTTP
+        status behavior depend on the node vendor; no fixed revert code is
+        asserted here. An empty result can also mean a wrong or undeployed to
+        address and must not be interpreted as an ABI boolean or version.
+      x-json-rpc:
+        method: eth_call
+        params-order: [callObject, blockTag]
+        transport-owner: Ethereum node, not integration-kit/mock-server/server.js.
+        scope: Single read-only eth_call envelopes; batches and other node methods are outside this review contract.
+        encoding: keccak256(canonical function signature)[0:4] followed by ABI argument words; addresses are left-padded to 32 bytes.
+        decoding:
+          bool: One 32-byte word; zero is false and one is true.
+          uint256: One unsigned 32-byte integer; decode without JavaScript Number precision loss.
+          bytes32: One 32-byte value, retaining leading zeros.
+          address: One 32-byte word; the last 20 bytes are the address.
+        error-contract: error.code is a vendor-provided integer; error.message and optional error.data are vendor-specific. No invented standard execution-revert code or fixed error example is supplied.
+      x-solidity-functions:
+        - name: verifyAssetCompliance
+          signature: verifyAssetCompliance(address)
+          declaration: function verifyAssetCompliance(address asset) external view whenNotPaused returns (bool compliant)
+          selector: '0x6095c14d'
+          contract-reference: contracts/GravitasPolicyRegistry.sol:134-136
+          interface-reference: contracts/interfaces/IShariahPolicyChecker.sol:16
+          state-mutability: view
+          inputs: [{name: asset, type: address}]
+          outputs: [{name: compliant, type: bool}]
+          pause-behavior: Reverts with EnforcedPause() when paused.
+          decoded-semantics: Returns isAssetCompliant[asset]; an unset mapping entry is false.
+        - name: areTokensCompliant
+          signature: areTokensCompliant(address,address)
+          declaration: function areTokensCompliant(address tokenA, address tokenB) external view whenNotPaused returns (bool compliant)
+          selector: '0x5715e6b7'
+          contract-reference: contracts/GravitasPolicyRegistry.sol:130-132
+          interface-reference: contracts/interfaces/IShariahPolicyChecker.sol:24
+          state-mutability: view
+          inputs: [{name: tokenA, type: address}, {name: tokenB, type: address}]
+          outputs: [{name: compliant, type: bool}]
+          pause-behavior: Reverts with EnforcedPause() when paused.
+          decoded-semantics: Returns isAssetCompliant[tokenA] AND isAssetCompliant[tokenB].
+        - name: verifyRouterAuthorization
+          signature: verifyRouterAuthorization(address)
+          declaration: function verifyRouterAuthorization(address router) external view whenNotPaused returns (bool authorized)
+          selector: '0xf224fb68'
+          contract-reference: contracts/GravitasPolicyRegistry.sol:138-140
+          interface-reference: The interface exposes the raw isRouterAuthorized(address) getter instead of this guarded method.
+          state-mutability: view
+          inputs: [{name: router, type: address}]
+          outputs: [{name: authorized, type: bool}]
+          pause-behavior: Reverts with EnforcedPause() when paused.
+          decoded-semantics: Returns isRouterAuthorized[router].
+        - name: verifyExecutorStatus
+          signature: verifyExecutorStatus(address)
+          declaration: function verifyExecutorStatus(address executor) external view whenNotPaused returns (bool authorized)
+          selector: '0x06166d2a'
+          contract-reference: contracts/GravitasPolicyRegistry.sol:142-144
+          interface-reference: contracts/interfaces/IShariahPolicyChecker.sol:31
+          state-mutability: view
+          inputs: [{name: executor, type: address}]
+          outputs: [{name: authorized, type: bool}]
+          pause-behavior: Reverts with EnforcedPause() when paused.
+          decoded-semantics: Returns isExecutor[executor]; this method checks the argument, not msg.sender.
+        - name: checkSubscriptionCompliance
+          signature: checkSubscriptionCompliance(address,address)
+          declaration: function checkSubscriptionCompliance(address subscriber, address subscriptionToken) external view whenNotPaused returns (uint256 policyVersion)
+          selector: '0xdc65a7b5'
+          contract-reference: contracts/GravitasPolicyRegistry.sol:157-167
+          interface-reference: contracts/interfaces/IShariahPolicyChecker.sol:44-47
+          state-mutability: view
+          inputs: [{name: subscriber, type: address}, {name: subscriptionToken, type: address}]
+          outputs: [{name: policyVersion, type: uint256}]
+          pause-behavior: Reverts with EnforcedPause() before evaluating either require when paused.
+          caller-semantics: isExecutor[msg.sender] must be true; set from to the intended executor for a direct eth_call.
+          decoded-semantics: First require isAssetCompliant[subscriptionToken], then require isExecutor[msg.sender], then return currentVersion. subscriber is unused and no investor policy is checked.
+          reverts:
+            - signature: EnforcedPause()
+              condition: Registry is paused.
+            - signature: Error(string)
+              reason: 'GPR: Asset not Shariah-compliant'
+              condition: Subscription token is not in the asset whitelist.
+            - signature: Error(string)
+              reason: 'GPR: Calling contract not an authorized executor'
+              condition: The token is compliant but msg.sender is not an executor.
+        - name: getPolicyVersion
+          signature: getPolicyVersion()
+          declaration: function getPolicyVersion() external view returns (uint256 policyVersion)
+          selector: '0x5e7770c8'
+          contract-reference: contracts/GravitasPolicyRegistry.sol:169-171
+          interface-reference: contracts/interfaces/IShariahPolicyChecker.sol:53
+          state-mutability: view
+          inputs: []
+          outputs: [{name: policyVersion, type: uint256}]
+          pause-behavior: Ungated; readable while paused.
+          decoded-semantics: Returns currentVersion, not the JSON policy file's string version.
+        - name: currentVersion
+          signature: currentVersion()
+          declaration: uint256 public currentVersion
+          selector: '0x9d888e86'
+          contract-reference: contracts/GravitasPolicyRegistry.sol:29
+          state-mutability: view
+          inputs: []
+          outputs: [{type: uint256}]
+          pause-behavior: Ungated; readable while paused.
+          decoded-semantics: Generated getter for the current governance change counter. The constructor records the deployer executor grant, making the initial deployed version 1.
+        - name: policyHistory
+          signature: policyHistory(uint256)
+          declaration: mapping(uint256 => bytes32) public policyHistory
+          selector: '0x505119f3'
+          contract-reference: contracts/GravitasPolicyRegistry.sol:30,109-114
+          state-mutability: view
+          inputs: [{name: version, type: uint256}]
+          outputs: [{type: bytes32}]
+          pause-behavior: Ungated; readable while paused.
+          decoded-semantics: Generated getter for a version commitment; version 0 and any unset version return bytes32 zero. No range check is implemented.
+          commitment: keccak256(abi.encode(previous commitment, keccak256(register name), subject address, boolean status)); register names are asset, router, and executor. Each actual setter change and the initial executor grant extends this ordered chain; no-op setters do not increment it.
+        - name: isAssetCompliant
+          signature: isAssetCompliant(address)
+          declaration: mapping(address => bool) public isAssetCompliant
+          selector: '0x146530c3'
+          contract-reference: contracts/GravitasPolicyRegistry.sol:24
+          state-mutability: view
+          inputs: [{name: asset, type: address}]
+          outputs: [{type: bool}]
+          pause-behavior: Ungated; readable while paused and not a pause-enforcing compliance API.
+          decoded-semantics: Raw asset mapping value; unset entries are false.
+        - name: isRouterAuthorized
+          signature: isRouterAuthorized(address)
+          declaration: mapping(address => bool) public isRouterAuthorized
+          selector: '0x82b32bb6'
+          contract-reference: contracts/GravitasPolicyRegistry.sol:25
+          interface-reference: contracts/interfaces/IShariahPolicyChecker.sol:60
+          state-mutability: view
+          inputs: [{name: router, type: address}]
+          outputs: [{type: bool}]
+          pause-behavior: Ungated; readable while paused and not equivalent to the guarded verifyRouterAuthorization call during a pause.
+          decoded-semantics: Raw router mapping value; unset entries are false. The interface names its return authorized; the generated mapping getter has an unnamed output.
+        - name: isExecutor
+          signature: isExecutor(address)
+          declaration: mapping(address => bool) public isExecutor
+          selector: '0xdebfda30'
+          contract-reference: contracts/GravitasPolicyRegistry.sol:26
+          state-mutability: view
+          inputs: [{name: executor, type: address}]
+          outputs: [{type: bool}]
+          pause-behavior: Ungated; readable while paused and not a pause-enforcing executor check.
+          decoded-semantics: Raw executor mapping value; unset entries are false and the constructor grants the deployer executor status.
+        - name: paused
+          signature: paused()
+          declaration: function paused() public view virtual returns (bool)
+          selector: '0x5c975abb'
+          contract-reference: lib/openzeppelin-contracts/contracts/utils/Pausable.sol:67-69
+          state-mutability: view
+          inputs: []
+          outputs: [{type: bool}]
+          pause-behavior: Ungated; readable while paused.
+          decoded-semantics: True means all five implemented verification/check entry points revert with EnforcedPause(); raw getters remain callable.
+        - name: owner
+          signature: owner()
+          declaration: function owner() public view virtual returns (address)
+          selector: '0x8da5cb5b'
+          contract-reference: lib/openzeppelin-contracts/contracts/access/Ownable.sol:56-58
+          state-mutability: view
+          inputs: []
+          outputs: [{type: address}]
+          pause-behavior: Ungated; readable while paused.
+          decoded-semantics: Current owner address; ownership alone does not grant executor status after an ownership transfer.
+        - name: pendingOwner
+          signature: pendingOwner()
+          declaration: function pendingOwner() public view virtual returns (address)
+          selector: '0xe30c3978'
+          contract-reference: lib/openzeppelin-contracts/contracts/access/Ownable2Step.sol:33-35
+          state-mutability: view
+          inputs: []
+          outputs: [{type: address}]
+          pause-behavior: Ungated; readable while paused.
+          decoded-semantics: Proposed owner awaiting acceptance; zero when no ownership transfer is pending.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EthCallRequest'
+            examples:
+              asset-check:
+                summary: ABI-encoded verifyAssetCompliance with dummy registry, caller, and asset
+                value:
+                  jsonrpc: '2.0'
+                  id: 1
+                  method: eth_call
+                  params:
+                    - to: '0x1111111111111111111111111111111111111111'
+                      from: '0x2222222222222222222222222222222222222222'
+                      data: '0x6095c14d0000000000000000000000003333333333333333333333333333333333333333'
+                    - latest
+              subscription-check:
+                summary: ABI-encoded subscription check; from must be the executor being simulated
+                value:
+                  jsonrpc: '2.0'
+                  id: 2
+                  method: eth_call
+                  params:
+                    - to: '0x1111111111111111111111111111111111111111'
+                      from: '0x2222222222222222222222222222222222222222'
+                      data: '0xdc65a7b500000000000000000000000044444444444444444444444444444444444444440000000000000000000000003333333333333333333333333333333333333333'
+                    - latest
+      responses:
+        '200':
+          description: Conventional node HTTP response; inspect result versus error. Node transport behavior is vendor-dependent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EthCallResponse'
+              examples:
+                encoded-false:
+                  summary: Illustrative ABI bool false, not an observed registry result
+                  value:
+                    jsonrpc: '2.0'
+                    id: 1
+                    result: '0x0000000000000000000000000000000000000000000000000000000000000000'
+        default:
+          description: Node-specific HTTP or transport failure; no fixed status code, authentication, or body shape is asserted.
+components:
+  schemas:
+    VerifyRequest:
+      type: object
+      required: [asset, amount, context]
+      additionalProperties: true
+      properties:
+        asset:
+          $ref: '#/components/schemas/MockAssetIdentifier'
+        amount:
+          type: string
+          description: Only string type is checked. Empty, signed, or nondecimal strings pass the guard; the value is audit-only and never used in decisions.
+          example: '10.00'
+        counterparty:
+          description: Optional arbitrary JSON value; not validated, used in classification, or included in the mock audit record.
+        context:
+          type: object
+          required: [channel]
+          additionalProperties: true
+          description: Object-shaped documented input. JavaScript checks only that context and its channel are truthy, not their types.
+          properties:
+            channel:
+              description: Required JavaScript-truthy JSON value; no string type or channel allowlist is enforced. Used only in the audit record.
+              not:
+                enum: [null, false, 0, '']
+              example: dummy-channel
+              x-validation: Excludes JSON-representable falsy values to model JavaScript truthiness; not a channel allowlist.
+            requestId:
+              description: Optional arbitrary correlation value; the audit stores this value or null when falsy. No idempotency behavior is implemented.
+              example: dummy-request
+    MockAssetIdentifier:
+      type: object
+      additionalProperties: true
+      description: |
+        For usable string inputs, provide at least one nonempty address, symbol,
+        or category. These schema string constraints are documentation, not
+        additional checks performed by the mock; the actual guard only tests
+        JavaScript truthiness and does not validate identifier types.
+      properties:
+        address:
+          type: string
+          description: Compared case-insensitively as text. No address syntax, checksum, or network validation.
+          example: '0x3333333333333333333333333333333333333333'
+        symbol:
+          type: string
+          description: Exact case-sensitive text match; can match even if address is mismatched.
+          example: DUMMY-ASSET
+        category:
+          type: string
+          description: Case-insensitive text match against active category rules, only after all explicit asset entries fail to match.
+          example: dummy-category
+      anyOf:
+        - required: [address]
+          properties:
+            address: {type: string, minLength: 1}
+        - required: [symbol]
+          properties:
+            symbol: {type: string, minLength: 1}
+        - required: [category]
+          properties:
+            category: {type: string, minLength: 1}
+    VerifyResponse:
+      type: object
+      required: [decision, policySetId, timestamp, onchainRef]
+      properties:
+        decision:
+          $ref: '#/components/schemas/Decision'
+        reason:
+          type: string
+          description: Included only when the decision's reason is truthy. An active explicit ALLOW asset in the current file has no reason, so this property is absent. Not guaranteed solely by the decision label.
+        ruleId:
+          type: string
+          description: Included only when truthy. Absent for active explicit asset matches because internal ruleId is null; null is not emitted. For an inactive asset match this is the policyId; for default denial it is DEFAULT-DENY.
+        policyId:
+          type: string
+          description: Included only when truthy; absent on default denial rather than null.
+        policySetId:
+          type: string
+          description: File-level identifier, not a registry governance version.
+          example: DUMMY-POLICY-SET
+        timestamp:
+          type: string
+          format: date-time
+          description: ISO timestamp created by the mock for this response.
+        onchainRef:
+          $ref: '#/components/schemas/OnchainReference'
+    OnchainReference:
+      type: object
+      required: [network, registry]
+      properties:
+        network:
+          type: string
+          description: Copied from the policy file; not checked against a node.
+          example: dummy-network
+        registry:
+          type: string
+          description: Copied from the policy file; no registry call or deployment verification is performed.
+          example: '0x1111111111111111111111111111111111111111'
+    ValidationError:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+          enum:
+            - body must be a JSON object
+            - asset is required
+            - asset.address, asset.category or asset.symbol is required
+            - amount must be a decimal string
+            - context.channel is required
+          description: Exact validate() messages. The decimal string wording does not mean decimal syntax is enforced.
+    Decision:
+      type: string
+      enum: [ALLOW, DENY]
+    PolicySet:
+      type: object
+      required: [policySetId, version, network, registry, note, policies]
+      description: Exact field structure of the current JSON fixture. The server returns this parsed file without schema validation; it is not an on-chain response.
+      properties:
+        policySetId:
+          type: string
+          example: DUMMY-POLICY-SET
+        version:
+          type: string
+          description: The current file uses the literal string 1.0.0; this is not a numeric Solidity policy version.
+          example: '0.0.0'
+        network:
+          type: string
+          description: File metadata, not a verified deployment network.
+          example: dummy-network
+        registry:
+          type: string
+          description: File metadata; no live registry validation.
+          example: '0x1111111111111111111111111111111111111111'
+        note:
+          type: string
+          description: Explanatory fixture text, returned unchanged.
+          example: Dummy policy data for local review only.
+        policies:
+          type: array
+          description: Full policy list, including inactive policies.
+          items:
+            $ref: '#/components/schemas/Policy'
+    Policy:
+      type: object
+      required: [policyId, name, status]
+      properties:
+        policyId:
+          type: string
+          example: DUMMY-POLICY
+        name:
+          type: string
+          example: Dummy policy
+        status:
+          type: string
+          enum: [active, inactive]
+          description: Both statuses occur in the current file. Category evaluation requires active status; explicit entries in inactive policies can deny.
+        assets:
+          type: array
+          description: Optional; absent from the category-rule policy in the current file.
+          items:
+            $ref: '#/components/schemas/PolicyAsset'
+        rules:
+          type: array
+          description: Optional; absent from the explicit-asset policies in the current file.
+          items:
+            $ref: '#/components/schemas/PolicyRule'
+    PolicyAsset:
+      type: object
+      required: [symbol, address, classification, decision]
+      properties:
+        symbol:
+          type: string
+          example: DUMMY-ASSET
+        address:
+          type: string
+          example: '0x3333333333333333333333333333333333333333'
+        classification:
+          type: string
+          description: Returned metadata; decide() does not evaluate this field.
+          example: dummy-classification
+        decision:
+          $ref: '#/components/schemas/Decision'
+        reason:
+          type: string
+          description: Optional; absent from active approved asset entries in the current file.
+    PolicyRule:
+      type: object
+      required: [ruleId, category, decision, reason]
+      properties:
+        ruleId:
+          type: string
+          example: DUMMY-RULE
+        category:
+          type: string
+          example: dummy-category
+        decision:
+          $ref: '#/components/schemas/Decision'
+        reason:
+          type: string
+          example: Dummy classification explanation.
+    EthCallRequest:
+      type: object
+      required: [jsonrpc, id, method, params]
+      description: Standard node RPC envelope. The schema models element types; x-params-order defines tuple position because OpenAPI 3.0 has no positional tuple items.
+      properties:
+        jsonrpc:
+          type: string
+          enum: ['2.0']
+        id:
+          $ref: '#/components/schemas/RpcId'
+        method:
+          type: string
+          enum: [eth_call]
+        params:
+          type: array
+          minItems: 2
+          maxItems: 2
+          x-params-order:
+            - index: 0
+              schema: '#/components/schemas/EthCallObject'
+            - index: 1
+              schema: '#/components/schemas/BlockTag'
+          items:
+            oneOf:
+              - $ref: '#/components/schemas/EthCallObject'
+              - $ref: '#/components/schemas/BlockTag'
+    EthCallObject:
+      type: object
+      required: [to, data]
+      additionalProperties: true
+      description: Node call object. Additional node-supported fields are outside this review. from is optional at the RPC level but essential for meaningful subscription authorization simulation.
+      properties:
+        to:
+          $ref: '#/components/schemas/RpcAddress'
+        from:
+          $ref: '#/components/schemas/RpcAddress'
+        data:
+          type: string
+          pattern: '^0x([0-9a-fA-F]{2}){4,}$'
+          description: ABI calldata; the selector and encoded arguments must match one listed function. Syntax alone cannot verify a selector, ABI layout, or deployment. This is not a JSON arguments object.
+    RpcAddress:
+      type: string
+      pattern: '^0x[0-9a-fA-F]{40}$'
+      description: EVM address syntax for node RPC input only; not a mock-server address validation or deployment check.
+      example: '0x1111111111111111111111111111111111111111'
+    BlockTag:
+      type: string
+      description: Standard node block tag or hexadecimal block number; historical state availability and tag support depend on the node.
+      pattern: '^(latest|earliest|pending|safe|finalized|0x(0|[1-9a-fA-F][0-9a-fA-F]*))$'
+      example: latest
+    RpcId:
+      anyOf:
+        - type: integer
+          nullable: true
+        - type: string
+      description: Request correlation identifier echoed by the node. Response id may be null for an unidentifiable failed request.
+    EthCallResponse:
+      oneOf:
+        - $ref: '#/components/schemas/EthCallSuccess'
+        - $ref: '#/components/schemas/RpcErrorResponse'
+    EthCallSuccess:
+      type: object
+      required: [jsonrpc, id, result]
+      properties:
+        jsonrpc:
+          type: string
+          enum: ['2.0']
+        id:
+          $ref: '#/components/schemas/RpcId'
+        result:
+          type: string
+          pattern: '^0x([0-9a-fA-F]{2})*$'
+          description: Raw ABI bytes, not a decoded bool, number, decision object, or policy set. Each listed getter/check has exactly one static 32-byte return value when it succeeds against the correct deployed contract.
+    RpcErrorResponse:
+      type: object
+      required: [jsonrpc, id, error]
+      properties:
+        jsonrpc:
+          type: string
+          enum: ['2.0']
+        id:
+          $ref: '#/components/schemas/RpcId'
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: integer
+              description: Node-vendor error code. No fixed execution-revert code is claimed.
+            message:
+              type: string
+              description: Node-specific error description; not a guaranteed Solidity reason string.
+            data:
+              description: Optional vendor-defined JSON value. May contain raw revert bytes or nested details; inspect and ABI-decode when available.

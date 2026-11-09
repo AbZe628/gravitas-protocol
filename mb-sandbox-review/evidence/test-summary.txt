@@ -1,0 +1,5 @@
+Review date: 2026-11-09
+Source: 692022e1ca34a280f90a198d2455ac3535b3bce2
+Command: forge test
+Toolchain: Foundry 1.9.0; solc 0.8.24; via_ir; optimiser 200 runs
+Ran 9 test suites in 38.23ms (128.79ms CPU time): 86 tests passed, 0 failed, 0 skipped (86 total tests)
