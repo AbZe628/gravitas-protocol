@@ -5,4 +5,3 @@
 **/deployments/local.json
 **/audit.log.jsonl
 **/*.verify.json
-**/*-review/
