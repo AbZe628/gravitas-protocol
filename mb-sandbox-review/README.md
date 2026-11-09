@@ -63,7 +63,7 @@ The API mock is not the registry. `npm audit` reported one critical, one high an
 
 - Registry gates, raw mappings, version and change hash: `contracts/GravitasPolicyRegistry.sol` (`checkSubscriptionCompliance`, verification functions, `_recordChange`).
 - Plain token transfer paths: `contracts/MockERC20.sol` and `evidence/.../local-results.json`.
-- Migration guards and owner paths: `contracts/TeleportV2.sol`, `contracts/TeleportV3.sol`, `contracts/TeleportBase.sol`.
+- Migration guards and owner paths: `contracts/TeleportV2.sol`, `contracts/TeleportV3.sol`.
 - File-driven HTTP behavior and example client: `integration-kit/mock-server/server.js`, `gravitas-sdk/src/compliance.ts`.
 - Governance issues and dated ownership caveat: `docs/KNOWN-ISSUES.md`.
 - Dated build, test, registry-runtime and API checks: `evidence/run-2026-11-09-2fbcc41882a3c84dd7efc8defa6768ef0bccf4d8/`.
