@@ -4,7 +4,7 @@
 **Author:** Distinguished Smart Contract Engineer
 **Date:** January 31, 2026
 
-This document formally defines the core invariants and mathematical logic of the Gravitas Protocol's Policy-Constrained Smart Routing engine, elevating the MVP to an institutional-grade infrastructure.
+This document formally defines the core invariants and mathematical logic of the Gravitas Protocol's Policy-Constrained Smart Routing engine, describing the intended infrastructure design of the MVP.
 
 ---
 

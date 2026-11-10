@@ -60,7 +60,7 @@ The new registry-backed API specification is [`reference/api/openapi.yaml`](refe
 | Registry-backed HTTP and outage behavior | **Reference implementation exists (unaudited); production work remaining:** key management, network and service hardening, monitoring, privacy controls, and an approved deployment. |
 | Investor eligibility | **Not built.** `checkSubscriptionCompliance` accepts a subscriber address but the registry does not inspect it. The API and token do not establish investor identity or eligibility. |
 | Ruling link | **Not built.** No instrument-specific ruling, evidence repository or approval workflow is connected to the registry. |
-| Governance changes | **Not built.** The existing registry is owner-controlled; this package adds no governed policy process, timelock or issuer operations. |
+| Governance changes | Partly built in the core repository. GravitasTimelock is deployed on testnet; ownership of the registry has not been handed to it. The engines are single-step Ownable and there is no separate pauser (docs/KNOWN-ISSUES.md). The reference package adds no governance process. |
 | Independent audit | **Not built.** No independent audit has been performed on this reference package. |
 | Funded shared testnet | **Not built.** The sandbox is private and local. It creates no shared testnet account or funding. |
 | Hosted service with keys | **Not built.** The API runs locally and uses a printed development key. |

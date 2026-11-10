@@ -2,7 +2,7 @@
 
 **Document Version:** 1.0.0  
 **Date:** February 25, 2026  
-**Status:** Production-Ready
+**Status:** Testnet only. Mainnet deployment follows the independent audit (see docs/AUDIT.md).
 
 ---
 

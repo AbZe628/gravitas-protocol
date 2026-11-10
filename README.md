@@ -1,7 +1,7 @@
 # <p align="center">Gravitas Protocol</p>
 
 <p align="center">
-  <strong>Institutional-Grade Shariah-Compliant Liquidity Infrastructure</strong>
+  <strong>Shariah-aligned liquidity infrastructure. Testnet only, unaudited, not certified.</strong>
 </p>
 
 <p align="center">

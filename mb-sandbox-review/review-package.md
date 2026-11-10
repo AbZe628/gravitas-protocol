@@ -14,7 +14,7 @@ docker compose -f mb-sandbox-review/docker-compose.yml up --build
 
 The container starts a local chain, deploys the registry, plain GUSD, the dummy gated sukuk and manager, approves the token, registers the manager, runs the tests and seven scenario checks, then starts the API. It prints addresses, policy version, a local development key and sample requests. Both ports bind to loopback. No public deployment is made.
 
-**API specification:** `mb-sandbox-review/reference/api/openapi.yaml` ([registry-backed reference API](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v3/mb-sandbox-review/reference/api/openapi.yaml)). The earlier [file-driven mock specification](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v3/mb-sandbox-review/api-spec/openapi.yaml) describes a different service and is superseded for this review.
+**API specification:** `mb-sandbox-review/reference/api/openapi.yaml` ([registry-backed reference API](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v4/mb-sandbox-review/reference/api/openapi.yaml)). The earlier [file-driven mock specification](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v4/mb-sandbox-review/api-spec/openapi.yaml) describes a different service and is superseded for this review.
 
 ## Three answers
 
@@ -75,14 +75,14 @@ curl -H 'X-API-Key: local-reference-key-only' \
   http://127.0.0.1:8787/v1/policy
 ```
 
-The [Compose file](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v3/mb-sandbox-review/docker-compose.yml), [Dockerfile](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v3/mb-sandbox-review/Dockerfile) and [startup script](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v3/mb-sandbox-review/reference/scripts/start-sandbox.sh) are versioned in the release.
+The [Compose file](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v4/mb-sandbox-review/docker-compose.yml), [Dockerfile](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v4/mb-sandbox-review/Dockerfile) and [startup script](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v4/mb-sandbox-review/reference/scripts/start-sandbox.sh) are versioned in the release.
 
 
 # 3. What the reference code does
 
 `GatedDemoSukuk` asks the registry from `_update`, covering direct transfer, delegated transfer, mint and burn after construction. The constructor's first mint is exempt: the token cannot be approved before it has an address. The tests assert that refused routes leave balances unchanged. This is why the existing registry alone cannot close the plain-token bypass: it stores and answers policy questions but it cannot intercept a token that never calls it.
 
-`DemoSukukManager.transferSukuk` checks that the token is approved and that the manager is an authorized executor. It then calls `transferFrom` and emits `TransferChecked` with the request ID, token, parties, amount, returned policy version and hash. Revert rolls back the transfer and event. The source is [GatedDemoSukuk.sol](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v3/mb-sandbox-review/reference/src/GatedDemoSukuk.sol) and [DemoSukukManager.sol](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v3/mb-sandbox-review/reference/src/DemoSukukManager.sol); see the [reference tests](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v3/mb-sandbox-review/reference/test/GatedDemoSukuk.t.sol).
+`DemoSukukManager.transferSukuk` checks that the token is approved and that the manager is an authorized executor. It then calls `transferFrom` and emits `TransferChecked` with the request ID, token, parties, amount, returned policy version and hash. Revert rolls back the transfer and event. The source is [GatedDemoSukuk.sol](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v4/mb-sandbox-review/reference/src/GatedDemoSukuk.sol) and [DemoSukukManager.sol](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v4/mb-sandbox-review/reference/src/DemoSukukManager.sol); see the [reference tests](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v4/mb-sandbox-review/reference/test/GatedDemoSukuk.t.sol).
 
 The manager's registry call originates from the manager contract. The registry accepts a subscriber argument but does not use it to make an eligibility decision. The API also classifies asset state only. Neither component identifies an investor or checks the instrument's terms.
 
@@ -92,7 +92,7 @@ While paused, the current reference token freezes transfer, mint and burn. That 
 
 `GET /health` reports service liveness; it does not prove that the registry is reachable. `GET /v1/policy` reads the current policy version and hash, block, chain ID, registry address, timestamp and pause flag. `POST /v1/verify` accepts an asset address, a decimal amount string and request context. The response records an asset decision, reason code, policy version/hash and the block used. The amount is validated and logged; it is not an investor-eligibility or instrument-terms check.
 
-The reader first fetches one latest block and performs the state reads against that same block tag. It does not return an old ALLOW on RPC error. All routes require the API key. Requests and outcomes are appended to local JSONL; invalid or unavailable reads do not invent a policy version, hash or block. The service and reader are [server.mjs](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v3/mb-sandbox-review/reference/api/server.mjs) and [registry.mjs](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v3/mb-sandbox-review/reference/api/registry.mjs).
+The reader first fetches one latest block and performs the state reads against that same block tag. It does not return an old ALLOW on RPC error. All routes require the API key. Requests and outcomes are appended to local JSONL; invalid or unavailable reads do not invent a policy version, hash or block. The service and reader are [server.mjs](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v4/mb-sandbox-review/reference/api/server.mjs) and [registry.mjs](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v4/mb-sandbox-review/reference/api/registry.mjs).
 
 
 
@@ -108,7 +108,7 @@ Run:
 bash mb-sandbox-review/scripts/run-scenario-1.sh
 ```
 
-Plain GUSD has no registry-aware transfer hook. The reference token checks its own approval on each balance-moving route. This is a dummy local transfer, not a real subscription or sukuk issuance. See the [scenario source](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v3/mb-sandbox-review/scenarios/01-simulated-sukuk-transfer.md).
+Plain GUSD has no registry-aware transfer hook. The reference token checks its own approval on each balance-moving route. This is a dummy local transfer, not a real subscription or sukuk issuance. See the [scenario source](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v4/mb-sandbox-review/scenarios/01-simulated-sukuk-transfer.md).
 
 ## 02 — Approved asset pair
 
@@ -120,14 +120,14 @@ Run:
 bash mb-sandbox-review/scripts/run-scenario-2.sh
 ```
 
-See the [scenario source](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v3/mb-sandbox-review/scenarios/02-permitted-pair.md) and [runner](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v3/mb-sandbox-review/scripts/run-scenario-2.sh).
+See the [scenario source](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v4/mb-sandbox-review/scenarios/02-permitted-pair.md) and [runner](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v4/mb-sandbox-review/scripts/run-scenario-2.sh).
 
 ## What the assertions establish
 
 | Case | Setup and action | Observable result |
 |---|---|---|
-| 01 — Transfer | Approved gated token, registered manager and holder allowance; request a 100-token transfer. | Holder decreases by 100; recipient increases by 100; manager event matches the current version and registry hash. See [captured run 01](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v3/mb-sandbox-review/evidence/reference-2026-11-09-87091556859d82c7a783dd97346bf83a8ca66fd0/scenario-1-runner.txt). |
-| 02 — Pair and gate | Query two registry-approved assets, then transfer the approved token through the registered manager. | Pair view returns true for the approved pair; transfer succeeds. The revoked-asset refusal is checked in Scenario 03. See [captured run 02](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v3/mb-sandbox-review/evidence/reference-2026-11-09-87091556859d82c7a783dd97346bf83a8ca66fd0/scenario-2-runner.txt). |
+| 01 — Transfer | Approved gated token, registered manager and holder allowance; request a 100-token transfer. | Holder decreases by 100; recipient increases by 100; manager event matches the current version and registry hash. See [captured run 01](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v4/mb-sandbox-review/evidence/reference-2026-11-09-87091556859d82c7a783dd97346bf83a8ca66fd0/scenario-1-runner.txt). |
+| 02 — Pair and gate | Query two registry-approved assets, then transfer the approved token through the registered manager. | Pair view returns true for the approved pair; transfer succeeds. The revoked-asset refusal is checked in Scenario 03. See [captured run 02](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v4/mb-sandbox-review/evidence/reference-2026-11-09-87091556859d82c7a783dd97346bf83a8ca66fd0/scenario-2-runner.txt). |
 
 # 5. Scenarios 03 and 04
 
@@ -141,7 +141,7 @@ Run:
 bash mb-sandbox-review/scripts/run-scenario-3.sh
 ```
 
-See the [scenario source](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v3/mb-sandbox-review/scenarios/03-prohibited-subscription.md).
+See the [scenario source](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v4/mb-sandbox-review/scenarios/03-prohibited-subscription.md).
 
 ## 04 — Rule change and policy history
 
@@ -153,7 +153,7 @@ Run:
 bash mb-sandbox-review/scripts/run-scenario-4.sh
 ```
 
-The manager event refers to the registry version/hash used in the transfer transaction. The commitment identifies an ordered policy change; it does not contain a ruling or prove an instrument's status. See the [scenario source](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v3/mb-sandbox-review/scenarios/04-policy-version-update.md).
+The manager event refers to the registry version/hash used in the transfer transaction. The commitment identifies an ordered policy change; it does not contain a ruling or prove an instrument's status. See the [scenario source](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v4/mb-sandbox-review/scenarios/04-policy-version-update.md).
 
 ## Expected checks
 
@@ -164,7 +164,7 @@ The manager event refers to the registry version/hash used in the transfer trans
 | Version N revoked | Version advances to N+1; prior hash remains; new hash uses `keccak256(abi.encode(previousHash, keccak256("asset"), token, false))`. |
 | Asset re-approved | Version advances again; transfer can proceed with the new current version and hash. |
 
-The captured outputs are [Scenario 03](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v3/mb-sandbox-review/evidence/reference-2026-11-09-87091556859d82c7a783dd97346bf83a8ca66fd0/scenario-3-runner.txt) and [Scenario 04](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v3/mb-sandbox-review/evidence/reference-2026-11-09-87091556859d82c7a783dd97346bf83a8ca66fd0/scenario-4-runner.txt).
+The captured outputs are [Scenario 03](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v4/mb-sandbox-review/evidence/reference-2026-11-09-87091556859d82c7a783dd97346bf83a8ca66fd0/scenario-3-runner.txt) and [Scenario 04](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v4/mb-sandbox-review/evidence/reference-2026-11-09-87091556859d82c7a783dd97346bf83a8ca66fd0/scenario-4-runner.txt).
 
 # 6. Scenarios 05 and 06
 
@@ -178,7 +178,7 @@ Run the contract checks:
 bash mb-sandbox-review/scripts/run-scenario-5.sh
 ```
 
-The full verifier also pauses the actual local registry, checks the API response, stops the actual local chain, checks 503, restores the saved state and checks recovery. This behavior is in the [outage and pause scripts](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v3/mb-sandbox-review/reference/scripts/verify-all.sh).
+The full verifier also pauses the actual local registry, checks the API response, stops the actual local chain, checks 503, restores the saved state and checks recovery. This behavior is in the [outage and pause scripts](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v4/mb-sandbox-review/reference/scripts/verify-all.sh).
 
 ## 06 — Unauthorized changes and transfer routes
 
@@ -190,7 +190,7 @@ Run:
 bash mb-sandbox-review/scripts/run-scenario-6.sh
 ```
 
-The package does not change the old token or registry. A real issuer would still have to choose the token code, protect approval and pause authority, and test the complete issuance and redemption routes. See the [scenario source](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v3/mb-sandbox-review/scenarios/06-unauthorized-rule-change.md).
+The package does not change the old token or registry. A real issuer would still have to choose the token code, protect approval and pause authority, and test the complete issuance and redemption routes. See the [scenario source](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v4/mb-sandbox-review/scenarios/06-unauthorized-rule-change.md).
 
 ## Route comparison
 
@@ -200,13 +200,13 @@ The package does not change the old token or registry. A real issuer would still
 | Registry paused | Direct and delegated balance changes fail closed with the pause error. | Its transfer is still independent of the paused registry. |
 | Registry restored | The owner unpauses; the approved, registered manager route can proceed again. | No registry recovery is needed for a plain-token transfer. |
 
-The captured outputs are [Scenario 05](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v3/mb-sandbox-review/evidence/reference-2026-11-09-87091556859d82c7a783dd97346bf83a8ca66fd0/scenario-5-runner.txt) and [Scenario 06](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v3/mb-sandbox-review/evidence/reference-2026-11-09-87091556859d82c7a783dd97346bf83a8ca66fd0/scenario-6-runner.txt).
+The captured outputs are [Scenario 05](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v4/mb-sandbox-review/evidence/reference-2026-11-09-87091556859d82c7a783dd97346bf83a8ca66fd0/scenario-5-runner.txt) and [Scenario 06](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v4/mb-sandbox-review/evidence/reference-2026-11-09-87091556859d82c7a783dd97346bf83a8ca66fd0/scenario-6-runner.txt).
 
 <!-- AUDIT_PAGEBREAK -->
 
 # 7. Scenario 07 — One-transaction audit record
 
-The manager transfer emits an ERC-20 `Transfer` and a `TransferChecked` event in the same transaction. The included [local record](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v3/mb-sandbox-review/reference-audit-record.json) was generated from a real local Anvil run and checked against its receipt and registry history.
+The manager transfer emits an ERC-20 `Transfer` and a `TransferChecked` event in the same transaction. The included [local record](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v4/mb-sandbox-review/reference-audit-record.json) was generated from a real local Anvil run and checked against its receipt and registry history.
 
 | Field | Recorded value |
 |---|---|
@@ -219,9 +219,9 @@ The manager transfer emits an ERC-20 `Transfer` and a `TransferChecked` event in
 | Block and timestamp | Block 11; `2026-11-09T20:16:54Z` |
 | Policy | Version 3; `0x96405a9315fa1a542184d8419512d74374ec2fff1684eaca112f6b36a723033f` |
 
-The verifier decodes both logs, checks their transaction and block, reads `getPolicyVersion` and `policyHistory` at the receipt block, replays the registry changes in order and recomputes every hash. The [verifier source](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v3/mb-sandbox-review/reference/scripts/verify-audit-record.py) and [captured output](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v3/mb-sandbox-review/evidence/reference-2026-11-09-87091556859d82c7a783dd97346bf83a8ca66fd0/real-manager-audit-validation.txt) are included. Run `bash mb-sandbox-review/scripts/run-scenario-7.sh` to produce and verify a new local record.
+The verifier decodes both logs, checks their transaction and block, reads `getPolicyVersion` and `policyHistory` at the receipt block, replays the registry changes in order and recomputes every hash. The [verifier source](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v4/mb-sandbox-review/reference/scripts/verify-audit-record.py) and [captured output](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v4/mb-sandbox-review/evidence/reference-2026-11-09-87091556859d82c7a783dd97346bf83a8ca66fd0/real-manager-audit-validation.txt) are included. Run `bash mb-sandbox-review/scripts/run-scenario-7.sh` to produce and verify a new local record.
 
-The older [composed example](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v3/mb-sandbox-review/sample-audit-record.json) combines separate operations; it is not evidence of an executed transfer. Neither example identifies an investor or establishes the legal or religious status of an instrument.
+The older [composed example](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v4/mb-sandbox-review/sample-audit-record.json) combines separate operations; it is not evidence of an executed transfer. Neither example identifies an investor or establishes the legal or religious status of an instrument.
 
 # 8. What production work remains
 
@@ -232,7 +232,7 @@ The older [composed example](https://github.com/AbZe628/gravitas-protocol/blob/m
 | Registry-backed HTTP and outages | **Reference implementation exists (unaudited).** Production work remaining: key management, infrastructure and network hardening, monitoring, privacy controls and an approved deployment. |
 | Investor eligibility | **Not built.** The registry ignores the subscriber argument; no identity or investor eligibility check exists. |
 | Ruling link | **Not built.** No ruling identifier, source document or approval workflow is connected to registry changes. |
-| Governance changes | **Not built.** The owner-controlled registry has no new timelock, governance flow or separately managed emergency role in this package. |
+| Governance changes | Partly built in the core repository. GravitasTimelock is deployed on testnet; ownership of the registry has not been handed to it. The engines are single-step Ownable and there is no separate pauser (docs/KNOWN-ISSUES.md). The reference package adds no governance process. |
 | Independent audit | **Not built.** The reference contracts and API have not received an independent audit. |
 | Funded shared testnet | **Not built.** No shared testnet or funded account was created. |
 | Hosted API with managed keys | **Not built.** The API runs locally and prints a development key. |
@@ -288,12 +288,12 @@ The bytecode comparison covers only the registry runtime. It does not establish 
 
 # 11. Limits and outstanding checks
 
-**Hosted Docker verification passed.** GitHub Actions run [42697229864](https://github.com/AbZe628/gravitas-protocol/actions/runs/42697229864) on commit `770ee815a794281817e8defac7f268708f042c3b` (tag `mb-review-v2`) built and started the container, completed verification, saved logs and shut down successfully in about two minutes. Docker was not available locally; local component checks were run directly. The full container lifecycle is verified only by that hosted run. See the [verification record](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v3/mb-sandbox-review/verification.md) and [dated evidence](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v3/mb-sandbox-review/evidence/reference-2026-11-09-87091556859d82c7a783dd97346bf83a8ca66fd0/metadata.txt).
+**Hosted Docker verification passed.** The latest successful run before this release is [GitHub Actions run 42817800623](https://github.com/AbZe628/gravitas-protocol/actions/runs/42817800623). It ran on commit `7d92f1ee6193d0fcf15d8fe9ad0fb4bfae3f925e` (tag `mb-review-v3`) and built and started the container, completed verification, saved logs and shut down successfully. Docker was not available locally; local component checks were run directly. See the [verification record](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v4/mb-sandbox-review/verification.md) and [dated evidence](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v4/mb-sandbox-review/evidence/reference-2026-11-09-87091556859d82c7a783dd97346bf83a8ca66fd0/metadata.txt).
 
 ## Limits of this review
 
 The reference code is unaudited and is not an issuer product. The dummy sukuk has no legal or religious standing. Tests prove only the selected behavior in the local setup. This work does not establish investor eligibility, a ruling, regulator approval, a hosted service or mainnet readiness. No public deployment was made. The full-freeze pause policy is a design choice, not a universal recommendation.
 
-The [earlier registry source review](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v3/mb-sandbox-review/README.md) describes the original token bypass and registry limits. It should be read with the new reference implementation status above, not as a claim that the old token was changed.
+The [earlier registry source review](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v4/mb-sandbox-review/README.md) describes the original token bypass and registry limits. It should be read with the new reference implementation status above, not as a claim that the old token was changed.
 
-For package entry points, see the [README](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v3/mb-sandbox-review/README.md), [sandbox access guide](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v3/mb-sandbox-review/sandbox-access.md), [reference API specification](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v3/mb-sandbox-review/reference/api/openapi.yaml), [Scenario 07](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v3/mb-sandbox-review/scenarios/07-gated-token-and-audit-record.md), and [verification metadata](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v3/mb-sandbox-review/evidence/reference-2026-11-09-87091556859d82c7a783dd97346bf83a8ca66fd0/metadata.txt).
+For package entry points, see the [README](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v4/mb-sandbox-review/README.md), [sandbox access guide](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v4/mb-sandbox-review/sandbox-access.md), [reference API specification](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v4/mb-sandbox-review/reference/api/openapi.yaml), [Scenario 07](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v4/mb-sandbox-review/scenarios/07-gated-token-and-audit-record.md), and [verification metadata](https://github.com/AbZe628/gravitas-protocol/blob/mb-review-v4/mb-sandbox-review/evidence/reference-2026-11-09-87091556859d82c7a783dd97346bf83a8ca66fd0/metadata.txt).
