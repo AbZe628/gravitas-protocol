@@ -11,6 +11,7 @@ STATE_PATH="${ANVIL_STATE_PATH:-/tmp/reference-anvil-state.json}"
 PID_FILE="/tmp/reference-anvil.pid"
 ANVIL_LOG="/tmp/reference-anvil.log"
 MNEMONIC="${ANVIL_MNEMONIC:-test test test test test test test test test test test junk}"
+ANVIL_HOST="${ANVIL_HOST:-0.0.0.0}"
 export PATH="/usr/local/bin:$PATH"
 export MB_API_KEY="${MB_API_KEY:-local-reference-key-only}"
 export RPC_URL="${RPC_URL:-http://127.0.0.1:8545}"
@@ -64,7 +65,7 @@ x=json.load(open(sys.argv[2])); assert x=={'decision':'DENY','reasonCode':'REGIS
 print('PASS stopped local Anvil: HTTP 503 DENY REGISTRY_UNAVAILABLE')
 PY
 
-anvil --host 0.0.0.0 --port 8545 --chain-id 31337 --mnemonic "$MNEMONIC" --state "$STATE_PATH" >"$ANVIL_LOG" 2>&1 &
+anvil --host "$ANVIL_HOST" --port 8545 --chain-id 31337 --mnemonic "$MNEMONIC" --state "$STATE_PATH" >"$ANVIL_LOG" 2>&1 &
 echo $! > "$PID_FILE"
 for _ in $(seq 1 80); do
   if cast chain-id --rpc-url "$RPC_URL" >/dev/null 2>&1; then break; fi

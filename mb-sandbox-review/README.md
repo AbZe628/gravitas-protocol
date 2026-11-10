@@ -18,6 +18,19 @@ In a second terminal, run the full verification:
 docker compose -f mb-sandbox-review/docker-compose.yml exec sandbox bash /workspace/mb-sandbox-review/reference/scripts/verify-all.sh
 ```
 
+## Run without Docker
+
+The native route is for Linux with Git, Bash, Node 22, Foundry 1.9.0, Python 3 with `venv`, and `curl`. Clone this release with recursive submodules; the reference tests use `forge-std` nested inside OpenZeppelin:
+
+```bash
+git clone --recurse-submodules --branch mb-review-v3 https://github.com/AbZe628/gravitas-protocol.git
+cd gravitas-protocol
+git submodule update --init --recursive
+[ -e lib/forge-std ] || ln -s openzeppelin-contracts/lib/forge-std lib/forge-std
+```
+
+The link supplies the root Foundry config's expected `lib/forge-std` path. Create a Python virtual environment, install the two pinned OpenAPI-check dependencies, set `ANVIL_HOST=127.0.0.1` and `API_HOST=127.0.0.1`, then run `bash mb-sandbox-review/reference/scripts/start-sandbox.sh`. In a second terminal, activate the same environment, set `ANVIL_HOST=127.0.0.1`, and run `bash mb-sandbox-review/reference/scripts/verify-all.sh`. Full setup, commands and limits are in the [Docker-free native access guide](sandbox-access.md#docker-free-native-run). The container path itself is verified in the linked [GitHub Actions run](https://github.com/AbZe628/gravitas-protocol/actions/runs/42697229864), not on the local machine.
+
 The new registry-backed API specification is [`reference/api/openapi.yaml`](reference/api/openapi.yaml). The earlier [`api-spec/openapi.yaml`](api-spec/openapi.yaml) describes the separate file-driven mock and direct JSON-RPC examples; that mock is left unchanged and is superseded for this review.
 
 ## Three answers

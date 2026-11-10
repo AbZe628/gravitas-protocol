@@ -9,6 +9,7 @@ PID_FILE="/tmp/reference-anvil.pid"
 ANVIL_LOG="/tmp/reference-anvil.log"
 API_LOG="/tmp/reference-api.log"
 MNEMONIC="${ANVIL_MNEMONIC:-test test test test test test test test test test test junk}"
+ANVIL_HOST="${ANVIL_HOST:-0.0.0.0}"
 API_KEY="${MB_API_KEY:-local-reference-key-only}"
 export PATH="/usr/local/bin:$PATH"
 export ANVIL_MNEMONIC="$MNEMONIC" MB_API_KEY="$API_KEY"
@@ -28,9 +29,9 @@ trap 'exit 0' INT TERM
 
 start_anvil() {
   if [[ -s "$STATE_PATH" ]]; then
-    anvil --host 0.0.0.0 --port 8545 --chain-id 31337 --mnemonic "$MNEMONIC" --state "$STATE_PATH" >"$ANVIL_LOG" 2>&1 &
+    anvil --host "$ANVIL_HOST" --port 8545 --chain-id 31337 --mnemonic "$MNEMONIC" --state "$STATE_PATH" >"$ANVIL_LOG" 2>&1 &
   else
-    anvil --host 0.0.0.0 --port 8545 --chain-id 31337 --mnemonic "$MNEMONIC" --dump-state "$STATE_PATH" >"$ANVIL_LOG" 2>&1 &
+    anvil --host "$ANVIL_HOST" --port 8545 --chain-id 31337 --mnemonic "$MNEMONIC" --dump-state "$STATE_PATH" >"$ANVIL_LOG" 2>&1 &
   fi
   echo $! > "$PID_FILE"
   for _ in $(seq 1 60); do
@@ -98,8 +99,11 @@ curl -X POST http://127.0.0.1:${API_PORT}/v1/verify \\
   -H 'X-API-Key: ${API_KEY}' -H 'Content-Type: application/json' \\
   -d '{"asset":"${TOKEN}","amount":"1.00","context":{"channel":"local-review","requestId":"try-001"}}'
 
-Full verification (second terminal):
+Full verification in Docker (second terminal):
 docker compose -f mb-sandbox-review/docker-compose.yml exec sandbox bash /workspace/mb-sandbox-review/reference/scripts/verify-all.sh
+
+Native full verification (second terminal, from repository root):
+ANVIL_HOST=127.0.0.1 bash mb-sandbox-review/reference/scripts/verify-all.sh
 
 This local example is unaudited, for evaluation only, and not for production.
 The well-known Anvil test mnemonic and development API key are not secrets; never reuse them elsewhere.

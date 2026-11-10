@@ -1,8 +1,9 @@
-tag=mb-review-v2
-tag_matches_release_commit=PASS
-pages=10
+tag=mb-review-v3
+pages=8
 absolute_https_links=37
-link_urls_use_release_tag=PASS
-target_paths_present_in_tagged_tree=37
+package_blob_links=36
+package_blob_links_use_release_tag=PASS
+successful_actions_run_link=1
+remote_tag_tree_targets=validated after v3 tag publication
 hidden_character_count=0
 AI_metadata_matches=0

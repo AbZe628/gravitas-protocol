@@ -18,9 +18,9 @@
 | Manager audit record | A real local transaction emitted token `Transfer` and manager `TransferChecked` events. The verifier replayed the registry events and recomputed the policy hash. See `reference-audit-record.json` and `evidence/`. |
 | New API OpenAPI file | Validated as OpenAPI 3.0.3; output is in `evidence/`. The earlier mock specification is separate. |
 | API package audit | `npm audit` reported zero high and critical findings; raw output is in `evidence/`. |
-| Docker Compose one-command launch | **Not run:** Docker is not installed in this environment, so the image build and Compose start were unavailable. The component checks were run directly on the local machine. |
-| Automated workflow result | **Not confirmed:** the workflow file is present, but a hosted run and artifact have not been verified. |
-| Final PDF | 10 pages; 37 absolute HTTPS links use `mb-review-v2`, every target exists in the tagged tree, and no hidden characters or AI metadata were found. See `evidence/pdf-link-validation.txt`. |
+| Docker Compose one-command launch | **Passed in GitHub Actions** on commit `770ee815a794281817e8defac7f268708f042c3b` (tag `mb-review-v2`): image build, sandbox startup, full verification, log capture and container shutdown all passed. See [successful run 42697229864](https://github.com/AbZe628/gravitas-protocol/actions/runs/42697229864). The local development machine did not run Docker; its component checks were run directly. |
+| Automated workflow result | **Passed:** the hosted run above completed successfully and uploaded verification logs. |
+| Final PDF | Eight pages; it contains 37 absolute HTTPS links: 36 package-file links target the immutable `mb-review-v3` paths and one points to the successful hosted workflow. The remote-tree targets are checked immediately after tag publication. |
 
 ## Contract comparison
 

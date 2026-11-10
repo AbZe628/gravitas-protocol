@@ -1,6 +1,6 @@
 # Local sandbox access
 
-**Reference implementation, unaudited, for evaluation, not for production.** Docker is the only tool that needs to be installed separately. The image supplies Node 22, Foundry 1.9.0 and verification utilities. The build needs network access to fetch the pinned tools and initialized source dependency.
+**Reference implementation, unaudited, for evaluation, not for production.** For the Compose route, the image supplies Node 22, Foundry 1.9.0 and verification utilities. The build needs network access to fetch the pinned tools and initialized source dependency.
 
 From the repository root, start everything with:
 
@@ -20,6 +20,34 @@ docker compose -f mb-sandbox-review/docker-compose.yml exec sandbox bash /worksp
 
 To stop the sandbox, press `Ctrl-C` in the first terminal. Or run `docker compose -f mb-sandbox-review/docker-compose.yml down`.
 
+## Docker-free native run
+
+This route is for Linux with Git, Bash, Node 22 (including npm), Foundry 1.9.0 (`forge`, `cast`, `anvil`), Python 3 with `venv`, and `curl`. The OpenAPI check downloads two pinned Python packages. Run from a fresh checkout of this release:
+
+```bash
+git clone --recurse-submodules --branch mb-review-v3 https://github.com/AbZe628/gravitas-protocol.git
+cd gravitas-protocol
+git submodule update --init --recursive
+[ -e lib/forge-std ] || ln -s openzeppelin-contracts/lib/forge-std lib/forge-std
+python3 -m venv .venv-review
+source .venv-review/bin/activate
+pip install openapi-spec-validator==0.7.2 pycryptodome==3.23.0
+export ANVIL_HOST=127.0.0.1 API_HOST=127.0.0.1
+bash mb-sandbox-review/reference/scripts/start-sandbox.sh
+```
+
+The recursive submodule step is required: `forge-std` is nested in OpenZeppelin. The symlink provides the root Foundry configuration's expected `lib/forge-std` path; the separate reference project already maps to the nested source. Binding both services to `127.0.0.1` keeps the native RPC and API local-only. The startup script builds, deploys and runs the tests, API checks and seven scenarios, then keeps Anvil and the API running.
+
+In a second terminal from the checkout, use:
+
+```bash
+source .venv-review/bin/activate
+export ANVIL_HOST=127.0.0.1
+bash mb-sandbox-review/reference/scripts/verify-all.sh
+```
+
+This full native check also stops the local node, verifies the API returns 503, restores the saved local state and checks recovery. Stop the native sandbox with `Ctrl-C` in the startup terminal. Native testing does not verify the container image. The complete Docker build and container run passed in [GitHub Actions](https://github.com/AbZe628/gravitas-protocol/actions/runs/42697229864).
+
 ## Test the API
 
 The start command prints ready-to-copy `curl` examples. For a policy read, use:
@@ -32,7 +60,7 @@ A request for the registered local token returns ALLOW only after a live registr
 
 ## Scenario runners
 
-Run one short check from the repository root while the Docker sandbox is up:
+Run one short check from the repository root while either sandbox is up:
 
 ```bash
 bash mb-sandbox-review/scripts/run-scenario-1.sh
