@@ -22,6 +22,7 @@ contract GatedDemoSukukTest is Test {
     uint256 internal constant INITIAL = 10_000 ether;
     uint256 internal constant TRANSFER_AMOUNT = 100 ether;
 
+    event Transfer(address indexed from, address indexed to, uint256 value);
     event TransferChecked(
         bytes32 indexed requestId,
         address indexed token,
@@ -34,9 +35,11 @@ contract GatedDemoSukukTest is Test {
 
     function setUp() public {
         registry = new GravitasPolicyRegistry();
-        // The token is created before it can be whitelisted; only this constructor mint is exempt.
-        token = new GatedDemoSukuk(address(registry), HOLDER, INITIAL);
         manager = new DemoSukukManager(address(registry));
+        // The token binds its manager in its constructor; the manager then accepts this
+        // exact token once. The constructor mint is the only asset-check exception.
+        token = new GatedDemoSukuk(address(registry), address(manager), HOLDER, INITIAL);
+        manager.initializeToken(address(token));
         registry.setAssetCompliance(address(token), true);
         registry.setExecutorStatus(address(manager), true);
     }
@@ -47,56 +50,77 @@ contract GatedDemoSukukTest is Test {
     }
 
     function _managerTransfer() internal {
-        manager.transferSukuk(REQUEST_ID, address(token), HOLDER, RECIPIENT, TRANSFER_AMOUNT);
+        vm.prank(HOLDER);
+        manager.transferSukuk(REQUEST_ID, HOLDER, RECIPIENT, TRANSFER_AMOUNT);
     }
 
-    function testScenario01_ApprovedManagerTransfersAndEmitsPolicyEvidence() public {
+    function testScenario01_ApprovedManagerTransfersAndEmitsBothEventsInOrder() public {
         _approveManager();
         uint256 version = registry.getPolicyVersion();
         bytes32 policyHash = registry.policyHistory(version);
+        vm.expectEmit(true, true, false, true, address(token));
+        emit Transfer(HOLDER, RECIPIENT, TRANSFER_AMOUNT);
         vm.expectEmit(true, true, false, true, address(manager));
         emit TransferChecked(REQUEST_ID, address(token), HOLDER, RECIPIENT, TRANSFER_AMOUNT, version, policyHash);
+
         _managerTransfer();
+
         assertEq(token.balanceOf(HOLDER), INITIAL - TRANSFER_AMOUNT);
         assertEq(token.balanceOf(RECIPIENT), TRANSFER_AMOUNT);
+        assertTrue(manager.processedRequestIds(REQUEST_ID));
     }
 
-    function testScenario02_UnapprovedAssetRevertsWithoutMovingBalances() public {
+    function testScenario02_UnapprovedAssetRevertsAtomically() public {
         _approveManager();
         registry.setAssetCompliance(address(token), false);
         vm.expectRevert(bytes("GPR: Asset not Shariah-compliant"));
         _managerTransfer();
         assertEq(token.balanceOf(HOLDER), INITIAL);
         assertEq(token.balanceOf(RECIPIENT), 0);
+        assertEq(token.allowance(HOLDER, address(manager)), type(uint256).max);
+        assertFalse(manager.processedRequestIds(REQUEST_ID));
     }
 
-    function testScenario03_UnregisteredManagerRevertsWithExactReason() public {
+    function testScenario03_UnregisteredBoundManagerCannotMoveItsToken() public {
         DemoSukukManager unregistered = new DemoSukukManager(address(registry));
+        GatedDemoSukuk unregisteredToken = new GatedDemoSukuk(
+            address(registry), address(unregistered), HOLDER, INITIAL
+        );
+        unregistered.initializeToken(address(unregisteredToken));
+        registry.setAssetCompliance(address(unregisteredToken), true);
+        vm.prank(HOLDER);
+        unregisteredToken.approve(address(unregistered), type(uint256).max);
+
         vm.expectRevert(bytes("GPR: Calling contract not an authorized executor"));
-        unregistered.transferSukuk(REQUEST_ID, address(token), HOLDER, RECIPIENT, TRANSFER_AMOUNT);
-        assertEq(token.balanceOf(HOLDER), INITIAL);
-        assertEq(token.balanceOf(RECIPIENT), 0);
+        vm.prank(HOLDER);
+        unregistered.transferSukuk(REQUEST_ID, HOLDER, RECIPIENT, TRANSFER_AMOUNT);
+
+        assertEq(unregisteredToken.balanceOf(HOLDER), INITIAL);
+        assertEq(unregisteredToken.balanceOf(RECIPIENT), 0);
+        assertFalse(unregistered.processedRequestIds(REQUEST_ID));
     }
 
-    function testScenario04_RevocationAndReapprovalAdvanceTheHashChain() public {
+    function testScenario04_RevocationAndReapprovalAdvanceHashChain() public {
         _approveManager();
         uint256 approvedVersion = registry.getPolicyVersion();
         bytes32 priorHash = registry.policyHistory(approvedVersion);
         registry.setAssetCompliance(address(token), false);
         uint256 revokedVersion = approvedVersion + 1;
-        bytes32 revokedHash = keccak256(
-            abi.encode(priorHash, keccak256("asset"), address(token), false)
-        );
+        bytes32 revokedHash = keccak256(abi.encode(priorHash, keccak256("asset"), address(token), false));
         assertEq(registry.getPolicyVersion(), revokedVersion);
         assertEq(registry.policyHistory(approvedVersion), priorHash);
         assertEq(registry.policyHistory(revokedVersion), revokedHash);
+
         vm.expectRevert(bytes("GPR: Asset not Shariah-compliant"));
         _managerTransfer();
+        assertEq(token.balanceOf(HOLDER), INITIAL);
+        assertEq(token.balanceOf(RECIPIENT), 0);
 
         registry.setAssetCompliance(address(token), true);
         uint256 reapprovedVersion = revokedVersion + 1;
         assertEq(registry.getPolicyVersion(), reapprovedVersion);
-        assertTrue(registry.policyHistory(reapprovedVersion) != priorHash);
+        vm.expectEmit(true, true, false, true, address(token));
+        emit Transfer(HOLDER, RECIPIENT, TRANSFER_AMOUNT);
         vm.expectEmit(true, true, false, true, address(manager));
         emit TransferChecked(
             REQUEST_ID, address(token), HOLDER, RECIPIENT, TRANSFER_AMOUNT,
@@ -106,7 +130,7 @@ contract GatedDemoSukukTest is Test {
         assertEq(token.balanceOf(RECIPIENT), TRANSFER_AMOUNT);
     }
 
-    function testScenario05_PauseStopsManagerAndDirectTransferAndNoCodeRegistryFails() public {
+    function testScenario05_PauseBlocksAllStateChangesAndRecoveryWorks() public {
         _approveManager();
         registry.pause();
         vm.expectRevert(bytes4(keccak256("EnforcedPause()")));
@@ -115,51 +139,77 @@ contract GatedDemoSukukTest is Test {
         vm.expectRevert(bytes4(keccak256("EnforcedPause()")));
         token.transfer(RECIPIENT, TRANSFER_AMOUNT);
         assertEq(token.balanceOf(HOLDER), INITIAL);
+        assertEq(token.balanceOf(RECIPIENT), 0);
+        assertFalse(manager.processedRequestIds(REQUEST_ID));
+
         registry.unpause();
         _managerTransfer();
         assertEq(token.balanceOf(RECIPIENT), TRANSFER_AMOUNT);
-
-        DemoSukukManager noRegistry = new DemoSukukManager(address(0xBEEF));
-        vm.expectRevert();
-        noRegistry.transferSukuk(REQUEST_ID, address(token), HOLDER, RECIPIENT, TRANSFER_AMOUNT);
     }
 
-    function testScenario06_DirectAndDelegatedRoutesAreGatedButPlainGusdIsNot() public {
-        registry.setAssetCompliance(address(token), false);
+    function testScenario06_DirectTransferCannotBypassManagerWhenAssetIsApproved() public {
+        uint256 holderBefore = token.balanceOf(HOLDER);
+        uint256 recipientBefore = token.balanceOf(RECIPIENT);
         vm.prank(HOLDER);
-        vm.expectRevert(bytes("GatedDemoSukuk: asset not approved"));
+        vm.expectRevert(bytes("GatedDemoSukuk: manager only"));
         token.transfer(RECIPIENT, TRANSFER_AMOUNT);
+        assertEq(token.balanceOf(HOLDER), holderBefore);
+        assertEq(token.balanceOf(RECIPIENT), recipientBefore);
+        assertEq(token.totalSupply(), INITIAL);
+    }
+
+    function testScenario06_DelegatedTransferCannotBypassManagerEvenForRegisteredExecutor() public {
+        registry.setExecutorStatus(DELEGATE, true);
+        vm.prank(HOLDER);
+        token.approve(DELEGATE, TRANSFER_AMOUNT);
+        uint256 holderBefore = token.balanceOf(HOLDER);
+        uint256 recipientBefore = token.balanceOf(RECIPIENT);
+
+        vm.prank(DELEGATE);
+        vm.expectRevert(bytes("GatedDemoSukuk: manager only"));
+        token.transferFrom(HOLDER, RECIPIENT, TRANSFER_AMOUNT);
+
+        assertEq(token.balanceOf(HOLDER), holderBefore);
+        assertEq(token.balanceOf(RECIPIENT), recipientBefore);
+        assertEq(token.allowance(HOLDER, DELEGATE), TRANSFER_AMOUNT);
+    }
+
+    function testScenario06_OnlyTheBoundManagerCanUseTransferFrom() public {
+        _approveManager();
         vm.prank(HOLDER);
         token.approve(DELEGATE, TRANSFER_AMOUNT);
         vm.prank(DELEGATE);
-        vm.expectRevert(bytes("GatedDemoSukuk: asset not approved"));
+        vm.expectRevert(bytes("GatedDemoSukuk: manager only"));
         token.transferFrom(HOLDER, RECIPIENT, TRANSFER_AMOUNT);
-        assertEq(token.balanceOf(HOLDER), INITIAL);
-        assertEq(token.balanceOf(RECIPIENT), 0);
+        assertEq(token.allowance(HOLDER, DELEGATE), TRANSFER_AMOUNT);
 
-        registry.pause();
-        vm.prank(HOLDER);
-        vm.expectRevert(bytes4(keccak256("EnforcedPause()")));
-        token.transfer(RECIPIENT, TRANSFER_AMOUNT);
-        vm.prank(HOLDER);
-        token.approve(DELEGATE, TRANSFER_AMOUNT);
-        vm.prank(DELEGATE);
-        vm.expectRevert(bytes4(keccak256("EnforcedPause()")));
-        token.transferFrom(HOLDER, RECIPIENT, TRANSFER_AMOUNT);
-
-        MockERC20 plainGusd = new MockERC20();
-        plainGusd.transfer(HOLDER, TRANSFER_AMOUNT);
-        registry.setAssetCompliance(address(plainGusd), false);
-        vm.prank(HOLDER);
-        assertTrue(plainGusd.transfer(RECIPIENT, TRANSFER_AMOUNT));
-        assertEq(plainGusd.balanceOf(RECIPIENT), TRANSFER_AMOUNT);
+        _managerTransfer();
+        assertEq(token.balanceOf(RECIPIENT), TRANSFER_AMOUNT);
     }
 
-    function testScenario07_PostDeploymentMintAndBurnAreGated_InitialMintIsTheException() public {
+    function testFuzz_DirectTransferAlwaysRevertsWhenAssetIsApproved(address to, uint256 amount) public {
+        vm.assume(to != address(0));
+        uint256 holderBefore = token.balanceOf(HOLDER);
+        uint256 recipientBefore = token.balanceOf(to);
+        vm.prank(HOLDER);
+        vm.expectRevert(bytes("GatedDemoSukuk: manager only"));
+        token.transfer(to, amount);
+        assertEq(token.balanceOf(HOLDER), holderBefore);
+        assertEq(token.balanceOf(to), recipientBefore);
+        assertEq(token.totalSupply(), INITIAL);
+    }
+
+    function testScenario07_PostDeploymentMintBurnAndConstructorExceptionRemainControlled() public {
         assertEq(token.balanceOf(HOLDER), INITIAL);
         assertEq(token.totalSupply(), INITIAL);
-        registry.setAssetCompliance(address(token), false);
+        token.mint(RECIPIENT, 1 ether);
+        assertEq(token.balanceOf(RECIPIENT), 1 ether);
 
+        vm.prank(HOLDER);
+        vm.expectRevert(bytes("GatedDemoSukuk: caller is not issuer"));
+        token.mint(RECIPIENT, 1 ether);
+
+        registry.setAssetCompliance(address(token), false);
         vm.expectRevert(bytes("GatedDemoSukuk: asset not approved"));
         token.mint(RECIPIENT, 1 ether);
         vm.prank(HOLDER);
@@ -170,22 +220,100 @@ contract GatedDemoSukukTest is Test {
         vm.prank(DELEGATE);
         vm.expectRevert(bytes("GatedDemoSukuk: asset not approved"));
         token.burnFrom(HOLDER, 1 ether);
-
         assertEq(token.balanceOf(HOLDER), INITIAL);
-        assertEq(token.balanceOf(RECIPIENT), 0);
-        assertEq(token.totalSupply(), INITIAL);
+        assertEq(token.totalSupply(), INITIAL + 1 ether);
+
+        registry.setAssetCompliance(address(token), true);
+        vm.prank(HOLDER);
+        token.burn(1 ether);
+        vm.prank(HOLDER);
+        token.approve(DELEGATE, 1 ether);
+        vm.prank(DELEGATE);
+        token.burnFrom(HOLDER, 1 ether);
+        assertEq(token.balanceOf(HOLDER), INITIAL - 2 ether);
+        assertEq(token.totalSupply(), INITIAL - 1 ether);
     }
 
-    function testFuzz_Scenario07_RefusedTransfersNeverChangeBalances(address to, uint256 amount) public {
-        vm.assume(to != address(0));
-        vm.assume(to != HOLDER);
-        registry.setAssetCompliance(address(token), false);
-        uint256 beforeHolder = token.balanceOf(HOLDER);
-        uint256 beforeRecipient = token.balanceOf(to);
+    function testScenario07_OwnerHasNoDirectTransferBypass() public {
+        token.mint(address(this), 5 ether);
+        uint256 ownerBefore = token.balanceOf(address(this));
+        vm.expectRevert(bytes("GatedDemoSukuk: manager only"));
+        token.transfer(RECIPIENT, 1 ether);
+        assertEq(token.balanceOf(address(this)), ownerBefore);
+        assertEq(token.balanceOf(RECIPIENT), 0);
+    }
+
+    function testScenario07_RequestIdCannotBeReplayed() public {
+        _approveManager();
+        _managerTransfer();
+        uint256 holderAfterFirst = token.balanceOf(HOLDER);
+        uint256 recipientAfterFirst = token.balanceOf(RECIPIENT);
+        vm.expectRevert(abi.encodeWithSelector(DemoSukukManager.RequestAlreadyProcessed.selector, REQUEST_ID));
+        _managerTransfer();
+        assertEq(token.balanceOf(HOLDER), holderAfterFirst);
+        assertEq(token.balanceOf(RECIPIENT), recipientAfterFirst);
+    }
+
+    function testScenario07_OneTimeTokenBindingRejectsReplacementAndWrongToken() public {
+        vm.expectRevert(DemoSukukManager.TokenAlreadyConfigured.selector);
+        manager.initializeToken(address(token));
+
+        DemoSukukManager otherManager = new DemoSukukManager(address(registry));
+        MockERC20 plainToken = new MockERC20();
+        vm.expectRevert(DemoSukukManager.InvalidToken.selector);
+        otherManager.initializeToken(address(plainToken));
+        assertEq(otherManager.gatedToken(), address(0));
+    }
+
+    function testScenario07_ManagerWithoutBoundTokenCannotTransfer() public {
+        DemoSukukManager uninitialized = new DemoSukukManager(address(registry));
+        vm.expectRevert(DemoSukukManager.TokenNotConfigured.selector);
+        uninitialized.transferSukuk(REQUEST_ID, HOLDER, RECIPIENT, TRANSFER_AMOUNT);
+    }
+
+    function testScenario07_NoCodeRegistryOrManagerIsRejected() public {
+        vm.expectRevert(GatedDemoSukuk.InvalidRegistry.selector);
+        new GatedDemoSukuk(address(0xBEEF), address(manager), HOLDER, INITIAL);
+        vm.expectRevert(GatedDemoSukuk.InvalidManager.selector);
+        new GatedDemoSukuk(address(registry), address(0xBEEF), HOLDER, INITIAL);
+        vm.expectRevert(DemoSukukManager.InvalidRegistry.selector);
+        new DemoSukukManager(address(0xBEEF));
+    }
+
+    function testScenario07_ZeroAndDuplicateRequestIdsAreRejected() public {
+        _approveManager();
         vm.prank(HOLDER);
-        vm.expectRevert(bytes("GatedDemoSukuk: asset not approved"));
-        token.transfer(to, amount);
-        assertEq(token.balanceOf(HOLDER), beforeHolder);
-        assertEq(token.balanceOf(to), beforeRecipient);
+        vm.expectRevert(DemoSukukManager.InvalidRequestId.selector);
+        manager.transferSukuk(bytes32(0), HOLDER, RECIPIENT, TRANSFER_AMOUNT);
+        _managerTransfer();
+        uint256 holderAfterFirst = token.balanceOf(HOLDER);
+        vm.expectRevert(abi.encodeWithSelector(DemoSukukManager.RequestAlreadyProcessed.selector, REQUEST_ID));
+        _managerTransfer();
+        assertEq(token.balanceOf(HOLDER), holderAfterFirst);
+    }
+
+    function testScenario07_ThirdPartyCannotRedirectHolderAllowance() public {
+        _approveManager();
+        uint256 holderBefore = token.balanceOf(HOLDER);
+        uint256 recipientBefore = token.balanceOf(RECIPIENT);
+        vm.prank(address(0xCAFE));
+        vm.expectRevert(
+            abi.encodeWithSelector(
+                DemoSukukManager.CallerNotTokenOwner.selector, address(0xCAFE), HOLDER
+            )
+        );
+        manager.transferSukuk(REQUEST_ID, HOLDER, RECIPIENT, TRANSFER_AMOUNT);
+        assertEq(token.balanceOf(HOLDER), holderBefore);
+        assertEq(token.balanceOf(RECIPIENT), recipientBefore);
+        assertEq(token.allowance(HOLDER, address(manager)), type(uint256).max);
+        assertFalse(manager.processedRequestIds(REQUEST_ID));
+    }
+
+    function testScenario07_PlainGusdRemainsOutsideReferenceTokenGate() public {
+        MockERC20 plainGusd = new MockERC20();
+        plainGusd.transfer(HOLDER, TRANSFER_AMOUNT);
+        vm.prank(HOLDER);
+        assertTrue(plainGusd.transfer(RECIPIENT, TRANSFER_AMOUNT));
+        assertEq(plainGusd.balanceOf(RECIPIENT), TRANSFER_AMOUNT);
     }
 }

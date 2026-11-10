@@ -16,8 +16,9 @@ contract DeployReference is Script {
 
         GravitasPolicyRegistry registry = new GravitasPolicyRegistry();
         MockERC20 gusd = new MockERC20();
-        GatedDemoSukuk token = new GatedDemoSukuk(address(registry), holder, 10_000 ether);
         DemoSukukManager manager = new DemoSukukManager(address(registry));
+        GatedDemoSukuk token = new GatedDemoSukuk(address(registry), address(manager), holder, 10_000 ether);
+        manager.initializeToken(address(token));
         registry.setAssetCompliance(address(token), true);
         registry.setExecutorStatus(address(manager), true);
 

@@ -1,0 +1,21 @@
+No files changed, compilation skipped
+
+Ran 9 tests for test/GatedDemoSukuk.t.sol:GatedDemoSukukTest
+[PASS] testScenario07_ManagerWithoutBoundTokenCannotTransfer() (gas: 573737)
+[PASS] testScenario07_NoCodeRegistryOrManagerIsRejected() (gas: 233184)
+[PASS] testScenario07_OneTimeTokenBindingRejectsReplacementAndWrongToken() (gas: 1169279)
+[PASS] testScenario07_OwnerHasNoDirectTransferBypass() (gas: 124282)
+[PASS] testScenario07_PlainGusdRemainsOutsideReferenceTokenGate() (gas: 659375)
+[PASS] testScenario07_PostDeploymentMintBurnAndConstructorExceptionRemainControlled() (gas: 568970)
+[PASS] testScenario07_RequestIdCannotBeReplayed() (gas: 227140)
+[PASS] testScenario07_ThirdPartyCannotRedirectHolderAllowance() (gas: 137280)
+[PASS] testScenario07_ZeroAndDuplicateRequestIdsAreRejected() (gas: 238363)
+Suite result: ok. 9 passed; 0 failed; 0 skipped; finished in 3.69ms (6.52ms CPU time)
+
+Ran 1 test suite in 15.48ms (3.69ms CPU time): 9 tests passed, 0 failed, 0 skipped (9 total tests)
+PASS receipt, calldata, events and block binding: 0xb65fce642061e06895c811fdda85c1a8b160cace22b05080e8130c5121910461
+PASS policy hash chain at transfer event: version 3, 0xcc538e304a3c0e799282cd1cb94915def57c7e7f8d461bbbd3a23351c7eeca98
+PASS registry history at block end: version 3; confirmations 1
+WROTE /home/ubuntu/gravitas-protocol/mb-sandbox-review/reference-audit-record.json
+PASS serialized audit record matches chain evidence: 0xb65fce642061e06895c811fdda85c1a8b160cace22b05080e8130c5121910461
+PASS expected chain 31337; block 9; policy version 3

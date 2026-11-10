@@ -9,8 +9,12 @@ import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {IShariahPolicyChecker} from "contracts/interfaces/IShariahPolicyChecker.sol";
 
 contract GatedDemoSukuk is ERC20 {
+    error InvalidRegistry();
+    error InvalidManager();
+
     IShariahPolicyChecker public immutable registry;
     address public immutable issuer;
+    address public immutable manager;
     bool private _initialMintInProgress = true;
 
     modifier onlyIssuer() {
@@ -18,11 +22,17 @@ contract GatedDemoSukuk is ERC20 {
         _;
     }
 
-    constructor(address registryAddress, address initialHolder, uint256 initialSupply)
-        ERC20("Demo Sukuk (dummy)", "DSUKUK")
-    {
+    constructor(
+        address registryAddress,
+        address managerAddress,
+        address initialHolder,
+        uint256 initialSupply
+    ) ERC20("Demo Sukuk (dummy)", "DSUKUK") {
+        if (registryAddress.code.length == 0) revert InvalidRegistry();
+        if (managerAddress.code.length == 0) revert InvalidManager();
         registry = IShariahPolicyChecker(registryAddress);
         issuer = msg.sender;
+        manager = managerAddress;
         // The token cannot be approved before its address exists. This constructor mint is the sole exception.
         _mint(initialHolder, initialSupply);
         _initialMintInProgress = false;
@@ -43,7 +53,14 @@ contract GatedDemoSukuk is ERC20 {
 
     function _update(address from, address to, uint256 amount) internal override {
         if (!_initialMintInProgress) {
+            // Retain the registry asset/pause gate on every post-deployment balance change.
             require(registry.verifyAssetCompliance(address(this)), "GatedDemoSukuk: asset not approved");
+        }
+        // Mint and burn keep their issuer/holder/allowance controls. Every transfer between
+        // nonzero addresses must be initiated by the fixed manager, so neither transfer nor
+        // transferFrom can bypass executor authorization or omit TransferChecked evidence.
+        if (from != address(0) && to != address(0)) {
+            require(_msgSender() == manager, "GatedDemoSukuk: manager only");
         }
         super._update(from, to, amount);
     }

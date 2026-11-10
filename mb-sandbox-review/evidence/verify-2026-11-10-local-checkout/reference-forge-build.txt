@@ -1,0 +1,16 @@
+No files changed, compilation skipped
+[1m[33mwarning[missing-zero-check][0m[1m: address parameter is used in a state write or value transfer without a zero-address check[0m
+  [1m[94m ╭▸ [0msrc/GatedDemoSukuk.sol:27:9
+   [1m[94m│[0m
+[1m[94m27[0m [1m[94m│[0m         address managerAddress,
+   [1m[94m│[0m         [1m[33m━━━━━━━━━━━━━━━━━━━━━━[0m
+   [1m[94m│[0m
+   [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/missing-zero-check\https://getfoundry.sh/forge/linting/missing-zero-check]8;;\
+
+[1m[33mwarning[missing-zero-check][0m[1m: address parameter is used in a state write or value transfer without a zero-address check[0m
+  [1m[94m ╭▸ [0msrc/DemoSukukManager.sol:52:30
+   [1m[94m│[0m
+[1m[94m52[0m [1m[94m│[0m     function initializeToken(address tokenAddress) external onlyOwner {
+   [1m[94m│[0m                              [1m[33m━━━━━━━━━━━━━━━━━━━━[0m
+   [1m[94m│[0m
+   [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/missing-zero-check\https://getfoundry.sh/forge/linting/missing-zero-check]8;;\

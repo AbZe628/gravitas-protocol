@@ -1,0 +1,130 @@
+
+up to date in 277ms
+
+> gravitas-registry-reference-api@0.1.0 test
+> node --test test/*.test.mjs
+
+TAP version 13
+# Subtest: allowed asset returns a pinned-block ALLOW and auditable policy fields
+ok 1 - allowed asset returns a pinned-block ALLOW and auditable policy fields
+  ---
+  duration_ms: 77.234818
+  type: 'test'
+  ...
+# Subtest: unapproved asset returns DENY without converting caller context into authority
+ok 2 - unapproved asset returns DENY without converting caller context into authority
+  ---
+  duration_ms: 32.553873
+  type: 'test'
+  ...
+# Subtest: paused registry returns DENY at the same pinned block
+ok 3 - paused registry returns DENY at the same pinned block
+  ---
+  duration_ms: 19.45239
+  type: 'test'
+  ...
+# Subtest: missing or wrong API key returns 401 on protected routes
+ok 4 - missing or wrong API key returns 401 on protected routes
+  ---
+  duration_ms: 8.294971
+  type: 'test'
+  ...
+# Subtest: bad addresses, negative amounts and unknown fields are rejected
+ok 5 - bad addresses, negative amounts and unknown fields are rejected
+  ---
+  duration_ms: 10.354766
+  type: 'test'
+  ...
+# Subtest: unknown route returns 404 after authentication
+ok 6 - unknown route returns 404 after authentication
+  ---
+  duration_ms: 4.156043
+  type: 'test'
+  ...
+# Subtest: stopped RPC returns 503 DENY; restoring the RPC recovers without a cached ALLOW
+ok 7 - stopped RPC returns 503 DENY; restoring the RPC recovers without a cached ALLOW
+  ---
+  duration_ms: 21.026574
+  type: 'test'
+  ...
+# Subtest: slow RPC times out, retries once, and returns 503 DENY
+ok 8 - slow RPC times out, retries once, and returns 503 DENY
+  ---
+  duration_ms: 4009.56013
+  type: 'test'
+  ...
+# Subtest: policy route reads the version and hash live
+ok 9 - policy route reads the version and hash live
+  ---
+  duration_ms: 14.867324
+  type: 'test'
+  ...
+# Subtest: unreachable API returns local UNAVAILABLE and does not invoke transfer callback
+ok 10 - unreachable API returns local UNAVAILABLE and does not invoke transfer callback
+  ---
+  duration_ms: 3.43095
+  type: 'test'
+  ...
+# Subtest: API-up/RPC-down HTTP 503 DENY remains distinct from an unreachable API
+ok 11 - API-up/RPC-down HTTP 503 DENY remains distinct from an unreachable API
+  ---
+  duration_ms: 3.901046
+  type: 'test'
+  ...
+# Subtest: invalid or mismatched HTTP 200 ALLOW is unavailable and never executes
+ok 12 - invalid or mismatched HTTP 200 ALLOW is unavailable and never executes
+  ---
+  duration_ms: 0.723673
+  type: 'test'
+  ...
+# Subtest: a valid current ALLOW is the only response that invokes transfer callback
+ok 13 - a valid current ALLOW is the only response that invokes transfer callback
+  ---
+  duration_ms: 0.951472
+  type: 'test'
+  ...
+# Subtest: valid policy DENY does not execute a transfer
+ok 14 - valid policy DENY does not execute a transfer
+  ---
+  duration_ms: 0.81514
+  type: 'test'
+  ...
+# Subtest: timeout and transport retries remain bounded by attempt and total-time caps
+ok 15 - timeout and transport retries remain bounded by attempt and total-time caps
+  ---
+  duration_ms: 55.5737
+  type: 'test'
+  ...
+# Subtest: transport recovery makes a fresh request and executes once only after validated ALLOW
+ok 16 - transport recovery makes a fresh request and executes once only after validated ALLOW
+  ---
+  duration_ms: 1.495393
+  type: 'test'
+  ...
+# Subtest: real closed loopback endpoint is not interpreted as approval
+ok 17 - real closed loopback endpoint is not interpreted as approval
+  ---
+  duration_ms: 22.591068
+  type: 'test'
+  ...
+# Subtest: HTTP 500 or malformed JSON cannot create ALLOW
+ok 18 - HTTP 500 or malformed JSON cannot create ALLOW
+  ---
+  duration_ms: 22.324379
+  type: 'test'
+  ...
+# Subtest: client rejects retry limits outside the documented bound
+ok 19 - client rejects retry limits outside the documented bound
+  ---
+  duration_ms: 1.27886
+  type: 'test'
+  ...
+1..19
+# tests 19
+# suites 0
+# pass 19
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4440.898327

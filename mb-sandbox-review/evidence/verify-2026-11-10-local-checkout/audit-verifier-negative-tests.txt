@@ -1,0 +1,23 @@
+PASS rejected mutated audit record: policy version
+PASS rejected mutated audit record: policy hash
+PASS rejected mutated audit record: amount
+PASS rejected mutated audit record: sender
+PASS rejected mutated audit record: recipient
+PASS rejected mutated audit record: missing event summaries
+PASS rejected mutated audit record: missing manager event
+PASS rejected mutated audit record: missing token event
+PASS rejected mutated audit record: different manager event transaction
+PASS rejected mutated audit record: different token event transaction
+PASS rejected mutated audit record: same-transaction flag
+PASS rejected mutated audit record: policy history gap
+PASS rejected mutated audit record: policy history ordering
+PASS rejected mutated audit record: unrelated transaction
+PASS rejected mutated audit record: block hash
+PASS rejected mutated audit record: transaction sender
+PASS valid record still verifies under python -O (checks do not depend on assert)
+PASS rejected RPC proof mutation: missing_manager_event
+PASS rejected RPC proof mutation: missing_token_event
+PASS rejected RPC proof mutation: cross_transaction_events
+PASS rejected RPC proof mutation: bad_receipt_block_hash
+PASS rejected RPC proof mutation: policy_history_gap
+ALL AUDIT VERIFIER NEGATIVE TESTS PASSED against real Anvil transaction 0xb65fce642061e06895c811fdda85c1a8b160cace22b05080e8130c5121910461

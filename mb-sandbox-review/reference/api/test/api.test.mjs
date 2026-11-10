@@ -148,6 +148,8 @@ test('unknown route returns 404 after authentication', async () => {
 
 test('stopped RPC returns 503 DENY; restoring the RPC recovers without a cached ALLOW', async () => {
   await closeServer(rpc); // Stop the JSON-RPC chain endpoint between requests.
+  const health = await fetch(`${apiUrl}/health`, { headers: { 'x-api-key': KEY } });
+  assert.equal(health.status, 200, 'HTTP process health remains distinct from registry/RPC health');
   const down = await post();
   assert.equal(down.status, 503);
   assert.deepEqual(await down.json(), { decision: 'DENY', reasonCode: 'REGISTRY_UNAVAILABLE' });

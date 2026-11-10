@@ -1,0 +1,28 @@
+No files changed, compilation skipped
+
+Ran 18 tests for test/GatedDemoSukuk.t.sol:GatedDemoSukukTest
+[PASS] testFuzz_DirectTransferAlwaysRevertsWhenAssetIsApproved(address,uint256) (runs: 256, μ: 79978, ~: 79999)
+[PASS] testScenario01_ApprovedManagerTransfersAndEmitsBothEventsInOrder() (gas: 216246)
+[PASS] testScenario02_UnapprovedAssetRevertsAtomically() (gas: 192111)
+[PASS] testScenario03_UnregisteredBoundManagerCannotMoveItsToken() (gas: 1706301)
+[PASS] testScenario04_RevocationAndReapprovalAdvanceHashChain() (gas: 446657)
+[PASS] testScenario05_PauseBlocksAllStateChangesAndRecoveryWorks() (gas: 350110)
+[PASS] testScenario06_DelegatedTransferCannotBypassManagerEvenForRegisteredExecutor() (gas: 216142)
+[PASS] testScenario06_DirectTransferCannotBypassManagerWhenAssetIsApproved() (gas: 76699)
+[PASS] testScenario06_OnlyTheBoundManagerCanUseTransferFrom() (gas: 268568)
+[PASS] testScenario07_ManagerWithoutBoundTokenCannotTransfer() (gas: 573737)
+[PASS] testScenario07_NoCodeRegistryOrManagerIsRejected() (gas: 233184)
+[PASS] testScenario07_OneTimeTokenBindingRejectsReplacementAndWrongToken() (gas: 1169279)
+[PASS] testScenario07_OwnerHasNoDirectTransferBypass() (gas: 124282)
+[PASS] testScenario07_PlainGusdRemainsOutsideReferenceTokenGate() (gas: 659375)
+[PASS] testScenario07_PostDeploymentMintBurnAndConstructorExceptionRemainControlled() (gas: 568970)
+[PASS] testScenario07_RequestIdCannotBeReplayed() (gas: 227140)
+[PASS] testScenario07_ThirdPartyCannotRedirectHolderAllowance() (gas: 137280)
+[PASS] testScenario07_ZeroAndDuplicateRequestIdsAreRejected() (gas: 238363)
+Suite result: ok. 18 passed; 0 failed; 0 skipped; finished in 19.49ms (29.80ms CPU time)
+
+╭--------------------+--------+--------+---------╮
+| Test Suite         | Passed | Failed | Skipped |
++================================================+
+| GatedDemoSukukTest | 18     | 0      | 0       |
+╰--------------------+--------+--------+---------╯

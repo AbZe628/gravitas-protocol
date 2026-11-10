@@ -10,10 +10,12 @@ ANVIL_LOG="/tmp/reference-anvil.log"
 API_LOG="/tmp/reference-api.log"
 MNEMONIC="${ANVIL_MNEMONIC:-test test test test test test test test test test test junk}"
 ANVIL_HOST="${ANVIL_HOST:-0.0.0.0}"
+ANVIL_PORT="${ANVIL_PORT:-8545}"
 API_KEY="${MB_API_KEY:-local-reference-key-only}"
 export PATH="/usr/local/bin:$PATH"
 export ANVIL_MNEMONIC="$MNEMONIC" MB_API_KEY="$API_KEY"
-export RPC_URL="http://127.0.0.1:8545" API_HOST="${API_HOST:-0.0.0.0}" API_PORT="${API_PORT:-8787}"
+export RPC_URL="${RPC_URL:-http://127.0.0.1:${ANVIL_PORT}}" API_HOST="${API_HOST:-0.0.0.0}" API_PORT="${API_PORT:-8787}"
+export API_URL="${API_URL:-http://127.0.0.1:${API_PORT}}"
 export AUDIT_LOG_PATH="${AUDIT_LOG_PATH:-/tmp/reference-api-audit.jsonl}"
 
 cleanup() {
@@ -29,9 +31,9 @@ trap 'exit 0' INT TERM
 
 start_anvil() {
   if [[ -s "$STATE_PATH" ]]; then
-    anvil --host "$ANVIL_HOST" --port 8545 --chain-id 31337 --mnemonic "$MNEMONIC" --state "$STATE_PATH" >"$ANVIL_LOG" 2>&1 &
+    anvil --host "$ANVIL_HOST" --port "$ANVIL_PORT" --chain-id 31337 --mnemonic "$MNEMONIC" --state "$STATE_PATH" >"$ANVIL_LOG" 2>&1 &
   else
-    anvil --host "$ANVIL_HOST" --port 8545 --chain-id 31337 --mnemonic "$MNEMONIC" --dump-state "$STATE_PATH" >"$ANVIL_LOG" 2>&1 &
+    anvil --host "$ANVIL_HOST" --port "$ANVIL_PORT" --chain-id 31337 --mnemonic "$MNEMONIC" --dump-state "$STATE_PATH" >"$ANVIL_LOG" 2>&1 &
   fi
   echo $! > "$PID_FILE"
   for _ in $(seq 1 60); do
@@ -71,6 +73,7 @@ python3 "$REF/scripts/verify-openapi.py"
 
 printf '\nRunning scenario runners 1–7...\n'
 for n in 1 2 3 4 5 6 7; do bash "$ROOT/mb-sandbox-review/scripts/run-scenario-${n}.sh"; done
+python3 "$REF/scripts/test-audit-verifier.py"
 python3 "$REF/scripts/check-live-api.py"
 bash "$REF/scripts/check-live-pause.sh"
 

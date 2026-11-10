@@ -1,0 +1,2 @@
+PASS actual paused registry: API DENY REGISTRY_PAUSED
+PASS unpaused registry: live API returns ALLOW again

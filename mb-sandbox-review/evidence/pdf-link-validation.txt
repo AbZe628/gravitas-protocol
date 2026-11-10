@@ -1,9 +1,9 @@
-tag=mb-review-v3
-pages=8
-absolute_https_links=37
-package_blob_links=36
-package_blob_links_use_release_tag=PASS
-successful_actions_run_link=1
-remote_tag_tree_targets=validated after v3 tag publication
+tag=mb-review-v5
+pages=9
+absolute_https_links=33
+package_tagged_file_or_tree_links=32
+package_links_use_immutable_release_tag=PASS
+successful_actions_run_link=1 (run 42820021688; mb-review-v4)
+local_tag_target_paths=31 unique; 32 link annotations resolve in current release tree
+remote_tag_tree_targets=verify after v5 publication
 hidden_character_count=0
-AI_metadata_matches=0

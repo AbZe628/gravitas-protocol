@@ -4,6 +4,7 @@ test = "test"
 script = "script"
 out = "out"
 libs = ["../../lib"]
+allow_paths = ["../../contracts"]
 solc_version = "0.8.24"
 optimizer = true
 optimizer_runs = 200

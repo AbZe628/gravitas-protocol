@@ -5,7 +5,11 @@ info:
   description: >-
     REFERENCE IMPLEMENTATION, UNAUDITED, FOR EVALUATION, NOT FOR PRODUCTION.
     Reads the existing GravitasPolicyRegistry at one pinned block. This service
-    does not transfer tokens, check investor eligibility, or create an issuer product.
+    does not transfer tokens, check investor identity or eligibility, or create an issuer product.
+    Consumers must treat transport/API errors as unavailable and accept ALLOW only
+    from a schema-valid response pinned to their expected chain and registry. An API
+    read and a later transaction are not atomic; the gated token and manager enforce
+    the final on-chain path in this reference package.
 servers:
   - url: http://127.0.0.1:8787
     description: Local sandbox; container deployments publish only on host loopback.
@@ -13,7 +17,7 @@ security:
   - ApiKey: []
 tags:
   - name: Registry reads
-    description: Live read-only decisions from the registry; no transfer is executed.
+    description: Live read-only asset decisions from the registry; no investor eligibility or transfer is executed.
 paths:
   /v1/verify:
     post:
@@ -24,7 +28,11 @@ paths:
         The amount and context are validated and logged but do not affect the
         registry decision. The current registry does not evaluate investors,
         amount, transfer parties, or instrument terms. RPC failure after two
-        attempts returns HTTP 503 with DENY; no cached ALLOW is used.
+        attempts returns HTTP 503 with DENY; no cached ALLOW is used. `requestId` is
+        caller-supplied correlation data, not identity, authorization, uniqueness,
+        or idempotency. This endpoint never executes a transfer; the reference
+        consumer client invokes its transfer callback only after a complete current
+        ALLOW response validates.
       requestBody:
         required: true
         content:
@@ -47,7 +55,7 @@ paths:
         '415':
           description: Content-Type is not application/json.
         '503':
-          description: Registry RPC unavailable after one retry; decision is DENY.
+          description: Registry RPC unavailable after one retry; response is DENY / REGISTRY_UNAVAILABLE and has no policy evidence fields.
           content:
             application/json:
               schema:

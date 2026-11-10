@@ -1,0 +1,10 @@
+No files changed, compilation skipped
+
+Ran 4 tests for test/GatedDemoSukuk.t.sol:GatedDemoSukukTest
+[PASS] testScenario01_ApprovedManagerTransfersAndEmitsBothEventsInOrder() (gas: 216246)
+[PASS] testScenario06_DelegatedTransferCannotBypassManagerEvenForRegisteredExecutor() (gas: 216142)
+[PASS] testScenario06_DirectTransferCannotBypassManagerWhenAssetIsApproved() (gas: 76699)
+[PASS] testScenario06_OnlyTheBoundManagerCanUseTransferFrom() (gas: 268568)
+Suite result: ok. 4 passed; 0 failed; 0 skipped; finished in 2.79ms (2.25ms CPU time)
+
+Ran 1 test suite in 14.52ms (2.79ms CPU time): 4 tests passed, 0 failed, 0 skipped (4 total tests)

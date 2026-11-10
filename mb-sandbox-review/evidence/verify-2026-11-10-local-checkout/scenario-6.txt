@@ -1,0 +1,17 @@
+No files changed, compilation skipped
+
+Ran 2 tests for test/foundry/PolicyCommitment.t.sol:PolicyCommitment
+[PASS] test_OnlyTheOwnerWrites() (gas: 33235)
+[PASS] test_OnlyTheOwnerWritesToEveryRegister() (gas: 61059)
+Suite result: ok. 2 passed; 0 failed; 0 skipped; finished in 1.03ms (432.90µs CPU time)
+
+Ran 1 test suite in 14.85ms (1.03ms CPU time): 2 tests passed, 0 failed, 0 skipped (2 total tests)
+No files changed, compilation skipped
+
+Ran 3 tests for test/GatedDemoSukuk.t.sol:GatedDemoSukukTest
+[PASS] testScenario06_DelegatedTransferCannotBypassManagerEvenForRegisteredExecutor() (gas: 216142)
+[PASS] testScenario06_DirectTransferCannotBypassManagerWhenAssetIsApproved() (gas: 76699)
+[PASS] testScenario06_OnlyTheBoundManagerCanUseTransferFrom() (gas: 268568)
+Suite result: ok. 3 passed; 0 failed; 0 skipped; finished in 3.16ms (1.86ms CPU time)
+
+Ran 1 test suite in 15.10ms (3.16ms CPU time): 3 tests passed, 0 failed, 0 skipped (3 total tests)

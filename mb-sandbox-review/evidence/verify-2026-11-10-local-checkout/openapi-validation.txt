@@ -1,0 +1,1 @@
+PASS OpenAPI 3.0.3 validation: /home/ubuntu/gravitas-protocol/mb-sandbox-review/reference/api/openapi.yaml
