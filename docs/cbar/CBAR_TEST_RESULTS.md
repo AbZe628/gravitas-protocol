@@ -26,6 +26,14 @@
 | Invalid Registry address lookup | **PASS negative control — HTTP 400** | Local reviewer service | Rejected before upstream RPC access. |
 | Main Typst institutional report | **PASS — 30 pages** | Strict compile; publication-profile verifier | `main.typ` compiled with no warnings; deterministic verification passed; representative contact sheet reviewed. |
 
+## Clean-checkout reproduction and Foundry notices
+
+A fresh recursive clone of published code commit `54ad95b69daea4000bd71ab0be8a2e3b9e686fd2` reproduced `forge fmt --check`, `forge build --sizes`, the 86-test Foundry suite, reviewer-app tests/syntax checks, Majlis typecheck plus 488 tests/build, and SDK 20 tests/build. The clean-checkout reviewer server also ran fixed local T26 and T27 actions successfully on loopback. Raw commands and outputs are preserved under `evidence/cbar/clean-checkout-*`; the runner response files contain no network transaction.
+
+The clean `forge build --sizes` emitted the existing unused-`subscriber` compiler warning and 39 Foundry lint notices across nine rule classes. Production-code notices include timestamp comparisons, external-call/reentrancy and ignored-return rules in Teleport V2/V3, plus two `missing-events-access-control` notices at the Registry executor setter and local WETH9 helper. Source inspection found executor/policy events in the Registry constructor/setter and `Withdrawal`/`Transfer` events in WETH9, so both event notices require independent rechecking rather than being accepted as proven defects. Both migration entrypoints are `nonReentrant`; that modifier does not replace an independent reentrancy review. Most remaining lint notices are in test mocks/fixtures or tests. None was suppressed; see `evidence/cbar/clean-checkout-foundry.log` for exact locations. These notices are review leads, not findings of exploitability by themselves.
+
+The repository workflow triggers only on pushes to `main` and pull requests targeting `main`; the feature-branch push did not trigger Actions. No pull request was created.
+
 ## Catalogue status
 
 The independent catalogue has 36 requested cases. **22 local contract/Registry cases** are marked PASS or PASS, LIMITED; **T31 and T34** are PASS, SIMULATED; **T36** is PASS, LIMITED for local Registry event replay; and **12 cases remain NOT EXECUTED**. Those twelve are T08, T09, T12, T13, T19, T20, T22, T23, T24, T32, T33 and T35. Exact case-by-case setup, expected and actual results, command, source test and limitations are in `CBAR_TEST_PLAN.md` and the institutional technical PDF.

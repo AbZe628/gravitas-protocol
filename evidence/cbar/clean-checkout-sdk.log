@@ -1,0 +1,31 @@
+
+added 63 packages, and audited 64 packages in 5s
+
+29 packages are looking for funding
+  run `npm fund` for details
+
+4 vulnerabilities (2 moderate, 2 high)
+
+To address all issues, run:
+  npm audit fix
+
+Run `npm audit` for details.
+
+> @gravitas/sdk@2.0.0 test
+> vitest run
+
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.11 [39m[90m/tmp/gravitas-protocol-cbar-clean/gravitas-sdk[39m
+
+ [32m✓[39m test/compliance.test.ts [2m([22m[2m15 tests[22m[2m)[22m[32m 19[2mms[22m[39m
+ [32m✓[39m test/builder.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 15[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m2 passed[39m[22m[90m (2)[39m
+[2m      Tests [22m [1m[32m20 passed[39m[22m[90m (20)[39m
+[2m   Start at [22m 18:27:48
+[2m   Duration [22m 637ms[2m (transform 169ms, setup 0ms, import 825ms, tests 34ms, environment 0ms)[22m
+
+
+> @gravitas/sdk@2.0.0 build
+> tsc
+

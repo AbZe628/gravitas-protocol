@@ -27,9 +27,27 @@
       }
     },
     {
+      "name": "page-size",
+      "status": "PASS",
+      "message": "595.276 x 841.89 pts (A4)",
+      "evidence": {}
+    },
+    {
+      "name": "metadata-title",
+      "status": "PASS",
+      "message": "expected='Gravitas Protocol — Institutional Technical Evaluation', actual='Gravitas Protocol — Institutional Technical Evaluation'",
+      "evidence": {}
+    },
+    {
+      "name": "metadata-author",
+      "status": "PASS",
+      "message": "expected='Gravitas Protocol', actual='Gravitas Protocol'",
+      "evidence": {}
+    },
+    {
       "name": "text-presence",
       "status": "PASS",
-      "message": "characters=63049",
+      "message": "characters=63871",
       "evidence": {}
     },
     {

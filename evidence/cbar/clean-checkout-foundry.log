@@ -1,0 +1,576 @@
+Compiling 90 files with Solc 0.8.24
+Solc 0.8.24 finished in 87.74s
+Compiler run successful with warnings:
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> contracts/GravitasPolicyRegistry.sol:157:42:
+    |
+157 |     function checkSubscriptionCompliance(address subscriber, address subscriptionToken)
+    |                                          ^^^^^^^^^^^^^^^^^^
+
+
+╭---------------------------------------------------+------------------+-------------------+--------------------+---------------------╮
+| Contract                                          | Runtime Size (B) | Initcode Size (B) | Runtime Margin (B) | Initcode Margin (B) |
++=====================================================================================================================================+
+| DustMockPositionManager                           | 6,425            | 7,196             | 18,151             | 41,956              |
+|---------------------------------------------------+------------------+-------------------+--------------------+---------------------|
+| GravitasPolicyRegistry                            | 3,244            | 3,668             | 21,332             | 45,484              |
+|---------------------------------------------------+------------------+-------------------+--------------------+---------------------|
+| GravitasTimelock                                  | 5,279            | 6,533             | 19,297             | 42,619              |
+|---------------------------------------------------+------------------+-------------------+--------------------+---------------------|
+| LocalMockERC20 (test/foundry/TeleportFlow.t.sol)  | 1,842            | 2,770             | 22,734             | 46,382              |
+|---------------------------------------------------+------------------+-------------------+--------------------+---------------------|
+| LocalMockERC20 (test/foundry/TeleportTests.t.sol) | 1,842            | 2,770             | 22,734             | 46,382              |
+|---------------------------------------------------+------------------+-------------------+--------------------+---------------------|
+| LyingToken                                        | 1,826            | 2,824             | 22,750             | 46,328              |
+|---------------------------------------------------+------------------+-------------------+--------------------+---------------------|
+| MockERC20                                         | 1,666            | 2,603             | 22,910             | 46,549              |
+|---------------------------------------------------+------------------+-------------------+--------------------+---------------------|
+| MockToken                                         | 1,666            | 2,726             | 22,910             | 46,426              |
+|---------------------------------------------------+------------------+-------------------+--------------------+---------------------|
+| MockUniswapV2Factory                              | 5,833            | 5,860             | 18,743             | 43,292              |
+|---------------------------------------------------+------------------+-------------------+--------------------+---------------------|
+| MockUniswapV2Pair                                 | 3,801            | 4,821             | 20,775             | 44,331              |
+|---------------------------------------------------+------------------+-------------------+--------------------+---------------------|
+| MockUniswapV2Router                               | 1,914            | 2,133             | 22,662             | 47,019              |
+|---------------------------------------------------+------------------+-------------------+--------------------+---------------------|
+| MockUniswapV3PositionManager                      | 6,517            | 7,292             | 18,059             | 41,860              |
+|---------------------------------------------------+------------------+-------------------+--------------------+---------------------|
+| MockUniswapV3SwapRouter                           | 1,199            | 1,226             | 23,377             | 47,926              |
+|---------------------------------------------------+------------------+-------------------+--------------------+---------------------|
+| TeleportV2                                        | 4,200            | 4,572             | 20,376             | 44,580              |
+|---------------------------------------------------+------------------+-------------------+--------------------+---------------------|
+| TeleportV3                                        | 8,996            | 10,937            | 15,580             | 38,215              |
+|---------------------------------------------------+------------------+-------------------+--------------------+---------------------|
+| TestToken                                         | 1,842            | 2,902             | 22,734             | 46,250              |
+|---------------------------------------------------+------------------+-------------------+--------------------+---------------------|
+| TestTokenV3                                       | 1,842            | 2,903             | 22,734             | 46,249              |
+|---------------------------------------------------+------------------+-------------------+--------------------+---------------------|
+| TimelockController                                | 5,279            | 6,533             | 19,297             | 42,619              |
+|---------------------------------------------------+------------------+-------------------+--------------------+---------------------|
+| TokenA                                            | 1,666            | 2,558             | 22,910             | 46,594              |
+|---------------------------------------------------+------------------+-------------------+--------------------+---------------------|
+| TokenB                                            | 1,666            | 2,558             | 22,910             | 46,594              |
+|---------------------------------------------------+------------------+-------------------+--------------------+---------------------|
+| WETH9                                             | 1,997            | 2,328             | 22,579             | 46,824              |
+╰---------------------------------------------------+------------------+-------------------+--------------------+---------------------╯
+
+[1m[33mwarning[missing-events-access-control][0m[1m: `isExecutor` is changed without an event but is used for access control[0m
+  [1m[94m ╭▸ [0mcontracts/GravitasPolicyRegistry.sol:79:9
+   [1m[94m│[0m
+[1m[94m79[0m [1m[94m│[0m         isExecutor[executor] = status;
+   [1m[94m│[0m         [1m[33m━━━━━━━━━━━━━━━━━━━━[0m
+   [1m[94m│[0m
+   [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/missing-events-access-control\https://getfoundry.sh/forge/linting/missing-events-access-control]8;;\
+
+[1m[33mwarning[reentrancy-no-eth][0m[1m: external call can be reentered before `lastMigrationAt` is updated[0m
+   [1m[94m ╭▸ [0mcontracts/TeleportV2.sol:141:46
+    [1m[94m│[0m
+[1m[94m141[0m [1m[94m│[0m         (uint256 amount0, uint256 amount1) = IUniswapV2PairExtended(pairFrom).burn(address(this));
+    [1m[94m│[0m                                              [1m[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
+    [1m[94m│[0m
+    [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/reentrancy-no-eth\https://getfoundry.sh/forge/linting/reentrancy-no-eth]8;;\
+
+[1m[33mwarning[reentrancy-no-eth][0m[1m: external call can be reentered before `lastMigrationAt` is updated[0m
+   [1m[94m ╭▸ [0mcontracts/TeleportV2.sol:152:40
+    [1m[94m│[0m
+[1m[94m152[0m [1m[94m│[0m           (,, uint256 liquidityMinted) = IUniswapV2Router02(routerTo)
+    [1m[94m│[0m [1m[33m┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛[0m
+[1m[94m153[0m [1m[94m│[0m [1m[33m┃[0m             .addLiquidity(tokenA, tokenB, amountAOut, amountBOut, amountAMin, amountBMin, recipient, deadline);
+    [1m[94m│[0m [1m[33m┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛[0m
+    [1m[94m│[0m
+    [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/reentrancy-no-eth\https://getfoundry.sh/forge/linting/reentrancy-no-eth]8;;\
+
+[1m[33mwarning[block-timestamp][0m[1m: usage of `block.timestamp` in a comparison may be manipulated by validators[0m
+   [1m[94m ╭▸ [0mcontracts/TeleportV2.sol:118:17
+    [1m[94m│[0m
+[1m[94m118[0m [1m[94m│[0m         require(deadline >= block.timestamp, "Teleport: deadline passed");
+    [1m[94m│[0m                 [1m[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
+    [1m[94m│[0m
+    [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/block-timestamp\https://getfoundry.sh/forge/linting/block-timestamp]8;;\
+
+[1m[33mwarning[block-timestamp][0m[1m: usage of `block.timestamp` in a comparison may be manipulated by validators[0m
+   [1m[94m ╭▸ [0mcontracts/TeleportV2.sol:136:17
+    [1m[94m│[0m
+[1m[94m136[0m [1m[94m│[0m         require(block.timestamp >= lastMigrationAt[key] + cooldownSeconds, "Teleport: cooldown active");
+    [1m[94m│[0m                 [1m[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
+    [1m[94m│[0m
+    [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/block-timestamp\https://getfoundry.sh/forge/linting/block-timestamp]8;;\
+
+[1m[33mwarning[reentrancy-events][0m[1m: event emitted after an external call; reentrancy can reorder or fabricate logs that off-chain consumers rely on[0m
+   [1m[94m ╭▸ [0mcontracts/TeleportV2.sol:160:9
+    [1m[94m│[0m
+[1m[94m160[0m [1m[94m│[0m [1m[33m┏[0m         emit LiquidityMigrated(
+[1m[94m161[0m [1m[94m│[0m [1m[33m┃[0m             msg.sender, factoryFrom, routerTo, pairFrom, tokenA, tokenB, lpAmount, liquidityMinted, recipient
+[1m[94m162[0m [1m[94m│[0m [1m[33m┃[0m         );
+    [1m[94m│[0m [1m[33m┗━━━━━━━━━━┛[0m
+    [1m[94m│[0m
+    [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/reentrancy-events\https://getfoundry.sh/forge/linting/reentrancy-events]8;;\
+
+[1m[33mwarning[unused-return][0m[1m: return value of an external call is not used[0m
+   [1m[94m ╭▸ [0mcontracts/TeleportV2.sol:152:40
+    [1m[94m│[0m
+[1m[94m152[0m [1m[94m│[0m           (,, uint256 liquidityMinted) = IUniswapV2Router02(routerTo)
+    [1m[94m│[0m [1m[33m┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛[0m
+[1m[94m153[0m [1m[94m│[0m [1m[33m┃[0m             .addLiquidity(tokenA, tokenB, amountAOut, amountBOut, amountAMin, amountBMin, recipient, deadline);
+    [1m[94m│[0m [1m[33m┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛[0m
+    [1m[94m│[0m
+    [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/unused-return\https://getfoundry.sh/forge/linting/unused-return]8;;\
+
+[1m[33mwarning[block-timestamp][0m[1m: usage of `block.timestamp` in a comparison may be manipulated by validators[0m
+   [1m[94m ╭▸ [0mcontracts/TeleportV3.sol:182:17
+    [1m[94m│[0m
+[1m[94m182[0m [1m[94m│[0m         require(params.deadline >= block.timestamp, "TV3: Deadline expired");
+    [1m[94m│[0m                 [1m[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
+    [1m[94m│[0m
+    [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/block-timestamp\https://getfoundry.sh/forge/linting/block-timestamp]8;;\
+
+[1m[33mwarning[reentrancy-events][0m[1m: event emitted after an external call; reentrancy can reorder or fabricate logs that off-chain consumers rely on[0m
+   [1m[94m ╭▸ [0mcontracts/TeleportV3.sol:239:9
+    [1m[94m│[0m
+[1m[94m239[0m [1m[94m│[0m         emit LiquidityTeleported(params.tokenId, newTokenId, owner, newLiquidity, params.newFee, params.executeSwap);
+    [1m[94m│[0m         [1m[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
+    [1m[94m│[0m
+    [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/reentrancy-events\https://getfoundry.sh/forge/linting/reentrancy-events]8;;\
+
+[1m[33mwarning[unused-return][0m[1m: return value of an external call is not used[0m
+   [1m[94m ╭▸ [0mcontracts/TeleportV3.sol:195:73
+    [1m[94m│[0m
+[1m[94m195[0m [1m[94m│[0m         (,, address token0, address token1,,,, uint128 liquidity,,,,) = positionManager.positions(params.tokenId);
+    [1m[94m│[0m                                                                         [1m[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
+    [1m[94m│[0m
+    [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/unused-return\https://getfoundry.sh/forge/linting/unused-return]8;;\
+
+[1m[33mwarning[unused-return][0m[1m: return value of an external call is not used[0m
+   [1m[94m ╭▸ [0mcontracts/TeleportV3.sol:208:9
+    [1m[94m│[0m
+[1m[94m208[0m [1m[94m│[0m [1m[33m┏[0m         positionManager.decreaseLiquidity(
+[1m[94m209[0m [1m[94m│[0m [1m[33m┃[0m             INonfungiblePositionManager.DecreaseLiquidityParams({
+[1m[94m210[0m [1m[94m│[0m [1m[33m┃[0m                 tokenId: params.tokenId,
+[1m[94m211[0m [1m[94m│[0m [1m[33m┃[0m                 liquidity: liquidity,
+    [1m[94m‡[0m [1m[33m┃[0m
+[1m[94m215[0m [1m[94m│[0m [1m[33m┃[0m             })
+[1m[94m216[0m [1m[94m│[0m [1m[33m┃[0m         );
+    [1m[94m│[0m [1m[33m┗━━━━━━━━━┛[0m
+    [1m[94m│[0m
+    [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/unused-return\https://getfoundry.sh/forge/linting/unused-return]8;;\
+
+[1m[33mwarning[unused-return][0m[1m: return value of an external call is not used[0m
+   [1m[94m ╭▸ [0mcontracts/TeleportV3.sol:337:9
+    [1m[94m│[0m
+[1m[94m337[0m [1m[94m│[0m [1m[33m┏[0m         (tokenId, liquidity,,) = positionManager.mint(
+[1m[94m338[0m [1m[94m│[0m [1m[33m┃[0m             INonfungiblePositionManager.MintParams({
+[1m[94m339[0m [1m[94m│[0m [1m[33m┃[0m                 token0: token0,
+[1m[94m340[0m [1m[94m│[0m [1m[33m┃[0m                 token1: token1,
+    [1m[94m‡[0m [1m[33m┃[0m
+[1m[94m350[0m [1m[94m│[0m [1m[33m┃[0m             })
+[1m[94m351[0m [1m[94m│[0m [1m[33m┃[0m         );
+    [1m[94m│[0m [1m[33m┗━━━━━━━━━┛[0m
+    [1m[94m│[0m
+    [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/unused-return\https://getfoundry.sh/forge/linting/unused-return]8;;\
+
+[1m[33mwarning[missing-events-access-control][0m[1m: `balanceOf` is changed without an event but is used for access control[0m
+  [1m[94m ╭▸ [0mcontracts/WETH9.sol:30:9
+   [1m[94m│[0m
+[1m[94m30[0m [1m[94m│[0m         balanceOf[msg.sender] -= wad;
+   [1m[94m│[0m         [1m[33m━━━━━━━━━━━━━━━━━━━━━[0m
+   [1m[94m│[0m
+   [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/missing-events-access-control\https://getfoundry.sh/forge/linting/missing-events-access-control]8;;\
+
+[1m[33mwarning[reentrancy-events][0m[1m: event emitted after an external call; reentrancy can reorder or fabricate logs that off-chain consumers rely on[0m
+  [1m[94m ╭▸ [0mcontracts/mocks/MockUniswapV2Factory.sol:34:9
+   [1m[94m│[0m
+[1m[94m34[0m [1m[94m│[0m         emit PairCreated(token0, token1, pair, allPairs.length);
+   [1m[94m│[0m         [1m[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
+   [1m[94m│[0m
+   [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/reentrancy-events\https://getfoundry.sh/forge/linting/reentrancy-events]8;;\
+
+[1m[33mwarning[unsafe-typecast][0m[1m: typecast can truncate values[0m
+  [1m[94m ╭▸ [0mcontracts/mocks/MockUniswapV2Pair.sol:46:21
+   [1m[94m│[0m
+[1m[94m46[0m [1m[94m│[0m         reserve0 += uint112(amount0);
+   [1m[94m│[0m                     [1m[33m━━━━━━━━━━━━━━━━[0m
+   [1m[94m│[0m
+   [1m[94m├ [0m[1mnote[0m: consider disabling this lint if you're certain the cast is safe
+   [1m[94m│[0m       
+   [1m[94m│[0m       // casting to 'uint112' is safe because [explain why]
+   [1m[94m│[0m       // forge-lint: disable-next-line(unsafe-typecast)
+   [1m[94m│[0m       
+   [1m[94m│[0m       
+   [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/unsafe-typecast\https://getfoundry.sh/forge/linting/unsafe-typecast]8;;\
+
+[1m[33mwarning[unsafe-typecast][0m[1m: typecast can truncate values[0m
+  [1m[94m ╭▸ [0mcontracts/mocks/MockUniswapV2Pair.sol:47:21
+   [1m[94m│[0m
+[1m[94m47[0m [1m[94m│[0m         reserve1 += uint112(amount1);
+   [1m[94m│[0m                     [1m[33m━━━━━━━━━━━━━━━━[0m
+   [1m[94m│[0m
+   [1m[94m├ [0m[1mnote[0m: consider disabling this lint if you're certain the cast is safe
+   [1m[94m│[0m       
+   [1m[94m│[0m       // casting to 'uint112' is safe because [explain why]
+   [1m[94m│[0m       // forge-lint: disable-next-line(unsafe-typecast)
+   [1m[94m│[0m       
+   [1m[94m│[0m       
+   [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/unsafe-typecast\https://getfoundry.sh/forge/linting/unsafe-typecast]8;;\
+
+[1m[33mwarning[unsafe-typecast][0m[1m: typecast can truncate values[0m
+  [1m[94m ╭▸ [0mcontracts/mocks/MockUniswapV2Pair.sol:73:20
+   [1m[94m│[0m
+[1m[94m73[0m [1m[94m│[0m         reserve0 = uint112(IERC20(token0).balanceOf(address(this)));
+   [1m[94m│[0m                    [1m[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
+   [1m[94m│[0m
+   [1m[94m├ [0m[1mnote[0m: consider disabling this lint if you're certain the cast is safe
+   [1m[94m│[0m       
+   [1m[94m│[0m       // casting to 'uint112' is safe because [explain why]
+   [1m[94m│[0m       // forge-lint: disable-next-line(unsafe-typecast)
+   [1m[94m│[0m       
+   [1m[94m│[0m       
+   [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/unsafe-typecast\https://getfoundry.sh/forge/linting/unsafe-typecast]8;;\
+
+[1m[33mwarning[unsafe-typecast][0m[1m: typecast can truncate values[0m
+  [1m[94m ╭▸ [0mcontracts/mocks/MockUniswapV2Pair.sol:74:20
+   [1m[94m│[0m
+[1m[94m74[0m [1m[94m│[0m         reserve1 = uint112(IERC20(token1).balanceOf(address(this)));
+   [1m[94m│[0m                    [1m[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
+   [1m[94m│[0m
+   [1m[94m├ [0m[1mnote[0m: consider disabling this lint if you're certain the cast is safe
+   [1m[94m│[0m       
+   [1m[94m│[0m       // casting to 'uint112' is safe because [explain why]
+   [1m[94m│[0m       // forge-lint: disable-next-line(unsafe-typecast)
+   [1m[94m│[0m       
+   [1m[94m│[0m       
+   [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/unsafe-typecast\https://getfoundry.sh/forge/linting/unsafe-typecast]8;;\
+
+[1m[33mwarning[unsafe-typecast][0m[1m: typecast can truncate values[0m
+  [1m[94m ╭▸ [0mcontracts/mocks/MockUniswapV2Pair.sol:83:37
+   [1m[94m│[0m
+[1m[94m83[0m [1m[94m│[0m         return (reserve0, reserve1, uint32(block.timestamp));
+   [1m[94m│[0m                                     [1m[33m━━━━━━━━━━━━━━━━━━━━━━━[0m
+   [1m[94m│[0m
+   [1m[94m├ [0m[1mnote[0m: consider disabling this lint if you're certain the cast is safe
+   [1m[94m│[0m       
+   [1m[94m│[0m       // casting to 'uint32' is safe because [explain why]
+   [1m[94m│[0m       // forge-lint: disable-next-line(unsafe-typecast)
+   [1m[94m│[0m       
+   [1m[94m│[0m       
+   [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/unsafe-typecast\https://getfoundry.sh/forge/linting/unsafe-typecast]8;;\
+
+[1m[33mwarning[block-timestamp][0m[1m: usage of `block.timestamp` in a comparison may be manipulated by validators[0m
+  [1m[94m ╭▸ [0mcontracts/mocks/MockUniswapV2Router.sol:38:17
+   [1m[94m│[0m
+[1m[94m38[0m [1m[94m│[0m         require(deadline >= block.timestamp, "MockRouter: expired");
+   [1m[94m│[0m                 [1m[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
+   [1m[94m│[0m
+   [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/block-timestamp\https://getfoundry.sh/forge/linting/block-timestamp]8;;\
+
+[1m[33mwarning[block-timestamp][0m[1m: usage of `block.timestamp` in a comparison may be manipulated by validators[0m
+  [1m[94m ╭▸ [0mcontracts/mocks/MockUniswapV2Router.sol:76:17
+   [1m[94m│[0m
+[1m[94m76[0m [1m[94m│[0m         require(deadline >= block.timestamp, "MockRouter: expired");
+   [1m[94m│[0m                 [1m[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
+   [1m[94m│[0m
+   [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/block-timestamp\https://getfoundry.sh/forge/linting/block-timestamp]8;;\
+
+[1m[33mwarning[unsafe-oz-erc721-mint][0m[1m: `ERC721._mint` does not check that the recipient can receive the token; use `_safeMint`[0m
+   [1m[94m ╭▸ [0mcontracts/mocks/MockUniswapV3PositionManager.sol:110:9
+    [1m[94m│[0m
+[1m[94m110[0m [1m[94m│[0m         _mint(params.recipient, tokenId);
+    [1m[94m│[0m         [1m[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
+    [1m[94m│[0m
+    [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/unsafe-oz-erc721-mint\https://getfoundry.sh/forge/linting/unsafe-oz-erc721-mint]8;;\
+
+[1m[33mwarning[block-timestamp][0m[1m: usage of `block.timestamp` in a comparison may be manipulated by validators[0m
+  [1m[94m ╭▸ [0mcontracts/mocks/MockUniswapV3PositionManager.sol:73:17
+   [1m[94m│[0m
+[1m[94m73[0m [1m[94m│[0m         require(params.deadline >= block.timestamp, "MockPM: expired");
+   [1m[94m│[0m                 [1m[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
+   [1m[94m│[0m
+   [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/block-timestamp\https://getfoundry.sh/forge/linting/block-timestamp]8;;\
+
+[1m[33mwarning[unsafe-typecast][0m[1m: typecast can truncate values[0m
+  [1m[94m ╭▸ [0mcontracts/mocks/MockUniswapV3PositionManager.sol:87:21
+   [1m[94m│[0m
+[1m[94m87[0m [1m[94m│[0m         liquidity = uint128(_sqrt(amount0 * amount1));
+   [1m[94m│[0m                     [1m[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
+   [1m[94m│[0m
+   [1m[94m├ [0m[1mnote[0m: consider disabling this lint if you're certain the cast is safe
+   [1m[94m│[0m       
+   [1m[94m│[0m       // casting to 'uint128' is safe because [explain why]
+   [1m[94m│[0m       // forge-lint: disable-next-line(unsafe-typecast)
+   [1m[94m│[0m       
+   [1m[94m│[0m       
+   [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/unsafe-typecast\https://getfoundry.sh/forge/linting/unsafe-typecast]8;;\
+
+[1m[33mwarning[divide-before-multiply][0m[1m: division before multiplication may lose precision[0m
+   [1m[94m ╭▸ [0mcontracts/mocks/MockUniswapV3PositionManager.sol:129:19
+    [1m[94m│[0m
+[1m[94m129[0m [1m[94m│[0m         amount0 = (IERC20(position.token0).balanceOf(address(this)) * liquidityRatio) / 1e18;
+    [1m[94m│[0m                   [1m[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
+    [1m[94m│[0m
+    [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/divide-before-multiply\https://getfoundry.sh/forge/linting/divide-before-multiply]8;;\
+
+[1m[33mwarning[divide-before-multiply][0m[1m: division before multiplication may lose precision[0m
+   [1m[94m ╭▸ [0mcontracts/mocks/MockUniswapV3PositionManager.sol:130:19
+    [1m[94m│[0m
+[1m[94m130[0m [1m[94m│[0m         amount1 = (IERC20(position.token1).balanceOf(address(this)) * liquidityRatio) / 1e18;
+    [1m[94m│[0m                   [1m[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
+    [1m[94m│[0m
+    [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/divide-before-multiply\https://getfoundry.sh/forge/linting/divide-before-multiply]8;;\
+
+[1m[33mwarning[block-timestamp][0m[1m: usage of `block.timestamp` in a comparison may be manipulated by validators[0m
+   [1m[94m ╭▸ [0mcontracts/mocks/MockUniswapV3PositionManager.sol:121:17
+    [1m[94m│[0m
+[1m[94m121[0m [1m[94m│[0m         require(params.deadline >= block.timestamp, "MockPM: expired");
+    [1m[94m│[0m                 [1m[33m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[0m
+    [1m[94m│[0m
+    [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/block-timestamp\https://getfoundry.sh/forge/linting/block-timestamp]8;;\
+
+[1m[33mwarning[unsafe-typecast][0m[1m: typecast can truncate values[0m
+   [1m[94m ╭▸ [0mcontracts/mocks/MockUniswapV3PositionManager.sol:136:33
+    [1m[94m│[0m
+[1m[94m136[0m [1m[94m│[0m         position.tokensOwed0 += uint128(amount0);
+    [1m[94m│[0m                                 [1m[33m━━━━━━━━━━━━━━━━[0m
+    [1m[94m│[0m
+    [1m[94m├ [0m[1mnote[0m: consider disabling this lint if you're certain the cast is safe
+    [1m[94m│[0m       
+    [1m[94m│[0m       // casting to 'uint128' is safe because [explain why]
+    [1m[94m│[0m       // forge-lint: disable-next-line(unsafe-typecast)
+    [1m[94m│[0m       
+    [1m[94m│[0m       
+    [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/unsafe-typecast\https://getfoundry.sh/forge/linting/unsafe-typecast]8;;\
+
+[1m[33mwarning[unsafe-typecast][0m[1m: typecast can truncate values[0m
+   [1m[94m ╭▸ [0mcontracts/mocks/MockUniswapV3PositionManager.sol:137:33
+    [1m[94m│[0m
+[1m[94m137[0m [1m[94m│[0m         position.tokensOwed1 += uint128(amount1);
+    [1m[94m│[0m                                 [1m[33m━━━━━━━━━━━━━━━━[0m
+    [1m[94m│[0m
+    [1m[94m├ [0m[1mnote[0m: consider disabling this lint if you're certain the cast is safe
+    [1m[94m│[0m       
+    [1m[94m│[0m       // casting to 'uint128' is safe because [explain why]
+    [1m[94m│[0m       // forge-lint: disable-next-line(unsafe-typecast)
+    [1m[94m│[0m       
+    [1m[94m│[0m       
+    [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/unsafe-typecast\https://getfoundry.sh/forge/linting/unsafe-typecast]8;;\
+
+[1m[33mwarning[unsafe-typecast][0m[1m: typecast can truncate values[0m
+   [1m[94m ╭▸ [0mcontracts/mocks/MockUniswapV3PositionManager.sol:151:33
+    [1m[94m│[0m
+[1m[94m151[0m [1m[94m│[0m         position.tokensOwed0 -= uint128(amount0);
+    [1m[94m│[0m                                 [1m[33m━━━━━━━━━━━━━━━━[0m
+    [1m[94m│[0m
+    [1m[94m├ [0m[1mnote[0m: consider disabling this lint if you're certain the cast is safe
+    [1m[94m│[0m       
+    [1m[94m│[0m       // casting to 'uint128' is safe because [explain why]
+    [1m[94m│[0m       // forge-lint: disable-next-line(unsafe-typecast)
+    [1m[94m│[0m       
+    [1m[94m│[0m       
+    [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/unsafe-typecast\https://getfoundry.sh/forge/linting/unsafe-typecast]8;;\
+
+[1m[33mwarning[unsafe-typecast][0m[1m: typecast can truncate values[0m
+   [1m[94m ╭▸ [0mcontracts/mocks/MockUniswapV3PositionManager.sol:152:33
+    [1m[94m│[0m
+[1m[94m152[0m [1m[94m│[0m         position.tokensOwed1 -= uint128(amount1);
+    [1m[94m│[0m                                 [1m[33m━━━━━━━━━━━━━━━━[0m
+    [1m[94m│[0m
+    [1m[94m├ [0m[1mnote[0m: consider disabling this lint if you're certain the cast is safe
+    [1m[94m│[0m       
+    [1m[94m│[0m       // casting to 'uint128' is safe because [explain why]
+    [1m[94m│[0m       // forge-lint: disable-next-line(unsafe-typecast)
+    [1m[94m│[0m       
+    [1m[94m│[0m       
+    [1m[94m╰ [0m[1mhelp[0m: ]8;;https://getfoundry.sh/forge/linting/unsafe-typecast\https://getfoundry.sh/forge/linting/unsafe-typecast]8;;\
+
+[1m[33mwarning[environment-read-across-mutation][0m[1m: `block.timestamp` may be reused across `vm.warp`[0m
+  [1m[94m ╭▸ [0mtest/foundry/TeleportV2FullFlow.t.sol:77:17
+   [1m[94m│[0m
+[1m[94m77[0m [1m[94m│[0m         vm.warp(block.timestamp + 1 hours); // Ensure no cooldown conflicts
+   [1m[94m│[0m         [1m[94m────────[0m[1m[33m━━━━━━━━━━━━━━━[0m[1m[94m───────────[0m [1m[94m`vm.warp` changes this environment here[0m
+   [1m[94m│[0m
+   [1m[94m├ [0m[1mhelp[0m: capture it with `vm.getBlockTimestamp()` instead
+   [1m[94m╰ [0m[1mhelp[0m: https://getfoundry.sh/forge/linting/environment-read-across-mutation
+
+[1m[33mwarning[environment-read-across-mutation][0m[1m: `block.timestamp` may be reused across `vm.warp`[0m
+   [1m[94m ╭▸ [0mtest/foundry/TeleportV2FullFlow.t.sol:142:17
+    [1m[94m│[0m
+[1m[94m142[0m [1m[94m│[0m         vm.warp(block.timestamp + 2 hours); // Ensure no cooldown conflicts
+    [1m[94m│[0m         [1m[94m────────[0m[1m[33m━━━━━━━━━━━━━━━[0m[1m[94m───────────[0m [1m[94m`vm.warp` changes this environment here[0m
+    [1m[94m│[0m
+    [1m[94m├ [0m[1mhelp[0m: capture it with `vm.getBlockTimestamp()` instead
+    [1m[94m╰ [0m[1mhelp[0m: https://getfoundry.sh/forge/linting/environment-read-across-mutation
+
+[1m[33mwarning[environment-read-across-mutation][0m[1m: `block.timestamp` may be reused across `vm.warp`[0m
+   [1m[94m ╭▸ [0mtest/foundry/TeleportV2FullFlow.t.sol:172:13
+    [1m[94m│[0m
+[1m[94m172[0m [1m[94m│[0m             block.timestamp + 1 hours,
+    [1m[94m│[0m             [1m[33m━━━━━━━━━━━━━━━[0m
+    [1m[94m‡[0m
+[1m[94m192[0m [1m[94m│[0m         vm.warp(block.timestamp + 16 minutes);
+    [1m[94m│[0m         [1m[94m─────────────────────────────────────[0m [1m[94m`vm.warp` changes this environment here[0m
+    [1m[94m│[0m
+    [1m[94m├ [0m[1mhelp[0m: capture it with `vm.getBlockTimestamp()` instead
+    [1m[94m╰ [0m[1mhelp[0m: https://getfoundry.sh/forge/linting/environment-read-across-mutation
+
+[1m[33mwarning[environment-read-across-mutation][0m[1m: `block.timestamp` may be reused across `vm.warp`[0m
+   [1m[94m ╭▸ [0mtest/foundry/TeleportV2FullFlow.t.sol:187:13
+    [1m[94m│[0m
+[1m[94m187[0m [1m[94m│[0m             block.timestamp + 1 hours,
+    [1m[94m│[0m             [1m[33m━━━━━━━━━━━━━━━[0m
+    [1m[94m‡[0m
+[1m[94m192[0m [1m[94m│[0m         vm.warp(block.timestamp + 16 minutes);
+    [1m[94m│[0m         [1m[94m─────────────────────────────────────[0m [1m[94m`vm.warp` changes this environment here[0m
+    [1m[94m│[0m
+    [1m[94m├ [0m[1mhelp[0m: capture it with `vm.getBlockTimestamp()` instead
+    [1m[94m╰ [0m[1mhelp[0m: https://getfoundry.sh/forge/linting/environment-read-across-mutation
+
+[1m[33mwarning[environment-read-across-mutation][0m[1m: `block.timestamp` may be reused across `vm.warp`[0m
+   [1m[94m ╭▸ [0mtest/foundry/TeleportV2FullFlow.t.sol:192:17
+    [1m[94m│[0m
+[1m[94m192[0m [1m[94m│[0m         vm.warp(block.timestamp + 16 minutes);
+    [1m[94m│[0m         [1m[94m────────[0m[1m[33m━━━━━━━━━━━━━━━[0m[1m[94m──────────────[0m [1m[94m`vm.warp` changes this environment here[0m
+    [1m[94m│[0m
+    [1m[94m├ [0m[1mhelp[0m: capture it with `vm.getBlockTimestamp()` instead
+    [1m[94m╰ [0m[1mhelp[0m: https://getfoundry.sh/forge/linting/environment-read-across-mutation
+
+[1m[33mwarning[environment-read-across-mutation][0m[1m: `block.timestamp` may be reused across `vm.warp`[0m
+   [1m[94m ╭▸ [0mtest/foundry/TeleportV2FullFlow.t.sol:213:17
+    [1m[94m│[0m
+[1m[94m213[0m [1m[94m│[0m         vm.warp(block.timestamp + 3 hours); // Ensure no cooldown conflicts
+    [1m[94m│[0m         [1m[94m────────[0m[1m[33m━━━━━━━━━━━━━━━[0m[1m[94m───────────[0m [1m[94m`vm.warp` changes this environment here[0m
+    [1m[94m│[0m
+    [1m[94m├ [0m[1mhelp[0m: capture it with `vm.getBlockTimestamp()` instead
+    [1m[94m╰ [0m[1mhelp[0m: https://getfoundry.sh/forge/linting/environment-read-across-mutation
+
+[1m[33mwarning[environment-read-across-mutation][0m[1m: `block.timestamp` may be reused across `vm.warp`[0m
+   [1m[94m ╭▸ [0mtest/foundry/TeleportV2FullFlow.t.sol:253:17
+    [1m[94m│[0m
+[1m[94m253[0m [1m[94m│[0m         vm.warp(block.timestamp + 4 hours); // Ensure no cooldown conflicts
+    [1m[94m│[0m         [1m[94m────────[0m[1m[33m━━━━━━━━━━━━━━━[0m[1m[94m───────────[0m [1m[94m`vm.warp` changes this environment here[0m
+    [1m[94m│[0m
+    [1m[94m├ [0m[1mhelp[0m: capture it with `vm.getBlockTimestamp()` instead
+    [1m[94m╰ [0m[1mhelp[0m: https://getfoundry.sh/forge/linting/environment-read-across-mutation
+
+[1m[33mwarning[environment-read-across-mutation][0m[1m: `block.timestamp` may be reused across `vm.warp`[0m
+   [1m[94m ╭▸ [0mtest/foundry/TeleportV2FullFlow.t.sol:392:17
+    [1m[94m│[0m
+[1m[94m392[0m [1m[94m│[0m         vm.warp(block.timestamp + 5 hours); // Ensure no cooldown conflicts
+    [1m[94m│[0m         [1m[94m────────[0m[1m[33m━━━━━━━━━━━━━━━[0m[1m[94m───────────[0m [1m[94m`vm.warp` changes this environment here[0m
+    [1m[94m│[0m
+    [1m[94m├ [0m[1mhelp[0m: capture it with `vm.getBlockTimestamp()` instead
+    [1m[94m╰ [0m[1mhelp[0m: https://getfoundry.sh/forge/linting/environment-read-across-mutation
+
+No files changed, compilation skipped
+
+Ran 3 tests for test/GravitasPolicyRegistryMultisig.t.sol:GravitasPolicyRegistryMultisigTest
+[PASS] test_Ownable2Step_AttackerCannotAccept() (gas: 87280)
+[PASS] test_Ownable2Step_OnlyOwnerCanPropose() (gas: 34976)
+[PASS] test_Ownable2Step_TransferRequiresAcceptance() (gas: 114977)
+Suite result: ok. 3 passed; 0 failed; 0 skipped; finished in 3.19ms (1.98ms CPU time)
+
+Ran 6 tests for test/GravitasSubscriptionIntegration.t.sol:GravitasSubscriptionIntegrationTest
+[PASS] test_AreTokensCompliant() (gas: 109137)
+[PASS] test_CheckSubscriptionCompliance_RevertOnNonCompliantAsset() (gas: 18106)
+[PASS] test_CheckSubscriptionCompliance_RevertOnUnauthorizedExecutor() (gas: 22583)
+[PASS] test_CheckSubscriptionCompliance_Success() (gas: 29525)
+[PASS] test_VerifyAssetCompliance() (gas: 20043)
+[PASS] test_VerifyExecutorStatus() (gas: 21812)
+Suite result: ok. 6 passed; 0 failed; 0 skipped; finished in 3.84ms (1.78ms CPU time)
+
+Ran 18 tests for test/foundry/PolicyCommitment.t.sol:PolicyCommitment
+[PASS] test_ARealChangeStillAdvancesTheRecord() (gas: 153110)
+[PASS] test_ARepeatedWriteEmitsNothing() (gas: 114659)
+[PASS] test_AnObserverCanReplayTheChainFromEvents() (gas: 261044)
+[PASS] test_EachVersionFoldsInTheOneBeforeIt() (gas: 253417)
+[PASS] test_GenesisIsTheDeployerGrant() (gas: 24583)
+[PASS] test_GetPolicyVersionTracksTheChain() (gas: 106083)
+[PASS] test_MovingAnAddressBetweenRegistersChangesTheHash() (gas: 1953530)
+[PASS] test_OnlyTheOwnerWrites() (gas: 33235)
+[PASS] test_OnlyTheOwnerWritesToEveryRegister() (gas: 61059)
+[PASS] test_OrderOfChangesIsPartOfTheCommitment() (gas: 2134398)
+[PASS] test_RevokingWhatWasNeverGrantedIsNotAChange() (gas: 80354)
+[PASS] test_RewritingARouterChangesNothing() (gas: 164799)
+[PASS] test_RewritingAnExecutorChangesNothing() (gas: 138163)
+[PASS] test_RewritingTheSameValueIsNotAPolicyChange() (gas: 165479)
+[PASS] test_SettingSomethingBackToFalseThatWasNeverTrueIsNotAChange() (gas: 42693)
+[PASS] test_TwoDifferentPoliciesDoNotShareAHash() (gas: 1964411)
+[PASS] test_ZeroAddressIsRejectedOnEveryRegister() (gas: 85629)
+[PASS] test_ZeroAddressIsStillRejected() (gas: 82846)
+Suite result: ok. 18 passed; 0 failed; 0 skipped; finished in 6.42ms (4.78ms CPU time)
+
+Ran 9 tests for test/foundry/PausableTests.t.sol:PausableTests
+[PASS] test_Registry_OnlyOwnerCanPause() (gas: 35689)
+[PASS] test_Registry_OwnerNotLockedOutOfAuthGateByRegistryPause() (gas: 3138909)
+[PASS] test_Registry_PauseHaltsExecutorAuthorizationSystemWide() (gas: 183705)
+[PASS] test_Registry_PauseUnpause() (gas: 103686)
+[PASS] test_Registry_UnpauseRestoresVerification() (gas: 175821)
+[PASS] test_Registry_VerifyFunctionsRevertWhenPaused() (gas: 344427)
+[PASS] test_Teleport_MigrationRevertsWhenPaused() (gas: 166294)
+[PASS] test_Teleport_OnlyOwnerCanPause() (gas: 35264)
+[PASS] test_Teleport_PauseUnpause() (gas: 87078)
+Suite result: ok. 9 passed; 0 failed; 0 skipped; finished in 7.09ms (6.18ms CPU time)
+
+Ran 18 tests for test/foundry/TeleportTests.t.sol:TeleportTests
+[PASS] test_Registry_RevertOnNonOwner() (gas: 89994)
+[PASS] test_Registry_RevertOnZeroAddress() (gas: 85964)
+[PASS] test_Registry_SetExecutor() (gas: 92629)
+[PASS] test_Registry_SetRouter() (gas: 92702)
+[PASS] test_Registry_VerifyFunctions() (gas: 42229)
+[PASS] test_Registry_Versioning() (gas: 111223)
+[PASS] test_V2_RescueTokens_NonOwner() (gas: 37567)
+[PASS] test_V2_RevertOnExpiredDeadline() (gas: 53432)
+[PASS] test_V2_RevertOnNonAuthorized() (gas: 48918)
+[PASS] test_V2_RevertOnNonCompliant() (gas: 60911)
+[PASS] test_V2_RevertOnUnauthorizedRouter() (gas: 56615)
+[PASS] test_V2_SetPolicy() (gas: 53555)
+[PASS] test_V2_SetPolicy_Revert() (gas: 85178)
+[PASS] test_V3_NonAuthorized() (gas: 50836)
+[PASS] test_V3_RevertOnDeadline() (gas: 50258)
+[PASS] test_V3_RevertOnInvalidFee() (gas: 50536)
+[PASS] test_V3_RevertOnInvalidTickSpacing() (gas: 51958)
+[PASS] test_V3_RevertOnZeroSlippage() (gas: 51671)
+Suite result: ok. 18 passed; 0 failed; 0 skipped; finished in 7.63ms (5.30ms CPU time)
+
+Ran 1 test for test/foundry/TeleportFlow.t.sol:TeleportFlowTests
+[PASS] test_V2_RescueTokens() (gas: 139800)
+Suite result: ok. 1 passed; 0 failed; 0 skipped; finished in 1.67ms (187.71µs CPU time)
+
+Ran 19 tests for test/foundry/TeleportV3FullFlow.t.sol:TeleportV3FullFlowTests
+[PASS] test_V3_AllValidFeeTiers() (gas: 2759347)
+[PASS] test_V3_ConstructorValidation() (gas: 305513)
+[PASS] test_V3_DustRefundRevertsWhenTheTokenReturnsFalse() (gas: 7247603)
+[PASS] test_V3_DustRefund_WithDust() (gas: 5941902)
+[PASS] test_V3_DustRefund_ZeroDust() (gas: 792648)
+[PASS] test_V3_FullMigration_NoSwap() (gas: 757901)
+[PASS] test_V3_FullMigration_WithSwap() (gas: 800918)
+[PASS] test_V3_ModifiedParams() (gas: 484351)
+[PASS] test_V3_NonceReplayProtection() (gas: 1170193)
+[PASS] test_V3_OnERC721Received() (gas: 5987)
+[PASS] test_V3_OwnerCanExecute() (gas: 755176)
+[PASS] test_V3_RevertOnInvalidTicks() (gas: 449520)
+[PASS] test_V3_RevertOnNoLiquidity() (gas: 621996)
+[PASS] test_V3_RevertOnNonCompliantAssets() (gas: 569681)
+[PASS] test_V3_RevertOnSwapExceedsAvailable() (gas: 659629)
+[PASS] test_V3_RevertOnUnsupportedFee() (gas: 449383)
+[PASS] test_V3_SignatureBindsMintSlippage() (gas: 484876)
+[PASS] test_V3_SignatureBindsSwapMinOut() (gas: 484762)
+[PASS] test_V3_WrongSigner() (gas: 482358)
+Suite result: ok. 19 passed; 0 failed; 0 skipped; finished in 19.97ms (34.25ms CPU time)
+
+Ran 10 tests for test/foundry/TeleportV2FullFlow.t.sol:TeleportV2FullFlowTests
+[PASS] test_V2_CooldownEnforcement() (gas: 6713004)
+[PASS] test_V2_DustRefund() (gas: 6246708)
+[PASS] test_V2_FullMigrationFlow_MaxMoveBpsEnforcement() (gas: 6379262)
+[PASS] test_V2_OwnerCanExecute() (gas: 6207076)
+[PASS] test_V2_PolicyUpdate() (gas: 53591)
+[PASS] test_V2_RescueTokens() (gas: 129988)
+[PASS] test_V2_RevertOnBadSupply() (gas: 5356035)
+[PASS] test_V2_RevertOnPairNotFound() (gas: 4024970)
+[PASS] test_V2_RevertOnZeroRegistry() (gas: 250572)
+[PASS] test_V2_SafeERC20Paths() (gas: 6229053)
+Suite result: ok. 10 passed; 0 failed; 0 skipped; finished in 25.04ms (26.73ms CPU time)
+
+Ran 2 tests for test/foundry/GravitasInvariants.t.sol:GravitasInvariants
+[PASS] testFuzz_ComplianceInvariant(address) (runs: 256, μ: 77796, ~: 77886)
+[PASS] test_AssetIntegrityInvariant() (gas: 17452)
+Suite result: ok. 2 passed; 0 failed; 0 skipped; finished in 29.11ms (27.50ms CPU time)
+
+Ran 9 test suites in 38.55ms (103.95ms CPU time): 86 tests passed, 0 failed, 0 skipped (86 total tests)

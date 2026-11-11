@@ -1,0 +1,38 @@
+
+> gravitas-cbar-reviewer-sandbox@0.1.0 test
+> node --test
+
+TAP version 13
+# Subtest: validates 20-byte EVM addresses and rejects malformed inputs
+ok 1 - validates 20-byte EVM addresses and rejects malformed inputs
+  ---
+  duration_ms: 1.367992
+  type: 'test'
+  ...
+# Subtest: pads addresses into a 32-byte ABI word
+ok 2 - pads addresses into a 32-byte ABI word
+  ---
+  duration_ms: 0.607508
+  type: 'test'
+  ...
+# Subtest: decodes ABI addresses, booleans, and large uint values without precision loss
+ok 3 - decodes ABI addresses, booleans, and large uint values without precision loss
+  ---
+  duration_ms: 0.470927
+  type: 'test'
+  ...
+# Subtest: HTTP interface is read-only for network access and exposes only allow-listed public documentation
+ok 4 - HTTP interface is read-only for network access and exposes only allow-listed public documentation
+  ---
+  duration_ms: 76.186482
+  type: 'test'
+  ...
+1..4
+# tests 4
+# suites 0
+# pass 4
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 361.951038

@@ -1,0 +1,5 @@
+
+> gravitas-cbar-reviewer-sandbox@0.1.0 start
+> node server.mjs
+
+CBAR reviewer sandbox listening on http://127.0.0.1:8790 (network reads + fixed local tests)

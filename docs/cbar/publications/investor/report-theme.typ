@@ -6,7 +6,7 @@
 
 // Relative rhythm values use B = body-size.
 // report = user-selected R4 chapter-emphasis profile.
-// longform = user-selected T1 no-indent longform profile.
+// longform = no-indent longform profile.
 #let report-rhythms = (
   report: (
     paragraph-gap: 0.84,
