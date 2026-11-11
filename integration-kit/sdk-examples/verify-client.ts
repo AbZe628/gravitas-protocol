@@ -1,13 +1,12 @@
 /**
- * PoC verify client — runs the six Annex-A test scenarios
- * (3 ALLOW / 3 DENY) against the Compliance API and prints
- * a pass/fail table.
+ * Local fixture client — runs six illustrative policy scenarios
+ * (3 ALLOW / 3 DENY) against the mock server and prints a result table.
  *
- *   Terminal 1:  cd ../mock-server && npm install && npm start
- *   Terminal 2:  npm install && npm run verify
+ *   Terminal 1:  cd ../mock-server && npm ci && npm start
+ *   Terminal 2:  npm ci && npm run verify
  *
- * Point BASE_URL at the hosted sandbox (key required) to run the
- * same scenarios against live infrastructure.
+ * No hosted API was verified for the CBAR review. The mock ignores
+ * the X-Gravitas-Key example header; this script proves no auth path.
  */
 const BASE_URL = process.env.GRAVITAS_API || "http://localhost:8787";
 

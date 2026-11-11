@@ -1,0 +1,12 @@
+flowchart LR
+  SRC[Repository source at pinned commit] --> CLAIM[Claim register]
+  TEST[Foundry / Majlis test outputs] --> CLAIM
+  RPC[Arbitrum Sepolia read-only snapshot<br/>provider + block + getters] --> CLAIM
+  EXPL[Explorer source / ABI pages] --> CLAIM
+  CBAR[Official CBAR / legal sources] --> CLAIM
+  CMD[Reproduction commands] --> CLAIM
+  CLAIM --> STATUS[Verified / Partial / Not implemented / Not executed]
+  CLAIM --> PKG[Reviewer UI + documents + PDF]
+  IMAGE[Screenshots] -. corroboration only .-> CLAIM
+  style CLAIM fill:#e5eee9,stroke:#174d3b
+  style IMAGE fill:#f6eddb,stroke:#8a5b0d

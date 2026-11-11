@@ -3,20 +3,16 @@ info:
   title: Gravitas Compliance API (Sandbox)
   version: 1.0.0-sandbox
   description: |
-    Pre-execution Shariah-compliance verification for digital-asset transactions.
+    Draft request/response schema for a proposed policy-decision integration. The repository
+    currently contains a local fixture-backed mock only; no hosted or production API was
+    verified in this review. The mock does not query the on-chain Registry. Its sample ALLOW
+    and DENY labels are illustrative policy outputs, not legal or Shariah determinations.
 
-    **Integration contract for institutional PoC evaluations** (see partnership proposal, Annex A).
-    A transaction is verified BEFORE routing. If the active policy set does not allow it,
-    the response is DENY with a machine-readable reason — the orchestrator must not route it.
-
-    Status: SANDBOX / TESTNET. Production keys are issued after the tier-1 security audit.
-    On-chain policy source of truth: GravitasPolicyRegistry on Arbitrum Sepolia
-    (0x6f3bfb896DD9964C9c05dA88692bDf1b1b2C3F23, source-verified).
+    This OpenAPI document declares X-Gravitas-Key authentication. The local mock does not
+    enforce that requirement; do not expose it as a production or shared-network service.
 servers:
-  - url: http://localhost:8787
+  - url: http://127.0.0.1:8787
     description: Local mock sandbox (this directory, /mock-server)
-  - url: https://sandbox.api.gravitasprotocol.xyz
-    description: Hosted sandbox — API key issued on request under Phase 0 (NDA)
 paths:
   /v1/verify:
     post:

@@ -2,9 +2,12 @@
 
 A governance and comprehension environment for Shariah boards supervising on-chain policy.
 
-**This repository contains Stage One only: the record, the explanations, and the technological
-briefings. It is read only. It carries no voting and no signing authority, and there is deliberately
-no API route by which a rule can be created, amended or approved.**
+**Current implementation: Stage Two application-level governance writes.** Authenticated member
+routes support matters, deliberation, operative parameters, source records, reasoned voting,
+objections, quorum/lifecycle progression, meetings and audit exports. These are application records
+using illustrative seed data, not production governance or legal authority. Stage Three signing is
+not implemented: Majlis does not submit Registry writes, and a password or parameter hash is not a
+cryptographic signature authorising an on-chain policy change.
 
 ---
 
@@ -40,15 +43,16 @@ comparison rather than to testimony. See [`server/src/services/hash.ts`](server/
 
 ---
 
-## What is in Stage One
+## What the current prototype demonstrates
 
 | | |
 |---|---|
-| **Matters** | Each with a plain-language brief, the operative parameters, what is *not* being decided, the mechanism, the simulation, and the deliberation record. |
-| **Rules in force** | Every rule with its parameters, its hash, and a live verification that the two still match. |
-| **Briefings** | A standing brief on technological change: what changed, why, which rules it touches, and a question for the board — never a conclusion. |
-| **Assistant** | Explains mechanism in ordinary language, with sources. Structurally prevented from giving rulings. See [`docs/ASSISTANT-RULES.md`](docs/ASSISTANT-RULES.md). |
-| **Record** | Retained explanations, and a one-action audit export with an integrity hash. |
+| **Matters and deliberation** | Authenticated application routes create proposals, record reasoning/sources, set proposed parameters and move matters through lifecycle states. |
+| **Voting and objections** | Per-member credentials attribute votes with reasons; signatory thresholds and objection/timelock stages are application rules. A completed `in_force` state is not an on-chain Registry update. |
+| **Rules and parameter hashes** | Canonical parameters are hashed and can be verified against the application record. The hash is an integrity commitment, not a signature or Registry transaction. |
+| **Meetings and records** | Meeting, attendance, minutes, decision history and audit export features support a traceable application record; external notices are not sent unless a delivery channel is configured. |
+| **Assistant and readings** | Optional comprehension features have explicit configuration boundaries; contract readings must not be mistaken for a ruling. See [`docs/ASSISTANT-RULES.md`](docs/ASSISTANT-RULES.md). |
+| **On-chain signing** | **Not implemented.** No verified governance-to-Registry signature or transaction path exists; seed boards, members, votes and history are illustrative demo data. |
 
 Three languages at launch — English, Arabic, Urdu — with full right-to-left support.
 
@@ -125,9 +129,9 @@ any production use.
 
 | Stage | Content |
 |---|---|
-| **One** *(this repository)* | Record, explanations, briefings. Read only. Useful to a board that has taken on no obligation. |
-| Two | Matters, briefs, simulation and deliberation. Votes recorded; signing still outside the system. |
-| Three | The vote becomes the signature. Threshold signing moves into Majlis. |
+| One | Record, explanations and briefings; read-only foundation. |
+| **Two** *(current implementation)* | Matters, deliberation, votes, objections, meetings and lifecycle; signing remains outside the system. |
+| Three | Proposed future work: the vote becomes a cryptographic signature authorising a precisely bound Registry change. |
 | Four | Multiple boards, cross-reference between them, published reference from the accumulated record. |
 
 The principal risk is not technical. It is that scholars find it burdensome and do not use it, at

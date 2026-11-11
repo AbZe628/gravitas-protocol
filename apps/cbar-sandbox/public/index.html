@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f3f2ed">
+  <title>Gravitas — CBAR Technical Review Sandbox</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="wordmark" href="#overview" aria-label="Gravitas review home"><span class="mark" aria-hidden="true">G</span><span>GRAVITAS <small>TECHNICAL REVIEW</small></span></a>
+    <div class="topbar-meta"><span class="tag tag-read">READ-ONLY REVIEW</span><span class="version">CBAR sandbox · v0.1</span></div>
+  </header>
+  <div class="shell">
+    <aside class="rail">
+      <p class="rail-label">REVIEW SECTIONS</p>
+      <nav aria-label="Review sections">
+        <a class="active" href="#overview">01 <span>Overview</span></a>
+        <a href="#architecture">02 <span>Architecture</span></a>
+        <a href="#diagrams">03 <span>Diagrams</span></a>
+        <a href="#governance">04 <span>Majlis governance</span></a>
+        <a href="#registry">05 <span>Policy Registry</span></a>
+        <a href="#teleport">06 <span>Teleport V2 / V3</span></a>
+        <a href="#atomicity">07 <span>Atomicity lab</span></a>
+        <a href="#testing">08 <span>Test catalogue</span></a>
+        <a href="#limitations">09 <span>Limitations</span></a>
+        <a href="#sources">10 <span>Evidence & sources</span></a>
+      </nav>
+      <div class="rail-note"><span class="dot"></span><div><strong>Current branch</strong><code>cbar-azerbaijan-sandbox</code><small>Base · 692022e1</small></div></div>
+    </aside>
+
+    <main id="overview">
+      <section class="hero">
+        <div class="eyebrow">INSTITUTIONAL TECHNICAL EVALUATION · 11 NOV 2026</div>
+        <h1>Policy-aware execution,<br><em>open to inspection.</em></h1>
+        <p class="lead">A reviewer environment for examining the Gravitas Policy Registry, Majlis governance application, and same-chain liquidity migration contracts against source, tests and read-only deployment state.</p>
+        <div class="hero-tags"><span class="tag tag-live">LIVE / DEPLOYED — READ-ONLY</span><span class="tag tag-local">LOCAL EVM — TESTS</span><span class="tag tag-sim">SIMULATED — FIXTURES</span><span class="tag tag-proposed">PROPOSED — FUTURE WORK</span><span class="tag tag-caution">NOT AUDITED</span></div>
+      </section>
+
+      <section class="notice" role="note"><strong>Scope boundary</strong><p>This is an exploratory technical review package, not a CBAR application or endorsement. Gravitas has no Azerbaijan-registered legal entity. No KYC, sanctions-screening, accreditation or investor-eligibility feature is implemented. The local UI and test fixtures are not production services.</p></section>
+
+      <section class="section-head" id="architecture"><div><p class="eyebrow">01 / SYSTEM MAP</p><h2>Human decisions and machine checks are separate layers.</h2></div><a class="text-link" href="/docs/CBAR_ARCHITECTURE.md">Architecture note ↗</a></section>
+      <div class="architecture">
+        <div class="arch-node"><span class="tag tag-sim">SIMULATED / APP</span><strong>Majlis</strong><p>Proposal, deliberation, votes, application quorum and decision records.</p></div>
+        <div class="arch-arrow" aria-hidden="true">···→</div>
+        <div class="arch-node"><span class="tag tag-live">LIVE / TESTNET</span><strong>Policy Registry</strong><p>Owner-set asset/router/executor flags, pause state, version and policy hash.</p></div>
+        <div class="arch-arrow" aria-hidden="true">→</div>
+        <div class="arch-node"><span class="tag tag-local">LOCAL TEST</span><strong>Teleport V2 / V3</strong><p>Caller contracts check Registry and execute same-chain liquidity operations.</p></div>
+        <div class="arch-arrow" aria-hidden="true">→</div>
+        <div class="arch-node"><span class="tag tag-local">LOCAL TEST</span><strong>Receipt + evidence</strong><p>Transaction result, contract events and reproducible state assertions.</p></div>
+      </div>
+      <p class="diagram-caption">The dashed connection is not implemented: Majlis has no verified governance-to-Registry transaction path. A Registry flag affects only callers that actually query it; it does not intercept arbitrary token transfers.</p>
+
+      <section class="section-head" id="diagrams"><div><p class="eyebrow">02 / SYSTEM DIAGRAMS</p><h2>Ten diagrams, each labelled by what is live, local, simulated or proposed.</h2></div></section>
+      <div class="two-col diagram-gallery">
+        <figure class="panel diagram-figure"><a href="/diagrams/system-architecture.png" target="_blank" rel="noopener noreferrer"><img class="diagram-image" src="/diagrams/system-architecture.png" alt="System architecture showing the absent Majlis-to-Registry handoff"></a><figcaption class="fine">System architecture — dashed Majlis handoff is proposed only.</figcaption></figure>
+        <figure class="panel diagram-figure"><a href="/diagrams/majlis-registry-boundary.png" target="_blank" rel="noopener noreferrer"><img class="diagram-image" src="/diagrams/majlis-registry-boundary.png" alt="Majlis application governance boundary and Registry owner-controlled writes"></a><figcaption class="fine">Majlis and Registry boundary — application decision is not an on-chain write.</figcaption></figure>
+        <figure class="panel diagram-figure"><a href="/diagrams/policy-enforcement.png" target="_blank" rel="noopener noreferrer"><img class="diagram-image" src="/diagrams/policy-enforcement.png" alt="Policy Registry checks in caller contracts"></a><figcaption class="fine">Policy enforcement — caller contracts check flags; the Registry is not a global token interceptor.</figcaption></figure>
+        <figure class="panel diagram-figure"><a href="/diagrams/signed-intent.png" target="_blank" rel="noopener noreferrer"><img class="diagram-image" src="/diagrams/signed-intent.png" alt="Teleport V3 EIP-712 signed intent execution sequence"></a><figcaption class="fine">Signed Intent — separate from Majlis governance approvals.</figcaption></figure>
+        <figure class="panel diagram-figure"><a href="/diagrams/teleport-v3-lifecycle.png" target="_blank" rel="noopener noreferrer"><img class="diagram-image" src="/diagrams/teleport-v3-lifecycle.png" alt="Teleport V3 liquidity position migration lifecycle"></a><figcaption class="fine">Teleport V3 — same-chain position migration using local mocks in tests.</figcaption></figure>
+        <figure class="panel diagram-figure"><a href="/diagrams/atomicity.png" target="_blank" rel="noopener noreferrer"><img class="diagram-image" src="/diagrams/atomicity.png" alt="Success path and transaction rollback after an induced failure"></a><figcaption class="fine">Atomicity — the demonstrated rollback scope is one EVM transaction.</figcaption></figure>
+        <figure class="panel diagram-figure"><a href="/diagrams/sandbox-environments.png" target="_blank" rel="noopener noreferrer"><img class="diagram-image" src="/diagrams/sandbox-environments.png" alt="Mock, local EVM, live read-only and gated testnet-write environments"></a><figcaption class="fine">Environment separation — testnet writes disabled by default.</figcaption></figure>
+        <figure class="panel diagram-figure"><a href="/diagrams/reviewer-workflow.png" target="_blank" rel="noopener noreferrer"><img class="diagram-image" src="/diagrams/reviewer-workflow.png" alt="Independent reviewer workflow from source inspection to evidence capture"></a><figcaption class="fine">Reviewer workflow — source, local execution, state comparison and read-only testnet.</figcaption></figure>
+        <figure class="panel diagram-figure"><a href="/diagrams/evidence-architecture.png" target="_blank" rel="noopener noreferrer"><img class="diagram-image" src="/diagrams/evidence-architecture.png" alt="Evidence architecture mapping source, tests, RPC, explorer and official sources"></a><figcaption class="fine">Evidence architecture — screenshots are corroboration, not sole proof.</figcaption></figure>
+        <figure class="panel diagram-figure"><a href="/diagrams/institutional-roadmap.png" target="_blank" rel="noopener noreferrer"><img class="diagram-image" src="/diagrams/institutional-roadmap.png" alt="Conditional exploratory roadmap for a possible future institutional evaluation"></a><figcaption class="fine">Institutional roadmap — conditional; no open cycle, entity, partner or application claim.</figcaption></figure>
+      </div>
+
+      <section class="section-head" id="registry"><div><p class="eyebrow">03 / DEPLOYED STATE</p><h2>Arbitrum Sepolia · current read-only snapshot</h2><p class="subhead">A point-in-time view from a public RPC. It is not a second-provider verification or bytecode-to-commit equivalence check.</p></div><button class="button" id="refresh" type="button">Refresh live reads</button></section>
+      <div class="read-status" id="read-status" role="status" aria-live="polite"><span class="spinner"></span> Requesting read-only state…</div>
+      <div id="network-card" class="network-card" hidden></div>
+      <div id="contracts-grid" class="contracts-grid"></div>
+      <div id="snapshot-error" class="error-card" hidden></div>
+      <div class="subsection"><div class="subsection-head"><div><p class="eyebrow">REGISTRY FLAG LOOKUP</p><h3>Inspect one address</h3></div><span class="tag tag-read">READ ONLY</span></div><p>Queries the Registry's asset, router or executor flag. It is not an identity, sanctions, KYC or eligibility check.</p><form id="flag-form"><label for="flag-kind">Registry flag</label><select id="flag-kind"><option value="asset">Asset compliance flag</option><option value="router">Router authorization</option><option value="executor">Executor authorization</option></select><label for="flag-address">EVM address</label><input id="flag-address" inputmode="text" autocomplete="off" placeholder="0x…" pattern="0x[0-9a-fA-F]{40}" required><button class="button button-secondary" type="submit">Read Registry flag</button></form><pre id="flag-result" class="result-box" hidden></pre></div>
+
+      <section class="section-head" id="governance"><div><p class="eyebrow">04 / HUMAN GOVERNANCE</p><h2>Majlis records governance activity; it does not submit Registry updates.</h2></div><a class="text-link" href="/docs/PHASE1_REPOSITORY_AUDIT.md">Phase 1 audit ↗</a></section>
+      <div class="two-col">
+        <article class="panel"><span class="tag tag-local">IMPLEMENTED · APPLICATION</span><h3>What the code can demonstrate</h3><p>Authenticated matter/proposal routes, reasoning and vote records, role checks, a signatory quorum calculation, lifecycle progression, objections, expiry and application-level timelock handling, canonical parameter hashing and sealed decision records.</p><p class="fine">Relevant evidence: Majlis server governance/lifecycle/signature services and focused tests. Test data is seeded demonstration data.</p></article>
+        <article class="panel panel-caution"><span class="tag tag-proposed">NOT IMPLEMENTED · ON-CHAIN HANDOFF</span><h3>What it cannot claim</h3><p>A completed Majlis vote does not create a verified Ethereum signature that submits policy parameters to the deployed Registry. A parameter hash is not an approval signature. The “in force” application status is not proof of on-chain enactment.</p><p class="fine">No real institutional members, votes, mandates or board records are represented here.</p></article>
+      </div>
+      <article class="panel"><span class="tag tag-sim">RUNNABLE APP · SIMULATED BOARD DATA</span><h3>Explore the Stage Two application workflow</h3><p>Majlis is a separate local web application. Its seed board and decisions are illustrative. Use it to inspect the application-level matter, deliberation, voting, objection and lifecycle workflow; do not interpret any seed outcome as a real board decision or Registry write.</p><div class="command-box"><code>cd apps/majlis &amp;&amp; npm ci &amp;&amp; npm run dev</code><button type="button" class="copy" data-copy="cd apps/majlis && npm ci && npm run dev">Copy</button></div><p><a class="text-link" href="http://127.0.0.1:5173" target="_blank" rel="noopener noreferrer">Open local Majlis UI (when running) ↗</a></p><p class="fine">Run only on an isolated local workstation; development authentication/configuration is not a production security setup. See the Majlis README and `.env.example`.</p></article>
+
+      <section class="section-head" id="teleport"><div><p class="eyebrow">05 / EXECUTION CONTRACTS</p><h2>Two bounded DeFi operations, not a payment network.</h2></div><a class="text-link" href="https://sepolia.arbiscan.io/address/0xEDfF3dFdcdd7C04B11d9B614D5e0cd368f1e93c0" target="_blank" rel="noopener noreferrer">V2 on Arbiscan ↗</a></section>
+      <div class="two-col">
+        <article class="panel"><span class="tag tag-local">TELEPORT V2</span><h3>V2-style liquidity migration</h3><p>Burns caller-provided LP tokens, then adds the resulting same pair through an authorized V2-compatible router; checks Registry executor/router/assets; enforces a cooldown and max LP-share movement; returns defined dust.</p><p class="fine">No cross-chain messaging, bridge, swap path or deployed V2 DEX route on Arbitrum Sepolia was established in the audit.</p></article>
+        <article class="panel"><span class="tag tag-local">TELEPORT V3</span><h3>Signed NFT position migration</h3><p>Uses an EIP-712 intent with chain/contract domain separation, owner/signature verification, nonce and deadline, removes and collects a V3 position, optionally performs a bounded single-hop rebalance, then mints a new position and refunds defined excess.</p><p class="fine">Tests cover modified fields, wrong signer, replay and expiry. Dedicated wrong-chain-ID and wrong-verifying-contract negative cases remain NOT EXECUTED. Local tests use deterministic mocks; not a live Uniswap fork.</p><a class="text-link" href="https://github.com/AbZe628/gravitas-protocol/blob/692022e1ca34a280f90a198d2455ac3535b3bce2/contracts/TeleportV3.sol" target="_blank" rel="noopener noreferrer">TeleportV3.sol at audited baseline ↗</a></article>
+      </div>
+
+      <section class="section-head" id="atomicity"><div><p class="eyebrow">06 / LOCAL EVM ATOMICITY LAB</p><h2>Execute two fixed tests and inspect the real Foundry output.</h2><p class="subhead">These buttons run allow-listed commands against local test fixtures only. No RPC transaction, wallet, private key or testnet write is involved.</p></div><a class="text-link" href="/docs/CBAR_TEST_PLAN.md">T26–T30 evidence ↗</a></section>
+      <div class="two-col">
+        <article class="panel"><span class="tag tag-local">LOCAL EVM · T26</span><h3>Successful V3 execution</h3><p>Runs the repository's no-swap and bounded-swap full migration tests. Review the assertions and events in the returned Foundry output.</p><button class="button run-local-test" data-test-id="T26" type="button">Run T26 success tests</button></article>
+        <article class="panel panel-caution"><span class="tag tag-local">LOCAL EVM · T27 / T28</span><h3>Induced late refund failure</h3><p>A token returns false during a late refund after earlier operations were provisionally executed. The test compares source NFT owner/liquidity, user token balances and nonce with their initial values after the revert.</p><button class="button run-local-test" data-test-id="T27" type="button">Run T27 rollback test</button></article>
+      </div>
+      <div class="read-status" id="local-test-status" role="status" aria-live="polite">Foundry must be installed and available on PATH. A local test failure is shown as FAIL, not converted into a success.</div>
+      <pre id="local-test-output" class="result-box" hidden></pre>
+
+      <section class="section-head" id="testing"><div><p class="eyebrow">07 / INDEPENDENT TESTING</p><h2>Test results are tied to commands and source.</h2></div><a class="text-link" href="/docs/CBAR_TEST_PLAN.md">Full catalogue ↗</a></section>
+      <div class="test-summary"><div><strong>86</strong><span>Foundry tests passed</span><small>Solidity 0.8.24 · local tests</small></div><div><strong>488</strong><span>Majlis tests passed</span><small>56 files · Vitest</small></div><div><strong>NOT RUN</strong><span>SDK package check</span><small>Vitest missing in package environment</small></div></div>
+      <p class="fine">These are base-commit test results, not live testnet transactions. The detailed 36-case catalogue marks unsupported or separately unexecuted cases accordingly. No result is inferred from this page loading.</p>
+      <div class="command-box"><code>forge fmt --check &amp;&amp; forge build --sizes &amp;&amp; forge test -vv</code><button type="button" class="copy" data-copy="forge fmt --check && forge build --sizes && forge test -vv">Copy</button></div>
+      <div class="command-box"><code>cd apps/majlis &amp;&amp; npm ci &amp;&amp; npm run typecheck &amp;&amp; npm test &amp;&amp; npm run build</code><button type="button" class="copy" data-copy="cd apps/majlis && npm ci && npm run typecheck && npm test && npm run build">Copy</button></div>
+
+      <section class="section-head" id="limitations"><div><p class="eyebrow">08 / LIMITATIONS</p><h2>Evaluation boundaries matter.</h2></div></section>
+      <div class="limit-list">
+        <div><b>01</b><p><strong>No KYC or eligibility.</strong> Registry address/token/router/executor flags are allow-lists, not identity verification, AML screening, sanctions controls or investor qualification.</p></div>
+        <div><b>02</b><p><strong>No Azerbaijan legal entity.</strong> No local eligibility or sandbox application is claimed; the third-cycle application period has passed.</p></div>
+        <div><b>03</b><p><strong>Not an audit.</strong> This is an internal technical review. No independent security audit or security certification is claimed.</p></div>
+        <div><b>04</b><p><strong>Timelock ownership gap.</strong> The deployed Registry's observed owner is a separate EOA, not the deployed Timelock; Registry pending owner read as zero.</p></div>
+        <div><b>05</b><p><strong>Atomicity is bounded.</strong> A revert rolls back a single EVM transaction; it does not eliminate market, oracle, liquidity, governance, smart-contract, legal risk or all gharar.</p></div>
+      </div>
+
+      <section class="section-head" id="sources"><div><p class="eyebrow">09 / EVIDENCE</p><h2>Inspect the source, not just the presentation.</h2></div></section>
+      <div class="source-links"><a href="/docs/CBAR_TECHNICAL_PROPOSAL.md">Technical proposal <span>System, use cases, testing and pathway ↗</span></a><a href="/docs/CBAR_EXECUTIVE_BRIEF.md">Executive brief <span>Exploratory discussion summary ↗</span></a><a href="/docs/CBAR_REVIEWER_GUIDE.md">Reviewer guide <span>Clean checkout and reproduction commands ↗</span></a><a href="/docs/CBAR_TEST_PLAN.md">36-case test catalogue <span>Expected/actual/status/evidence ↗</span></a><a href="/docs/CBAR_TEST_RESULTS.md">Test results <span>Passes, limits and not-executed checks ↗</span></a><a href="/docs/CBAR_EVIDENCE_INDEX.md">Evidence index <span>Claims, tests, RPC and official sources ↗</span></a><a href="/docs/CBAR_ARCHITECTURE.md">Architecture note <span>Components and absent handoffs ↗</span></a><a href="/docs/CBAR_SECURITY_REVIEW.md">Internal security review <span>Findings and non-audit caveat ↗</span></a><a href="/docs/CBAR_REGULATORY_CONSIDERATIONS.md">Regulatory considerations <span>Official-source status and use-case matrix ↗</span></a><a href="/docs/CBAR_KNOWN_LIMITATIONS.md">Known limitations <span>Technical, legal and operational boundaries ↗</span></a><a href="/docs/CBAR_ROADMAP.md">Conditional roadmap <span>No application or endorsement implied ↗</span></a><a href="/docs/CBAR_INVESTOR_BRIEF.md">Separate investor brief <span>Not part of regulatory package ↗</span></a><a href="/docs/CBAR_COMMUNICATION_PACKAGE.md">Communication drafts <span>Email, LinkedIn, follow-ups, agenda and FAQ — not sent ↗</span></a><a href="https://sandbox.cbar.az/en/" target="_blank" rel="noopener noreferrer">CBAR Regulatory Sandbox <span>Official portal ↗</span></a></div>
+      <footer><span>Internal technical review — not an independent security audit.</span><span>Source baseline · <code>692022e1ca34</code></span></footer>
+    </main>
+  </div>
+</body>
+</html>

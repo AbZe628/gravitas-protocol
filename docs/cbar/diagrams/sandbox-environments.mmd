@@ -1,0 +1,15 @@
+flowchart TB
+  R[Independent reviewer]
+  R --> M[Environment 1: MOCK MODE<br/>fixture data · SIMULATED]
+  R --> L[Environment 2: LOCAL EVM<br/>Anvil/Foundry tests · LOCAL TEST]
+  R --> S[Environment 3: Arbitrum Sepolia<br/>public RPC + explorer · READ ONLY]
+  R -. only after safety gates .-> W[Environment 4: Testnet writes<br/>DISABLED by default]
+  M --> UI[Reviewer interface]
+  L --> T[Actual local transactions and assertions]
+  S --> Q[eth_call / eth_getCode snapshot]
+  W --> G{All safety gates and approvals satisfied?}
+  G -->|No| NO[Do not enable; remain read-only]
+  G -->|Yes| AUTH[Separately authorized operation]
+  style W fill:#f6eddb,stroke:#8a5b0d
+  style NO fill:#f7e8e4,stroke:#9b352a
+  style M fill:#f0ebf1,stroke:#6a596f

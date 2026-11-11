@@ -1,0 +1,24 @@
+sequenceDiagram
+  autonumber
+  participant U as Position owner
+  participant W as Wallet test signer
+  participant T as TeleportV3
+  participant R as Policy Registry
+  participant P as V3 Position Manager
+  participant S as Optional single-hop router
+  U->>W: Define position output minima deadline and swap bounds
+  W->>W: Sign EIP-712 intent with chain and contract domain
+  U->>T: Call executeAtomicMigration with parameters and signature
+  T->>T: Check deadline owner signature and per-owner nonce
+  T->>R: Read executor and asset policy
+  alt Intent or Registry guard fails
+    T-->>U: Revert and roll back the transaction
+  else Guards pass
+    T->>P: Decrease and remove liquidity then collect tokens
+    opt Optional rebalance
+      T->>S: Single-hop swap with signed minimum output
+    end
+    T->>P: Mint destination position to original owner
+    T->>T: Refund defined excess and consume nonce
+    T-->>U: Return new position ID and emit event
+  end

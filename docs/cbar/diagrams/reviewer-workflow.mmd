@@ -1,0 +1,16 @@
+flowchart TB
+  A[Clone branch with submodules] --> B[Read reviewer guide and environment labels]
+  B --> C[Inspect source ABI and limitations]
+  C --> D[Run local unit and Foundry tests]
+  D --> E[Deploy local fixtures or use existing local setup]
+  E --> F[Run success scenario]
+  E --> G[Induce a late failure]
+  G --> H[Compare state before and after revert]
+  F --> I[Save receipt logs and state evidence]
+  H --> I
+  I --> J[Inspect testnet state independently using read-only calls]
+  J --> K[Record provider block selectors and caveats]
+  K --> L[Separate verified facts from proposals]
+  style G fill:#f6eddb,stroke:#8a5b0d
+  style I fill:#e5eee9,stroke:#174d3b
+  style L fill:#e8eef2,stroke:#36546c

@@ -1,0 +1,36 @@
+# Terminal Full Output
+# Terminal: cbar-final-sdk
+# Command: set -euo pipefail
+mkdir -p /home/ubuntu/gravitas-protocol-cbar/evidence/cbar
+npm ci
+npm test
+npm run build
+# PID: 31261
+# Timestamp: 2026-11-11_18-07-41.007953
+# Original Length: 1124 characters
+# ----------------------------------------
+
+[32mubuntu@sandbox:~$ [0mset -euo pipefail
+mkdir -p /home/ubuntu/gravitas-protocol-cbar/evidence/cbar
+npm ci
+npm test
+npm run build
+added 63 packages, and audited 64 packages in 6s
+29 packages are looking for funding
+  run `npm fund` for details
+[31m[1m4[22m[39m vulnerabilities (2 [33m[1mmoderate[22m[39m, 2 [31m[1mhigh[22m[39m)
+To address all issues, run:
+  npm audit fix
+Run `npm audit` for details.
+> @gravitas/sdk@2.0.0 test
+> vitest run
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.11 [39m[90m/home/ubuntu/gravitas-protocol-cbar/gravitas-sdk
+ [32m✓[39m test/builder.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 14[2mms
+[22m[39m [32m✓[39m test/compliance.test.ts [2m([22m[2m15 tests[22m[2m)[22m[32m 18[2mms
+[22m[39m[2m Test Files [22m [1m[32m2 passed[39m[22m[90m (2)
+[39m[2m      Tests [22m [1m[32m20 passed[39m[22m[90m (20)
+[39m[2m   Start at [22m 18:07:33
+[2m   Duration [22m 678ms[2m (transform 225ms, setup 0ms, import 914ms, tests 33ms, environment 0ms)
+> @gravitas/sdk@2.0.0 build
+> tsc
+[32mubuntu@sandbox:~/gravitas-protocol-cbar/gravitas-sdk$ [0m

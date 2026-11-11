@@ -1,0 +1,33 @@
+{
+  "base": {
+    "auto_apply": true,
+    "conflict_group": "document-base",
+    "id": "markdown-entry",
+    "kind": "asset",
+    "ownership": "global",
+    "path": "assets/markdown-entry.typ",
+    "reason": "Existing Markdown source.",
+    "status": "ready"
+  },
+  "catalog_version": "2026-07-17-affiliated-formats-v3",
+  "channel": "typst-pdf",
+  "confirmation_candidates": [],
+  "enhancements": [],
+  "exclusions": [],
+  "fingerprint": "sha256:ebc807f0270e236ee107fde074c6569f755419c2482396521a8535724b9f48f3",
+  "next_action": "minimal-compile-preflight",
+  "optional_idea": null,
+  "question": null,
+  "reused": false,
+  "schema_version": 1,
+  "state": "ready",
+  "style_owner": "markdown-entry",
+  "typst_version": "typst 0.15.1 (9dfd3a08)",
+  "minimum_compile_preflight": {
+    "entry": "main.typ",
+    "status": "PASS",
+    "strict": true,
+    "warnings": 0,
+    "imports": ["report-theme.typ", "@preview/cmarker:0.1.10", "@preview/mitex:0.2.7"]
+  }
+}

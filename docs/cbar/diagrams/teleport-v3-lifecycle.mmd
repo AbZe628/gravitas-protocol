@@ -1,0 +1,19 @@
+flowchart TD
+  A[Owner's source V3 NFT] --> B[Validate owner, signature, deadline and nonce]
+  B --> C[Read Registry executor / asset guards]
+  C --> D[Decrease liquidity and collect tokens]
+  D --> E[Burn source position]
+  E --> F{Signed intent requests one-hop rebalance?}
+  F -->|Yes| G[Execute bounded swap through configured router]
+  F -->|No| H[Keep collected token pair]
+  G --> I[Mint new V3 position to original owner]
+  H --> I
+  I --> J[Refund defined residual balances; emit event]
+  C -. guard fails .-> R[Revert whole transaction]
+  D -. late external-call failure .-> R
+  G -. swap or slippage failure .-> R
+  I -. mint failure .-> R
+  R --> Z[State changes in that transaction roll back]
+  MOCK[Local suite uses deterministic mocks] -. testing environment .-> D
+  style R fill:#f7e8e4,stroke:#9b352a
+  style MOCK fill:#f0ebf1,stroke:#6a596f

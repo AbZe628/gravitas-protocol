@@ -1,0 +1,17 @@
+{
+  "task_kind": "new-document",
+  "output": "pdf",
+  "signals": [],
+  "hard_constraints": [
+    "English institutional technical evaluation report",
+    "Target 30–40 pages with substantive content, not padding",
+    "Include all ten accurate diagrams and clearly label proposed or simulated flows",
+    "Clearly disclose technical, regulatory, legal and security limitations",
+    "No Manus or AI attribution"
+  ],
+  "content_features": {
+    "code_blocks": 12,
+    "defined_terms": 20,
+    "portrait_images": 0
+  }
+}

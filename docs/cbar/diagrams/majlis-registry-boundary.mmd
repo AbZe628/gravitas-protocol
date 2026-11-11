@@ -1,0 +1,13 @@
+flowchart TD
+  U[Authenticated application user] --> P[Create proposal / matter]
+  P --> D[Deliberation, reasoning and votes]
+  D --> Q[Application-level quorum and lifecycle checks]
+  Q -->|if passed| A[Application decision record / seal]
+  A --> H[Canonical parameter hash]
+  H --> N{{No verified EIP-712 governance signature<br/>or Registry transaction writer}}
+  N -. future proposal only .-> R[Policy Registry owner-controlled setters]
+  R --> C[Caller contracts can read policy flags]
+  C --> V[Teleport V2 / V3 checks]
+  SEED[Seeded boards, members and votes<br/>SIMULATED] -. demo data .-> P
+  style N fill:#f6eddb,stroke:#8a5b0d,color:#422e0b
+  style SEED fill:#f0ebf1,stroke:#6a596f

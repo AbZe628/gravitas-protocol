@@ -1,0 +1,9 @@
+{
+  "entry": "main.typ",
+  "mode": "markdown",
+  "source": {
+    "original_path": "/home/ubuntu/gravitas-protocol-cbar/docs/cbar/CBAR_INVESTOR_BRIEF.md",
+    "prepared_path": "source.md"
+  },
+  "theme": "report-theme.typ"
+}

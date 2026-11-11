@@ -1,0 +1,21 @@
+flowchart LR
+  subgraph SUCCESS[LOCAL TEST — SUCCESS]
+    S0[Initial balances / NFT / nonce] --> S1[Registry and signature checks]
+    S1 --> S2[Remove source position]
+    S2 --> S3[Optional swap]
+    S3 --> S4[Mint destination position]
+    S4 --> S5[Final state + receipt/events]
+  end
+  subgraph REVERT[LOCAL TEST — INDUCED LATE FAILURE]
+    F0[Initial balances / NFT / nonce] --> F1[Checks pass]
+    F1 --> F2[Earlier calls execute provisionally]
+    F2 --> F3[Late call reverts]
+    F3 --> F4[Transaction revert]
+    F4 --> F5[State equals initial state]
+  end
+  NOTE[One EVM transaction only; does not remove market, oracle, contract, governance, legal risk or all gharar]
+  S5 -. bounded claim .-> NOTE
+  F5 -. bounded claim .-> NOTE
+  style F3 fill:#f7e8e4,stroke:#9b352a
+  style F5 fill:#e5eee9,stroke:#174d3b
+  style NOTE fill:#f6eddb,stroke:#8a5b0d

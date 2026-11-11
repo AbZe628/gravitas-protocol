@@ -9,10 +9,10 @@
  * the same policy semantics enforced on-chain by
  * GravitasPolicyRegistry (Arbitrum Sepolia, source-verified).
  *
- * This mock is for PoC evaluation only. Hosted sandbox keys are
- * issued under Phase 0 of the partnership (NDA).
+ * This is a local fixture mock only. It does not implement API-key
+ * authentication and is not a hosted or production service.
  *
- *   npm install && npm start        →  http://localhost:8787
+ *   npm ci && npm start             →  http://127.0.0.1:8787
  */
 const express = require("express");
 const fs = require("fs");
@@ -102,6 +102,6 @@ app.post("/v1/verify", (req, res) => {
 
 app.get("/v1/policies", (_req, res) => res.json(policySet));
 
-app.listen(PORT, () =>
-  console.log(`Gravitas mock sandbox listening on http://localhost:${PORT}  (policy set: ${policySet.policySetId})`)
+app.listen(PORT, "127.0.0.1", () =>
+  console.log(`Gravitas mock sandbox listening on http://127.0.0.1:${PORT}  (policy set: ${policySet.policySetId})`)
 );

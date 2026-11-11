@@ -1,88 +1,41 @@
-# Gravitas Integration Kit
+# Gravitas Integration Kit — local evaluation only
 
-**Pre-execution Shariah-compliance verification for payment orchestration.**
-Everything an integrating engineering team needs to evaluate the Gravitas
-Compliance API — spec, runnable mock sandbox, client examples, and the full
-PoC scope — with no meetings and no external dependencies.
+This directory contains an OpenAPI draft, a fixture-backed mock compliance API and a small request client. It is an illustrative local PoC, not a hosted service, regulated integration, Shariah ruling, customer deployment or production compliance control.
 
-> Status: **sandbox / testnet**. On-chain source of truth is source-verified on
-> Arbitrum Sepolia. Production integrations follow the independent tier-1
-> security audit (CertiK / Trail of Bits) — nothing ships to mainnet before it.
+## Verified contents
 
-## The flow
+- `openapi/gravitas-compliance-api.yaml` describes the proposed request and response contract.
+- `mock-server/` runs an Express service over `policies/sandbox-policies.json`. It binds to `127.0.0.1` by default and appends synthetic requests to a local JSONL file.
+- `sdk-examples/verify-client.ts` sends six scenarios to the local mock. Their `PASS` results prove only that the fixture decisions match the expected sample outcomes.
+- `sdk-examples/onchain-read.ts` is a separate read-only example. It does not make the fixture API read the live Registry.
 
-```mermaid
-sequenceDiagram
-    participant O as Orchestrator (your payment / settlement system)
-    participant G as Gravitas Compliance API
-    participant R as PolicyRegistry (on-chain)
-    O->>G: POST /v1/verify {asset, amount, context}
-    G->>G: evaluate active policy set
-    G-->>O: ALLOW | DENY + reason + audit ref
-    O->>O: ALLOW → route · DENY → block + log
-    O-->>R: (optional) trustless cross-check of the decision
+## Run the local scenarios
+
+Terminal 1:
+
+```sh
+cd integration-kit/mock-server
+npm ci
+npm start
 ```
 
-One synchronous call before routing. Default posture is **DENY** — anything not
-explicitly approved by the active policy set is blocked.
+Terminal 2:
 
-> **Reviewing the protocol itself (not just the compliance API)?** See
-> [`PROTOCOL-TESTING.md`](PROTOCOL-TESTING.md) for the trust/custody model — who signs,
-> who executes, what Gravitas controls — the atomic settlement flow, and how to verify
-> every security property yourself. It answers the questions institutional CTOs ask
-> first, so an integration review needs no live call to get started.
-
-## 10-minute quickstart
-
-```bash
-# Terminal 1 — mock sandbox (implements the OpenAPI contract)
-cd mock-server && npm install && npm start        # → http://localhost:8787
-
-# Terminal 2 — run the six Annex-A PoC scenarios (3 ALLOW / 3 DENY)
-cd sdk-examples && npm install && npm run verify  # expect: 6/6 passed
-
-# Optional — trustless on-chain read of the live registry (testnet)
-# (Works out-of-the-box via Sourcify; set ARBISCAN_API_KEY to use Etherscan)
-cd sdk-examples && npm run onchain
+```sh
+cd integration-kit/sdk-examples
+npm ci
+GRAVITAS_API=http://127.0.0.1:8787 npm run verify
 ```
 
-Every verification is appended to `mock-server/audit.log.jsonl` — the audit
-trail format referenced in Annex A.
+The six sample cases are expected to report `6/6 scenarios passed` when the local mock is running. This is simulated evidence from static fixtures; it is not a live API decision, on-chain transaction or proof of financial, legal or Shariah compliance. Requests append to `mock-server/audit.log.jsonl`; remove or archive that local file after a test run.
 
-## Repository map
+## Important boundaries
 
-| Path | What it is |
-|------|-----------|
-| `PROTOCOL-TESTING.md` | **Reviewer guide** — trust/custody model (who signs, who executes, what Gravitas controls), the atomic settlement flow, security properties + how to reproduce each, and how to test the protocol end-to-end |
-| `openapi/gravitas-compliance-api.yaml` | The integration contract — request/response schemas, examples, error semantics |
-| `mock-server/` | Local implementation of the contract; decisions driven by the sandbox policy set |
-| `policies/sandbox-policies.json` | Example policy set: approved assets, prohibited categories (riba / gharar / maysir), inactive-policy case |
-| `sdk-examples/verify-client.ts` | Runs all six PoC scenarios, prints pass/fail |
-| `sdk-examples/onchain-read.ts` | Fetches the **verified ABI from the explorer** and reads the live registry — no trust in any Gravitas server required |
-| `scenarios/poc-test-scenarios.md` | Annex A scenarios + measurable success criteria |
+- No hosted compliance API, API key service, production endpoint, service-level agreement or API availability was verified in this review. The earlier hosted URL and “Phase 0 / NDA” language are not supported by execution evidence and must not be treated as an available service.
+- The OpenAPI draft declares `X-Gravitas-Key` authentication, but the mock server does not enforce API-key authentication. A request header in the example client is ignored by the mock. Do not expose the mock to a shared or public network.
+- The sample policy file labels its network as Arbitrum Sepolia but uses canonical Arbitrum One USDC/WETH addresses for illustrative asset classification. The mock does not query the Registry and its decision must not be represented as an on-chain decision.
+- The mock performs limited request-shape checks, not complete schema validation, identity screening or risk assessment. It does not implement KYC, AML/CFT, sanctions, accreditation, investor eligibility, suitability or beneficial-ownership checks.
+- Registry allow-list flags are not a universal transfer interceptor. Only contracts that check the Registry are gated.
+- No independent security audit or Shariah certification is claimed. Sample classifications are not a religious ruling.
 
-## Verify the chain, not the claims
-
-| Contract | Network | Address |
-|----------|---------|---------|
-| GravitasPolicyRegistry | Arbitrum Sepolia | `0x6f3bfb896DD9964C9c05dA88692bDf1b1b2C3F23` |
-| TeleportV3 (atomic execution engine) | Arbitrum Sepolia | `0x6702C2CE6eD58ca3934eBBd785CaC1De8DCd85B4` |
-
-Both are source-verified. `onchain-read.ts` deliberately pulls the ABI from the
-explorer at runtime — the same path any independent reviewer would take.
-
-## Scope and process
-
-- The full PoC scope, in/out-of-scope list and success criteria live in the
-  partnership proposal, **Annex A**, and in `scenarios/`.
-- Technical questions: **in writing** (email / issues) — answers within 24–48 h
-  with references to code and documentation.
-- Hosted sandbox keys and internal integration documentation are shared under
-  **Phase 0 (NDA)** of the partnership. The protocol repository itself is public
-  and source-verified — verify the chain, not the claims.
-
----
-
-**Gravitas Protocol** — compliance enforced by code.
-Licensed under BUSL-1.1 — see the repository LICENSE.
-Contact: abdusamed@gravitasprotocol.xyz · www.gravitasprotocol.xyz
+See `../docs/cbar/` for the source-backed technical review, limitations and evidence status.

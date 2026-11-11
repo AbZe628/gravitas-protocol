@@ -1,0 +1,32 @@
+# Terminal Full Output
+# Terminal: cbar-final-reviewer-tests
+# Command: set -euo pipefail
+npm test
+node --check server.mjs
+node --check public/app.js
+python3 -m json.tool public/manus-routes.json >/dev/null
+# PID: 31261
+# Timestamp: 2026-11-11_18-07-42.571993
+# Original Length: 902 characters
+# ----------------------------------------
+
+[32mubuntu@sandbox:~$ [0mset -euo pipefail
+npm test
+node --check server.mjs
+node --check public/app.js
+python3 -m json.tool public/manus-routes.json >/dev/null
+> gravitas-cbar-reviewer-sandbox@0.1.0 test
+> node --test
+[32m✔ validates 20-byte EVM addresses and rejects malformed inputs [90m(1.366925ms)
+[39m[39m[32m✔ pads addresses into a 32-byte ABI word [90m(0.587759ms)
+[39m[39m[32m✔ decodes ABI addresses, booleans, and large uint values without precision loss [90m(0.500876ms)
+[39m[39m[32m✔ HTTP interface is read-only for network access and exposes only allow-listed public documentation [90m(79.28097ms)
+[39m[39m[34mℹ tests 4
+[39m[34mℹ suites 0
+[39m[34mℹ pass 4
+[39m[34mℹ fail 0
+[39m[34mℹ cancelled 0
+[39m[34mℹ skipped 0
+[39m[34mℹ todo 0
+[39m[34mℹ duration_ms 363.406342
+[32mubuntu@sandbox:~/gravitas-protocol-cbar/apps/cbar-sandbox$ [0m

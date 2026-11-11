@@ -1,0 +1,29 @@
+flowchart LR
+  subgraph APP[APPLICATION / SIMULATED SEED DATA]
+    M[Majlis governance workflow]
+    H[Canonical parameter hash]
+    M --> H
+  end
+  GAP{{PROPOSED ONLY<br/>No verified on-chain handoff}}
+  H -. no transaction writer .-> GAP
+  GAP -. absent .-> R
+  subgraph CHAIN[ARBITRUM SEPOLIA / LIVE READ ONLY]
+    R[Gravitas Policy Registry]
+    V2[Teleport V2<br/>same-chain LP migration]
+    V3[Teleport V3<br/>signed position migration]
+    TL[GravitasTimelock]
+    V2 -->|Registry checks| R
+    V3 -->|Registry checks| R
+    TL -. owner not handed over .-> R
+  end
+  subgraph TEST[LOCAL EVM / TESTS]
+    F[Foundry suite and test mocks]
+    E[Transaction receipts and assertions]
+    F --> E
+  end
+  V2 -. tested locally .-> F
+  V3 -. tested locally .-> F
+  style GAP fill:#f6eddb,stroke:#8a5b0d,color:#422e0b
+  style R fill:#e5eee9,stroke:#174d3b
+  style V2 fill:#e8eef2,stroke:#36546c
+  style V3 fill:#e8eef2,stroke:#36546c

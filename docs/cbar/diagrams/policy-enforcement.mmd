@@ -1,0 +1,17 @@
+sequenceDiagram
+  autonumber
+  participant O as Registry owner EOA
+  participant R as Policy Registry
+  participant T as Teleport caller contract
+  participant X as DEX manager or router
+  O->>R: Call an owner-only policy setter
+  R->>R: Increment version and record policy hash
+  T->>R: Read executor and asset flags and pause state
+  alt Guard fails or Registry is paused
+    R-->>T: Revert or false policy result
+    T-->>O: Operation is rejected
+  else Guards pass
+    R-->>T: Policy flags accepted
+    T->>X: Execute one-transaction liquidity operation
+    X-->>T: Return result or revert
+  end

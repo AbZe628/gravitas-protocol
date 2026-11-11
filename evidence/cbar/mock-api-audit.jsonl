@@ -1,0 +1,7 @@
+{"ts":"2026-11-11T17:51:50.867Z","requestId":"poc-s1","channel":"orchestrator","asset":{"symbol":"USDC","address":"0xaf88d065e77c8cC2239327C5EDb3A432268e5831"},"amount":"25000.00","decision":"ALLOW","reason":null}
+{"ts":"2026-11-11T17:51:50.882Z","requestId":"poc-s2","channel":"orchestrator","asset":{"symbol":"WETH","address":"0x82aF49447D8a07e3bd95BD0d56f35241523fBab1"},"amount":"3.5000","decision":"ALLOW","reason":null}
+{"ts":"2026-11-11T17:51:50.889Z","requestId":"poc-s3","channel":"orchestrator","asset":{"symbol":"USDC","address":"0xaf88d065e77c8cC2239327C5EDb3A432268e5831"},"amount":"980.00","decision":"ALLOW","reason":null}
+{"ts":"2026-11-11T17:51:50.894Z","requestId":"poc-s4","channel":"orchestrator","asset":{"symbol":"yUSD-INT","category":"interest-bearing"},"amount":"10000.00","decision":"DENY","reason":"R-RIBA-01: Interest-bearing instrument (riba)"}
+{"ts":"2026-11-11T17:51:50.899Z","requestId":"poc-s5","channel":"orchestrator","asset":{"symbol":"CASINO","category":"speculative-gaming"},"amount":"500.00","decision":"DENY","reason":"R-MAYSIR-01: Speculative / gambling-like instrument (maysir)"}
+{"ts":"2026-11-11T17:51:50.903Z","requestId":"poc-s6","channel":"orchestrator","asset":{"symbol":"RANDOM","address":"0x00000000000000000000000000000000000000AA"},"amount":"1.00","decision":"DENY","reason":"DEFAULT-DENY: asset not present in the active policy set"}
+{"ts":"2026-11-11T17:51:51.047Z","requestId":"synthetic-t31","channel":"local-cbar-review","asset":{"symbol":"USDC"},"amount":"1000","decision":"ALLOW","reason":null}

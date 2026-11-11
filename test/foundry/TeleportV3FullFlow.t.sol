@@ -1052,9 +1052,22 @@ contract TeleportV3FullFlowTests is Test {
         });
         bytes memory signature = _signMigrationFor(userPrivateKey, address(tele), params, 0);
 
+        uint256 nonceBefore = tele.nonces(user);
+        uint256 userT0Before = IERC20(t0).balanceOf(user);
+        uint256 userT1Before = IERC20(t1).balanceOf(user);
+        address originalPositionOwner = dustPM.ownerOf(tokenId);
+        (,,,,,,, uint128 liquidityBefore,,,,) = dustPM.positions(tokenId);
+
         vm.prank(executor);
         vm.expectRevert(abi.encodeWithSelector(SafeERC20.SafeERC20FailedOperation.selector, address(liar)));
         tele.executeAtomicMigration(params, signature);
+
+        (,,,,,,, uint128 liquidityAfter,,,,) = dustPM.positions(tokenId);
+        assertEq(tele.nonces(user), nonceBefore, "reverted migration must not consume nonce");
+        assertEq(dustPM.ownerOf(tokenId), originalPositionOwner, "source NFT ownership must be restored");
+        assertEq(liquidityAfter, liquidityBefore, "source liquidity must be restored");
+        assertEq(IERC20(t0).balanceOf(user), userT0Before, "token0 balance must be restored");
+        assertEq(IERC20(t1).balanceOf(user), userT1Before, "token1 balance must be restored");
     }
 
     /**
